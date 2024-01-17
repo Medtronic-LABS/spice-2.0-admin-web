@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { matchPath, NavLink, useLocation } from 'react-router-dom';
-
 import APPCONSTANTS from '../../constants/appConstants';
-import { PROTECTED_ROUTES } from '../../constants/route';
 import sessionStorageServices from '../../global/sessionStorageServices';
 // import { roleSelector } from '../../store/user/selectors';
 
