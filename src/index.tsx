@@ -12,13 +12,14 @@ import { setupInterceptors } from './global/interceptors';
 import ErrorBoundary from './components/errorBoundary/ErrorBoundary';
 import sessionStorageServices from './global/sessionStorageServices';
 import APPCONSTANTS from './constants/appConstants';
+import { addToken } from './store/user/actions';
 
-// const secretToken = sessionStorageServices.getItem(APPCONSTANTS.SECRET_TOKEN);
+const secretToken = sessionStorageServices.getItem(APPCONSTANTS.SECRET_TOKEN);
 
-// if (!!secretToken) {
-//   store.dispatch(addToken(secretToken));
-//   sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, secretToken);
-// }
+if (!!secretToken) {
+  store.dispatch(addToken(secretToken));
+  sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, secretToken);
+}
 sessionStorageServices.deleteItem(APPCONSTANTS.SECRET_TOKEN);
 
 setupInterceptors(store);

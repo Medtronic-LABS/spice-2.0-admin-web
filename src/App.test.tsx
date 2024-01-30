@@ -20,6 +20,7 @@ jest.mock('react-ga', () => ({
 jest.mock('./assets/images/app-logo.svg', () => ({
   ReactComponent: 'Logo'
 }));
+
 describe('App Component', () => {
   beforeEach(() => {
     process.env.REACT_APP_GA_TRACKING_ID = 'UA-220096139-1';

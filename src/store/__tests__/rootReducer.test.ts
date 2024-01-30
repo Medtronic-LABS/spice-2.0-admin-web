@@ -1,21 +1,15 @@
 import { combineReducers } from 'redux';
 import rootReducer from '../rootReducer';
-import regionReducer from '../region/reducer';
 import userReducer from '../user/reducer';
-import superAdminReducer from '../superAdmin/reducer';
 
 describe('rootReducer', () => {
   it('should combine all reducers correctly', () => {
     const appReducer = combineReducers({
-      user: userReducer,
-      region: regionReducer,
-      superAdmin: superAdminReducer
+      user: userReducer
     });
 
     const initialState = {
-      user: {},
-      region: {},
-      superAdmin: {}
+      user: {}
     };
 
     const action = { type: 'SOME_ACTION' };
@@ -28,15 +22,11 @@ describe('rootReducer', () => {
 
   it('should reset the store correctly', () => {
     const appReducer = combineReducers({
-      user: userReducer,
-      region: regionReducer,
-      superAdmin: superAdminReducer
+      user: userReducer
     });
 
     const initialState = {
-      user: {},
-      region: {},
-      superAdmin: {}
+      user: {}
     };
 
     const resetAction = { type: 'RESET_STORE' };

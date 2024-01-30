@@ -3,9 +3,9 @@ import axios, { AxiosResponse } from 'axios';
 import ApiError from './ApiError';
 import ERRORS from '../constants/errors';
 import APPCONSTANTS from '../constants/appConstants';
-// import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/actions';
 import { decryptData } from '../utils/commonUtils';
 import sessionStorageServices from './sessionStorageServices';
+import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/actions';
 
 const responseStatusReturn = (response: AxiosResponse, store: any) => {
   const { status } = response;
@@ -22,8 +22,8 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
         if (response.config.url === '/auth-service/session') {
           throw new ApiError({ name: APPCONSTANTS.LOGIN_FAILED_TITLE, message: response.data.message }, 401);
         } else {
-          // store.dispatch(sessionTimedout(response.data.message || APPCONSTANTS.SESSION_EXPIRED));
-          // store.dispatch(resetStore());
+          store.dispatch(sessionTimedout(response.data.message || APPCONSTANTS.SESSION_EXPIRED));
+          store.dispatch(resetStore());
           throw new ApiError({ name: APPCONSTANTS.ERROR, message: APPCONSTANTS.SESSION_EXPIRED }, 401);
         }
       case 409:
@@ -53,7 +53,7 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
 export const setupInterceptors = (store: any) => {
   axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
   axios.defaults.headers.post['Content-Type'] = 'application/json';
-  axios.defaults.headers.client = 'spice web';
+  axios.defaults.headers.client = 'admin';
   axios.defaults.validateStatus = () => true;
 
   axios.interceptors.request.use(
@@ -62,7 +62,6 @@ export const setupInterceptors = (store: any) => {
       const tenantId = store.getState().user.userTenantId;
       request.headers.Authorization = token ? decryptData(token) : '';
       request.headers.tenantId = tenantId || sessionStorageServices.getItem(APPCONSTANTS.USER_TENANTID) || '0';
-      request.headers['App-Version'] = sessionStorageServices.getItem(APPCONSTANTS.APP_VERSION);
       return request;
     },
     (error: any) => Promise.reject(error)
@@ -76,7 +75,7 @@ export const setupInterceptors = (store: any) => {
   );
 
   // get logged in user while refresh
-  // if (store.getState().user.token) {
-  // store.dispatch(fetchLoggedInUser());
-  // }
+  if (store.getState().user.token) {
+    store.dispatch(fetchLoggedInUser());
+  }
 };

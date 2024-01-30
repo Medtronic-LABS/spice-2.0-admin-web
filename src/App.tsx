@@ -10,14 +10,23 @@ import './App.scss';
 import ErrorBoundary from './components/errorBoundary/ErrorBoundary';
 import sessionStorageServices from './global/sessionStorageServices';
 import APPCONSTANTS from './constants/appConstants';
+import { useSelector } from 'react-redux';
+import {
+  authTokenSelector,
+  getIsLoggedInSelector,
+  getIsLoggingInSelector,
+  getIsLoggingOutSelector,
+  initializingSelector,
+  loadingSelector
+} from './store/user/selectors';
 
 const App = () => {
-  const loggingIn = false;
-  const loggedIn = false;
-  const loggingOut = false;
-  const loading = false;
-  const initializingApp = false;
-  const token = 'test';
+  const loggingIn = useSelector(getIsLoggingInSelector);
+  const loggedIn = useSelector(getIsLoggedInSelector);
+  const loggingOut = useSelector(getIsLoggingOutSelector);
+  const loading = useSelector(loadingSelector);
+  const initializingApp = useSelector(initializingSelector);
+  const token = useSelector(authTokenSelector);
   const { pathname } = useLocation();
 
   useEffect(() => {

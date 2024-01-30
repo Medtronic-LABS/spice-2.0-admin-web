@@ -3,10 +3,6 @@ import AppLayout from '../AppLayout';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { BrowserRouter as Router } from 'react-router-dom';
-import REGION_MOCK_DATA_CONSTANTS from '../../../tests/mockData/regionDataConstants';
-import ACCOUNT_MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
-import OU_MOCK_DATA_CONSTANTS from '../../../tests/mockData/operatingUnitDataConstants';
-import { SITE_MOCK_DATA } from '../../../../src/store/site/siteMockDataConstants';
 import APPCONSTANTS from '../../../constants/appConstants';
 
 const mockStore = configureMockStore();
@@ -28,18 +24,6 @@ describe('AppLayout component', () => {
       user: {
         role: APPCONSTANTS.ROLES.SUPER_ADMIN
       }
-    },
-    region: {
-      detail: REGION_MOCK_DATA_CONSTANTS.FETCH_REGION_DETAIL_RESPONSE_PAYLOAD
-    },
-    account: {
-      account: ACCOUNT_MOCK_DATA_CONSTANTS.FETCH_ACCOUNTS_RESPONSE_PAYLOAD
-    },
-    operatingUnit: {
-      operatingUnitDetail: OU_MOCK_DATA_CONSTANTS.OPERATING_UNIT_ADMIN_REQUEST_PAYLOAD
-    },
-    site: {
-      site: SITE_MOCK_DATA.SITE_DATA_REQUEST_PAYLOAD
     }
   });
   it('renders component', () => {

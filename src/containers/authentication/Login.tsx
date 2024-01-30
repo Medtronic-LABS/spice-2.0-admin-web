@@ -12,9 +12,11 @@ import { decryptData } from '../../utils/commonUtils';
 import showPass from '../../assets/images/showPass.svg';
 import hidePass from '../../assets/images/hidePass.svg';
 import { PUBLIC_ROUTES } from '../../constants/route';
-// import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-// import { loginRequest } from '../../store/user/actions';
-// import { useDispatch } from 'react-redux';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { loginRequest } from '../../store/user/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { getIsLoggingInSelector } from '../../store/user/selectors';
+import { toast } from 'react-toastify';
 
 interface ILoginForm {
   email: string;
@@ -23,7 +25,7 @@ interface ILoginForm {
 }
 
 const Login = (props: any): React.ReactElement => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const initialFormValues = useRef({} as ILoginForm);
   const [isShowPassword, setShowPassword] = useState(false);
 
@@ -37,6 +39,9 @@ const Login = (props: any): React.ReactElement => {
         rememberMe: true
       };
     }
+    return () => {
+      toastCenter.dismissAllToast();
+    };
   }, []);
 
   const onSubmit = ({
@@ -48,22 +53,22 @@ const Login = (props: any): React.ReactElement => {
     password: string;
     rememberMe: boolean;
   }) => {
-    // dispatch(
-    //   loginRequest({
-    //     username: email,
-    //     password,
-    //     rememberMe,
-    //     failureCb: (e: Error) => {
-    //       toastCenter.error(
-    //         ...getErrorToastArgs(
-    //           e,
-    //           APPCONSTANTS.LOGIN_FAILED_TITLE,
-    //           e?.message === APPCONSTANTS.INVALID_CREDENTIALS ? e.message : APPCONSTANTS.LOGIN_FAILED_MESSAGE
-    //         )
-    //       );
-    //     }
-    //   })
-    // );
+    dispatch(
+      loginRequest({
+        username: email,
+        password,
+        rememberMe,
+        failureCb: (e: Error) => {
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.LOGIN_FAILED_TITLE,
+              e?.message === APPCONSTANTS.INVALID_CREDENTIALS ? e.message : APPCONSTANTS.LOGIN_FAILED_MESSAGE
+            )
+          );
+        }
+      })
+    );
   };
 
   const setShowPasswordHandle = () => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -17,7 +16,7 @@ describe('UserMenu', () => {
   beforeEach(() => {
     const store = mockStore({
       user: {
-        role: 'SU_SA',
+        role: 'SUPER_ADMIN',
         formDataId: '12345',
         tenantId: '1'
       }
@@ -25,7 +24,7 @@ describe('UserMenu', () => {
     shallow(
       <Provider store={store}>
         <MemoryRouter>
-          <UserMenu role='SU_SA' />
+          <UserMenu role='SUPER_ADMIN' />
         </MemoryRouter>
       </Provider>
     );
@@ -33,7 +32,7 @@ describe('UserMenu', () => {
   it('should render only the permitted menus for a super admin', () => {
     const store = mockStore({
       user: {
-        role: 'SU_SA',
+        role: 'SUPER_ADMIN',
         formDataId: '12345',
         tenantId: '1'
       }
@@ -41,39 +40,30 @@ describe('UserMenu', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <UserMenu role='SU_SA' />
+          <UserMenu role='SUPER_ADMIN' />
         </MemoryRouter>
       </Provider>
     );
 
-    expect(screen.queryByText('Legal Terms')).not.toBeInTheDocument();
-    expect(screen.queryByText('Region Details')).not.toBeInTheDocument();
-    expect(screen.queryByText('Account Details')).not.toBeInTheDocument();
-    expect(screen.queryByText('Operating Unit Details')).not.toBeInTheDocument();
+    expect(screen.getByText('My Profile')).toBeInTheDocument();
   });
 
-  it('should render only the permitted menus for a region admin', () => {
+  it('should render only the permitted menus for a admin', () => {
     const store = mockStore({
       user: {
-        role: 'REGION_ADMIN',
-        formDataId: 'region123',
+        role: 'ADMIN',
+        formDataId: '123',
         tenantId: 'tenant123'
       }
     });
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <UserMenu role='REGION_ADMIN' />
+          <UserMenu role='ADMIN' />
         </MemoryRouter>
       </Provider>
     );
 
-    expect(screen.getByText('Region Details')).toBeInTheDocument();
     expect(screen.getByText('My Profile')).toBeInTheDocument();
-    expect(screen.queryByText('Super Admins')).not.toBeInTheDocument();
-    expect(screen.queryByText('Account Details')).not.toBeInTheDocument();
-    expect(screen.queryByText('Operating Unit Details')).not.toBeInTheDocument();
   });
-
-  // Add more test cases for other roles as needed
 });

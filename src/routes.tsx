@@ -6,6 +6,9 @@ import Login from './containers/authentication/Login';
 import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
+import { useSelector } from 'react-redux';
+import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
+import Region from './containers/region/Region';
 
 interface IRoute {
   path: string;
@@ -17,16 +20,16 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_ADMIN, ADMIN } = APPCONSTANTS.ROLES;
-export const SA = [SUPER_ADMIN];
-export const SA_A = [...SA, ADMIN];
+export const { SUPER_USER, SUPER_ADMIN, ADMIN } = APPCONSTANTS.ROLES;
+export const SU_SA = [SUPER_ADMIN, SUPER_USER];
+export const SU_SA_A = [...SU_SA, ADMIN];
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
     {
       path: PROTECTED_ROUTES.home,
       exact: true,
-      component: (<></>) as unknown as React.FunctionComponent<any>,
-      authorisedRoles: SA_A
+      component: Region,
+      authorisedRoles: SU_SA_A
     }
   ];
 })();
@@ -54,16 +57,18 @@ const publicRoutes = [
   }
 ];
 export const AppRoutes = () => {
-  // const isLoggedIn = useSelector(getIsLoggedInSelector);
-  // const role = useSelector(roleSelector);
-  const isLoggedIn = false;
-  const role = 'SUPER_ADMIN';
+  const isLoggedIn = useSelector(getIsLoggedInSelector);
+  const role = useSelector(roleSelector);
+  const userData = useSelector(userDataSelector);
+  const {
+    country: { id: regionId, tenantId }
+  } = userData;
 
   return isLoggedIn ? (
     <AppLayout>
       <Switch>
-        {protectedRoutes.map((route: IProtectedRoute, index: number) =>
-          route.authorisedRoles?.includes(role) ? (
+        {protectedRoutes.map((route: IProtectedRoute, index: number) => {
+          return route.authorisedRoles?.includes(role) ? (
             <Route
               path={route.path}
               exact={route.exact}
@@ -72,9 +77,14 @@ export const AppRoutes = () => {
                 <route.component key={routeProps.location.key} {...routeProps} />
               )}
             />
-          ) : null
-        )}
-        <Redirect exact={true} to={PROTECTED_ROUTES.home} />
+          ) : null;
+        })}
+        <Redirect
+          exact={true}
+          to={PROTECTED_ROUTES.home
+            .replace(':regionId', regionId?.toString())
+            .replace(':tenantId', tenantId?.toString())}
+        />
       </Switch>
     </AppLayout>
   ) : (

@@ -7,11 +7,15 @@ import UserMenu from './UserMenu';
 import { ROLE_LABELS } from '../../constants/appConstants';
 
 import styles from './Header.module.scss';
+import { logoutRequest } from '../../store/user/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { firstNameSelector, lastNameSelector, roleSelector } from '../../store/user/selectors';
 
 export default function Header() {
-  const firstName: string = '';
-  const lastName: string = '';
-  const role = 'SUPER_ADMIN';
+  const dispatch = useDispatch();
+  const firstName: string = useSelector(firstNameSelector) || '';
+  const lastName: string = useSelector(lastNameSelector) || '';
+  const role = useSelector(roleSelector);
   return (
     <div>
       <nav
@@ -47,9 +51,7 @@ export default function Header() {
             <li>
               <div
                 className={`dropdown-item px-0dot875 py-0dot75 pointer d-flex align-items-center ${styles.navbarDropdownItem}`}
-                onClick={() => {
-                  //
-                }}
+                onClick={() => dispatch(logoutRequest())}
               >
                 <div className={`${styles.iconWrapper} me-0dot75 d-flex align-items-center justify-content-center`}>
                   <img src={LogoutIcon} alt='' width={16} height={16} />

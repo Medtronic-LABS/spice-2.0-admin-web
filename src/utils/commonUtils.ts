@@ -4,7 +4,7 @@ import APPCONSTANTS from '../constants/appConstants';
 import CryptoJS from 'crypto-js';
 
 const getEncryptionKey = () => {
-  return CryptoJS.PBKDF2(process.env.REACT_APP_CRYPTR_SECRET_KEY as string, APPCONSTANTS.ENCRYPTION.SALT, {
+  return CryptoJS.PBKDF2('spice_uat', APPCONSTANTS.ENCRYPTION.SALT, {
     keySize: APPCONSTANTS.ENCRYPTION.KEYLEN / 32,
     iterations: APPCONSTANTS.ENCRYPTION.ITERATION
   });

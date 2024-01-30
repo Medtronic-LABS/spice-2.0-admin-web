@@ -1,4 +1,4 @@
-import { decryptData, encryptData, appendZeroBefore, resetFields, stopPropogation, formatSite } from '../commonUtils';
+import { decryptData, encryptData, appendZeroBefore, resetFields, stopPropogation } from '../commonUtils';
 
 describe('Your Component', () => {
   beforeEach(() => {
@@ -120,39 +120,5 @@ describe('stopPropogation', () => {
     expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
 
     consoleErrorSpy.mockRestore();
-  });
-});
-
-describe('formatSite', () => {
-  it('should format the site object correctly', () => {
-    const site = {
-      name: 'Site Name',
-      siteType: { value: 'type' },
-      addressUse: { value: 'use' },
-      addressType: ['type1', 'type2'],
-      county: { id: '1' },
-      subCounty: { id: '2' },
-      culture: { id: '3' },
-      city: { value: { Latitude: '123', Longitude: '456' }, label: 'City' },
-      siteLevel: { value: 'level' }
-    };
-
-    const formatted = formatSite(site as any);
-
-    expect(formatted).toEqual({
-      name: 'Site Name',
-      siteType: 'type',
-      addressUse: 'use',
-      addressType: 'type1|type2',
-      countyId: 1,
-      subCountyId: 2,
-      culture: '3',
-      isQualipharmEnabledSite: false,
-      latitude: '',
-      longitude: '',
-      mflCode: null,
-      city: 'City',
-      siteLevel: 'level'
-    });
   });
 });

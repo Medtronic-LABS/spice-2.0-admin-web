@@ -1,5 +1,5 @@
-import React from 'react';
 import { mount } from 'enzyme';
+import { act } from 'react-dom/test-utils';
 import TextInput from '../TextInput';
 import { Field, Form } from 'react-final-form';
 import styles from './TextInput.module.scss';
@@ -98,7 +98,9 @@ describe('<Field />', () => {
 
   it('should call validateUser function on blur', () => {
     const input = wrapper.find(TextInput);
-    input.props().onBlur({ target: { value: 'test@example.com' } });
+    act(() => {
+      input.props().onBlur({ target: { value: 'test@example.com' } });
+    });
     expect(props.validateUser).toHaveBeenCalledTimes(1);
     expect(props.validateUser).toHaveBeenCalledWith('');
   });
@@ -106,7 +108,9 @@ describe('<Field />', () => {
   it('should call setNetworkError and onChange functions on change', () => {
     const input = wrapper.find(TextInput);
     const event = { target: { value: 'test@example.com' } };
-    input.props().onChange(event);
+    act(() => {
+      input.props().onChange(event);
+    });
     expect(props.currentEmail.current).toEqual('test@example.com');
     expect(props.setNetworkError).toHaveBeenCalledWith(false);
   });

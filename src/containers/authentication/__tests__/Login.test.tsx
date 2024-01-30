@@ -66,9 +66,10 @@ describe('Login', () => {
     expect(loginRequestFn).toBeCalledTimes(0);
   });
 
-  it('calls toastCenter.dismissAllToast() on unmount', () => {
+  it('calls toastCenter.dismissAllToast() on unmount', async () => {
     const dismissAllToastMock = jest.spyOn(toastCenter, 'dismissAllToast');
     wrapper.unmount();
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(dismissAllToastMock).toHaveBeenCalled();
   });
 
