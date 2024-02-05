@@ -8,10 +8,12 @@ import styles from './DetailCard.module.scss';
 
 interface IDetailCardProps {
   header: string;
+  buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+  buttonCustomStyle?: any;
   buttonLabel?: string;
   customLabel?: string;
-  customIcon?: string;
-  customButtonIcon?: string;
+  customIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+  customButtonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   isEdit?: boolean;
   children: React.ReactElement;
   onSearch?: (searchStr: string) => void;
@@ -32,7 +34,9 @@ const DetailCard = ({
   header,
   buttonLabel,
   customLabel,
+  buttonIcon = '',
   customIcon,
+  buttonCustomStyle = {},
   customButtonIcon,
   isEdit,
   children,
@@ -62,10 +66,15 @@ const DetailCard = ({
       <div className={`${customIcon ? styles.customIcon : searchClass} me-1`} onClick={onCustomClick}>
         {customIcon ? (
           <CustomTooltip title={customLabel}>
-            <img src={customIcon} alt='custom-icon' />
+            {typeof customIcon === 'string' ? <img src={customIcon} alt='custom-icon' /> : <></>}
           </CustomTooltip>
         ) : (
-          <IconButton customIcon={customButtonIcon} label={customLabel} handleClick={() => null} />
+          <IconButton
+            buttonCustomStyle={buttonCustomStyle}
+            customIcon={customButtonIcon}
+            label={customLabel}
+            handleClick={() => null}
+          />
         )}
       </div>
     ) : null;
@@ -83,12 +92,14 @@ const DetailCard = ({
           }  ${isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'} flex-grow-md-0`}
         >
           {renderSearchBar()}
-          {renderCustomIcon()}
-          {buttonLabel && onButtonClick ? (
-            <div className={searchClass}>
-              <IconButton label={buttonLabel} isEdit={isEdit} handleClick={onButtonClick} />
-            </div>
-          ) : null}
+          <div className='d-flex'>
+            {renderCustomIcon()}
+            {buttonLabel && onButtonClick ? (
+              <div className={searchClass}>
+                <IconButton customIcon={buttonIcon} label={buttonLabel} isEdit={isEdit} handleClick={onButtonClick} />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
       <div className={`card-body p-0 ${bodyClassName}`}>{children}</div>

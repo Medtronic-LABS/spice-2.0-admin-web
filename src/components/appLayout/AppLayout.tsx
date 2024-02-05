@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { matchPath, useLocation } from 'react-router-dom';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import { roleSelector } from '../../store/user/selectors';
 import { stopPropogation } from '../../utils/commonUtils';
+import Breadcrumb from '../breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 import SideMenu from '../sideMenu/SideMenu';
 import styles from './AppLayout.module.scss';
@@ -9,9 +13,9 @@ interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
 
-const routesWithSideMenu: any[] = [];
+const routesWithSideMenu: any[] = [{ route: PROTECTED_ROUTES.home }];
 
-const routesWithoutBreadcrumb: any[] = [];
+const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.home }];
 
 const header = (
   isBCDisabled: boolean,
@@ -36,13 +40,14 @@ const header = (
             <div />
           </div>
         )}
+        <Breadcrumb />
       </header>
     )
   );
 };
 
 export const AppLayout = ({ children }: IAppLayout) => {
-  const role = 'SUPER_ADMIN';
+  const role = useSelector(roleSelector);
   const { pathname } = useLocation();
   const isSideMenuDisabled = useMemo(
     () =>

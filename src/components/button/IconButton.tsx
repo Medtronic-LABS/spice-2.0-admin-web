@@ -7,6 +7,7 @@ interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   isEdit?: boolean;
   customIcon?: any;
+  buttonCustomStyle?: any;
   handleClick: () => void;
 }
 
@@ -21,22 +22,49 @@ const IconButton = ({
   isEdit,
   customIcon,
   type = 'button',
+  buttonCustomStyle = {},
   handleClick,
   ..._props
 }: IProps): React.ReactElement => {
   const buttonIconElmt = () => {
     if (customIcon) {
-      return <img src={customIcon} className={styles.btnImg} alt='custom-icon' />;
+      return (
+        <img
+          src={customIcon}
+          className={`${styles.btnImgSpacing}  ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          alt='custom-icon'
+        />
+      );
     } else if (isEdit) {
-      return <img src={EditIcon} className={styles.btnImg} alt='edit-icon' />;
+      return (
+        <img
+          src={EditIcon}
+          className={`${styles.btnImgSpacing}  ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          alt='edit-icon'
+        />
+      );
     } else {
-      return <img src={PlusIcon} className={styles.btnImg} alt='plus-icon' />;
+      return (
+        <img
+          src={PlusIcon}
+          className={`${styles.btnImgSpacing}  ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          alt='plus-icon'
+        />
+      );
     }
   };
   return (
-    <button type={type} disabled={disabled} className={`btn primary-btn ${styles.iconButton}`} onClick={handleClick}>
+    <button
+      type={type}
+      disabled={disabled}
+      style={buttonCustomStyle.iconStyle}
+      className={`btn primary-btn ${styles.iconButton}`}
+      onClick={handleClick}
+    >
       {buttonIconElmt()}
-      <span className={styles.btnLabel}>{label}</span>
+      <span style={buttonCustomStyle.textStyle} className={styles.btnLabel}>
+        {label}
+      </span>
     </button>
   );
 };
