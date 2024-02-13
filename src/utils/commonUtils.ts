@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { saveAs } from 'file-saver';
 import APPCONSTANTS from '../constants/appConstants';
 import CryptoJS from 'crypto-js';
 
@@ -62,4 +62,9 @@ export const stopPropogation = (e: React.BaseSyntheticEvent) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+export const fileDownload = async (data: any, fileName: string, fileType: string, fileExtension?: string) => {
+  const blob = new Blob([data], { type: fileType });
+  return saveAs(blob, fileName + (fileExtension ? fileExtension : ''), { autoBom: false });
 };

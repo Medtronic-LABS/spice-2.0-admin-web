@@ -22,7 +22,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 0.625rem;
   position: relative;
   min-height: 12.5rem;
 
@@ -61,6 +60,7 @@
   .fileDetail {
     position: relative;
     bottom: auto;
+    margin-bottom: 1rem;
     label {
       font-size: 0.938rem;
       padding-bottom: 0.5rem;

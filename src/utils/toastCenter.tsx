@@ -1,8 +1,8 @@
 import { toast } from 'react-toastify';
 
-import WarningIcon from '../assets/images/info-orange.svg';
-import SuccessIcon from '../assets/images/Info-green.svg';
-import InfoIcon from '../assets/images/Info-blue.svg';
+import { ReactComponent as WarningIcon } from '../assets/images/info-orange.svg';
+import { ReactComponent as SuccessIcon } from '../assets/images/Info-green.svg';
+import { ReactComponent as InfoIcon } from '../assets/images/Info-blue.svg';
 import ERRORS from '../constants/errors';
 
 /**
@@ -28,7 +28,7 @@ export const error = async (
     }, 500);
   } else {
     toast.warning(messageFormatter(brief, body), {
-      icon: <img src={WarningIcon} alt='' />,
+      icon: <WarningIcon />,
       closeButton: true,
       hideProgressBar: true,
       position: toast.POSITION.BOTTOM_RIGHT,
@@ -47,7 +47,7 @@ export const error = async (
 export const success = (brief: string, body?: string) => {
   dismissAllToast();
   toast.success(messageFormatter(brief, body), {
-    icon: <img src={SuccessIcon} alt='' />,
+    icon: <SuccessIcon />,
     closeButton: false,
     hideProgressBar: true,
     position: toast.POSITION.BOTTOM_RIGHT
@@ -62,7 +62,7 @@ export const success = (brief: string, body?: string) => {
 export const info = (brief: string, body?: string) => {
   dismissAllToast();
   toast.info(messageFormatter(brief, body), {
-    icon: <img src={InfoIcon} alt='' />,
+    icon: <InfoIcon />,
     closeButton: false,
     hideProgressBar: true,
     position: toast.POSITION.BOTTOM_RIGHT

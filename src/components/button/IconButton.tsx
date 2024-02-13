@@ -8,6 +8,7 @@ interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isEdit?: boolean;
   customIcon?: any;
   buttonCustomStyle?: any;
+  buttonCustomClass?: any;
   handleClick: () => void;
 }
 
@@ -23,6 +24,7 @@ const IconButton = ({
   customIcon,
   type = 'button',
   buttonCustomStyle = {},
+  buttonCustomClass = '',
   handleClick,
   ..._props
 }: IProps): React.ReactElement => {
@@ -31,7 +33,9 @@ const IconButton = ({
       return (
         <img
           src={customIcon}
-          className={`${styles.btnImgSpacing}  ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          className={`${styles.btnImgSpacing} ${buttonCustomClass ? '' : styles.btnImgFilter} ${
+            buttonCustomStyle ? '' : styles.btnImgFilter
+          }`}
           alt='custom-icon'
         />
       );
@@ -39,7 +43,9 @@ const IconButton = ({
       return (
         <img
           src={EditIcon}
-          className={`${styles.btnImgSpacing}  ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          className={`${styles.btnImgSpacing} ${buttonCustomClass ? '' : styles.btnImgFilter} ${
+            buttonCustomStyle ? '' : styles.btnImgFilter
+          }`}
           alt='edit-icon'
         />
       );
@@ -47,7 +53,9 @@ const IconButton = ({
       return (
         <img
           src={PlusIcon}
-          className={`${styles.btnImgSpacing}  ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          className={`${styles.btnImgSpacing} ${buttonCustomClass ? '' : styles.btnImgFilter} ${
+            buttonCustomStyle ? '' : styles.btnImgFilter
+          }`}
           alt='plus-icon'
         />
       );
@@ -58,11 +66,11 @@ const IconButton = ({
       type={type}
       disabled={disabled}
       style={buttonCustomStyle.iconStyle}
-      className={`btn primary-btn ${styles.iconButton}`}
+      className={`btn primary-btn ${styles.iconButton} ${buttonCustomClass}`}
       onClick={handleClick}
     >
       {buttonIconElmt()}
-      <span style={buttonCustomStyle.textStyle} className={styles.btnLabel}>
+      <span style={buttonCustomStyle.textStyle} className={styles.btnLabel + ' ' + buttonCustomClass}>
         {label}
       </span>
     </button>

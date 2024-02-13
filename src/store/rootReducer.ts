@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import userReducer from './user/reducer';
+import regionReducer from './region/reducer';
 
-const appReducer = combineReducers({ user: userReducer });
+const appReducer = combineReducers({ user: userReducer, region: regionReducer });
 
 const rootReducer = (state: any, action: any) => {
   if (action.type === 'RESET_STORE') {

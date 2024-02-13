@@ -2,12 +2,11 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
-import { ILoginRequest, IUser, roleType } from './types';
+import { ILoginRequest, IUser } from './types';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import localStorageServices from '../../global/localStorageServices';
 import { encryptData } from '../../utils/commonUtils';
-import ERRORS from '../../constants/errors';
 import CryptoJS from 'crypto-js';
 import * as userService from '../../services/userAPI';
 import * as userActions from './actions';

@@ -15,7 +15,14 @@ const MOCK_DATA_CONSTANTS = {
     roleDetail: { name: 'SUPER_USER' },
     tenantId: '1',
     formDataId: 1,
-    country: '1',
+    country: {
+      id: 1,
+      name: 'Sierra Leone',
+      phoneNumberCode: '+21',
+      unitMeasurement: null,
+      regionCode: '',
+      tenantId: 1
+    },
     suiteAccess: ['admin']
   },
   LOGGED_IN_USER_DATA: {
@@ -27,7 +34,14 @@ const MOCK_DATA_CONSTANTS = {
         id: '1',
         roles: [{ name: 'SUPER_USER' }],
         tenantId: '1',
-        country: '1',
+        country: {
+          id: 1,
+          name: 'Sierra Leone',
+          phoneNumberCode: '+21',
+          unitMeasurement: null,
+          regionCode: '',
+          tenantId: 1
+        },
         suiteAccess: ['admin'],
         organizations: [{ formDataId: 1 }]
       }

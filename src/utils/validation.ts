@@ -267,7 +267,7 @@ export function normalizeFloatingNumber(value: any) {
   // Remove non-numeric characters except dot and minus sign
   const onlyNums = value.replace(/[^\d.-]/g, '');
   // Validate if only numbers with dots and minus are present
-  if (/^[-]?\d*\.?\d*$/.test(onlyNums) && onlyNums.indexOf('.') === onlyNums.lastIndexOf('.')) {
+  if (/^-?\d*\.?\d*$/.test(onlyNums) && onlyNums.indexOf('.') === onlyNums.lastIndexOf('.')) {
     return onlyNums;
   } else {
     return undefined; // or throw an error, depending on your requirements

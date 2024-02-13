@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ReactComponent as UploadIcon } from '../../assets/images/upload_blue.svg';
 import toastCenter from '../../utils/toastCenter';
 import styles from './DragDropFiles.module.scss';
 
-const DragDropFiles = () => {
-  const [files, setFiles] = useState(null);
-  const browseClicked = (e: any) => {
-    //
-  };
+const acceptableFileFormat = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+
+interface IProps {
+  onUploadSubmit: (file: any) => void;
+}
+
+const DragDropFiles = (props: IProps) => {
+  const [file, setFile] = useState(null);
 
   const handleDragOver = (event: any) => {
     event.preventDefault();
@@ -16,20 +18,20 @@ const DragDropFiles = () => {
 
   const handleDrop = (event: any) => {
     event.preventDefault();
-    if (event.dataTransfer.files[0].type === 'text/csv') {
-      setFiles(event.dataTransfer.files[0]);
+    if (acceptableFileFormat.includes(event.dataTransfer.files[0].type)) {
+      setFile(event.dataTransfer.files[0]);
     } else {
-      setFiles(null);
-      toastCenter.error('Error', 'Please upload a valid CSV file');
+      setFile(null);
+      toastCenter.error('Error', 'Please upload a valid file');
     }
   };
 
   const uploadHandler = (event: any) => {
-    if (event.target.files[0].type === 'text/csv') {
-      setFiles(event.target.files[0]);
+    if (acceptableFileFormat.includes(event.target.files[0].type)) {
+      setFile(event.target.files[0]);
     } else {
-      setFiles(null);
-      toastCenter.error('Error', 'Please upload a valid CSV file');
+      setFile(null);
+      toastCenter.error('Error', 'Please upload a valid file');
     }
     event.preventDefault();
   };
@@ -44,12 +46,21 @@ const DragDropFiles = () => {
           <label className='link' htmlFor='file_input_id'>
             Browse
           </label>
-          <input type='file' id='file_input_id' name='file' accept='.csv' onChange={uploadHandler} /> file
+          <input type='file' id='file_input_id' name='file' accept={acceptableFileFormat[0]} onChange={uploadHandler} />
+          {' file'}
         </p>
-        {files && (
-          <div className={'d-flex justify-content-center align-items-center flex-column' + styles.fileDetail}>
-            <label>{(files as any).name}</label>
-            <button type='button' className='btn primary-btn'>
+        {file && (
+          <div className={`d-flex flex-column justify-content-center align-items-center ${styles.fileDetail}`}>
+            <label>{(file as any).name}</label>
+            <button
+              type='button'
+              className='btn primary-btn'
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                props.onUploadSubmit(file);
+              }}
+            >
               Upload
             </button>
           </div>

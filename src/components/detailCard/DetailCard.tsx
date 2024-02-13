@@ -10,6 +10,7 @@ interface IDetailCardProps {
   header: string;
   buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   buttonCustomStyle?: any;
+  buttonCustomClass?: any;
   buttonLabel?: string;
   customLabel?: string;
   customIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -37,6 +38,7 @@ const DetailCard = ({
   buttonIcon = '',
   customIcon,
   buttonCustomStyle = {},
+  buttonCustomClass = '',
   customButtonIcon,
   isEdit,
   children,
@@ -71,6 +73,7 @@ const DetailCard = ({
         ) : (
           <IconButton
             buttonCustomStyle={buttonCustomStyle}
+            buttonCustomClass={buttonCustomClass}
             customIcon={customButtonIcon}
             label={customLabel}
             handleClick={() => null}

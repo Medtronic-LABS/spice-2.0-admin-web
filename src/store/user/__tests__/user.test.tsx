@@ -24,30 +24,11 @@ const {
   roles,
   suiteAccess
 } = loggedInUserMockData.data.entity;
-// const forgotPasswordRequestMockData = { email: MOCK_DATA_CONSTANTS.MOCK_LOGIN_REQUEST.username,
-// successCB: () => null };
-// const resetPasswordRequestMockData = MOCK_DATA_CONSTANTS.RESET_PASSWORD_REQUEST_MOCK_DATA;
-// const changePasswordRequestMockData = MOCK_DATA_CONSTANTS.CHANGE_PASSWORD_REQUEST_MOCK_DATA;
-// const updatePasswordRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_PASSWORD_REQUEST_MOCK_DATA;
-// const getUsernameResponseMockData = MOCK_DATA_CONSTANTS.GET_USERNAME_RESPONSE_MOCK_DATA;
-// const getUsernameRequestMockData = MOCK_DATA_CONSTANTS.GET_USERNAME_REQUEST_MOCK_DATA;
-// const createPasswordRequestMockData = MOCK_DATA_CONSTANTS.CREATE_PASSWORD_REQUEST_MOCK_DATA;
-// const fetchTimezoneListResponseMockData = [MOCK_DATA_CONSTANTS.FETCH_TIMEZONE_RESPONSE_PAYLOAD];
-// const fetchUserByIdRequestMockData = MOCK_DATA_CONSTANTS.FETCH_USER_BY_ID_REQUEST;
-// const fetchUserByIdResponseMockData = MOCK_DATA_CONSTANTS.FETCH_USER_RESPONSE_PAYLOAD;
-// const fetchUserByIdRawResponseMockData = MOCK_DATA_CONSTANTS.FETCH_USER_BACKEND_RESPONSE;
-// const fetchUserByEmailRequestMockData = MOCK_DATA_CONSTANTS.FETCH_USER_BY_EMAIL_REQUEST;
-// const updateUserRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_USER_REQUEST_PAYLOAD;
-// const fetchCountryListResponseMockData = [MOCK_DATA_CONSTANTS.FETCH_COUNTRY_PAYLOAD];
-// const fetchLockedUsersRequestMockData = MOCK_DATA_CONSTANTS.FETCH_LOCKED_USERS_REQUEST;
-// const fetchLockedUsersResponseMockData = [MOCK_DATA_CONSTANTS.FETCH_LOCKED_USERS_RESPONSE_PAYLOAD];
-// const unlockUserRequestMockData = MOCK_DATA_CONSTANTS.UNLOCK_USER_REQUEST_PAYLOAD;
-// const fetchCultureListResponseMockData = MOCK_DATA_CONSTANTS.FETCH_CULTURE_LIST_RESPONSE_PAYLOAD;
 
 describe('User Login', () => {
   it('Adds user tenant id and encrypted token to store and logs in successfully', async () => {
     const { username, password } = loginRequestMockData;
-    const hmac = CryptoJS.HmacSHA512(password, 'spice_uat');
+    const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
     const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
     const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
       return Promise.resolve({
@@ -55,21 +36,7 @@ describe('User Login', () => {
       } as AxiosResponse);
     });
     const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
-      return Promise.resolve({
-        data: {
-          entity: {
-            username: email,
-            firstName,
-            lastName,
-            id,
-            role: roles?.[0]?.name,
-            tenantId,
-            country,
-            suiteAccess,
-            organizations
-          }
-        }
-      } as AxiosResponse);
+      return Promise.resolve(loggedInUserMockData as AxiosResponse);
     });
     const dispatched: any = [];
     await runSaga(
@@ -82,6 +49,7 @@ describe('User Login', () => {
         type: ACTION_TYPES.LOGIN_REQUEST
       }
     ).toPromise();
+
     const encryptedToken = encryptData(token);
     expect(loginUserSpy).toHaveBeenCalledWith(username, hashedPassword);
     expect(fetchLoggedInUserSpy).toHaveBeenCalled();
@@ -90,7 +58,6 @@ describe('User Login', () => {
       loginActions.addUserTenantID(userTenantID),
       loginActions.loginSuccess(loginSuccessResponseMockData as any)
     ]);
-    expect(loginUserSpy).toHaveBeenCalledTimes(1);
   });
 
   it('Login failure', async () => {

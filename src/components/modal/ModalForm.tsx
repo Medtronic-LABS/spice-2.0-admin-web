@@ -19,6 +19,7 @@ export interface IModalProps {
   handleCancel: () => void;
   deactivateLabel?: string;
   handleForceSubmit?: boolean;
+  hideFooterButton?: boolean;
   handleFormSubmit: (values?: any) => void;
   handleDeactivate?: () => void;
   render?: (form?: FormApi<any>) => React.ReactElement;
@@ -42,6 +43,7 @@ const ModalForm = React.memo(
     handleFormSubmit,
     handleDeactivate,
     initialValues = {},
+    hideFooterButton = false,
     size,
     render,
     mutators
@@ -82,44 +84,46 @@ const ModalForm = React.memo(
                     <div className={`${styles.scroll} modal-body px-1dot25 py-1dot5`}>
                       {render ? render(form) : children}
                     </div>
-                    <div className={`modal-footer py-0dot75 px-1dot25`}>
-                      {deactivateLabel ? (
+                    {!hideFooterButton && (
+                      <div className={`modal-footer py-0dot75 px-1dot25`}>
+                        {deactivateLabel ? (
+                          <button
+                            type='button'
+                            className='btn danger-btn me-auto'
+                            data-dismiss='modal'
+                            onClick={handleDeactivate}
+                          >
+                            {deactivateLabel}
+                          </button>
+                        ) : null}
+                        {cancelText && (
+                          <button
+                            type='button'
+                            className='btn secondary-btn me-0dot5'
+                            data-dismiss='modal'
+                            onClick={handleCancel}
+                          >
+                            {cancelText}
+                          </button>
+                        )}
                         <button
-                          type='button'
-                          className='btn danger-btn me-auto'
-                          data-dismiss='modal'
-                          onClick={handleDeactivate}
+                          type='submit'
+                          className='btn primary-btn'
+                          disabled={submitDisabled}
+                          onClick={
+                            handleForceSubmit
+                              ? (e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleFormSubmit(values);
+                                }
+                              : () => null
+                          }
                         >
-                          {deactivateLabel}
+                          {submitText}
                         </button>
-                      ) : null}
-                      {cancelText && (
-                        <button
-                          type='button'
-                          className='btn secondary-btn me-0dot5'
-                          data-dismiss='modal'
-                          onClick={handleCancel}
-                        >
-                          {cancelText}
-                        </button>
-                      )}
-                      <button
-                        type='submit'
-                        className='btn primary-btn'
-                        disabled={submitDisabled}
-                        onClick={
-                          handleForceSubmit
-                            ? (e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                handleFormSubmit(values);
-                              }
-                            : () => null
-                        }
-                      >
-                        {submitText}
-                      </button>
-                    </div>
+                      </div>
+                    )}
                   </form>
                 );
               }}
