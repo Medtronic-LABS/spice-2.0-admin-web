@@ -4,7 +4,7 @@ import APPCONSTANTS from '../constants/appConstants';
 import CryptoJS from 'crypto-js';
 
 const getEncryptionKey = () => {
-  return CryptoJS.PBKDF2('spice_uat', APPCONSTANTS.ENCRYPTION.SALT, {
+  return CryptoJS.PBKDF2(process.env.REACT_APP_CRYPTR_SECRET_KEY as string, APPCONSTANTS.ENCRYPTION.SALT, {
     keySize: APPCONSTANTS.ENCRYPTION.KEYLEN / 32,
     iterations: APPCONSTANTS.ENCRYPTION.ITERATION
   });
@@ -13,13 +13,13 @@ const getEncryptionKey = () => {
 export const decryptData = (password: string) => {
   const key = getEncryptionKey();
   const iv = CryptoJS.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
-  return CryptoJS.AES.decrypt(password, key, { iv }).toString(CryptoJS.enc.Utf8);
+  return CryptoJS.AES.decrypt(password, CryptoJS.enc.Utf8.parse(key as any), { iv }).toString(CryptoJS.enc.Utf8);
 };
 
 export const encryptData = (value: string) => {
   const key = getEncryptionKey();
   const iv = CryptoJS.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
-  return CryptoJS.AES.encrypt(value, key, { iv }).toString();
+  return CryptoJS.AES.encrypt(value, CryptoJS.enc.Utf8.parse(key as any), { iv }).toString();
 };
 
 /**

@@ -1,5 +1,6 @@
 import userReducer from '../reducer';
 import * as USERTYPES from '../actionTypes';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/userDataConstants';
 
 describe('userReducer', () => {
   it('should handle LOGIN_REQUEST', () => {
@@ -126,36 +127,6 @@ describe('userReducer', () => {
   //   expect(userReducer(initialState, action)).toEqual(expectedState);
   // });
 
-  // it('should handle FETCH_COUNTRY_LIST_SUCCESS', () => {
-  //   const initialState: any = {
-  //     countryList: []
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_COUNTRY_LIST_SUCCESS,
-  //     payload: ['Country 1', 'Country 2']
-  //   };
-  //   const expectedState = {
-  //     countryList: ['Country 1', 'Country 2']
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
-
-  // it('should handle FETCH_CULTURE_LIST_SUCCESS', () => {
-  //   const initialState: any = {
-  //     cultureListLoading: true,
-  //     cultureList: []
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_CULTURE_LIST_SUCCESS,
-  //     payload: ['Culture 1', 'Culture 2']
-  //   };
-  //   const expectedState = {
-  //     cultureListLoading: false,
-  //     cultureList: ['Culture 1', 'Culture 2']
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
-
   it('should handle FETCH_LOGGED_IN_USER_REQUEST', () => {
     const initialState: any = {
       initializing: false
@@ -198,179 +169,48 @@ describe('userReducer', () => {
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
 
-  // it('should handle loading actions', () => {
-  //   const initialState: any = {
-  //     loading: false
-  //   };
-  //   const loadingActions = [
-  //     USERTYPES.USER_FORGOT_PASSWORD_REQUEST,
-  //     USERTYPES.RESET_PASSWORD_REQUEST,
-  //     USERTYPES.CHANGE_PASSWORD_REQUEST,
-  //     USERTYPES.UPDATE_PASSWORD_REQUEST,
-  //     USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET,
-  //     USERTYPES.CREATE_PASSWORD_REQUEST,
-  //     USERTYPES.FETCH_USER_BY_ID_REQUEST,
-  //     USERTYPES.FETCH_LOCKED_USERS_REQUEST,
-  //     USERTYPES.UNLOCK_USERS_REQUEST
-  //   ];
-  //   loadingActions.forEach((actionType) => {
-  //     const action: any = { type: actionType };
-  //     const expectedState = { loading: true };
-  //     expect(userReducer(initialState, action)).toEqual(expectedState);
-  //   });
-  // });
+  it('should handle FETCH_USER_ROLES_REQUEST', () => {
+    const initialState: any = {
+      isRolesLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_USER_ROLES_REQUEST
+    };
+    const expectedState = {
+      isRolesLoading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
 
-  // it('should handle FETCH_LOCKED_USERS_SUCCESS', () => {
-  //   const initialState: any = {
-  //     loading: true,
-  //     lockedUsers: [],
-  //     totalLockedUsers: 0
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_LOCKED_USERS_SUCCESS,
-  //     payload: {
-  //       lockedUsers: [
-  //         { id: 1, username: 'user1' },
-  //         { id: 2, username: 'user2' }
-  //       ],
-  //       totalCount: 2
-  //     }
-  //   };
-  //   const expectedState = {
-  //     loading: false,
-  //     lockedUsers: [
-  //       { id: 1, username: 'user1' },
-  //       { id: 2, username: 'user2' }
-  //     ],
-  //     totalLockedUsers: 2
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
+  const userRoles = MOCK_DATA_CONSTANTS.USER_ROLES_RESPONSE_PAYLOAD.data.entity;
 
-  // const failureActions = [
-  //   USERTYPES.USER_FORGOT_PASSWORD_FAIL,
-  //   USERTYPES.UNLOCK_USERS_FAILURE,
-  //   USERTYPES.RESET_PASSWORD_FAIL,
-  //   USERTYPES.CHANGE_PASSWORD_FAIL,
-  //   USERTYPES.UPDATE_PASSWORD_FAIL,
-  //   USERTYPES.CREATE_PASSWORD_FAIL,
-  //   USERTYPES.FETCH_USER_BY_ID_FAILURE,
-  //   USERTYPES.FETCH_LOCKED_USERS_FAILURE,
-  //   USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL
-  // ];
-  // failureActions.forEach((actionType) => {
-  //   it(`should handle ${actionType}`, () => {
-  //     const initialState: any = {
-  //       loading: true
-  //     };
-  //     const action: any = { type: actionType };
-  //     const expectedState = { loading: false };
-  //     expect(userReducer(initialState, action)).toEqual(expectedState);
-  //   });
-  // });
+  it('should handle FETCH_USER_ROLES_SUCCESS', () => {
+    const initialState: any = {
+      isRolesLoading: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_USER_ROLES_SUCCESS,
+      payload: userRoles
+    };
+    const expectedState = {
+      isRolesLoading: false,
+      userRoles
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
 
-  // const successActions = [
-  //   USERTYPES.USER_FORGOT_PASSWORD_SUCCESS,
-  //   USERTYPES.UNLOCK_USERS_SUCCESS,
-  //   USERTYPES.RESET_PASSWORD_SUCCESS,
-  //   USERTYPES.CHANGE_PASSWORD_SUCCESS,
-  //   USERTYPES.UPDATE_PASSWORD_SUCCESS,
-  //   USERTYPES.CREATE_PASSWORD_SUCCESS
-  // ];
-  // successActions.forEach((actionType) => {
-  //   it(`should handle ${actionType}`, () => {
-  //     const initialState: any = {
-  //       loading: true
-  //     };
-  //     const action: any = { type: actionType };
-  //     const expectedState = { loading: false };
-  //     expect(userReducer(initialState, action)).toEqual(expectedState);
-  //   });
-  // });
-
-  // it('should handle FETCH_USER_BY_ID_SUCCESS when userId matches', () => {
-  //   const initialState: any = {
-  //     loading: true,
-  //     user: {
-  //       userId: 'user1',
-  //       email: 'user1@example.com',
-  //       firstName: 'John',
-  //       lastName: 'Doe'
-  //     }
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_USER_BY_ID_SUCCESS,
-  //     data: {
-  //       userId: 'user1',
-  //       email: 'user1@example.com',
-  //       firstName: 'John',
-  //       lastName: 'Doe',
-  //       role: 'admin'
-  //     }
-  //   };
-  //   const expectedState = {
-  //     loading: false,
-  //     user: {
-  //       userId: 'user1',
-  //       email: 'user1@example.com',
-  //       firstName: 'John',
-  //       lastName: 'Doe',
-  //       role: 'admin'
-  //     }
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
-
-  // it('should handle FETCH_USER_BY_ID_SUCCESS when userId does not match', () => {
-  //   const initialState: any = {
-  //     loading: true,
-  //     user: {
-  //       userId: 'user1',
-  //       email: 'user1@example.com',
-  //       firstName: 'John',
-  //       lastName: 'Doe'
-  //     }
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_USER_BY_ID_SUCCESS,
-  //     data: {
-  //       userId: 'user2',
-  //       email: 'user2@example.com',
-  //       firstName: 'Jane',
-  //       lastName: 'Smith',
-  //       role: 'admin'
-  //     }
-  //   };
-  //   const expectedState = {
-  //     loading: false,
-  //     user: {
-  //       userId: 'user1',
-  //       email: 'user1@example.com',
-  //       firstName: 'John',
-  //       lastName: 'Doe'
-  //     }
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
-
-  // it('should handle GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS', () => {
-  //   const initialState: any = {
-  //     loading: true
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS,
-  //     response: {
-  //       email: 'user1@example.com',
-  //       is_password_set: true
-  //     }
-  //   };
-  //   const expectedState = {
-  //     loading: false,
-  //     email: 'user1@example.com',
-  //     isPasswordSet: true
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
+  it('should handle FETCH_USER_ROLES_FAILURE', () => {
+    const initialState: any = {
+      isRolesLoading: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_USER_ROLES_FAILURE
+    };
+    const expectedState = {
+      isRolesLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
 
   it('should handle SESSION_TIMEDOUT', () => {
     const initialState: any = {
@@ -387,29 +227,6 @@ describe('userReducer', () => {
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
-
-  // it('should handle FETCH_USER_BY_EMAIL', () => {
-  //   const initialState: any = {
-  //     showLoader: false
-  //   };
-  //   const action: any = { type: USERTYPES.FETCH_USER_BY_EMAIL };
-  //   const expectedState = {
-  //     showLoader: true
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
-
-  // const fetchUserByEmailActions = [USERTYPES.FETCH_USER_BY_EMAIL_SUCCESS, USERTYPES.FETCH_USER_BY_EMAIL_FAIL];
-  // fetchUserByEmailActions.forEach((actionType) => {
-  //   it(`should handle ${actionType}`, () => {
-  //     const initialState: any = {
-  //       showLoader: true
-  //     };
-  //     const action: any = { type: actionType };
-  //     const expectedState = { showLoader: false };
-  //     expect(userReducer(initialState, action)).toEqual(expectedState);
-  //   });
-  // });
 
   it('should handle AUTH_TOKEN', () => {
     const initialState: any = {
@@ -464,17 +281,4 @@ describe('userReducer', () => {
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
-
-  // it('should handle FETCH_CULTURE_LIST_REQUEST', () => {
-  //   const initialState: any = {
-  //     cultureListLoading: false
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_CULTURE_LIST_REQUEST
-  //   };
-  //   const expectedState = {
-  //     cultureListLoading: true
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
 });

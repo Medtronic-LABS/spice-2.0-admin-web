@@ -24,3 +24,9 @@ export const fetchLoggedInUser = () =>
     method: 'POST',
     url: '/user-service/user/profile'
   });
+
+export const fetchUserRoles = () =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/roles-list'
+  });

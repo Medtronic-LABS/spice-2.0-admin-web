@@ -54,6 +54,8 @@ export interface IUserState {
   loggingIn: boolean;
   loggingOut: boolean;
   user: IUser;
+  userRoles: IGroupRoles;
+  isRolesLoading: boolean;
   error: string | null;
   loading: boolean;
   cultureListLoading?: boolean;
@@ -156,6 +158,32 @@ export interface IFetchLoggedInUserSuccess {
 export interface IFetchLoggedInUserFailure {
   type: typeof USER_TYPES.FETCH_LOGGED_IN_USER_FAILURE;
 }
+export interface IFetchUserRolesRequest {
+  type: typeof USER_TYPES.FETCH_USER_ROLES_REQUEST;
+  successCb?: (payload: IGroupRoles) => void;
+  failureCb?: (error: Error) => void;
+}
+interface IRoles {
+  id: number;
+  name: string;
+  level: number;
+  suiteAccessName: string;
+  displayName: string;
+  groupName: string;
+}
+
+export interface IGroupRoles {
+  [key: string]: IRoles[];
+}
+
+export interface IFetchUserRolesSuccess {
+  type: typeof USER_TYPES.FETCH_USER_ROLES_SUCCESS;
+  payload: IGroupRoles;
+}
+
+export interface IFetchUserRolesFailure {
+  type: typeof USER_TYPES.FETCH_USER_ROLES_FAILURE;
+}
 
 export interface IAddUserTenantId {
   type: typeof USER_TYPES.ADD_USER_TENANT_ID;
@@ -199,4 +227,7 @@ export type UserActions =
   | ISessionTimeout
   | IResetStore
   | IAddToken
-  | IRemoveToken;
+  | IRemoveToken
+  | IFetchUserRolesRequest
+  | IFetchUserRolesSuccess
+  | IFetchUserRolesFailure;

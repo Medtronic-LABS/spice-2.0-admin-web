@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { login, logout, fetchLoggedInUser } from '../userAPI';
+import { login, logout, fetchLoggedInUser, fetchUserRoles } from '../userAPI';
 
 describe('User Service', () => {
   let mockAxios: any;
@@ -49,5 +49,14 @@ describe('User Service', () => {
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/profile');
+  });
+
+  it('sends a POST request to /user-service/user/roles-list', async () => {
+    mockAxios.onPost('/user-service/user/roles-list').reply(200, {});
+
+    await fetchUserRoles();
+
+    expect(mockAxios.history.post.length).toBe(1);
+    expect(mockAxios.history.post[0].url).toBe('/user-service/user/roles-list');
   });
 });

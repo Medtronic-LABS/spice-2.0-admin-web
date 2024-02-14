@@ -26,6 +26,8 @@ const initialStateGetter: () => IUserState = () => ({
   loggingIn: false,
   loggingOut: false,
   user: userInitialStateGetter(),
+  userRoles: {},
+  isRolesLoading: false,
   error: null,
   loading: false,
   cultureListLoading: false,
@@ -92,6 +94,22 @@ const userReducer = (state = initialStateGetter(), action = {} as UserActions): 
       return {
         ...state,
         initializing: false
+      };
+    case USERTYPES.FETCH_USER_ROLES_REQUEST:
+      return {
+        ...state,
+        isRolesLoading: true
+      };
+    case USERTYPES.FETCH_USER_ROLES_SUCCESS:
+      return {
+        ...state,
+        isRolesLoading: false,
+        userRoles: action.payload
+      };
+    case USERTYPES.FETCH_USER_ROLES_FAILURE:
+      return {
+        ...state,
+        isRolesLoading: false
       };
     case USERTYPES.SESSION_TIMEDOUT:
       sessionStorageServices.clearAllItem();

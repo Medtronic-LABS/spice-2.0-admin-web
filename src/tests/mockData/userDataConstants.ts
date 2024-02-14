@@ -1,4 +1,28 @@
 const MOCK_DATA_CONSTANTS = {
+  INITIAL_STATE: {
+    defaultRole: [],
+    token: '',
+    isLoggedIn: true,
+    loggingIn: false,
+    loggingOut: false,
+    user: {},
+    userRoles: {},
+    isRolesLoading: false,
+    error: null,
+    loading: false,
+    cultureListLoading: false,
+    initializing: false,
+    isPasswordSet: false,
+    email: '',
+    timezoneList: [],
+    errorMessage: '',
+    showLoader: false,
+    countryList: [],
+    lockedUsers: [],
+    totalLockedUsers: 0,
+    userTenantId: '',
+    cultureList: []
+  },
   MOCK_LOGIN_REQUEST: {
     username: 'testuser@test.com',
     password: 'Spice123',
@@ -44,6 +68,32 @@ const MOCK_DATA_CONSTANTS = {
         },
         suiteAccess: ['admin'],
         organizations: [{ formDataId: 1 }]
+      }
+    }
+  },
+  USER_ROLES_RESPONSE_PAYLOAD: {
+    data: {
+      entity: {
+        'SPICE INSIGHTS': [
+          {
+            id: 1,
+            name: 'REPORT_ADMIN',
+            level: 1,
+            suiteAccessName: 'cfr',
+            displayName: 'Report Admin',
+            groupName: 'SPICE INSIGHTS'
+          }
+        ],
+        SPICE: [
+          {
+            id: 2,
+            name: 'SUPER_USER',
+            level: 1,
+            suiteAccessName: 'admin',
+            displayName: 'Super user',
+            groupName: 'SPICE'
+          }
+        ]
       }
     }
   },

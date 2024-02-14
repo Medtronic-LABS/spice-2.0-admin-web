@@ -13,7 +13,10 @@ import {
   IAddToken,
   IRemoveToken,
   IAddUserTenantId,
-  IRemoveUserTenantId
+  IRemoveUserTenantId,
+  IFetchUserRolesSuccess,
+  IGroupRoles,
+  IFetchUserRolesRequest
 } from './types';
 
 export const loginRequest = ({
@@ -89,4 +92,25 @@ export const fetchLoggedInUserSuccess = (payload: IUser) => ({
 
 export const fetchLoggedInUserFail = () => ({
   type: USER_TYPES.FETCH_LOGGED_IN_USER_FAILURE
+});
+
+export const fetchUserRolesAction = ({
+  successCb,
+  failureCb
+}: {
+  successCb?: (payload: IGroupRoles) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchUserRolesRequest => ({
+  type: USER_TYPES.FETCH_USER_ROLES_REQUEST,
+  successCb,
+  failureCb
+});
+
+export const fetchUserRolesActionSuccess = (payload: IGroupRoles): IFetchUserRolesSuccess => ({
+  type: USER_TYPES.FETCH_USER_ROLES_SUCCESS,
+  payload
+});
+
+export const fetchUserRolesActionFail = () => ({
+  type: USER_TYPES.FETCH_USER_ROLES_FAILURE
 });

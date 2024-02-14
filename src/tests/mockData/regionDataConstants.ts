@@ -13,6 +13,14 @@ const MOCK_REGION_DETAIL = {
 };
 
 const MOCK_DATA_CONSTANTS = {
+  INITIAL_STATE: {
+    file: {},
+    uploading: false,
+    downloading: false,
+    error: null,
+    loading: false,
+    regionDetails: { list: [], total: 0 }
+  },
   REGION_DETAILS_RESPONSE_PAYLOAD: {
     list: [MOCK_REGION_DETAIL.DETAIL],
     total: 10

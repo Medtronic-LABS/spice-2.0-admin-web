@@ -2,7 +2,7 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
-import { ILoginRequest, IUser } from './types';
+import { IFetchUserRolesRequest, ILoginRequest, IUser } from './types';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import localStorageServices from '../../global/localStorageServices';
@@ -11,8 +11,8 @@ import CryptoJS from 'crypto-js';
 import * as userService from '../../services/userAPI';
 import * as userActions from './actions';
 
-export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
-  roles.length && rolesArray.find((role) => roles.includes(role));
+// export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
+//   roles.length && rolesArray.find((role) => roles.includes(role));
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -63,16 +63,14 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     successCb?.(payload);
     yield put(userActions.loginSuccess(payload));
   } catch (e: any) {
-    if (e?.message) {
-      sessionStorageServices.clearAllItem();
-      sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
-      sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-      sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
-      yield put(userActions.resetStore());
-      yield put(userActions.removeToken());
-    }
+    sessionStorageServices.clearAllItem();
+    sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
+    sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
+    sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
+    yield put(userActions.resetStore());
+    yield put(userActions.removeToken());
     failureCb?.(e);
-    yield put(userActions.loginFailure({ error: e.message }));
+    yield put(userActions.loginFailure({ error: e?.message }));
   }
 }
 
@@ -96,7 +94,7 @@ export function* logout(): SagaIterator {
   }
 }
 
-function updateRememberMe(username: string, password: string, rememberMe: boolean) {
+export function updateRememberMe(username: string, password: string, rememberMe: boolean) {
   try {
     if (rememberMe) {
       localStorageServices.setItems([
@@ -146,14 +144,28 @@ export function* fetchLoggedInUser(): SagaIterator {
     };
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {
-    if (e?.message) {
-      sessionStorageServices.clearAllItem();
-      sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
-      sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-      yield put(userActions.removeToken());
-      yield put(userActions.resetStore());
-    }
+    sessionStorageServices.clearAllItem();
+    sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
+    sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
+    yield put(userActions.removeToken());
+    yield put(userActions.resetStore());
     yield put(userActions.fetchLoggedInUserFail());
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_LOGGED_IN_USER_REQUEST action
+*/
+export function* fetchUserRoles({ successCb, failureCb }: IFetchUserRolesRequest): SagaIterator {
+  try {
+    const {
+      data: { entity: userRoles }
+    } = yield call(userService.fetchUserRoles);
+    successCb?.(userRoles);
+    yield put(userActions.fetchUserRolesActionSuccess(userRoles));
+  } catch (e: any) {
+    failureCb?.(e);
+    yield put(userActions.fetchUserRolesActionFail());
   }
 }
 
@@ -165,6 +177,7 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.LOGIN_REQUEST, login)]);
   yield all([takeLatest(USERTYPES.LOGOUT_REQUEST, logout)]);
   yield takeLatest(USERTYPES.FETCH_LOGGED_IN_USER_REQUEST, fetchLoggedInUser);
+  yield takeLatest(USERTYPES.FETCH_USER_ROLES_REQUEST, fetchUserRoles);
 }
 
 export default userSaga;
