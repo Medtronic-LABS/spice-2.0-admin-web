@@ -1,7 +1,7 @@
 import { RouteComponentProps } from 'react-router';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
-import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
+import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
 import Login from './containers/authentication/Login';
 import { AppLayout } from './components/appLayout/AppLayout';
 
@@ -9,6 +9,8 @@ import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
 import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
 import Region from './containers/region/Region';
+import ForgotPassword from './containers/authentication/ForgotPassword';
+import ResetPassword from './containers/authentication/ResetPassword';
 
 interface IRoute {
   path: string;
@@ -20,16 +22,23 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_USER, SUPER_ADMIN, ADMIN } = APPCONSTANTS.ROLES;
+export const { SUPER_USER, SUPER_ADMIN, SITE_ADMIN } = APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
-export const SU_SA_A = [...SU_SA, ADMIN];
+export const SU_SA_A = [...SU_SA, SITE_ADMIN];
+
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
     {
-      path: PROTECTED_ROUTES.home,
+      path: PROTECTED_ROUTES.region,
       exact: true,
       component: Region,
-      authorisedRoles: SU_SA_A
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.healthFacility,
+      exact: true,
+      component: (() => <>Health Facility List</>) as React.FunctionComponent<any>,
+      authorisedRoles: [SITE_ADMIN]
     }
   ];
 })();
@@ -43,32 +52,27 @@ const publicRoutes = [
   {
     path: PUBLIC_ROUTES.forgotPassword,
     exact: true,
-    component: (<></>) as unknown as React.FunctionComponent<any>
+    component: ForgotPassword
   },
   {
     path: PUBLIC_ROUTES.resetPassword,
     exact: true,
-    component: (<></>) as unknown as React.FunctionComponent<any>
-  },
-  {
-    path: PUBLIC_ROUTES.privacyPolicy,
-    exact: true,
-    component: (<></>) as unknown as React.FunctionComponent<any>
+    component: ResetPassword
   }
 ];
 export const AppRoutes = () => {
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const role = useSelector(roleSelector);
-  const userData = useSelector(userDataSelector);
+  const data = useSelector(userDataSelector);
   const {
     country: { id: regionId, tenantId }
-  } = userData;
+  } = data;
 
   return isLoggedIn ? (
     <AppLayout>
       <Switch>
-        {protectedRoutes.map((route: IProtectedRoute, index: number) => {
-          return route.authorisedRoles?.includes(role) ? (
+        {protectedRoutes.map((route: IProtectedRoute, index: number) =>
+          route.authorisedRoles?.includes(role) ? (
             <Route
               path={route.path}
               exact={route.exact}
@@ -77,11 +81,11 @@ export const AppRoutes = () => {
                 <route.component key={routeProps.location.key} {...routeProps} />
               )}
             />
-          ) : null;
-        })}
+          ) : null
+        )}
         <Redirect
           exact={true}
-          to={PROTECTED_ROUTES.home
+          to={HOME_PAGE_BY_ROLE[role]
             .replace(':regionId', regionId?.toString())
             .replace(':tenantId', tenantId?.toString())}
         />

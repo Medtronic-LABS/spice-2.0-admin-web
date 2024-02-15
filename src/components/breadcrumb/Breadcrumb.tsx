@@ -5,12 +5,11 @@ import { matchPath, useLocation } from 'react-router';
 import { ReactComponent as HomeIcon } from '../../assets/images/home.svg';
 import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES } from '../../constants/route';
 import { useDispatch, useSelector } from 'react-redux';
-import { roleSelector } from '../../store/user/selectors';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
 
 import styles from './Breadcrumb.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
-// import { clearRegionDetail, setRegionDetails } from '../../store/region/actions';
 
 interface ISection {
   route: string;
@@ -18,21 +17,7 @@ interface ISection {
   appendParent?: boolean;
 }
 
-const superAdminRoutes = [PROTECTED_ROUTES.home];
-
-// const siteRoutes = [
-//   PROTECTED_ROUTES.siteSummary,
-//   PROTECTED_ROUTES.siteByRegion,
-//   PROTECTED_ROUTES.groupBySite,
-//   PROTECTED_ROUTES.createGroupBySite
-// ];
-
-// const dashboardRoutes = [
-//   PROTECTED_ROUTES.regionDashboard,
-//   PROTECTED_ROUTES.accountDashboard,
-//   PROTECTED_ROUTES.OUDashboard,
-//   PROTECTED_ROUTES.siteDashboard
-// ];
+const superAdminRoutes = [PROTECTED_ROUTES.region];
 
 const customBreadcrumbs = [{ route: '', label: 'Add Medication', appendParent: true }];
 
@@ -43,20 +28,7 @@ const customBreadcrumbs = [{ route: '', label: 'Add Medication', appendParent: t
 const Breadcrumb = (): React.ReactElement => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
-  const region = useMemo(
-    () => ({
-      id: '2',
-      name: 'Sierra Leone',
-      countryCode: '2',
-      unitMeasurement: 'metric',
-      users: [],
-      tenantId: '1'
-    }),
-    []
-  );
-  // const account = useSelector(accountSelector);
-  // const operatingUnit = useSelector(getOperatingUnitDetailSelector);
-  // const site = useSelector(siteSelector);
+  const region = useSelector(userDataSelector).country;
   const role = useSelector(roleSelector);
 
   const activeRoute = useMemo(
@@ -90,7 +62,7 @@ const Breadcrumb = (): React.ReactElement => {
     if (region?.name && showRegion) {
       result.push({
         label: region.name,
-        route: PROTECTED_ROUTES.home.replace(':regionId', region.id).replace(':tenantId', region.tenantId)
+        route: PROTECTED_ROUTES.region.replace(':regionId', region.id).replace(':tenantId', region.tenantId)
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
@@ -105,7 +77,7 @@ const Breadcrumb = (): React.ReactElement => {
       });
     }
     return result;
-  }, [customBreadcrumb, region.name, region.id, region.tenantId, showRegion]);
+  }, [customBreadcrumb, region, showRegion]);
 
   const dispatchData = useCallback((routeObject: any, name: string) => {
     return {

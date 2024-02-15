@@ -14,9 +14,7 @@ import hidePass from '../../assets/images/hidePass.svg';
 import { PUBLIC_ROUTES } from '../../constants/route';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { loginRequest } from '../../store/user/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { getIsLoggingInSelector } from '../../store/user/selectors';
-import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 
 interface ILoginForm {
   email: string;

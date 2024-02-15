@@ -26,18 +26,15 @@ const APPCONSTANTS = {
   ROLES: {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
-    ADMIN: 'ADMIN'
+    SITE_ADMIN: 'SITE_ADMIN'
   },
   ALL_ROLES: {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
-    ADMIN: 'ADMIN'
+    SITE_ADMIN: 'SITE_ADMIN'
   },
   ROUTE_NAMES: {
-    REGION: 'region',
-    ACCOUNT: 'account',
-    OU: 'OU',
-    SITE: 'site'
+    REGION: 'region'
   },
   IS_SIDEMENU_COLLAPSED: 'isSmCollapsed',
   REGIONS_PER_PAGE: 10,
@@ -67,24 +64,6 @@ const APPCONSTANTS = {
   REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
-  SITE_FETCH_ERROR: 'Unable to load sites. Please try after sometime.',
-  SITE_USERS_FETCH_ERROR: 'Unable to load site users. Please try after sometime.',
-  SITE_ADMINS_FETCH_ERROR: 'Unable to load site admins. Please try after sometime.',
-  SITE_DETAILS_UPDATE_ERROR: 'Unable to update site details. Please try after sometime.',
-  SITE_DETAILS_UPDATE_SUCCESS: 'Site details updated successfully.',
-  SITE_USER_CREATE_SUCCESS: 'Site user added successfully.',
-  SITE_USER_CREATE_ERROR: 'Unable to add site user. Please try after sometime.',
-  SITE_USER_UPDATE_ERROR: 'Unable to update site user. Please try after sometime.',
-  SITE_SUMMARY_FETCH_ERROR: 'Unable to load site summary Details. Please try after sometime.',
-  SITE_SUMMARY_UPDATE_ERROR: 'Unable to update site summary Details. Please try after sometime.',
-  PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
-  SITE_CREATION_SUCCESS: 'Site created successfully',
-  SITE_CREATION_ERROR: 'Unable to create site. Please try after sometime.',
-  GROUP_UPDATE_SUCCESS: 'Group updated successfully.',
-  GROUP_DETAILS_FETCH_ERROR: 'Unable to load group details. Please try after sometime.',
-  GROUP_DETAILS_UPDATE_ERROR: 'Unable to update group details. Please try after sometime.',
-  GROUP_CREATION_SUCCESS: 'Group created successfully',
-  GROUP_CREATION_ERROR: 'Unable to create group. Please try after sometime.',
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
   MEDICATION_FETCH_ERROR: 'Unable to load medications. Please try after sometime.',
@@ -106,16 +85,8 @@ const APPCONSTANTS = {
   ENTER_CONFIRM_PASSWORD: 'Please enter confirm password.',
   PASSWORD_SHOULD_NOT_MATCH_ACC_NAME: `New password should not match the user's account name.`,
   COMMON_PASSWORDS_ARE_NOT_ALLOWED: 'Common passwords are not allowed.',
-  CONFIRM_PASSWORD_SHOULD_MATCH: 'Confirm new password should be match with new password.',
+  CONFIRM_PASSWORD_SHOULD_MATCH: 'Confirm new password should match with new password.',
   REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
-  OPERATING_UNIT_DETAIL_FETCH_ERROR: 'Unable to load operating unit summary. Please try after sometime.',
-  OPERATING_UNIT_LIST_FETCH_ERROR: 'Unable to load operating unit list. Please try after sometime.',
-  OPERATING_UNIT_UPDATE_SUCCESS: 'Operating Unit updated successfully.',
-  OPERATING_UNIT_UPDATE_FAIL: 'Unable to update operating unit. Please try after sometime.',
-  OPERATING_UNIT_ADMIN_CREATE_SUCCESS: 'Operating Unit admin created successfully.',
-  OPERATING_UNIT_ADMIN_CREATE_FAIL: 'Unable to create operating unit admin. Please try after sometime.',
-  OPERATING_UNIT_ADMIN_UPDATE_SUCCESS: 'Operating Unit admin updated successfully.',
-  OPERATING_UNIT_ADMIN_UPDATE_FAIL: 'Unable to update operating unit admin. Please try after sometime.',
   MEDICATION_LIST_FETCH_ERROR: 'Unable to load medications list. Please try after sometime.',
   MEDICATION_UPDATE_SUCCESS: 'Medication updated successfully.',
   MEDICATION_UPDATE_FAIL: 'Unable to update medication. Please try after sometime.',
@@ -139,16 +110,6 @@ const APPCONSTANTS = {
   ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
   SITE_USER_DELETE_TITLE: 'Delete Site User',
-  ADMIN_DELETE_TITLE: 'Delete Site Admin',
-  ACTIVATE_ACCOUNT_CONFIRMATION: 'Are you sure want to activate the account?',
-  ACTIVATE_ACCOUNT_TITLE: 'Activate Account',
-  SITE_TYPE: [
-    { value: 'Clinic', label: 'Clinic' },
-    { value: 'Pharmacy', label: 'Pharmacy' },
-    { value: 'Community', label: 'Community' },
-    { value: 'Workplace', label: 'Workplace' },
-    { value: 'Other', label: 'Other' }
-  ],
   ADDRESS_USE: [
     { value: 'Home', label: 'Home' },
     { value: 'Work', label: 'Work' },
@@ -165,8 +126,7 @@ const APPCONSTANTS = {
     { value: 'NURSE', label: 'Nurse' },
     { value: 'PHYSICIAN_PRESCRIBER', label: 'Physician Prescriber' },
     { value: 'PROVIDER', label: 'Provider' },
-    { value: 'COUNSELOR', label: 'Counselor' },
-    { value: 'SITE_ADMIN', label: 'Site Admin' }
+    { value: 'COUNSELOR', label: 'Counselor' }
   ],
   SITE_LEVEL: [
     { label: 'Level 1', value: 'Level 1' },
@@ -179,12 +139,6 @@ const APPCONSTANTS = {
   SEARCH_BY_NAME_EMAIL: 'First Name / Email',
   SEARCH_BY_NAME: 'Search Name',
   SEARCH_BY_EMAIL: 'Search Email',
-  OPERATING_UNIT_DELETE_CONFIRMATION: 'Are you sure want to delete the operating unit?',
-  OPERATING_UNIT_DELETE_TITLE: 'Delete Operating Unit',
-  OPERATING_UNIT_ADMIN_DELETE_SUCCESS: 'Operating Unit admin deleted successfully.',
-  OPERATING_UNIT_ADMIN_DELETE_FAIL: 'Unable to delete operating unit admin. Please try after sometime.',
-  OPERATING_UNIT_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete the operating unit admin?',
-  OPERATING_UNIT_ADMIN_DELETE_TITLE: 'Delete Operating Unit Admin',
   GENDER_OPTIONS: [
     { value: 'Male', label: 'Male' },
     { value: 'Female', label: 'Female' },
@@ -194,27 +148,12 @@ const APPCONSTANTS = {
     { value: 'Postal', label: 'Postal' },
     { value: 'Physical', label: 'Physical' }
   ],
-  REGION_DEACTIVATE_SUCCESS: 'Region deactivated successfully.',
-  REGION_DEACTIVATE_FAIL: 'Unable to deactivate the region. Please try after sometime.',
-  DEACTIVATE_REASON: [
-    { label: 'Unable to pay', value: 'Unable to pay' },
-    { label: 'Contract expired', value: 'Contract expired' },
-    { label: 'Site closure', value: 'Site closure' },
-    { label: 'Inactive site', value: 'Inactive site' },
-    { label: 'Other', value: 'Other' }
-  ],
   SESSION_EXPIRED: 'Session got expired. Please login again.',
-  SEARCH_ACCOUNT_ERROR: 'Unable to search the account. Please try after sometime.',
-  ACCOUNT_FETCH_ERROR: 'Unable to load accounts. Please try after sometime.',
-  DEACTIVATED_RECORDS_FETCH_ERROR: 'Unable to load deactivated records. Please try after sometime.',
   LOCKED_USERS_FETCH_ERROR: 'Unable to load the locked users list. Please try after sometime.',
-  SUPERADMIN_FETCH_ERROR: 'Unable to load super admins. Please try after sometime.',
   RESTRICTION_OPTIONS: [
     { value: 'Yes', label: 'Yes' },
     { value: 'No', label: 'No' }
   ],
-  ACCOUNT_CREATION_SUCCESS: 'Account created successfully.',
-  ACCOUNT_CREATION_FAIL: 'Unable to create account. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
@@ -224,22 +163,13 @@ const APPCONSTANTS = {
   ACCOUNT_WORKFLOW_DELETE_SUCCESS: 'Account workflow module deleted successfully.',
   ACCOUNT_WORKFLOW_DELETE_ERROR: 'Unable to delete the account workflow. Please try after sometime.',
   ACCOUNT_WORKFLOW_ALREADY_EXISTS: 'Account workflow name already exists.',
-  VIEW_REPORTS: [
-    { value: 'Yes', label: 'Yes' },
-    { value: 'No', label: 'No' }
-  ],
   DEFAULT_CULTURE: { id: 1, name: 'English - India' },
   FORM_ID: 'formId',
   COUNTRY_ID: 'ci',
   COUNTRY_TENANT_ID: 'cti',
-  SUPER_ADMIN_CREATE_SUCCESS: 'Super admin added successfully.',
-  SUPER_ADMIN_CREATE_FAIL: 'Unable to add super admin. Please try after sometime.',
   ID: 'id',
   REGION_NAME: 'regionName',
   ACC_ID: 'accId',
-  ACCOUNT_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete account admin?',
-  ACCOUNT_ADMIN_DELETE_TITLE: 'Delete Account Admin',
-  ACCOUNT_DETAIL_FETCH_ERROR: 'Unable to load account summary. Please try after sometime.',
   REGION_ADMIN_UPDATE_SUCCESS: 'Region admin updated successfully.',
   REGION_ADMIN_UPDATE_FAIL: 'Unable to update region admin. Please try after sometime.',
   DELETE: 'Delete',
@@ -247,36 +177,6 @@ const APPCONSTANTS = {
   RESET: 'Reset',
   YES: 'Yes',
   NO: 'No',
-  SUPER_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete super admin?',
-  SUPER_ADMIN_DELETE_TITLE: 'Delete Super Admin',
-  SUPER_ADMIN_DELETE_SUCCESS: 'Super admin deleted successfully.',
-  SUPER_ADMIN_DELETE_FAIL: 'Unable to delete super admin. Please try after sometime.',
-  ACCOUNT_UPDATE_SUCCESS: 'Account summary updated successfully.',
-  ACCOUNT_UPDATE_FAIL: 'Unable to update account summary. Please try after sometime.',
-  ACCOUNT_ADMIN_CREATE_SUCCESS: 'Account admin added successfully.',
-  ACCOUNT_ADMIN_CREATE_FAIL: 'Unable to add account admin. Please try after sometime',
-  ACCOUNT_ADMIN_UPDATE_SUCCESS: 'Account admin updated successfully.',
-  ACCOUNT_ADMIN_UPDATE_FAIL: 'Unable to update account admin. Please try after sometime',
-  ACCOUNT_ADMIN_DELETE_SUCCESS: 'Account admin deleted successfully.',
-  ACCOUNT_ADMIN_DELETE_FAIL: 'Unable to delete account admin. Please try after sometime.',
-  SUPER_ADMIN_UPDATE_TITLE: 'Update Super Admin',
-  SUPER_ADMIN_UPDATE_SUCCESS: 'Super admin updated successfully.',
-  SUPER_ADMIN_UPDATE_FAIL: 'Unable to update super admin. Please try after sometime.',
-  SUPER_ADMIN_FETCH_FAIL: 'Unable to fetch super admin. Please try after sometime.',
-  SITE_UPDATE_SUCCESS: 'Site updated successfully.',
-  SITE_UPDATE_FAIL: 'Unable to update site. Please try after sometime.',
-  SITE_USER_UPDATE_TITLE: 'Update Site User',
-  SITE_USER_UPDATE_SUCCESS: 'Site user updated successfully.',
-  SITE_USER_UPDATE_FAIL: 'Unable to update site user. Please try after sometime.',
-  SITE_USER_FETCH_FAIL: 'Unable to fetch site user. Please try after sometime.',
-  SITE_USER_DELETE_SUCCESS: 'Site user deleted successfully.',
-  SITE_USER_DELETE_FAIL: 'Unable to delete site user. Please try after sometime.',
-  SITE_ADMIN_UPDATE_TITLE: 'Update Site Admin',
-  SITE_ADMIN_UPDATE_SUCCESS: 'Site admin updated successfully.',
-  SITE_ADMIN_UPDATE_FAIL: 'Unable to update site Admin. Please try after sometime.',
-  SITE_ADMIN_FETCH_FAIL: 'Unable to fetch site Admin. Please try after sometime.',
-  SITE_ADMIN_DELETE_SUCCESS: 'Site Admin deleted successfully.',
-  SITE_ADMIN_DELETE_FAIL: 'Unable to delete site Admin. Please try after sometime.',
   UNLOCK_USER_SUCCESS: 'User unlocked successfully.',
   UNLOCK_USER_FAIL: 'Unable to unlock the user. Please try after sometime.',
   ACCOUNT_ACTIVATE_SUCCESS: 'Account activated successfully.',
@@ -315,11 +215,6 @@ const APPCONSTANTS = {
   LABTEST_RESULT_RANGES_CREATE_FAIL: 'Unable to create lab result ranges. Please try after sometime.',
   LABTEST_RESULT_RANGES_UPDATE_SUCCESS: 'Labtest result ranges updated successfully.',
   LABTEST_RESULT_RANGES_UPDATE_FAIL: 'Unable to update lab result ranges. Please try after sometime.',
-  GROUP_FETCH_ERROR: 'Unable to load groups. Please try after sometime.',
-  GROUP_DELETE_SUCCESS: 'Group deleted successfully.',
-  GROUP_DELETE_FAIL: 'Unable to delete the group. Please try after sometime.',
-  GROUP_DELETE_TITLE: 'Delete Group',
-  GROUP_DELETE_CONFIRMATION: 'Are you sure want to delete the group?',
   EMAIL_ALREADY_EXISTS_ERR_MSG: 'Email ID already exists',
   EMR_ERR_MSG: 'Email ID already exists in EMR role',
   SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',
@@ -335,8 +230,7 @@ const APPCONSTANTS = {
     'PHYSICIAN_PRESCRIBER',
     'PHARMACIST',
     'PROVIDER',
-    'NURSE',
-    'SITE_ADMIN'
+    'NURSE'
   ],
   REPORTING_ROLE_NAMES: ['REPORT_ADMIN', 'EMR_FACILITY_ADMIN', 'EMR_REPORTING_ADMIN'],
   ACTIVE: 'Active',
@@ -358,29 +252,6 @@ const APPCONSTANTS = {
     { name: 'Enrollment Form' },
     { name: 'Assessment Form', isCustomIconInvisible: true }
   ],
-  FORM_CUSTOMIZATION_SUCCESS: 'Dynamic form customization updated successfully.',
-  FORM_CUSTOMIZATION_ERROR: 'Unable to update the dynamic form customization. Please try after sometime.',
-  CONSENT_FORM_CUSTOMIZATION_SUCCESS: 'consent form updated successfully.',
-  CONSENT_FORM_CUSTOMIZATION_ERROR: 'consent form updation failed. Please try after sometime.',
-  DEACTIVATE_CONSENT_SUCCESS: 'consent form deleted successfully.',
-  DEACTIVATE_CONSENT_FAILURE: 'consent form deletion failed. Please try after sometime.',
-  DEACTIVATE_CONSENT_NO_DATA: 'consent data not found. Please try after sometime.',
-  DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the account consent form?',
-  DELETE_CONSENT_TITLE: 'Delete confirmation',
-  CONSENT_FORM_EMPTY_ERROR: 'Consent data should not be empty.',
-  FETCH_CONSENT_FORM_ERROR: 'Unable to fetch the consent form data. Please try after sometime.',
-  FETCH_FORM_META_ERROR: 'Unable to fetch the form meta data. Please try after sometime.',
-  GROUP_ORDER: {
-    bioData: 1,
-    bioMetrics: 2,
-    glucoseLog: 3,
-    phq4: 4,
-    bpLog: 5
-  },
-  VALIDITY_OPTIONS: {
-    gone: { key: 'gone', label: 'Hide' },
-    visible: { key: 'visible', label: 'Show' }
-  },
   NO_FAMILY: 'NO_FAMILY',
   INVALID_CREDENTIALS: 'Invalid credentials'
 };
@@ -388,7 +259,7 @@ const APPCONSTANTS = {
 export const ROLE_LABELS = {
   [APPCONSTANTS.ALL_ROLES.SUPER_USER]: 'Super User',
   [APPCONSTANTS.ALL_ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ALL_ROLES.ADMIN]: 'Admin'
+  [APPCONSTANTS.ALL_ROLES.SITE_ADMIN]: 'Admin'
 };
 
 export default APPCONSTANTS;

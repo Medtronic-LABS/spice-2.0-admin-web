@@ -13,9 +13,9 @@ interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
 
-const routesWithSideMenu: any[] = [{ route: PROTECTED_ROUTES.home }];
+const routesWithSideMenu: any[] = [{ route: PROTECTED_ROUTES.region }, { route: PROTECTED_ROUTES.healthFacility }];
 
-const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.home }];
+const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.region }, { route: PROTECTED_ROUTES.healthFacility }];
 
 const header = (
   isBCDisabled: boolean,
