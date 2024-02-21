@@ -13,7 +13,10 @@ interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
 
-const routesWithSideMenu: any[] = [{ route: PROTECTED_ROUTES.region }, { route: PROTECTED_ROUTES.healthFacility }];
+const routesWithSideMenu: any[] = [
+  { route: PROTECTED_ROUTES.region },
+  { route: PROTECTED_ROUTES.healthFacility, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
+];
 
 const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.region }, { route: PROTECTED_ROUTES.healthFacility }];
 
@@ -53,8 +56,9 @@ export const AppLayout = ({ children }: IAppLayout) => {
     () =>
       !Boolean(
         routesWithSideMenu.find(
-          ({ route, disabledRoles }) =>
-            matchPath(pathname, { path: route, exact: true }) && !disabledRoles?.includes(role)
+          ({ route, childRoutes, disabledRoles }) =>
+            [...(childRoutes || []), route].some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
+            !disabledRoles?.includes(role)
         )
       ),
     [pathname, role]

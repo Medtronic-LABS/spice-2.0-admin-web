@@ -395,13 +395,13 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
                   const isLastChild = (rowData.length || 0) === idx + 1;
                   return (
                     <tr
-                      key={idx}
+                      key={data.id || idx}
                       onClick={() => this.navigateToDetail(data)}
                       className={this.handleRowStyle(isLastChild)}
                     >
                       {columnsDef &&
-                        columnsDef.map((column: IColumns) => (
-                          <td key={column.id}>
+                        columnsDef.map((column: IColumns, index: number) => (
+                          <td key={column.id || index}>
                             {column.cellFormatter ? column.cellFormatter(data, column) : data[column.name]}
                           </td>
                         ))}

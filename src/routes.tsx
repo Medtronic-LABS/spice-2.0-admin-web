@@ -11,6 +11,8 @@ import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/u
 import Region from './containers/region/Region';
 import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
+import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
+import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
 
 interface IRoute {
   path: string;
@@ -37,8 +39,14 @@ const protectedRoutes: IProtectedRoute[] = (() => {
     {
       path: PROTECTED_ROUTES.healthFacility,
       exact: true,
-      component: (() => <>Health Facility List</>) as React.FunctionComponent<any>,
-      authorisedRoles: [SITE_ADMIN]
+      component: HealthFacilityList,
+      authorisedRoles: SU_SA_A
+    },
+    {
+      path: PROTECTED_ROUTES.healthFacilitySummary,
+      exact: true,
+      component: HealthFacilitySummary,
+      authorisedRoles: SU_SA_A
     }
   ];
 })();
@@ -68,7 +76,21 @@ export const AppRoutes = () => {
     country: { id: regionId, tenantId }
   } = data;
 
-  return isLoggedIn ? (
+  return !isLoggedIn ? (
+    <Switch>
+      {publicRoutes.map((route: any, index: number) => (
+        <Route
+          path={route.path}
+          exact={route.exact}
+          key={index}
+          render={(routeProps: RouteComponentProps<any>) => (
+            <route.component key={routeProps.location.key} {...routeProps} />
+          )}
+        />
+      ))}
+      <Redirect exact={true} to={PUBLIC_ROUTES.login} />
+    </Switch>
+  ) : isLoggedIn && regionId && tenantId ? (
     <AppLayout>
       <Switch>
         {protectedRoutes.map((route: IProtectedRoute, index: number) =>
@@ -92,18 +114,6 @@ export const AppRoutes = () => {
       </Switch>
     </AppLayout>
   ) : (
-    <Switch>
-      {publicRoutes.map((route: any, index: number) => (
-        <Route
-          path={route.path}
-          exact={route.exact}
-          key={index}
-          render={(routeProps: RouteComponentProps<any>) => (
-            <route.component key={routeProps.location.key} {...routeProps} />
-          )}
-        />
-      ))}
-      <Redirect exact={true} to={PUBLIC_ROUTES.login} />
-    </Switch>
+    <></>
   );
 };

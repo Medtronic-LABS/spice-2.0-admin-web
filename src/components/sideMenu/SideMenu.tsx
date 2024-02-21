@@ -3,11 +3,15 @@ import { matchPath, NavLink, useLocation } from 'react-router-dom';
 import { PROTECTED_ROUTES } from '../../constants/route';
 
 import styles from './SideMenu.module.scss';
+import { useSelector } from 'react-redux';
+import { roleSelector } from '../../store/user/selectors';
+import APPCONSTANTS from '../../constants/appConstants';
 
 interface ISideMenuItem {
   label: string;
   route: string;
   disabled?: boolean;
+  childRoutes?: string[];
 }
 
 interface ISideMenuProps {
@@ -33,12 +37,13 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Lab Test Database',
     route: '',
-    disabled: false
+    disabled: true
   },
   {
     label: 'Health Facility',
-    route: '',
-    disabled: false
+    route: PROTECTED_ROUTES.healthFacility,
+    disabled: false,
+    childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
   },
   {
     label: 'Users',
@@ -59,35 +64,31 @@ const adminRoutes: ISideMenuItem[] = [
 
 const SideMenu = ({ className }: ISideMenuProps) => {
   const { pathname } = useLocation();
+  const role = useSelector(roleSelector);
 
-  const { regionId, regionTenantId } = useMemo(() => {
-    const matchedRoute = superAdminRoutes.find(({ route }) => matchPath(pathname, { path: route, exact: true }));
+  const { regionId, regionTenantId, healthFacilityId } = useMemo(() => {
+    const matchedRoute = (role === APPCONSTANTS.ROLES.SITE_ADMIN ? adminRoutes : superAdminRoutes).find(
+      ({ route, childRoutes }) => {
+        return [...(childRoutes || []), route].some((newRoute) => matchPath(pathname, { path: newRoute, exact: true }));
+      }
+    );
     if (matchedRoute) {
       const params = matchPath(pathname, { path: matchedRoute.route, exact: true })?.params as any;
-      return { regionId: params?.regionId, regionTenantId: params?.tenantId };
+      return {
+        regionId: params?.regionId,
+        regionTenantId: params?.tenantId,
+        healthFacilityId: params?.healthFacilityId
+      };
     }
     return {};
-  }, [pathname]);
-
-  const { regionId: rIdForHealthFacility } = useMemo(() => {
-    const matchedRoute = adminRoutes.find(({ route }) => matchPath(pathname, { path: route, exact: true }));
-    if (matchedRoute) {
-      const params = matchPath(pathname, { path: matchedRoute.route, exact: true })?.params as any;
-      return { regionId: params?.regionId };
-    }
-    return {};
-  }, [pathname]);
+  }, [pathname, role]);
 
   const sideMenu = useMemo(() => {
     let choosenRoutes: ISideMenuItem[] = [];
     const pathParams: Array<[string, string]> = [];
-    if (regionId) {
-      choosenRoutes = [...superAdminRoutes];
-      pathParams.push([':regionId', regionId], [':tenantId', regionTenantId]);
-    }
-    if (rIdForHealthFacility) {
-      choosenRoutes = [...adminRoutes];
-      pathParams.push([':regionId', regionId]);
+    if (regionId || healthFacilityId) {
+      choosenRoutes = [...(role === 'SITE_ADMIN' ? adminRoutes : superAdminRoutes)];
+      pathParams.push([':regionId', regionId], [':healthFacilityId', healthFacilityId], [':tenantId', regionTenantId]);
     }
     return choosenRoutes.map((menu: ISideMenuItem) => {
       menu = { ...menu };
@@ -96,7 +97,7 @@ const SideMenu = ({ className }: ISideMenuProps) => {
       });
       return menu;
     });
-  }, [rIdForHealthFacility, regionId, regionTenantId]);
+  }, [healthFacilityId, regionId, regionTenantId, role]);
 
   return (
     <div className={`${styles.sideMenu} py-0dot25 ${className}`}>

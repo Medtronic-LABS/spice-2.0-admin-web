@@ -70,7 +70,7 @@ export const setupInterceptors = (store: any) => {
   axios.interceptors.response.use(
     (response: AxiosResponse) => responseStatusReturn(response, store),
     (error) => {
-      if (error) {
+      if (error && error?.message !== ERRORS.NETWORK_ERROR.name) {
         return error;
       } else {
         throw new ApiError(ERRORS.NETWORK_ERROR);

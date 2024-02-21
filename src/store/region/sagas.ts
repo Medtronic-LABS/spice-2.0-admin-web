@@ -2,7 +2,7 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
-import { IDownloadFileRequest, IRegionDetailsRequest, IUploadFileRequest } from './types';
+import { IDownloadFileRequest, IRegionDetails, IRegionDetailsRequest, IUploadFileRequest } from './types';
 import * as regionService from '../../services/regionAPI';
 import * as regionActions from './actions';
 
@@ -49,7 +49,12 @@ export function* regionDetailsSaga({
     const {
       data: { entityList: regionDetails, totalCount }
     } = yield call(regionService.regionDetails, countryId, limit, skip, search);
-    const payload = { list: regionDetails, total: totalCount };
+    const payload = {
+      list: regionDetails[0]?.id
+        ? regionDetails
+        : regionDetails.map((d: IRegionDetails, id: number) => ({ ...d, id: id + 1 })),
+      total: totalCount
+    };
     successCb?.(payload);
     yield put(regionActions.regionDetailsSuccess(payload));
   } catch (e: any) {

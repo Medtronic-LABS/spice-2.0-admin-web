@@ -122,12 +122,12 @@ const Region = (): React.ReactElement => {
                     label: 'CHEIFDOM'
                   },
                   {
-                    id: 1,
+                    id: 3,
                     name: 'villagename',
                     label: 'VILLAGE'
                   },
                   {
-                    id: 1,
+                    id: 4,
                     name: 'villagetype',
                     label: 'VILLAGE TYPE'
                   }
@@ -138,8 +138,8 @@ const Region = (): React.ReactElement => {
                 rowsPerPage={listParams.rowsPerPage}
                 count={regionDetails.total}
                 handlePageChange={handlePage}
-                confirmationTitle={APPCONSTANTS.SITE_USER_DELETE_CONFIRMATION}
-                deleteTitle={APPCONSTANTS.SITE_USER_DELETE_TITLE}
+                confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
+                deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
               />
             </DetailCard>
           </div>

@@ -21,15 +21,13 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
   try {
     const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
     const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
-    const {
-      headers: { authorization: token, tenantId: userTenantID }
-    } = yield call(userService.login, username, hashedPassword);
-    const encryptedToken = encryptData(token);
-    sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, encryptedToken);
+    const { headers } = yield call(userService.login, username, hashedPassword);
     sessionStorageServices.setItem('iLi', true);
-    sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, userTenantID);
+    sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headers?.tenantID);
+    yield put(userActions.addUserTenantID(headers?.tenantID));
+    const encryptedToken = encryptData(headers?.authorization);
+    sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, encryptedToken);
     yield put(userActions.addToken(encryptedToken));
-    yield put(userActions.addUserTenantID(userTenantID));
     const {
       data: {
         entity: {
@@ -63,14 +61,16 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     successCb?.(payload);
     yield put(userActions.loginSuccess(payload));
   } catch (e: any) {
-    sessionStorageServices.clearAllItem();
-    sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
-    sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-    sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
-    yield put(userActions.resetStore());
-    yield put(userActions.removeToken());
-    failureCb?.(e);
-    yield put(userActions.loginFailure({ error: e?.message }));
+    if (e instanceof Error) {
+      sessionStorageServices.clearAllItem();
+      sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
+      sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
+      sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
+      yield put(userActions.resetStore());
+      yield put(userActions.removeToken());
+      failureCb?.(e);
+      yield put(userActions.loginFailure({ error: e?.message }));
+    }
   }
 }
 

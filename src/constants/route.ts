@@ -9,7 +9,8 @@ export const PUBLIC_ROUTES = {
 
 export const PROTECTED_ROUTES = {
   region: '/region/:regionId/:tenantId',
-  healthFacility: '/healthFacility/:regionId/'
+  healthFacility: '/healthFacility/list/:regionId/',
+  healthFacilitySummary: '/healthFacility/:healthFacilityId/'
 };
 
 export const HOME_PAGE_BY_ROLE = {

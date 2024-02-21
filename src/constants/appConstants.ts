@@ -105,11 +105,11 @@ const APPCONSTANTS = {
   REGION_ADMIN_DELETE_FAIL: 'Unable to delete region admin. Please try after sometime.',
   REGION_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete region admin?',
   REGION_ADMIN_DELETE_TITLE: 'Delete Region Admin',
-  SITE_USER_DELETE_CONFIRMATION: 'Are you sure want to delete the site user?',
+  HEALTH_FACILITY_USER_DELETE_CONFIRMATION: 'Are you sure want to delete the health facility user?',
   USER_DELETE_CONFIRMATION: 'Users will be deleted from all the linked sites. Are you sure to proceed?',
   ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
-  SITE_USER_DELETE_TITLE: 'Delete Site User',
+  HEALTH_FACILITY_USER_DELETE_TITLE: 'Delete Health Facility User',
   ADDRESS_USE: [
     { value: 'Home', label: 'Home' },
     { value: 'Work', label: 'Work' },
