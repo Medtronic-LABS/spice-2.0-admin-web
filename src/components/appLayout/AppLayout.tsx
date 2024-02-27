@@ -15,10 +15,13 @@ interface IAppLayout {
 
 const routesWithSideMenu: any[] = [
   { route: PROTECTED_ROUTES.region },
-  { route: PROTECTED_ROUTES.healthFacility, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
 ];
 
-const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.region }, { route: PROTECTED_ROUTES.healthFacility }];
+const routesWithoutBreadcrumb: any[] = [
+  { route: PROTECTED_ROUTES.region },
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin }
+];
 
 const header = (
   isBCDisabled: boolean,

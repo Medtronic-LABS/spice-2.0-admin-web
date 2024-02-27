@@ -9,6 +9,9 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 import ModalForm from '../../components/modal/ModalForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
+import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
+import { FormApi } from 'final-form';
+
 interface IModalState {
   data?: any;
   isOpen: boolean;
@@ -33,7 +36,7 @@ const HealthFacilityList = (): React.ReactElement => {
   };
 
   const editHealthFacilityDetailsModalRender = (form: any) => {
-    return <></>;
+    return <HealthFacilityDetailsForm form={form as FormApi<any>} isEdit={true} />;
   };
 
   const handleHealthFacilityDetailsSubmit = ({ site }: any) => {
@@ -41,9 +44,9 @@ const HealthFacilityList = (): React.ReactElement => {
   };
 
   const openCreateHealthFacility = () => {
-    const url = PROTECTED_ROUTES.healthFacilitySummary;
-    const healthFacilityId = '1';
-    history.push(url.replace(':healthFacilityId', healthFacilityId as string));
+    const url = PROTECTED_ROUTES.createHealthFacility;
+    const regionId = '1';
+    history.push(url.replace(':regionId', regionId as string));
   };
 
   const handleRowClick = (data: any) => {

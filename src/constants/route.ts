@@ -9,12 +9,14 @@ export const PUBLIC_ROUTES = {
 
 export const PROTECTED_ROUTES = {
   region: '/region/:regionId/:tenantId',
-  healthFacility: '/healthFacility/list/:regionId/',
-  healthFacilitySummary: '/healthFacility/:healthFacilityId/'
+  healthFacilityBySuperAdmin: '/region/:regionId/healthFacility/list',
+  healthFacilityByAdmin: '/healthFacility/list',
+  healthFacilitySummary: '/healthFacility/:healthFacilityId',
+  createHealthFacility: '/region/:regionId/healthFacility/create'
 };
 
 export const HOME_PAGE_BY_ROLE = {
   [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.region,
   [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.region,
-  [APPCONSTANTS.ROLES.SITE_ADMIN]: PROTECTED_ROUTES.healthFacility
+  [APPCONSTANTS.ROLES.SITE_ADMIN]: PROTECTED_ROUTES.healthFacilityByAdmin
 };

@@ -10,6 +10,8 @@ import toastCenter from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
+import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
+import UserForm from '../../components/userForm/UserForm';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -31,7 +33,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId } = useParams<IMatchParams>();
 
-  const [editHealthFacilityDetailsModal, setEditHealthFacilityDetailsModal] = useState<IModalState>({
+  const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false
   });
 
@@ -40,29 +42,38 @@ const HealthFacilitySummary = (): React.ReactElement => {
     data: [
       {
         id: 1,
-        adminName: 'Albert Flores',
-        roleName: 'Nurse',
+        firstName: 'Albert',
+        lastName: 'Flores',
+        role: 'CHW',
         username: 'albert@exmple.com',
         gender: 'Male',
         countryCode: '232',
-        phoneNumber: '9840123456'
+        phoneNumber: '9840123456',
+        suiteAccess: 'SPICE',
+        assignedHealthFacility: 'Health Facility 1',
+        selectedPeerSupervisor: 'Peer Supervisor 1',
+        assignedVillages: [{ label: 'Village 1', value: 'village1' }]
       },
       {
         id: 2,
-        adminName: 'Albert Flores',
-        roleName: 'Nurse',
+        firstName: 'Albert',
+        lastName: 'Flores',
+        role: 'CHW',
         username: 'albert@exmple.com',
         gender: 'Male',
         countryCode: '232',
-        phoneNumber: '9840123456'
+        phoneNumber: '9840123456',
+        assignedHealthFacility: '',
+        selectedPeerSupervisor: '',
+        assignedVillages: [{ label: 'Peer Supervisor 1', value: 'peersupervisor1' }]
       }
     ]
   });
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
 
-  const [showHealtFacilityUserModal, setHealthFacilityUserModal] = useState(false);
-  const [isHealthFacilityUserEdit, setIsHealthFacilityUserEdit] = useState(false);
-  const healtFacilityUserForEdit = useRef<{ users: any[] }>({ users: [] });
+  const [showHFUserModal, setHFUserModal] = useState(false);
+  const [isHFUserEdit, setIsHFUserEdit] = useState(false);
+  const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
   const summaryDetails = useMemo(
     () =>
       ({
@@ -72,25 +83,17 @@ const HealthFacilitySummary = (): React.ReactElement => {
         phuNo: '+254 79474839',
         district: 'Port Loko',
         chiefdom: 'Kamaranka',
-        address: '',
+        address: 'test address',
         city: 'Makatha',
-        latitude: '',
-        longitude: '',
+        latitude: '12.4',
+        longitude: '10.37',
         postalCode: '485645',
-        linkedPeerSupervisor: '',
-        language: '',
+        linkedPeerSupervisor: 'Supervisor 1',
+        language: 'English',
         linkedVillages: [
-          { name: 'Village 1' },
-          { name: 'Village 2' },
-          { name: 'Village 3' },
-          { name: 'Village 4' },
-          { name: 'Village 5' },
-          { name: 'Village 6' },
-          { name: 'Village 7' },
-          { name: 'Village 8' },
-          { name: 'Village 9' },
-          { name: 'Village 10' },
-          { name: 'Village 11' }
+          { label: 'Village 1', value: 'village1' },
+          { label: 'Village 2', value: 'village2' },
+          { label: 'Village 5', value: '5' }
         ]
       } as any),
     []
@@ -114,7 +117,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       {
         label: 'Linked Villages',
         value: summaryDetails?.linkedVillages,
-        subKey: 'name',
+        subKey: 'label',
         style: { col: 'col-12', subCol: 'col-3' }
       }
     ],
@@ -134,9 +137,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
     setSummaryUsers((prevState) => ({ ...prevState, loading: true }));
   };
 
-  const openHealthFacilityEditModal = () => {
+  const openHFEditModal = () => {
     if (summaryDetails) {
-      setEditHealthFacilityDetailsModal({
+      setEditHFDetailsModal({
         isOpen: true,
         data: {
           ...summaryDetails
@@ -147,28 +150,28 @@ const HealthFacilitySummary = (): React.ReactElement => {
     }
   };
 
-  const closeHealthFacilityEditModal = () => {
-    setEditHealthFacilityDetailsModal({
+  const closeHFEditModal = () => {
+    setEditHFDetailsModal({
       isOpen: false
     });
   };
 
-  const editHealthFacilityDetailsModalRender = () => {
-    return <></>;
+  const editHFDetailsModalRender = (form: any) => {
+    return <HealthFacilityDetailsForm form={form} isEdit={true} data={editHFDetailsModal.data} />;
   };
 
-  const handleHealthFacilityDetailsSubmit = () => {
+  const handleHFDetailsSubmit = () => {
     //
   };
 
   const handleEditUserClick = useCallback(
     (user: any) => {
-      setIsHealthFacilityUserEdit(true);
+      setIsHFUserEdit(true);
       user.country = { countryCode: user.countryCode || '' };
-      healtFacilityUserForEdit.current = { users: [{ ...user }] };
-      setHealthFacilityUserModal(true);
+      hfUserForEdit.current = { users: [{ ...user }] };
+      setHFUserModal(true);
     },
-    [healtFacilityUserForEdit]
+    [hfUserForEdit]
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
@@ -176,10 +179,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
   };
 
   const handleAddUserClick = useCallback(() => {
-    setIsHealthFacilityUserEdit(false);
-    healtFacilityUserForEdit.current = { users: [] };
-    setHealthFacilityUserModal(true);
-  }, [healtFacilityUserForEdit]);
+    setIsHFUserEdit(false);
+    hfUserForEdit.current = { users: [] };
+    setHFUserModal(true);
+  }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
     //
@@ -198,15 +201,28 @@ const HealthFacilitySummary = (): React.ReactElement => {
     return `${user.countryCode && '+ ' + user.countryCode} ${user.phoneNumber}`;
   };
 
+  const formatName = (user: any) => {
+    return `${user.firstName} ${user.lastName}`;
+  };
+
   const formatRole = (user: any) => {
-    if (user.roleName) {
-      const role = user.roleName as keyof typeof ROLE_LABELS;
-      return ROLE_LABELS[role] || user.roleName;
+    if (user.role) {
+      const role = user.role as keyof typeof ROLE_LABELS;
+      return ROLE_LABELS[role] || user.role;
     }
   };
 
   const userFormRender = (form?: FormApi<any>) => {
-    return <></>;
+    return (
+      <UserForm
+        form={form as FormApi<any>}
+        initialEditValue={hfUserForEdit.current.users[0]}
+        disableOptions={true}
+        isEdit={isHFUserEdit}
+        entityName='healthFacility'
+        enableAutoPopulate={true}
+      />
+    );
   };
 
   return (
@@ -217,7 +233,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
             buttonLabel='Edit Health Facility'
             isEdit={true}
             header='Health Facility Summary'
-            onButtonClick={openHealthFacilityEditModal}
+            onButtonClick={openHFEditModal}
           >
             <div className='row gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
               {lableData.map(({ label, value, style, subKey }) => (
@@ -257,11 +273,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
               columnsDef={[
                 {
                   id: 1,
-                  name: 'adminName',
+                  name: 'name',
                   label: 'ADMIN NAME',
-                  width: '20%'
+                  width: '20%',
+                  cellFormatter: formatName
                 },
-                { id: 2, name: 'roleName', label: 'ROLE', width: '12%', cellFormatter: formatRole },
+                { id: 2, name: 'role', label: 'ROLE', width: '12%', cellFormatter: formatRole },
                 { id: 3, name: 'username', label: 'EMAIL ID', width: '25%' },
                 { id: 4, name: 'gender', label: 'GENDER', width: '9%' },
                 {
@@ -286,25 +303,25 @@ const HealthFacilitySummary = (): React.ReactElement => {
           </DetailCard>
         </div>
         <ModalForm
-          show={editHealthFacilityDetailsModal.isOpen}
+          show={editHFDetailsModal.isOpen}
           title='Edit Health Facility'
           cancelText='Cancel'
           submitText='Submit'
-          handleCancel={closeHealthFacilityEditModal}
-          handleFormSubmit={handleHealthFacilityDetailsSubmit}
-          initialValues={{ healthFacility: editHealthFacilityDetailsModal.data }}
-          render={editHealthFacilityDetailsModalRender}
+          handleCancel={closeHFEditModal}
+          handleFormSubmit={handleHFDetailsSubmit}
+          initialValues={{ healthFacility: editHFDetailsModal.data }}
+          render={editHFDetailsModalRender}
           size='modal-lg'
           mutators={arrayMutators}
         />
         <ModalForm
-          show={showHealtFacilityUserModal}
-          title={`${isHealthFacilityUserEdit ? 'Edit' : 'Add'} User`}
+          show={showHFUserModal}
+          title={`${isHFUserEdit ? 'Edit' : 'Add'} User`}
           cancelText='Cancel'
           submitText='Submit'
-          handleCancel={() => setHealthFacilityUserModal(false)}
-          handleFormSubmit={isHealthFacilityUserEdit ? handleEditUserSubmit : handleAddUserSubmit}
-          initialValues={healtFacilityUserForEdit.current}
+          handleCancel={() => setHFUserModal(false)}
+          handleFormSubmit={isHFUserEdit ? handleEditUserSubmit : handleAddUserSubmit}
+          initialValues={hfUserForEdit.current}
           render={userFormRender}
           mutators={{ ...arrayMutators }}
         />

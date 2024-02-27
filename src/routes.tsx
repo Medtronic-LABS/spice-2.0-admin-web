@@ -13,6 +13,7 @@ import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
 import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
+import CreateHealthFacility from './containers/healthFacility/CreateHealthFacility';
 
 interface IRoute {
   path: string;
@@ -37,16 +38,28 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.healthFacility,
+      path: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
       exact: true,
       component: HealthFacilityList,
-      authorisedRoles: SU_SA_A
+      authorisedRoles: SU_SA
     },
     {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
       authorisedRoles: SU_SA_A
+    },
+    {
+      path: PROTECTED_ROUTES.createHealthFacility,
+      exact: true,
+      component: CreateHealthFacility,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.healthFacilityByAdmin,
+      exact: true,
+      component: HealthFacilityList,
+      authorisedRoles: [SITE_ADMIN]
     }
   ];
 })();

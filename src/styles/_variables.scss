@@ -7,6 +7,14 @@ $field-focus-box-shadow-color: rgba(var(--black-rgb), 0.1);
 $field-placeholder-color: rgba(var(--black-rgb), 0.4);
 $field-error-color: var(--red);
 $field-deactivate-color: var(--off-white);
+$full-white: var(--white-100);
+$button-disabled-background: var(--light-grey-bg);
+
+//multiSelect
+$multiselect-gradient-color-1: var(--white-100);
+$multiselect-gradient-color-2: var(--medium-blue-3);
+$multiselect-border-color: var(--border-color);
+$multiselect-primary-color: var(--medium-blue);
 
 // Icons
 $icon-hover-background-color: var(--medium-blue-3);
