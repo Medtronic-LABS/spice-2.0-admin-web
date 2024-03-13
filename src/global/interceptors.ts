@@ -20,18 +20,20 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
         throw new ApiError(ERRORS.SERVER_ERROR, 404);
       case 401:
         if (response.config.url === '/auth-service/session') {
-          throw new ApiError({ name: APPCONSTANTS.LOGIN_FAILED_TITLE, message: response.data.message }, 401);
+          throw new ApiError(
+            { ...response.data, name: APPCONSTANTS.LOGIN_FAILED_TITLE, message: response.data.message },
+            401
+          );
         } else {
           store.dispatch(sessionTimedout(response.data.message || APPCONSTANTS.SESSION_EXPIRED));
           store.dispatch(resetStore());
-          throw new ApiError({ name: APPCONSTANTS.ERROR, message: APPCONSTANTS.SESSION_EXPIRED }, 401);
+          throw new ApiError(
+            { ...response.data, name: APPCONSTANTS.ERROR, message: APPCONSTANTS.SESSION_EXPIRED },
+            401
+          );
         }
       case 409:
-        if (response.config.url === '/admin-service/clinical-workflow/create') {
-          throw new ApiError({ name: APPCONSTANTS.OOPS, message: response.data.message }, 409);
-        } else {
-          throw new ApiError({ ...response.data, name: APPCONSTANTS.OOPS }, 409);
-        }
+        throw new ApiError({ ...response.data, name: APPCONSTANTS.OOPS }, 409);
       case 406:
         throw new ApiError({ ...response.data, name: APPCONSTANTS.OOPS }, 406);
       case 400:
@@ -70,7 +72,7 @@ export const setupInterceptors = (store: any) => {
   axios.interceptors.response.use(
     (response: AxiosResponse) => responseStatusReturn(response, store),
     (error) => {
-      if (error && error?.message !== ERRORS.NETWORK_ERROR.name) {
+      if (error && error?.message && error?.message !== ERRORS.NETWORK_ERROR.name) {
         return error;
       } else {
         throw new ApiError(ERRORS.NETWORK_ERROR);

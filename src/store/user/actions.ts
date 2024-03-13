@@ -16,7 +16,10 @@ import {
   IRemoveUserTenantId,
   IFetchUserRolesSuccess,
   IGroupRoles,
-  IFetchUserRolesRequest
+  IFetchUserRolesRequest,
+  IFetchUserByEmail,
+  IFetchUserByEmailSuccess,
+  IFetchUserByEmailFail
 } from './types';
 
 export const loginRequest = ({
@@ -92,6 +95,25 @@ export const fetchLoggedInUserSuccess = (payload: IUser) => ({
 
 export const fetchLoggedInUserFail = () => ({
   type: USER_TYPES.FETCH_LOGGED_IN_USER_FAILURE
+});
+
+export const fetchUserByEmail = ({
+  email,
+  successCb,
+  failureCb
+}: Omit<IFetchUserByEmail, 'type'>): IFetchUserByEmail => ({
+  type: USER_TYPES.FETCH_USER_BY_EMAIL,
+  email,
+  successCb,
+  failureCb
+});
+
+export const fetchUserByEmailSuccess = (): IFetchUserByEmailSuccess => ({
+  type: USER_TYPES.FETCH_USER_BY_EMAIL_SUCCESS
+});
+
+export const fetchUserByEmailFail = (): IFetchUserByEmailFail => ({
+  type: USER_TYPES.FETCH_USER_BY_EMAIL_FAIL
 });
 
 export const fetchUserRolesAction = ({

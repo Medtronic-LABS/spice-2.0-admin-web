@@ -8,15 +8,23 @@ export interface IOption {
   label: string;
 }
 
-const MultiSelect = (props: any) => {
-  const options =
-    props.labelKey && props.valueKey
-      ? props.options.map((option: any) => ({
+const convertOptionType = (labelKey: string | string[], valueKey: string | string[], options: any[]) =>
+  labelKey && valueKey
+    ? (options || []).map((option: any) => {
+        return {
           ...option,
-          label: option[props.labelKey],
-          value: option[props.valueKey]
-        }))
-      : props.options;
+          label: Array.isArray(labelKey) ? option[labelKey[0]] + ' ' + option[labelKey[1]] : option[labelKey],
+          value: Array.isArray(valueKey) ? option[valueKey[0]] + ' ' + option[valueKey[1]] : option[valueKey]
+        };
+      })
+    : options;
+
+const MultiSelect = (props: any) => {
+  const newProps = {
+    ...props,
+    value: convertOptionType(props.labelKey, props.valueKey, props.value),
+    options: convertOptionType(props.labelKey, props.valueKey, props.options)
+  };
   const [selectInput, setSelectInput] = useState<string>('');
   const isAllSelected = useRef<boolean>(false);
   const selectAllLabel = useRef<string>('Select all');
@@ -29,8 +37,8 @@ const MultiSelect = (props: any) => {
 
   const comparator = (v1: IOption, v2: IOption) => (v1.value as number) - (v2.value as number);
 
-  const filteredOptions = filterOptions(options, selectInput);
-  const filteredSelectedOptions = filterOptions(props?.value, selectInput);
+  const filteredOptions = filterOptions(newProps.options, selectInput);
+  const filteredSelectedOptions = filterOptions(newProps?.value, selectInput);
 
   const multiOption = (multiSelectprops: any) => (
     <components.Option {...multiSelectprops}>
@@ -88,7 +96,7 @@ const MultiSelect = (props: any) => {
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if ((e.key === ' ' || e.key === 'Enter' || e.key === 'Space') && !selectInput) {
-      // e.preventDefault();
+      e.preventDefault();
     }
   };
 
@@ -99,13 +107,13 @@ const MultiSelect = (props: any) => {
       (selected[selected.length - 1].value === allOption.value ||
         JSON.stringify(filteredOptions) === JSON.stringify(selected.sort(comparator)))
     ) {
-      return props.onChange(
+      return newProps.onChange(
         [
-          ...(props.value || []),
-          ...options?.filter(
+          ...(newProps.value || []),
+          ...newProps.options?.filter(
             ({ label }: IOption) =>
               label.toLowerCase().includes(selectInput?.toLowerCase()) &&
-              (props.value || []).filter((opt: IOption) => opt.label === label).length === 0
+              (newProps.value || []).filter((opt: IOption) => opt.label === label).length === 0
           )
         ].sort(comparator)
       );
@@ -114,10 +122,10 @@ const MultiSelect = (props: any) => {
       selected[selected.length - 1].value !== allOption.value &&
       JSON.stringify(selected.sort(comparator)) !== JSON.stringify(filteredOptions)
     ) {
-      return props.onChange(selected);
+      return newProps.onChange(selected);
     } else {
-      return props.onChange([
-        ...props.value?.filter(({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase()))
+      return newProps.onChange([
+        ...newProps.value?.filter(({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase()))
       ]);
     }
   };
@@ -125,11 +133,11 @@ const MultiSelect = (props: any) => {
   const customFilterOption = ({ value, label }: IOption, input: string) => {
     return (
       (value !== '*' && label.toLowerCase().includes(input.toLowerCase())) ||
-      (props.selectAll !== false && value === '*' && filteredOptions?.length > 0)
+      (newProps.selectAll !== false && value === '*' && filteredOptions?.length > 0)
     );
   };
 
-  if (props.isSelectAll && options.length !== 0) {
+  if (newProps.isSelectAll && newProps.options.length !== 0) {
     isAllSelected.current = filteredSelectedOptions.length === filteredOptions.length;
     if (filteredSelectedOptions?.length > 0) {
       if (filteredSelectedOptions?.length === filteredOptions?.length) {
@@ -144,35 +152,35 @@ const MultiSelect = (props: any) => {
 
     return (
       <div className={`d-flex flex-column ${styles.selectInputContainer}`}>
-        {props.isShowLabel && !props.showOnlyDropdown && (
+        {newProps.isShowLabel && !newProps.showOnlyDropdown && (
           <label className='mb-0dot5 fs-0dot875 lh-1dot25'>
-            {props.label}
-            {props.required && <span className='input-asterisk'>*</span>}
+            {newProps.label}
+            {newProps.required && <span className='input-asterisk'>*</span>}
           </label>
         )}
         <ReactSelect
-          {...props}
-          className={`multi-select ${props.error ? 'danger' : ''}`}
+          {...newProps}
+          className={`multi-select ${newProps.error ? 'danger' : ''}`}
           classNamePrefix='multi-select'
           inputValue={selectInput}
           onInputChange={onInputChange}
           onKeyDown={onKeyDown}
-          options={[allOption, ...options]}
-          placeholder={props.placeholder || ''}
+          options={[allOption, ...newProps.options]}
+          placeholder={newProps.placeholder || ''}
           onChange={handleChange}
           components={{
             Option: multiOption,
             Input: multiSelectInput,
-            ...props.components
+            ...newProps.components
           }}
           styles={{
             control: (baseStyles, state) => {
               return {
                 ...baseStyles,
-                ...props.controlStyles,
-                borderColor: props.error ? 'red !important' : props?.controlStyles?.borderColor || '#8c8c8c',
+                ...newProps.controlStyles,
+                borderColor: newProps.error ? 'red !important' : newProps?.controlStyles?.borderColor || '#8c8c8c',
                 '&:focus': {
-                  borderColor: props.error ? 'red !important' : '#8c8c8c'
+                  borderColor: newProps.error ? 'red !important' : '#8c8c8c'
                 },
                 overflow: 'auto',
                 maxHeight: '5.875rem',
@@ -183,11 +191,11 @@ const MultiSelect = (props: any) => {
               ...optionStyles,
               backgroundColor: 'white',
               color: 'black',
-              ...props.optionStyles
+              ...newProps.optionStyles
             })
           }}
           filterOption={customFilterOption}
-          menuPlacement={props.menuPlacement || 'auto'}
+          menuPlacement={newProps.menuPlacement || 'auto'}
           isMulti={true}
           isClearable={false}
           closeMenuOnSelect={false}
@@ -196,38 +204,64 @@ const MultiSelect = (props: any) => {
           hideSelectedOptions={false}
           blurInputOnSelect={false}
         />
-        {
-          <div className={styles.error}>
-            {props.error} {props.error && props.errorLabel}
-          </div>
-        }
+        <div className={styles.error}>
+          {newProps.error} {newProps.error && newProps.errorLabel}
+        </div>
       </div>
     );
   }
 
   return (
     <div className={`d-flex flex-column `}>
-      {props.isShowLabel && !props.showOnlyDropdown && (
+      {newProps.isShowLabel && !newProps.showOnlyDropdown && (
         <label className={`mb-0dot5 fs-0dot875 lh-1dot25 ${styles.labelCSS}`}>
-          <span className={styles.labelCSS}>{props.label}</span>
-          {props.required && <span className='input-asterisk'>*</span>}
+          <span className={styles.labelCSS}>{newProps.label}</span>
+          {newProps.required && <span className='input-asterisk'>*</span>}
         </label>
       )}
       <ReactSelect
-        {...props}
+        {...newProps}
         inputValue={selectInput}
         onInputChange={onInputChange}
         components={{
           Input: multiSelectInput,
-          ...props.components
+          ...newProps.components
         }}
-        menuPlacement={props.menuPlacement ?? 'auto'}
+        menuPlacement={newProps.menuPlacement ?? 'auto'}
         onKeyDown={onKeyDown}
         tabSelectsValue={false}
         hideSelectedOptions={true}
         backspaceRemovesValue={false}
         blurInputOnSelect={true}
+        styles={{
+          control: (baseStyles, state) => {
+            return {
+              ...baseStyles,
+              ...newProps.controlStyles,
+              borderColor: newProps.error ? 'red !important' : newProps?.controlStyles?.borderColor || '#8c8c8c',
+              '&:focus': {
+                borderColor: newProps.error ? 'red !important' : '#8c8c8c'
+              },
+              overflow: 'auto',
+              maxHeight: '5.875rem',
+              minHeight: '0.875rem'
+            };
+          },
+          placeholder: (defaultStyles) => ({
+            ...defaultStyles,
+            fontSize: '0.875rem'
+          }),
+          option: (optionStyles) => ({
+            ...optionStyles,
+            backgroundColor: 'white',
+            color: 'black',
+            ...newProps.optionStyles
+          })
+        }}
       />
+      <div className={styles.error}>
+        {newProps.error} {newProps.error && newProps.errorLabel}
+      </div>
     </div>
   );
 };

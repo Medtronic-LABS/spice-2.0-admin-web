@@ -85,7 +85,8 @@ const SelectInput = ({
   appendPlus = false,
   isModel = false,
   isShowLabel = true,
-  isMulti = false
+  isMulti = false,
+  ...rest
 }: ISelectBoxProps): React.ReactElement => {
   const getOptionLabel = (option: any) => {
     if (labelKey && nestedObject) {
@@ -122,6 +123,7 @@ const SelectInput = ({
         </label>
       )}
       <Select
+        {...rest}
         {...input}
         id={id}
         options={options}

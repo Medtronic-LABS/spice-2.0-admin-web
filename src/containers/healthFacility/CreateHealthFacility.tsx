@@ -12,6 +12,14 @@ import UserForm from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import { ICulture } from '../../store/user/types';
 import Workflows from './Workflows';
+import APPCONSTANTS from '../../constants/appConstants';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { createHFRequest } from '../../store/healthFacility/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { formatHealthFacility, formatHFUserData } from './HealthFacilitySummary';
+import { IHealthFacility } from '../../store/healthFacility/types';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import { workflowListSelector } from '../../store/healthFacility/selectors';
 
 export interface IAddUserFormValues {
   email: string;
@@ -35,8 +43,6 @@ export interface IAddUserFormValues {
 interface IMatchParams {
   regionId?: string;
   tenantId: string;
-  OUId?: string;
-  accountId?: string;
 }
 
 interface IRouteProps extends RouteComponentProps<IMatchParams> {}
@@ -45,8 +51,10 @@ interface IRouteProps extends RouteComponentProps<IMatchParams> {}
  * Renders the form for create site
  */
 const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
+  const dispatch = useDispatch();
   let formInstance: FormApi<any>;
   const history = useHistory();
+  const workflows = useSelector(workflowListSelector);
   const [OUTenantId, setSelectedOUTenantId] = useState<string>('');
   const [submittedData, setSubmittedData] = useState({
     data: {
@@ -56,7 +64,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     isNextClicked: false
   });
 
-  const { regionId, tenantId, accountId, OUId } = props.match.params;
+  const { regionId, tenantId } = props.match.params;
 
   useEffect(() => {
     formInstance?.subscribe(
@@ -78,13 +86,13 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     if (submittedData.isNextClicked) {
       setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
     } else {
-      const url = '';
-      history.push(
-        url
-          .replace(':tenantId', tenantId)
-          .replace(/(:regionId)|(:accountId)|(:OUId)/, (regionId || OUId || accountId) as string)
-      );
+      onGotoList();
     }
+  };
+
+  const onGotoList = () => {
+    const url = PROTECTED_ROUTES.healthFacilityBySuperAdmin;
+    history.push(url.replace(':tenantId', tenantId).replace(/(:regionId)/, regionId as string));
   };
 
   /**
@@ -105,15 +113,27 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     }
   };
 
+  const onCreateSuccess = () => {
+    toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS);
+    setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
+    onGotoList();
+  };
+
+  const onCreateFailure = (e: Error) =>
+    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR));
+
   /**
    * Handler for form submition action
    * @param values
    */
-  const onSubmit = (data: any) => {
-    if (submittedData.isNextClicked) {
-      // Submit Actions
+  const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
+    if (submittedData.isNextClicked && regionId) {
+      const postData = {
+        ...formatHealthFacility({ ...healthFacility, clinicalWorkflows: workflows }, regionId),
+        users: formatHFUserData(users, regionId)
+      };
+      dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
     } else {
-      const { healthFacility, users }: { healthFacility: any; users: any[] } = data;
       setSubmittedData({ data: { healthFacility, users }, isNextClicked: true });
     }
   };
@@ -149,8 +169,9 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                       <FormContainer label='Add User' icon={SiteAddUserIcon}>
                         <UserForm
                           form={form}
-                          isSiteUser={true}
                           enableAutoPopulate={true}
+                          isHF={true}
+                          isHFCreate={true}
                           entityName='healthFacility'
                           data={submittedData.data.users}
                         />

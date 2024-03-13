@@ -1,12 +1,15 @@
+import { AxiosResponse } from 'axios';
 import { FormApi } from 'final-form';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Field, FieldRenderProps } from 'react-final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import styles from './TextInput.module.scss';
 
+import { fetchUserByEmail } from '../../services/userAPI';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { composeValidators, required, validateEmail } from '../../utils/validation';
+import { IUserFormValues } from '../userForm/UserForm';
 import TextInput from './TextInput';
 
 const EmailField = forwardRef(
@@ -17,8 +20,6 @@ const EmailField = forwardRef(
       form,
       formName,
       index,
-      parentOrgId,
-      tenantId,
       enableAutoPopulate,
       onFindExistingUser
     }: {
@@ -27,8 +28,6 @@ const EmailField = forwardRef(
       form: FormApi<any>;
       formName: string;
       index: number;
-      parentOrgId?: string;
-      tenantId?: string;
       entityName?: string;
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
@@ -52,7 +51,6 @@ const EmailField = forwardRef(
     const [validating, setValidating] = useState(!isEdit);
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
-    const lastOrgId = useRef<string | undefined>(parentOrgId);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
     const emrError = APPCONSTANTS.EMR_ERR_MSG;
     const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
@@ -89,7 +87,7 @@ const EmailField = forwardRef(
           let smallestDuplicateIndex: number = -1;
           const users = form?.getState().values[formName];
           let count = 0;
-          users.forEach(({ email }: any, i: number) => {
+          users.forEach(({ email }: IUserFormValues, i: number) => {
             if (email.toLowerCase() === value.toLowerCase()) {
               if (smallestDuplicateIndex < 0) {
                 smallestDuplicateIndex = i;
@@ -109,6 +107,29 @@ const EmailField = forwardRef(
       return email && !validateEmail(email) && (lastCheckedEmail.current !== email || checkSameEmailAgain);
     };
 
+    const fetchUserByEmailResFn = useCallback(
+      (res: AxiosResponse<any>, email: string) => {
+        const {
+          data: { entity: data }
+        } = res;
+        if (enableAutoPopulate && data?.username === email) {
+          onFindExistingUser?.(data);
+          setDisabled(true);
+          setError('');
+        } else if (!enableAutoPopulate) {
+          setError(data !== null ? alreadyExistError : '');
+        } else if (!data?.username) {
+          setError('');
+        }
+        setValidating(false);
+        setLoading(false);
+        lastCheckedEmail.current = email;
+        form.change?.(`${name}.email`, email + ' '); // to trigger onchange space added
+        form.change?.(`${name}.email`, email);
+      },
+      [alreadyExistError, enableAutoPopulate, form, name, onFindExistingUser]
+    );
+
     const validateUser = useCallback(
       async (email: string, checkSameEmailAgain?: boolean) => {
         try {
@@ -117,6 +138,7 @@ const EmailField = forwardRef(
           }
           setValidating(true);
           setLoading(true);
+          await fetchUserByEmail(email).then((res) => fetchUserByEmailResFn(res, email));
           setNetworkError(false);
         } catch (e: any) {
           setLoading(false);
@@ -145,15 +167,8 @@ const EmailField = forwardRef(
           }
         }
       },
-      [form, name, emrError, differentOrgError, siteAdminError, alreadyExistError]
+      [fetchUserByEmailResFn, form, name, emrError, differentOrgError, siteAdminError, alreadyExistError]
     );
-
-    useEffect(() => {
-      if (lastOrgId.current !== parentOrgId) {
-        lastOrgId.current = parentOrgId;
-        validateUser(currentEmail.current, true);
-      }
-    }, [parentOrgId, validateUser]);
 
     return (
       <Field

@@ -8,8 +8,29 @@ import {
   normalizePhone,
   normalizeFloatingNumber
 } from '../../utils/validation';
-import SelectInput from '../../components/formFields/SelectInput';
+import SelectInput, { AsyncSelectInput, ISelectOption } from '../../components/formFields/SelectInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  chiefdomListSelector,
+  chiefdomLoadingSelector,
+  districtListSelector,
+  districtLoadingSelector,
+  peerSupervisorListSelector,
+  peerSupervisorLoadingSelector,
+  villagesListSelector,
+  villagesLoadingSelector
+} from '../../store/healthFacility/selectors';
+import { useEffect, useRef } from 'react';
+import {
+  fetchChiefdomListRequest,
+  fetchDistrictListRequest,
+  fetchPeerSupervisorListRequest,
+  fetchVillagesListRequest
+} from '../../store/healthFacility/actions';
+import { useParams } from 'react-router';
+import { userDataSelector } from '../../store/user/selectors';
+import { listCities } from '../../services/healthFacilityAPI';
 
 interface IAddUserFormProps {
   form: FormApi<any>;
@@ -33,45 +54,111 @@ const HealthFacilityDetailsForm = ({
   isEdit = false,
   data = {}
 }: IAddUserFormProps & IMatchParams): React.ReactElement => {
+  const dispatch = useDispatch();
+  const { regionId } = useParams<{ regionId: string }>();
+  const regionData = useSelector(userDataSelector).country;
+  const districtList = useSelector(districtListSelector);
+  const districtListLoading = useSelector(districtLoadingSelector);
+  const chiefdomList = useSelector(chiefdomListSelector);
+  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const peerSupervisorList = useSelector(peerSupervisorListSelector);
+  const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
+  const villagesList = useSelector(villagesListSelector);
+  const villagesLoading = useSelector(villagesLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
+  const countryId = Number(regionId || regionData.id);
+  const cityOptions = useRef<ISelectOption[]>([]);
+
+  // District fetch
+  useEffect(() => {
+    if (!districtList.length) {
+      dispatch(fetchDistrictListRequest({ countryId }));
+    }
+  }, [dispatch, districtList.length, countryId]);
+
+  // Peer Supervisor fetch
+  useEffect(() => {
+    const tenantId = form.getState().values.healthFacility?.district?.tenantId;
+    if (tenantId && !peerSupervisorList.length) {
+      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId, peerSupervisorList.length]);
+
+  // Chiefdom fetch
+  useEffect(() => {
+    const districtId = form.getState().values.healthFacility?.district?.id;
+    if (districtId && !chiefdomList.length) {
+      dispatch(fetchChiefdomListRequest({ countryId, districtId: Number(districtId) }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chiefdomList.length, dispatch, countryId, form.getState().values.healthFacility?.district?.id]);
+
+  // Villages fetch
+  useEffect(() => {
+    const districtId = form.getState().values.healthFacility.district?.id;
+    const chiefdomId = form.getState().values.healthFacility.chiefdom?.id;
+    if (chiefdomId && districtId && !villagesList.length) {
+      dispatch(
+        fetchVillagesListRequest({
+          countryId,
+          districtId: Number(districtId),
+          chiefdomId: Number(chiefdomId)
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    countryId,
+    dispatch,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    form.getState().values.healthFacility.district?.id,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    form.getState().values.healthFacility.chiefdom?.id,
+    regionId,
+    villagesList.length
+  ]);
+
+  /**
+   * It gets the city from API and list the options
+   * @param searchStr it denotes the search text
+   */
+  const loadCities = async (searchStr: string) => {
+    if (searchStr) {
+      try {
+        const city: any = await new Promise(async (resolve) => {
+          try {
+            const response = await listCities(Number(regionId), searchStr);
+            resolve(response);
+          } catch (e) {
+            console.error('Unable to fetch cities', e);
+            return [];
+          }
+        }).catch((e) => {
+          console.error('Unable to fetch cities', e);
+          return [];
+        });
+        cityOptions.current = city.data;
+        return city.data;
+      } catch (e) {
+        console.error('Unable to fetch cities', e);
+        return [];
+      }
+    }
+  };
 
   const hfType = [
-    { label: 'CHP', value: 'chp' },
-    { label: 'CHP1', value: 'chp1' }
+    { name: 'MCU', id: 'MCU' },
+    { name: 'CHP', id: 'CHP' },
+    { name: 'CHCP', id: 'CHCP' },
+    { name: 'CHC', id: 'CHC' }
   ] as any[];
   const hfTypeLoading = false;
-  const districtList = [
-    { value: 'port_loko', label: 'Port Loko' },
-    { value: 'port_loko1', label: 'Port Loko 1' }
-  ] as any[];
-  const districtListLoading = false;
-  const chiefdomOptions = [
-    { label: 'Kamaranka', value: 'kamaranka' },
-    { label: 'Kamaranka 1', value: 'kamaranka1' }
-  ] as any[];
-  const chiefdomLoading = false;
-  const cityOptions = [{ label: 'Makatha', value: 'makatha' }] as any[];
-  const cityLoading = false;
-  const linkedPeerSupervisorList = [{ id: '1', name: 'Supervisor 1' }] as any[];
-  const linkedPeerSupervisorLoading = false;
   const languages = [{ id: '1', name: 'English' }] as any[];
   const languageLoading = false;
-  const linkedVillages = [
-    { label: 'Village 1', value: 'village1' },
-    { label: 'Village 2', value: 'village2' },
-    { label: 'Village 3', value: 'village3' },
-    { label: 'Village 4', value: '4' },
-    { label: 'Village 5', value: '5' },
-    { label: 'Village 6', value: '6' },
-    { label: 'Village 7', value: '7' },
-    { label: 'Village 8', value: '8' },
-    { label: 'Village 9', value: '9' },
-    { label: 'Village 10', value: '10' },
-    { label: 'Village 11', value: '11' }
-  ] as any[];
-  const linkedVillagesLoading = false;
+
   return (
-    <div className='row gx-1dot25'>
+    <div className='row gx-1dot25 align-items-end'>
       <div className={columnStyle}>
         <Field
           name='healthFacility.name'
@@ -99,7 +186,9 @@ const HealthFacilityDetailsForm = ({
               {...(input as any)}
               label='Health Facility Type'
               errorLabel='type'
-              defaultValue={hfType.find((type) => type.label === (data.type?.label || data.type))}
+              labelKey='name'
+              valueKey='id'
+              defaultValue={hfType.find((type) => type.name === (data.type?.name || data.type))}
               options={hfType}
               loadingOptions={hfTypeLoading}
               error={(meta.touched && meta.error) || undefined}
@@ -109,7 +198,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.phuName'
+          name='healthFacility.phuFocalPersonName'
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -125,7 +214,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.phuNo'
+          name='healthFacility.phuFocalPersonNumber'
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -139,7 +228,7 @@ const HealthFacilityDetailsForm = ({
           )}
         />
       </div>
-      <div className={`${isEdit ? 'col-8' : 'col-12'}`}>
+      <div className={`${isEdit ? 'col-12 col-md-8' : 'col-12'}`}>
         <Field
           name='healthFacility.address'
           type='text'
@@ -167,8 +256,9 @@ const HealthFacilityDetailsForm = ({
                 {...(meta as any)}
                 label='District'
                 errorLabel='district'
-                defaultValue={districtList.find((value) => value.label === (data.district?.label || data.district))}
-                options={districtList}
+                labelKey='name'
+                valueKey='id'
+                options={districtList || []}
                 loadingOptions={districtListLoading}
                 error={(meta.touched && meta.error) || undefined}
               />
@@ -187,8 +277,9 @@ const HealthFacilityDetailsForm = ({
               {...(meta as any)}
               label='Chiefdom'
               errorLabel='chiefdom'
-              defaultValue={chiefdomOptions.find((value) => value.label === (data.chiefdom?.label || data.chiefdom))}
-              options={chiefdomOptions}
+              labelKey='name'
+              valueKey='id'
+              options={chiefdomList}
               loadingOptions={chiefdomLoading}
               error={(meta.touched && meta.error) || undefined}
             />
@@ -200,16 +291,16 @@ const HealthFacilityDetailsForm = ({
           required={true}
           name='healthFacility.city'
           validate={required}
-          render={({ input, meta }) => (
-            <SelectInput
-              {...(input as any)}
-              {...(meta as any)}
+          render={(props) => (
+            <AsyncSelectInput
+              {...props}
               label='City/Village'
               errorLabel='city/village'
-              defaultValue={cityOptions.find((value) => value.label === (data.city?.label || data.city))}
-              options={cityOptions}
-              loadingOptions={cityLoading}
-              error={(meta.touched && meta.error) || undefined}
+              labelKey='name'
+              valueKey='id'
+              options={cityOptions.current}
+              loadInputOptions={loadCities}
+              error={(props.meta.touched && props.meta.error) || undefined}
             />
           )}
         />
@@ -264,22 +355,30 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.linkedPeerSupervisor'
+          name='healthFacility.peerSupervisors'
           type='text'
-          validate={required}
           render={({ input, meta }) => (
-            <SelectInput
+            <MultiSelect
               {...(input as any)}
               label='Linked Peer Supervisor'
               errorLabel='linked peer supervisor'
-              valueKey='id'
               labelKey='name'
-              defaultValue={linkedPeerSupervisorList.find(
-                (value) => value.name === (data.linkedPeerSupervisor?.name || data.linkedPeerSupervisor)
-              )}
-              options={linkedPeerSupervisorList}
-              loadingOptions={linkedPeerSupervisorLoading}
+              valueKey='id'
+              isShowLabel={true}
+              isSelectAll={true}
+              menuPlacement={'bottom'}
+              placeholder=''
+              isModel={true}
+              isMulti={true}
+              options={peerSupervisorList}
+              loading={peerSupervisorLoading}
               error={(meta.touched && meta.error) || undefined}
+              controlStyles={{
+                borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
+                '&:focus-visible': {
+                  borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
+                }
+              }}
             />
           )}
         />
@@ -297,7 +396,6 @@ const HealthFacilityDetailsForm = ({
               labelKey='name'
               valueKey='id'
               options={languages}
-              defaultValue={languages.find((value) => value.name === (data.language?.name || data.language))}
               loadingOptions={languageLoading}
               error={(meta.touched && meta.error) || undefined}
               isModel={isEdit ? true : false}
@@ -315,13 +413,17 @@ const HealthFacilityDetailsForm = ({
               {...(input as any)}
               label='Linked Villages'
               errorLabel='linked villages'
+              labelKey='name'
+              valueKey='id'
+              required={true}
               isShowLabel={true}
               isSelectAll={true}
+              placeholder=''
               menuPlacement={'bottom'}
               isModel={true}
               isMulti={true}
-              options={linkedVillages}
-              loading={linkedVillagesLoading}
+              options={villagesList}
+              loading={villagesLoading}
               error={(meta.touched && meta.error) || undefined}
               controlStyles={{
                 borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',

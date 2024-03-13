@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 
@@ -22,6 +22,10 @@ import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
 import { IUser } from '../../store/user/types';
 import MultiSelect from '../multiSelect/MultiSelect';
+import { useDispatch, useSelector } from 'react-redux';
+import { isUserRolesLoading, userRolesSelector } from '../../store/user/selectors';
+import { fetchUserRolesAction } from '../../store/user/actions';
+import toastCenter from '../../utils/toastCenter';
 
 export interface IUserFormValues {
   email: string;
@@ -40,7 +44,8 @@ interface IUserFormProps {
   initialEditValue?: any;
   disableOptions?: boolean;
   isEdit?: boolean;
-  isSiteUser?: boolean;
+  isHF?: boolean;
+  isHFCreate?: boolean;
   isRegionUser?: boolean;
   account?: { id: string; tenantId: string };
   isDropdownDisable?: boolean;
@@ -59,7 +64,8 @@ const UserForm = ({
   initialEditValue,
   disableOptions = false,
   isEdit,
-  isSiteUser = false,
+  isHF = false,
+  isHFCreate = false,
   isDropdownDisable = false,
   entityName,
   enableAutoPopulate,
@@ -67,6 +73,10 @@ const UserForm = ({
 }: IUserFormProps): React.ReactElement => {
   const idRefs = useRef([new Date().getTime()]);
   const formName = 'users';
+  const dispatch = useDispatch();
+  const rolesGrouped = useSelector(userRolesSelector);
+  const isRolesLoading = useSelector(isUserRolesLoading);
+
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
     () => [
@@ -76,9 +86,13 @@ const UserForm = ({
         lastName: '',
         phoneNumber: '',
         gender: '',
-        subCounty: '',
-        roleName: '',
-        culture: {}
+        username: '',
+        countryCode: '',
+        roles: [],
+        villageIds: [],
+        supervisor: '',
+        organizations: [],
+        country: {}
       }
     ],
     []
@@ -126,6 +140,16 @@ const UserForm = ({
     });
   };
 
+  useEffect(() => {
+    if (!rolesGrouped.hasOwnProperty('SPICE')) {
+      dispatch(
+        fetchUserRolesAction({
+          failureCb: (_) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR)
+        })
+      );
+    }
+  }, [dispatch, rolesGrouped]);
+
   const isError = (meta: any) => (meta.touched && meta.error) || undefined;
 
   const handleShowAddIcon = (isLastChild: boolean, fields: any) => {
@@ -143,7 +167,7 @@ const UserForm = ({
           }
         >
           <img className='me-0dot5' src={PlusIcon} alt='' />
-          {isSiteUser ? 'Add Another User' : 'Add Another Admin'}
+          {'Add Another User'}
         </div>
       )
     );
@@ -163,7 +187,7 @@ const UserForm = ({
           }}
         >
           <img className='me-0dot5' src={BinIcon} alt='' />
-          {isSiteUser ? 'Remove User' : 'Remove Admin'}
+          {'Remove User'}
         </div>
       )
     );
@@ -194,198 +218,189 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
-  const suiteAccess = [
-    { name: 'SPICE', id: 'spice' },
-    { name: 'SPICE Engage', id: 'spiceEngage' }
+  const healthFacilityList = [
+    { name: 'Health Facility 1', id: '1', tenantId: '4' },
+    { name: 'Health Facility 2', id: '2', tenantId: '2' }
   ];
-  const isSuiteAccessLoading = false;
-  const roles = [
-    { name: 'CHW', id: 'chw' },
-    { name: 'Admin', id: 'admin' }
-  ];
-  const isRoleLoading = false;
-
-  const healthFacilityList = [{ name: 'Health Facility 1', id: '1' }];
   const isHealthFacilityLoading = false;
   const peerSupervisorList = [{ name: 'Peer Supervisor 1', id: '1' }];
   const ispeerSupervisorLoading = false;
   const villageList = [{ name: 'Peer Supervisor 1', id: '1' }];
   const isVillageListLoading = false;
-  const countryList = [{ countryCode: '232' }, { countryCode: '91' }];
+  const countryList = [{ countryCode: '232' }, { countryCode: '91' }, { countryCode: '+21' }];
   const isCountryListLoading = false;
 
   return (
-    <>
-      <FieldArray name={formName} initialValue={isEdit ? initialEditData : data.length ? data : initialValue}>
-        {({ fields }) =>
-          fields.map((name, index) => {
-            const isLastChild = (fields?.length || 0) === index + 1;
-            const isFirstChild = !index;
-            const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
-            return (
-              <span key={`form_${idRefs.current[index]}`}>
-                <div className='row gx-1dot25'>
-                  <Field name={`${name}._id`} render={() => null} />{' '}
-                  {/** A hidden field to store user' id if user is auto populated */}
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.suiteAccess`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
-                        <SelectInput
-                          {...(input as any)}
-                          label='SPICE Suite Access'
-                          errorLabel='suite access'
-                          labelKey='name'
-                          valueKey='id'
-                          defaultValue={suiteAccess.find(
-                            (value) =>
-                              value?.name === (data[index]?.suiteAccess.name || initialEditData[index].suiteAccess)
-                          )}
-                          options={suiteAccess}
-                          loadingOptions={isSuiteAccessLoading}
-                          error={isError(meta)}
-                          isModel={true}
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.role`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
+    <FieldArray name={formName} initialValue={isEdit ? initialEditData : data.length ? data : initialValue}>
+      {({ fields }) =>
+        fields.map((name, index) => {
+          const isLastChild = (fields?.length || 0) === index + 1;
+          const isFirstChild = !index;
+          const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
+          const suiteAccess = Object.keys(rolesGrouped)
+            .map((role) => ({ name: role, id: role }))
+            .sort();
+          return (
+            <span key={`form_${idRefs.current[index]}`}>
+              <div className='row gx-1dot25'>
+                <Field name={`${name}._id`} render={() => null} />{' '}
+                {/** A hidden field to store user' id if user is auto populated */}
+                <div className='col-sm-6 col-12'>
+                  <Field
+                    name={`${name}.suiteAccess`}
+                    type='text'
+                    validate={required}
+                    render={({ input, meta }) => (
+                      <SelectInput
+                        {...(input as any)}
+                        label='SPICE Suite Access'
+                        errorLabel='suite access'
+                        labelKey='name'
+                        valueKey='id'
+                        defaultValue={(suiteAccess || []).find(
+                          (value) => value?.name === (isEdit ? initialEditData : data)[index]?.roles[0]?.groupName
+                        )}
+                        options={suiteAccess || []}
+                        loadingOptions={isRolesLoading}
+                        error={isError(meta)}
+                        isModel={true}
+                      />
+                    )}
+                  />
+                </div>
+                <div className='col-sm-6 col-12'>
+                  <Field
+                    name={`${name}.roles`}
+                    type='text'
+                    validate={required}
+                    render={({ input, meta }) => {
+                      const selectedSuiteAccess = form.getState().values.users[index]?.suiteAccess?.id;
+                      const roles = rolesGrouped[selectedSuiteAccess] || [];
+                      return (
                         <SelectInput
                           {...(input as any)}
                           label='Role'
                           errorLabel='role'
-                          labelKey='name'
+                          labelKey='displayName'
                           valueKey='id'
-                          options={roles}
-                          defaultValue={roles.find(
-                            (value) => value.name === (data[index]?.role.name || initialEditData[index].role)
+                          options={roles || []}
+                          defaultValue={(roles || []).find(
+                            (value) => value.id === (isEdit ? initialEditData : data)[index]?.roles[0]?.id
                           )}
-                          loadingOptions={isRoleLoading}
+                          loadingOptions={isRolesLoading}
+                          error={isError(meta)}
+                          isModel={true}
+                        />
+                      );
+                    }}
+                  />
+                </div>
+                <div className='col-sm-6 col-12'>
+                  <Field
+                    name={`${name}.firstName`}
+                    type='text'
+                    validate={composeValidators(required, validateName)}
+                    render={({ input, meta }) => (
+                      <TextInput
+                        {...input}
+                        label='First Name'
+                        errorLabel='first name'
+                        maxLength={APPCONSTANTS.FIRST_NAME_LENGTH}
+                        capitalize={true}
+                        error={isError(meta)}
+                      />
+                    )}
+                  />
+                </div>
+                <div className='col-sm-6 col-12'>
+                  <Field
+                    name={`${name}.lastName`}
+                    type='text'
+                    validate={composeValidators(required, validateLastName)}
+                    render={({ input, meta }) => (
+                      <TextInput
+                        {...input}
+                        label='Last Name'
+                        errorLabel='last name'
+                        maxLength={APPCONSTANTS.LAST_NAME_LENGTH}
+                        capitalize={true}
+                        error={isError(meta)}
+                      />
+                    )}
+                  />
+                </div>
+                <div className='col-12'>
+                  <Field
+                    name={`${name}.gender`}
+                    render={(props) => (
+                      <Radio {...props} fieldLabel='Gender' errorLabel='gender' options={APPCONSTANTS.GENDER_OPTIONS} />
+                    )}
+                  />
+                </div>
+                <div className={`col-12 ${isFirstChild ? '' : 'mt-1dot5'}`}>
+                  <EmailField
+                    ref={emailFieldRef}
+                    formName={formName}
+                    index={index}
+                    name={name}
+                    isEdit={isEdit}
+                    form={form}
+                    entityName={entityName}
+                    enableAutoPopulate={enableAutoPopulate}
+                    onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
+                  />
+                </div>
+                {isDropdownDisable ? (
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.countryCode`}
+                      type='text'
+                      validate={required}
+                      parse={convertToNumber}
+                      format={(value: string) => formatCountryCode(value)}
+                      render={({ input, meta }) => (
+                        <TextInput {...input} label='Country Code' errorLabel='country code' error={isError(meta)} />
+                      )}
+                    />
+                  </div>
+                ) : (
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.countryCode`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => (
+                        <SelectInput
+                          {...(input as any)}
+                          label='Country Code'
+                          errorLabel='country code'
+                          labelKey='countryCode'
+                          valueKey='countryCode'
+                          appendPlus={true}
+                          options={countryList}
+                          defaultValue={countryList.find(
+                            (value) => value.countryCode === (isEdit ? initialEditData : data)[index]?.countryCode
+                          )}
+                          loadingOptions={isCountryListLoading}
                           error={isError(meta)}
                           isModel={true}
                         />
                       )}
                     />
                   </div>
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.firstName`}
-                      type='text'
-                      validate={composeValidators(required, validateName)}
-                      render={({ input, meta }) => (
-                        <TextInput
-                          {...input}
-                          label='First Name'
-                          errorLabel='first name'
-                          maxLength={APPCONSTANTS.FIRST_NAME_LENGTH}
-                          capitalize={true}
-                          error={isError(meta)}
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.lastName`}
-                      type='text'
-                      validate={composeValidators(required, validateLastName)}
-                      render={({ input, meta }) => (
-                        <TextInput
-                          {...input}
-                          label='Last Name'
-                          errorLabel='last name'
-                          maxLength={APPCONSTANTS.LAST_NAME_LENGTH}
-                          capitalize={true}
-                          error={isError(meta)}
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className='col-12'>
-                    <Field
-                      name={`${name}.gender`}
-                      render={(props) => (
-                        <Radio
-                          {...props}
-                          fieldLabel='Gender'
-                          errorLabel='gender'
-                          options={APPCONSTANTS.GENDER_OPTIONS}
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className={`col-12 ${isFirstChild ? '' : 'mt-1dot5'}`}>
-                    <EmailField
-                      ref={emailFieldRef}
-                      formName={formName}
-                      index={index}
-                      name={name}
-                      isEdit={isEdit}
-                      form={form}
-                      entityName={entityName}
-                      enableAutoPopulate={enableAutoPopulate}
-                      onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
-                    />
-                  </div>
-                  {isDropdownDisable ? (
-                    <div className='col-sm-6 col-12'>
-                      <Field
-                        name={`${name}.countryCode`}
-                        type='text'
-                        validate={required}
-                        parse={convertToNumber}
-                        format={(value: string) => formatCountryCode(value)}
-                        render={({ input, meta }) => (
-                          <TextInput {...input} label='Country Code' errorLabel='country code' error={isError(meta)} />
-                        )}
-                      />
-                    </div>
-                  ) : (
-                    <div className='col-sm-6 col-12'>
-                      <Field
-                        name={`${name}.countryCode`}
-                        type='text'
-                        validate={required}
-                        render={({ input, meta }) => (
-                          <SelectInput
-                            {...(input as any)}
-                            label='Country Code'
-                            errorLabel='country code'
-                            labelKey='countryCode'
-                            valueKey='countryCode'
-                            appendPlus={true}
-                            options={countryList}
-                            defaultValue={countryList.find(
-                              (value) =>
-                                value.countryCode ===
-                                (data[index]?.countryCode.countryCode || initialEditData[index].countryCode)
-                            )}
-                            loadingOptions={isCountryListLoading}
-                            error={isError(meta)}
-                            isModel={true}
-                          />
-                        )}
-                      />
-                    </div>
-                  )}
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.phoneNumber`}
-                      type='text'
-                      validate={composeValidators(required, validateMobile)}
-                      parse={normalizePhone}
-                      render={({ input, meta }) => (
-                        <TextInput {...input} label='Phone Number' errorLabel='phone number' error={isError(meta)} />
-                      )}
-                    />
-                  </div>
+                )}
+                <div className='col-sm-6 col-12'>
+                  <Field
+                    name={`${name}.phoneNumber`}
+                    type='text'
+                    validate={composeValidators(required, validateMobile)}
+                    parse={normalizePhone}
+                    render={({ input, meta }) => (
+                      <TextInput {...input} label='Phone Number' errorLabel='phone number' error={isError(meta)} />
+                    )}
+                  />
+                </div>
+                {!isHFCreate && !isHF && !isEdit && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.assignedHealthFacility`}
@@ -401,9 +416,7 @@ const UserForm = ({
                           options={healthFacilityList}
                           defaultValue={healthFacilityList.find(
                             (value) =>
-                              value.name ===
-                              (data[index]?.assignedHealthFacility.name ||
-                                initialEditData[index].assignedHealthFacility)
+                              value.name === (isEdit ? initialEditData : data)[index]?.assignedHealthFacility?.name
                           )}
                           loadingOptions={isHealthFacilityLoading}
                           error={isError(meta)}
@@ -412,65 +425,68 @@ const UserForm = ({
                       )}
                     />
                   </div>
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.selectedPeerSupervisor`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
-                        <SelectInput
-                          {...(input as any)}
-                          {...(meta as any)}
-                          label='Selected Peer Supervisor'
-                          errorLabel='selected peer supervisor'
-                          labelKey='name'
-                          valueKey='id'
-                          options={peerSupervisorList}
-                          defaultValue={peerSupervisorList.find(
-                            (value) =>
-                              value.name ===
-                              (data[index]?.selectedPeerSupervisor || initialEditData[index].selectedPeerSupervisor)
-                          )}
-                          loadingOptions={ispeerSupervisorLoading}
-                          error={isError(meta)}
-                          isModel={true}
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.assignedVillages`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
-                        <MultiSelect
-                          {...(input as any)}
-                          label='Assigned Villages'
-                          errorLabel='assigned villages'
-                          labelKey='name'
-                          valueKey='id'
-                          isShowLabel={true}
-                          isSelectAll={true}
-                          menuPlacement={'bottom'}
-                          isModel={true}
-                          isMulti={true}
-                          options={villageList}
-                          loadingOptions={isVillageListLoading}
-                          error={isError(meta)}
-                        />
-                      )}
-                    />
-                  </div>
-                  {actionButtons(fields, index, isLastChild, emailFieldRef)}
-                </div>
-                {divider(isLastChild)}
-              </span>
-            );
-          })
-        }
-      </FieldArray>
-    </>
+                )}
+                {((isHF && isEdit) || !isHFCreate) && (
+                  <>
+                    <div className='col-sm-6 col-12'>
+                      <Field
+                        name={`${name}.selectedPeerSupervisor`}
+                        type='text'
+                        validate={required}
+                        render={({ input, meta }) => (
+                          <SelectInput
+                            {...(input as any)}
+                            {...(meta as any)}
+                            label='Selected Peer Supervisor'
+                            errorLabel='selected peer supervisor'
+                            labelKey='name'
+                            valueKey='id'
+                            options={peerSupervisorList}
+                            defaultValue={peerSupervisorList.find(
+                              (value) => value.name === (isEdit ? initialEditData : data)[index]?.selectedPeerSupervisor
+                            )}
+                            loadingOptions={ispeerSupervisorLoading}
+                            error={isError(meta)}
+                            isModel={true}
+                          />
+                        )}
+                      />
+                    </div>
+                    <div className='col-sm-6 col-12'>
+                      <Field
+                        name={`${name}.assignedVillages`}
+                        type='text'
+                        validate={required}
+                        render={({ input, meta }) => (
+                          <MultiSelect
+                            {...(input as any)}
+                            label='Assigned Villages'
+                            errorLabel='assigned villages'
+                            labelKey='name'
+                            valueKey='id'
+                            required={true}
+                            isShowLabel={true}
+                            isSelectAll={true}
+                            menuPlacement={'bottom'}
+                            isModel={true}
+                            isMulti={true}
+                            options={villageList}
+                            loadingOptions={isVillageListLoading}
+                            error={isError(meta)}
+                          />
+                        )}
+                      />
+                    </div>
+                  </>
+                )}
+                {actionButtons(fields, index, isLastChild, emailFieldRef)}
+              </div>
+              {divider(isLastChild)}
+            </span>
+          );
+        })
+      }
+    </FieldArray>
   );
 };
 

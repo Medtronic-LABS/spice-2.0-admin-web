@@ -26,12 +26,14 @@ const APPCONSTANTS = {
   ROLES: {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
-    SITE_ADMIN: 'SITE_ADMIN'
+    SITE_ADMIN: 'SITE_ADMIN',
+    PEER_SUPERVISOR: 'PEER_SUPERVISOR'
   },
   ALL_ROLES: {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
-    SITE_ADMIN: 'SITE_ADMIN'
+    SITE_ADMIN: 'SITE_ADMIN',
+    PEER_SUPERVISOR: 'PEER_SUPERVISOR'
   },
   ROUTE_NAMES: {
     REGION: 'region'
@@ -55,6 +57,7 @@ const APPCONSTANTS = {
     'You will receive the email notification to reset the password if your account exists in our system.',
   OOPS: 'Oops',
   ERROR: 'Error',
+  // REGION
   REGION_UPLOAD_SUCCESS: 'Region data uploaded successfully.',
   REGION_UPLOAD_FAILURE: 'Unable to upload the region data. Please try after sometime.',
   REGION_DOWNLOAD_SUCCESS: 'Region data downloaded successfully.',
@@ -62,8 +65,31 @@ const APPCONSTANTS = {
   REGION_CREATION_SUCCESS: 'Region created successfully.',
   REGION_CREATION_ERROR: 'Unable to create region. Please try after sometime.',
   REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
+  REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
+  // HF
+  HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load health facilities. Please try after sometime.',
+  HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load health facility users. Please try after sometime.',
+  HEALTH_FACILITY_DETAILS_UPDATE_ERROR: 'Unable to update health facility details. Please try after sometime.',
+  HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS: 'Health facility details updated successfully.',
+  HEALTH_FACILITY_DETAILS_FETCH_ERROR: 'Unable to load health facility details. Please try after sometime.',
+  HEALTH_FACILITY_SUMMARY_FETCH_ERROR: 'Unable to load health facility summary details. Please try after sometime.',
+  HEALTH_FACILITY_SUMMARY_UPDATE_ERROR: 'Unable to update health facility summary details. Please try after sometime.',
+  HEALTH_FACILITY_CREATION_SUCCESS: 'Health facility created successfully',
+  HEALTH_FACILITY_CREATION_ERROR: 'Unable to create health facility. Please try after sometime.',
+  HEALTH_FACILITY_USER_CREATE_SUCCESS: 'Health facility user added successfully.',
+  HEALTH_FACILITY_USER_CREATE_ERROR: 'Unable to add health facility user. Please try after sometime.',
+  HEALTH_FACILITY_USER_UPDATE_TITLE: 'Update health facility user.',
+  HEALTH_FACILITY_USER_UPDATE_SUCCESS: 'Health facility user updated successfully.',
+  HEALTH_FACILITY_USER_UPDATE_ERROR: 'Unable to update health facility user. Please try after sometime.',
+  HEALTH_FACILITY_USER_DELETE_SUCCESS: 'Health facility user deleted successfully.',
+  HEALTH_FACILITY_USER_DELETE_FAIL: 'Unable to delete health facility user. Please try after sometime.',
+  HEALTH_FACILITY_USER_DELETE_CONFIRMATION: 'Are you sure want to delete the health facility user?',
+  HEALTH_FACILITY_USER_DELETE_TITLE: 'Delete Health Facility User',
+  CLINICAL_WORKFLOW_FETCH_SUCCESS: 'Unable to load the clinical workflows. Please try after sometime.',
+  // USER
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
+  // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
   MEDICATION_FETCH_ERROR: 'Unable to load medications. Please try after sometime.',
@@ -72,10 +98,16 @@ const APPCONSTANTS = {
   RESULT_UNIT_REENTERED_ERROR: 'You have already entered this range in the form.',
   UNSAVED_CHANGES_MESSAGE: 'Please save your edited changes before submitting.',
   MEDICATION_EXISTS_ERROR: 'This medication is already available in the regional database.',
-  OU_CREATION_SUCCESS: 'Operating Unit created successfully.',
-  OU_CREATION_FAIL: 'Unable to create operating unit. Please try after sometime.',
-  OU_FETCH_ERROR: 'Unable to load operating units. Please try after sometime.',
-  OU_REST_ERROR: 'unable to reset Operating Unit.',
+  MEDICATION_LIST_FETCH_ERROR: 'Unable to load medications list. Please try after sometime.',
+  MEDICATION_UPDATE_SUCCESS: 'Medication updated successfully.',
+  MEDICATION_UPDATE_FAIL: 'Unable to update medication. Please try after sometime.',
+  MEDICATION_DELETE_SUCCESS: 'Medication deleted successfully.',
+  MEDICATION_DELETE_FAIL: 'Unable to delete the medication. Please try after sometime.',
+  MEDICATION_DELETE_TITLE: 'Delete Medication',
+  MEDICATION_DELETE_CONFIRMATION: 'Are you sure want to delete the medication?',
+
+  USER_ROLES_FETCH_ERROR: 'Unable to fetch the user roles. Please try again after sometime',
+
   NETWORK_ERROR: 'Network Error',
   LOGIN_FAILED_TITLE: 'Login failed',
   LOGIN_FAILED_MESSAGE: 'Unable to login. Please try after sometime.',
@@ -86,30 +118,12 @@ const APPCONSTANTS = {
   PASSWORD_SHOULD_NOT_MATCH_ACC_NAME: `New password should not match the user's account name.`,
   COMMON_PASSWORDS_ARE_NOT_ALLOWED: 'Common passwords are not allowed.',
   CONFIRM_PASSWORD_SHOULD_MATCH: 'Confirm new password should match with new password.',
-  REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
-  MEDICATION_LIST_FETCH_ERROR: 'Unable to load medications list. Please try after sometime.',
-  MEDICATION_UPDATE_SUCCESS: 'Medication updated successfully.',
-  MEDICATION_UPDATE_FAIL: 'Unable to update medication. Please try after sometime.',
-  MEDICATION_DELETE_SUCCESS: 'Medication deleted successfully.',
-  MEDICATION_DELETE_FAIL: 'Unable to delete the medication. Please try after sometime.',
-  MEDICATION_DELETE_TITLE: 'Delete Medication',
-  MEDICATION_DELETE_CONFIRMATION: 'Are you sure want to delete the medication?',
   LOGIN_GENERAL_ERROR: 'Unable to login. Please try after sometime.',
   NO_RECORDS_FOUND: 'No records found',
   SEARCH_USER_ERROR: 'Unable to search the admin. Please try after sometime.',
-  REGION_ADMIN_CREATE_SUCCESS: 'Region admin added successfully.',
-  REGION_ADMIN_CREATE_FAIL: 'Unable to add region admin. Please try after sometime.',
-  REGION_UPDATE_SUCCESS: 'Region summary updated successfully.',
-  REGION_UPDATE_FAIL: 'Unable to update region summary. Please try after sometime.',
-  REGION_ADMIN_DELETE_SUCCESS: 'Region admin deleted successfully.',
-  REGION_ADMIN_DELETE_FAIL: 'Unable to delete region admin. Please try after sometime.',
-  REGION_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete region admin?',
-  REGION_ADMIN_DELETE_TITLE: 'Delete Region Admin',
-  HEALTH_FACILITY_USER_DELETE_CONFIRMATION: 'Are you sure want to delete the health facility user?',
   USER_DELETE_CONFIRMATION: 'Users will be deleted from all the linked sites. Are you sure to proceed?',
   ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
-  HEALTH_FACILITY_USER_DELETE_TITLE: 'Delete Health Facility User',
   ADDRESS_USE: [
     { value: 'Home', label: 'Home' },
     { value: 'Work', label: 'Work' },
@@ -259,7 +273,8 @@ const APPCONSTANTS = {
 export const ROLE_LABELS = {
   [APPCONSTANTS.ALL_ROLES.SUPER_USER]: 'Super User',
   [APPCONSTANTS.ALL_ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ALL_ROLES.SITE_ADMIN]: 'Admin'
+  [APPCONSTANTS.ALL_ROLES.SITE_ADMIN]: 'Admin',
+  [APPCONSTANTS.ALL_ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
 };
 
 export default APPCONSTANTS;

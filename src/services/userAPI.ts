@@ -25,6 +25,25 @@ export const fetchLoggedInUser = () =>
     url: '/user-service/user/profile'
   });
 
+export const fetchUserByEmail = (email: string) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/validate-user',
+    data: {
+      email
+    }
+  });
+
+export const validatePhoneNumber = (phoneNumber: string, id: number | null) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/validate-phonenumber',
+    data: {
+      phoneNumber,
+      id
+    }
+  });
+
 export const fetchUserRoles = () =>
   axios({
     method: 'POST',

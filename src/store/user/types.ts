@@ -1,5 +1,6 @@
 import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
+import ApiError from '../../global/ApiError';
 import * as USER_TYPES from './actionTypes';
 
 export type roleType = (typeof APPCONSTANTS.ROLES)[keyof typeof APPCONSTANTS.ROLES];
@@ -157,6 +158,21 @@ export interface IFetchLoggedInUserSuccess {
 
 export interface IFetchLoggedInUserFailure {
   type: typeof USER_TYPES.FETCH_LOGGED_IN_USER_FAILURE;
+}
+
+export interface IFetchUserByEmail {
+  type: typeof USER_TYPES.FETCH_USER_BY_EMAIL;
+  email: string;
+  successCb?: (data: IUser) => void;
+  failureCb?: (error: ApiError) => void;
+}
+
+export interface IFetchUserByEmailSuccess {
+  type: typeof USER_TYPES.FETCH_USER_BY_EMAIL_SUCCESS;
+}
+
+export interface IFetchUserByEmailFail {
+  type: typeof USER_TYPES.FETCH_USER_BY_EMAIL_FAIL;
 }
 export interface IFetchUserRolesRequest {
   type: typeof USER_TYPES.FETCH_USER_ROLES_REQUEST;
