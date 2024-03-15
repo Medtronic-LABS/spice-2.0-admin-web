@@ -12,7 +12,11 @@ export const PROTECTED_ROUTES = {
   healthFacilityBySuperAdmin: '/region/:regionId/healthFacility/list',
   healthFacilityByAdmin: '/healthFacility/list',
   healthFacilitySummary: '/healthFacility/:healthFacilityId/:tenantId',
-  createHealthFacility: '/region/:regionId/healthFacility/create'
+  createHealthFacility: '/region/:regionId/healthFacility/create',
+  usersBySuperAdmin: '/region/:regionId/users/list',
+  usersByAdmin: '/users/list',
+  createUserBySuperAdmin: '/region/:regionId/users/create',
+  createUserByAdmin: '/region/:regionId/users/create'
 };
 
 export const HOME_PAGE_BY_ROLE = {

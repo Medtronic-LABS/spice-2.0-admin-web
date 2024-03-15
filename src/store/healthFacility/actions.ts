@@ -50,7 +50,11 @@ import {
   IFetchWorkflowListFailure,
   IDistrict,
   IHealthFacility,
-  IFetchVillagespayload
+  IFetchVillagespayload,
+  IFetchHFTypesRequest,
+  IFetchHFTypesSuccess,
+  IObjectData,
+  IFetchHFTypesFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -134,6 +138,24 @@ export const fetchHFSummarySuccess = (payload: IHealthFacilitySummary): IFetchHF
 
 export const fetchHFSummaryFailure = (error: Error): IFetchHFSummaryFailure => ({
   type: SITE_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_FAILURE,
+  error
+});
+export const fetchHFTypesRequest = ({
+  failureCb,
+  successCb
+}: Omit<IFetchHFTypesRequest, 'type'>): IFetchHFTypesRequest => ({
+  type: SITE_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST,
+  failureCb,
+  successCb
+});
+
+export const fetchHFTypesSuccess = (payload: IObjectData[]): IFetchHFTypesSuccess => ({
+  type: SITE_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS,
+  payload
+});
+
+export const fetchHFTypesFailure = (error: Error): IFetchHFTypesFailure => ({
+  type: SITE_TYPES.FETCH_HEALTH_FACILITY_TYPES_FAILURE,
   error
 });
 

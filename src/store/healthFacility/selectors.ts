@@ -3,6 +3,8 @@ import { AppState } from '../rootReducer';
 
 const getHealthFacility = (state: AppState) => (state.healthFacility as any).healthFacility;
 const getLoading = (state: AppState) => (state.healthFacility as any).loading;
+const getHFTypes = (state: AppState) => (state.healthFacility as any).hfTypes;
+const getHFTYpesLoading = (state: AppState) => (state.healthFacility as any).hfTypesLoading;
 const getHFTotal = (state: AppState) => (state.healthFacility as any).hfTotal;
 const getHFUsersTotal = (state: AppState) => (state.healthFacility as any).hfUsersTotal;
 const getHFListDetails = (state: AppState) => (state.healthFacility as any).healthFacilityList;
@@ -24,6 +26,8 @@ const getWorkflowLoading = (state: AppState) => (state.healthFacility as any).cl
 
 export const healthFacilitySelector = createSelector(getHealthFacility, (site) => site);
 export const healthFacilityLoadingSelector = createSelector(getLoading, (loading) => loading);
+export const hfTypesSelector = createSelector(getHFTypes, (types) => types);
+export const hfTypesLoadingSelector = createSelector(getHFTYpesLoading, (loading) => loading);
 export const healthFacilityListTotalSelector = createSelector(getHFTotal, (total) => total);
 export const healthFacilityListUsersTotalSelector = createSelector(getHFUsersTotal, (total) => total);
 export const healthFacilityListSelector = createSelector(getHFListDetails, (siteList) => siteList);

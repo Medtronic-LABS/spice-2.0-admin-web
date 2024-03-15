@@ -168,6 +168,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                     <div className='col-lg-6 col-12'>
                       <FormContainer label='Add User' icon={SiteAddUserIcon}>
                         <UserForm
+                          countryId={Number(regionId)}
                           form={form}
                           enableAutoPopulate={true}
                           isHF={true}

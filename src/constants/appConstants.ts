@@ -89,6 +89,8 @@ const APPCONSTANTS = {
   // USER
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
+  USER_DELETE_CONFIRMATION: 'Are you sure want to delete the user?',
+  USER_DELETE_TITLE: 'Delete User',
   // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
@@ -121,7 +123,7 @@ const APPCONSTANTS = {
   LOGIN_GENERAL_ERROR: 'Unable to login. Please try after sometime.',
   NO_RECORDS_FOUND: 'No records found',
   SEARCH_USER_ERROR: 'Unable to search the admin. Please try after sometime.',
-  USER_DELETE_CONFIRMATION: 'Users will be deleted from all the linked sites. Are you sure to proceed?',
+
   ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
   ADDRESS_USE: [

@@ -26,6 +26,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isUserRolesLoading, userRolesSelector } from '../../store/user/selectors';
 import { fetchUserRolesAction } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
+import { fetchHFListRequest, fetchPeerSupervisorListRequest } from '../../store/healthFacility/actions';
+import { healthFacilityListSelector, healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
+import { IObjectData } from '../../store/healthFacility/types';
 
 export interface IUserFormValues {
   email: string;
@@ -52,6 +55,7 @@ interface IUserFormProps {
   entityName?: string;
   enableAutoPopulate?: boolean;
   data?: any[];
+  countryId: number;
 }
 
 /**
@@ -69,6 +73,7 @@ const UserForm = ({
   isDropdownDisable = false,
   entityName,
   enableAutoPopulate,
+  countryId,
   data = []
 }: IUserFormProps): React.ReactElement => {
   const idRefs = useRef([new Date().getTime()]);
@@ -76,6 +81,8 @@ const UserForm = ({
   const dispatch = useDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
   const isRolesLoading = useSelector(isUserRolesLoading);
+  const healthFacilityList = useSelector(healthFacilityListSelector);
+  const hfLoading = useSelector(healthFacilityLoadingSelector);
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -102,10 +109,12 @@ const UserForm = ({
   const initialEditData = useMemo<Array<Partial<any>>>(
     () => [
       {
-        ...initialEditValue
+        ...initialEditValue,
+        hfTenantIds: isEdit ? (initialEditValue.organizations || []).map((org: any) => org.id) : [],
+        hfIds: isEdit ? (initialEditValue.organizations || []).map((org: any) => org.formDataId) : {}
       }
     ],
-    [initialEditValue]
+    [initialEditValue, isEdit]
   );
   const resetAdminForm = useCallback(
     (fields, index: number) => {
@@ -218,17 +227,28 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
-  const healthFacilityList = [
-    { name: 'Health Facility 1', id: '1', tenantId: '4' },
-    { name: 'Health Facility 2', id: '2', tenantId: '2' }
-  ];
-  const isHealthFacilityLoading = false;
   const peerSupervisorList = [{ name: 'Peer Supervisor 1', id: '1' }];
-  const ispeerSupervisorLoading = false;
+  const peerSupervisorLoading = false;
   const villageList = [{ name: 'Peer Supervisor 1', id: '1' }];
   const isVillageListLoading = false;
   const countryList = [{ countryCode: '232' }, { countryCode: '91' }, { countryCode: '+21' }];
   const isCountryListLoading = false;
+
+  useEffect(() => {
+    if (countryId && healthFacilityList.length) {
+      dispatch(fetchHFListRequest({ countryId, skip: 0, limit: null }));
+    }
+  }, [countryId, dispatch, healthFacilityList.length]);
+
+  // Peer Supervisor fetch
+  useEffect(() => {
+    if (isEdit) {
+      const tenantIds = initialEditData[0].hfTenanatIds;
+      if (tenantIds && !peerSupervisorList.length) {
+        dispatch(fetchPeerSupervisorListRequest({ tenantIds }));
+      }
+    }
+  }, [dispatch, initialEditData, isEdit, peerSupervisorList.length]);
 
   return (
     <FieldArray name={formName} initialValue={isEdit ? initialEditData : data.length ? data : initialValue}>
@@ -415,10 +435,10 @@ const UserForm = ({
                           valueKey='id'
                           options={healthFacilityList}
                           defaultValue={healthFacilityList.find(
-                            (value) =>
+                            (value: IObjectData) =>
                               value.name === (isEdit ? initialEditData : data)[index]?.assignedHealthFacility?.name
                           )}
-                          loadingOptions={isHealthFacilityLoading}
+                          loadingOptions={hfLoading}
                           error={isError(meta)}
                           isModel={true}
                         />
@@ -430,7 +450,7 @@ const UserForm = ({
                   <>
                     <div className='col-sm-6 col-12'>
                       <Field
-                        name={`${name}.selectedPeerSupervisor`}
+                        name={`${name}.supervisor`}
                         type='text'
                         validate={required}
                         render={({ input, meta }) => (
@@ -442,10 +462,11 @@ const UserForm = ({
                             labelKey='name'
                             valueKey='id'
                             options={peerSupervisorList}
-                            defaultValue={peerSupervisorList.find(
-                              (value) => value.name === (isEdit ? initialEditData : data)[index]?.selectedPeerSupervisor
+                            defaultValue={(peerSupervisorList || []).find(
+                              (value: any) =>
+                                value.name === (isEdit ? initialEditData : data)[index]?.selectedPeerSupervisor
                             )}
-                            loadingOptions={ispeerSupervisorLoading}
+                            loadingOptions={peerSupervisorLoading}
                             error={isError(meta)}
                             isModel={true}
                           />

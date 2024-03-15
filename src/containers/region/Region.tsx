@@ -82,7 +82,7 @@ const Region = (): React.ReactElement => {
     <>
       {loading && <Loader />}
       <div className={` row g-0dot625 position-relative h-100`}>
-        {!loading && false ? (
+        {!loading && !regionDetails.list.length ? (
           <div
             className={`${dragDropStyles.dragDropContainer} d-flex justify-content-center align-items-center`}
             onDragOver={(e) => e.preventDefault()}

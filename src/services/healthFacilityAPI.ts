@@ -47,6 +47,12 @@ export const updateHFDetails = (data: IHealthFacilityPost) =>
     data
   });
 
+export const fetchHealthFacilityTypes = () =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/healthfacility-types'
+  });
+
 export const addHFUser = (data: IHFUserPayLoad) =>
   axios({
     method: 'POST',

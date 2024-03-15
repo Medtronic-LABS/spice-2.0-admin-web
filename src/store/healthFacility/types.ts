@@ -3,6 +3,8 @@ import * as ACTION_TYPES from './actionTypes';
 
 export interface IHealthFacilityState {
   healthFacility: IHealthFacility;
+  hfTypes: IObjectData[];
+  hfTypesLoading: boolean;
   loading: boolean;
   healthFacilityList: IHealthFacility[];
   healthFacilityUserList: IHFUserGet[];
@@ -45,7 +47,7 @@ export interface IHealthFacility {
   clinicalWorkflows: IClinicalWorkflows[];
 }
 
-interface IObjectData {
+export interface IObjectData {
   id: number;
   name: string;
 }
@@ -126,15 +128,16 @@ export interface IHFUserGet {
   countryCode: string;
   roles: IUserRole[];
   tenantId: number;
-  villageIds?: number[];
-  supervisor: string;
-  organizations: Array<{ id: number; name: string; parentOrganizationId: number; formDataId: number }>;
-  country?: { id: number; name: string };
+  villages?: number[];
+  supervisor: string | null;
+  organizations: Array<{ id: number; name: string; parentOrganizationId: number | null; formDataId: number }>;
+  country?: { id: number; name: string; tenantId?: number };
 }
 
 export interface IUserRole {
   id: number;
   name: string;
+  displayName?: string;
   groupName?: string;
 }
 
@@ -252,6 +255,22 @@ export interface IUpdateHFDetailsSuccess {
 
 export interface IUpdateHFDetailsFailure {
   type: typeof ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_FAILURE;
+  error: Error;
+}
+
+export interface IFetchHFTypesRequest {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST;
+  successCb?: (data: IObjectData[]) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchHFTypesSuccess {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS;
+  payload: IObjectData[];
+}
+
+export interface IFetchHFTypesFailure {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_FAILURE;
   error: Error;
 }
 
@@ -450,6 +469,9 @@ export type HealthFacilityActions =
   | IFetchHFSummaryRequest
   | IFetchHFSummarySuccess
   | IFetchHFSummaryFailure
+  | IFetchHFTypesRequest
+  | IFetchHFTypesSuccess
+  | IFetchHFTypesFailure
   | ICreateHFUserRequest
   | ICreateHFUserSuccess
   | ICreateHFUserFailure

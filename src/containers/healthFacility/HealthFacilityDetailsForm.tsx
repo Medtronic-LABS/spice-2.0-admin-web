@@ -8,7 +8,7 @@ import {
   normalizePhone,
   normalizeFloatingNumber
 } from '../../utils/validation';
-import SelectInput, { AsyncSelectInput, ISelectOption } from '../../components/formFields/SelectInput';
+import SelectInput, { AsyncSelectInput } from '../../components/formFields/SelectInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -16,6 +16,8 @@ import {
   chiefdomLoadingSelector,
   districtListSelector,
   districtLoadingSelector,
+  hfTypesLoadingSelector,
+  hfTypesSelector,
   peerSupervisorListSelector,
   peerSupervisorLoadingSelector,
   villagesListSelector,
@@ -25,12 +27,14 @@ import { useEffect, useRef } from 'react';
 import {
   fetchChiefdomListRequest,
   fetchDistrictListRequest,
+  fetchHFTypesRequest,
   fetchPeerSupervisorListRequest,
   fetchVillagesListRequest
 } from '../../store/healthFacility/actions';
 import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
 import { listCities } from '../../services/healthFacilityAPI';
+import { IObjectData } from '../../store/healthFacility/types';
 
 interface IAddUserFormProps {
   form: FormApi<any>;
@@ -59,6 +63,8 @@ const HealthFacilityDetailsForm = ({
   const regionData = useSelector(userDataSelector).country;
   const districtList = useSelector(districtListSelector);
   const districtListLoading = useSelector(districtLoadingSelector);
+  const hfTypesList = useSelector(hfTypesSelector);
+  const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const chiefdomList = useSelector(chiefdomListSelector);
   const chiefdomLoading = useSelector(chiefdomLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
@@ -67,7 +73,14 @@ const HealthFacilityDetailsForm = ({
   const villagesLoading = useSelector(villagesLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
   const countryId = Number(regionId || regionData.id);
-  const cityOptions = useRef<ISelectOption[]>([]);
+  const cityOptions = useRef<IObjectData[]>([]);
+
+  // Health Facility Types fetch
+  useEffect(() => {
+    if (!hfTypesList.length) {
+      dispatch(fetchHFTypesRequest({}));
+    }
+  }, [dispatch, hfTypesList.length]);
 
   // District fetch
   useEffect(() => {
@@ -128,7 +141,9 @@ const HealthFacilityDetailsForm = ({
       try {
         const city: any = await new Promise(async (resolve) => {
           try {
-            const response = await listCities(Number(regionId), searchStr);
+            const {
+              data: { entity: response }
+            } = await listCities(Number(countryId), searchStr);
             resolve(response);
           } catch (e) {
             console.error('Unable to fetch cities', e);
@@ -138,8 +153,8 @@ const HealthFacilityDetailsForm = ({
           console.error('Unable to fetch cities', e);
           return [];
         });
-        cityOptions.current = city.data;
-        return city.data;
+        cityOptions.current = city;
+        return city;
       } catch (e) {
         console.error('Unable to fetch cities', e);
         return [];
@@ -147,13 +162,6 @@ const HealthFacilityDetailsForm = ({
     }
   };
 
-  const hfType = [
-    { name: 'MCU', id: 'MCU' },
-    { name: 'CHP', id: 'CHP' },
-    { name: 'CHCP', id: 'CHCP' },
-    { name: 'CHC', id: 'CHC' }
-  ] as any[];
-  const hfTypeLoading = false;
   const languages = [{ id: '1', name: 'English' }] as any[];
   const languageLoading = false;
 
@@ -188,9 +196,9 @@ const HealthFacilityDetailsForm = ({
               errorLabel='type'
               labelKey='name'
               valueKey='id'
-              defaultValue={hfType.find((type) => type.name === (data.type?.name || data.type))}
-              options={hfType}
-              loadingOptions={hfTypeLoading}
+              defaultValue={hfTypesList.find((type: IObjectData) => type.name === (data.type?.name || data.type))}
+              options={hfTypesList}
+              loadingOptions={hfTypesLoading}
               error={(meta.touched && meta.error) || undefined}
             />
           )}
@@ -205,7 +213,7 @@ const HealthFacilityDetailsForm = ({
             <TextInput
               {...input}
               label='PHU Focal Person Name'
-              errorLabel='PHU person name'
+              errorLabel='PHU focal person name'
               capitalize={true}
               error={(meta.touched && meta.error) || undefined}
             />
@@ -221,7 +229,7 @@ const HealthFacilityDetailsForm = ({
             <TextInput
               {...input}
               label='PHU Focal Person Number'
-              errorLabel='PHU person number'
+              errorLabel='PHU focal person number'
               capitalize={true}
               error={(meta.touched && meta.error) || undefined}
             />

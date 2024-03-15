@@ -24,6 +24,8 @@ const initialState: IHealthFacilityState = {
     linkedVillages: [],
     clinicalWorkflows: []
   },
+  hfTypes: [],
+  hfTypesLoading: false,
   healthFacilityList: [
     {
       id: 1,
@@ -207,6 +209,22 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
       return {
         ...state,
         clinicalWorkflowLoading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST:
+      return {
+        ...state,
+        hfTypesLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS:
+      return {
+        ...state,
+        hfTypesLoading: false,
+        hfTypes: action.payload
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_FAILURE:
+      return {
+        ...state,
+        hfTypesLoading: false
       };
     default:
       return state;

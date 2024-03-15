@@ -333,6 +333,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     return (
       <UserForm
         form={form as FormApi<any>}
+        countryId={regionData.id}
         initialEditValue={hfUserForEdit.current.users[0]}
         disableOptions={true}
         isEdit={isHFUserEdit}

@@ -14,6 +14,7 @@ import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
 import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
 import CreateHealthFacility from './containers/healthFacility/CreateHealthFacility';
+import UserList from './containers/user/UserList';
 
 interface IRoute {
   path: string;
@@ -27,7 +28,8 @@ interface IProtectedRoute extends IRoute {
 
 export const { SUPER_USER, SUPER_ADMIN, SITE_ADMIN, PEER_SUPERVISOR } = APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
-export const SU_SA_A = [...SU_SA, SITE_ADMIN];
+export const SU_SA_A_P = [...SU_SA, SITE_ADMIN, PEER_SUPERVISOR];
+export const A_P = [SITE_ADMIN, PEER_SUPERVISOR];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
@@ -47,7 +49,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
-      authorisedRoles: SU_SA_A
+      authorisedRoles: SU_SA_A_P
     },
     {
       path: PROTECTED_ROUTES.createHealthFacility,
@@ -59,7 +61,19 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilityByAdmin,
       exact: true,
       component: HealthFacilityList,
-      authorisedRoles: [SITE_ADMIN]
+      authorisedRoles: A_P
+    },
+    {
+      path: PROTECTED_ROUTES.usersBySuperAdmin,
+      exact: true,
+      component: UserList,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.usersByAdmin,
+      exact: true,
+      component: UserList,
+      authorisedRoles: A_P
     }
   ];
 })();

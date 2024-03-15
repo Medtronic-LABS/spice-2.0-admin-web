@@ -47,7 +47,7 @@ const superAdminRoutes: ISideMenuItem[] = [
   },
   {
     label: 'Users',
-    route: '',
+    route: PROTECTED_ROUTES.usersBySuperAdmin,
     disabled: false
   }
 ];
@@ -58,7 +58,7 @@ const adminRoutes: ISideMenuItem[] = [
   },
   {
     label: 'Users',
-    route: ''
+    route: PROTECTED_ROUTES.usersByAdmin
   }
 ];
 

@@ -16,7 +16,8 @@ import {
   IFetchVillagesListRequest,
   IFetchPeerSupervisorListRequest,
   IFetchWorkflowListRequest,
-  IPeerSupervisor
+  IPeerSupervisor,
+  IFetchHFTypesRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -44,7 +45,9 @@ import {
   fetchPeerSupervisorListSuccess,
   fetchPeerSupervisorListFailure,
   fetchWorkflowListSuccess,
-  fetchWorkflowListFailure
+  fetchWorkflowListFailure,
+  fetchHFTypesSuccess,
+  fetchHFTypesFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -59,7 +62,8 @@ import {
   FETCH_DISTRICT_LIST_REQUEST,
   FETCH_VILLAGES_LIST_REQUEST,
   FETCH_PEER_SUPERVISOR_LIST_REQUEST,
-  FETCH_WORKFLOW_LIST_REQUEST
+  FETCH_WORKFLOW_LIST_REQUEST,
+  FETCH_HEALTH_FACILITY_TYPES_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 
@@ -140,6 +144,24 @@ export function* updateHFDetailsRequest({ data, successCb, failureCb }: IUpdateH
     if (e instanceof Error) {
       failureCb?.(e);
       yield put(updateHFDetailsFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_HEALTH_FACILITY_TYPES_REQUEST action
+*/
+export function* fetchHFTypesSaga({ successCb, failureCb }: IFetchHFTypesRequest): SagaIterator {
+  try {
+    const {
+      data: { entity: list }
+    } = yield call(hfService.fetchHealthFacilityTypes as any);
+    successCb?.(list);
+    yield put(fetchHFTypesSuccess(list));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchHFTypesFailure(e));
     }
   }
 }
@@ -368,6 +390,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST, fetchVillagesListSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_LIST_REQUEST, fetchPeerSupervisorListSagaRequest)]);
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
+  yield all([takeLatest(FETCH_HEALTH_FACILITY_TYPES_REQUEST, fetchHFTypesSaga)]);
 }
 
 export default healthFacilitySaga;

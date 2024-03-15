@@ -169,12 +169,36 @@ export const AsyncSelectInput = ({
   error = '',
   errorLabel = '',
   required = true,
+  valueKey,
+  nestedObject,
+  labelKey,
+  appendPlus,
   input,
   disabled = false,
   loadInputOptions,
   isModel = false,
   ...rest
 }: ISelectBoxProps) => {
+  const getOptionLabel = (option: any) => {
+    if (labelKey && nestedObject) {
+      return option[labelKey[0]][labelKey[1]];
+    } else if (labelKey && typeof labelKey === 'string') {
+      return appendPlus ? `+${option[labelKey]}` : option[labelKey];
+    } else {
+      return option.label;
+    }
+  };
+
+  const getOptionValue = (option: any) => {
+    if (valueKey && nestedObject) {
+      return option[valueKey[0]][valueKey[1]];
+    } else if (valueKey && typeof valueKey === 'string') {
+      return option[valueKey];
+    } else {
+      return option.value;
+    }
+  };
+
   let timeoutId: ReturnType<typeof setTimeout>;
   const loadOptions = (inputValue: string, callback: any) => {
     if (timeoutId) {
@@ -222,6 +246,8 @@ export const AsyncSelectInput = ({
         loadOptions={loadOptions}
         defaultOptions={[]}
         isDisabled={disabled}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
       />
       <div className={styles.error}>
         {error} {error && errorLabel}
