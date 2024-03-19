@@ -22,7 +22,8 @@ import {
 } from '../../store/healthFacility/actions';
 import { IHFUserGet, IHFUserPost, IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { healthFacilitySelector } from '../../store/healthFacility/selectors';
-import { userDataSelector } from '../../store/user/selectors';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
+import { IRoles } from '../../store/user/types';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -90,6 +91,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const { healthFacilityId, tenantId } = useParams<IMatchParams>();
   const healthFacility = useSelector(healthFacilitySelector);
   const regionData = useSelector(userDataSelector).country;
+  const role = useSelector(roleSelector);
 
   const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false
@@ -171,8 +173,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
-        userBased: false,
-        tenantBased: false,
+        userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
+        tenantBased: true,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();
@@ -240,7 +242,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const handleEditUserClick = useCallback(
     (user: any) => {
       setIsHFUserEdit(true);
-      user.country = { countryCode: user.countryCode || '' };
+      user.suiteAccess = user.roles[0] || [];
+      user.role = user.roles.filter((r: IRoles) => r.groupName === user.suiteAccess.groupName) || [];
       hfUserForEdit.current = { users: [{ ...user }] };
       setHFUserModal(true);
     },

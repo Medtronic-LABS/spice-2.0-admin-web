@@ -20,15 +20,20 @@ import SelectInput from '../formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
-import { IUser } from '../../store/user/types';
+import { IRoles, IUser } from '../../store/user/types';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
-import { isUserRolesLoading, userRolesSelector } from '../../store/user/selectors';
+import { isUserRolesLoading, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { fetchUserRolesAction } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
 import { fetchHFListRequest, fetchPeerSupervisorListRequest } from '../../store/healthFacility/actions';
-import { healthFacilityListSelector, healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
-import { IObjectData } from '../../store/healthFacility/types';
+import {
+  healthFacilityListSelector,
+  healthFacilityLoadingSelector,
+  peerSupervisorListSelector,
+  peerSupervisorLoadingSelector
+} from '../../store/healthFacility/selectors';
+import { IObjectData, IUserRole } from '../../store/healthFacility/types';
 
 export interface IUserFormValues {
   email: string;
@@ -83,6 +88,12 @@ const UserForm = ({
   const isRolesLoading = useSelector(isUserRolesLoading);
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const hfLoading = useSelector(healthFacilityLoadingSelector);
+  const peerSupervisorList = useSelector(peerSupervisorListSelector);
+  const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
+  const role = useSelector(roleSelector);
+
+  const [isCHWUser, setUserAsCHW] = useState([false]);
+  const roleOptions = useRef<IRoles[][]>([]);
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -227,28 +238,47 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
-  const peerSupervisorList = [{ name: 'Peer Supervisor 1', id: '1' }];
-  const peerSupervisorLoading = false;
   const villageList = [{ name: 'Peer Supervisor 1', id: '1' }];
   const isVillageListLoading = false;
-  const countryList = [{ countryCode: '232' }, { countryCode: '91' }, { countryCode: '+21' }];
+  const countryList = [{ phoneNumberCode: '232', id: '232' }];
   const isCountryListLoading = false;
-
-  useEffect(() => {
-    if (countryId && healthFacilityList.length) {
-      dispatch(fetchHFListRequest({ countryId, skip: 0, limit: null }));
-    }
-  }, [countryId, dispatch, healthFacilityList.length]);
 
   // Peer Supervisor fetch
   useEffect(() => {
     if (isEdit) {
-      const tenantIds = initialEditData[0].hfTenanatIds;
-      if (tenantIds && !peerSupervisorList.length) {
+      const tenantIds = initialEditData[0].hfTenantIds;
+      if (tenantIds.length && !peerSupervisorList.length) {
         dispatch(fetchPeerSupervisorListRequest({ tenantIds }));
       }
     }
   }, [dispatch, initialEditData, isEdit, peerSupervisorList.length]);
+
+  const selectedRoles = useCallback((index: number) => form.getState().values.users[index].roles, [form]);
+  const isCHWSelected = (roles: IRoles[]) => roles.some((userRole: IRoles) => userRole.name === 'CHW');
+  const isCHWUserSelectedFn = useCallback(
+    (roles: IRoles[], index: number) => {
+      const newChWStatus = [...isCHWUser];
+      newChWStatus[index] = isCHWSelected(roles);
+      setUserAsCHW(newChWStatus);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  useEffect(() => {
+    if (isEdit) {
+      isCHWUserSelectedFn(form.getState().values.users[0].role, 0);
+    }
+  }, [form, isCHWUserSelectedFn, isEdit, selectedRoles]);
+
+  const roleOptionSelection = useCallback(
+    (suite: string, index: number) => {
+      const newRoleOptions = [...roleOptions.current];
+      newRoleOptions[index] = rolesGrouped[suite];
+      roleOptions.current = newRoleOptions;
+    },
+    [rolesGrouped]
+  );
 
   return (
     <FieldArray name={formName} initialValue={isEdit ? initialEditData : data.length ? data : initialValue}>
@@ -257,9 +287,17 @@ const UserForm = ({
           const isLastChild = (fields?.length || 0) === index + 1;
           const isFirstChild = !index;
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
+          // SUITE options
           const suiteAccess = Object.keys(rolesGrouped)
-            .map((role) => ({ name: role, id: role }))
+            .map((userRole: any) => ({ groupName: userRole, id: userRole }))
             .sort();
+          // Default Role options selection base on SUITE on initial Edit
+          if (isEdit && !roleOptions.current[index]) {
+            const selectedSuiteAccess = (isEdit ? initialEditData : data.length ? data : initialValue)[index]
+              ?.suiteAccess?.groupName;
+            roleOptionSelection(selectedSuiteAccess, index);
+          }
+
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -275,41 +313,78 @@ const UserForm = ({
                         {...(input as any)}
                         label='SPICE Suite Access'
                         errorLabel='suite access'
-                        labelKey='name'
-                        valueKey='id'
-                        defaultValue={(suiteAccess || []).find(
-                          (value) => value?.name === (isEdit ? initialEditData : data)[index]?.roles[0]?.groupName
-                        )}
+                        labelKey='groupName'
+                        valueKey='groupName'
                         options={suiteAccess || []}
                         loadingOptions={isRolesLoading}
                         error={isError(meta)}
                         isModel={true}
+                        onChange={(value) => {
+                          // Role option selection
+                          roleOptionSelection(value.groupName, index);
+                          // To store ALL ROLES
+                          form.change(
+                            `${formName}[${index}].role`,
+                            selectedRoles(index).filter(
+                              (userRole: IUserRole) => userRole.groupName === value.groupName
+                            ) || []
+                          );
+                          // CHW User selection
+                          isCHWUserSelectedFn(form.getState().values.users[index].role, index);
+                          input.onChange(value);
+                        }}
                       />
                     )}
                   />
                 </div>
                 <div className='col-sm-6 col-12'>
                   <Field
-                    name={`${name}.roles`}
+                    name={`${name}.role`}
                     type='text'
                     validate={required}
                     render={({ input, meta }) => {
-                      const selectedSuiteAccess = form.getState().values.users[index]?.suiteAccess?.id;
-                      const roles = rolesGrouped[selectedSuiteAccess] || [];
                       return (
-                        <SelectInput
+                        <MultiSelect
                           {...(input as any)}
                           label='Role'
-                          errorLabel='role'
+                          errorLabel='Please select at least one role.'
                           labelKey='displayName'
                           valueKey='id'
-                          options={roles || []}
-                          defaultValue={(roles || []).find(
-                            (value) => value.id === (isEdit ? initialEditData : data)[index]?.roles[0]?.id
-                          )}
-                          loadingOptions={isRolesLoading}
-                          error={isError(meta)}
+                          isShowLabel={true}
+                          isSelectAll={true}
+                          menuPlacement={'bottom'}
+                          placeholder=''
                           isModel={true}
+                          isMulti={true}
+                          required={true}
+                          options={roleOptions.current?.[index] || []}
+                          loading={isRolesLoading}
+                          error={isError(meta) && !form.getState().values.users[index]?.roles?.length}
+                          onChange={(values: any) => {
+                            //  Store ALL ROLES on each update
+                            const suiteAccessSelected = form.getState().values.users[index].suiteAccess?.groupName;
+                            const remainingRoles = selectedRoles(index).filter(
+                              (r: IUserRole) => r.groupName !== suiteAccessSelected
+                            );
+                            form.change(`${formName}[${index}].roles`, [...remainingRoles, ...values]);
+                            // CHW User selection
+                            isCHWUserSelectedFn(values, index);
+                            // fetch HF list based on CHW selection
+                            if (isCHWSelected(values) && !isEdit && !isHFCreate) {
+                              if (countryId && healthFacilityList.length) {
+                                dispatch(
+                                  fetchHFListRequest({
+                                    countryId,
+                                    skip: 0,
+                                    limit: null,
+                                    userBased:
+                                      role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER)
+                                  })
+                                );
+                              }
+                            }
+                            input.onChange(values);
+                          }}
                         />
                       );
                     }}
@@ -386,7 +461,7 @@ const UserForm = ({
                 ) : (
                   <div className='col-sm-6 col-12'>
                     <Field
-                      name={`${name}.countryCode`}
+                      name={`${name}.country`}
                       type='text'
                       validate={required}
                       render={({ input, meta }) => (
@@ -394,13 +469,10 @@ const UserForm = ({
                           {...(input as any)}
                           label='Country Code'
                           errorLabel='country code'
-                          labelKey='countryCode'
-                          valueKey='countryCode'
-                          appendPlus={true}
+                          labelKey='phoneNumberCode'
+                          valueKey='id'
+                          appendPlus={!!input.value}
                           options={countryList}
-                          defaultValue={countryList.find(
-                            (value) => value.countryCode === (isEdit ? initialEditData : data)[index]?.countryCode
-                          )}
                           loadingOptions={isCountryListLoading}
                           error={isError(meta)}
                           isModel={true}
@@ -420,84 +492,88 @@ const UserForm = ({
                     )}
                   />
                 </div>
-                {!isHFCreate && !isHF && !isEdit && (
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.assignedHealthFacility`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
-                        <SelectInput
-                          {...(input as any)}
-                          label='Assigned Health Facility'
-                          errorLabel='assigned health facility'
-                          labelKey='name'
-                          valueKey='id'
-                          options={healthFacilityList}
-                          defaultValue={healthFacilityList.find(
-                            (value: IObjectData) =>
-                              value.name === (isEdit ? initialEditData : data)[index]?.assignedHealthFacility?.name
-                          )}
-                          loadingOptions={hfLoading}
-                          error={isError(meta)}
-                          isModel={true}
-                        />
-                      )}
-                    />
-                  </div>
-                )}
-                {((isHF && isEdit) || !isHFCreate) && (
+                {isCHWUser[index] && (
                   <>
-                    <div className='col-sm-6 col-12'>
-                      <Field
-                        name={`${name}.supervisor`}
-                        type='text'
-                        validate={required}
-                        render={({ input, meta }) => (
-                          <SelectInput
-                            {...(input as any)}
-                            {...(meta as any)}
-                            label='Selected Peer Supervisor'
-                            errorLabel='selected peer supervisor'
-                            labelKey='name'
-                            valueKey='id'
-                            options={peerSupervisorList}
-                            defaultValue={(peerSupervisorList || []).find(
-                              (value: any) =>
-                                value.name === (isEdit ? initialEditData : data)[index]?.selectedPeerSupervisor
+                    {!isHFCreate && !isHF && !isEdit && (
+                      <div className='col-sm-6 col-12'>
+                        <Field
+                          name={`${name}.healthFacility`}
+                          type='text'
+                          validate={required}
+                          render={({ input, meta }) => (
+                            <SelectInput
+                              {...(input as any)}
+                              label='Assigned Health Facility'
+                              errorLabel='assigned health facility'
+                              labelKey='name'
+                              valueKey='id'
+                              options={healthFacilityList}
+                              defaultValue={healthFacilityList.find(
+                                (value: IObjectData) =>
+                                  value.name === (isEdit ? initialEditData : data)[index]?.assignedHealthFacility?.name
+                              )}
+                              loadingOptions={hfLoading}
+                              error={isError(meta)}
+                              isModel={true}
+                            />
+                          )}
+                        />
+                      </div>
+                    )}
+                    {((isHF && isEdit) || !isHFCreate) && (
+                      <>
+                        <div className='col-sm-6 col-12'>
+                          <Field
+                            name={`${name}.supervisor`}
+                            type='text'
+                            validate={required}
+                            render={({ input, meta }) => (
+                              <SelectInput
+                                {...(input as any)}
+                                {...(meta as any)}
+                                label='Selected Peer Supervisor'
+                                errorLabel='selected peer supervisor'
+                                labelKey='name'
+                                valueKey='id'
+                                options={peerSupervisorList}
+                                defaultValue={(peerSupervisorList || []).find(
+                                  (value: any) =>
+                                    value.name === (isEdit ? initialEditData : data)[index]?.selectedPeerSupervisor
+                                )}
+                                loadingOptions={peerSupervisorLoading}
+                                error={isError(meta)}
+                                isModel={true}
+                              />
                             )}
-                            loadingOptions={peerSupervisorLoading}
-                            error={isError(meta)}
-                            isModel={true}
                           />
-                        )}
-                      />
-                    </div>
-                    <div className='col-sm-6 col-12'>
-                      <Field
-                        name={`${name}.assignedVillages`}
-                        type='text'
-                        validate={required}
-                        render={({ input, meta }) => (
-                          <MultiSelect
-                            {...(input as any)}
-                            label='Assigned Villages'
-                            errorLabel='assigned villages'
-                            labelKey='name'
-                            valueKey='id'
-                            required={true}
-                            isShowLabel={true}
-                            isSelectAll={true}
-                            menuPlacement={'bottom'}
-                            isModel={true}
-                            isMulti={true}
-                            options={villageList}
-                            loadingOptions={isVillageListLoading}
-                            error={isError(meta)}
+                        </div>
+                        <div className='col-sm-6 col-12'>
+                          <Field
+                            name={`${name}.assignedVillages`}
+                            type='text'
+                            validate={required}
+                            render={({ input, meta }) => (
+                              <MultiSelect
+                                {...(input as any)}
+                                label='Assigned Villages'
+                                errorLabel='assigned villages'
+                                labelKey='name'
+                                valueKey='id'
+                                required={true}
+                                isShowLabel={true}
+                                isSelectAll={true}
+                                menuPlacement={'bottom'}
+                                isModel={true}
+                                isMulti={true}
+                                options={villageList}
+                                loadingOptions={isVillageListLoading}
+                                error={isError(meta)}
+                              />
+                            )}
                           />
-                        )}
-                      />
-                    </div>
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}

@@ -91,6 +91,7 @@ const APPCONSTANTS = {
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
   USER_DELETE_CONFIRMATION: 'Are you sure want to delete the user?',
   USER_DELETE_TITLE: 'Delete User',
+  USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
   // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
@@ -236,18 +237,6 @@ const APPCONSTANTS = {
   SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',
   EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG: 'Email ID already exists in different organization',
   EMAIL_DUPLICATION_ERR_MSG: `Multiple users can't have same`,
-  SITE_ROLE_NAMES: [
-    'HEALTH_COACH',
-    'HEALTH_SCREENER',
-    'HRIO',
-    'LAB_TECHNICIAN',
-    'NUTRITIONIST',
-    'COUNSELOR',
-    'PHYSICIAN_PRESCRIBER',
-    'PHARMACIST',
-    'PROVIDER',
-    'NURSE'
-  ],
   REPORTING_ROLE_NAMES: ['REPORT_ADMIN', 'EMR_FACILITY_ADMIN', 'EMR_REPORTING_ADMIN'],
   ACTIVE: 'Active',
   INACTIVE: 'Inactive',

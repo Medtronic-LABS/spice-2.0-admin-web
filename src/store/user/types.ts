@@ -179,13 +179,13 @@ export interface IFetchUserRolesRequest {
   successCb?: (payload: IGroupRoles) => void;
   failureCb?: (error: Error) => void;
 }
-interface IRoles {
+export interface IRoles {
   id: number;
   name: string;
-  level: number;
-  suiteAccessName: string;
-  displayName: string;
-  groupName: string;
+  level?: number;
+  suiteAccessName?: string;
+  displayName?: string;
+  groupName?: string;
 }
 
 export interface IGroupRoles {

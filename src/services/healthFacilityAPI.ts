@@ -76,8 +76,7 @@ export const fetchHFUserList = (data: IFetchHFUserListRequest) =>
 export const fetchHFUserDetails = (data: { id: number }) =>
   axios({
     method: 'POST',
-    url: '/user-service/user/details',
-    data
+    url: `/user-service/user/details/${data.id}`
   });
 
 export const deleteHFUser = (data: IDeleteUserSuccessPayload) =>

@@ -6,9 +6,10 @@ const getLoading = (state: AppState) => (state.healthFacility as any).loading;
 const getHFTypes = (state: AppState) => (state.healthFacility as any).hfTypes;
 const getHFTYpesLoading = (state: AppState) => (state.healthFacility as any).hfTypesLoading;
 const getHFTotal = (state: AppState) => (state.healthFacility as any).hfTotal;
-const getHFUsersTotal = (state: AppState) => (state.healthFacility as any).hfUsersTotal;
 const getHFListDetails = (state: AppState) => (state.healthFacility as any).healthFacilityList;
 const getHFUserList = (state: AppState) => (state.healthFacility as any).healthFacilityUserList;
+const getHFUsersTotal = (state: AppState) => (state.healthFacility as any).hfUsersTotal;
+const getHFUserLoading = (state: AppState) => (state.healthFacility as any).hfUsersLoading;
 const getDistrictList = (state: AppState) => (state.healthFacility as any).districtList;
 const getDistrictTotal = (state: AppState) => (state.healthFacility as any).districtTotal;
 const getDistrictLoading = (state: AppState) => (state.healthFacility as any).districtLoading;
@@ -29,9 +30,10 @@ export const healthFacilityLoadingSelector = createSelector(getLoading, (loading
 export const hfTypesSelector = createSelector(getHFTypes, (types) => types);
 export const hfTypesLoadingSelector = createSelector(getHFTYpesLoading, (loading) => loading);
 export const healthFacilityListTotalSelector = createSelector(getHFTotal, (total) => total);
-export const healthFacilityListUsersTotalSelector = createSelector(getHFUsersTotal, (total) => total);
 export const healthFacilityListSelector = createSelector(getHFListDetails, (siteList) => siteList);
 export const healthFacilityUserListSelector = createSelector(getHFUserList, (siteUserList) => siteUserList);
+export const healthFacilityListUsersTotalSelector = createSelector(getHFUsersTotal, (total) => total);
+export const healthFacilityUsersLoadingSelector = createSelector(getHFUserLoading, (hfUsersLoading) => hfUsersLoading);
 
 export const districtListSelector = createSelector(getDistrictList, (districtList) => districtList);
 export const districtTotalSelector = createSelector(getDistrictTotal, (districtTotal) => districtTotal);

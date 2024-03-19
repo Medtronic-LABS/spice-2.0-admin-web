@@ -49,6 +49,7 @@ const initialState: IHealthFacilityState = {
   ],
   healthFacilityUserList: [],
   hfUsersTotal: 0,
+  hfUsersLoading: false,
   districtList: [],
   districtTotal: 0,
   districtLoading: false,
@@ -78,7 +79,7 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_SUCCESS:
       return {
         ...state,
-        loading: false,
+        hfUsersLoading: false,
         hfUsersTotal: action.payload.total || 0,
         healthFacilityUserList: action.payload.users || []
       };
@@ -97,17 +98,27 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
         healthFacility: action.payload,
         loading: false
       };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_REQUEST:
+      return {
+        ...state,
+        hfUsersLoading: true
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_REQUEST:
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST:
       return {
         ...state,
         loading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_FAILURE:
+      return {
+        ...state,
+        hfUsersLoading: false,
+        error: action.error
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_FAILURE:
@@ -115,7 +126,6 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_FAILURE:
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_FAILURE:
       return {
         ...state,

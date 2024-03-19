@@ -9,6 +9,7 @@ export interface IHealthFacilityState {
   healthFacilityList: IHealthFacility[];
   healthFacilityUserList: IHFUserGet[];
   hfTotal: number;
+  hfUsersLoading: boolean;
   hfUsersTotal: number;
   districtList: IDistrict[];
   districtTotal: number;

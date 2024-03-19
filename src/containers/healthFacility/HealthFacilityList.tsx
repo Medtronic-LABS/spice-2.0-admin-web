@@ -20,7 +20,7 @@ import {
   healthFacilityListTotalSelector,
   healthFacilityLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { userDataSelector } from '../../store/user/selectors';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { formatHealthFacility } from './HealthFacilitySummary';
 
@@ -35,6 +35,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const healthFacilityCount = useSelector(healthFacilityListTotalSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
+  const role = useSelector(roleSelector);
   const regionData = useSelector(userDataSelector).country;
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -54,10 +55,11 @@ const HealthFacilityList = (): React.ReactElement => {
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
+        userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );
-  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id, role]);
 
   useEffect(() => {
     fetchList();
