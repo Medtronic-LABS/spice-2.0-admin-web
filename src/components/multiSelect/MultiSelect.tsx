@@ -8,13 +8,13 @@ export interface IOption {
   label: string;
 }
 
-const convertOptionType = (labelKey: string | string[], valueKey: string | string[], options: any[]) =>
+const convertOptionType = (labelKey: string | string[], valueKey: string | string[], options: any) =>
   labelKey && valueKey
     ? (options || []).map((option: any) => {
         return {
           ...option,
-          label: Array.isArray(labelKey) ? option[labelKey[0]] + ' ' + option[labelKey[1]] : option[labelKey],
-          value: Array.isArray(valueKey) ? option[valueKey[0]] + ' ' + option[valueKey[1]] : option[valueKey]
+          label: Array.isArray(labelKey) ? option[labelKey[0]] + ' ' + option[labelKey[1]] : option?.[labelKey] || '',
+          value: Array.isArray(valueKey) ? option[valueKey[0]] + ' ' + option[valueKey[1]] : option?.[valueKey] || ''
         };
       })
     : options;
@@ -22,14 +22,14 @@ const convertOptionType = (labelKey: string | string[], valueKey: string | strin
 const MultiSelect = (props: any) => {
   const newProps = {
     ...props,
-    value: convertOptionType(props.labelKey, props.valueKey, props.value),
-    options: convertOptionType(props.labelKey, props.valueKey, props.options)
+    value: convertOptionType(props.labelKey, props.valueKey, Array.isArray(props.value) ? props.value : []),
+    options: convertOptionType(props.labelKey, props.valueKey, Array.isArray(props.options) ? props.options : [])
   };
   const [selectInput, setSelectInput] = useState<string>('');
   const isAllSelected = useRef<boolean>(false);
   const selectAllLabel = useRef<string>('Select all');
   const allOption = { value: '*', label: selectAllLabel.current };
-  const filterOptions = (filters: IOption[], input: string) =>
+  const filterOptions = (filters: IOption[] = [], input: string) =>
     filters &&
     filters
       ?.filter(({ label }: IOption) => label?.toLowerCase().includes(input?.toLowerCase()))
@@ -221,6 +221,7 @@ const MultiSelect = (props: any) => {
       )}
       <ReactSelect
         {...newProps}
+        required={null}
         inputValue={selectInput}
         onInputChange={onInputChange}
         components={{

@@ -35,7 +35,7 @@ describe('User Login', () => {
     const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
     const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
       return Promise.resolve({
-        headers: { authorization: token, tenantId: userTenantID }
+        headers: { authorization: token, Tenantid: userTenantID }
       } as AxiosResponse);
     });
     const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
@@ -57,8 +57,8 @@ describe('User Login', () => {
     expect(loginUserSpy).toHaveBeenCalledWith(username, hashedPassword);
     expect(fetchLoggedInUserSpy).toHaveBeenCalled();
     expect(dispatched).toEqual([
-      loginActions.addToken(encryptedToken),
       loginActions.addUserTenantID(userTenantID),
+      loginActions.addToken(encryptedToken),
       loginActions.loginSuccess(loginSuccessResponseMockData as any)
     ]);
   });

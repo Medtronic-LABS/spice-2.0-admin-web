@@ -161,7 +161,7 @@ const Breadcrumb = (): React.ReactElement => {
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
         onClick={clearData}
-        to={HOME_PAGE_BY_ROLE[role].replace(':regionId', region.id).replace(':tenantId', region.tenantId)}
+        to={HOME_PAGE_BY_ROLE[role].replace(':regionId', region?.id).replace(':tenantId', region?.tenantId)}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

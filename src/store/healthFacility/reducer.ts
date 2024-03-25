@@ -1,12 +1,19 @@
 import * as HEALTH_FACILITY_ACTION_TYPES from '../healthFacility/actionTypes';
 
-import { HealthFacilityActions, IChiefdom, IDistrict, IHealthFacilityState } from './types';
+import {
+  HealthFacilityActions,
+  IChiefdom,
+  IDistrict,
+  IHFUserGet,
+  IHealthFacility,
+  IHealthFacilityState
+} from './types';
 
 const initialState: IHealthFacilityState = {
   hfTotal: 0,
   loading: false,
   healthFacility: {
-    id: 1,
+    id: 0,
     name: '',
     type: '',
     phuFocalPersonName: '',
@@ -19,35 +26,17 @@ const initialState: IHealthFacilityState = {
     longitude: '',
     postalCode: '',
     language: '',
-    tenantId: 1,
+    tenantId: 0,
     peerSupervisors: [],
     linkedVillages: [],
     clinicalWorkflows: []
   },
   hfTypes: [],
   hfTypesLoading: false,
-  healthFacilityList: [
-    {
-      id: 1,
-      name: '',
-      type: '',
-      phuFocalPersonName: '',
-      phuFocalPersonNumber: '',
-      address: '',
-      district: {} as IDistrict,
-      chiefdom: {} as IChiefdom,
-      cityName: '',
-      latitude: '',
-      longitude: '',
-      postalCode: '',
-      language: '',
-      tenantId: 1,
-      peerSupervisors: [],
-      linkedVillages: [],
-      clinicalWorkflows: []
-    }
-  ],
+  healthFacilityList: [] as IHealthFacility[],
   healthFacilityUserList: [],
+  hfUser: {} as IHFUserGet,
+  hfUserDetailLoading: false,
   hfUsersTotal: 0,
   hfUsersLoading: false,
   districtList: [],
@@ -59,7 +48,9 @@ const initialState: IHealthFacilityState = {
   villagesList: [],
   villagesTotal: 0,
   villagesLoading: false,
-  peerSupervisorList: [],
+  villagesFromHFList: { list: [], hfTenantIds: null },
+  villagesFromHFLoading: false,
+  peerSupervisorList: { list: [], hfTenantIds: null },
   peerSupervisorTotal: 0,
   peerSupervisorLoading: false,
   clinicalWorkflowList: [],
@@ -67,7 +58,10 @@ const initialState: IHealthFacilityState = {
   error: null
 };
 
-const healthFacilityReducer = (state: IHealthFacilityState = initialState, action = {} as HealthFacilityActions) => {
+const healthFacilityReducer = (
+  state: IHealthFacilityState = initialState,
+  action = {} as HealthFacilityActions
+): IHealthFacilityState => {
   switch (action.type) {
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_SUCCESS:
       return {
@@ -82,6 +76,12 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
         hfUsersLoading: false,
         hfUsersTotal: action.payload.total || 0,
         healthFacilityUserList: action.payload.users || []
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_SUCCESS:
+      return {
+        ...state,
+        hfUserDetailLoading: false,
+        hfUser: action.payload
       };
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_SUCCESS:
@@ -103,6 +103,11 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
         ...state,
         hfUsersLoading: true
       };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST:
+      return {
+        ...state,
+        hfUserDetailLoading: true
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_REQUEST:
@@ -120,6 +125,12 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
         hfUsersLoading: false,
         error: action.error
       };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_FAILURE:
+      return {
+        ...state,
+        hfUserDetailLoading: false,
+        error: action.error
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_FAILURE:
@@ -132,9 +143,22 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
         loading: false,
         error: action.error
       };
-    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_DROPDOWN_VALUES:
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HEALTH_FACILITY_LIST:
       return {
-        ...state
+        ...state,
+        healthFacilityList: [],
+        hfTotal: 0
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_PEER_SUPERVISOR_LIST:
+      return {
+        ...state,
+        peerSupervisorList: { list: [], hfTenantIds: [] },
+        peerSupervisorTotal: 0
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_VILLAGES_LIST_FROM_HF:
+      return {
+        ...state,
+        villagesFromHFList: { list: [], hfTenantIds: [] }
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST:
       return {
@@ -187,6 +211,22 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
         ...state,
         villagesLoading: false
       };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST:
+      return {
+        ...state,
+        villagesFromHFLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_SUCCESS:
+      return {
+        ...state,
+        villagesFromHFLoading: false,
+        villagesFromHFList: action.payload.data
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_FAILURE:
+      return {
+        ...state,
+        villagesFromHFLoading: false
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST:
       return {
         ...state,
@@ -196,7 +236,7 @@ const healthFacilityReducer = (state: IHealthFacilityState = initialState, actio
       return {
         ...state,
         peerSupervisorLoading: false,
-        peerSupervisorList: action.payload.list,
+        peerSupervisorList: action.payload.data,
         peerSupervisorTotal: action.payload.total
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_FAILURE:

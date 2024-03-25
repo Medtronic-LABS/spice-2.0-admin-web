@@ -7,7 +7,6 @@ import {
   ICreateHFRequest,
   ICreateHFSuccess,
   ICreateHFFailure,
-  IClearDropdownValues,
   IFetchHFSummaryRequest,
   IFetchHFSummarySuccess,
   IFetchHFSummaryFailure,
@@ -28,7 +27,6 @@ import {
   IDeleteHFUserSuccess,
   IDeleteHFUserFailure,
   ICreateHFRequestPayload,
-  IHealthFacilitySummary,
   IHFUserPost,
   IFetchChiefdomListRequest,
   IChiefdom,
@@ -54,7 +52,18 @@ import {
   IFetchHFTypesRequest,
   IFetchHFTypesSuccess,
   IObjectData,
-  IFetchHFTypesFailure
+  IFetchHFTypesFailure,
+  IFetchVillagesListFromHFRequest,
+  IFetchVillagesListFromHFSuccess,
+  IFetchVillagesListFromHFFailure,
+  IVillages,
+  IClearSupervisorList,
+  IClearVillagesList,
+  IClearHFList,
+  IHFUserGet,
+  IFetchUserDetailRequest,
+  IFetchUserDetailSuccess,
+  IFetchUserDetailFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -64,6 +73,7 @@ export const fetchHFListRequest = ({
   limit,
   searchTerm,
   userBased,
+  successCb,
   failureCb
 }: Omit<IFetchHFListRequest, 'type'>): IFetchHFListRequest => ({
   type: SITE_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -72,6 +82,7 @@ export const fetchHFListRequest = ({
   countryId,
   searchTerm,
   userBased,
+  successCb,
   failureCb
 });
 
@@ -109,8 +120,14 @@ export const createHFFailure = (error: Error): ICreateHFFailure => ({
   error
 });
 
-export const clearDropdownValues = (): IClearDropdownValues => ({
-  type: SITE_TYPES.CLEAR_DROPDOWN_VALUES
+export const clearHFList = (): IClearHFList => ({
+  type: SITE_TYPES.CLEAR_HEALTH_FACILITY_LIST
+});
+export const clearSupervisorList = (): IClearSupervisorList => ({
+  type: SITE_TYPES.CLEAR_PEER_SUPERVISOR_LIST
+});
+export const clearVillageList = (): IClearVillagesList => ({
+  type: SITE_TYPES.CLEAR_VILLAGES_LIST_FROM_HF
 });
 
 export const fetchHFSummaryRequest = ({
@@ -131,7 +148,7 @@ export const fetchHFSummaryRequest = ({
   successCb
 });
 
-export const fetchHFSummarySuccess = (payload: IHealthFacilitySummary): IFetchHFSummarySuccess => ({
+export const fetchHFSummarySuccess = (payload: IHealthFacility): IFetchHFSummarySuccess => ({
   type: SITE_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_SUCCESS,
   payload
 });
@@ -140,6 +157,28 @@ export const fetchHFSummaryFailure = (error: Error): IFetchHFSummaryFailure => (
   type: SITE_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_FAILURE,
   error
 });
+
+export const fetchUserDetailRequest = ({
+  id,
+  failureCb,
+  successCb
+}: Omit<IFetchUserDetailRequest, 'type'>): IFetchUserDetailRequest => ({
+  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
+  id,
+  failureCb,
+  successCb
+});
+
+export const fetchUserDetailSuccess = (payload: IHFUserGet): IFetchUserDetailSuccess => ({
+  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_SUCCESS,
+  payload
+});
+
+export const fetchUserDetailFailure = (error: Error): IFetchUserDetailFailure => ({
+  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_FAILURE,
+  error
+});
+
 export const fetchHFTypesRequest = ({
   failureCb,
   successCb
@@ -348,6 +387,30 @@ export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailur
   error
 });
 
+// VILLAGES LIST FROM HF
+export const fetchVillagesListFromHFRequest = ({
+  tenantIds,
+  successCb,
+  failureCb
+}: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
+  type: SITE_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
+  tenantIds,
+  successCb,
+  failureCb
+});
+
+export const fetchVillagesListFromHFSuccess = (payload: {
+  data: { list: IVillages[]; hfTenantIds: number[] };
+}): IFetchVillagesListFromHFSuccess => ({
+  type: SITE_TYPES.FETCH_VILLAGES_LIST_FROM_HF_SUCCESS,
+  payload
+});
+
+export const fetchVillagesListFromHFFailure = (error: Error): IFetchVillagesListFromHFFailure => ({
+  type: SITE_TYPES.FETCH_VILLAGES_LIST_FROM_HF_FAILURE,
+  error
+});
+
 // PEER_SUPERVISOR LIST
 export const fetchPeerSupervisorListRequest = ({
   tenantIds,
@@ -361,7 +424,7 @@ export const fetchPeerSupervisorListRequest = ({
 });
 
 export const fetchPeerSupervisorListSuccess = (payload: {
-  list: IPeerSupervisor[];
+  data: { list: IPeerSupervisor[]; hfTenantIds: number[] };
   total: number;
 }): IFetchPeerSupervisorListSuccess => ({
   type: SITE_TYPES.FETCH_PEER_SUPERVISOR_LIST_SUCCESS,

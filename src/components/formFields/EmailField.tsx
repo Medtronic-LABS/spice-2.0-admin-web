@@ -9,8 +9,8 @@ import styles from './TextInput.module.scss';
 import { fetchUserByEmail } from '../../services/userAPI';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { composeValidators, required, validateEmail } from '../../utils/validation';
-import { IUserFormValues } from '../userForm/UserForm';
 import TextInput from './TextInput';
+import { IHFUserGet } from '../../store/healthFacility/types';
 
 const EmailField = forwardRef(
   (
@@ -87,8 +87,8 @@ const EmailField = forwardRef(
           let smallestDuplicateIndex: number = -1;
           const users = form?.getState().values[formName];
           let count = 0;
-          users.forEach(({ email }: IUserFormValues, i: number) => {
-            if (email.toLowerCase() === value.toLowerCase()) {
+          users.forEach(({ username }: IHFUserGet, i: number) => {
+            if (username.toLowerCase() === value.toLowerCase()) {
               if (smallestDuplicateIndex < 0) {
                 smallestDuplicateIndex = i;
               }
@@ -204,7 +204,7 @@ const EmailField = forwardRef(
               helpertext={
                 isNetworkError ? (
                   <div>
-                    <span className={styles.emailError} onClick={() => validateUser(input.value, true)}>
+                    <span className={styles.validateErrorText} onClick={() => validateUser(input.value, true)}>
                       Validate email
                     </span>
                   </div>

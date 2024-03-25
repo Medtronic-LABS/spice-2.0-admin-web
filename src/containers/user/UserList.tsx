@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
 import { FormApi } from 'final-form';
 
@@ -10,20 +10,28 @@ import APPCONSTANTS from '../../constants/appConstants';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
-import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
+import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import CustomTable from '../../components/customTable/CustomTable';
 import { roleSelector, userDataSelector } from '../../store/user/selectors';
-import { fetchHFUserListRequest } from '../../store/healthFacility/actions';
+import {
+  clearSupervisorList,
+  clearVillageList,
+  deleteHFUserRequest,
+  fetchHFUserListRequest,
+  fetchUserDetailRequest,
+  updateHFUserRequest
+} from '../../store/healthFacility/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   healthFacilityListUsersTotalSelector,
   healthFacilityUserListSelector,
-  healthFacilityUsersLoadingSelector
+  healthFacilityUsersLoadingSelector,
+  userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IRoles } from '../../store/user/types';
+import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 
 interface IMatchParams {
-  regionId: string;
   tenantId: string;
 }
 
@@ -31,49 +39,92 @@ interface IMatchProps extends RouteComponentProps<IMatchParams> {}
 
 const UserList = (props: IMatchProps): React.ReactElement => {
   const dispatch = useDispatch();
+  const { tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const regionData = useSelector(userDataSelector).country;
   const role = useSelector(roleSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
-  const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
+  const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
+  const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
 
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
+  const refreshHFUserList = useCallback(
+    () =>
+      dispatch(
+        fetchHFUserListRequest({
+          countryId: regionData.id,
+          skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: listParams.rowsPerPage,
+          searchTerm: listParams.searchTerm,
+          userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
+          tenantBased: false,
+          failureCb: (e: Error) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
+          }
+        })
+      ),
+    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id, role]
+  );
 
   useEffect(() => {
-    dispatch(
-      fetchHFUserListRequest({
-        countryId: regionData.id,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: listParams.rowsPerPage,
-        searchTerm: listParams.searchTerm,
-        userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
-        tenantBased: false,
-        failureCb: (e: Error) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
-        }
-      })
-    );
-  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id, role]);
+    refreshHFUserList();
+    return () => {
+      clearSupervisorList();
+      clearVillageList();
+    };
+  }, [refreshHFUserList]);
 
-  const handleUserDelete = useCallback(({ data }: any) => {
-    //
-  }, []);
+  const handleUserDelete = useCallback(
+    ({ data: { id, tenantId: userTenantId } }: { data: { id: number; tenantId: number } }) => {
+      dispatch(
+        deleteHFUserRequest({
+          data: {
+            id,
+            tenantId: userTenantId
+          },
+          successCb: () => {
+            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DELETE_SUCCESS);
+            refreshHFUserList();
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DELETE_FAIL));
+          }
+        })
+      );
+    },
+    [dispatch, refreshHFUserList]
+  );
 
   /**
    * Handler to open user edit modal
    * @param value
    */
   const openEditModal = (value: any) => {
-    value.suiteAccess = value.roles[0];
-    value.role = value.roles.filter((r: IRoles) => r.groupName === value.suiteAccess.groupName) || [];
-    userForEdit.current = { users: [{ ...value }] };
-    setIsOpenUserModal({ isOpen: true, isEdit: true });
+    dispatch(
+      fetchUserDetailRequest({
+        id: Number(value?.id),
+        successCb: (user: any) => {
+          const postData = { ...user };
+          postData.suiteAccess = user.roles[0] || [];
+          postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+          postData.supervisor = {
+            ...postData.supervisor,
+            name: `${postData.supervisor.firstName} ${postData.supervisor.lastName}`
+          };
+          userForEdit.current = { users: [{ ...postData }] };
+          setIsOpenUserModal({ isOpen: true, isEdit: true });
+        },
+        failureCb: (e) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DETAIL_FETCH_FAIL));
+        }
+      })
+    );
   };
 
   const handleAddUserClick = () => {
-    userForEdit.current = { users: [] };
+    userForEdit.current = { users: [] as IHFUserGet[] };
     setIsOpenUserModal({ isOpen: true, isEdit: false });
   };
 
@@ -82,15 +133,46 @@ const UserList = (props: IMatchProps): React.ReactElement => {
    */
   const handleCancelClick = () => {
     setIsOpenUserModal({ isOpen: false, isEdit: true });
-    userForEdit.current = { users: [] };
+    userForEdit.current = { users: [] as IHFUserGet[] };
   };
+
+  const siteUserSuccess = useCallback(() => {
+    const successMessage = isOpenUserModal.isEdit
+      ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS
+      : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS;
+    toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
+    refreshHFUserList();
+    setIsOpenUserModal({ isOpen: false, isEdit: true });
+  }, [isOpenUserModal.isEdit, refreshHFUserList]);
 
   /**
    * Handler for edit user form submit.
    */
-  const handleEditSubmit = useCallback(({ users }: { users: IHFUserGet[] }) => {
-    //
-  }, []);
+  const handleEditSubmit = useCallback(
+    ({ users }: { users: IHFUserGet[] }) => {
+      const userObj = formatHFUserData(users, regionData.id, tenantId);
+      const data: IHFUserPost = userObj[0];
+      dispatch(
+        updateHFUserRequest({
+          data,
+          successCb: siteUserSuccess,
+          failureCb: (e) => {
+            setIsOpenUserModal({ isOpen: false, isEdit: true });
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                isOpenUserModal.isEdit
+                  ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
+                  : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
+              )
+            );
+          }
+        })
+      );
+    },
+    [dispatch, isOpenUserModal.isEdit, regionData.id, siteUserSuccess, tenantId]
+  );
 
   const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
 
@@ -107,13 +189,14 @@ const UserList = (props: IMatchProps): React.ReactElement => {
         disableOptions={true}
         isEdit={isOpenUserModal.isEdit}
         countryId={regionData.id}
+        hfTenantId={Number(tenantId)}
       />
     );
   };
 
   return (
     <>
-      {hfUserLoading && <Loader />}
+      {(hfUserLoading || hfUserDetailLoading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add User'
@@ -174,7 +257,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
         </DetailCard>
         <ModalForm
           show={isOpenUserModal.isOpen}
-          title='Edit User'
+          title={`${isOpenUserModal.isEdit ? 'Edit' : 'Add'} User`}
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}

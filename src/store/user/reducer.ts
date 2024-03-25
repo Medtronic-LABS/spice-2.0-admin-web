@@ -123,6 +123,11 @@ const userReducer = (state = initialStateGetter(), action = {} as UserActions): 
         ...state,
         token: action.payload
       };
+    case USERTYPES.ADD_USER_TENANT_ID:
+      return {
+        ...state,
+        userTenantId: action.payload
+      };
     case USERTYPES.REMOVE_TOKEN:
       return {
         ...state,

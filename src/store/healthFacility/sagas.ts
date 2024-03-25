@@ -17,7 +17,9 @@ import {
   IFetchPeerSupervisorListRequest,
   IFetchWorkflowListRequest,
   IPeerSupervisor,
-  IFetchHFTypesRequest
+  IFetchHFTypesRequest,
+  IFetchVillagesListFromHFRequest,
+  IFetchUserDetailRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -47,7 +49,11 @@ import {
   fetchWorkflowListSuccess,
   fetchWorkflowListFailure,
   fetchHFTypesSuccess,
-  fetchHFTypesFailure
+  fetchHFTypesFailure,
+  fetchVillagesListFromHFSuccess,
+  fetchVillagesListFromHFFailure,
+  fetchUserDetailSuccess,
+  fetchUserDetailFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -63,7 +69,9 @@ import {
   FETCH_VILLAGES_LIST_REQUEST,
   FETCH_PEER_SUPERVISOR_LIST_REQUEST,
   FETCH_WORKFLOW_LIST_REQUEST,
-  FETCH_HEALTH_FACILITY_TYPES_REQUEST
+  FETCH_HEALTH_FACILITY_TYPES_REQUEST,
+  FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
+  FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 
@@ -75,6 +83,7 @@ export function* fetchHealthFacilityList({
   skip,
   limit,
   searchTerm,
+  successCb,
   failureCb
 }: IFetchHFListRequest): SagaIterator {
   try {
@@ -82,6 +91,7 @@ export function* fetchHealthFacilityList({
       data: { entityList: healthFacilities, totalCount: total }
     } = yield call(hfService.fetchHealthFacilityList as any, { countryId, limit, skip, searchTerm });
     const payload = { healthFacilityList: healthFacilities || [], total, limit };
+    successCb?.({ healthFacilityList: healthFacilities || [], total, limit });
     yield put(fetchHFListSuccess(payload));
   } catch (e) {
     if (e instanceof Error) {
@@ -103,6 +113,24 @@ export function* createHealthFacilityRequest({ data, successCb, failureCb }: ICr
     if (e instanceof ApiError) {
       failureCb?.(e);
       yield put(createHFFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST action
+*/
+export function* fetchUserDetailRequest({ id, successCb, failureCb }: IFetchUserDetailRequest): SagaIterator {
+  try {
+    const {
+      data: { entity: user }
+    } = yield call(hfService.fetchHFUserDetail as any, id);
+    successCb?.(user);
+    yield put(fetchUserDetailSuccess(user));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchUserDetailFailure(e));
     }
   }
 }
@@ -324,6 +352,28 @@ export function* fetchVillagesListSagaRequest({
 }
 
 /*
+  Worker Saga: Fired on FETCH_VILLAGES_LIST_FOR_HF_REQUEST action
+*/
+export function* fetchVillagesListFromHFSagaRequest({
+  tenantIds,
+  successCb,
+  failureCb
+}: IFetchVillagesListFromHFRequest): SagaIterator {
+  try {
+    const {
+      data: { entity: list }
+    } = yield call(hfService.fetchVillagesListfromHF as any, tenantIds);
+    successCb?.({ list, hfTenantIds: tenantIds });
+    yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: tenantIds } }));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchVillagesListFromHFFailure(e));
+    }
+  }
+}
+
+/*
   Worker Saga: Fired on FETCH_PEER_SUPERVISOR_LIST_REQUEST action
 */
 export function* fetchPeerSupervisorListSagaRequest({
@@ -340,8 +390,8 @@ export function* fetchPeerSupervisorListSagaRequest({
       ...supervisor,
       name: `${supervisor.firstName} ${supervisor.lastName}`
     }));
-    successCb?.(list, total);
-    yield put(fetchPeerSupervisorListSuccess({ list, total }));
+    successCb?.({ list, hfTenantIds: tenantIds }, total);
+    yield put(fetchPeerSupervisorListSuccess({ data: { list, hfTenantIds: tenantIds }, total }));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -382,6 +432,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_HEALTH_FACILITY_SUMMARY_REQUEST, fetchHFSummaryRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_DETAILS_REQUEST, updateHFDetailsRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_USER_LIST_REQUEST, fetchHFUserList)]);
+  yield all([takeLatest(FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST, fetchUserDetailRequest)]);
   yield all([takeLatest(DELETE_HEALTH_FACILITY_USER_REQUEST, deleteHFUserRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_USER_REQUEST, updateHFUserSagaRequest)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_USER_REQUEST, createHFUserSagaRequest)]);
@@ -391,6 +442,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_LIST_REQUEST, fetchPeerSupervisorListSagaRequest)]);
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_TYPES_REQUEST, fetchHFTypesSaga)]);
+  yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
 }
 
 export default healthFacilitySaga;

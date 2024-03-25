@@ -37,7 +37,7 @@ export const fetchUserByEmail = (email: string) =>
 export const validatePhoneNumber = (phoneNumber: string, id: number | null) =>
   axios({
     method: 'POST',
-    url: '/user-service/validate-phonenumber',
+    url: '/user-service/user/validate-phonenumber',
     data: {
       phoneNumber,
       id

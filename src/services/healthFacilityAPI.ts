@@ -73,10 +73,10 @@ export const fetchHFUserList = (data: IFetchHFUserListRequest) =>
     url: '/user-service/user/admin-users',
     data
   });
-export const fetchHFUserDetails = (data: { id: number }) =>
+export const fetchHFUserDetail = (id: number) =>
   axios({
     method: 'POST',
-    url: `/user-service/user/details/${data.id}`
+    url: `/user-service/user/details/${id}`
   });
 
 export const deleteHFUser = (data: IDeleteUserSuccessPayload) =>
@@ -116,9 +116,9 @@ export const listCities = (countryId: number, searchTerm: string) =>
     data: { countryId, searchTerm }
   });
 
-export const fetchHealthFacilityVillagesList = (tenantIds: number[]) =>
+export const fetchVillagesListfromHF = (tenantIds: number[]) =>
   axios({
-    url: '/admin-service/healthFacility/villages-list',
+    url: '/admin-service/healthfacility/villages-list',
     method: 'POST',
     data: { tenantIds }
   });

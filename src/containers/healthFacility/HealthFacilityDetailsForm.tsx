@@ -37,6 +37,7 @@ import { listCities } from '../../services/healthFacilityAPI';
 import { IObjectData } from '../../store/healthFacility/types';
 
 interface IAddUserFormProps {
+  formName: string;
   form: FormApi<any>;
   isEdit?: boolean;
   data?: any;
@@ -55,6 +56,7 @@ interface IMatchParams {
  */
 const HealthFacilityDetailsForm = ({
   form,
+  formName,
   isEdit = false,
   data = {}
 }: IAddUserFormProps & IMatchParams): React.ReactElement => {
@@ -92,11 +94,11 @@ const HealthFacilityDetailsForm = ({
   // Peer Supervisor fetch
   useEffect(() => {
     const tenantId = form.getState().values.healthFacility?.district?.tenantId;
-    if (tenantId && !peerSupervisorList.length) {
+    if (tenantId && !peerSupervisorList.list.length) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId, peerSupervisorList.length]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId, peerSupervisorList.list.length]);
 
   // Chiefdom fetch
   useEffect(() => {
@@ -169,7 +171,7 @@ const HealthFacilityDetailsForm = ({
     <div className='row gx-1dot25 align-items-end'>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.name'
+          name={`${formName}.name`}
           type='text'
           validate={composeValidators(required, minLength(2))}
           render={({ input, meta }) => (
@@ -186,7 +188,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.type'
+          name={`${formName}.type`}
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -206,7 +208,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.phuFocalPersonName'
+          name={`${formName}.phuFocalPersonName`}
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -222,7 +224,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.phuFocalPersonNumber'
+          name={`${formName}.phuFocalPersonNumber`}
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -238,7 +240,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={`${isEdit ? 'col-12 col-md-8' : 'col-12'}`}>
         <Field
-          name='healthFacility.address'
+          name={`${formName}.address`}
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -254,7 +256,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.district'
+          name={`${formName}.district`}
           type='text'
           validate={required}
           render={({ input, meta }) => {
@@ -277,7 +279,7 @@ const HealthFacilityDetailsForm = ({
       <div className={columnStyle}>
         <Field
           required={true}
-          name='healthFacility.chiefdom'
+          name={`${formName}.chiefdom`}
           validate={required}
           render={({ input, meta }) => (
             <SelectInput
@@ -297,7 +299,7 @@ const HealthFacilityDetailsForm = ({
       <div className={columnStyle}>
         <Field
           required={true}
-          name='healthFacility.city'
+          name={`${formName}.city`}
           validate={required}
           render={(props) => (
             <AsyncSelectInput
@@ -315,7 +317,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.latitude'
+          name={`${formName}.latitude`}
           type='text'
           validate={composeValidators(required)}
           parse={normalizeFloatingNumber}
@@ -331,7 +333,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.longitude'
+          name={`${formName}.longitude`}
           type='text'
           validate={composeValidators(required)}
           parse={normalizeFloatingNumber}
@@ -347,7 +349,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.postalCode'
+          name={`${formName}.postalCode`}
           type='text'
           validate={composeValidators(required, minLength(4))}
           parse={normalizePhone}
@@ -363,7 +365,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.peerSupervisors'
+          name={`${formName}.peerSupervisors`}
           type='text'
           render={({ input, meta }) => (
             <MultiSelect
@@ -378,7 +380,7 @@ const HealthFacilityDetailsForm = ({
               placeholder=''
               isModel={true}
               isMulti={true}
-              options={peerSupervisorList}
+              options={peerSupervisorList.list}
               loading={peerSupervisorLoading}
               error={(meta.touched && meta.error) || undefined}
               controlStyles={{
@@ -393,7 +395,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.language'
+          name={`${formName}.language`}
           type='text'
           validate={required}
           render={({ input, meta }) => (
@@ -413,7 +415,7 @@ const HealthFacilityDetailsForm = ({
       </div>
       <div className={columnStyle}>
         <Field
-          name='healthFacility.linkedVillages'
+          name={`${formName}.linkedVillages`}
           type='text'
           validate={required}
           render={({ input, meta }) => (

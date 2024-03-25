@@ -23,8 +23,8 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
     const { headers } = yield call(userService.login, username, hashedPassword);
     sessionStorageServices.setItem('iLi', true);
-    sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headers?.tenantID);
-    yield put(userActions.addUserTenantID(headers?.tenantID));
+    sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headers?.Tenantid);
+    yield put(userActions.addUserTenantID(headers?.Tenantid));
     const encryptedToken = encryptData(headers?.authorization);
     sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, encryptedToken);
     yield put(userActions.addToken(encryptedToken));

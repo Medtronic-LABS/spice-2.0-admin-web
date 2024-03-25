@@ -13,17 +13,25 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import UserForm from '../../components/userForm/UserForm';
 import {
+  clearSupervisorList,
+  clearVillageList,
   createHFUserRequest,
   deleteHFUserRequest,
   fetchHFSummaryRequest,
   fetchHFUserListRequest,
+  fetchUserDetailRequest,
   updateHFDetailsRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
 import { IHFUserGet, IHFUserPost, IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
-import { healthFacilitySelector } from '../../store/healthFacility/selectors';
+import {
+  healthFacilityLoadingSelector,
+  healthFacilitySelector,
+  userDetailLoadingSelector
+} from '../../store/healthFacility/selectors';
 import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
+import Loader from '../../components/loader/Loader';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -74,14 +82,14 @@ export const formatHFUserData = (userData: any[], countryId: number | string, te
       gender: user.gender,
       username: user.username,
       phoneNumber: user.phoneNumber,
+      countryCode: user.country.phoneNumberCode || user.countryCode,
       country: { id: Number(countryId) },
-      countryCode: user.countryCode.countryCode || user.countryCode,
-      tenantId: user?.assignedHealthFacility?.tenantId
-        ? Number(user.assignedHealthFacility.tenantId)
-        : Number(tenantId),
-      supervisorId: Number(user.selectedPeerSupervisor?.id),
+      tenantId: user?.healthFacility?.tenantId
+        ? Number(user.healthFacility.tenantId)
+        : Number(tenantId) || user.tenantId,
+      supervisorId: Number(user.supervisor?.id),
       roleIds: Array.isArray(user.roles) ? (user.roles || []).map(({ id }: { id: any }) => id) : [user.roles.id],
-      villageIds: (user.assignedVillages || []).map(({ id }: { id: number }) => id)
+      villageIds: (user.villages || []).map(({ id }: { id: number }) => id)
     };
     return data;
   });
@@ -90,8 +98,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { healthFacilityId, tenantId } = useParams<IMatchParams>();
   const healthFacility = useSelector(healthFacilitySelector);
+  const loading = useSelector(healthFacilityLoadingSelector);
   const regionData = useSelector(userDataSelector).country;
   const role = useSelector(roleSelector);
+  const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
 
   const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false
@@ -122,7 +132,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: 'Language', value: healthFacility?.language },
       {
         label: 'Linked Peer Supervisor',
-        value: healthFacility?.linkedPeerSupervisor,
+        value: healthFacility?.peerSupervisors,
         subKey: 'name',
         style: { col: 'col-12', subCol: 'col-3' }
       },
@@ -143,6 +153,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
   useEffect(() => {
     refreshHFUserList();
     refreshHFDetails();
+    return () => {
+      clearSupervisorList();
+      clearVillageList();
+    };
     // eslint-disable-next-line
   }, [listParams, tenantId, dispatch]);
 
@@ -216,7 +230,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
   };
 
   const editHFDetailsModalRender = (form: any) => {
-    return <HealthFacilityDetailsForm form={form} isEdit={true} data={editHFDetailsModal.data} />;
+    return (
+      <HealthFacilityDetailsForm formName='healthFacility' form={form} isEdit={true} data={editHFDetailsModal.data} />
+    );
   };
 
   const handleHFEditDetailsSubmit = ({ healthFacility: healthFacilityData }: { healthFacility: IHealthFacility }) => {
@@ -241,13 +257,28 @@ const HealthFacilitySummary = (): React.ReactElement => {
 
   const handleEditUserClick = useCallback(
     (user: any) => {
-      setIsHFUserEdit(true);
-      user.suiteAccess = user.roles[0] || [];
-      user.role = user.roles.filter((r: IRoles) => r.groupName === user.suiteAccess.groupName) || [];
-      hfUserForEdit.current = { users: [{ ...user }] };
-      setHFUserModal(true);
+      dispatch(
+        fetchUserDetailRequest({
+          id: Number(user?.id),
+          successCb: (userData: any) => {
+            setIsHFUserEdit(true);
+            const postData = { ...userData };
+            postData.suiteAccess = userData.roles[0] || [];
+            postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+            postData.supervisor = postData.supervisor && {
+              ...postData.supervisor,
+              name: `${postData.supervisor.firstName || ''} ${postData.supervisor.lastName || ''}`
+            };
+            hfUserForEdit.current = { users: [{ ...postData }] };
+            setHFUserModal(true);
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DETAIL_FETCH_FAIL));
+          }
+        })
+      );
     },
-    [hfUserForEdit]
+    [dispatch]
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
@@ -258,7 +289,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
         data,
         successCb: siteUserSuccess,
         failureCb: (e) => {
-          setHFUserModal(false);
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR);
         }
       })
@@ -326,11 +356,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
     return `${user.firstName} ${user.lastName}`;
   };
 
-  const formatRole = (user: any) => {
-    if (user.roles.length) {
-      return user.roles.filter(({ groupName }: { groupName: string }) => groupName === 'SPICE')[0].displayName;
-    }
-  };
+  const formatRoles = (user: IHFUserGet) =>
+    `${(user.roles || []).map((userRole: IRoles) => userRole.displayName).join(',')}`;
 
   const userFormRender = (form?: FormApi<any>) => {
     return (
@@ -343,12 +370,14 @@ const HealthFacilitySummary = (): React.ReactElement => {
         isHF={true}
         entityName='healthFacility'
         enableAutoPopulate={true}
+        hfTenantId={Number(tenantId)}
       />
     );
   };
 
   return (
     <>
+      {(loading || hfUserDetailLoading) && <Loader />}
       <div className='row g-0dot625'>
         <div className='col-12'>
           <DetailCard
@@ -363,7 +392,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   <div className='fs-0dot875 charcoal-grey-text'>{label}</div>
                   {Array.isArray(value) ? (
                     <ol className='row'>
-                      {value.map((data) => (
+                      {value.map((data: any) => (
                         <li
                           key={subKey && data[subKey] ? data[subKey] : data}
                           className={`${style?.subCol ? style?.subCol : 'col-3'}`}
@@ -391,7 +420,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           >
             <CustomTable
               rowData={hfUsers.data || []}
-              loading={hfUsers.loading}
+              loading={hfUsers.loading && !(loading || hfUserDetailLoading)}
               columnsDef={[
                 {
                   id: 1,
@@ -400,14 +429,14 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   width: '20%',
                   cellFormatter: formatName
                 },
-                { id: 2, name: 'role', label: 'ROLE', width: '12%', cellFormatter: formatRole },
-                { id: 3, name: 'username', label: 'EMAIL ID', width: '25%' },
+                { id: 2, name: 'role', label: 'ROLE', width: '20%', cellFormatter: formatRoles },
+                { id: 3, name: 'username', label: 'EMAIL ID', width: '20%' },
                 { id: 4, name: 'gender', label: 'GENDER', width: '9%' },
                 {
                   id: 5,
                   name: 'phoneNumber',
                   label: 'CONTACT NUMBER',
-                  width: '140px',
+                  width: '20',
                   cellFormatter: formatPhone
                 }
               ]}

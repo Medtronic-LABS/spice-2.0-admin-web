@@ -7,8 +7,10 @@ export interface IHealthFacilityState {
   hfTypesLoading: boolean;
   loading: boolean;
   healthFacilityList: IHealthFacility[];
-  healthFacilityUserList: IHFUserGet[];
   hfTotal: number;
+  healthFacilityUserList: IHFUserGet[];
+  hfUser: IHFUserGet;
+  hfUserDetailLoading: boolean;
   hfUsersLoading: boolean;
   hfUsersTotal: number;
   districtList: IDistrict[];
@@ -20,7 +22,9 @@ export interface IHealthFacilityState {
   villagesList: IVillages[];
   villagesTotal: number;
   villagesLoading: boolean;
-  peerSupervisorList: IPeerSupervisor[];
+  villagesFromHFList: { list: IVillages[]; hfTenantIds: number[] | null };
+  villagesFromHFLoading: boolean;
+  peerSupervisorList: { list: IPeerSupervisor[]; hfTenantIds: number[] | null };
   peerSupervisorTotal: number;
   peerSupervisorLoading: boolean;
   error: string | null | Error;
@@ -106,6 +110,7 @@ export interface IFetchHFListRequest {
   limit: number | null;
   searchTerm?: string;
   userBased?: boolean;
+  successCb?: (data: IFetchHFListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
 }
 
@@ -132,7 +137,7 @@ export interface IHFUserGet {
   villages?: number[];
   supervisor: string | null;
   organizations: Array<{ id: number; name: string; parentOrganizationId: number | null; formDataId: number }>;
-  country?: { id: number; name: string; tenantId?: number };
+  country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
 }
 
 export interface IUserRole {
@@ -200,8 +205,14 @@ export interface ICreateHFFailure {
   error: Error;
 }
 
-export interface IClearDropdownValues {
-  type: typeof ACTION_TYPES.CLEAR_DROPDOWN_VALUES;
+export interface IClearHFList {
+  type: typeof ACTION_TYPES.CLEAR_HEALTH_FACILITY_LIST;
+}
+export interface IClearSupervisorList {
+  type: typeof ACTION_TYPES.CLEAR_PEER_SUPERVISOR_LIST;
+}
+export interface IClearVillagesList {
+  type: typeof ACTION_TYPES.CLEAR_VILLAGES_LIST_FROM_HF;
 }
 
 export interface IFetchHFSummaryRequest {
@@ -214,11 +225,27 @@ export interface IFetchHFSummaryRequest {
 
 export interface IFetchHFSummarySuccess {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_SUCCESS;
-  payload: IHealthFacilitySummary;
+  payload: IHealthFacility;
 }
 
 export interface IFetchHFSummaryFailure {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_FAILURE;
+  error: Error;
+}
+export interface IFetchUserDetailRequest {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST;
+  id: number;
+  successCb?: (data: IHFUserGet) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchUserDetailSuccess {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_SUCCESS;
+  payload: IHFUserGet;
+}
+
+export interface IFetchUserDetailFailure {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_FAILURE;
   error: Error;
 }
 
@@ -410,6 +437,22 @@ export interface IFetchVillagesListFailure {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE;
   error: Error;
 }
+export interface IFetchVillagesListFromHFRequest {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
+  tenantIds: number[];
+  successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchVillagesListFromHFSuccess {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_SUCCESS;
+  payload: { data: { list: IVillages[]; hfTenantIds: number[] } };
+}
+
+export interface IFetchVillagesListFromHFFailure {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_FAILURE;
+  error: Error;
+}
 
 export interface IPeerSupervisor {
   id: number;
@@ -423,13 +466,13 @@ export interface IPeerSupervisor {
 export interface IFetchPeerSupervisorListRequest {
   type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST;
   tenantIds: number[];
-  successCb?: (data: IPeerSupervisor[], total: number) => void;
+  successCb?: (data: { list: IPeerSupervisor[]; hfTenantIds: number[] }, total: number) => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IFetchPeerSupervisorListSuccess {
   type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_SUCCESS;
-  payload: { list: IPeerSupervisor[]; total: number };
+  payload: { data: { list: IPeerSupervisor[]; hfTenantIds: number[] }; total: number };
 }
 
 export interface IFetchPeerSupervisorListFailure {
@@ -466,7 +509,9 @@ export type HealthFacilityActions =
   | ICreateHFRequest
   | ICreateHFSuccess
   | ICreateHFFailure
-  | IClearDropdownValues
+  | IClearHFList
+  | IClearSupervisorList
+  | IClearVillagesList
   | IFetchHFSummaryRequest
   | IFetchHFSummarySuccess
   | IFetchHFSummaryFailure
@@ -485,6 +530,9 @@ export type HealthFacilityActions =
   | IFetchHFUserListRequest
   | IFetchHFUserListSuccess
   | IFetchHFUserListFailure
+  | IFetchUserDetailRequest
+  | IFetchUserDetailSuccess
+  | IFetchUserDetailFailure
   | IDeleteHFUserRequest
   | IDeleteHFUserSuccess
   | IDeleteHFUserFailure
@@ -497,6 +545,9 @@ export type HealthFacilityActions =
   | IFetchVillagesListRequest
   | IFetchVillagesListSuccess
   | IFetchVillagesListFailure
+  | IFetchVillagesListFromHFRequest
+  | IFetchVillagesListFromHFSuccess
+  | IFetchVillagesListFromHFFailure
   | IFetchPeerSupervisorListRequest
   | IFetchPeerSupervisorListSuccess
   | IFetchPeerSupervisorListFailure

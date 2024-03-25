@@ -6,39 +6,18 @@ import arrayMutators from 'final-form-arrays';
 import FormContainer from '../../components/formContainer/FormContainer';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import SiteAddUserIcon from '../../assets/images/avatar-o.svg';
-import { ISelectOption } from '../../components/formFields/SelectInput';
 import Loader from '../../components/loader/Loader';
 import UserForm from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
-import { ICulture } from '../../store/user/types';
 import Workflows from './Workflows';
 import APPCONSTANTS from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { createHFRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility, formatHFUserData } from './HealthFacilitySummary';
-import { IHealthFacility } from '../../store/healthFacility/types';
+import { IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { workflowListSelector } from '../../store/healthFacility/selectors';
-
-export interface IAddUserFormValues {
-  email: string;
-  firstName: string;
-  lastName: string;
-  countryCode: { countryCode?: string; id?: number };
-  phoneNumber: string;
-  timezone: { id: string; description: string };
-  gender: string;
-  roleName: ISelectOption;
-  country: { countryCode?: string; id?: number };
-  redRisk: boolean;
-  culture: ICulture;
-  cultureId: number;
-  village?: string;
-  union?: Array<{ id: string }>;
-  unions?: { list: Array<{ id: number; name: string }>; subCounty: string };
-  unionLoading?: boolean;
-}
 
 interface IMatchParams {
   regionId?: string;
@@ -59,7 +38,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const [submittedData, setSubmittedData] = useState({
     data: {
       healthFacility: {},
-      users: [] as any[]
+      users: [] as IHFUserGet[]
     },
     isNextClicked: false
   });
@@ -162,7 +141,11 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                   <>
                     <div className='col-lg-6 col-12'>
                       <FormContainer label='Health Facility Details' icon={SiteDetailsIcon}>
-                        <HealthFacilityDetailsForm form={formInstance} data={submittedData.data.healthFacility} />
+                        <HealthFacilityDetailsForm
+                          formName='healthFacility'
+                          form={formInstance}
+                          data={submittedData.data.healthFacility}
+                        />
                       </FormContainer>
                     </div>
                     <div className='col-lg-6 col-12'>

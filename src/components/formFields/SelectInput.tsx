@@ -92,7 +92,7 @@ const SelectInput = ({
     if (labelKey && nestedObject) {
       return option[labelKey[0]][labelKey[1]];
     } else if (labelKey && typeof labelKey === 'string') {
-      return appendPlus ? `+${option[labelKey]}` : option[labelKey];
+      return appendPlus && option[labelKey] ? `+${option[labelKey]}` : option[labelKey];
     } else {
       return option.label;
     }
@@ -240,7 +240,6 @@ export const AsyncSelectInput = ({
         label={label}
         isClearable={true}
         onChange={(value) => handleChange(input, onChange as (e: any) => void, value)}
-        required={required}
         menuPortalTarget={isModel ? document.body : false}
         cacheOptions={false}
         loadOptions={loadOptions}

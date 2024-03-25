@@ -243,6 +243,7 @@ export type UserActions =
   | ISessionTimeout
   | IResetStore
   | IAddToken
+  | IAddUserTenantId
   | IRemoveToken
   | IFetchUserRolesRequest
   | IFetchUserRolesSuccess

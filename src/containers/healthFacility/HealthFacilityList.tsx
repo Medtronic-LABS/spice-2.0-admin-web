@@ -37,6 +37,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
   const regionData = useSelector(userDataSelector).country;
+  const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
@@ -55,11 +56,11 @@ const HealthFacilityList = (): React.ReactElement => {
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
-        userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
+        userBased: !isSuperUser,
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );
-  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id, role]);
+  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
 
   useEffect(() => {
     fetchList();
@@ -104,7 +105,14 @@ const HealthFacilityList = (): React.ReactElement => {
   };
 
   const editHealthFacilityDetailsModalRender = (form: any) => {
-    return <HealthFacilityDetailsForm form={form as FormApi<any>} isEdit={true} data={editHealthFacilityModal.data} />;
+    return (
+      <HealthFacilityDetailsForm
+        formName='healthFacility'
+        form={form as FormApi<any>}
+        isEdit={true}
+        data={editHealthFacilityModal.data}
+      />
+    );
   };
 
   const hfUpdateSuccess = () => {
@@ -145,11 +153,17 @@ const HealthFacilityList = (): React.ReactElement => {
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel='Add Health Facility'
+          buttonLabel={`${isSuperUser ? 'Add Health Facility' : ''}`}
           header='Health Facility'
           isSearch={true}
           onSearch={handleSearch}
-          onButtonClick={openCreateHealthFacility}
+          onButtonClick={
+            isSuperUser
+              ? openCreateHealthFacility
+              : () => {
+                  //
+                }
+          }
         >
           <CustomTable
             rowData={healthFacilityList}
