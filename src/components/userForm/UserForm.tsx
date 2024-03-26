@@ -137,7 +137,7 @@ const UserForm = ({
       form.change(`${formName}[${index}].suiteAccess`, userData.suiteAccess);
       form.change(`${formName}[${index}].role`, userData.role);
       form.change(`${formName}[${index}].roles`, userData.roles);
-      form.change(`${formName}[${index}].firstName`, userData.firstName);
+      form.change(`${formName}[${index}].firstName`, userData?.firstName);
       form.change(`${formName}[${index}].lastName`, userData.lastName);
       form.change(`${formName}[${index}].gender`, userData.gender);
       form.change(`${formName}[${index}].country`, userData.country);
@@ -281,6 +281,20 @@ const UserForm = ({
     }
   };
 
+  // HF List fetch
+  useEffect(() => {
+    if (countryId && !isHF && !isEdit && !healthFacilityList.length) {
+      dispatch(
+        fetchHFListRequest({
+          countryId,
+          skip: 0,
+          limit: null,
+          userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER)
+        })
+      );
+    }
+  }, [countryId, dispatch, healthFacilityList.length, isEdit, isHF, role]);
+
   useEffect(() => {
     if (isEdit) {
       const tenantIds = initialEditData[0].hfTenantIds;
@@ -398,17 +412,6 @@ const UserForm = ({
                           if (isCHWSelected(values) && !isEdit) {
                             // To clear the Selected village during Add User
                             form.change(`${formName}[${index}].villages`, {});
-                            // HF List fetch
-                            if (countryId && !isHF && !healthFacilityList.length) {
-                              dispatch(
-                                fetchHFListRequest({
-                                  countryId,
-                                  skip: 0,
-                                  limit: null,
-                                  userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER)
-                                })
-                              );
-                            }
                           }
                           // fetch Supervisor and Village List on CHW select
                           let newTenantIds = [];
@@ -512,36 +515,36 @@ const UserForm = ({
                     index={index}
                   />
                 </div>
+                {!isHFCreate && !isHF && !isEdit && (
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.healthFacility`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => (
+                        <SelectInput
+                          {...(input as any)}
+                          label='Assigned Health Facility'
+                          errorLabel='assigned health facility'
+                          labelKey='name'
+                          valueKey='id'
+                          options={healthFacilityList}
+                          loadingOptions={hfLoading}
+                          error={isError(meta)}
+                          isModel={true}
+                          onChange={(hf: IHealthFacility) => {
+                            form.change(`${formName}[${index}].villages`, {});
+                            fetchSupervisorList([hf.tenantId]);
+                            fetchVillagesList([hf.tenantId]);
+                            input.onChange(hf);
+                          }}
+                        />
+                      )}
+                    />
+                  </div>
+                )}
                 {isCHWUser[index] && (
                   <>
-                    {!isHFCreate && !isHF && !isEdit && (
-                      <div className='col-sm-6 col-12'>
-                        <Field
-                          name={`${name}.healthFacility`}
-                          type='text'
-                          validate={required}
-                          render={({ input, meta }) => (
-                            <SelectInput
-                              {...(input as any)}
-                              label='Assigned Health Facility'
-                              errorLabel='assigned health facility'
-                              labelKey='name'
-                              valueKey='id'
-                              options={healthFacilityList}
-                              loadingOptions={hfLoading}
-                              error={isError(meta)}
-                              isModel={true}
-                              onChange={(hf: IHealthFacility) => {
-                                form.change(`${formName}[${index}].villages`, {});
-                                fetchSupervisorList([hf.tenantId]);
-                                fetchVillagesList([hf.tenantId]);
-                                input.onChange(hf);
-                              }}
-                            />
-                          )}
-                        />
-                      </div>
-                    )}
                     {((isHF && isEdit) || !isHFCreate) && (
                       <>
                         <div className='col-sm-6 col-12'>

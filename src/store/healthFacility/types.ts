@@ -347,14 +347,14 @@ export interface IFetchHFUserListFailure {
   error: Error;
 }
 
-export interface IDeleteUserSuccessPayload {
+export interface IDeleteUserPayload {
   id: number;
-  tenantId: number;
+  tenantIds: number[];
 }
 
 export interface IDeleteHFUserRequest {
   type: typeof ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST;
-  data: IDeleteUserSuccessPayload;
+  data: IDeleteUserPayload;
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }

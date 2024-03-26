@@ -4,7 +4,7 @@ import {
   IFetchHFListRequest,
   IHFUserPayLoad,
   IFetchHFUserListRequest,
-  IDeleteUserSuccessPayload,
+  IDeleteUserPayload,
   ICreateHFRequestPayload,
   IHFUserPost,
   IHealthFacilityPost
@@ -79,7 +79,7 @@ export const fetchHFUserDetail = (id: number) =>
     url: `/user-service/user/details/${id}`
   });
 
-export const deleteHFUser = (data: IDeleteUserSuccessPayload) =>
+export const deleteHFUser = (data: IDeleteUserPayload) =>
   axios({
     url: '/admin-service/healthfacility/user-remove',
     method: 'POST',

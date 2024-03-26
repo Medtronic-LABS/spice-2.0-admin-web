@@ -74,25 +74,20 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
 };
 
 export const formatHFUserData = (userData: any[], countryId: number | string, tenantId?: number | string) =>
-  userData.map((user: any) => {
-    const data = {
-      id: Number(user?.id),
-      firstName: user.firstName,
-      lastName: user.lastName,
-      gender: user.gender,
-      username: user.username,
-      phoneNumber: user.phoneNumber,
-      countryCode: user.country.phoneNumberCode || user.countryCode,
-      country: { id: Number(countryId) },
-      tenantId: user?.healthFacility?.tenantId
-        ? Number(user.healthFacility.tenantId)
-        : Number(tenantId) || user.tenantId,
-      supervisorId: Number(user.supervisor?.id),
-      roleIds: Array.isArray(user.roles) ? (user.roles || []).map(({ id }: { id: any }) => id) : [user.roles.id],
-      villageIds: (user.villages || []).map(({ id }: { id: number }) => id)
-    };
-    return data;
-  });
+  userData.map((user: any) => ({
+    id: Number(user?.id),
+    firstName: user.firstName,
+    lastName: user.lastName,
+    gender: user.gender,
+    username: user.username,
+    phoneNumber: user.phoneNumber,
+    countryCode: user.country.phoneNumberCode || user.countryCode,
+    country: { id: Number(countryId) },
+    tenantId: user?.healthFacility?.tenantId ? Number(user.healthFacility.tenantId) : Number(tenantId) || user.tenantId,
+    supervisorId: Number(user.supervisor?.id),
+    roleIds: Array.isArray(user.roles) ? (user.roles || []).map(({ id }: { id: any }) => id) : [user.roles.id],
+    villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id)
+  }));
 
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -242,7 +237,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
         data: postData,
         successCb: hfUpdateSuccess,
         failureCb: (e) => {
-          closeHFEditModal();
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
         }
       })
@@ -330,7 +324,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       deleteHFUserRequest({
         data: {
           id,
-          tenantId: userTenantId
+          tenantIds: [userTenantId]
         },
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS);

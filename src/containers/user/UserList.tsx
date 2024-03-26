@@ -16,6 +16,7 @@ import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageList,
+  createHFUserRequest,
   deleteHFUserRequest,
   fetchHFUserListRequest,
   fetchUserDetailRequest,
@@ -77,12 +78,12 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   }, [refreshHFUserList]);
 
   const handleUserDelete = useCallback(
-    ({ data: { id, tenantId: userTenantId } }: { data: { id: number; tenantId: number } }) => {
+    ({ data: { id, organization } }: { data: { id: number; organization: any[] } }) => {
       dispatch(
         deleteHFUserRequest({
           data: {
             id,
-            tenantId: userTenantId
+            tenantIds: [Number(organization.map((s) => s.id))]
           },
           successCb: () => {
             toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DELETE_SUCCESS);
@@ -111,7 +112,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
           postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
           postData.supervisor = {
             ...postData.supervisor,
-            name: `${postData.supervisor.firstName} ${postData.supervisor.lastName}`
+            name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
           };
           userForEdit.current = { users: [{ ...postData }] };
           setIsOpenUserModal({ isOpen: true, isEdit: true });
@@ -142,8 +143,21 @@ const UserList = (props: IMatchProps): React.ReactElement => {
       : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS;
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
-    setIsOpenUserModal({ isOpen: false, isEdit: true });
+    setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
   }, [isOpenUserModal.isEdit, refreshHFUserList]);
+
+  const onSubmitHandler = useCallback(
+    (
+      data: IHFUserPost,
+      actionFn: any,
+      options: any,
+      successCB: (data: any) => void,
+      failureCB: (error: any) => void
+    ) => {
+      dispatch(actionFn({ data, ...options, successCb: successCB, failureCb: failureCB }));
+    },
+    [dispatch]
+  );
 
   /**
    * Handler for edit user form submit.
@@ -152,26 +166,25 @@ const UserList = (props: IMatchProps): React.ReactElement => {
     ({ users }: { users: IHFUserGet[] }) => {
       const userObj = formatHFUserData(users, regionData.id, tenantId);
       const data: IHFUserPost = userObj[0];
-      dispatch(
-        updateHFUserRequest({
-          data,
-          successCb: siteUserSuccess,
-          failureCb: (e) => {
-            setIsOpenUserModal({ isOpen: false, isEdit: true });
-            toastCenter.error(
-              ...getErrorToastArgs(
-                e,
-                APPCONSTANTS.OOPS,
-                isOpenUserModal.isEdit
-                  ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
-                  : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
-              )
-            );
-          }
-        })
+      onSubmitHandler(
+        data,
+        isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
+        null,
+        siteUserSuccess,
+        (e) => {
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.OOPS,
+              isOpenUserModal.isEdit
+                ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
+                : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
+            )
+          );
+        }
       );
     },
-    [dispatch, isOpenUserModal.isEdit, regionData.id, siteUserSuccess, tenantId]
+    [isOpenUserModal.isEdit, onSubmitHandler, regionData.id, siteUserSuccess, tenantId]
   );
 
   const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
