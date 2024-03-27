@@ -31,7 +31,7 @@ const superAdminRoutes: ISideMenuItem[] = [
   },
   {
     label: 'Medication Database',
-    route: '',
+    route: PROTECTED_ROUTES.medicationByRegion,
     disabled: false
   },
   {

@@ -16,7 +16,9 @@ export const PROTECTED_ROUTES = {
   usersBySuperAdmin: '/region/:regionId/users/list',
   usersByAdmin: '/users/list',
   createUserBySuperAdmin: '/region/:regionId/users/create',
-  createUserByAdmin: '/region/:regionId/users/create'
+  createUserByAdmin: '/region/:regionId/users/create',
+  medicationByRegion: '/region/:regionId/medication/list',
+  createMedication: '/region/:regionId/medication/create'
 };
 
 export const HOME_PAGE_BY_ROLE = {

@@ -28,12 +28,12 @@ $radio-color: var(--medium-blue-60);
         height: 101%;
         border-radius: 50%;
         border: 1px solid $radio-color;
-        background-color: var(--white);
+        background-color: $full-white;
       }
       &:checked {
         &::after {
           border-width: 2px;
-          background: radial-gradient($radio-color 45%, var(--white) 1%, var(--white) 44%);
+          background: radial-gradient($radio-color 45%, $full-white 1%, $full-white 44%);
         }
       }
     }

@@ -1,7 +1,7 @@
 @import '../../styles/variables';
 
 $load-more-btn-height: 2.678rem;
-$no-data-message-background-color: var(--white);
+$no-data-message-background-color: $full-white;
 $no-data-message-border-color: var(--black-30);
 
 .loaderWrapper {

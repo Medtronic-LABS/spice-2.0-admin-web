@@ -21,7 +21,7 @@ $dropdown-item-hover-background: var(--medium-blue-3);
       border-radius: 50%;
       width: 2.25rem;
       height: 2.25rem;
-      color: var(--white);
+      color: $full-white;
     }
     .name {
       max-inline-size: 300px; // 32 character

@@ -48,7 +48,7 @@
   }
   .iconHover {
     align-items: center;
-    background-color: var(--white);
+    background-color: $full-white;
     border: 1px solid var(--primary-error-color);
     border-radius: 50%;
     cursor: pointer;

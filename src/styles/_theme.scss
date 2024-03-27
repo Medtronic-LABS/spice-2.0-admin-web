@@ -40,17 +40,17 @@
   --primary-btn-background: var(--medium-blue);
   --primary-btn-hover-background: var(--medium-blue-120);
   --primary-btn-active-background: var(--medium-blue-140);
-  --primary-btn-text-color: var(--white);
-  --primary-btn-hover-text-color: var(--white);
-  --primary-btn-active-text-color: var(--white);
+  --primary-btn-text-color: var(--white-100);
+  --primary-btn-hover-text-color: var(--white-100);
+  --primary-btn-active-text-color: var(--white-100);
   --primary-btn-outline: var(--medium-blue);
 
   // secondary-btn
-  --secondary-btn-background: var(--white);
+  --secondary-btn-background: var(--white-100);
   --secondary-btn-hover-background: var(--medium-blue-3);
   --secondary-btn-active-background: var(--medium-blue);
   --secondary-btn-text-color: var(--medium-blue);
-  --secondary-btn-active-text-color: var(--white);
+  --secondary-btn-active-text-color: var(--white-100);
   --secondary-btn-border-color: var(--medium-blue);
   --secondary-btn-active-border-color: var(--medium-blue-140);
 
@@ -59,16 +59,16 @@
   --load-more-btn-hover-background: var(--medium-blue-3);
   --load-more-btn-active-background: var(--medium-blue);
   --load-more-btn-text-color: var(--medium-blue);
-  --load-more-btn-active-text-color: var(--white);
-  --load-more-btn-border-color: var(--white);
+  --load-more-btn-active-text-color: var(--white-100);
+  --load-more-btn-border-color: var(--white-100);
   --load-more-btn-active-border-color: var(--medium-blue);
 
   // danger-btn
-  --danger-btn-background: var(--white);
+  --danger-btn-background: var(--white-100);
   --danger-btn-hover-background: var(--red-5);
   --danger-btn-active-background: var(--red);
   --danger-btn-text-color: var(--red);
-  --danger-btn-active-text-color: var(--white);
+  --danger-btn-active-text-color: var(--white-100);
   --danger-btn-border-color: var(--red);
   --danger-btn-active-border-color: var(--red);
 
@@ -78,7 +78,7 @@
   // switchbox
   --checkbox-selection-color: var(--medium-blue);
   --checkbox-un-selected-bar-color: var(--grey);
-  --checkbox-un-selected-circle-color: var(--white);
+  --checkbox-un-selected-circle-color: var(--white-100);
 
   //error
   --primary-error-color: var(--red) !important;
@@ -86,7 +86,7 @@
   // reorder
   --drag-handle-background-color: var(--off-white);
   --reorerableItem-border-color: var(--black-30);
-  --reorerableItem-background-color: var(--white);
+  --reorerableItem-background-color: var(--white-100);
   --box-shadow-color-when-drag: rgba(var(--black-rgb), 0.12);
 }
 

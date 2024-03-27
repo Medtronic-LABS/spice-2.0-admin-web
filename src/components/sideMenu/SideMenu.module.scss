@@ -2,18 +2,18 @@
 
 .sideMenu {
   width: 240px;
-  background-color: var(--white);
+  background-color: $full-white;
   border-radius: 0.75rem;
   border: 0.5px solid $side-menu-border;
   .menuItem {
-    border-inline-start: 0.25rem solid var(--white);
+    border-inline-start: 0.25rem solid $full-white;
     &:hover {
       border-inline-start-color: $menu-item-hover-background;
       background-color: $menu-item-hover-background;
       color: $menu-item-active-color;
     }
     &:active {
-      color: var(--white);
+      color: $full-white;
       background-color: $menu-item-active-color;
       border-inline-start-color: $menu-item-active-color;
     }
@@ -26,7 +26,7 @@
     &.showMore {
       color: $menu-item-active-color;
       &:active {
-        color: var(--white);
+        color: $full-white;
       }
     }
   }

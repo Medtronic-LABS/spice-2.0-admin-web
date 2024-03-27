@@ -18,7 +18,7 @@
     }
     &.select-field__option--is-selected {
       background-color: var(--medium-blue) !important;
-      color: var(--white) !important;
+      color: $full-white !important;
     }
   }
 }

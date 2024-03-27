@@ -16,7 +16,7 @@ $text-color: var(--black);
   .pageNo {
     padding: 5px 10px;
     background: var(--theme-color);
-    color: var(--white);
+    color: $full-white;
     font-weight: bold;
     border-radius: 4px;
   }
@@ -50,11 +50,11 @@ $text-color: var(--black);
       display: inline-block;
       border: 1px solid $border-btn;
       margin-left: -1px;
-      background-color: var(--white);
+      background-color: $full-white;
       &.active {
         border: 1px solid var(--theme-color);
         button {
-          color: var(--white);
+          color: $full-white;
           background-color: var(--theme-color);
           cursor: default;
         }
@@ -79,7 +79,7 @@ $text-color: var(--black);
       .paginationButton {
         cursor: not-allowed;
         &:hover {
-          background-color: var(--white);
+          background-color: $full-white;
         }
       }
     }
@@ -93,14 +93,14 @@ $text-color: var(--black);
     .active {
       .paginationButton {
         background: var(--theme-color);
-        color: var(--white) !important;
+        color: $full-white !important;
       }
     }
     .disabled {
       color: $disable-btn-clr !important;
       cursor: not-allowed;
       &:hover {
-        background-color: var(--white);
+        background-color: $full-white;
       }
     }
   }

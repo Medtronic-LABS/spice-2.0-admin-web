@@ -41,8 +41,8 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      background: var(--white);
-      color: var(--white);
+      background: $full-white;
+      color: $full-white;
       overflow: hidden;
       padding-left: 0.063rem; // to make the tick looks centered
     }
