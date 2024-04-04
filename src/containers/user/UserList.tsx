@@ -25,6 +25,7 @@ import {
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   healthFacilityListUsersTotalSelector,
+  healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
   healthFacilityUsersLoadingSelector,
   userDetailLoadingSelector
@@ -47,6 +48,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   const role = useSelector(roleSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
   const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
+  const loading = useSelector(healthFacilityLoadingSelector);
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
 
@@ -78,12 +80,12 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   }, [refreshHFUserList]);
 
   const handleUserDelete = useCallback(
-    ({ data: { id, organization } }: { data: { id: number; organization: any[] } }) => {
+    ({ data: { id, organizations } }: { data: { id: number; organizations: any[] } }) => {
       dispatch(
         deleteHFUserRequest({
           data: {
             id,
-            tenantIds: [Number(organization.map((s) => s.id))]
+            tenantIds: [Number(organizations.map((s) => s.id))]
           },
           successCb: () => {
             toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DELETE_SUCCESS);
@@ -209,7 +211,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
 
   return (
     <>
-      {(hfUserLoading || hfUserDetailLoading) && <Loader />}
+      {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add User'

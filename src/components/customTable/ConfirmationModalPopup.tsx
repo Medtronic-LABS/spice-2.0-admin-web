@@ -5,6 +5,7 @@ interface IModalPopupTypes {
   popupTitle: string;
   cancelText: string;
   submitText: string;
+  submitTestId?: string;
   handleCancel: () => void;
   handleSubmit: () => void;
   popupSize: IModalSize;
@@ -16,6 +17,7 @@ const ConfirmationModalPopup = ({
   popupTitle,
   cancelText = 'Cancel',
   submitText = 'Ok',
+  submitTestId,
   handleCancel,
   handleSubmit,
   popupSize = 'modal-md',
@@ -30,6 +32,7 @@ const ConfirmationModalPopup = ({
       handleCancel={handleCancel}
       handleFormSubmit={handleSubmit}
       size={popupSize}
+      submitTestId={submitTestId}
     >
       <>{confirmationMessage}</>
     </ModalForm>

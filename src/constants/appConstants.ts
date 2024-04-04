@@ -103,7 +103,7 @@ const APPCONSTANTS = {
   RESULT_NAME_REENTERED_ERROR: 'You have already entered this result name in the form.',
   RESULT_UNIT_REENTERED_ERROR: 'You have already entered this range in the form.',
   UNSAVED_CHANGES_MESSAGE: 'Please save your edited changes before submitting.',
-  MEDICATION_EXISTS_ERROR: 'This medication is already available in the regional database.',
+  MEDICATION_EXISTS_ERROR: 'This medication is already available in the database.',
   MEDICATION_LIST_FETCH_ERROR: 'Unable to load medications list. Please try after sometime.',
   MEDICATION_UPDATE_SUCCESS: 'Medication updated successfully.',
   MEDICATION_UPDATE_FAIL: 'Unable to update medication. Please try after sometime.',

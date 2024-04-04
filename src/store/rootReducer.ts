@@ -2,8 +2,14 @@ import { combineReducers } from 'redux';
 import userReducer from './user/reducer';
 import regionReducer from './region/reducer';
 import healthFacilityReducer from './healthFacility/reducer';
+import medicationReducer from './medication/reducer';
 
-const appReducer = combineReducers({ user: userReducer, region: regionReducer, healthFacility: healthFacilityReducer });
+const appReducer = combineReducers({
+  user: userReducer,
+  region: regionReducer,
+  healthFacility: healthFacilityReducer,
+  medication: medicationReducer
+});
 
 const rootReducer = (state: any, action: any) => {
   if (action.type === 'RESET_STORE') {

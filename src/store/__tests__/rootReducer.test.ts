@@ -3,19 +3,22 @@ import rootReducer from '../rootReducer';
 import userReducer from '../user/reducer';
 import regionReducer from '../region/reducer';
 import healthFacilityReducer from '../healthFacility/reducer';
+import medicationReducer from '../medication/reducer';
 
 describe('rootReducer', () => {
   it('should combine all reducers correctly', () => {
     const appReducer = combineReducers({
       user: userReducer,
       region: regionReducer,
-      healthFacility: healthFacilityReducer
+      healthFacility: healthFacilityReducer,
+      medication: medicationReducer
     });
 
     const initialState = {
       user: {},
       region: {},
-      healthFacility: {}
+      healthFacility: {},
+      medication: {}
     };
 
     const action = { type: 'SOME_ACTION' };
@@ -30,13 +33,15 @@ describe('rootReducer', () => {
     const appReducer = combineReducers({
       user: userReducer,
       region: regionReducer,
-      healthFacility: healthFacilityReducer
+      healthFacility: healthFacilityReducer,
+      medication: medicationReducer
     });
 
     const initialState = {
       user: {},
       region: {},
-      healthFacility: {}
+      healthFacility: {},
+      medication: {}
     };
 
     const resetAction = { type: 'RESET_STORE' };

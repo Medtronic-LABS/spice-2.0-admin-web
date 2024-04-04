@@ -130,7 +130,6 @@ const HealthFacilityList = (): React.ReactElement => {
         data: postData,
         successCb: hfUpdateSuccess,
         failureCb: (e) => {
-          closeHealthFacilityEditModal();
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
         }
       })

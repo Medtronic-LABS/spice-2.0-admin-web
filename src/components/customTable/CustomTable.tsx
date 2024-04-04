@@ -309,7 +309,7 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
       isDelete &&
       (!actionFormattor?.hideDeleteIcon ||
         (actionFormattor?.hideDeleteIcon && !actionFormattor?.hideDeleteIcon(data))) && (
-        <div className={styles.deleteIcon} onClick={(e) => this.handleDelete(e, data, idx)}>
+        <div data-testid='delete-icon' className={styles.deleteIcon} onClick={(e) => this.handleDelete(e, data, idx)}>
           <CustomTooltip title={'Delete'}>
             <DeleteIcon aria-labelledby={'delete-icon'} />
           </CustomTooltip>
@@ -344,6 +344,7 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
           popupTitle={(activateClicked ? activateTitle : deleteTitle) || ''}
           cancelText='Cancel'
           submitText='Ok'
+          submitTestId='delete-ok-button'
           handleCancel={this.handleConfirmationClose}
           handleSubmit={this.handleConfirmationSuccess}
           popupSize='modal-md'

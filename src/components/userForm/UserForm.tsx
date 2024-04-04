@@ -32,7 +32,7 @@ import {
   villagesFromHFLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHealthFacility, IUserRole } from '../../store/healthFacility/types';
-import PhoneNumberField from '../formFields/phoneNumberField';
+import PhoneNumberField from '../formFields/PhoneNumberField';
 
 interface IUserFormProps {
   form: FormApi<any>;

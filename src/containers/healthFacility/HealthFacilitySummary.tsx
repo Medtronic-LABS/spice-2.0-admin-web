@@ -23,7 +23,14 @@ import {
   updateHFDetailsRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
-import { IHFUserGet, IHFUserPost, IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
+import {
+  IHFUserGet,
+  IHFUserPost,
+  IHealthFacility,
+  IHealthFacilityForm,
+  IPeerSupervisor,
+  IVillages
+} from '../../store/healthFacility/types';
 import {
   healthFacilityLoadingSelector,
   healthFacilitySelector,
@@ -66,6 +73,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     country: { id: countryId },
     language: hf.language.name,
     parentTenantId: hf.chiefdom?.id,
+    tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
     clinicalWorkflowIds: (hf.clinicalWorkflows || []).map(({ id }: { id: number }) => id)
@@ -386,12 +394,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   <div className='fs-0dot875 charcoal-grey-text'>{label}</div>
                   {Array.isArray(value) ? (
                     <ol className='row'>
-                      {value.map((data: any) => (
+                      {(value || []).map((data: IPeerSupervisor | IVillages) => (
                         <li
-                          key={subKey && data[subKey] ? data[subKey] : data}
+                          key={subKey && (data as any)[subKey] ? (data as any)[subKey] : JSON.stringify(data)}
                           className={`${style?.subCol ? style?.subCol : 'col-3'}`}
                         >
-                          {subKey && data[subKey] ? data[subKey] : data}
+                          {subKey && (data as any)[subKey] ? (data as any)[subKey] : JSON.stringify(data)}
                         </li>
                       ))}
                     </ol>

@@ -94,7 +94,7 @@ const HealthFacilityDetailsForm = ({
   // Peer Supervisor fetch
   useEffect(() => {
     const tenantId = form.getState().values.healthFacility?.district?.tenantId;
-    if (tenantId && !peerSupervisorList.list.length) {
+    if (!isEdit && tenantId && !peerSupervisorList.list.length) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -363,36 +363,38 @@ const HealthFacilityDetailsForm = ({
           )}
         />
       </div>
-      <div className={columnStyle}>
-        <Field
-          name={`${formName}.peerSupervisors`}
-          type='text'
-          render={({ input, meta }) => (
-            <MultiSelect
-              {...(input as any)}
-              label='Linked Peer Supervisor'
-              errorLabel='linked peer supervisor'
-              labelKey='name'
-              valueKey='id'
-              isShowLabel={true}
-              isSelectAll={true}
-              menuPlacement={'bottom'}
-              placeholder=''
-              isModel={true}
-              isMulti={true}
-              options={peerSupervisorList.list}
-              loading={peerSupervisorLoading}
-              error={(meta.touched && meta.error) || undefined}
-              controlStyles={{
-                borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
-                '&:focus-visible': {
-                  borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
-                }
-              }}
-            />
-          )}
-        />
-      </div>
+      {!isEdit && (
+        <div className={columnStyle}>
+          <Field
+            name={`${formName}.peerSupervisors`}
+            type='text'
+            render={({ input, meta }) => (
+              <MultiSelect
+                {...(input as any)}
+                label='Linked Peer Supervisor'
+                errorLabel='linked peer supervisor'
+                labelKey='name'
+                valueKey='id'
+                isShowLabel={true}
+                isSelectAll={true}
+                menuPlacement={'bottom'}
+                placeholder=''
+                isModel={true}
+                isMulti={true}
+                options={peerSupervisorList.list}
+                loading={peerSupervisorLoading}
+                error={(meta.touched && meta.error) || undefined}
+                controlStyles={{
+                  borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
+                  '&:focus-visible': {
+                    borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
+                  }
+                }}
+              />
+            )}
+          />
+        </div>
+      )}
       <div className={columnStyle}>
         <Field
           name={`${formName}.language`}

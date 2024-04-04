@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 
@@ -13,17 +13,27 @@ import TickIcon from '../../assets/images/tick.svg';
 import SelectInput from '../../components/formFields/SelectInput';
 
 import styles from './AddMedication.module.scss';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import CustomTooltip from '../../components/tooltip';
 import Loader from '../../components/loader/Loader';
+import {
+  getClassificationsLoadingSelector,
+  getDosageFormsLoadingSelector,
+  getMedicationClassificationsSelector,
+  getMedicationDosageFormsSelector,
+  getMedicationLoadingSelector
+} from '../../store/medication/selectors';
+import { fetchClassifications, fetchDosageForms } from '../../store/medication/actions';
+import { IList } from '../../store/medication/types';
 
 export interface IMedicationDataFormValues {
+  id?: number;
   name: string;
-  brand: { brand: any };
-  classification: { classification: any };
-  dosage_form: any;
-  country: string | any;
+  brand: IList;
+  classification: IList;
+  dosage_form: IList;
+  country: string | IList;
 }
 
 export interface ICheckDuplicateValidation {
@@ -68,15 +78,14 @@ const MedicationForm = ({
 }: IMedicationFormProps): React.ReactElement => {
   const formName = 'medication';
   const { regionId: countryId }: { regionId: string } = useParams();
-  const [brandOptions, setBrandOptions] = useState([] as any[][]);
+  const [brandOptions, setBrandOptions] = useState([] as Array<Partial<IList[]>>);
 
   const dispatch = useDispatch();
-  const classificationOptions = [] as any;
-  const dosageFormOptions = [] as any;
-  const isLoading = false;
-  const isClassificationsLoading = false;
-  const isBrandsLoading = false;
-  const isDosageFormsLoading = false;
+  const classificationOptions = useSelector(getMedicationClassificationsSelector);
+  const dosageFormOptions = useSelector(getMedicationDosageFormsSelector);
+  const isLoading = useSelector(getMedicationLoadingSelector);
+  const isClassificationsLoading = useSelector(getClassificationsLoadingSelector);
+  const isDosageFormsLoading = useSelector(getDosageFormsLoadingSelector);
 
   const initialValue = useMemo<Array<Partial<IMedicationDataFormValues>>>(
     () => [
@@ -94,6 +103,13 @@ const MedicationForm = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialEditData = useMemo<Array<Partial<IMedicationDataFormValues>>>(() => [{ ...initialEditValue }], []);
 
+  useEffect(() => {
+    dispatch(fetchClassifications({ countryId: Number(countryId) }));
+    if (dosageFormOptions && !dosageFormOptions.length) {
+      dispatch(fetchDosageForms());
+    }
+  }, [dispatch, countryId, dosageFormOptions]);
+
   const resetBrandField = useCallback(
     (fields, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}].brand`);
@@ -103,22 +119,12 @@ const MedicationForm = ({
   );
 
   const setBrandOptionsToState = useCallback(
-    (brands: any[], index = 0) => {
+    (brands: IList[], index = 0) => {
       const brandValues = [...brandOptions];
       brandValues[index] = brands;
       setBrandOptions(brandValues);
     },
     [brandOptions]
-  );
-
-  const loadBrands = useCallback(
-    (value: any, fields: any, index: number, isReset = false) => {
-      if (fields.value[index].brand && !isReset) {
-        resetBrandField(fields, index);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [countryId, dispatch, setBrandOptionsToState]
   );
 
   /**
@@ -158,10 +164,9 @@ const MedicationForm = ({
     (fields: any, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...previousFieldValue?.[index] });
-      loadBrands(previousFieldValue?.[index]?.classification, fields, index, true);
       setInternalFormState?.({ isValueChanged: false, isValid: true }, index);
     },
-    [form.mutators, loadBrands, previousFieldValue, setInternalFormState]
+    [form.mutators, previousFieldValue, setInternalFormState]
   );
 
   const handleAddAnotherMedication = (addNewRowEnabled: boolean, fields: any, index: number, isFirstChild: boolean) => {
@@ -175,6 +180,7 @@ const MedicationForm = ({
       });
     }
   };
+
   const renderActionIcons = (fields: any, index: number, isFirstChild: boolean, isLastChild: boolean) => {
     const isFieldValueChanged = internalFormState?.[index] && internalFormState[index]?.isValueChanged;
     const addNewRowEnabled = form.getState().valid && !isFieldValueChanged;
@@ -257,7 +263,7 @@ const MedicationForm = ({
 
   const renderMedicationName = (name: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.name`}
           type='text'
@@ -285,7 +291,7 @@ const MedicationForm = ({
 
   const renderClassification = (name: any, fields: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.classification`}
           type='text'
@@ -295,15 +301,17 @@ const MedicationForm = ({
               {...(props as any)}
               label='Classification'
               errorLabel='classification'
-              labelKey={['classification', 'name']}
-              valueKey={['classification', 'id']}
-              nestedObject={true}
+              labelKey='name'
+              valueKey='id'
               options={classificationOptions}
               loadingOptions={isClassificationsLoading}
               error={(props.meta.touched && props.meta.error) || undefined}
               onChange={(value) => {
                 detectFieldChange(value, index);
-                loadBrands(value, fields, index);
+                if (fields.value[index].brand) {
+                  resetBrandField(fields, index);
+                }
+                setBrandOptionsToState(value?.brands, index);
               }}
               isModel={initialEditValue ? true : false}
             />
@@ -315,7 +323,7 @@ const MedicationForm = ({
 
   const renderBrand = (name: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.brand`}
           type='text'
@@ -325,11 +333,10 @@ const MedicationForm = ({
               {...(props as any)}
               label='Brand'
               errorLabel='brand'
-              labelKey={['brand', 'name']}
-              valueKey={['brand', 'id']}
-              nestedObject={true}
+              labelKey='name'
+              valueKey='id'
               options={brandOptions[index]}
-              loadingOptions={isBrandsLoading && internalFormState?.[index]?.isValueChanged}
+              loadingOptions={isClassificationsLoading}
               error={(props.meta.touched && props.meta.error) || undefined}
               onChange={(value) => detectFieldChange(value, index)}
               isModel={initialEditValue ? true : false}
@@ -342,7 +349,7 @@ const MedicationForm = ({
 
   const renderDosageForm = (name: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.dosage_form`}
           type='text'
@@ -366,15 +373,28 @@ const MedicationForm = ({
     );
   };
 
+  useEffect(() => {
+    if (classificationOptions && classificationOptions.length && initialEditData[0]?.id) {
+      if (initialEditData[0]?.classification?.id) {
+        const selectedClassification = classificationOptions.find(
+          (option) => option.id === initialEditData[0].classification?.id
+        );
+        if (selectedClassification && selectedClassification.brands.length) {
+          setBrandOptionsToState(selectedClassification.brands, 0);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classificationOptions, initialEditData]);
+
   return (
     <>
       {isLoading && !initialEditValue && <Loader />}
-      <FieldArray name={formName} initialValue={initialEditValue ? initialEditData : initialValue}>
+      <FieldArray name={formName} initialValue={initialEditValue?.id ? initialEditData : initialValue}>
         {({ fields }) =>
           fields.map((name, index) => {
             const isLastChild = (fields?.length || 0) === index + 1;
             const isFirstChild = !index;
-
             return (
               <span key={`form_${name}`}>
                 <div className={`position-relative w-100  ${isLastChild ? '' : styles.borderBottom}`}>

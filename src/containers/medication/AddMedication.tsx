@@ -5,11 +5,13 @@ import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import FormContainer from '../../components/formContainer/FormContainer';
 import { Tools } from 'final-form';
-import toastCenter from '../../utils/toastCenter';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
 import { useState } from 'react';
 import MedicationFormIcon from '../../assets/images/info-grey.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
+import { useDispatch } from 'react-redux';
+import { createMedicationRequest, validateMedication } from '../../store/medication/actions';
 
 export interface IMedicationFormValues {
   medication: IMedicationDataFormValues[];
@@ -34,20 +36,16 @@ interface IMatchParams {
   tenantId: string;
 }
 
-// interface IAddMedicationState {
-//   previousFieldValue: IMedicationDataFormValues[];
-//   internalFormState: Array<{ isValueChanged: boolean; isValid: boolean }>;
-// }
-
 interface IMatchProps extends RouteComponentProps<IMatchParams> {}
 
 type Props = IStateProps & IDispatchProps & IRouteProps & IMatchProps;
 
 const AddMedication = (props: Props) => {
-  const [newState, SetState] = useState({
-    previousFieldValue: [] as IMedicationDataFormValues[],
-    internalFormState: [] as Array<{ isValueChanged: boolean; isValid: boolean }>
-  });
+  const dispatch = useDispatch();
+  const [previousFieldValue, setPreviousFieldValueState] = useState([] as IMedicationDataFormValues[]);
+  const [internalFormState, setStateInternalFormState] = useState(
+    [] as Array<{ isValueChanged: boolean; isValid: boolean }>
+  );
 
   /**
    * This function checks for duplicate data validation with existing form values and existing values in database
@@ -61,19 +59,19 @@ const AddMedication = (props: Props) => {
     isSubmitted = false,
     submitCb
   }: ICheckDuplicateValidation): void => {
+    const { regionId } = props.match.params;
     const currentRecord = fields.value[index];
     // contains all the field values except the value of current index to check for duplicates.
     const oldRecords = fields.value.filter(
       (_record: IMedicationDataFormValues, fieldIndex: number) => fieldIndex !== index
     );
-
     // checks if current row values exists in the previous row values in the form
     const isRecordExists = oldRecords.some((record: IMedicationDataFormValues) => {
       let result: boolean;
       try {
         result =
-          record.classification.classification.id === currentRecord.classification.classification.id &&
-          record.brand.brand.id === currentRecord.brand.brand.id &&
+          record.classification.id === currentRecord.classification.id &&
+          record.brand.id === currentRecord.brand.id &&
           record.name.toLowerCase() === currentRecord.name.toLowerCase() &&
           record.dosage_form.id === currentRecord.dosage_form.id;
       } catch {
@@ -89,8 +87,37 @@ const AddMedication = (props: Props) => {
         APPCONSTANTS.MEDICATION_REENTERED_ERROR.replace('this medication', `"${currentRecord.name}"`)
       );
     } else if (isFirstChild || !isRecordExists) {
+      const { tenantId } = props.match.params;
       // if all the form row values are unique then check if the current row values exists in the database
-      // Validate medication API
+      const postData = {
+        countryId: Number(regionId),
+        classificationId: currentRecord?.classification.id,
+        classificationName: currentRecord?.classification.name,
+        brandId: currentRecord?.brand.id,
+        brandName: currentRecord?.brand.name,
+        name: currentRecord?.name,
+        dosageFormId: currentRecord?.dosage_form.id,
+        dosageFormName: currentRecord?.dosage_form.name,
+        tenantId
+      };
+      dispatch(
+        validateMedication({
+          data: postData,
+          successCb: () => {
+            // no duplicates found in the database
+            if (!isUpdate && !isSubmitted) {
+              fields.push({ ...initialValue });
+            }
+            setPreviousFieldValue(fields.value[index], index);
+            setInternalFormState({ isValueChanged: false, isValid: true }, index);
+            // if submitted and no duplicates found then the below callback
+            submitCb?.();
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.MEDICATION_EXISTS_ERROR));
+          }
+        })
+      );
     }
   };
 
@@ -110,13 +137,13 @@ const AddMedication = (props: Props) => {
    * Sets the new field row value or Removes the specific field row values by index
    */
   const setPreviousFieldValue = (value: IMedicationDataFormValues | null, index: number, isRemove = false) => {
-    const newFieldValues = [...newState.previousFieldValue];
+    const newFieldValues = [...previousFieldValue];
     if (isRemove) {
       newFieldValues.splice(index, 1);
     } else if (!isRemove && value) {
       newFieldValues[index] = value;
     }
-    SetState({ ...newState, previousFieldValue: newFieldValues });
+    setPreviousFieldValueState(newFieldValues);
   };
 
   /**
@@ -127,14 +154,14 @@ const AddMedication = (props: Props) => {
     index: number,
     isRemove = false
   ) => {
-    const valueUpdates = [...newState.internalFormState];
+    const valueUpdates = [...internalFormState];
     if (isRemove) {
       valueUpdates.splice(index, 1);
       valueUpdates[valueUpdates.length - 1].isValid = false;
     } else if (!isRemove && value) {
       valueUpdates[index] = value;
     }
-    SetState({ ...newState, internalFormState: valueUpdates });
+    setStateInternalFormState(valueUpdates);
   };
 
   /**
@@ -151,8 +178,59 @@ const AddMedication = (props: Props) => {
     props.history.push(medicationURL);
   };
 
-  const onSubmit = () => {
-    //
+  const onSubmit = ({ medication: medicationValues }: IMedicationFormValues) => {
+    const medication = medicationValues.map((medicationData: IMedicationDataFormValues) => ({
+      ...medicationData,
+      name: medicationData.name.trim()
+    }));
+
+    const lastChildIndex = medication.length - 1;
+    // contains the form state of all field rows except the last child
+    const oldInternalFormState = internalFormState.filter((_value, index) => index !== lastChildIndex);
+    // checks if any existing field value changed and not saved
+    const isChangesNotConfirmed = oldInternalFormState.some((value) => value?.isValueChanged);
+    if (isChangesNotConfirmed) {
+      toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.UNSAVED_CHANGES_MESSAGE);
+      return;
+    }
+    checkDuplicateValidation({
+      fields: { value: medication },
+      index: lastChildIndex,
+      isFirstChild: medication.length === 1,
+      initialValue: {},
+      isUpdate: false,
+      isSubmitted: true,
+      submitCb: () => {
+        // no duplicate data found so save to database
+        saveMedication(medication);
+      }
+    });
+  };
+
+  const saveMedication = (medication: IMedicationDataFormValues[]) => {
+    const { regionId } = props.match.params;
+    const data = medication.map((medicationData: IMedicationDataFormValues) => ({
+      countryId: Number(regionId),
+      classificationId: medicationData.classification.id,
+      classificationName: medicationData.classification.name,
+      brandId: medicationData.brand.id,
+      brandName: medicationData.brand.name,
+      name: medicationData.name,
+      dosageFormId: medicationData.dosage_form.id,
+      dosageFormName: medicationData.dosage_form.name
+    }));
+
+    dispatch(
+      createMedicationRequest({
+        data,
+        successCb: () => {
+          goBackToMedication();
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.MEDICATION_CREATION_SUCCESS);
+        },
+        failureCb: (e: Error) =>
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.MEDICATION_CREATION_ERROR))
+      })
+    );
   };
 
   return (
@@ -166,7 +244,6 @@ const AddMedication = (props: Props) => {
           }}
           render={({ handleSubmit, form }: FormRenderProps<IMedicationFormValues>) => {
             const formInstance = form;
-            const { previousFieldValue, internalFormState } = newState;
             return (
               <form onSubmit={handleSubmit}>
                 <div className='row g-1dot25'>

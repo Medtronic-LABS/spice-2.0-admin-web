@@ -12,6 +12,7 @@ export type IModalSize = 'modal-md' | 'modal-lg' | 'modal-xl';
 export interface IModalProps {
   title: string;
   cancelText?: string;
+  submitTestId?: string;
   submitText: string;
   submitDisabled?: boolean;
   children?: React.ReactElement;
@@ -37,6 +38,7 @@ const ModalForm = React.memo(
     title,
     cancelText,
     submitText,
+    submitTestId,
     submitDisabled = false,
     deactivateLabel,
     handleForceSubmit = false,
@@ -109,6 +111,7 @@ const ModalForm = React.memo(
                         <button
                           type='submit'
                           className='btn primary-btn'
+                          data-testid={submitTestId}
                           disabled={submitDisabled}
                           onClick={
                             handleForceSubmit
