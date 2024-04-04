@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import APPCONSTANTS from '../../constants/appConstants';
 import styles from './Header.module.scss';
 import IconProfile from '../../assets/images/icon-profile.svg';
+import { PROTECTED_ROUTES } from '../../constants/route';
 
 interface IUserMenuItem {
   label: string;
@@ -17,7 +18,7 @@ const UserMenu = ({ role }: any) => {
     {
       label: 'My Profile',
       icon: IconProfile,
-      route: '',
+      route: PROTECTED_ROUTES.profile,
       roles: Object.values(ROLES)
     }
   ];

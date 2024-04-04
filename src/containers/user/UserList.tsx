@@ -61,7 +61,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
-          userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
+          userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
           tenantBased: false,
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));

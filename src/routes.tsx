@@ -17,6 +17,7 @@ import CreateHealthFacility from './containers/healthFacility/CreateHealthFacili
 import UserList from './containers/user/UserList';
 import MedicationList from './containers/medication/MedicationList';
 import AddMedication from './containers/medication/AddMedication';
+import MyProfile from './containers/myProfile/MyProfile';
 
 interface IRoute {
   path: string;
@@ -88,6 +89,12 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: false,
       component: MedicationList,
       authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.profile,
+      exact: true,
+      component: MyProfile,
+      authorisedRoles: SU_SA_A_P
     }
   ];
 })();

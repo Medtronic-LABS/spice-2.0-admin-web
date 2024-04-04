@@ -8,6 +8,7 @@ export const PUBLIC_ROUTES = {
 };
 
 export const PROTECTED_ROUTES = {
+  profile: '/profile',
   region: '/region/:regionId/:tenantId',
   healthFacilityBySuperAdmin: '/region/:regionId/healthFacility/list',
   healthFacilityByAdmin: '/healthFacility/list',

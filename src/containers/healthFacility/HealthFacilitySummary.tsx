@@ -190,7 +190,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
-        userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER),
+        userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
         tenantBased: true,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {

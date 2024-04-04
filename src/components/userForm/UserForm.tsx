@@ -236,7 +236,7 @@ const UserForm = ({
 
   // roles based CHW related utils
   const selectedRoles = useCallback((index: number) => form.getState().values.users[index].roles, [form]);
-  const isCHWSelected = (roles: IRoles[]) => roles.some((userRole: IRoles) => userRole.name === 'CHW');
+  const isCHWSelected = (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => userRole.name === 'CHW');
   const isCHWUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
       const newChWStatus = [...isCHWUser];
@@ -289,7 +289,7 @@ const UserForm = ({
           countryId,
           skip: 0,
           limit: null,
-          userBased: role !== (APPCONSTANTS.ROLES.SUPER_ADMIN || APPCONSTANTS.ROLES.SUPER_USER)
+          userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER)
         })
       );
     }
