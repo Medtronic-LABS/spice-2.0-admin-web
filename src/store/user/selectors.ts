@@ -12,7 +12,7 @@ const getEmail = (state: AppState) => state.user.user?.email;
 const getFormDataId = (state: AppState) => state.user.user?.formDataId;
 const getTenantId = (state: AppState) => state.user.user?.tenantId;
 const getRole = (state: AppState) => state.user.user?.role;
-// const getTimezoneList = (state: AppState) => state.user.timezoneList;
+const getUserId = (state: AppState) => state.user.user?.userId;
 const getLoading = (state: AppState) => state.user.loading;
 const getInitializing = (state: AppState) => state.user.initializing;
 const getShowLoader = (state: AppState) => state.user.showLoader;
@@ -28,7 +28,7 @@ export const lastNameSelector = createSelector(getLastName, (lastName) => lastNa
 export const emailSelector = createSelector(getEmail, (email) => email);
 export const formDataIdSelector = createSelector(getFormDataId, (formDataId) => formDataId);
 export const tenantIdSelector = createSelector(getTenantId, (tenantId) => tenantId);
-// export const timezoneListSelector = createSelector(getTimezoneList, (timezoneList) => timezoneList);
+export const userIdSelector = createSelector(getUserId, (userId) => userId);
 export const loadingSelector = createSelector(getLoading, (loading) => loading);
 export const initializingSelector = createSelector(getInitializing, (initializing) => initializing);
 export const roleSelector = createSelector(getRole, (role) => role);

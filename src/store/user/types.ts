@@ -1,6 +1,7 @@
 import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
+import { IPeerSupervisor, IUserRole, IVillages } from '../healthFacility/types';
 import * as USER_TYPES from './actionTypes';
 
 export type roleType = (typeof APPCONSTANTS.ROLES)[keyof typeof APPCONSTANTS.ROLES];
@@ -25,20 +26,14 @@ export interface IUserDetail {
   email: string;
   gender: string;
   phoneNumber: string;
-  timezone: ITimezone;
-  isAdded?: boolean;
-  redRisk?: boolean;
-  isUpdated?: boolean;
-  roleName?: string | ISelectOption;
+  roles: IUserRole[];
   countryCode?: string;
-  village?: string;
-  subCounty?: string;
+  villages?: IVillages[];
+  supervisor?: IPeerSupervisor;
 }
 
-export interface IUpdateUserDetail extends Omit<IUserDetail, 'timezone'> {
-  timezone: string;
-  cultureId?: number;
-}
+export interface IUpdateUserDetail
+  extends Omit<IUserDetail, 'username' | 'email' | 'roles' | 'villages' | 'supervisor'> {}
 
 export interface IEditUserDetail extends IUserDetail {
   country?: ICountry;
@@ -46,8 +41,9 @@ export interface IEditUserDetail extends IUserDetail {
 
 export interface ICountry {
   id?: string;
-  countryCode?: string;
+  phoneNumberCode?: string;
   name?: string;
+  tenantId?: number;
 }
 
 export interface IUserState {
@@ -63,15 +59,10 @@ export interface IUserState {
   initializing: boolean;
   isPasswordSet: boolean;
   email: string;
-  timezoneList: ITimezone[];
   errorMessage: string;
   showLoader: boolean;
-  countryList: ICountryCode[];
   token: string;
-  lockedUsers?: ILockedUsers[];
-  totalLockedUsers?: number;
   userTenantId: string;
-  cultureList?: ICulture[];
 }
 
 export type ILoginSuccessPayload = IUser;
@@ -218,16 +209,35 @@ export interface IResetStore {
   type: typeof USER_TYPES.RESET_STORE;
 }
 
-export interface ILockedUsers {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+export interface IFetchUserByIdRequest {
+  type: typeof USER_TYPES.FETCH_USER_BY_ID_REQUEST;
+  payload: { id: string };
+  successCb?: (payload: IEditUserDetail) => void;
+  failureCb?: (e: Error) => void;
 }
 
-export interface IFetchLockedUsersPayload {
-  lockedUsers: ILockedUsers[];
-  totalCount: number;
+export interface IFetchUserByIdSuccess {
+  type: typeof USER_TYPES.FETCH_USER_BY_ID_SUCCESS;
+  data: Omit<IUser, 'formDataId' | 'countryId' | 'role'>;
+}
+
+export interface IFetchUserByIdFailure {
+  type: typeof USER_TYPES.FETCH_USER_BY_ID_FAILURE;
+}
+
+export interface IUpdateUserRequest {
+  type: typeof USER_TYPES.UPDATE_USER_REQUEST;
+  payload: IUpdateUserDetail;
+  successCb?: () => void;
+  failureCb?: (e: Error) => void;
+}
+
+export interface IUpdateUserSuccess {
+  type: typeof USER_TYPES.UPDATE_USER_SUCCESS;
+}
+
+export interface IUpdateUserFailure {
+  type: typeof USER_TYPES.UPDATE_USER_FAILURE;
 }
 
 export type UserActions =
@@ -247,4 +257,10 @@ export type UserActions =
   | IRemoveToken
   | IFetchUserRolesRequest
   | IFetchUserRolesSuccess
-  | IFetchUserRolesFailure;
+  | IFetchUserRolesFailure
+  | IFetchUserByIdRequest
+  | IFetchUserByIdSuccess
+  | IFetchUserByIdFailure
+  | IUpdateUserRequest
+  | IUpdateUserSuccess
+  | IUpdateUserFailure;

@@ -87,6 +87,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_USER_DELETE_TITLE: 'Delete Health Facility User',
   CLINICAL_WORKFLOW_FETCH_SUCCESS: 'Unable to load the clinical workflows. Please try after sometime.',
   // USER
+  PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
   USER_DELETE_CONFIRMATION: 'Are you sure want to delete the user?',

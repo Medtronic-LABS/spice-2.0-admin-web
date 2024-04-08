@@ -2,7 +2,7 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
-import { IFetchUserRolesRequest, ILoginRequest, IUser } from './types';
+import { IFetchUserByIdRequest, IFetchUserRolesRequest, ILoginRequest, IUpdateUserRequest, IUser } from './types';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import localStorageServices from '../../global/localStorageServices';
@@ -170,12 +170,52 @@ export function* fetchUserRoles({ successCb, failureCb }: IFetchUserRolesRequest
 }
 
 /*
+  Worker Saga: Fired on FETCH_USER_BY_ID_REQUEST action
+*/
+export function* fetchUserById(action: IFetchUserByIdRequest): SagaIterator {
+  try {
+    const {
+      data: { entity: userDetail }
+    } = yield call(userService.fetchUserById, action.payload);
+    action.successCb?.(userDetail);
+    console.log(userDetail);
+    const payload: Omit<IUser, 'formDataId' | 'countryId' | 'role'> = {
+      ...userDetail
+    };
+    yield put(userActions.fetchUserByIdSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      action.failureCb?.(e);
+    }
+    yield put(userActions.fetchUserByIdFailure());
+  }
+}
+
+/*
+  Worker Saga: Fired on UPDATE_USER_REQUEST action
+*/
+export function* updateUser(action: IUpdateUserRequest): SagaIterator {
+  try {
+    yield call(userService.updateUser, action.payload);
+    action.successCb?.();
+    yield put(userActions.updateUserSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      action.failureCb?.(e);
+    }
+    yield put(userActions.updateUserFailure());
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
 function* userSaga() {
   yield all([takeLatest(USERTYPES.LOGIN_REQUEST, login)]);
   yield all([takeLatest(USERTYPES.LOGOUT_REQUEST, logout)]);
+  yield all([takeLatest(USERTYPES.FETCH_USER_BY_ID_REQUEST, fetchUserById)]);
+  yield all([takeLatest(USERTYPES.UPDATE_USER_REQUEST, updateUser)]);
   yield takeLatest(USERTYPES.FETCH_LOGGED_IN_USER_REQUEST, fetchLoggedInUser);
   yield takeLatest(USERTYPES.FETCH_USER_ROLES_REQUEST, fetchUserRoles);
 }

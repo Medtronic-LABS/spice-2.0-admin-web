@@ -19,7 +19,13 @@ import {
   IFetchUserRolesRequest,
   IFetchUserByEmail,
   IFetchUserByEmailSuccess,
-  IFetchUserByEmailFail
+  IFetchUserByEmailFail,
+  IFetchUserByIdRequest,
+  IFetchUserByIdSuccess,
+  IFetchUserByIdFailure,
+  IUpdateUserRequest,
+  IUpdateUserSuccess,
+  IUpdateUserFailure
 } from './types';
 
 export const loginRequest = ({
@@ -135,4 +141,45 @@ export const fetchUserRolesActionSuccess = (payload: IGroupRoles): IFetchUserRol
 
 export const fetchUserRolesActionFail = () => ({
   type: USER_TYPES.FETCH_USER_ROLES_FAILURE
+});
+
+export const fetchUserByIdReq = ({
+  payload,
+  successCb,
+  failureCb
+}: Omit<IFetchUserByIdRequest, 'type'>): IFetchUserByIdRequest => ({
+  type: USER_TYPES.FETCH_USER_BY_ID_REQUEST,
+  payload,
+  successCb,
+  failureCb
+});
+
+export const fetchUserByIdSuccess = (
+  data: Omit<IUser, 'formDataId' | 'countryId' | 'role'>
+): IFetchUserByIdSuccess => ({
+  type: USER_TYPES.FETCH_USER_BY_ID_SUCCESS,
+  data
+});
+
+export const fetchUserByIdFailure = (): IFetchUserByIdFailure => ({
+  type: USER_TYPES.FETCH_USER_BY_ID_FAILURE
+});
+
+export const updateUserRequest = ({
+  payload,
+  successCb,
+  failureCb
+}: Omit<IUpdateUserRequest, 'type'>): IUpdateUserRequest => ({
+  type: USER_TYPES.UPDATE_USER_REQUEST,
+  payload,
+  successCb,
+  failureCb
+});
+
+export const updateUserSuccess = (): IUpdateUserSuccess => ({
+  type: USER_TYPES.UPDATE_USER_SUCCESS
+});
+
+export const updateUserFailure = (): IUpdateUserFailure => ({
+  type: USER_TYPES.UPDATE_USER_FAILURE
 });

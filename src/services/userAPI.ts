@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { IEditUserDetail, IFetchUserByIdRequest, IUpdateUserDetail } from '../store/user/types';
 
 export const login = (username: string, password: string) => {
   const data = new FormData();
@@ -25,6 +26,13 @@ export const fetchLoggedInUser = () =>
     url: '/user-service/user/profile'
   });
 
+export const updateUser = (payload: IUpdateUserDetail) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/update',
+    data: payload
+  });
+
 export const fetchUserByEmail = (email: string) =>
   axios({
     method: 'POST',
@@ -48,4 +56,10 @@ export const fetchUserRoles = () =>
   axios({
     method: 'POST',
     url: '/user-service/user/roles-list'
+  });
+
+export const fetchUserById = ({ id }: IFetchUserByIdRequest['payload']) =>
+  axios({
+    url: `user-service/user/details/${id}`,
+    method: 'POST'
   });

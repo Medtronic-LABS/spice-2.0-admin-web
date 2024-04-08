@@ -1,46 +1,54 @@
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import arrayMutators from 'final-form-arrays';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import UserForm from '../../components/userForm/UserForm';
 import ModalForm from '../../components/modal/ModalForm';
-import { IEditUserDetail } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
-import { userDataSelector } from '../../store/user/selectors';
-import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
+import { userDataSelector, userIdSelector } from '../../store/user/selectors';
+import { IUserRole } from '../../store/healthFacility/types';
+import { fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
+import toastCenter from '../../utils/toastCenter';
+import APPCONSTANTS from '../../constants/appConstants';
+import { IEditUserDetail } from '../../store/user/types';
 
 const MyProfile = (): React.ReactElement => {
+  const dispatch = useDispatch();
+  const userId = useSelector(userIdSelector);
   const [showEditModal, setShowEditModal] = useState(false);
-  const userForEdit = useRef({ users: [] as IHFUserGet[] });
-  // const [userDetails, _setUserDetails] = useState<IEditUserDetail>();
-  const userDetails = useMemo(
-    () =>
-      ({
-        id: 1,
-        firstName: 'Test',
-        lastName: 'Last',
-        gender: 'Male',
-        phoneNumber: '1234567890',
-        username: 'test@gmail.com',
-        countryCode: '232',
-        roles: [{ id: 4, name: 'ADMIN', displayName: 'Admin', groupName: 'SPICE' }],
-        tenantId: 1,
-        villages: [1, 2],
-        supervisor: 'test',
-        organizations: [{ id: 1, name: 'HF', parentOrganizationId: 1, formDataId: 1 }],
-        country: { id: 1, phoneNumberCode: '232', name: 'SL', tenantId: 1 }
-      } as IHFUserGet),
-    []
-  );
-  const loading = false;
-  const regionData = useSelector(userDataSelector).country;
-  const formatRoles = (user: IHFUserGet) =>
-    `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(',')}`;
+  const [userDetails, setUserDetails] = useState<IEditUserDetail>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const userForEdit = useRef({ users: [] as IEditUserDetail[] });
 
-  const lableData = useMemo(
-    () => [
+  const regionData = useSelector(userDataSelector).country;
+  const formatRoles = (user: IEditUserDetail) =>
+    `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
+
+  const fetchUser = useCallback(
+    () =>
+      dispatch(
+        fetchUserByIdReq({
+          payload: { id: userId },
+          successCb: (payload) => {
+            setUserDetails(payload);
+          },
+          failureCb: () => {
+            toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.PROFILE_DETAIL_ERROR);
+          }
+        })
+      ),
+    [dispatch, userId]
+  );
+
+  useEffect(() => {
+    fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const lableData = useMemo(() => {
+    const data = [
       { label: 'Name', value: userDetails ? `${userDetails.firstName} ${userDetails.lastName}` : null },
       { label: 'Email ID', value: userDetails?.username, colClassName: 'col-sm-6 col-lg-8' },
       {
@@ -53,20 +61,33 @@ const MyProfile = (): React.ReactElement => {
       { label: 'Gender', value: userDetails?.gender },
       {
         label: 'Role',
-        value: formatRoles(userDetails)
+        value: formatRoles(userDetails || ({} as IEditUserDetail))
       }
-    ],
-    [userDetails]
-  );
+    ];
+    if (userDetails?.id && (userDetails.roles || []).some((userRole: IUserRole) => userRole.name === 'CHW')) {
+      data.push(
+        {
+          label: 'Supervisor',
+          value: `${(userDetails.supervisor || {}).firstName} ${(userDetails.supervisor || {}).lastName}`
+        },
+        { label: 'Villages', value: (userDetails.villages || []).map((village: any) => village.name).join(', ') }
+      );
+    }
+
+    return data;
+  }, [userDetails]);
+
   useEffect(() => {
-    const postData: any = { ...userDetails };
-    postData.suiteAccess = userDetails.roles[0] || {};
-    postData.role = postData.roles.filter((r: IUserRole) => r.groupName === postData.suiteAccess.groupName) || [];
-    postData.supervisor = {
-      ...postData.supervisor,
-      name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
-    };
-    userForEdit.current = { users: [postData] as IHFUserGet[] };
+    if (userDetails && userDetails.id) {
+      const postData: any = { ...userDetails };
+      postData.suiteAccess = postData.roles[0] || {};
+      postData.role = postData.roles.filter((r: IUserRole) => r.groupName === postData.suiteAccess.groupName) || [];
+      postData.supervisor = {
+        ...postData.supervisor,
+        name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
+      };
+      userForEdit.current = { users: [postData] as IEditUserDetail[] };
+    }
   }, [userDetails]);
 
   const handleEditClick = useCallback(() => {
@@ -74,7 +95,34 @@ const MyProfile = (): React.ReactElement => {
   }, []);
 
   const handleEdit = ({ users: [user] }: { users: IEditUserDetail[] }) => {
-    //
+    const payload = {
+      id: user.id,
+      gender: user.gender,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      countryCode: user?.country?.phoneNumberCode,
+      phoneNumber: user.phoneNumber
+    };
+    setLoading(true);
+    dispatch(
+      updateUserRequest({
+        payload,
+        successCb: () => {
+          editSuccess();
+        },
+        failureCb: () => {
+          setLoading(false);
+          toastCenter.error(APPCONSTANTS.ERROR, APPCONSTANTS.USER_DETAILS_UPDATE_ERROR);
+        }
+      })
+    );
+  };
+
+  const editSuccess = () => {
+    setLoading(false);
+    setShowEditModal(false);
+    fetchUser();
+    toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS);
   };
 
   return (
@@ -103,6 +151,7 @@ const MyProfile = (): React.ReactElement => {
               form={form as FormApi<any>}
               initialEditValue={userForEdit.current.users[0]}
               disableOptions={true}
+              isProfile={true}
               isEdit={true}
               countryId={regionData?.id}
             />

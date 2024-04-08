@@ -31,13 +31,14 @@ import {
   villagesFromHFListSelector,
   villagesFromHFLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHealthFacility, IUserRole } from '../../store/healthFacility/types';
+import { IHealthFacility, IPeerSupervisor, IUserRole, IVillages } from '../../store/healthFacility/types';
 import PhoneNumberField from '../formFields/PhoneNumberField';
 
 interface IUserFormProps {
   form: FormApi<any>;
   initialEditValue?: any;
   disableOptions?: boolean;
+  isProfile?: boolean;
   isEdit?: boolean;
   isHF?: boolean;
   isHFCreate?: boolean;
@@ -60,6 +61,7 @@ const UserForm = ({
   form,
   initialEditValue,
   disableOptions = false,
+  isProfile = false,
   isEdit,
   isHF = false,
   isHFCreate = false,
@@ -81,6 +83,8 @@ const UserForm = ({
   const villagesList = useSelector(villagesFromHFListSelector);
   const villagesLoading = useSelector(villagesFromHFLoadingSelector);
   const role = useSelector(roleSelector);
+  const [peerSupervisors, setPeerSupervisors] = useState([] as IPeerSupervisor[][]);
+  const [villages, setVillages] = useState([] as IVillages[][]);
 
   const [isCHWUser, setUserAsCHW] = useState([false]);
   const roleOptions = useRef<IRoles[][]>([]);
@@ -131,12 +135,13 @@ const UserForm = ({
       ...user
     };
     userData.suiteAccess = userData.roles[0];
-    userData.role = userData.roles.filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
+    userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
     form.batch(() => {
       form.change(`${formName}[${index}].id`, userData.id);
       form.change(`${formName}[${index}].suiteAccess`, userData.suiteAccess);
       form.change(`${formName}[${index}].role`, userData.role);
       form.change(`${formName}[${index}].roles`, userData.roles);
+      form.change(`${formName}[${index}].selectedRoles`, [...(userData.roles || [])]);
       form.change(`${formName}[${index}].firstName`, userData?.firstName);
       form.change(`${formName}[${index}].lastName`, userData.lastName);
       form.change(`${formName}[${index}].gender`, userData.gender);
@@ -145,23 +150,32 @@ const UserForm = ({
       form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber);
       form.change(`${formName}[${index}].supervisor`, userData.supervisor);
       form.change(`${formName}[${index}].villages`, userData.villages);
+      form.change(`${formName}[${index}].selectedVillages`, [
+        ...(Array.isArray(userData.villages) ? userData.villages : [])
+      ]);
+      form.change(`${formName}[${index}].organizations`, userData.organizations);
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = true;
       setAutoFetched(newAutoFetched);
     });
-    roleOptionSelection(userData.suiteAccess.groupName, index);
+    roleOptionSelection(userData.suiteAccess.groupName, index, userData.roles);
     isCHWUserSelectedFn(userData.role, index);
+    if (isCHWSelected(userData.roles)) {
+      const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
+      fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'village', index);
+      fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'supervisor', index);
+    }
   };
 
   useEffect(() => {
-    if (!rolesGrouped.hasOwnProperty('SPICE')) {
+    if (!rolesGrouped.hasOwnProperty('SPICE') && !isProfile) {
       dispatch(
         fetchUserRolesAction({
           failureCb: (_) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR)
         })
       );
     }
-  }, [dispatch, rolesGrouped]);
+  }, [dispatch, isProfile, rolesGrouped]);
 
   const isError = (meta: any) => (meta.touched && meta.error) || undefined;
 
@@ -249,17 +263,35 @@ const UserForm = ({
 
   // Peer Supervisor fetch
   const fetchSupervisorList = useCallback(
-    (tenantIds: number[]) => {
-      dispatch(fetchPeerSupervisorListRequest({ tenantIds }));
+    (tenantIds: number[], index: number) => {
+      dispatch(
+        fetchPeerSupervisorListRequest({
+          tenantIds,
+          successCb: ({ list }: { list: IPeerSupervisor[] }) => {
+            const newSupervisors = [...peerSupervisors];
+            newSupervisors[index] = list;
+            setPeerSupervisors(newSupervisors);
+          }
+        })
+      );
     },
-    [dispatch]
+    [dispatch, peerSupervisors]
   );
   // Villages fetch
   const fetchVillagesList = useCallback(
-    (tenantIds: number[]) => {
-      dispatch(fetchVillagesListFromHFRequest({ tenantIds }));
+    (tenantIds: number[], index: number) => {
+      dispatch(
+        fetchVillagesListFromHFRequest({
+          tenantIds,
+          successCb: ({ list }: { list: IVillages[] }) => {
+            const newVillages = [...villages];
+            newVillages[index] = list;
+            setVillages(newVillages);
+          }
+        })
+      );
     },
-    [dispatch]
+    [dispatch, villages]
   );
 
   // Common function for the supervisor and village list fetch with conditions
@@ -267,16 +299,17 @@ const UserForm = ({
     roles: IRoles[],
     tenantIds: number[] = [],
     listData: any = { list: [], hfTenantIds: [] },
-    name: string
+    name: string,
+    index: number
   ) => {
     const isTenantChanged =
       tenantIds.length >= (listData.hfTenantIds || []).length &&
       tenantIds.some((id: number) => !(listData.hfTenantIds || []).includes(id));
     if (isCHWSelected(roles) && tenantIds.length && (!listData.list.length || isTenantChanged)) {
       if (name === 'village') {
-        return fetchVillagesList(tenantIds);
+        return fetchVillagesList(tenantIds, index);
       } else {
-        return fetchSupervisorList(tenantIds);
+        return fetchSupervisorList(tenantIds, index);
       }
     }
   };
@@ -296,10 +329,10 @@ const UserForm = ({
   }, [countryId, dispatch, healthFacilityList.length, isEdit, isHF, role]);
 
   useEffect(() => {
-    if (isEdit) {
-      const tenantIds = initialEditData[0].hfTenantIds;
-      fetchListWithConditions(selectedRoles(0), tenantIds, villagesList, 'village');
-      fetchListWithConditions(selectedRoles(0), tenantIds, peerSupervisorList, 'supervisor');
+    if (isEdit && !isProfile) {
+      const tenantIds = [...initialEditData[0].hfTenantIds, hfTenantId].filter((v: number) => v);
+      fetchListWithConditions(selectedRoles(0), tenantIds, villagesList, 'village', 0);
+      fetchListWithConditions(selectedRoles(0), tenantIds, peerSupervisorList, 'supervisor', 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -308,14 +341,15 @@ const UserForm = ({
     if (isEdit) {
       isCHWUserSelectedFn(form.getState().values.users[0].role, 0);
     }
-  }, [form, isCHWUserSelectedFn, isEdit, selectedRoles]);
+  }, [form, isCHWUserSelectedFn, isEdit, isProfile, selectedRoles]);
 
   const roleOptionSelection = useCallback(
-    (suite: string, index: number) => {
+    (suite: string, index: number, mandatoryRoles?: IRoles[]) => {
       const newRoleOptions = [...roleOptions.current];
-      newRoleOptions[index] = isHFCreate
-        ? (rolesGrouped[suite] || []).filter((r: IRoles) => r.name !== 'CHW')
-        : rolesGrouped[suite];
+      newRoleOptions[index] =
+        isHFCreate && (mandatoryRoles ? !isCHWSelected(mandatoryRoles) : true)
+          ? (rolesGrouped[suite] || []).filter((r: IRoles) => r.name !== 'CHW')
+          : rolesGrouped[suite];
       roleOptions.current = newRoleOptions;
     },
     [isHFCreate, rolesGrouped]
@@ -356,6 +390,7 @@ const UserForm = ({
                         labelKey='groupName'
                         valueKey='groupName'
                         options={suiteAccess || []}
+                        disabled={isProfile}
                         loadingOptions={isRolesLoading}
                         error={isError(meta)}
                         isModel={true}
@@ -382,51 +417,64 @@ const UserForm = ({
                     name={`${name}.role`}
                     type='text'
                     validate={required}
-                    render={({ input, meta }) => (
-                      <MultiSelect
-                        {...(input as any)}
-                        label='Role'
-                        errorLabel='Please select at least one role.'
-                        labelKey='displayName'
-                        valueKey='id'
-                        isShowLabel={true}
-                        isSelectAll={true}
-                        menuPlacement={'bottom'}
-                        placeholder=''
-                        isModel={true}
-                        isMulti={true}
-                        required={true}
-                        options={roleOptions.current?.[index] || []}
-                        loading={isRolesLoading}
-                        error={isError(meta) && !selectedRoles(index)?.length}
-                        onChange={(values: any) => {
-                          //  Store ALL ROLES on each update
-                          const suiteAccessSelected = form.getState().values.users[index].suiteAccess?.groupName;
-                          const remainingRoles = selectedRoles(index).filter(
-                            (r: IUserRole) => r.groupName !== suiteAccessSelected
-                          );
-                          form.change(`${formName}[${index}].roles`, [...remainingRoles, ...values]);
-                          // CHW User selection
-                          isCHWUserSelectedFn(values, index);
-                          // fetch HF list based on CHW selection
-                          if (isCHWSelected(values) && !isEdit) {
-                            // To clear the Selected village during Add User
-                            form.change(`${formName}[${index}].villages`, {});
-                          }
-                          // fetch Supervisor and Village List on CHW select
-                          let newTenantIds = [];
-                          if (isHF) {
-                            newTenantIds = [hfTenantId];
-                          } else if (isEdit) {
-                            newTenantIds = initialEditData[0].hfTenantIds;
-                          }
-                          const tenantIds = newTenantIds.filter((v: any) => v);
-                          fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'village');
-                          fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'supervisor');
-                          input.onChange(values);
-                        }}
-                      />
-                    )}
+                    render={({ input, meta }) => {
+                      const mandatoryRoles = form.getState().values.users[index].selectedRoles || [];
+                      return (
+                        <MultiSelect
+                          {...(input as any)}
+                          label='Role'
+                          errorLabel='Please select at least one role.'
+                          labelKey='displayName'
+                          valueKey='id'
+                          isShowLabel={true}
+                          isSelectAll={true}
+                          menuPlacement={'bottom'}
+                          isDisabled={isProfile}
+                          placeholder=''
+                          isModel={true}
+                          isMulti={true}
+                          isOptionDisabled={(option: any) => {
+                            return autoFetched[index]
+                              ? (mandatoryRoles || []).map((v: any) => v.id).includes(option.id)
+                              : null;
+                          }}
+                          required={true}
+                          options={roleOptions.current?.[index] || []}
+                          mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                          loading={isRolesLoading}
+                          error={isError(meta) && !selectedRoles(index)?.length}
+                          onChange={(values: any) => {
+                            //  Store ALL ROLES on each update
+                            const suiteAccessSelected = form.getState().values.users[index].suiteAccess?.groupName;
+                            const remainingRoles = selectedRoles(index).filter(
+                              (r: IUserRole) => r.groupName !== suiteAccessSelected
+                            );
+                            form.change(`${formName}[${index}].roles`, [...remainingRoles, ...values]);
+                            // CHW User selection
+                            isCHWUserSelectedFn(values, index);
+                            // fetch HF list based on CHW selection
+                            if (isCHWSelected(values)) {
+                              if (!isEdit) {
+                                // To clear the Selected village during Add User
+                                form.change(`${formName}[${index}].villages`, {});
+                              }
+                              const tenantIds = [...initialEditData[index].hfTenantIds, hfTenantId].filter(
+                                (v: number) => v
+                              );
+                              fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'village', index);
+                              fetchListWithConditions(
+                                selectedRoles(index),
+                                tenantIds,
+                                villagesList,
+                                'supervisor',
+                                index
+                              );
+                            }
+                            input.onChange(values);
+                          }}
+                        />
+                      );
+                    }}
                   />
                 </div>
                 <div className='col-sm-6 col-12'>
@@ -521,25 +569,41 @@ const UserForm = ({
                       name={`${name}.healthFacility`}
                       type='text'
                       validate={required}
-                      render={({ input, meta }) => (
-                        <SelectInput
-                          {...(input as any)}
-                          label='Assigned Health Facility'
-                          errorLabel='assigned health facility'
-                          labelKey='name'
-                          valueKey='id'
-                          options={healthFacilityList}
-                          loadingOptions={hfLoading}
-                          error={isError(meta)}
-                          isModel={true}
-                          onChange={(hf: IHealthFacility) => {
-                            form.change(`${formName}[${index}].villages`, {});
-                            fetchSupervisorList([hf.tenantId]);
-                            fetchVillagesList([hf.tenantId]);
-                            input.onChange(hf);
-                          }}
-                        />
-                      )}
+                      render={({ input, meta }) => {
+                        return (
+                          <SelectInput
+                            {...(input as any)}
+                            label='Assigned Health Facility'
+                            errorLabel='assigned health facility'
+                            labelKey='name'
+                            valueKey='id'
+                            options={healthFacilityList}
+                            loadingOptions={hfLoading}
+                            error={isError(meta)}
+                            isModel={true}
+                            disabled={isProfile}
+                            onChange={(hf: IHealthFacility) => {
+                              const formData = form.getState().values.users[index];
+                              if (autoFetched[index] && formData?.selectedVillages?.length) {
+                                form.change(`${formName}[${index}].villages`, [
+                                  ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
+                                ]);
+                              } else {
+                                form.change(`${formName}[${index}].villages`, []);
+                              }
+                              fetchSupervisorList(
+                                [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
+                                index
+                              );
+                              fetchVillagesList(
+                                [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
+                                index
+                              );
+                              input.onChange(hf);
+                            }}
+                          />
+                        );
+                      }}
                     />
                   </div>
                 )}
@@ -560,7 +624,8 @@ const UserForm = ({
                                 errorLabel='selected peer supervisor'
                                 labelKey='name'
                                 valueKey='id'
-                                options={peerSupervisorList.list}
+                                disabled={isProfile}
+                                options={peerSupervisors[index]}
                                 loadingOptions={peerSupervisorLoading}
                                 error={isError(meta)}
                                 isModel={true}
@@ -573,24 +638,34 @@ const UserForm = ({
                             name={`${name}.villages`}
                             type='text'
                             validate={required}
-                            render={({ input, meta }) => (
-                              <MultiSelect
-                                {...(input as any)}
-                                label='Assigned Villages'
-                                errorLabel='assigned villages'
-                                labelKey='name'
-                                valueKey='id'
-                                required={true}
-                                isShowLabel={true}
-                                isSelectAll={true}
-                                menuPlacement={'bottom'}
-                                isModel={true}
-                                isMulti={true}
-                                options={villagesList?.list || []}
-                                loadingOptions={villagesLoading}
-                                error={isError(meta)}
-                              />
-                            )}
+                            render={({ input, meta }) => {
+                              const mandatoryVillages = form.getState().values.users[index].selectedVillages || [];
+                              return (
+                                <MultiSelect
+                                  {...(input as any)}
+                                  label='Assigned Villages'
+                                  errorLabel='assigned villages'
+                                  labelKey='name'
+                                  valueKey='id'
+                                  required={true}
+                                  isShowLabel={true}
+                                  isSelectAll={true}
+                                  menuPlacement={'bottom'}
+                                  isDisabled={isProfile}
+                                  isModel={true}
+                                  isMulti={true}
+                                  isOptionDisabled={(option: any) => {
+                                    return autoFetched[index]
+                                      ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
+                                      : null;
+                                  }}
+                                  mandatoryOptions={autoFetched[index] ? mandatoryVillages : []}
+                                  options={villages[index] || []}
+                                  loadingOptions={villagesLoading}
+                                  error={isError(meta)}
+                                />
+                              );
+                            }}
                           />
                         </div>
                       </>

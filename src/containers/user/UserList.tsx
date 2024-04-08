@@ -105,25 +105,33 @@ const UserList = (props: IMatchProps): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
-    dispatch(
-      fetchUserDetailRequest({
-        id: Number(value?.id),
-        successCb: (user: any) => {
-          const postData = { ...user };
-          postData.suiteAccess = user.roles[0] || [];
-          postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
-          postData.supervisor = {
-            ...postData.supervisor,
-            name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
-          };
-          userForEdit.current = { users: [{ ...postData }] };
-          setIsOpenUserModal({ isOpen: true, isEdit: true });
-        },
-        failureCb: (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DETAIL_FETCH_FAIL));
-        }
-      })
-    );
+    if ((value.roles || []).some((userRole: IUserRole) => userRole.name === 'CHW')) {
+      dispatch(
+        fetchUserDetailRequest({
+          id: Number(value?.id),
+          successCb: (user: any) => {
+            const postData = { ...user };
+            postData.suiteAccess = user.roles[0] || [];
+            postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+            postData.supervisor = {
+              ...postData.supervisor,
+              name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
+            };
+            userForEdit.current = { users: [{ ...postData }] };
+            setIsOpenUserModal({ isOpen: true, isEdit: true });
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DETAIL_FETCH_FAIL));
+          }
+        })
+      );
+    } else {
+      const postData = { ...value };
+      postData.suiteAccess = value.roles[0] || [];
+      postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+      userForEdit.current = { users: [{ ...postData }] };
+      setIsOpenUserModal({ isOpen: true, isEdit: true });
+    }
   };
 
   const handleAddUserClick = () => {
@@ -192,9 +200,9 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
 
   const formatRoles = (user: IHFUserGet) =>
-    `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(',')}`;
+    `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
 
-  const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(',')}`;
+  const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(', ')}`;
 
   const userFormRenderer = (form?: FormApi<any>) => {
     return (
@@ -204,6 +212,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
         disableOptions={true}
         isEdit={isOpenUserModal.isEdit}
         countryId={regionData.id}
+        enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
       />
     );

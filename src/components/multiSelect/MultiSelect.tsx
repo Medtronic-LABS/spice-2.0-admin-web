@@ -125,6 +125,7 @@ const MultiSelect = (props: any) => {
       return newProps.onChange(selected);
     } else {
       return newProps.onChange([
+        ...props.mandatoryOptions,
         ...newProps.value?.filter(({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase()))
       ]);
     }
@@ -174,21 +175,30 @@ const MultiSelect = (props: any) => {
             ...newProps.components
           }}
           styles={{
-            control: (baseStyles, state) => {
-              return {
-                ...baseStyles,
-                ...newProps.controlStyles,
-                borderColor: newProps.error ? 'red !important' : newProps?.controlStyles?.borderColor || '#8c8c8c',
-                '&:focus': {
-                  borderColor: newProps.error ? 'red !important' : '#8c8c8c'
-                },
-                overflow: 'auto',
-                maxHeight: '5.875rem',
-                minHeight: '0.875rem'
-              };
+            multiValueRemove: (base: any, removeProps: any) => {
+              if (props.mandatoryOptions) {
+                const newOptions = props.mandatoryOptions.map((v: any) => v.id);
+                return newOptions.includes(removeProps.data.id) ? { ...base, display: 'none' } : base;
+              } else if (props.optionsDisabled) {
+                return { ...base, display: 'none' };
+              } else {
+                return props.isDisabled ? { ...base, display: 'none' } : base;
+              }
             },
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              ...newProps.controlStyles,
+              borderColor: newProps.error ? 'red !important' : newProps?.controlStyles?.borderColor || '#8c8c8c',
+              '&:focus': {
+                borderColor: newProps.error ? 'red !important' : '#8c8c8c'
+              },
+              overflow: 'auto',
+              maxHeight: '5.875rem',
+              minHeight: '0.875rem'
+            }),
             option: (optionStyles) => ({
               ...optionStyles,
+              disabled: true,
               backgroundColor: 'white',
               color: 'black',
               ...newProps.optionStyles

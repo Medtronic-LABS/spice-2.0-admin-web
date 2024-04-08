@@ -108,7 +108,8 @@ const MedicationForm = ({
     if (dosageFormOptions && !dosageFormOptions.length) {
       dispatch(fetchDosageForms());
     }
-  }, [dispatch, countryId, dosageFormOptions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, countryId, dosageFormOptions && dosageFormOptions.length]);
 
   const resetBrandField = useCallback(
     (fields, index: number) => {

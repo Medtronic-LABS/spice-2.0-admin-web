@@ -37,11 +37,7 @@ const initialStateGetter: () => IUserState = () => ({
   timezoneList: [],
   errorMessage: '',
   showLoader: false,
-  countryList: [],
-  lockedUsers: [],
-  totalLockedUsers: 0,
-  userTenantId: '',
-  cultureList: []
+  userTenantId: ''
 });
 
 const userReducer = (state = initialStateGetter(), action = {} as UserActions): IUserState => {
@@ -133,6 +129,29 @@ const userReducer = (state = initialStateGetter(), action = {} as UserActions): 
         ...state,
         token: ''
       };
+    case USERTYPES.FETCH_USER_BY_ID_REQUEST:
+      return {
+        ...state,
+        loading: true
+      };
+    case USERTYPES.FETCH_USER_BY_ID_FAILURE:
+      return {
+        ...state,
+        loading: false
+      };
+    case USERTYPES.FETCH_USER_BY_ID_SUCCESS: {
+      if (state.user.userId === action.data.userId) {
+        return {
+          ...state,
+          user: { ...state.user, ...action.data },
+          loading: false
+        };
+      }
+      return {
+        ...state,
+        loading: false
+      };
+    }
     case USERTYPES.RESET_STORE:
     default:
       return {
