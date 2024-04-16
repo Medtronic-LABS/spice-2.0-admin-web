@@ -74,7 +74,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     language: hf.language.name,
     parentTenantId: hf.chiefdom?.id,
     tenantId: hf.tenantId,
-    linkedSupervisorIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
+    linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
     clinicalWorkflowIds: (hf.clinicalWorkflows || []).map(({ id }: { id: number }) => id)
   };

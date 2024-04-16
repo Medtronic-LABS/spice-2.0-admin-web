@@ -6,7 +6,8 @@ import {
   required,
   minLength,
   normalizePhone,
-  normalizeFloatingNumber
+  normalizeFloatingNumber,
+  validateMobile
 } from '../../utils/validation';
 import SelectInput, { AsyncSelectInput } from '../../components/formFields/SelectInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
@@ -94,26 +95,26 @@ const HealthFacilityDetailsForm = ({
   // Peer Supervisor fetch
   useEffect(() => {
     const tenantId = form.getState().values.healthFacility?.district?.tenantId;
-    if (!isEdit && tenantId && !peerSupervisorList.list.length) {
+    if (!isEdit && tenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId, peerSupervisorList.list.length]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId]);
 
   // Chiefdom fetch
   useEffect(() => {
     const districtId = form.getState().values.healthFacility?.district?.id;
-    if (districtId && !chiefdomList.length) {
+    if (districtId) {
       dispatch(fetchChiefdomListRequest({ countryId, districtId: Number(districtId) }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chiefdomList.length, dispatch, countryId, form.getState().values.healthFacility?.district?.id]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.id]);
 
   // Villages fetch
   useEffect(() => {
     const districtId = form.getState().values.healthFacility.district?.id;
     const chiefdomId = form.getState().values.healthFacility.chiefdom?.id;
-    if (chiefdomId && districtId && !villagesList.length) {
+    if (chiefdomId && districtId) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
@@ -127,11 +128,10 @@ const HealthFacilityDetailsForm = ({
     countryId,
     dispatch,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility.district?.id,
+    form.getState().values.healthFacility?.district?.id,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility.chiefdom?.id,
-    regionId,
-    villagesList.length
+    form.getState().values.healthFacility?.chiefdom?.id,
+    regionId
   ]);
 
   /**
@@ -226,7 +226,8 @@ const HealthFacilityDetailsForm = ({
         <Field
           name={`${formName}.phuFocalPersonNumber`}
           type='text'
-          validate={required}
+          validate={composeValidators(required, validateMobile)}
+          parse={normalizePhone}
           render={({ input, meta }) => (
             <TextInput
               {...input}
@@ -271,6 +272,11 @@ const HealthFacilityDetailsForm = ({
                 options={districtList || []}
                 loadingOptions={districtListLoading}
                 error={(meta.touched && meta.error) || undefined}
+                onChange={(value: any) => {
+                  form.change(`${formName}.chiefdom`, undefined);
+                  form.change(`${formName}.peerSupervisors`, undefined);
+                  input.onChange(value);
+                }}
               />
             );
           }}
@@ -292,6 +298,10 @@ const HealthFacilityDetailsForm = ({
               options={chiefdomList}
               loadingOptions={chiefdomLoading}
               error={(meta.touched && meta.error) || undefined}
+              onChange={(value: any) => {
+                form.change(`${formName}.linkedVillages`, undefined);
+                input.onChange(value);
+              }}
             />
           )}
         />

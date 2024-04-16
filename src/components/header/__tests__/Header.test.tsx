@@ -36,24 +36,24 @@ describe('Header component', () => {
 
   it('should render the logo', () => {
     const logo = wrapper.find('img');
-    expect(logo).toHaveLength(3);
+    expect(logo).toHaveLength(8);
   });
   it('should display the name', () => {
     const initials = wrapper.find(`.${styles.name}`);
     expect(initials.exists()).toBe(true);
-    expect(initials).toHaveLength(10);
+    expect(initials).toHaveLength(19);
   });
 
   it('should display the user name', () => {
     const name = wrapper.find(`.${styles.userOptions}`);
     expect(name.exists()).toBe(true);
-    expect(name).toHaveLength(10);
+    expect(name).toHaveLength(19);
   });
 
   it('should display the user logo', () => {
     const name = wrapper.find(`.${styles.userLogo}`);
     expect(name.exists()).toBe(true);
-    expect(name).toHaveLength(10);
+    expect(name).toHaveLength(19);
   });
 
   it('should display the user role', () => {
@@ -63,7 +63,7 @@ describe('Header component', () => {
 
   it('should render the Logout icon', () => {
     const icon = wrapper.find('img[src="' + LogoutIcon + '"]');
-    expect(icon).toHaveLength(3);
+    expect(icon).toHaveLength(8);
   });
 
   it('should display the text "Logout"', () => {

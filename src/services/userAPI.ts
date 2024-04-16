@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IEditUserDetail, IFetchUserByIdRequest, IUpdateUserDetail } from '../store/user/types';
+import { IFetchUserByIdRequest, IUpdateUserDetail } from '../store/user/types';
 
 export const login = (username: string, password: string) => {
   const data = new FormData();
@@ -62,4 +62,24 @@ export const fetchUserById = ({ id }: IFetchUserByIdRequest['payload']) =>
   axios({
     url: `user-service/user/details/${id}`,
     method: 'POST'
+  });
+
+export const changePasswordReq = (data: { userId: number; newPassword: string }) =>
+  axios({
+    method: 'POST',
+    url: `user-service/user/change-user-password`,
+    data: {
+      ...data
+    }
+  });
+
+export const updatePassword = (data: { userId: number; oldPassword: string; newPassword: string }) =>
+  axios({
+    method: 'post',
+    url: `user-service/user/change-password`,
+    data: {
+      oldPassword: data.oldPassword,
+      newPassword: data.newPassword,
+      userId: data.userId
+    }
   });

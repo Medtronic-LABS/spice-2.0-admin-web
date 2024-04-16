@@ -50,7 +50,7 @@ const App = () => {
 
   return (
     <div className='app-container'>
-      {loggedIn ? <Header /> : null}
+      {loggedIn && token ? <Header /> : null}
       <div className={`app-body ${loggedIn ? 'logged-in' : ''}`}>
         {loggingIn || loggingOut || loading || initializingApp ? <Loader /> : null}
         <ErrorBoundary pathname={pathname}>

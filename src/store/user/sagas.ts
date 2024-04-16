@@ -10,6 +10,7 @@ import { encryptData } from '../../utils/commonUtils';
 import CryptoJS from 'crypto-js';
 import * as userService from '../../services/userAPI';
 import * as userActions from './actions';
+import { IActionProps } from '../../typings/global';
 
 // export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
 //   roles.length && rolesArray.find((role) => roles.includes(role));
@@ -178,7 +179,6 @@ export function* fetchUserById(action: IFetchUserByIdRequest): SagaIterator {
       data: { entity: userDetail }
     } = yield call(userService.fetchUserById, action.payload);
     action.successCb?.(userDetail);
-    console.log(userDetail);
     const payload: Omit<IUser, 'formDataId' | 'countryId' | 'role'> = {
       ...userDetail
     };
@@ -208,6 +208,40 @@ export function* updateUser(action: IUpdateUserRequest): SagaIterator {
 }
 
 /*
+  Worker Saga: Fired on CHANGE_PASSWORD_REQUEST action
+*/
+export function* changePassword(action: IActionProps) {
+  const { userId, password, successCB, failureCb } = action.data;
+  try {
+    yield call(userService.changePasswordReq, { userId, newPassword: password });
+    yield put(userActions.changePasswordSuccess());
+    successCB();
+  } catch (e: any) {
+    failureCb?.(e);
+    yield put(userActions.changePasswordFail(e));
+  }
+}
+
+/*
+  Worker Saga: Fired on UPDATE_PASSWORD_REQUEST action
+*/
+export function* updatePassword(action: IActionProps) {
+  const { userId, oldPassword, newPassword, successCB, failureCb } = action.data;
+  try {
+    yield call(userService.updatePassword, {
+      userId,
+      oldPassword,
+      newPassword
+    });
+    yield put(userActions.changeOwnPasswordSuccess());
+    successCB();
+  } catch (e: any) {
+    failureCb?.(e);
+    yield put(userActions.changeOwnPasswordFail(e));
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
@@ -218,6 +252,8 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.UPDATE_USER_REQUEST, updateUser)]);
   yield takeLatest(USERTYPES.FETCH_LOGGED_IN_USER_REQUEST, fetchLoggedInUser);
   yield takeLatest(USERTYPES.FETCH_USER_ROLES_REQUEST, fetchUserRoles);
+  yield all([takeLatest(USERTYPES.CHANGE_PASSWORD_REQUEST, changePassword)]);
+  yield all([takeLatest(USERTYPES.CHANGE_OWN_PASSWORD_REQUEST, updatePassword)]);
 }
 
 export default userSaga;

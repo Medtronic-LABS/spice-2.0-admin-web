@@ -86,6 +86,7 @@ const UserForm = ({
   const [peerSupervisors, setPeerSupervisors] = useState([] as IPeerSupervisor[][]);
   const [villages, setVillages] = useState([] as IVillages[][]);
 
+  const [autoFetchData, setAutoFetchData] = useState([] as any);
   const [isCHWUser, setUserAsCHW] = useState([false]);
   const roleOptions = useRef<IRoles[][]>([]);
 
@@ -115,7 +116,7 @@ const UserForm = ({
     () => [
       {
         ...initialEditValue,
-        hfTenantIds: isEdit ? (initialEditValue.organizations || []).map((org: any) => org.id) : []
+        hfTenantIds: isEdit ? (initialEditValue?.organizations || []).map((org: any) => org.id) : []
       }
     ],
     [initialEditValue, isEdit]
@@ -136,28 +137,28 @@ const UserForm = ({
     };
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
+    userData.selectedRoles = [...(userData.roles || [])];
+    userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
     form.batch(() => {
-      form.change(`${formName}[${index}].id`, userData.id);
-      form.change(`${formName}[${index}].suiteAccess`, userData.suiteAccess);
-      form.change(`${formName}[${index}].role`, userData.role);
-      form.change(`${formName}[${index}].roles`, userData.roles);
-      form.change(`${formName}[${index}].selectedRoles`, [...(userData.roles || [])]);
-      form.change(`${formName}[${index}].firstName`, userData?.firstName);
-      form.change(`${formName}[${index}].lastName`, userData.lastName);
-      form.change(`${formName}[${index}].gender`, userData.gender);
-      form.change(`${formName}[${index}].country`, userData.country);
-      form.change(`${formName}[${index}].countryCode`, userData.countryCode);
-      form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber);
-      form.change(`${formName}[${index}].supervisor`, userData.supervisor);
-      form.change(`${formName}[${index}].villages`, userData.villages);
-      form.change(`${formName}[${index}].selectedVillages`, [
-        ...(Array.isArray(userData.villages) ? userData.villages : [])
-      ]);
-      form.change(`${formName}[${index}].organizations`, userData.organizations);
-      const newAutoFetched = [...autoFetched];
-      newAutoFetched[index] = true;
-      setAutoFetched(newAutoFetched);
+      form.change(`${formName}[${index}].id`, userData.id || '');
+      form.change(`${formName}[${index}].suiteAccess`, userData.suiteAccess || null);
+      form.change(`${formName}[${index}].role`, userData.role || []);
+      form.change(`${formName}[${index}].roles`, userData.roles || []);
+      form.change(`${formName}[${index}].selectedRoles`, userData.selectedRoles || []);
+      form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
+      form.change(`${formName}[${index}].lastName`, userData.lastName || '');
+      form.change(`${formName}[${index}].gender`, userData.gender || '');
+      form.change(`${formName}[${index}].country`, userData.country || {});
+      form.change(`${formName}[${index}].countryCode`, userData.countryCode || '');
+      form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
+      form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
+      form.change(`${formName}[${index}].villages`, userData.villages || []);
+      form.change(`${formName}[${index}].organizations`, userData.organizations || []);
+      form.change(`${formName}[${index}].selectedVillages`, userData.selectedVillages || []);
     });
+    const newAutoFetched = [...autoFetched];
+    newAutoFetched[index] = true;
+    setAutoFetched(newAutoFetched);
     roleOptionSelection(userData.suiteAccess.groupName, index, userData.roles);
     isCHWUserSelectedFn(userData.role, index);
     if (isCHWSelected(userData.roles)) {
@@ -168,7 +169,7 @@ const UserForm = ({
   };
 
   useEffect(() => {
-    if (!rolesGrouped.hasOwnProperty('SPICE') && !isProfile) {
+    if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile) {
       dispatch(
         fetchUserRolesAction({
           failureCb: (_) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR)
@@ -249,7 +250,7 @@ const UserForm = ({
   const isCountryListLoading = false;
 
   // roles based CHW related utils
-  const selectedRoles = useCallback((index: number) => form.getState().values.users[index].roles, [form]);
+  const selectedRoles = useCallback((index: number) => form.getState().values.users[index]?.roles, [form]);
   const isCHWSelected = (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => userRole.name === 'CHW');
   const isCHWUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
@@ -326,7 +327,7 @@ const UserForm = ({
         })
       );
     }
-  }, [countryId, dispatch, healthFacilityList.length, isEdit, isHF, role]);
+  }, [countryId, dispatch, healthFacilityList?.length, isEdit, isHF, role]);
 
   useEffect(() => {
     if (isEdit && !isProfile) {
@@ -339,7 +340,7 @@ const UserForm = ({
 
   useEffect(() => {
     if (isEdit) {
-      isCHWUserSelectedFn(form.getState().values.users[0].role, 0);
+      isCHWUserSelectedFn(form.getState().values.users[0]?.role, 0);
     }
   }, [form, isCHWUserSelectedFn, isEdit, isProfile, selectedRoles]);
 
@@ -349,21 +350,35 @@ const UserForm = ({
       newRoleOptions[index] =
         isHFCreate && (mandatoryRoles ? !isCHWSelected(mandatoryRoles) : true)
           ? (rolesGrouped[suite] || []).filter((r: IRoles) => r.name !== 'CHW')
-          : rolesGrouped[suite];
+          : rolesGrouped?.[suite];
       roleOptions.current = newRoleOptions;
     },
     [isHFCreate, rolesGrouped]
   );
 
+  const initData = useCallback(() => {
+    if (isEdit) {
+      setAutoFetchData(initialEditData);
+    } else if (data.length) {
+      setAutoFetchData(data);
+    } else {
+      setAutoFetchData(initialValue);
+    }
+  }, [data, initialEditData, initialValue, isEdit]);
+
+  useEffect(() => {
+    initData();
+  }, [initData]);
+
   return (
-    <FieldArray name={formName} initialValue={isEdit ? initialEditData : data.length ? data : initialValue}>
+    <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
         fields.map((name: string, index: number) => {
           const isLastChild = (fields?.length || 0) === index + 1;
           const isFirstChild = !index;
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
           // SUITE options
-          const suiteAccess = Object.keys(rolesGrouped)
+          const suiteAccess = Object.keys(rolesGrouped || {})
             .map((userRole: any) => ({ groupName: userRole, id: userRole }))
             .sort();
           // Default Role options selection base on SUITE on initial Edit

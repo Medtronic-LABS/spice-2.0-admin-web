@@ -7,7 +7,7 @@ import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
+import { authTokenSelector, getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
 import Region from './containers/region/Region';
 import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
@@ -118,27 +118,14 @@ const publicRoutes = [
 ];
 export const AppRoutes = () => {
   const isLoggedIn = useSelector(getIsLoggedInSelector);
+  const token = useSelector(authTokenSelector);
   const role = useSelector(roleSelector);
   const data = useSelector(userDataSelector);
   const {
     country: { id: regionId, tenantId }
   } = data;
 
-  return !isLoggedIn ? (
-    <Switch>
-      {publicRoutes.map((route: any, index: number) => (
-        <Route
-          path={route.path}
-          exact={route.exact}
-          key={index}
-          render={(routeProps: RouteComponentProps<any>) => (
-            <route.component key={routeProps.location.key} {...routeProps} />
-          )}
-        />
-      ))}
-      <Redirect exact={true} to={PUBLIC_ROUTES.login} />
-    </Switch>
-  ) : isLoggedIn && regionId && tenantId ? (
+  return isLoggedIn && regionId && tenantId && !!token ? (
     <AppLayout>
       <Switch>
         {protectedRoutes.map((route: IProtectedRoute, index: number) =>
@@ -161,7 +148,19 @@ export const AppRoutes = () => {
         />
       </Switch>
     </AppLayout>
-  ) : (
-    <></>
-  );
+  ) : !isLoggedIn || !token ? (
+    <Switch>
+      {publicRoutes.map((route: any, index: number) => (
+        <Route
+          path={route.path}
+          exact={route.exact}
+          key={index}
+          render={(routeProps: RouteComponentProps<any>) => (
+            <route.component key={routeProps.location.key} {...routeProps} />
+          )}
+        />
+      ))}
+      <Redirect exact={true} to={PUBLIC_ROUTES.login} />
+    </Switch>
+  ) : null;
 };

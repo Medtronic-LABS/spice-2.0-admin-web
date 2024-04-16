@@ -1,4 +1,3 @@
-import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import { IPeerSupervisor, IUserRole, IVillages } from '../healthFacility/types';
@@ -240,6 +239,45 @@ export interface IUpdateUserFailure {
   type: typeof USER_TYPES.UPDATE_USER_FAILURE;
 }
 
+export interface IChangePasswordReq {
+  type: typeof USER_TYPES.CHANGE_PASSWORD_REQUEST;
+  data: {
+    userId: number;
+    password: string;
+    successCB: () => void;
+    failureCb?: (error: Error) => void;
+  };
+}
+
+export interface IChangePasswordSuccess {
+  type: typeof USER_TYPES.CHANGE_PASSWORD_SUCCESS;
+}
+
+export interface IChangePasswordFail {
+  type: typeof USER_TYPES.CHANGE_PASSWORD_FAILURE;
+  error: any;
+}
+
+export interface IChangeOwnPasswordReq {
+  type: typeof USER_TYPES.CHANGE_OWN_PASSWORD_REQUEST;
+  data: {
+    userId: number;
+    oldPassword: string;
+    newPassword: string;
+    successCB: () => void;
+    failureCb?: (error: Error) => void;
+  };
+}
+
+export interface IChangeOwnPasswordSuccess {
+  type: typeof USER_TYPES.CHANGE_OWN_PASSWORD_SUCCESS;
+}
+
+export interface IChangeOwnPasswordFail {
+  type: typeof USER_TYPES.CHANGE_OWN_PASSWORD_FAILURE;
+  error: any;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -263,4 +301,10 @@ export type UserActions =
   | IFetchUserByIdFailure
   | IUpdateUserRequest
   | IUpdateUserSuccess
-  | IUpdateUserFailure;
+  | IUpdateUserFailure
+  | IChangePasswordReq
+  | IChangePasswordSuccess
+  | IChangePasswordFail
+  | IChangeOwnPasswordReq
+  | IChangeOwnPasswordSuccess
+  | IChangeOwnPasswordFail;

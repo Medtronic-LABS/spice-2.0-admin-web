@@ -129,11 +129,17 @@ const userReducer = (state = initialStateGetter(), action = {} as UserActions): 
         ...state,
         token: ''
       };
+    case USERTYPES.CHANGE_PASSWORD_REQUEST:
+    case USERTYPES.CHANGE_OWN_PASSWORD_REQUEST:
     case USERTYPES.FETCH_USER_BY_ID_REQUEST:
       return {
         ...state,
         loading: true
       };
+    case USERTYPES.CHANGE_PASSWORD_FAILURE:
+    case USERTYPES.CHANGE_PASSWORD_SUCCESS:
+    case USERTYPES.CHANGE_OWN_PASSWORD_FAILURE:
+    case USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS:
     case USERTYPES.FETCH_USER_BY_ID_FAILURE:
       return {
         ...state,

@@ -4,6 +4,7 @@ import { RouteComponentProps, useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
 import { FormApi } from 'final-form';
 
+import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -32,6 +33,8 @@ import {
 } from '../../store/healthFacility/selectors';
 import { IRoles } from '../../store/user/types';
 import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
+import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
+import { changePassword } from '../../store/user/actions';
 
 interface IMatchParams {
   tenantId: string;
@@ -218,6 +221,35 @@ const UserList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
+  // state for Change Password
+  const [openModal, setOpenModal] = useState({ isOpen: false, userData: {} as IHFUserGet });
+  const [submitEnable, setSubmitEnabled] = useState(false);
+
+  const onModalCancel = () => {
+    setOpenModal({ isOpen: false, userData: {} as IHFUserGet });
+  };
+
+  const handleChangePassword = (userData: IHFUserGet) => {
+    setOpenModal({ isOpen: true, userData });
+  };
+
+  const handleFormSubmit = (data: any) => {
+    const password = generatePassword(data.newPassword);
+    dispatch(
+      changePassword({
+        userId: Number(openModal.userData?.id),
+        password,
+        successCB: () => {
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_CHANGE_SUCCESS);
+          onModalCancel();
+        },
+        failureCb: (e) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED));
+        }
+      })
+    );
+  };
+
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
@@ -277,6 +309,11 @@ const UserList = (props: IMatchProps): React.ReactElement => {
             count={hfUserCount}
             confirmationTitle={APPCONSTANTS.USER_DELETE_CONFIRMATION}
             deleteTitle={APPCONSTANTS.USER_DELETE_TITLE}
+            onCustomConfirmed={handleChangePassword}
+            CustomIcon={PasswordChangeIcon}
+            customTitle='Change Password'
+            isCustom={true}
+            customIconStyle={{ width: 18 }}
           />
         </DetailCard>
         <ModalForm
@@ -290,8 +327,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
           render={userFormRenderer}
           mutators={{ ...arrayMutators }}
         />
-        {/* To be added later */}
-        {/* <ModalForm
+        <ModalForm
           show={openModal.isOpen}
           title={'Change Password'}
           cancelText={'Cancel'}
@@ -306,7 +342,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
             setSubmitEnabled={setSubmitEnabled}
             adminPasswordChange={false}
           />
-        </ModalForm> */}
+        </ModalForm>
       </div>
     </>
   );

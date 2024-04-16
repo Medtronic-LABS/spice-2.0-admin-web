@@ -2,8 +2,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import MyProfile from '../MyProfile';
+import { REGION_LIST } from '../../../tests/mockData/healthFacilityConstants';
 
 const mockStore = configureMockStore();
+const regionList = REGION_LIST;
 
 describe('MyProfile component', () => {
   it('should render user details', async () => {
@@ -42,6 +44,9 @@ describe('MyProfile component', () => {
             countryCode: '232'
           }
         ]
+      },
+      healthFacility: {
+        healthFacilityList: regionList
       }
     });
     render(

@@ -25,7 +25,13 @@ import {
   IFetchUserByIdFailure,
   IUpdateUserRequest,
   IUpdateUserSuccess,
-  IUpdateUserFailure
+  IUpdateUserFailure,
+  IChangePasswordReq,
+  IChangePasswordSuccess,
+  IChangePasswordFail,
+  IChangeOwnPasswordReq,
+  IChangeOwnPasswordSuccess,
+  IChangeOwnPasswordFail
 } from './types';
 
 export const loginRequest = ({
@@ -182,4 +188,43 @@ export const updateUserSuccess = (): IUpdateUserSuccess => ({
 
 export const updateUserFailure = (): IUpdateUserFailure => ({
   type: USER_TYPES.UPDATE_USER_FAILURE
+});
+
+export const changePassword = (data: {
+  userId: number;
+  password: string;
+  successCB: () => void;
+  failureCb?: (error: Error) => void;
+}): IChangePasswordReq => ({
+  type: USER_TYPES.CHANGE_PASSWORD_REQUEST,
+  data
+});
+
+export const changePasswordSuccess = (): IChangePasswordSuccess => ({
+  type: USER_TYPES.CHANGE_PASSWORD_SUCCESS
+});
+
+export const changePasswordFail = (error: any): IChangePasswordFail => ({
+  type: USER_TYPES.CHANGE_PASSWORD_FAILURE,
+  error
+});
+
+export const changeOwnPassword = (data: {
+  userId: number;
+  oldPassword: string;
+  newPassword: string;
+  successCB: () => void;
+  failureCb?: (error: Error) => void;
+}): IChangeOwnPasswordReq => ({
+  type: USER_TYPES.CHANGE_OWN_PASSWORD_REQUEST,
+  data
+});
+
+export const changeOwnPasswordSuccess = (): IChangeOwnPasswordSuccess => ({
+  type: USER_TYPES.CHANGE_OWN_PASSWORD_SUCCESS
+});
+
+export const changeOwnPasswordFail = (error: any): IChangeOwnPasswordFail => ({
+  type: USER_TYPES.CHANGE_OWN_PASSWORD_FAILURE,
+  error
 });

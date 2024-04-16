@@ -34,7 +34,7 @@ export const healthFacilityLoadingSelector = createSelector(getLoading, (loading
 export const hfTypesSelector = createSelector(getHFTypes, (types) => types);
 export const hfTypesLoadingSelector = createSelector(getHFTYpesLoading, (loading) => loading);
 export const healthFacilityListTotalSelector = createSelector(getHFTotal, (total) => total);
-export const healthFacilityListSelector = createSelector(getHFListDetails, (siteList) => siteList);
+export const healthFacilityListSelector = createSelector(getHFListDetails, (hfList) => hfList);
 export const healthFacilityUserListSelector = createSelector(getHFUserList, (siteUserList) => siteUserList);
 export const healthFacilityUsersLoadingSelector = createSelector(getHFUserLoading, (hfUsersLoading) => hfUsersLoading);
 export const healthFacilityListUsersTotalSelector = createSelector(getHFUsersTotal, (total) => total);
