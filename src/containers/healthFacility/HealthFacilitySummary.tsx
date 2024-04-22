@@ -42,7 +42,7 @@ import Loader from '../../components/loader/Loader';
 
 interface IMatchParams {
   healthFacilityId: string;
-  tenantId: string;
+  hfTenantId: string;
 }
 
 interface ISummaryUsersState {
@@ -99,7 +99,7 @@ export const formatHFUserData = (userData: any[], countryId: number | string, te
 
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { healthFacilityId, tenantId } = useParams<IMatchParams>();
+  const { healthFacilityId, hfTenantId } = useParams<IMatchParams>();
   const healthFacility = useSelector(healthFacilitySelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const regionData = useSelector(userDataSelector).country;
@@ -161,7 +161,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       clearVillageList();
     };
     // eslint-disable-next-line
-  }, [listParams, tenantId, dispatch]);
+  }, [listParams, hfTenantId, dispatch]);
 
   /*
    * Load initial health facility summary details
@@ -169,14 +169,14 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const refreshHFDetails = useCallback(() => {
     dispatch(
       fetchHFSummaryRequest({
-        tenantId: Number(tenantId),
+        tenantId: Number(hfTenantId),
         id: Number(healthFacilityId),
         failureCb: (e) => {
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR);
         }
       })
     );
-  }, [dispatch, healthFacilityId, tenantId]);
+  }, [dispatch, healthFacilityId, hfTenantId]);
 
   const fetchFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, errorMessage));
@@ -186,7 +186,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     dispatch(
       fetchHFUserListRequest({
         countryId: regionData.id,
-        tenantId,
+        tenantId: hfTenantId,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
@@ -284,7 +284,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, regionData.id, tenantId);
+    const userObj = formatHFUserData(users, regionData.id, hfTenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -313,7 +313,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, regionData.id, tenantId);
+    const userObj = formatHFUserData(users, regionData.id, hfTenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({
@@ -327,12 +327,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
-  const handleUserDelete = ({ data: { id, tenantId: userTenantId } }: { data: { id: number; tenantId: number } }) => {
+  const handleUserDelete = ({ data: { id } }: { data: { id: number } }) => {
     dispatch(
       deleteHFUserRequest({
         data: {
           id,
-          tenantIds: [userTenantId]
+          tenantIds: [Number(hfTenantId)]
         },
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS);
@@ -372,7 +372,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         isHF={true}
         entityName='healthFacility'
         enableAutoPopulate={true}
-        hfTenantId={Number(tenantId)}
+        hfTenantId={Number(hfTenantId)}
       />
     );
   };

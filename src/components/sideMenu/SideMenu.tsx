@@ -4,7 +4,7 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 
 import styles from './SideMenu.module.scss';
 import { useSelector } from 'react-redux';
-import { roleSelector } from '../../store/user/selectors';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
 
 interface ISideMenuItem {
@@ -65,44 +65,80 @@ const adminRoutes: ISideMenuItem[] = [
 const SideMenu = ({ className }: ISideMenuProps) => {
   const { pathname } = useLocation();
   const role = useSelector(roleSelector);
+  const regionData = useSelector(userDataSelector).country;
 
-  const { regionId, regionTenantId, healthFacilityId } = useMemo(() => {
-    const matchedRoute = (role === APPCONSTANTS.ROLES.SITE_ADMIN ? adminRoutes : superAdminRoutes).find(
+  const { regionId, tenantId, healthFacilityId, hfTenantId } = useMemo(() => {
+    const matchedRoute = (role === APPCONSTANTS.ROLES.SITE_ADMIN ? [...adminRoutes] : [...superAdminRoutes]).find(
       ({ route, childRoutes }) => {
-        return [...(childRoutes || []), route].some((newRoute) => matchPath(pathname, { path: newRoute, exact: true }));
+        return [...(childRoutes || []), route]
+          .filter((v) => v)
+          .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true }));
       }
     );
     if (matchedRoute) {
       const params = matchPath(pathname, { path: matchedRoute.route, exact: true })?.params as any;
+      let childParams: any[] = [];
+      if (!params) {
+        childParams =
+          matchedRoute.childRoutes?.map(
+            (childRoute) => matchPath(pathname, { path: childRoute, exact: true })?.params as any
+          ) || [];
+      }
+      const allParams: any[] = [...childParams, params].filter((param) => param);
+
       return {
-        regionId: params?.regionId,
-        regionTenantId: params?.tenantId,
-        healthFacilityId: params?.healthFacilityId
+        regionId: allParams?.[0]?.regionId || regionData?.id,
+        tenantId: allParams?.[0]?.tenantId || regionData?.tenantId,
+        healthFacilityId: allParams?.[0]?.healthFacilityId,
+        hfTenantId: allParams?.[0]?.hfTenantId
       };
     }
     return {};
-  }, [pathname, role]);
+  }, [pathname, regionData, role]);
 
   const sideMenu = useMemo(() => {
     let choosenRoutes: ISideMenuItem[] = [];
     const pathParams: Array<[string, string]> = [];
-    if (regionId || healthFacilityId) {
-      choosenRoutes = [...(role === 'SITE_ADMIN' ? adminRoutes : superAdminRoutes)];
-      pathParams.push([':regionId', regionId], [':healthFacilityId', healthFacilityId], [':tenantId', regionTenantId]);
-    }
+    const newMenu = [...(role === APPCONSTANTS.ROLES.SITE_ADMIN ? [...adminRoutes] : [...superAdminRoutes])].map(
+      (routes) => ({ ...routes, childRoutes: [...(routes.childRoutes || [])] })
+    );
+    choosenRoutes = newMenu;
+    pathParams.push(
+      [':regionId', regionId],
+      [':healthFacilityId', healthFacilityId],
+      [':tenantId', tenantId],
+      [':hfTenantId', hfTenantId]
+    );
     return choosenRoutes.map((menu: ISideMenuItem) => {
       menu = { ...menu };
       pathParams.forEach(([paramName, paramValue]) => {
-        menu.route = menu.route.replace(paramName, paramValue);
+        if (paramValue) {
+          menu.route = menu.route.replace(paramName, paramValue);
+          menu.childRoutes?.forEach((childRoute, i) => {
+            if (menu.childRoutes?.length) {
+              menu.childRoutes[i] = childRoute.replace(paramName, paramValue);
+            }
+          });
+        }
       });
       return menu;
     });
-  }, [healthFacilityId, regionId, regionTenantId, role]);
+  }, [role, regionId, healthFacilityId, tenantId, hfTenantId]);
 
   return (
     <div className={`${styles.sideMenu} py-0dot25 ${className}`}>
-      {sideMenu.map(({ label, route, disabled }: any, i: number) => {
-        const isActive = matchPath(pathname, { exact: true, path: route });
+      {sideMenu.map(({ label, route, disabled, childRoutes }: any, i: number) => {
+        let isActive = false;
+        const params = matchPath(pathname, { path: route, exact: true }) as any;
+        let childParams: any[] = [];
+        if (!params) {
+          childParams = (childRoutes || [])
+            ?.map((childRoute: any) => matchPath(pathname, { path: childRoute, exact: true })?.params as any)
+            .filter((param: any) => param);
+          isActive = !!childParams.length;
+        } else {
+          isActive = !!params;
+        }
         return (
           <NavLink
             to={route}

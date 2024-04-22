@@ -12,7 +12,7 @@ export const PROTECTED_ROUTES = {
   region: '/region/:regionId/:tenantId',
   healthFacilityBySuperAdmin: '/region/:regionId/healthFacility/list',
   healthFacilityByAdmin: '/healthFacility/list',
-  healthFacilitySummary: '/healthFacility/:healthFacilityId/:tenantId',
+  healthFacilitySummary: '/healthFacility/:healthFacilityId/:hfTenantId',
   createHealthFacility: '/region/:regionId/healthFacility/create',
   usersBySuperAdmin: '/region/:regionId/users/list',
   usersByAdmin: '/users/list',

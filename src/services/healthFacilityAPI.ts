@@ -10,7 +10,14 @@ import {
   IHealthFacilityPost
 } from '../store/healthFacility/types';
 
-export const fetchHealthFacilityList = ({ countryId, limit, skip, userBased, searchTerm }: IFetchHFListRequest) =>
+export const fetchHealthFacilityList = ({
+  countryId,
+  limit,
+  skip,
+  userBased,
+  tenantBased,
+  searchTerm
+}: IFetchHFListRequest) =>
   axios({
     method: 'POST',
     url: 'admin-service/healthfacility/list',
@@ -19,6 +26,7 @@ export const fetchHealthFacilityList = ({ countryId, limit, skip, userBased, sea
       skip: skip || null,
       countryId,
       userBased,
+      tenantBased,
       ...(searchTerm ? { searchTerm: searchTerm || null } : {})
     }
   });

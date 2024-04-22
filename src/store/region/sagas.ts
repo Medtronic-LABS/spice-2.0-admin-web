@@ -50,9 +50,10 @@ export function* regionDetailsSaga({
       data: { entityList: regionDetails, totalCount }
     } = yield call(regionService.regionDetails, countryId, limit, skip, search);
     const payload = {
-      list: regionDetails[0]?.id
-        ? regionDetails
-        : regionDetails.map((d: IRegionDetails, id: number) => ({ ...d, id: id + 1 })),
+      list:
+        regionDetails === null || regionDetails[0]?.id
+          ? regionDetails
+          : regionDetails.map((d: IRegionDetails, id: number) => ({ ...d, id: id + 1 })),
       total: totalCount
     };
     successCb?.(payload);

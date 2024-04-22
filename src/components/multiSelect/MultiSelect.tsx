@@ -125,8 +125,10 @@ const MultiSelect = (props: any) => {
       return newProps.onChange(selected);
     } else {
       return newProps.onChange([
-        ...props.mandatoryOptions,
-        ...newProps.value?.filter(({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase()))
+        ...(props?.mandatoryOptions || []),
+        ...(newProps.value || [])?.filter(
+          ({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase())
+        )
       ]);
     }
   };

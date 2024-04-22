@@ -82,7 +82,7 @@ const Region = (): React.ReactElement => {
     <>
       {loading && <Loader />}
       <div className={` row g-0dot625 position-relative h-100`}>
-        {!loading && !regionDetails.list.length ? (
+        {!loading && Array.isArray(regionDetails.list) && !regionDetails.list.length ? (
           <div
             className={`${dragDropStyles.dragDropContainer} d-flex justify-content-center align-items-center`}
             onDragOver={(e) => e.preventDefault()}
@@ -109,7 +109,7 @@ const Region = (): React.ReactElement => {
               onButtonClick={onDownloadClick}
             >
               <CustomTable
-                rowData={regionDetails.list}
+                rowData={regionDetails.list ? regionDetails.list : []}
                 columnsDef={[
                   {
                     id: 1,

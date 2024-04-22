@@ -83,10 +83,10 @@ const UserForm = ({
   const villagesList = useSelector(villagesFromHFListSelector);
   const villagesLoading = useSelector(villagesFromHFLoadingSelector);
   const role = useSelector(roleSelector);
-  const [peerSupervisors, setPeerSupervisors] = useState([] as IPeerSupervisor[][]);
-  const [villages, setVillages] = useState([] as IVillages[][]);
+  const [peerSupervisors, setPeerSupervisors] = useState([[...peerSupervisorList.list]] as IPeerSupervisor[][]);
+  const [villages, setVillages] = useState([[...villagesList.list]] as IVillages[][]);
 
-  const [autoFetchData, setAutoFetchData] = useState([] as any);
+  const [autoFetchData, setAutoFetchData] = useState([] as any[]);
   const [isCHWUser, setUserAsCHW] = useState([false]);
   const roleOptions = useRef<IRoles[][]>([]);
 
@@ -130,6 +130,7 @@ const UserForm = ({
   );
 
   const [autoFetched, setAutoFetched] = useState<boolean[]>([]);
+  const fetchedData = useRef([] as any[]);
 
   const autoPopulateUserData = (user: any, index: number) => {
     const userData = {
@@ -159,6 +160,9 @@ const UserForm = ({
     const newAutoFetched = [...autoFetched];
     newAutoFetched[index] = true;
     setAutoFetched(newAutoFetched);
+    const newFetchedData = [...fetchedData.current];
+    newFetchedData[index] = userData;
+    fetchedData.current = newFetchedData;
     roleOptionSelection(userData.suiteAccess.groupName, index, userData.roles);
     isCHWUserSelectedFn(userData.role, index);
     if (isCHWSelected(userData.roles)) {
@@ -473,14 +477,16 @@ const UserForm = ({
                                 // To clear the Selected village during Add User
                                 form.change(`${formName}[${index}].villages`, {});
                               }
-                              const tenantIds = [...initialEditData[index].hfTenantIds, hfTenantId].filter(
-                                (v: number) => v
-                              );
+                              const tenantIds = [
+                                ...initialEditData[index].hfTenantIds,
+                                ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
+                                hfTenantId
+                              ].filter((v: number) => v);
                               fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'village', index);
                               fetchListWithConditions(
                                 selectedRoles(index),
                                 tenantIds,
-                                villagesList,
+                                peerSupervisorList,
                                 'supervisor',
                                 index
                               );

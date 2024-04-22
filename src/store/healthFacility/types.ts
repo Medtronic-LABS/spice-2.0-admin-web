@@ -110,6 +110,7 @@ export interface IFetchHFListRequest {
   limit: number | null;
   searchTerm?: string;
   userBased?: boolean;
+  tenantBased?: boolean;
   successCb?: (data: IFetchHFListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
 }

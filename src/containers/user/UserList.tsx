@@ -83,12 +83,12 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   }, [refreshHFUserList]);
 
   const handleUserDelete = useCallback(
-    ({ data: { id, organizations } }: { data: { id: number; organizations: any[] } }) => {
+    ({ data: { id, organizations = [] } }: { data: { id: number; organizations: any[] } }) => {
       dispatch(
         deleteHFUserRequest({
           data: {
             id,
-            tenantIds: [Number(organizations.map((s) => s.id))]
+            tenantIds: organizations.map((s) => Number(s.id))
           },
           successCb: () => {
             toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DELETE_SUCCESS);

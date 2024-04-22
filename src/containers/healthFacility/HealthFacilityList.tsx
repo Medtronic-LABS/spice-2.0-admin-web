@@ -143,7 +143,7 @@ const HealthFacilityList = (): React.ReactElement => {
 
   const handleRowClick = (data: any) => {
     history.push(
-      PROTECTED_ROUTES.healthFacilitySummary.replace(':healthFacilityId', data.id).replace(':tenantId', data.tenantId)
+      PROTECTED_ROUTES.healthFacilitySummary.replace(':healthFacilityId', data.id).replace(':hfTenantId', data.tenantId)
     );
   };
 

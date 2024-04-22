@@ -83,13 +83,22 @@ export function* fetchHealthFacilityList({
   skip,
   limit,
   searchTerm,
+  userBased,
+  tenantBased,
   successCb,
   failureCb
 }: IFetchHFListRequest): SagaIterator {
   try {
     const {
       data: { entityList: healthFacilities, totalCount: total }
-    } = yield call(hfService.fetchHealthFacilityList as any, { countryId, limit, skip, searchTerm });
+    } = yield call(hfService.fetchHealthFacilityList as any, {
+      countryId,
+      limit,
+      skip,
+      searchTerm,
+      userBased,
+      tenantBased
+    });
     const payload = { healthFacilityList: healthFacilities || [], total, limit };
     successCb?.({ healthFacilityList: healthFacilities || [], total, limit });
     yield put(fetchHFListSuccess(payload));
