@@ -105,7 +105,7 @@ const UserForm = ({
         villages: [],
         supervisor: '',
         organizations: [],
-        country: {}
+        country: ''
       }
     ],
     []
@@ -658,7 +658,7 @@ const UserForm = ({
                           <Field
                             name={`${name}.villages`}
                             type='text'
-                            validate={required}
+                            validate={(value) => required(Array.isArray(value) ? value : [])}
                             render={({ input, meta }) => {
                               const mandatoryVillages = form.getState().values.users[index].selectedVillages || [];
                               return (
@@ -671,6 +671,7 @@ const UserForm = ({
                                   required={true}
                                   isShowLabel={true}
                                   isSelectAll={true}
+                                  placeholder=''
                                   menuPlacement={'bottom'}
                                   isDisabled={isProfile}
                                   isModel={true}

@@ -168,6 +168,7 @@ const MultiSelect = (props: any) => {
           inputValue={selectInput}
           onInputChange={onInputChange}
           onKeyDown={onKeyDown}
+          required={null}
           options={[allOption, ...newProps.options]}
           placeholder={newProps.placeholder || ''}
           onChange={handleChange}
