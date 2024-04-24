@@ -24,12 +24,17 @@ interface ILoginForm {
 
 const Login = (props: any): React.ReactElement => {
   const dispatch = useDispatch();
-  const initialFormValues = useRef({} as ILoginForm);
+  const username = localStorageServices.getItem(APPCONSTANTS.USERNAME);
+  const password = localStorageServices.getItem(APPCONSTANTS.PASSWORD);
+  const rememberMe = localStorageServices.getItem(APPCONSTANTS.REMEMBER_ME);
+  const initialFormValues = useRef({
+    email: username || '',
+    password: password ? decryptData(password) : '',
+    rememberMe
+  } as ILoginForm);
   const [isShowPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    const username = localStorageServices.getItem(APPCONSTANTS.USERNAME);
-    const password = localStorageServices.getItem(APPCONSTANTS.PASSWORD);
     if (username && password) {
       initialFormValues.current = {
         email: username,
@@ -40,12 +45,12 @@ const Login = (props: any): React.ReactElement => {
     return () => {
       toastCenter.dismissAllToast();
     };
-  }, []);
+  }, [password, username]);
 
   const onSubmit = ({
     email,
-    password,
-    rememberMe = false
+    password: newPassword,
+    rememberMe: newRememberMe = false
   }: {
     email: string;
     password: string;
@@ -54,8 +59,8 @@ const Login = (props: any): React.ReactElement => {
     dispatch(
       loginRequest({
         username: email,
-        password,
-        rememberMe,
+        password: newPassword,
+        rememberMe: newRememberMe,
         failureCb: (e: Error) => {
           toastCenter.error(
             ...getErrorToastArgs(
@@ -83,9 +88,10 @@ const Login = (props: any): React.ReactElement => {
           <b>Welcome</b>
         </div>
         <div className={`primary-title text-center ${styles.loginTitle}`}>Login to your account</div>
+
         <Form
           onSubmit={onSubmit}
-          initialValues={initialFormValues}
+          initialValues={initialFormValues.current}
           render={({ handleSubmit, valid }) => (
             <form onSubmit={handleSubmit}>
               <Field
