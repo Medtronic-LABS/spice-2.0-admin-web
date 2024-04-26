@@ -250,7 +250,7 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
-  const countryList = [{ phoneNumberCode: '232', id: '232' }];
+  const countryList = [{ phoneNumberCode: '232', id: 1 }];
   const isCountryListLoading = false;
 
   // roles based CHW related utils

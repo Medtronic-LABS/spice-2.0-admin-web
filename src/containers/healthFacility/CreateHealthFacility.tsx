@@ -12,7 +12,7 @@ import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import Workflows from './Workflows';
 import APPCONSTANTS from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import { createHFRequest } from '../../store/healthFacility/actions';
+import { createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility, formatHFUserData } from './HealthFacilitySummary';
 import { IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
@@ -108,12 +108,33 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
     if (submittedData.isNextClicked && regionId) {
       const postData = {
-        ...formatHealthFacility({ ...healthFacility, clinicalWorkflows: workflows }, regionId),
+        ...formatHealthFacility({ ...healthFacility }, regionId),
         users: formatHFUserData(users, regionId)
       };
       dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
     } else {
-      setSubmittedData({ data: { healthFacility, users }, isNextClicked: true });
+      if (!workflows.length) {
+        dispatch(
+          fetchWorkflowListRequest({
+            countryId: Number(regionId),
+            successCb: (flows) => {
+              setSubmittedData({
+                data: { healthFacility: { ...healthFacility, workflows: flows.map((v: any) => v.id) }, users },
+                isNextClicked: true
+              });
+            },
+            failureCb: (error) =>
+              toastCenter.error(
+                ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+              )
+          })
+        );
+      } else {
+        setSubmittedData({
+          data: { healthFacility: { ...healthFacility, workflows: workflows.map((v: any) => v.id) }, users },
+          isNextClicked: true
+        });
+      }
     }
   };
 
@@ -135,7 +156,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
               <div className='row g-1dot25'>
                 {submittedData.isNextClicked ? (
                   <FormContainer label='Clinical Workflows Involved' icon={SiteDetailsIcon}>
-                    <Workflows />
+                    <Workflows formName='healthFacility' form={form} />
                   </FormContainer>
                 ) : (
                   <>

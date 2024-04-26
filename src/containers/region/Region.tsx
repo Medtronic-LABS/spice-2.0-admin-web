@@ -119,7 +119,7 @@ const Region = (): React.ReactElement => {
                   {
                     id: 2,
                     name: 'chiefdomname',
-                    label: 'CHEIFDOM'
+                    label: 'CHIEFDOM'
                   },
                   {
                     id: 3,

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { matchPath, useLocation } from 'react-router-dom';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import { roleSelector } from '../../store/user/selectors';
+import { initializingSelector, roleSelector } from '../../store/user/selectors';
 import { stopPropogation } from '../../utils/commonUtils';
 import Breadcrumb from '../breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
@@ -61,7 +61,9 @@ export const AppLayout = ({ children }: IAppLayout) => {
       !Boolean(
         routesWithSideMenu.find(
           ({ route, childRoutes, disabledRoles }) =>
-            [...(childRoutes || []), route].some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
+            [...(childRoutes || []), route]
+              .filter((v) => v)
+              .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
             !disabledRoles?.includes(role)
         )
       ),
@@ -73,7 +75,7 @@ export const AppLayout = ({ children }: IAppLayout) => {
     [pathname]
   );
 
-  const initializingApp = false;
+  const initializingApp = useSelector(initializingSelector);
 
   // menu toggling in low resolution device
   const menuEnabledResolution = 1100;

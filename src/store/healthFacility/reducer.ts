@@ -276,6 +276,11 @@ const healthFacilityReducer = (
         ...state,
         hfTypesLoading: false
       };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HEALTH_FACILITY_DETAIL:
+      return {
+        ...state,
+        healthFacility: initialState.healthFacility
+      };
     default:
       return state;
   }

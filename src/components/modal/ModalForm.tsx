@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { Form } from 'react-final-form';
-import React from 'react';
+import React, { useRef } from 'react';
 import { FormApi } from 'final-form';
 
 import close from '../../assets/images/close.svg';
@@ -23,7 +23,7 @@ export interface IModalProps {
   hideFooterButton?: boolean;
   handleFormSubmit: (values?: any) => void;
   handleDeactivate?: () => void;
-  render?: (form?: FormApi<any>) => React.ReactElement;
+  render?: (form?: FormApi<any>, ref?: HTMLDivElement | null) => React.ReactElement;
   mutators?: object;
   initialValues?: object;
   size?: IModalSize;
@@ -50,14 +50,15 @@ const ModalForm = React.memo(
     render,
     mutators
   }: IModalProps) => {
+    const ref = useRef<HTMLDivElement>(null);
     if (!show) {
       return null;
     }
     return ReactDOM.createPortal(
-      <div className={`${styles.modal} modal modal-show`}>
+      <div ref={ref} className={`${styles.modal} modal modal-show`}>
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
           <div className={`modal-content ${styles.modalContent}`}>
-            <div className='modal-header py-1 px-1dot25'>
+            <div id='modal-header' className='modal-header py-1 px-1dot25'>
               <h5 className={`modal-title ${styles.modalTitle}`}>{title}</h5>
               <div
                 className={`d-flex justify-content-center align-items-center ${styles.closeIcon}`}
@@ -84,7 +85,7 @@ const ModalForm = React.memo(
                     }}
                   >
                     <div className={`${styles.scroll} modal-body px-1dot25 py-1dot5`}>
-                      {render ? render(form) : children}
+                      {render ? render(form, ref.current) : children}
                     </div>
                     {!hideFooterButton && (
                       <div className={`modal-footer py-0dot75 px-1dot25`}>

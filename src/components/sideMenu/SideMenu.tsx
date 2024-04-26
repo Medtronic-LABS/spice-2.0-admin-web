@@ -25,11 +25,6 @@ const superAdminRoutes: ISideMenuItem[] = [
     disabled: false
   },
   {
-    label: 'Health Facility Workflows',
-    route: '',
-    disabled: false
-  },
-  {
     label: 'Medication Database',
     route: PROTECTED_ROUTES.medicationByRegion,
     disabled: false
@@ -54,7 +49,8 @@ const superAdminRoutes: ISideMenuItem[] = [
 const adminRoutes: ISideMenuItem[] = [
   {
     label: 'Health Facility',
-    route: PROTECTED_ROUTES.healthFacilityByAdmin
+    route: PROTECTED_ROUTES.healthFacilityByAdmin,
+    childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
   },
   {
     label: 'Users',

@@ -76,7 +76,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
-    clinicalWorkflowIds: (hf.clinicalWorkflows || []).map(({ id }: { id: number }) => id)
+    workflowIds: hf.workflows
   };
   return postData;
 };
@@ -232,9 +232,15 @@ const HealthFacilitySummary = (): React.ReactElement => {
     });
   };
 
-  const editHFDetailsModalRender = (form: any) => {
+  const editHFDetailsModalRender = (form: any, ref: HTMLDivElement | null | undefined) => {
     return (
-      <HealthFacilityDetailsForm formName='healthFacility' form={form} isEdit={true} data={editHFDetailsModal.data} />
+      <HealthFacilityDetailsForm
+        formName='healthFacility'
+        form={form}
+        modalRef={ref}
+        isEdit={true}
+        data={editHFDetailsModal.data}
+      />
     );
   };
 

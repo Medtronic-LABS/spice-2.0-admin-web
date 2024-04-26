@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { matchPath, useLocation } from 'react-router';
 
@@ -10,6 +10,8 @@ import APPCONSTANTS from '../../constants/appConstants';
 
 import styles from './Breadcrumb.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { healthFacilitySelector } from '../../store/healthFacility/selectors';
+import { clearHealthFaciliityDetail } from '../../store/healthFacility/actions';
 
 interface ISection {
   route: string;
@@ -17,9 +19,14 @@ interface ISection {
   appendParent?: boolean;
 }
 
-const superAdminRoutes = [PROTECTED_ROUTES.region];
+const superAdminRoutes = [PROTECTED_ROUTES.region, PROTECTED_ROUTES.healthFacilityBySuperAdmin];
+const adminRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.healthFacilityByAdmin];
 
-const customBreadcrumbs = [{ route: '', label: 'Add Medication', appendParent: true }];
+const customBreadcrumbs = [
+  { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
+  { route: PROTECTED_ROUTES.createHealthFacility, label: 'Add Health Facility', appendParent: true },
+  { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true }
+];
 
 /**
  * Dynamic breadcrumb for application
@@ -29,6 +36,7 @@ const Breadcrumb = (): React.ReactElement => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const region = useSelector(userDataSelector).country;
+  const healthFacility = useSelector(healthFacilitySelector);
   const role = useSelector(roleSelector);
 
   const activeRoute = useMemo(
@@ -45,24 +53,32 @@ const Breadcrumb = (): React.ReactElement => {
     }
   }, [pathname]);
 
+  const showHealthFacility = activeRoute.includes(':healthFacilityId');
   const showRegion =
-    (role !== APPCONSTANTS.ROLES.SUPER_ADMIN ||
-      APPCONSTANTS.ROLES.SUPER_USER ||
+    ([APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role) ||
       superAdminRoutes.includes(activeRoute)) &&
-    activeRoute.includes(':regionId');
+    (showHealthFacility || activeRoute.includes(':regionId'));
 
   const sections: ISection[] = useMemo(() => {
     const result = [];
     if (customBreadcrumb && !customBreadcrumb.appendParent) {
       // we have a custom breadcrumb for certain routes
-      // this if block executes when current route is one of customBreadcrumb routes
+      // this block executes when current route is one of customBreadcrumb routes
       result.push(customBreadcrumb);
-      return result; // function execution ends here
+      return result;
     }
     if (region?.name && showRegion) {
       result.push({
         label: region.name,
         route: PROTECTED_ROUTES.region.replace(':regionId', region.id).replace(':tenantId', region.tenantId)
+      });
+    }
+    if (healthFacility?.name && showHealthFacility) {
+      result.push({
+        label: healthFacility.name,
+        route: PROTECTED_ROUTES.healthFacilitySummary
+          .replace(':healthFacilityId', String(healthFacility.id))
+          .replace(':hfTenantId', String(healthFacility.tenantId))
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
@@ -77,7 +93,17 @@ const Breadcrumb = (): React.ReactElement => {
       });
     }
     return result;
-  }, [customBreadcrumb, region, showRegion]);
+  }, [
+    customBreadcrumb,
+    healthFacility.id,
+    healthFacility.name,
+    healthFacility.tenantId,
+    region.id,
+    region.name,
+    region.tenantId,
+    showHealthFacility,
+    showRegion
+  ]);
 
   const dispatchData = useCallback((routeObject: any, name: string) => {
     return {
@@ -87,58 +113,30 @@ const Breadcrumb = (): React.ReactElement => {
     };
   }, []);
 
-  const urlRouteIdDispatch = useCallback((label: any, routeInitArray?: string[], currentRouteArr?: any[]) => {
-    let routeObject: any = {};
-    if (routeInitArray && currentRouteArr && routeInitArray.length === currentRouteArr.length) {
-      routeInitArray?.forEach((route: string, i: number) => {
-        routeObject = { ...routeObject, [i === 1 ? 'name' : route]: currentRouteArr[i] };
-      });
-      if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.REGION) {
-        // dispatch(setRegionDetails(dispatchData(routeObject, label)));
-      }
-    }
-  }, []);
-
-  const dataPersistOnRefresh = useCallback(() => {
-    const storedBC = sessionStorageServices.getItem('breadCrumbs');
-    if (storedBC) {
-      const breadCrumbs = JSON.parse(storedBC);
-      breadCrumbs.forEach((bc: ISection) => {
-        const isCustomPath = Boolean(
-          customBreadcrumbs.find(({ route }) => Boolean(matchPath(bc.route, { path: route, exact: true })))
-        );
-        if (!isCustomPath) {
-          const routeMatch = Object.values(PROTECTED_ROUTES).find((route) =>
-            Boolean(matchPath(bc.route, { path: route, exact: true }))
-          );
-          const routeInitArray = routeMatch?.split('/');
-          const currentRouteArr = bc.route?.split('/');
-
-          urlRouteIdDispatch(bc.label, routeInitArray, currentRouteArr);
-        }
-      });
-      sessionStorageServices.deleteItem('breadCrumbs');
-    }
-  }, [urlRouteIdDispatch]);
-
-  // const prevPathname = useRef(pathname);
+  const prevPathname = useRef(pathname);
   // Clearing the region/account/ou/site data in reducer, to prevent showing wrong data in breadcrumb
   useEffect(() => {
-    // if (prevPathname.current !== pathname) {
-    //   const prevRoute = {
-    //     isRegionRoute: Boolean(
-    //       superAdminRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
-    //     )
-    //   };
-    //   const currRoute = {
-    //     isRegionRoute: Boolean(
-    //       superAdminRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
-    //     )
-    //   };
-    //   prevPathname.current = pathname;
-    // }
-    dataPersistOnRefresh();
-  }, [dataPersistOnRefresh, dispatch, dispatchData, pathname, region]);
+    if (prevPathname.current !== pathname) {
+      const prevRoute = {
+        isRegionRoute: Boolean(
+          superAdminRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        ),
+        isAdminRoute: Boolean(
+          adminRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        )
+      };
+      const currRoute = {
+        isRegionRoute: Boolean(
+          superAdminRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        ),
+        isAdminRoute: Boolean(adminRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true }))))
+      };
+      if (prevRoute.isAdminRoute && currRoute.isRegionRoute) {
+        dispatch(clearHealthFaciliityDetail());
+      }
+      prevPathname.current = pathname;
+    }
+  }, [dispatch, dispatchData, pathname, region]);
 
   const sessionStoreEvent = useCallback(() => {
     sessionStorageServices.setItem(`breadCrumbs`, `${JSON.stringify(sections)}`);
@@ -151,16 +149,10 @@ const Breadcrumb = (): React.ReactElement => {
     };
   }, [sessionStoreEvent]);
 
-  const clearData = useCallback(() => {
-    // dispatch(clearRegionDetail());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
-        onClick={clearData}
         to={HOME_PAGE_BY_ROLE[role].replace(':regionId', region?.id).replace(':tenantId', region?.tenantId)}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />

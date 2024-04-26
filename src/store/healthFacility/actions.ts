@@ -457,3 +457,7 @@ export const fetchWorkflowListFailure = (error: Error): IFetchWorkflowListFailur
   type: SITE_TYPES.FETCH_WORKFLOW_LIST_FAILURE,
   error
 });
+
+export const clearHealthFaciliityDetail = () => ({
+  type: SITE_TYPES.CLEAR_HEALTH_FACILITY_DETAIL
+});

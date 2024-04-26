@@ -503,6 +503,10 @@ export interface IFetchWorkflowListFailure {
   error: Error;
 }
 
+export interface IClearHealthFacilityDetail {
+  type: typeof ACTION_TYPES.CLEAR_HEALTH_FACILITY_DETAIL;
+}
+
 export type HealthFacilityActions =
   | IFetchHFListRequest
   | IFetchHFListSuccess
@@ -554,4 +558,5 @@ export type HealthFacilityActions =
   | IFetchPeerSupervisorListFailure
   | IFetchWorkflowListRequest
   | IFetchWorkflowListSuccess
-  | IFetchWorkflowListFailure;
+  | IFetchWorkflowListFailure
+  | IClearHealthFacilityDetail;

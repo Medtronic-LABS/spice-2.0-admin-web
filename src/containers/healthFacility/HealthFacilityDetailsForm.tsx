@@ -40,6 +40,7 @@ import { IObjectData } from '../../store/healthFacility/types';
 interface IAddUserFormProps {
   formName: string;
   form: FormApi<any>;
+  modalRef?: any;
   isEdit?: boolean;
   data?: any;
 }
@@ -58,6 +59,7 @@ interface IMatchParams {
 const HealthFacilityDetailsForm = ({
   form,
   formName,
+  modalRef,
   isEdit = false,
   data = {}
 }: IAddUserFormProps & IMatchParams): React.ReactElement => {
