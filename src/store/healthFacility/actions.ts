@@ -1,4 +1,4 @@
-import * as SITE_TYPES from './actionTypes';
+import * as HF_TYPES from './actionTypes';
 import {
   IFetchHFListFailure,
   IFetchHFListRequest,
@@ -63,7 +63,15 @@ import {
   IHFUserGet,
   IFetchUserDetailRequest,
   IFetchUserDetailSuccess,
-  IFetchUserDetailFailure
+  IFetchUserDetailFailure,
+  IFetchCultureListSuccessPayload,
+  IFetchCountryListSuccessPayload,
+  IFetchCultureListRequest,
+  IFetchCultureListSuccess,
+  IFetchCultureListFailure,
+  IFetchCountryListRequest,
+  IFetchCountryListSuccess,
+  IFetchCountryListFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -76,7 +84,7 @@ export const fetchHFListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchHFListRequest, 'type'>): IFetchHFListRequest => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST,
   skip,
   limit,
   countryId,
@@ -87,12 +95,12 @@ export const fetchHFListRequest = ({
 });
 
 export const fetchHFListSuccess = (payload: IFetchHFListSuccessPayload): IFetchHFListSuccess => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_LIST_SUCCESS,
   payload
 });
 
 export const fetchHFListFailure = (error: Error): IFetchHFListFailure => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_LIST_FAILURE,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_LIST_FAILURE,
   error
 });
 
@@ -105,29 +113,29 @@ export const createHFRequest = ({
   successCb?: () => void;
   failureCb?: (error: ApiError) => void;
 }): ICreateHFRequest => ({
-  type: SITE_TYPES.CREATE_HEALTH_FACILITY_REQUEST,
+  type: HF_TYPES.CREATE_HEALTH_FACILITY_REQUEST,
   data,
   successCb,
   failureCb
 });
 
 export const createHFSuccess = (): ICreateHFSuccess => ({
-  type: SITE_TYPES.CREATE_HEALTH_FACILITY_SUCCESS
+  type: HF_TYPES.CREATE_HEALTH_FACILITY_SUCCESS
 });
 
 export const createHFFailure = (error: Error): ICreateHFFailure => ({
-  type: SITE_TYPES.CREATE_HEALTH_FACILITY_FAILURE,
+  type: HF_TYPES.CREATE_HEALTH_FACILITY_FAILURE,
   error
 });
 
 export const clearHFList = (): IClearHFList => ({
-  type: SITE_TYPES.CLEAR_HEALTH_FACILITY_LIST
+  type: HF_TYPES.CLEAR_HEALTH_FACILITY_LIST
 });
 export const clearSupervisorList = (): IClearSupervisorList => ({
-  type: SITE_TYPES.CLEAR_PEER_SUPERVISOR_LIST
+  type: HF_TYPES.CLEAR_PEER_SUPERVISOR_LIST
 });
 export const clearVillageList = (): IClearVillagesList => ({
-  type: SITE_TYPES.CLEAR_VILLAGES_LIST_FROM_HF
+  type: HF_TYPES.CLEAR_VILLAGES_LIST_FROM_HF
 });
 
 export const fetchHFSummaryRequest = ({
@@ -141,7 +149,7 @@ export const fetchHFSummaryRequest = ({
   successCb?: (data: IHealthFacility) => void;
   failureCb?: (error: Error) => void;
 }): IFetchHFSummaryRequest => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_REQUEST,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_REQUEST,
   tenantId,
   id,
   failureCb,
@@ -149,12 +157,12 @@ export const fetchHFSummaryRequest = ({
 });
 
 export const fetchHFSummarySuccess = (payload: IHealthFacility): IFetchHFSummarySuccess => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_SUCCESS,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_SUCCESS,
   payload
 });
 
 export const fetchHFSummaryFailure = (error: Error): IFetchHFSummaryFailure => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_FAILURE,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_FAILURE,
   error
 });
 
@@ -163,19 +171,19 @@ export const fetchUserDetailRequest = ({
   failureCb,
   successCb
 }: Omit<IFetchUserDetailRequest, 'type'>): IFetchUserDetailRequest => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
   id,
   failureCb,
   successCb
 });
 
 export const fetchUserDetailSuccess = (payload: IHFUserGet): IFetchUserDetailSuccess => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_SUCCESS,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_SUCCESS,
   payload
 });
 
 export const fetchUserDetailFailure = (error: Error): IFetchUserDetailFailure => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_FAILURE,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_FAILURE,
   error
 });
 
@@ -183,18 +191,18 @@ export const fetchHFTypesRequest = ({
   failureCb,
   successCb
 }: Omit<IFetchHFTypesRequest, 'type'>): IFetchHFTypesRequest => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST,
   failureCb,
   successCb
 });
 
 export const fetchHFTypesSuccess = (payload: IObjectData[]): IFetchHFTypesSuccess => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS,
   payload
 });
 
 export const fetchHFTypesFailure = (error: Error): IFetchHFTypesFailure => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_TYPES_FAILURE,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_TYPES_FAILURE,
   error
 });
 
@@ -207,18 +215,18 @@ export const createHFUserRequest = ({
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }): ICreateHFUserRequest => ({
-  type: SITE_TYPES.CREATE_HEALTH_FACILITY_USER_REQUEST,
+  type: HF_TYPES.CREATE_HEALTH_FACILITY_USER_REQUEST,
   data,
   successCb,
   failureCb
 });
 
 export const createHFUserSuccess = (): ICreateHFUserSuccess => ({
-  type: SITE_TYPES.CREATE_HEALTH_FACILITY_USER_SUCCESS
+  type: HF_TYPES.CREATE_HEALTH_FACILITY_USER_SUCCESS
 });
 
 export const createHFUserFailure = (error: Error): ICreateHFUserFailure => ({
-  type: SITE_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE,
+  type: HF_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE,
   error
 });
 
@@ -227,18 +235,18 @@ export const updateHFDetailsRequest = ({
   successCb,
   failureCb
 }: Omit<IUpdateHFDetailsRequest, 'type'>): IUpdateHFDetailsRequest => ({
-  type: SITE_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_REQUEST,
+  type: HF_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_REQUEST,
   data,
   successCb,
   failureCb
 });
 
 export const updateHFDetailsSuccess = (): IUpdateHFDetailsSuccess => ({
-  type: SITE_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_SUCCESS
+  type: HF_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_SUCCESS
 });
 
 export const updateHFDetailsFailure = (error: Error): IUpdateHFDetailsFailure => ({
-  type: SITE_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_FAILURE,
+  type: HF_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_FAILURE,
   error
 });
 
@@ -247,18 +255,18 @@ export const updateHFUserRequest = ({
   successCb,
   failureCb
 }: Omit<IUpdateHFUserRequest, 'type'>): IUpdateHFUserRequest => ({
-  type: SITE_TYPES.UPDATE_HEALTH_FACILITY_USER_REQUEST,
+  type: HF_TYPES.UPDATE_HEALTH_FACILITY_USER_REQUEST,
   data,
   successCb,
   failureCb
 });
 
 export const updateHFUserSuccess = (): IUpdateHFUserSuccess => ({
-  type: SITE_TYPES.UPDATE_HEALTH_FACILITY_USER_SUCCESS
+  type: HF_TYPES.UPDATE_HEALTH_FACILITY_USER_SUCCESS
 });
 
 export const updateHFUserFailure = (error: Error): IUpdateHFUserFailure => ({
-  type: SITE_TYPES.UPDATE_HEALTH_FACILITY_USER_FAILURE,
+  type: HF_TYPES.UPDATE_HEALTH_FACILITY_USER_FAILURE,
   error
 });
 
@@ -273,7 +281,7 @@ export const fetchHFUserListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchHFUserListRequest, 'type'>): IFetchHFUserListRequest => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_REQUEST,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_REQUEST,
   skip,
   limit,
   countryId,
@@ -286,12 +294,12 @@ export const fetchHFUserListRequest = ({
 });
 
 export const fetchHFUserListSuccess = (payload: IFetchHFUserListSuccessPayload): IFetchHFUserListSuccess => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_SUCCESS,
   payload
 });
 
 export const fetchHFUserListFailure = (error: Error): IFetchHFUserListFailure => ({
-  type: SITE_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_FAILURE,
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_FAILURE,
   error
 });
 
@@ -300,18 +308,18 @@ export const deleteHFUserRequest = ({
   successCb,
   failureCb
 }: Omit<IDeleteHFUserRequest, 'type'>): IDeleteHFUserRequest => ({
-  type: SITE_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST,
+  type: HF_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST,
   data,
   successCb,
   failureCb
 });
 
 export const deleteHFUserSuccess = (): IDeleteHFUserSuccess => ({
-  type: SITE_TYPES.DELETE_HEALTH_FACILITY_USER_SUCCESS
+  type: HF_TYPES.DELETE_HEALTH_FACILITY_USER_SUCCESS
 });
 
 export const deleteHFUserFailure = (error: Error): IDeleteHFUserFailure => ({
-  type: SITE_TYPES.DELETE_HEALTH_FACILITY_USER_FAILURE,
+  type: HF_TYPES.DELETE_HEALTH_FACILITY_USER_FAILURE,
   error
 });
 
@@ -321,19 +329,19 @@ export const fetchDistrictListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchDistrictListRequest, 'type'>): IFetchDistrictListRequest => ({
-  type: SITE_TYPES.FETCH_DISTRICT_LIST_REQUEST,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST,
   countryId,
   successCb,
   failureCb
 });
 
 export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
-  type: SITE_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
   payload
 });
 
 export const fetchDistrictListFailure = (error: Error): IFetchDistrictListFailure => ({
-  type: SITE_TYPES.FETCH_DISTRICT_LIST_FAILURE,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_FAILURE,
   error
 });
 
@@ -344,7 +352,7 @@ export const fetchChiefdomListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchChiefdomListRequest, 'type'>): IFetchChiefdomListRequest => ({
-  type: SITE_TYPES.FETCH_CHIEFDOM_LIST_REQUEST,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_REQUEST,
   countryId,
   districtId,
   successCb,
@@ -352,12 +360,12 @@ export const fetchChiefdomListRequest = ({
 });
 
 export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
-  type: SITE_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
   payload
 });
 
 export const fetchChiefdomListFailure = (error: Error): IFetchChiefdomListFailure => ({
-  type: SITE_TYPES.FETCH_CHIEFDOM_LIST_FAILURE,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_FAILURE,
   error
 });
 
@@ -369,7 +377,7 @@ export const fetchVillagesListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchVillagesListRequest, 'type'>): IFetchVillagesListRequest => ({
-  type: SITE_TYPES.FETCH_VILLAGES_LIST_REQUEST,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_REQUEST,
   countryId,
   districtId,
   chiefdomId,
@@ -378,12 +386,12 @@ export const fetchVillagesListRequest = ({
 });
 
 export const fetchVillagesListSuccess = (payload: IFetchVillagespayload): IFetchVillagesListSuccess => ({
-  type: SITE_TYPES.FETCH_VILLAGES_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_SUCCESS,
   payload
 });
 
 export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailure => ({
-  type: SITE_TYPES.FETCH_VILLAGES_LIST_FAILURE,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_FAILURE,
   error
 });
 
@@ -393,7 +401,7 @@ export const fetchVillagesListFromHFRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
-  type: SITE_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
   tenantIds,
   successCb,
   failureCb
@@ -402,12 +410,12 @@ export const fetchVillagesListFromHFRequest = ({
 export const fetchVillagesListFromHFSuccess = (payload: {
   data: { list: IVillages[]; hfTenantIds: number[] };
 }): IFetchVillagesListFromHFSuccess => ({
-  type: SITE_TYPES.FETCH_VILLAGES_LIST_FROM_HF_SUCCESS,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_SUCCESS,
   payload
 });
 
 export const fetchVillagesListFromHFFailure = (error: Error): IFetchVillagesListFromHFFailure => ({
-  type: SITE_TYPES.FETCH_VILLAGES_LIST_FROM_HF_FAILURE,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_FAILURE,
   error
 });
 
@@ -417,7 +425,7 @@ export const fetchPeerSupervisorListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchPeerSupervisorListRequest, 'type'>): IFetchPeerSupervisorListRequest => ({
-  type: SITE_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
   tenantIds,
   successCb,
   failureCb
@@ -427,12 +435,12 @@ export const fetchPeerSupervisorListSuccess = (payload: {
   data: { list: IPeerSupervisor[]; hfTenantIds: number[] };
   total: number;
 }): IFetchPeerSupervisorListSuccess => ({
-  type: SITE_TYPES.FETCH_PEER_SUPERVISOR_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_LIST_SUCCESS,
   payload
 });
 
 export const fetchPeerSupervisorListFailure = (error: Error): IFetchPeerSupervisorListFailure => ({
-  type: SITE_TYPES.FETCH_PEER_SUPERVISOR_LIST_FAILURE,
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_LIST_FAILURE,
   error
 });
 
@@ -442,22 +450,48 @@ export const fetchWorkflowListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchWorkflowListRequest, 'type'>): IFetchWorkflowListRequest => ({
-  type: SITE_TYPES.FETCH_WORKFLOW_LIST_REQUEST,
+  type: HF_TYPES.FETCH_WORKFLOW_LIST_REQUEST,
   countryId,
   successCb,
   failureCb
 });
 
 export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetchWorkflowListSuccess => ({
-  type: SITE_TYPES.FETCH_WORKFLOW_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_WORKFLOW_LIST_SUCCESS,
   payload
 });
 
 export const fetchWorkflowListFailure = (error: Error): IFetchWorkflowListFailure => ({
-  type: SITE_TYPES.FETCH_WORKFLOW_LIST_FAILURE,
+  type: HF_TYPES.FETCH_WORKFLOW_LIST_FAILURE,
   error
 });
 
 export const clearHealthFaciliityDetail = () => ({
-  type: SITE_TYPES.CLEAR_HEALTH_FACILITY_DETAIL
+  type: HF_TYPES.CLEAR_HEALTH_FACILITY_DETAIL
+});
+
+export const fetchCultureListRequest = (): IFetchCultureListRequest => ({
+  type: HF_TYPES.FETCH_CULTURE_LIST_REQUEST
+});
+
+export const fetchCultureListSuccess = (payload: IFetchCultureListSuccessPayload): IFetchCultureListSuccess => ({
+  type: HF_TYPES.FETCH_CULTURE_LIST_SUCCESS,
+  payload
+});
+
+export const fetchCultureListFailure = (): IFetchCultureListFailure => ({
+  type: HF_TYPES.FETCH_CULTURE_LIST_FAILURE
+});
+
+export const fetchCountryListRequest = (): IFetchCountryListRequest => ({
+  type: HF_TYPES.FETCH_COUNTRY_LIST_REQUEST
+});
+
+export const fetchCountryListSuccess = (payload: IFetchCountryListSuccessPayload): IFetchCountryListSuccess => ({
+  type: HF_TYPES.FETCH_COUNTRY_LIST_SUCCESS,
+  payload
+});
+
+export const fetchCountryListFailure = (): IFetchCountryListFailure => ({
+  type: HF_TYPES.FETCH_COUNTRY_LIST_FAILURE
 });

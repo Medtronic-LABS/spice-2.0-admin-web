@@ -19,6 +19,7 @@ const getShowLoader = (state: AppState) => state.user.showLoader;
 const getAuthToken = (state: AppState) => state.user.token;
 const getUserRoles = (state: AppState) => state.user.userRoles;
 const getIsUserRolesLoading = (state: AppState) => state.user.isRolesLoading;
+const getIsPasswordSet = (state: AppState) => state.user.isPasswordSet;
 
 export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
 export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
@@ -37,3 +38,4 @@ export const authTokenSelector = createSelector(getAuthToken, (token) => token);
 export const userDataSelector = createSelector(getUserData, (user) => user);
 export const userRolesSelector = createSelector(getUserRoles, (roles) => roles);
 export const isUserRolesLoading = createSelector(getIsUserRolesLoading, (loading) => loading);
+export const isPasswordSetSelector = createSelector(getIsPasswordSet, (passwordSet) => passwordSet);

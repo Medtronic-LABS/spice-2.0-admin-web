@@ -53,7 +53,11 @@ import {
   fetchVillagesListFromHFSuccess,
   fetchVillagesListFromHFFailure,
   fetchUserDetailSuccess,
-  fetchUserDetailFailure
+  fetchUserDetailFailure,
+  fetchCultureListSuccess,
+  fetchCultureListFailure,
+  fetchCountryListSuccess,
+  fetchCountryListFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -71,7 +75,9 @@ import {
   FETCH_WORKFLOW_LIST_REQUEST,
   FETCH_HEALTH_FACILITY_TYPES_REQUEST,
   FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
-  FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST
+  FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
+  FETCH_CULTURE_LIST_REQUEST,
+  FETCH_COUNTRY_LIST_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 
@@ -432,6 +438,38 @@ export function* fetchWorkflowListSagaRequest({
 }
 
 /*
+  Worker Saga: Fired on FETCH_CULTURE_LIST_REQUEST action
+*/
+export function* fetchCultureList(): SagaIterator {
+  try {
+    const {
+      data: { entity: cultureList }
+    } = yield call(hfService.fetchCultureList);
+    yield put(fetchCultureListSuccess(cultureList || []));
+  } catch (e) {
+    yield put(fetchCultureListFailure());
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_COUNTRY_LIST_REQUEST action
+*/
+export function* fetchCountryList(): SagaIterator {
+  try {
+    const {
+      data: { entity: countryList }
+    } = yield call(hfService.fetchCountryCodeList);
+    const countryCodeList = countryList.map((code: any) => ({
+      phoneNumberCode: code,
+      id: code
+    }));
+    yield put(fetchCountryListSuccess(countryCodeList || []));
+  } catch (e) {
+    yield put(fetchCountryListFailure());
+  }
+}
+
+/*
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
@@ -452,6 +490,8 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_TYPES_REQUEST, fetchHFTypesSaga)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
+  yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);
+  yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
 }
 
 export default healthFacilitySaga;

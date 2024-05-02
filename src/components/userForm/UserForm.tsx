@@ -19,11 +19,14 @@ import { isUserRolesLoading, roleSelector, userRolesSelector } from '../../store
 import { fetchUserRolesAction } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
 import {
+  fetchCountryListRequest,
   fetchHFListRequest,
   fetchPeerSupervisorListRequest,
   fetchVillagesListFromHFRequest
 } from '../../store/healthFacility/actions';
 import {
+  countryListSelector,
+  countryLoadingSelector,
   healthFacilityListSelector,
   healthFacilityLoadingSelector,
   peerSupervisorListSelector,
@@ -83,6 +86,8 @@ const UserForm = ({
   const villagesList = useSelector(villagesFromHFListSelector);
   const villagesLoading = useSelector(villagesFromHFLoadingSelector);
   const role = useSelector(roleSelector);
+  const countryList = useSelector(countryListSelector);
+  const isCountryListLoading = useSelector(countryLoadingSelector);
   const [peerSupervisors, setPeerSupervisors] = useState([[...peerSupervisorList.list]] as IPeerSupervisor[][]);
   const [villages, setVillages] = useState([[...villagesList.list]] as IVillages[][]);
 
@@ -173,6 +178,12 @@ const UserForm = ({
   };
 
   useEffect(() => {
+    if (!countryList.length) {
+      dispatch(fetchCountryListRequest());
+    }
+  }, [countryList.length, dispatch]);
+
+  useEffect(() => {
     if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile) {
       dispatch(
         fetchUserRolesAction({
@@ -249,9 +260,6 @@ const UserForm = ({
   const divider = (isLastChild: boolean) => {
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
-
-  const countryList = [{ phoneNumberCode: '232', id: 1 }];
-  const isCountryListLoading = false;
 
   // roles based CHW related utils
   const selectedRoles = useCallback((index: number) => form.getState().values.users[index]?.roles, [form]);
@@ -565,7 +573,7 @@ const UserForm = ({
                         errorLabel='country code'
                         labelKey='phoneNumberCode'
                         valueKey='id'
-                        appendPlus={!!input.value}
+                        appendPlus={true}
                         options={countryList || []}
                         loadingOptions={isCountryListLoading}
                         error={isError(meta)}

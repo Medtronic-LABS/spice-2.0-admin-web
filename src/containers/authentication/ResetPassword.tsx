@@ -1,16 +1,18 @@
 import styles from './Authentication.module.scss';
 import logo from '../../assets/images/app-logo.svg';
 import { Form } from 'react-final-form';
-import ResetPasswordFields from './ResetPasswordFields';
+import ResetPasswordFields, { generatePassword } from './ResetPasswordFields';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants/route';
 import { useCallback, useEffect, useState } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
 import { info } from '../../utils/toastCenter';
+import { useDispatch } from 'react-redux';
+import { getUserName, resetPassword } from '../../store/user/actions';
 
 interface IRouteProps extends RouteComponentProps<{ token: string }> {}
 interface IResetPasswordState {
-  isResetPassword: boolean;
+  isTokenValid: boolean;
   token: string;
   isShowPassword: boolean;
   isShowConfirmPassword: boolean;
@@ -24,9 +26,10 @@ interface IStateProps {
 type Props = IRouteProps & IStateProps;
 
 const ResetPassword = (props: Props) => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
+
   const [passwordState, setPasswordState] = useState<IResetPasswordState>({
-    isResetPassword: false,
+    isTokenValid: false,
     token: '',
     isShowPassword: false,
     isShowConfirmPassword: false
@@ -38,55 +41,40 @@ const ResetPassword = (props: Props) => {
 
   const getUsername = useCallback(() => {
     const { token } = props.match.params;
-    setPasswordState({ ...passwordState, token });
-    // this.props.getUserName({ token, successCB: this.showToast });
+    dispatch(
+      getUserName(
+        token,
+        () => {
+          setPasswordState({ ...passwordState, token, isTokenValid: true });
+        },
+        (e) => {
+          info('', APPCONSTANTS.LINK_EXPIRED);
+          backToLogin();
+        }
+      )
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.match.params]);
 
   useEffect(() => {
-    const url = props.history.location.search;
-    const params = new URLSearchParams(url);
-    const isResetPassword = Boolean(params.get('reset_password'));
-    setPasswordState({ ...passwordState, isResetPassword });
-    let canRequest: boolean = true;
-    if (isResetPassword) {
-      const expiresValue = params.get('expires');
-      const expiresTime = Number(expiresValue);
-      if (expiresTime < new Date().getTime()) {
-        canRequest = false;
-        info('', APPCONSTANTS.LINK_EXPIRED);
-        backToLogin();
-      }
-    }
-    if (canRequest) {
-      getUsername();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [backToLogin, getUsername, props.history.location.search]);
+    getUsername();
+  }, [getUsername]);
 
   const onSubmitForm = (values: any) => {
-    // const postEmail = values.email;
-    // const password = generatePassword(values.newPassword);
-    // const { token, isResetPassword } = passwordState;
-    // if (isResetPassword) {
-    // dispatch(
-    //   resetPassword({
-    //     email:postEmail,
-    //     password,
-    //     token,
-    //     successCB: backToLogin
-    //   })
-    // );
-    // } else {
-    // dispatch(
-    //   createPassword({
-    //     email:postEmail,
-    //     password,
-    //     token,
-    //     successCB: backToLogin
-    //   })
-    // );
-    // }
+    if (passwordState.isTokenValid) {
+      const password = generatePassword(values.newPassword);
+      const { token } = passwordState;
+      dispatch(
+        resetPassword({
+          email: values.email,
+          password,
+          token,
+          successCB: backToLogin
+        })
+      );
+    } else {
+      backToLogin();
+    }
   };
 
   const { email } = props;

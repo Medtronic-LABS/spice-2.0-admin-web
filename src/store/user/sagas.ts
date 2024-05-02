@@ -11,6 +11,7 @@ import CryptoJS from 'crypto-js';
 import * as userService from '../../services/userAPI';
 import * as userActions from './actions';
 import { IActionProps } from '../../typings/global';
+import { error, success } from '../../utils/toastCenter';
 
 // export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
 //   roles.length && rolesArray.find((role) => roles.includes(role));
@@ -242,12 +243,64 @@ export function* updatePassword(action: IActionProps) {
 }
 
 /*
+  Worker Saga: Fired on USER_FORGOT_PASSWORD_REQUEST action
+*/
+export function* userForgotPassword(action: any) {
+  const { email, successCB } = action;
+  try {
+    yield call(userService.forgotPassword, email.toLowerCase());
+    yield put(userActions.forgotPasswordSuccess());
+    success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_RESET_EMAIL_SENT_MESSAGE);
+    successCB();
+  } catch (e: any) {
+    error(APPCONSTANTS.ALERT, e.message);
+    yield put(userActions.forgotPasswordFail(e));
+  }
+}
+
+/*
+  Worker Saga: Fired on RESET_PASSWORD_REQUEST action
+*/
+export function* resetPassword(action: IActionProps) {
+  const { email, password, token, successCB, failureCb } = action.data;
+  try {
+    yield call(userService.resetPasswordReq, { email, password }, token);
+    yield put(userActions.resetPasswordSuccess());
+    success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_SET_SUCCESS);
+    successCB();
+  } catch (e: any) {
+    failureCb?.(e);
+    yield put(userActions.resetPasswordFail(e));
+    const message = e?.message || APPCONSTANTS.PASSWORD_SET_FAILED;
+    error(APPCONSTANTS.ALERT, message);
+  }
+}
+
+/*
+  Worker Saga: Fired on GET_USERNAME_FOR_PASSWORD_RESET action
+*/
+export function* getUsername(action: IActionProps): SagaIterator {
+  const { token, successCB, failureCB } = action;
+  try {
+    yield call(userService.getUsername, token);
+    yield put(userActions.getUserNameSuccess());
+    successCB?.();
+  } catch (e) {
+    failureCB?.(e);
+    yield put(userActions.getUserNameFail(e));
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
 function* userSaga() {
   yield all([takeLatest(USERTYPES.LOGIN_REQUEST, login)]);
   yield all([takeLatest(USERTYPES.LOGOUT_REQUEST, logout)]);
+  yield all([takeLatest(USERTYPES.USER_FORGOT_PASSWORD_REQUEST, userForgotPassword)]);
+  yield all([takeLatest(USERTYPES.RESET_PASSWORD_REQUEST, resetPassword)]);
+  yield all([takeLatest(USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET, getUsername)]);
   yield all([takeLatest(USERTYPES.FETCH_USER_BY_ID_REQUEST, fetchUserById)]);
   yield all([takeLatest(USERTYPES.UPDATE_USER_REQUEST, updateUser)]);
   yield takeLatest(USERTYPES.FETCH_LOGGED_IN_USER_REQUEST, fetchLoggedInUser);

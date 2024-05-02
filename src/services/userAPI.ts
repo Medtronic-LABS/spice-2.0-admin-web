@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { IFetchUserByIdRequest, IUpdateUserDetail } from '../store/user/types';
+import APPCONSTANTS from '../constants/appConstants';
 
 export const login = (username: string, password: string) => {
   const data = new FormData();
@@ -82,4 +83,26 @@ export const updatePassword = (data: { userId: number; oldPassword: string; newP
       newPassword: data.newPassword,
       userId: data.userId
     }
+  });
+
+export const forgotPassword = (username: string) =>
+  axios({
+    method: 'post',
+    url: `/user-service/user/forgot-password/${username}/${APPCONSTANTS.APP_TYPE}`,
+    data: username
+  });
+
+export const resetPasswordReq = (data: { email: string; password: string }, token: string) =>
+  axios({
+    method: 'post',
+    url: `/user-service/user/reset-password/${token}`,
+    data: {
+      ...data
+    }
+  });
+
+export const getUsername = (token: string) =>
+  axios({
+    method: 'post',
+    url: `/user-service/user/verify-token/${token}`
   });

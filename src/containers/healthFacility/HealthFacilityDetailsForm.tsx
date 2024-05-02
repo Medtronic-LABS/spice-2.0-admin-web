@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   chiefdomListSelector,
   chiefdomLoadingSelector,
+  cultureListSelector,
+  cultureLoadingSelector,
   districtListSelector,
   districtLoadingSelector,
   hfTypesLoadingSelector,
@@ -27,6 +29,7 @@ import {
 import { useEffect, useRef } from 'react';
 import {
   fetchChiefdomListRequest,
+  fetchCultureListRequest,
   fetchDistrictListRequest,
   fetchHFTypesRequest,
   fetchPeerSupervisorListRequest,
@@ -76,9 +79,18 @@ const HealthFacilityDetailsForm = ({
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
+  const languages = useSelector(cultureListSelector);
+  const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
   const countryId = Number(regionId || regionData.id);
   const cityOptions = useRef<IObjectData[]>([]);
+
+  // Culture list fetch
+  useEffect(() => {
+    if (!languages.length) {
+      dispatch(fetchCultureListRequest());
+    }
+  }, [dispatch, languages.length]);
 
   // Health Facility Types fetch
   useEffect(() => {
@@ -165,9 +177,6 @@ const HealthFacilityDetailsForm = ({
       }
     }
   };
-
-  const languages = [{ id: '1', name: 'English' }] as any[];
-  const languageLoading = false;
 
   return (
     <div className='row gx-1dot25 align-items-end'>

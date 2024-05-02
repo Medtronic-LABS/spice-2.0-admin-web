@@ -29,10 +29,10 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_USER, SUPER_ADMIN, SITE_ADMIN, PEER_SUPERVISOR } = APPCONSTANTS.ROLES;
+export const { SUPER_USER, SUPER_ADMIN, ADMIN } = APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
-export const SU_SA_A_P = [...SU_SA, SITE_ADMIN, PEER_SUPERVISOR];
-export const A_P = [SITE_ADMIN, PEER_SUPERVISOR];
+export const SU_SA_A = [...SU_SA, ADMIN];
+export const A = [ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
@@ -52,7 +52,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
-      authorisedRoles: SU_SA_A_P
+      authorisedRoles: SU_SA_A
     },
     {
       path: PROTECTED_ROUTES.createHealthFacility,
@@ -64,7 +64,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilityByAdmin,
       exact: true,
       component: HealthFacilityList,
-      authorisedRoles: A_P
+      authorisedRoles: A
     },
     {
       path: PROTECTED_ROUTES.usersBySuperAdmin,
@@ -76,7 +76,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.usersByAdmin,
       exact: true,
       component: UserList,
-      authorisedRoles: A_P
+      authorisedRoles: A
     },
     {
       path: PROTECTED_ROUTES.createMedication,
@@ -94,7 +94,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.profile,
       exact: true,
       component: MyProfile,
-      authorisedRoles: SU_SA_A_P
+      authorisedRoles: SU_SA_A
     }
   ];
 })();

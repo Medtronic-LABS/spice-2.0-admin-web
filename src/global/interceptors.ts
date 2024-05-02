@@ -55,7 +55,7 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
 export const setupInterceptors = (store: any) => {
   axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
   axios.defaults.headers.post['Content-Type'] = 'application/json';
-  axios.defaults.headers.client = 'admin';
+  axios.defaults.headers.client = APPCONSTANTS.APP_TYPE;
   axios.defaults.validateStatus = () => true;
 
   axios.interceptors.request.use(

@@ -31,7 +31,16 @@ import {
   IChangePasswordFail,
   IChangeOwnPasswordReq,
   IChangeOwnPasswordSuccess,
-  IChangeOwnPasswordFail
+  IChangeOwnPasswordFail,
+  IForgotPasswordReq,
+  IForgotPasswordSuccess,
+  IForgotPasswordFailure,
+  IResetPasswordReq,
+  IResetPasswordSuccess,
+  IResetPasswordFail,
+  IGetUserNameReq,
+  IGetUserNameSuccess,
+  IGetUserNameFail
 } from './types';
 
 export const loginRequest = ({
@@ -226,5 +235,66 @@ export const changeOwnPasswordSuccess = (): IChangeOwnPasswordSuccess => ({
 
 export const changeOwnPasswordFail = (error: any): IChangeOwnPasswordFail => ({
   type: USER_TYPES.CHANGE_OWN_PASSWORD_FAILURE,
+  error
+});
+
+export const forgotPasswordRequest = ({
+  email,
+  successCB
+}: {
+  email: string;
+  successCB: () => void;
+}): IForgotPasswordReq => ({
+  type: USER_TYPES.USER_FORGOT_PASSWORD_REQUEST,
+  email,
+  successCB
+});
+
+export const forgotPasswordSuccess = (): IForgotPasswordSuccess => ({
+  type: USER_TYPES.USER_FORGOT_PASSWORD_SUCCESS
+});
+
+export const forgotPasswordFail = (error: any): IForgotPasswordFailure => ({
+  type: USER_TYPES.USER_FORGOT_PASSWORD_FAILURE,
+  error
+});
+
+export const resetPassword = (data: {
+  email: string;
+  password: string;
+  token: string;
+  successCB: () => void;
+  failureCb?: (error: Error) => void;
+}): IResetPasswordReq => ({
+  type: USER_TYPES.RESET_PASSWORD_REQUEST,
+  data
+});
+
+export const resetPasswordSuccess = (): IResetPasswordSuccess => ({
+  type: USER_TYPES.RESET_PASSWORD_SUCCESS
+});
+
+export const resetPasswordFail = (error: any): IResetPasswordFail => ({
+  type: USER_TYPES.RESET_PASSWORD_FAILURE,
+  error
+});
+
+export const getUserName = (
+  token: string,
+  successCB?: () => void,
+  failureCB?: (error: Error) => void
+): IGetUserNameReq => ({
+  type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET,
+  token,
+  successCB,
+  failureCB
+});
+
+export const getUserNameSuccess = (): IGetUserNameSuccess => ({
+  type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS
+});
+
+export const getUserNameFail = (error: any): IGetUserNameFail => ({
+  type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL,
   error
 });

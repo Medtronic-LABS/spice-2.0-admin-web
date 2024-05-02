@@ -296,7 +296,8 @@ const UserList = (props: IMatchProps): React.ReactElement => {
                 id: 5,
                 name: 'phoneNumber',
                 label: 'CONTACT NUMBER',
-                width: '20%'
+                width: '20%',
+                cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
               }
             ]}
             isDelete={true}

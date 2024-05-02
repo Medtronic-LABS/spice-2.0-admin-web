@@ -53,6 +53,10 @@ const initialState: IHealthFacilityState = {
   peerSupervisorList: { list: [], hfTenantIds: null },
   peerSupervisorTotal: 0,
   peerSupervisorLoading: false,
+  cultureListLoading: false,
+  countryListLoading: false,
+  cultureList: [],
+  countryList: [],
   clinicalWorkflowList: [],
   clinicalWorkflowLoading: false,
   error: null
@@ -280,6 +284,38 @@ const healthFacilityReducer = (
       return {
         ...state,
         healthFacility: initialState.healthFacility
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CULTURE_LIST_SUCCESS:
+      return {
+        ...state,
+        cultureListLoading: false,
+        cultureList: action.payload
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CULTURE_LIST_REQUEST:
+      return {
+        ...state,
+        cultureListLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_COUNTRY_LIST_SUCCESS:
+      return {
+        ...state,
+        countryList: action.payload,
+        countryListLoading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CULTURE_LIST_FAILURE:
+      return {
+        ...state,
+        cultureListLoading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_COUNTRY_LIST_REQUEST:
+      return {
+        ...state,
+        countryListLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_COUNTRY_LIST_FAILURE:
+      return {
+        ...state,
+        countryListLoading: false
       };
     default:
       return state;

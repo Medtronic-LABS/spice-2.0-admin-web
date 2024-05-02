@@ -1,6 +1,5 @@
 import { Field } from 'react-final-form';
 import TextInput from '../../components/formFields/TextInput';
-import CustomTooltip from '../../components/tooltip';
 import APPCONSTANTS from '../../constants/appConstants';
 import { composeValidators, isEmpty, validatePassword } from '../../utils/validation';
 import styles from './Authentication.module.scss';
@@ -124,13 +123,14 @@ export const ResetPasswordFields = ({
           type={isShowPassword ? 'text' : 'password'}
           validate={composeValidators(validatePassword, checkUsername)}
           render={({ input, meta }) => (
-            <CustomTooltip title={APPCONSTANTS.PASSWORD_RULE}>
+            <>
               <TextInput
                 {...input}
                 label='New Password'
                 placeholder='Enter New Password'
                 error={handleIsError(input, meta)}
                 className={styles.passwordBox}
+                toolTipTitle={APPCONSTANTS.PASSWORD_RULE}
               />
               {handleShowTickIcon(meta)}
               <img
@@ -140,7 +140,7 @@ export const ResetPasswordFields = ({
                 onClick={setShowPassword}
                 alt={handleShowPasswordText()}
               />
-            </CustomTooltip>
+            </>
           )}
         />
       </div>

@@ -78,27 +78,6 @@ export interface ILoginRequestPayload {
   failureCb?: (error: Error) => void;
 }
 
-export interface ITimezone {
-  id: string;
-  description?: string;
-}
-
-export interface ICountryCode {
-  id: string;
-  countryCode: string;
-}
-
-export interface ICulture {
-  id: number;
-  name: string;
-}
-
-export type IFetchTimezoneListSuccessPayload = ITimezone[];
-
-export type IFetchCountryListSuccessPayload = ICountryCode[];
-
-export type IFetchCultureListSuccessPayload = ICulture[];
-
 export interface ILoginRequest {
   type: typeof USER_TYPES.LOGIN_REQUEST;
   username: string;
@@ -278,6 +257,57 @@ export interface IChangeOwnPasswordFail {
   error: any;
 }
 
+export interface IForgotPasswordReq {
+  type: typeof USER_TYPES.USER_FORGOT_PASSWORD_REQUEST;
+  email: string;
+  successCB: () => void;
+}
+
+export interface IForgotPasswordSuccess {
+  type: typeof USER_TYPES.USER_FORGOT_PASSWORD_SUCCESS;
+}
+
+export interface IForgotPasswordFailure {
+  type: typeof USER_TYPES.USER_FORGOT_PASSWORD_FAILURE;
+  error: any;
+}
+
+export interface IResetPasswordReq {
+  type: typeof USER_TYPES.RESET_PASSWORD_REQUEST;
+  data: {
+    email: string;
+    password: string;
+    token: string;
+    successCB: () => void;
+    failureCb?: (error: Error) => void;
+  };
+}
+
+export interface IResetPasswordSuccess {
+  type: typeof USER_TYPES.RESET_PASSWORD_SUCCESS;
+}
+
+export interface IResetPasswordFail {
+  type: typeof USER_TYPES.RESET_PASSWORD_FAILURE;
+  error: any;
+}
+
+export interface IGetUserNameReq {
+  type: typeof USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET;
+  token: string;
+  successCB?: () => void;
+  failureCB?: (error: Error) => void;
+}
+
+export interface IGetUserNameSuccess {
+  type: typeof USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS;
+}
+
+export interface IGetUserNameFail {
+  type: typeof USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL;
+  error: any;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -307,4 +337,13 @@ export type UserActions =
   | IChangePasswordFail
   | IChangeOwnPasswordReq
   | IChangeOwnPasswordSuccess
-  | IChangeOwnPasswordFail;
+  | IChangeOwnPasswordFail
+  | IForgotPasswordReq
+  | IForgotPasswordSuccess
+  | IForgotPasswordFailure
+  | IResetPasswordReq
+  | IResetPasswordSuccess
+  | IResetPasswordFail
+  | IGetUserNameReq
+  | IGetUserNameSuccess
+  | IGetUserNameFail;

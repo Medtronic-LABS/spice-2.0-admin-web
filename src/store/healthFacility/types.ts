@@ -19,6 +19,10 @@ export interface IHealthFacilityState {
   chiefdomList: IChiefdom[];
   chiefdomTotal: number;
   chiefdomLoading: boolean;
+  cultureListLoading: boolean;
+  cultureList: ICulture[];
+  countryList: ICountryCode[];
+  countryListLoading: boolean;
   villagesList: IVillages[];
   villagesTotal: number;
   villagesLoading: boolean;
@@ -506,6 +510,45 @@ export interface IFetchWorkflowListFailure {
 export interface IClearHealthFacilityDetail {
   type: typeof ACTION_TYPES.CLEAR_HEALTH_FACILITY_DETAIL;
 }
+export interface ICulture {
+  id: number;
+  name: string;
+}
+
+export interface ICountryCode {
+  id: string;
+  phoneNumberCode: string;
+}
+
+export interface IFetchCultureListRequest {
+  type: typeof ACTION_TYPES.FETCH_CULTURE_LIST_REQUEST;
+}
+
+export interface IFetchCultureListSuccess {
+  type: typeof ACTION_TYPES.FETCH_CULTURE_LIST_SUCCESS;
+  payload: IFetchCultureListSuccessPayload;
+}
+
+export interface IFetchCultureListFailure {
+  type: typeof ACTION_TYPES.FETCH_CULTURE_LIST_FAILURE;
+}
+
+export interface IFetchCountryListRequest {
+  type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_REQUEST;
+}
+
+export interface IFetchCountryListSuccess {
+  type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_SUCCESS;
+  payload: IFetchCountryListSuccessPayload;
+}
+
+export interface IFetchCountryListFailure {
+  type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_FAILURE;
+}
+
+export type IFetchCultureListSuccessPayload = ICulture[];
+
+export type IFetchCountryListSuccessPayload = ICountryCode[];
 
 export type HealthFacilityActions =
   | IFetchHFListRequest
@@ -559,4 +602,10 @@ export type HealthFacilityActions =
   | IFetchWorkflowListRequest
   | IFetchWorkflowListSuccess
   | IFetchWorkflowListFailure
-  | IClearHealthFacilityDetail;
+  | IClearHealthFacilityDetail
+  | IFetchCultureListRequest
+  | IFetchCultureListSuccess
+  | IFetchCultureListFailure
+  | IFetchCountryListRequest
+  | IFetchCountryListSuccess
+  | IFetchCountryListFailure;

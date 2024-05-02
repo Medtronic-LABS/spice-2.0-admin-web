@@ -144,3 +144,15 @@ export const fetchWorkflowList = (data: any) =>
     method: 'POST',
     data
   });
+
+export const fetchCultureList = () =>
+  axios({
+    url: '/admin-service/cultures',
+    method: 'POST'
+  });
+
+export const fetchCountryCodeList = () =>
+  axios({
+    url: '/admin-service/country-codes',
+    method: 'POST'
+  });

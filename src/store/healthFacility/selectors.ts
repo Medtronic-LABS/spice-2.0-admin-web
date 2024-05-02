@@ -28,6 +28,10 @@ const getPeerSupervisorTotal = (state: AppState) => state.healthFacility.peerSup
 const getPeerSupervisorLoading = (state: AppState) => state.healthFacility.peerSupervisorLoading;
 const getWorkflowList = (state: AppState) => state.healthFacility.clinicalWorkflowList;
 const getWorkflowLoading = (state: AppState) => state.healthFacility.clinicalWorkflowLoading;
+const getCultureLoading = (state: AppState) => state.healthFacility.cultureListLoading;
+const getCultureList = (state: AppState) => state.healthFacility.cultureList;
+const getCountryList = (state: AppState) => state.healthFacility.countryList;
+const getCountryListLoading = (state: AppState) => state.healthFacility.countryListLoading;
 
 export const healthFacilitySelector = createSelector(getHealthFacility, (site) => site);
 export const healthFacilityLoadingSelector = createSelector(getLoading, (loading) => loading);
@@ -69,3 +73,7 @@ export const peerSupervisorLoadingSelector = createSelector(
 );
 export const workflowListSelector = createSelector(getWorkflowList, (workflowList) => workflowList);
 export const workflowLoadingSelector = createSelector(getWorkflowLoading, (workflowLoading) => workflowLoading);
+export const cultureLoadingSelector = createSelector(getCultureLoading, (loading) => loading);
+export const cultureListSelector = createSelector(getCultureList, (list) => list);
+export const countryListSelector = createSelector(getCountryList, (list) => list);
+export const countryLoadingSelector = createSelector(getCountryListLoading, (loading) => loading);
