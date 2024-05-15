@@ -76,7 +76,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
-    workflowIds: hf.workflows
+    clinicalWorkflowIds: hf.workflows
   };
   return postData;
 };

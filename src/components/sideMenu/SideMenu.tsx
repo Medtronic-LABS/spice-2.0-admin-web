@@ -64,13 +64,13 @@ const SideMenu = ({ className }: ISideMenuProps) => {
   const regionData = useSelector(userDataSelector).country;
 
   const { regionId, tenantId, healthFacilityId, hfTenantId } = useMemo(() => {
-    const matchedRoute = (role === APPCONSTANTS.ROLES.ADMIN ? [...adminRoutes] : [...superAdminRoutes]).find(
-      ({ route, childRoutes }) => {
-        return [...(childRoutes || []), route]
-          .filter((v) => v)
-          .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true }));
-      }
-    );
+    const matchedRoute = (
+      role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ? [...adminRoutes] : [...superAdminRoutes]
+    ).find(({ route, childRoutes }) => {
+      return [...(childRoutes || []), route]
+        .filter((v) => v)
+        .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true }));
+    });
     if (matchedRoute) {
       const params = matchPath(pathname, { path: matchedRoute.route, exact: true })?.params as any;
       let childParams: any[] = [];
@@ -95,9 +95,9 @@ const SideMenu = ({ className }: ISideMenuProps) => {
   const sideMenu = useMemo(() => {
     let choosenRoutes: ISideMenuItem[] = [];
     const pathParams: Array<[string, string]> = [];
-    const newMenu = [...(role === APPCONSTANTS.ROLES.ADMIN ? [...adminRoutes] : [...superAdminRoutes])].map(
-      (routes) => ({ ...routes, childRoutes: [...(routes.childRoutes || [])] })
-    );
+    const newMenu = [
+      ...(role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ? [...adminRoutes] : [...superAdminRoutes])
+    ].map((routes) => ({ ...routes, childRoutes: [...(routes.childRoutes || [])] }));
     choosenRoutes = newMenu;
     pathParams.push(
       [':regionId', regionId],

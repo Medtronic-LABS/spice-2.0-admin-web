@@ -29,10 +29,10 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_USER, SUPER_ADMIN, ADMIN } = APPCONSTANTS.ROLES;
+export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN } = APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
-export const SU_SA_A = [...SU_SA, ADMIN];
-export const A = [ADMIN];
+export const SU_SA_A = [...SU_SA, HEALTH_FACILITY_ADMIN];
+export const A = [HEALTH_FACILITY_ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [

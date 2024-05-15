@@ -54,7 +54,7 @@ const ResetPassword = (props: Props) => {
       )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.match.params]);
+  }, []);
 
   useEffect(() => {
     getUsername();

@@ -1,5 +1,13 @@
 import { useState, useRef } from 'react';
-import { default as ReactSelect, components, InputAction } from 'react-select';
+import {
+  default as ReactSelect,
+  components,
+  InputAction,
+  ControlProps,
+  GroupBase,
+  OptionProps,
+  CSSObjectWithLabel
+} from 'react-select';
 
 import styles from './MultiSelect.module.scss';
 
@@ -38,35 +46,44 @@ const MultiSelect = (props: any) => {
   const comparator = (v1: IOption, v2: IOption) => (v1.value as number) - (v2.value as number);
 
   const filteredOptions = filterOptions(newProps.options, selectInput);
-  const filteredSelectedOptions = filterOptions(newProps?.value, selectInput);
-
-  const multiOption = (multiSelectprops: any) => (
-    <components.Option {...multiSelectprops}>
-      <div className='d-flex align-items-baseline h-100'>
-        {multiSelectprops.value === '*' && !isAllSelected.current && filteredSelectedOptions?.length > 0 ? (
-          <input
-            key={multiSelectprops.value}
-            type='checkbox'
-            ref={(input) => {
-              if (input) {
-                input.indeterminate = true;
-              }
-            }}
-          />
-        ) : (
-          <input
-            key={multiSelectprops.value}
-            type='checkbox'
-            checked={multiSelectprops.isSelected || isAllSelected.current}
-            onChange={() => {
-              /* No action needed */
-            }}
-          />
-        )}
-        <label style={{ marginLeft: '5px' }}>{multiSelectprops.label}</label>
-      </div>
-    </components.Option>
+  const filteredSelectedOptions = filterOptions(
+    newProps?.value.filter((o: any) => filteredOptions.some((f) => f.value === o.id)),
+    selectInput
   );
+
+  const multiOption = (multiSelectprops: any) => {
+    const isChecked = !(newProps.disabledOptions || []).some((v: any) => v.id === multiSelectprops.value);
+    const isDisabled = !![...(newProps.disabledOptions || [])].some((v: any) => v.id === multiSelectprops.value);
+    return (
+      <components.Option {...multiSelectprops}>
+        <div className='d-flex align-items-baseline h-100'>
+          {multiSelectprops.value === '*' && !isAllSelected.current && filteredSelectedOptions?.length > 0 ? (
+            <input
+              key={multiSelectprops.value}
+              type='checkbox'
+              disabled={isDisabled}
+              ref={(input) => {
+                if (input) {
+                  input.indeterminate = true;
+                }
+              }}
+            />
+          ) : (
+            <input
+              key={multiSelectprops.value}
+              type='checkbox'
+              disabled={isDisabled}
+              checked={isChecked && (multiSelectprops.isSelected || isAllSelected.current)}
+              onChange={() => {
+                /* No action needed */
+              }}
+            />
+          )}
+          <label style={{ marginLeft: '5px' }}>{multiSelectprops.label}</label>
+        </div>
+      </components.Option>
+    );
+  };
 
   const multiSelectInput = ({ selectProps, children, ...inputProps }: any) => (
     <>
@@ -100,17 +117,24 @@ const MultiSelect = (props: any) => {
     }
   };
 
+  const filteredFinalOptions = (options: any) =>
+    [...options].filter((opt) =>
+      (newProps.disabledOptions || []).length
+        ? !newProps.disabledOptions.some((dOptions: any) => dOptions.id === opt.value)
+        : true
+    );
   const handleChange = (selected: IOption[]) => {
     if (
       selected.length > 0 &&
       !isAllSelected.current &&
-      (selected[selected.length - 1].value === allOption.value ||
-        JSON.stringify(filteredOptions) === JSON.stringify(selected.sort(comparator)))
+      (selected[selected.length - 1]?.value === allOption.value ||
+        JSON.stringify(filteredFinalOptions(filteredOptions)) === JSON.stringify(selected.sort(comparator)))
     ) {
+      // Select All clicked
       return newProps.onChange(
         [
           ...(newProps.value || []),
-          ...newProps.options?.filter(
+          ...filteredFinalOptions(newProps.options || [])?.filter(
             ({ label }: IOption) =>
               label.toLowerCase().includes(selectInput?.toLowerCase()) &&
               (newProps.value || []).filter((opt: IOption) => opt.label === label).length === 0
@@ -120,10 +144,12 @@ const MultiSelect = (props: any) => {
     } else if (
       selected.length > 0 &&
       selected[selected.length - 1].value !== allOption.value &&
-      JSON.stringify(selected.sort(comparator)) !== JSON.stringify(filteredOptions)
+      JSON.stringify(selected.sort(comparator)) !== JSON.stringify(filteredFinalOptions(filteredOptions))
     ) {
+      // Each role selected
       return newProps.onChange(selected);
     } else {
+      // Select All unclicked
       return newProps.onChange([
         ...(props?.mandatoryOptions || []),
         ...(newProps.value || [])?.filter(
@@ -136,17 +162,62 @@ const MultiSelect = (props: any) => {
   const customFilterOption = ({ value, label }: IOption, input: string) => {
     return (
       (value !== '*' && label.toLowerCase().includes(input.toLowerCase())) ||
-      (newProps.selectAll !== false && value === '*' && filteredOptions?.length > 0)
+      (newProps.selectAll !== false && value === '*' && filteredFinalOptions(filteredOptions)?.length > 0)
     );
   };
 
-  if (newProps.isSelectAll && newProps.options.length !== 0) {
-    isAllSelected.current = filteredSelectedOptions.length === filteredOptions.length;
-    if (filteredSelectedOptions?.length > 0) {
-      if (filteredSelectedOptions?.length === filteredOptions?.length) {
-        selectAllLabel.current = `All (${filteredOptions.length}) selected`;
+  const multiSelectStyles = {
+    multiValueRemove: (base: CSSObjectWithLabel, removeProps: any) => {
+      if (props.mandatoryOptions) {
+        const newOptions = props.mandatoryOptions.map((v: any) => v.id);
+        return newOptions.includes(removeProps.data.id) ? { ...base, display: 'none' } : base;
+      } else if (props.optionsDisabled) {
+        return { ...base, display: 'none' };
       } else {
-        selectAllLabel.current = `${filteredSelectedOptions?.length} / ${filteredOptions.length} selected`;
+        return props.isDisabled ? { ...base, display: 'none' } : base;
+      }
+    },
+    control: (baseStyles: any, state: ControlProps<unknown, false, GroupBase<unknown>>) => ({
+      ...baseStyles,
+      ...newProps.controlStyles,
+      boxShadow: state.isFocused ? 'inset 0px 4px 8px rgba(0,0,0, 0.1) !important' : 'none',
+      borderColor: newProps.error ? 'red !important' : state.isFocused ? '#595959' : '#8c8c8c',
+      '&:hover': {
+        borderColor: '#595959'
+      },
+      '&:focus': {
+        borderColor: newProps.error ? 'red !important' : '#8c8c8c'
+      },
+      overflow: 'auto',
+      maxHeight: '5.875rem',
+      minHeight: '2.5rem'
+    }),
+    option: (optionStyles: CSSObjectWithLabel, optionProps: OptionProps<unknown, false, GroupBase<unknown>>) => {
+      return {
+        ...optionStyles,
+        ...newProps.optionStyles,
+        disabled: true,
+        backgroundColor:
+          optionProps.isDisabled && newProps.disabledOptions.some((v: any) => v.id === (optionProps as any).value)
+            ? '#e6e6e6'
+            : optionProps.isFocused
+            ? '#DEEBFF'
+            : 'white',
+        color: optionProps.isDisabled ? 'grey' : 'black'
+      };
+    }
+  };
+
+  if (newProps.isSelectAll && newProps.options.length !== 0) {
+    const newFilteredOptionsLength = (newProps.disabledOptions || []).length
+      ? filteredOptions.length - newProps.disabledOptions.length
+      : filteredOptions.length;
+    isAllSelected.current = filteredSelectedOptions.length === newFilteredOptionsLength;
+    if (filteredSelectedOptions?.length > 0) {
+      if (filteredSelectedOptions?.length === newFilteredOptionsLength) {
+        selectAllLabel.current = `All (${newFilteredOptionsLength}) selected`;
+      } else {
+        selectAllLabel.current = `${filteredSelectedOptions?.length} / ${newFilteredOptionsLength} selected`;
       }
     } else {
       selectAllLabel.current = 'Select all';
@@ -177,43 +248,14 @@ const MultiSelect = (props: any) => {
             Input: multiSelectInput,
             ...newProps.components
           }}
-          styles={{
-            multiValueRemove: (base: any, removeProps: any) => {
-              if (props.mandatoryOptions) {
-                const newOptions = props.mandatoryOptions.map((v: any) => v.id);
-                return newOptions.includes(removeProps.data.id) ? { ...base, display: 'none' } : base;
-              } else if (props.optionsDisabled) {
-                return { ...base, display: 'none' };
-              } else {
-                return props.isDisabled ? { ...base, display: 'none' } : base;
-              }
-            },
-            control: (baseStyles, state) => ({
-              ...baseStyles,
-              ...newProps.controlStyles,
-              borderColor: newProps.error ? 'red !important' : newProps?.controlStyles?.borderColor || '#8c8c8c',
-              '&:focus': {
-                borderColor: newProps.error ? 'red !important' : '#8c8c8c'
-              },
-              overflow: 'auto',
-              maxHeight: '5.875rem',
-              minHeight: '0.875rem'
-            }),
-            option: (optionStyles) => ({
-              ...optionStyles,
-              disabled: true,
-              backgroundColor: 'white',
-              color: 'black',
-              ...newProps.optionStyles
-            })
-          }}
+          styles={multiSelectStyles}
           filterOption={customFilterOption}
           menuPlacement={newProps.menuPlacement || 'auto'}
           isMulti={true}
           isClearable={false}
           closeMenuOnSelect={false}
           tabSelectsValue={true}
-          backspaceRemovesValue={true}
+          backspaceRemovesValue={false}
           hideSelectedOptions={false}
           blurInputOnSelect={false}
         />
@@ -247,31 +289,7 @@ const MultiSelect = (props: any) => {
         hideSelectedOptions={true}
         backspaceRemovesValue={false}
         blurInputOnSelect={true}
-        styles={{
-          control: (baseStyles, state) => {
-            return {
-              ...baseStyles,
-              ...newProps.controlStyles,
-              borderColor: newProps.error ? 'red !important' : newProps?.controlStyles?.borderColor || '#8c8c8c',
-              '&:focus': {
-                borderColor: newProps.error ? 'red !important' : '#8c8c8c'
-              },
-              overflow: 'auto',
-              maxHeight: '5.875rem',
-              minHeight: '0.875rem'
-            };
-          },
-          placeholder: (defaultStyles) => ({
-            ...defaultStyles,
-            fontSize: '0.875rem'
-          }),
-          option: (optionStyles) => ({
-            ...optionStyles,
-            backgroundColor: 'white',
-            color: 'black',
-            ...newProps.optionStyles
-          })
-        }}
+        styles={multiSelectStyles}
       />
       <div className={styles.error}>
         {newProps.error} {newProps.error && newProps.errorLabel}

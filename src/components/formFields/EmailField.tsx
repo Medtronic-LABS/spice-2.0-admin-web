@@ -35,6 +35,7 @@ const EmailField = forwardRef(
     ref
   ) => {
     const [disabled, setDisabled] = useState(false);
+    const submitEnabledStatus = useRef(true);
     const currentEmail = useRef(
       (() => {
         try {
@@ -72,7 +73,7 @@ const EmailField = forwardRef(
     const validateIsEmailExist = useCallback(
       () =>
         error ||
-        (validating
+        (validating && !submitEnabledStatus.current
           ? ' ' // blank space is given as error to block submition till the user already exist validation is completed
           : ''),
       [error, validating]
@@ -139,6 +140,7 @@ const EmailField = forwardRef(
           setValidating(true);
           setLoading(true);
           await fetchUserByEmail(email).then((res) => fetchUserByEmailResFn(res, email));
+          submitEnabledStatus.current = true;
           setNetworkError(false);
         } catch (e: any) {
           setLoading(false);
@@ -181,10 +183,12 @@ const EmailField = forwardRef(
               {...input}
               onBlur={(event) => {
                 input.onBlur(event);
+                submitEnabledStatus.current = false;
                 validateUser(input.value);
               }}
               onChange={(event) => {
                 if (!(isEdit || disabled)) {
+                  submitEnabledStatus.current = false;
                   currentEmail.current = event.target.value.trim();
                   setNetworkError(false);
                   input.onChange(event);

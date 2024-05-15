@@ -1,5 +1,5 @@
 import { SagaIterator } from 'redux-saga';
-import { all, call, put, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
 import { IFetchUserByIdRequest, IFetchUserRolesRequest, ILoginRequest, IUpdateUserRequest, IUser } from './types';
@@ -12,6 +12,8 @@ import * as userService from '../../services/userAPI';
 import * as userActions from './actions';
 import { IActionProps } from '../../typings/global';
 import { error, success } from '../../utils/toastCenter';
+import { AppState } from '../rootReducer';
+import { IUserRole } from '../healthFacility/types';
 
 // export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
 //   roles.length && rolesArray.find((role) => roles.includes(role));
@@ -163,8 +165,15 @@ export function* fetchUserRoles({ successCb, failureCb }: IFetchUserRolesRequest
     const {
       data: { entity: userRoles }
     } = yield call(userService.fetchUserRoles);
-    successCb?.(userRoles);
-    yield put(userActions.fetchUserRolesActionSuccess(userRoles));
+    const role = yield select((state: AppState) => state.user.user.role);
+    const updatedUserRoles = {
+      ...userRoles,
+      SPICE: [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
+        ? userRoles.SPICE
+        : userRoles.SPICE.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
+    };
+    successCb?.(updatedUserRoles);
+    yield put(userActions.fetchUserRolesActionSuccess(updatedUserRoles));
   } catch (e: any) {
     failureCb?.(e);
     yield put(userActions.fetchUserRolesActionFail());

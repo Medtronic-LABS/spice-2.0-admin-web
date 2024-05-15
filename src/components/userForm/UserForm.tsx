@@ -94,6 +94,7 @@ const UserForm = ({
   const [autoFetchData, setAutoFetchData] = useState([] as any[]);
   const [isCHWUser, setUserAsCHW] = useState([false]);
   const roleOptions = useRef<IRoles[][]>([]);
+  const [disabledRoles, setDisabledRoles] = useState([] as IRoles[][]);
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -261,13 +262,36 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
+  const mobileRoles = useMemo(() => ['CHW', 'CHA', 'MCHA', 'SECHN', 'PROVIDER'], []);
+  const adminRoles = useMemo(() => ['HEALTH_FACILITY_ADMIN', 'SUPER_ADMIN'], []);
+  const notHFCreateRoles = useMemo(() => ['SUPER_ADMIN', 'CHW', 'CHA', 'MCHA', 'SECHN'], []);
+
   // roles based CHW related utils
   const selectedRoles = useCallback((index: number) => form.getState().values.users[index]?.roles, [form]);
-  const isCHWSelected = (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => userRole.name === 'CHW');
+  const isCHWSelected = useCallback(
+    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
+    [mobileRoles]
+  );
+  const isAdminRoleSelected = useCallback(
+    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => adminRoles.includes(userRole.name)),
+    [adminRoles]
+  );
+
   const isCHWUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
       const newChWStatus = [...isCHWUser];
       newChWStatus[index] = isCHWSelected(roles);
+      const newDisabledRoles = [...disabledRoles];
+      newDisabledRoles[index] = (roleOptions.current?.[index] || []).filter((r: IRoles) => {
+        if (isCHWSelected(roles)) {
+          return adminRoles.includes(r.name);
+        } else if (isAdminRoleSelected(roles)) {
+          return mobileRoles.includes(r.name);
+        } else {
+          return false;
+        }
+      });
+      setDisabledRoles(newDisabledRoles);
       setUserAsCHW(newChWStatus);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -315,10 +339,7 @@ const UserForm = ({
     name: string,
     index: number
   ) => {
-    const isTenantChanged =
-      tenantIds.length >= (listData.hfTenantIds || []).length &&
-      tenantIds.some((id: number) => !(listData.hfTenantIds || []).includes(id));
-    if (isCHWSelected(roles) && tenantIds.length && (!listData.list.length || isTenantChanged)) {
+    if (isCHWSelected(roles) && tenantIds.length) {
       if (name === 'village') {
         return fetchVillagesList(tenantIds, index);
       } else {
@@ -359,13 +380,22 @@ const UserForm = ({
   const roleOptionSelection = useCallback(
     (suite: string, index: number, mandatoryRoles?: IRoles[]) => {
       const newRoleOptions = [...roleOptions.current];
-      newRoleOptions[index] =
-        isHFCreate && (mandatoryRoles ? !isCHWSelected(mandatoryRoles) : true)
-          ? (rolesGrouped[suite] || []).filter((r: IRoles) => r.name !== 'CHW')
-          : rolesGrouped?.[suite];
+      if (isHFCreate && (mandatoryRoles ? !isCHWSelected(mandatoryRoles) : true)) {
+        newRoleOptions[index] = (rolesGrouped[suite] || [])
+          .filter((r: IRoles) => !notHFCreateRoles.includes(r.name))
+          .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
+      } else if (isHF) {
+        newRoleOptions[index] = rolesGrouped?.[suite]
+          .filter((r: IRoles) => r.name !== 'SUPER_ADMIN')
+          .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
+      } else {
+        newRoleOptions[index] = rolesGrouped?.[suite].sort((a: any, b: any) =>
+          a.displayName > b.displayName ? 1 : -1
+        );
+      }
       roleOptions.current = newRoleOptions;
     },
-    [isHFCreate, rolesGrouped]
+    [isCHWSelected, isHF, isHFCreate, notHFCreateRoles, rolesGrouped]
   );
 
   const initData = useCallback(() => {
@@ -392,7 +422,8 @@ const UserForm = ({
           // SUITE options
           const suiteAccess = Object.keys(rolesGrouped || {})
             .map((userRole: any) => ({ groupName: userRole, id: userRole }))
-            .sort();
+            .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
+
           // Default Role options selection base on SUITE on initial Edit
           if (isEdit && !roleOptions.current[index]) {
             const selectedSuiteAccess = (isEdit ? initialEditData : data.length ? data : initialValue)[index]
@@ -455,19 +486,25 @@ const UserForm = ({
                           valueKey='id'
                           isShowLabel={true}
                           isSelectAll={true}
+                          selectAll={false}
                           menuPlacement={'bottom'}
                           isDisabled={isProfile}
                           placeholder=''
                           isModel={true}
                           isMulti={true}
                           isOptionDisabled={(option: any) => {
-                            return autoFetched[index]
-                              ? (mandatoryRoles || []).map((v: any) => v.id).includes(option.id)
+                            const optionsToBeDisabled = [
+                              ...(autoFetched[index] ? mandatoryRoles : []),
+                              ...disabledRoles[index]
+                            ];
+                            return optionsToBeDisabled.length
+                              ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                               : null;
                           }}
                           required={true}
                           options={roleOptions.current?.[index] || []}
                           mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                          disabledOptions={disabledRoles[index]}
                           loading={isRolesLoading}
                           error={isError(meta) && !selectedRoles(index)?.length}
                           onChange={(values: any) => {
