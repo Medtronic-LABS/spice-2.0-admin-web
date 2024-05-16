@@ -19,7 +19,8 @@ import {
   IPeerSupervisor,
   IFetchHFTypesRequest,
   IFetchVillagesListFromHFRequest,
-  IFetchUserDetailRequest
+  IFetchUserDetailRequest,
+  IDeleteHFRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -57,7 +58,9 @@ import {
   fetchCultureListSuccess,
   fetchCultureListFailure,
   fetchCountryListSuccess,
-  fetchCountryListFailure
+  fetchCountryListFailure,
+  deleteHealthFacilitySuccess,
+  deleteHealthFacilityFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -77,7 +80,8 @@ import {
   FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
   FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
   FETCH_CULTURE_LIST_REQUEST,
-  FETCH_COUNTRY_LIST_REQUEST
+  FETCH_COUNTRY_LIST_REQUEST,
+  DELETE_HEALTH_FACILITY_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 
@@ -128,6 +132,22 @@ export function* createHealthFacilityRequest({ data, successCb, failureCb }: ICr
     if (e instanceof ApiError) {
       failureCb?.(e);
       yield put(createHFFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on DELETE_HEALTH_FACILITY_REQUEST action
+*/
+export function* deleteHFRequest({ data, successCb, failureCb }: IDeleteHFRequest): SagaIterator {
+  try {
+    yield call(hfService.deleteHealtFacility as any, data);
+    yield put(deleteHealthFacilitySuccess());
+    successCb?.();
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(deleteHealthFacilityFailure(e));
     }
   }
 }
@@ -476,6 +496,7 @@ export function* fetchCountryList(): SagaIterator {
 function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_HEALTH_FACILITY_LIST_REQUEST, fetchHealthFacilityList)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_REQUEST, createHealthFacilityRequest)]);
+  yield all([takeLatest(DELETE_HEALTH_FACILITY_REQUEST, deleteHFRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_SUMMARY_REQUEST, fetchHFSummaryRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_DETAILS_REQUEST, updateHFDetailsRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_USER_LIST_REQUEST, fetchHFUserList)]);

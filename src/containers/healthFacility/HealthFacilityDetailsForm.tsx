@@ -9,7 +9,7 @@ import {
   normalizeFloatingNumber,
   validateMobile
 } from '../../utils/validation';
-import SelectInput, { AsyncSelectInput } from '../../components/formFields/SelectInput';
+import SelectInput from '../../components/formFields/SelectInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -26,7 +26,7 @@ import {
   villagesListSelector,
   villagesLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import {
   fetchChiefdomListRequest,
   fetchCultureListRequest,
@@ -37,7 +37,6 @@ import {
 } from '../../store/healthFacility/actions';
 import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
-import { listCities } from '../../services/healthFacilityAPI';
 import { IObjectData } from '../../store/healthFacility/types';
 
 interface IAddUserFormProps {
@@ -83,7 +82,6 @@ const HealthFacilityDetailsForm = ({
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
   const countryId = Number(regionId || regionData.id);
-  const cityOptions = useRef<IObjectData[]>([]);
 
   // Culture list fetch
   useEffect(() => {
@@ -148,36 +146,6 @@ const HealthFacilityDetailsForm = ({
     regionId
   ]);
 
-  /**
-   * It gets the city from API and list the options
-   * @param searchStr it denotes the search text
-   */
-  const loadCities = async (searchStr: string) => {
-    if (searchStr) {
-      try {
-        const city: any = await new Promise(async (resolve) => {
-          try {
-            const {
-              data: { entity: response }
-            } = await listCities(Number(countryId), searchStr);
-            resolve(response);
-          } catch (e) {
-            console.error('Unable to fetch cities', e);
-            return [];
-          }
-        }).catch((e) => {
-          console.error('Unable to fetch cities', e);
-          return [];
-        });
-        cityOptions.current = city;
-        return city;
-      } catch (e) {
-        console.error('Unable to fetch cities', e);
-        return [];
-      }
-    }
-  };
-
   return (
     <div className='row gx-1dot25 align-items-end'>
       <div className={columnStyle}>
@@ -205,6 +173,7 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
+              form={form}
               label='Health Facility Type'
               errorLabel='type'
               labelKey='name'
@@ -276,6 +245,7 @@ const HealthFacilityDetailsForm = ({
               <SelectInput
                 {...(input as any)}
                 {...(meta as any)}
+                form={form}
                 label='District'
                 errorLabel='district'
                 labelKey='name'
@@ -302,6 +272,7 @@ const HealthFacilityDetailsForm = ({
             <SelectInput
               {...(input as any)}
               {...(meta as any)}
+              form={form}
               label='Chiefdom'
               errorLabel='chiefdom'
               labelKey='name'
@@ -323,14 +294,15 @@ const HealthFacilityDetailsForm = ({
           name={`${formName}.city`}
           validate={required}
           render={(props) => (
-            <AsyncSelectInput
+            <SelectInput
               {...props}
+              form={form}
               label='City/Village'
               errorLabel='city/village'
               labelKey='name'
               valueKey='id'
-              options={cityOptions.current}
-              loadInputOptions={loadCities}
+              options={villagesList}
+              loadingOptions={villagesLoading}
               error={(props.meta.touched && props.meta.error) || undefined}
             />
           )}
@@ -424,6 +396,7 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
+              form={form}
               label='Language'
               errorLabel='language'
               labelKey='name'
@@ -444,6 +417,7 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <MultiSelect
               {...(input as any)}
+              form={form}
               label='Linked Villages'
               errorLabel='linked villages'
               labelKey='name'

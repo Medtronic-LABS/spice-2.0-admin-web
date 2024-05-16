@@ -64,7 +64,7 @@ const Login = (props: any): React.ReactElement => {
         failureCb: (e: Error) => {
           toastCenter.error(
             ...getErrorToastArgs(
-              e,
+              e.name === 'TypeError' ? { ...e, message: APPCONSTANTS.LOGIN_FAILED_MESSAGE } : e,
               APPCONSTANTS.LOGIN_FAILED_TITLE,
               e?.message === APPCONSTANTS.INVALID_CREDENTIALS ? e.message : APPCONSTANTS.LOGIN_FAILED_MESSAGE
             )

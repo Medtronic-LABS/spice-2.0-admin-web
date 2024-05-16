@@ -9,6 +9,7 @@ import TickIcon from '../../assets/images/tick.svg';
 import { useState } from 'react';
 import CryptoJS from 'crypto-js';
 import commonPassword from '../../utils/Common_Passwords';
+import { sanitize } from 'dompurify';
 
 export const generatePassword = (password: string) => {
   const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
@@ -94,6 +95,7 @@ export const ResetPasswordFields = ({
             name='oldPassword'
             type={isShowOldPassword ? 'text' : 'password'}
             validate={composeValidators(validatePassword, validateOldPassword)}
+            parse={(value) => sanitize(value)}
             render={({ input, meta }) => (
               <div>
                 <TextInput
@@ -122,6 +124,7 @@ export const ResetPasswordFields = ({
           name='newPassword'
           type={isShowPassword ? 'text' : 'password'}
           validate={composeValidators(validatePassword, checkUsername)}
+          parse={(value) => sanitize(value)}
           render={({ input, meta }) => (
             <>
               <TextInput
@@ -150,6 +153,7 @@ export const ResetPasswordFields = ({
             name='confirmPassword'
             type={isShowConfirmPassword ? 'text' : 'password'}
             validate={composeValidators(validatePassword, validatePasswordMatch)}
+            parse={(value) => sanitize(value)}
             render={({ input: newIn, meta }) => (
               <div>
                 <TextInput

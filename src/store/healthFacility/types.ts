@@ -210,6 +210,27 @@ export interface ICreateHFFailure {
   error: Error;
 }
 
+export interface IDeleteHFPayload {
+  id: number;
+  tenantId: number;
+}
+
+export interface IDeleteHFRequest {
+  type: typeof ACTION_TYPES.DELETE_HEALTH_FACILITY_REQUEST;
+  data: IDeleteHFPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IDeleteHFSuccess {
+  type: typeof ACTION_TYPES.DELETE_HEALTH_FACILITY_SUCCESS;
+}
+
+export interface IDeleteHFFailure {
+  type: typeof ACTION_TYPES.DELETE_HEALTH_FACILITY_FAILURE;
+  error: Error;
+}
+
 export interface IClearHFList {
   type: typeof ACTION_TYPES.CLEAR_HEALTH_FACILITY_LIST;
 }
@@ -557,6 +578,9 @@ export type HealthFacilityActions =
   | ICreateHFRequest
   | ICreateHFSuccess
   | ICreateHFFailure
+  | IDeleteHFRequest
+  | IDeleteHFSuccess
+  | IDeleteHFFailure
   | IClearHFList
   | IClearSupervisorList
   | IClearVillagesList

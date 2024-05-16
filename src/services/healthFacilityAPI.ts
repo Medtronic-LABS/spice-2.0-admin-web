@@ -7,7 +7,8 @@ import {
   IDeleteUserPayload,
   ICreateHFRequestPayload,
   IHFUserPost,
-  IHealthFacilityPost
+  IHealthFacilityPost,
+  IDeleteHFPayload
 } from '../store/healthFacility/types';
 
 export const fetchHealthFacilityList = ({
@@ -35,6 +36,13 @@ export const createHealthFacility = (data: ICreateHFRequestPayload) =>
   axios({
     method: 'POST',
     url: '/user-service/organization/create-healthfacility',
+    data
+  });
+
+export const deleteHealtFacility = (data: IDeleteHFPayload) =>
+  axios({
+    url: '/user-service/organization/delete-healthfacility',
+    method: 'POST',
     data
   });
 

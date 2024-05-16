@@ -71,7 +71,10 @@ import {
   IFetchCultureListFailure,
   IFetchCountryListRequest,
   IFetchCountryListSuccess,
-  IFetchCountryListFailure
+  IFetchCountryListFailure,
+  IDeleteHFRequest,
+  IDeleteHFSuccess,
+  IDeleteHFFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -125,6 +128,26 @@ export const createHFSuccess = (): ICreateHFSuccess => ({
 
 export const createHFFailure = (error: Error): ICreateHFFailure => ({
   type: HF_TYPES.CREATE_HEALTH_FACILITY_FAILURE,
+  error
+});
+
+export const deleteHealthFacilityRequest = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<IDeleteHFRequest, 'type'>): IDeleteHFRequest => ({
+  type: HF_TYPES.DELETE_HEALTH_FACILITY_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const deleteHealthFacilitySuccess = (): IDeleteHFSuccess => ({
+  type: HF_TYPES.DELETE_HEALTH_FACILITY_SUCCESS
+});
+
+export const deleteHealthFacilityFailure = (error: Error): IDeleteHFFailure => ({
+  type: HF_TYPES.DELETE_HEALTH_FACILITY_FAILURE,
   error
 });
 

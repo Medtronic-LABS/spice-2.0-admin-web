@@ -108,7 +108,11 @@ const UserList = (props: IMatchProps): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
-    if ((value.roles || []).some((userRole: IUserRole) => userRole.name === 'CHW')) {
+    if (
+      (value.roles || []).some((userRole: IUserRole) =>
+        ['CHW', 'CHA', 'MCHA', 'SECHN', 'PROVIDER'].includes(userRole.name)
+      )
+    ) {
       dispatch(
         fetchUserDetailRequest({
           id: Number(value?.id),

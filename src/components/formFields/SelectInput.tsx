@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Select, { CSSObjectWithLabel } from 'react-select';
 import Async from 'react-select/async';
 
 import InfoIcon from '../../assets/images/info-grey.svg';
 import CustomTooltip from '../tooltip';
 import styles from './SelectInput.module.scss';
+import { FormApi } from 'final-form';
 
 export interface ISelectOption {
   label: string;
@@ -27,6 +28,7 @@ interface ISelectBoxProps {
   placeholder?: string;
   error?: string;
   errorLabel?: string;
+  form?: FormApi<any>;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onChange?: (e: any) => void;
@@ -46,6 +48,7 @@ interface ISelectBoxProps {
   isModel?: boolean;
   isShowLabel?: boolean;
   isMulti?: boolean;
+  name?: string;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {
@@ -65,6 +68,7 @@ export const handleChange = (input: any, onChange: (e: any) => void, value: any)
  */
 const SelectInput = ({
   id,
+  form,
   label,
   onFocus,
   onBlur,
@@ -86,6 +90,7 @@ const SelectInput = ({
   isModel = false,
   isShowLabel = true,
   isMulti = false,
+  name = '',
   ...rest
 }: ISelectBoxProps): React.ReactElement => {
   const getOptionLabel = (option: any) => {
@@ -113,6 +118,13 @@ const SelectInput = ({
       valueContainer: (base: CSSObjectWithLabel) => ({ ...base, maxHeight: '200px', overflowY: 'auto' })
     };
   };
+
+  useEffect(() => {
+    if (options.length === 1 && form && name && required) {
+      form.change(name, options[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, options.length, required]);
 
   return (
     <div className={`d-flex flex-column ${styles.selectInputContainer}`}>

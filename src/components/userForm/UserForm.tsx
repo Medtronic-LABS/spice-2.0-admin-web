@@ -173,8 +173,8 @@ const UserForm = ({
     isCHWUserSelectedFn(userData.role, index);
     if (isCHWSelected(userData.roles)) {
       const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
-      fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'village', index);
-      fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'supervisor', index);
+      fetchListWithConditions(selectedRoles(index), tenantIds, 'village', index);
+      fetchListWithConditions(selectedRoles(index), tenantIds, 'supervisor', index);
     }
   };
 
@@ -267,7 +267,7 @@ const UserForm = ({
   const notHFCreateRoles = useMemo(() => ['SUPER_ADMIN', 'CHW', 'CHA', 'MCHA', 'SECHN'], []);
 
   // roles based CHW related utils
-  const selectedRoles = useCallback((index: number) => form.getState().values.users[index]?.roles, [form]);
+  const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.roles, [form]);
   const isCHWSelected = useCallback(
     (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
     [mobileRoles]
@@ -332,13 +332,7 @@ const UserForm = ({
   );
 
   // Common function for the supervisor and village list fetch with conditions
-  const fetchListWithConditions = (
-    roles: IRoles[],
-    tenantIds: number[] = [],
-    listData: any = { list: [], hfTenantIds: [] },
-    name: string,
-    index: number
-  ) => {
+  const fetchListWithConditions = (roles: IRoles[], tenantIds: number[] = [], name: string, index: number) => {
     if (isCHWSelected(roles) && tenantIds.length) {
       if (name === 'village') {
         return fetchVillagesList(tenantIds, index);
@@ -365,11 +359,11 @@ const UserForm = ({
   useEffect(() => {
     if (isEdit && !isProfile) {
       const tenantIds = [...initialEditData[0].hfTenantIds, hfTenantId].filter((v: number) => v);
-      fetchListWithConditions(selectedRoles(0), tenantIds, villagesList, 'village', 0);
-      fetchListWithConditions(selectedRoles(0), tenantIds, peerSupervisorList, 'supervisor', 0);
+      fetchListWithConditions(selectedRoles(0), tenantIds, 'village', 0);
+      fetchListWithConditions(selectedRoles(0), tenantIds, 'supervisor', 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [autoFetchData]);
 
   useEffect(() => {
     if (isEdit) {
@@ -385,11 +379,11 @@ const UserForm = ({
           .filter((r: IRoles) => !notHFCreateRoles.includes(r.name))
           .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
       } else if (isHF) {
-        newRoleOptions[index] = rolesGrouped?.[suite]
+        newRoleOptions[index] = (rolesGrouped[suite] || [])
           .filter((r: IRoles) => r.name !== 'SUPER_ADMIN')
           .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
       } else {
-        newRoleOptions[index] = rolesGrouped?.[suite].sort((a: any, b: any) =>
+        newRoleOptions[index] = (rolesGrouped[suite] || []).sort((a: any, b: any) =>
           a.displayName > b.displayName ? 1 : -1
         );
       }
@@ -443,6 +437,7 @@ const UserForm = ({
                     render={({ input, meta }) => (
                       <SelectInput
                         {...(input as any)}
+                        form={form}
                         label='SPICE Suite Access'
                         errorLabel='suite access'
                         labelKey='groupName'
@@ -457,7 +452,7 @@ const UserForm = ({
                           roleOptionSelection(value.groupName, index);
                           // To store ALL ROLES
                           form.change(
-                            `${formName}[${index}].role`,
+                            `${formName}[${index}].roles`,
                             selectedRoles(index).filter(
                               (userRole: IUserRole) => userRole.groupName === value.groupName
                             ) || []
@@ -527,14 +522,8 @@ const UserForm = ({
                                 ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
                                 hfTenantId
                               ].filter((v: number) => v);
-                              fetchListWithConditions(selectedRoles(index), tenantIds, villagesList, 'village', index);
-                              fetchListWithConditions(
-                                selectedRoles(index),
-                                tenantIds,
-                                peerSupervisorList,
-                                'supervisor',
-                                index
-                              );
+                              fetchListWithConditions(selectedRoles(index), tenantIds, 'village', index);
+                              fetchListWithConditions(selectedRoles(index), tenantIds, 'supervisor', index);
                             }
                             input.onChange(values);
                           }}
@@ -606,6 +595,7 @@ const UserForm = ({
                     render={({ input, meta }) => (
                       <SelectInput
                         {...(input as any)}
+                        form={form}
                         label='Country Code'
                         errorLabel='country code'
                         labelKey='phoneNumberCode'
@@ -639,6 +629,7 @@ const UserForm = ({
                         return (
                           <SelectInput
                             {...(input as any)}
+                            form={form}
                             label='Assigned Health Facility'
                             errorLabel='assigned health facility'
                             labelKey='name'
@@ -686,6 +677,7 @@ const UserForm = ({
                               <SelectInput
                                 {...(input as any)}
                                 {...(meta as any)}
+                                form={form}
                                 label='Selected Peer Supervisor'
                                 errorLabel='selected peer supervisor'
                                 labelKey='name'

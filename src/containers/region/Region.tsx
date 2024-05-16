@@ -103,7 +103,7 @@ const Region = (): React.ReactElement => {
               customLabel='Upload'
               customButtonIcon={UploadIcon}
               onCustomClick={() => setUploadClicked(true)}
-              header={regionData.name}
+              header='Region'
               isSearch={true}
               onSearch={handleSearch}
               onButtonClick={onDownloadClick}

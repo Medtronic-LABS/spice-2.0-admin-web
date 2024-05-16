@@ -14,7 +14,12 @@ import { FormApi } from 'final-form';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHFListRequest, fetchHFSummaryRequest, updateHFDetailsRequest } from '../../store/healthFacility/actions';
+import {
+  deleteHealthFacilityRequest,
+  fetchHFListRequest,
+  fetchHFSummaryRequest,
+  updateHFDetailsRequest
+} from '../../store/healthFacility/actions';
 import {
   healthFacilityListSelector,
   healthFacilityListTotalSelector,
@@ -147,6 +152,27 @@ const HealthFacilityList = (): React.ReactElement => {
     );
   };
 
+  const handleHFDelete = useCallback(
+    ({ data: { id, tenantId } }: { data: { id: number; tenantId: number } }) => {
+      dispatch(
+        deleteHealthFacilityRequest({
+          data: {
+            id,
+            tenantId
+          },
+          successCb: () => {
+            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DELETE_SUCCESS);
+            fetchList();
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_DELETE_FAIL));
+          }
+        })
+      );
+    },
+    [dispatch, fetchList]
+  );
+
   return (
     <>
       {loading && <Loader />}
@@ -187,14 +213,17 @@ const HealthFacilityList = (): React.ReactElement => {
                 cellFormatter: ({ chiefdom }) => chiefdom.name
               }
             ]}
-            isDelete={false}
+            isDelete={true}
             isEdit={true}
             page={listParams.page}
             rowsPerPage={listParams.rowsPerPage}
             count={healthFacilityCount}
             onRowEdit={openEditDialogue}
+            onDeleteClick={handleHFDelete}
             handlePageChange={handlePage}
             handleRowClick={handleRowClick}
+            confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION}
+            deleteTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE}
           />
         </DetailCard>
       </div>

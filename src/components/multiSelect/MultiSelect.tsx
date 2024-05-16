@@ -1,4 +1,3 @@
-import { useState, useRef } from 'react';
 import {
   default as ReactSelect,
   components,
@@ -8,7 +7,7 @@ import {
   OptionProps,
   CSSObjectWithLabel
 } from 'react-select';
-
+import { useState, useRef, useEffect } from 'react';
 import styles from './MultiSelect.module.scss';
 
 export interface IOption {
@@ -158,6 +157,13 @@ const MultiSelect = (props: any) => {
       ]);
     }
   };
+
+  useEffect(() => {
+    if (props.form && props.options.length === 1 && props.required) {
+      props.form.change(props.name, props.options);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.name, props.options, props.required]);
 
   const customFilterOption = ({ value, label }: IOption, input: string) => {
     return (
