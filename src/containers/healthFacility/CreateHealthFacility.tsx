@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility, formatHFUserData } from './HealthFacilitySummary';
 import { IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import { workflowListSelector } from '../../store/healthFacility/selectors';
+import { healthFacilityLoadingSelector, workflowListSelector } from '../../store/healthFacility/selectors';
 
 interface IMatchParams {
   regionId?: string;
@@ -34,6 +34,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   let formInstance: FormApi<any>;
   const history = useHistory();
   const workflows = useSelector(workflowListSelector);
+  const loading = useSelector(healthFacilityLoadingSelector);
   const [OUTenantId, setSelectedOUTenantId] = useState<string>('');
   const [submittedData, setSubmittedData] = useState({
     data: {
@@ -137,8 +138,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       }
     }
   };
-
-  const loading = false;
 
   return (
     <>

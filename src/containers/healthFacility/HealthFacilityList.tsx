@@ -203,13 +203,13 @@ const HealthFacilityList = (): React.ReactElement => {
                 id: 2,
                 name: 'type',
                 label: 'Type',
-                width: '20%'
+                width: '35%'
               },
               {
                 id: 3,
                 name: 'chiefdom',
                 label: 'Chiefdom',
-                width: '40%',
+                width: '30%',
                 cellFormatter: ({ chiefdom }) => chiefdom.name
               }
             ]}

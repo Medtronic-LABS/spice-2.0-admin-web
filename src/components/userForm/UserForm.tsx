@@ -619,51 +619,55 @@ const UserForm = ({
                     index={index}
                   />
                 </div>
-                {!isHFCreate && !isHF && !isEdit && (
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.healthFacility`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => {
-                        return (
-                          <SelectInput
-                            {...(input as any)}
-                            form={form}
-                            label='Assigned Health Facility'
-                            errorLabel='assigned health facility'
-                            labelKey='name'
-                            valueKey='id'
-                            options={healthFacilityList}
-                            loadingOptions={hfLoading}
-                            error={isError(meta)}
-                            isModel={true}
-                            disabled={isProfile}
-                            onChange={(hf: IHealthFacility) => {
-                              const formData = form.getState().values.users[index];
-                              if (autoFetched[index] && formData?.selectedVillages?.length) {
-                                form.change(`${formName}[${index}].villages`, [
-                                  ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
-                                ]);
-                              } else {
-                                form.change(`${formName}[${index}].villages`, []);
-                              }
-                              fetchSupervisorList(
-                                [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
-                                index
-                              );
-                              fetchVillagesList(
-                                [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
-                                index
-                              );
-                              input.onChange(hf);
-                            }}
-                          />
-                        );
-                      }}
-                    />
-                  </div>
-                )}
+                {!isHFCreate &&
+                  !isHF &&
+                  !isEdit &&
+                  !(form.getState().values.users[index].roles || []).some((userRole: IRoles) =>
+                    [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(userRole.name)
+                  ) && (
+                    <div className='col-sm-6 col-12'>
+                      <Field
+                        name={`${name}.healthFacility`}
+                        type='text'
+                        validate={required}
+                        render={({ input, meta }) => {
+                          return (
+                            <SelectInput
+                              {...(input as any)}
+                              label='Assigned Health Facility'
+                              errorLabel='assigned health facility'
+                              labelKey='name'
+                              valueKey='id'
+                              options={healthFacilityList}
+                              loadingOptions={hfLoading}
+                              error={isError(meta)}
+                              isModel={true}
+                              disabled={isProfile}
+                              onChange={(hf: IHealthFacility) => {
+                                const formData = form.getState().values.users[index];
+                                if (autoFetched[index] && formData?.selectedVillages?.length) {
+                                  form.change(`${formName}[${index}].villages`, [
+                                    ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
+                                  ]);
+                                } else {
+                                  form.change(`${formName}[${index}].villages`, []);
+                                }
+                                fetchSupervisorList(
+                                  [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
+                                  index
+                                );
+                                fetchVillagesList(
+                                  [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
+                                  index
+                                );
+                                input.onChange(hf);
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
                 {isCHWUser[index] && (
                   <>
                     {((isHF && isEdit) || !isHFCreate) && (

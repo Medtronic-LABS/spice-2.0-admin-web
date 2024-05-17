@@ -162,7 +162,7 @@ const APPCONSTANTS = {
     { label: 'Level 5', value: 'Level 5' },
     { label: 'Level 6', value: 'Level 6' }
   ],
-  SEARCH_BY_NAME_EMAIL: 'First Name / Email',
+  SEARCH_BY_NAME_EMAIL: 'Name / Email',
   SEARCH_BY_NAME: 'Search Name',
   SEARCH_BY_EMAIL: 'Search Email',
   GENDER_OPTIONS: [

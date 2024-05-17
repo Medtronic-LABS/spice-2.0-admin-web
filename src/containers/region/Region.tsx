@@ -104,6 +104,7 @@ const Region = (): React.ReactElement => {
               customButtonIcon={UploadIcon}
               onCustomClick={() => setUploadClicked(true)}
               header='Region'
+              searchPlaceholder='Search'
               isSearch={true}
               onSearch={handleSearch}
               onButtonClick={onDownloadClick}

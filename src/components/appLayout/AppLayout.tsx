@@ -111,7 +111,7 @@ export const AppLayout = ({ children }: IAppLayout) => {
   return (
     <div className={`position-relative ${pyChange} ${styles.layout} ${pxForSideMenu} d-flex justify-content-center`}>
       {!initializingApp && (
-        <div className={`px-md-3 px-1  ${styles.contentCenter}`}>
+        <div className={`px-1  ${styles.contentCenter}`}>
           {header(isBreadcrumbDisabled, isMenuTogglable, isSideMenuDisabled, isStyleVisible, setIsMenuVisible)}
           <div className={`row gx-1dot25 ${styles.body}`}>
             {!isSideMenuDisabled && (
