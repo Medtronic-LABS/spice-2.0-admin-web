@@ -5,7 +5,7 @@ import Async from 'react-select/async';
 import InfoIcon from '../../assets/images/info-grey.svg';
 import CustomTooltip from '../tooltip';
 import styles from './SelectInput.module.scss';
-import { FormApi } from 'final-form';
+import { useForm } from 'react-final-form';
 
 export interface ISelectOption {
   label: string;
@@ -28,7 +28,6 @@ interface ISelectBoxProps {
   placeholder?: string;
   error?: string;
   errorLabel?: string;
-  form?: FormApi<any>;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onChange?: (e: any) => void;
@@ -49,6 +48,7 @@ interface ISelectBoxProps {
   isShowLabel?: boolean;
   isMulti?: boolean;
   name?: string;
+  menuPlacement?: string;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {
@@ -68,7 +68,6 @@ export const handleChange = (input: any, onChange: (e: any) => void, value: any)
  */
 const SelectInput = ({
   id,
-  form,
   label,
   onFocus,
   onBlur,
@@ -90,9 +89,22 @@ const SelectInput = ({
   isModel = false,
   isShowLabel = true,
   isMulti = false,
+  menuPlacement = 'auto',
   name = '',
   ...rest
 }: ISelectBoxProps): React.ReactElement => {
+  const { change } = useForm();
+
+  // To auto select if only 1 option is available
+  useEffect(() => {
+    if (options && options.length === 1 && name && required) {
+      setTimeout(() => {
+        change(name, options[0]);
+      }, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, options, options?.length, required]);
+
   const getOptionLabel = (option: any) => {
     if (labelKey && nestedObject) {
       return option[labelKey[0]][labelKey[1]];
@@ -118,13 +130,6 @@ const SelectInput = ({
       valueContainer: (base: CSSObjectWithLabel) => ({ ...base, maxHeight: '200px', overflowY: 'auto' })
     };
   };
-
-  useEffect(() => {
-    if (options.length === 1 && form && name && required) {
-      form.change(name, options[0]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, options.length, required]);
 
   return (
     <div className={`d-flex flex-column ${styles.selectInputContainer}`}>
@@ -158,7 +163,7 @@ const SelectInput = ({
         placeholder={placeholder || ''}
         openMenuOnFocus={true}
         isLoading={loadingOptions}
-        menuPlacement='bottom'
+        menuPlacement={menuPlacement}
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         isDisabled={disabled}

@@ -14,7 +14,7 @@ import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import UserForm from '../../components/userForm/UserForm';
 import {
   clearSupervisorList,
-  clearVillageList,
+  clearVillageHFList,
   createHFUserRequest,
   deleteHFUserRequest,
   fetchHFSummaryRequest,
@@ -158,7 +158,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     refreshHFDetails();
     return () => {
       clearSupervisorList();
-      clearVillageList();
+      clearVillageHFList();
     };
     // eslint-disable-next-line
   }, [listParams, hfTenantId, dispatch]);

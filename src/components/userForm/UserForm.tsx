@@ -144,6 +144,10 @@ const UserForm = ({
     };
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
+    userData.supervisor = {
+      ...userData.supervisor,
+      name: `${userData.supervisor?.firstName || ''} ${userData.supervisor?.lastName || ''}`
+    };
     userData.selectedRoles = [...(userData.roles || [])];
     userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
     form.batch(() => {
@@ -437,7 +441,6 @@ const UserForm = ({
                     render={({ input, meta }) => (
                       <SelectInput
                         {...(input as any)}
-                        form={form}
                         label='SPICE Suite Access'
                         errorLabel='suite access'
                         labelKey='groupName'
@@ -595,7 +598,6 @@ const UserForm = ({
                     render={({ input, meta }) => (
                       <SelectInput
                         {...(input as any)}
-                        form={form}
                         label='Country Code'
                         errorLabel='country code'
                         labelKey='phoneNumberCode'
@@ -645,6 +647,7 @@ const UserForm = ({
                               disabled={isProfile}
                               onChange={(hf: IHealthFacility) => {
                                 const formData = form.getState().values.users[index];
+                                form.change(`${formName}[${index}].supervisor`, null);
                                 if (autoFetched[index] && formData?.selectedVillages?.length) {
                                   form.change(`${formName}[${index}].villages`, [
                                     ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
@@ -681,12 +684,12 @@ const UserForm = ({
                               <SelectInput
                                 {...(input as any)}
                                 {...(meta as any)}
-                                form={form}
                                 label='Selected Peer Supervisor'
                                 errorLabel='selected peer supervisor'
                                 labelKey='name'
                                 valueKey='id'
                                 disabled={isProfile}
+                                menuPlacement={'auto'}
                                 options={peerSupervisors[index]}
                                 loadingOptions={peerSupervisorLoading}
                                 error={isError(meta)}
@@ -712,6 +715,7 @@ const UserForm = ({
                                   required={true}
                                   isShowLabel={true}
                                   isSelectAll={true}
+                                  isDefaultSelected={true}
                                   placeholder=''
                                   menuPlacement={'bottom'}
                                   isDisabled={isProfile}

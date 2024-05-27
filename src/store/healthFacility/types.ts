@@ -238,7 +238,14 @@ export interface IClearSupervisorList {
   type: typeof ACTION_TYPES.CLEAR_PEER_SUPERVISOR_LIST;
 }
 export interface IClearVillagesList {
+  type: typeof ACTION_TYPES.CLEAR_VILLAGES_LIST;
+}
+export interface IClearVillagesHFList {
   type: typeof ACTION_TYPES.CLEAR_VILLAGES_LIST_FROM_HF;
+}
+
+export interface IClearDependentData {
+  type: typeof ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA;
 }
 
 export interface IFetchHFSummaryRequest {
@@ -583,7 +590,9 @@ export type HealthFacilityActions =
   | IDeleteHFFailure
   | IClearHFList
   | IClearSupervisorList
+  | IClearVillagesHFList
   | IClearVillagesList
+  | IClearDependentData
   | IFetchHFSummaryRequest
   | IFetchHFSummarySuccess
   | IFetchHFSummaryFailure

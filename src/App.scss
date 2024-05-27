@@ -7,6 +7,9 @@
     height: calc(100vh - #{$app-navbar-height});
     overflow: auto;
   }
+  &:not(.logged-in) {
+    height: 100vh;
+  }
 }
 
 .btn {

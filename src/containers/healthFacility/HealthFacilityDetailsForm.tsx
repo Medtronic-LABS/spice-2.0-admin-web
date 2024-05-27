@@ -7,7 +7,8 @@ import {
   minLength,
   normalizePhone,
   normalizeFloatingNumber,
-  validateMobile
+  validateMobile,
+  validateName
 } from '../../utils/validation';
 import SelectInput from '../../components/formFields/SelectInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
@@ -28,6 +29,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { useEffect } from 'react';
 import {
+  clearVillageList,
   fetchChiefdomListRequest,
   fetchCultureListRequest,
   fetchDistrictListRequest,
@@ -173,7 +175,6 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
-              form={form}
               label='Health Facility Type'
               errorLabel='type'
               labelKey='name'
@@ -190,7 +191,7 @@ const HealthFacilityDetailsForm = ({
         <Field
           name={`${formName}.phuFocalPersonName`}
           type='text'
-          validate={required}
+          validate={composeValidators(required, validateName)}
           render={({ input, meta }) => (
             <TextInput
               {...input}
@@ -245,7 +246,6 @@ const HealthFacilityDetailsForm = ({
               <SelectInput
                 {...(input as any)}
                 {...(meta as any)}
-                form={form}
                 label='District'
                 errorLabel='district'
                 labelKey='name'
@@ -256,6 +256,9 @@ const HealthFacilityDetailsForm = ({
                 onChange={(value: any) => {
                   form.change(`${formName}.chiefdom`, undefined);
                   form.change(`${formName}.peerSupervisors`, undefined);
+                  form.change(`${formName}.linkedVillages`, undefined);
+                  form.change(`${formName}.city`, undefined);
+                  dispatch(clearVillageList());
                   input.onChange(value);
                 }}
               />
@@ -272,7 +275,6 @@ const HealthFacilityDetailsForm = ({
             <SelectInput
               {...(input as any)}
               {...(meta as any)}
-              form={form}
               label='Chiefdom'
               errorLabel='chiefdom'
               labelKey='name'
@@ -281,6 +283,8 @@ const HealthFacilityDetailsForm = ({
               loadingOptions={chiefdomLoading}
               error={(meta.touched && meta.error) || undefined}
               onChange={(value: any) => {
+                form.change(`${formName}.peerSupervisors`, undefined);
+                form.change(`${formName}.city`, undefined);
                 form.change(`${formName}.linkedVillages`, undefined);
                 input.onChange(value);
               }}
@@ -293,17 +297,17 @@ const HealthFacilityDetailsForm = ({
           required={true}
           name={`${formName}.city`}
           validate={required}
-          render={(props) => (
+          render={({ input, meta }) => (
             <SelectInput
-              {...props}
-              form={form}
+              {...(input as any)}
+              {...(meta as any)}
               label='City/Village'
               errorLabel='city/village'
               labelKey='name'
               valueKey='id'
               options={villagesList}
               loadingOptions={villagesLoading}
-              error={(props.meta.touched && props.meta.error) || undefined}
+              error={(meta.touched && meta.error) || undefined}
             />
           )}
         />
@@ -396,7 +400,6 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
-              form={form}
               label='Language'
               errorLabel='language'
               labelKey='name'
@@ -417,7 +420,6 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <MultiSelect
               {...(input as any)}
-              form={form}
               label='Linked Villages'
               errorLabel='linked villages'
               labelKey='name'
@@ -426,6 +428,7 @@ const HealthFacilityDetailsForm = ({
               isShowLabel={true}
               isSelectAll={true}
               placeholder=''
+              isDefaultSelected={true}
               menuPlacement={'bottom'}
               isModel={true}
               isMulti={true}

@@ -167,6 +167,11 @@ const healthFacilityReducer = (
         ...state,
         villagesFromHFList: { list: [], hfTenantIds: [] }
       };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_VILLAGES_LIST:
+      return {
+        ...state,
+        villagesList: []
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST:
       return {
         ...state,
@@ -319,6 +324,12 @@ const healthFacilityReducer = (
       return {
         ...state,
         countryListLoading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA:
+      return {
+        ...state,
+        chiefdomList: [],
+        villagesFromHFList: { list: [], hfTenantIds: null }
       };
     default:
       return state;

@@ -20,6 +20,7 @@ interface IProps {
 }
 
 const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps) => {
+  const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
       try {
@@ -48,10 +49,10 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
   const validateIfNumberExist = useCallback(
     () =>
       error ||
-      (validating
-        ? ' ' // blank space is given as error to block submition till the number already exist validation is completed
+      (validating || !submitEnabledStatus.current
+        ? ' ' // blank space is given as error to block submition till number already exist validation is completed
         : ''),
-    [error, validating]
+    [error, submitEnabledStatus, validating]
   );
 
   const validateDuplication = useCallback(
@@ -88,6 +89,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
         setValidating(true);
         setLoading(true);
         await validatePhoneNumber(phoneNumber, id).then((res) => {
+          submitEnabledStatus.current = true;
           setError('');
           setValidating(false);
           setLoading(false);
@@ -125,9 +127,11 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
             {...input}
             onBlur={(event) => {
               input.onBlur(event);
+              submitEnabledStatus.current = false;
               validatePhoneNumberFn(input.value);
             }}
             onChange={(event) => {
+              submitEnabledStatus.current = false;
               currentphoneNumber.current = event.target.value.trim();
               setNetworkError(false);
               input.onChange(event);
@@ -135,7 +139,11 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
             lowerCase={true}
             showLoader={loading}
             label='Phone number'
-            errorLabel={alreadyExistError === meta.error || isNetworkError ? '' : 'phone number'}
+            errorLabel={
+              alreadyExistError === meta.error || isNetworkError || !meta.error || meta.error === ' '
+                ? ''
+                : 'phone number'
+            }
             error={
               (isNetworkError ? 'Phone number is not validated.' : meta.touched && (meta.error || '')) || undefined
             }

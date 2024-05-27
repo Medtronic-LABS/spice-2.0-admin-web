@@ -16,7 +16,7 @@ import CustomTable from '../../components/customTable/CustomTable';
 import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
-  clearVillageList,
+  clearVillageHFList,
   createHFUserRequest,
   deleteHFUserRequest,
   fetchHFUserListRequest,
@@ -78,7 +78,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
     refreshHFUserList();
     return () => {
       clearSupervisorList();
-      clearVillageList();
+      clearVillageHFList();
     };
   }, [refreshHFUserList]);
 

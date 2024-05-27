@@ -58,7 +58,7 @@ import {
   IFetchVillagesListFromHFFailure,
   IVillages,
   IClearSupervisorList,
-  IClearVillagesList,
+  IClearVillagesHFList,
   IClearHFList,
   IHFUserGet,
   IFetchUserDetailRequest,
@@ -74,7 +74,9 @@ import {
   IFetchCountryListFailure,
   IDeleteHFRequest,
   IDeleteHFSuccess,
-  IDeleteHFFailure
+  IDeleteHFFailure,
+  IClearDependentData,
+  IClearVillagesList
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -157,8 +159,14 @@ export const clearHFList = (): IClearHFList => ({
 export const clearSupervisorList = (): IClearSupervisorList => ({
   type: HF_TYPES.CLEAR_PEER_SUPERVISOR_LIST
 });
-export const clearVillageList = (): IClearVillagesList => ({
+export const clearVillageHFList = (): IClearVillagesHFList => ({
   type: HF_TYPES.CLEAR_VILLAGES_LIST_FROM_HF
+});
+export const clearVillageList = (): IClearVillagesList => ({
+  type: HF_TYPES.CLEAR_VILLAGES_LIST
+});
+export const clearAllDependentData = (): IClearDependentData => ({
+  type: HF_TYPES.CLEAR_ALL_DEPENDENT_DATA
 });
 
 export const fetchHFSummaryRequest = ({

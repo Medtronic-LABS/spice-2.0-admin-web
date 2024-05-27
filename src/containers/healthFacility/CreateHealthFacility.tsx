@@ -12,12 +12,16 @@ import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import Workflows from './Workflows';
 import APPCONSTANTS from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import { createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
+import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility, formatHFUserData } from './HealthFacilitySummary';
 import { IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import { healthFacilityLoadingSelector, workflowListSelector } from '../../store/healthFacility/selectors';
+import {
+  healthFacilityLoadingSelector,
+  workflowListSelector,
+  workflowLoadingSelector
+} from '../../store/healthFacility/selectors';
 
 interface IMatchParams {
   regionId?: string;
@@ -34,8 +38,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   let formInstance: FormApi<any>;
   const history = useHistory();
   const workflows = useSelector(workflowListSelector);
+  const isWorkflowLoading = useSelector(workflowLoadingSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
-  const [OUTenantId, setSelectedOUTenantId] = useState<string>('');
   const [submittedData, setSubmittedData] = useState({
     data: {
       healthFacility: {},
@@ -47,17 +51,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const { regionId, tenantId } = props.match.params;
 
   useEffect(() => {
-    formInstance?.subscribe(
-      (formState) => {
-        const nextOUTenantId = formState?.values?.site?.operatingUnit?.tenantId || '';
-        if (nextOUTenantId !== OUTenantId) {
-          setSelectedOUTenantId(nextOUTenantId);
-        }
-      },
-      { values: true }
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => {
+      dispatch(clearAllDependentData());
+    };
+  }, [dispatch]);
 
   /**
    * Handler for form cancel
@@ -193,7 +190,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                   {submittedData.isNextClicked ? 'Submit' : 'Next'}
                 </button>
               </div>
-              {loading && <Loader isFullScreen={true} className='translate-x-minus50' />}
+              {(loading || isWorkflowLoading) && <Loader isFullScreen={true} className='translate-x-minus50' />}
             </form>
           );
         }}

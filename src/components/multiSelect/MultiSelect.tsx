@@ -9,6 +9,7 @@ import {
 } from 'react-select';
 import { useState, useRef, useEffect } from 'react';
 import styles from './MultiSelect.module.scss';
+import { useForm } from 'react-final-form';
 
 export interface IOption {
   value: number | string;
@@ -27,6 +28,7 @@ const convertOptionType = (labelKey: string | string[], valueKey: string | strin
     : options;
 
 const MultiSelect = (props: any) => {
+  const { change } = useForm();
   const newProps = {
     ...props,
     value: convertOptionType(props.labelKey, props.valueKey, Array.isArray(props.value) ? props.value : []),
@@ -49,6 +51,16 @@ const MultiSelect = (props: any) => {
     newProps?.value.filter((o: any) => filteredOptions.some((f) => f.value === o.id)),
     selectInput
   );
+
+  // To auto select if only 1 option is available
+  useEffect(() => {
+    if (props.options.length === 1 && props.required && props.isDefaultSelected) {
+      setTimeout(() => {
+        change(props.name, props.options);
+      }, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.name, props.options, props.required]);
 
   const multiOption = (multiSelectprops: any) => {
     const isChecked = !(newProps.disabledOptions || []).some((v: any) => v.id === multiSelectprops.value);
@@ -158,13 +170,6 @@ const MultiSelect = (props: any) => {
     }
   };
 
-  useEffect(() => {
-    if (props.form && props.options.length === 1 && props.required) {
-      props.form.change(props.name, props.options);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.name, props.options, props.required]);
-
   const customFilterOption = ({ value, label }: IOption, input: string) => {
     return (
       (value !== '*' && label.toLowerCase().includes(input.toLowerCase())) ||
@@ -204,7 +209,8 @@ const MultiSelect = (props: any) => {
         ...newProps.optionStyles,
         disabled: true,
         backgroundColor:
-          optionProps.isDisabled && newProps.disabledOptions.some((v: any) => v.id === (optionProps as any).value)
+          optionProps.isDisabled &&
+          (newProps.disabledOptions || []).some((v: any) => v.id === (optionProps as any).value)
             ? '#e6e6e6'
             : optionProps.isFocused
             ? '#DEEBFF'
