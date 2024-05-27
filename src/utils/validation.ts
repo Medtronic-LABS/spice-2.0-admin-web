@@ -280,6 +280,30 @@ export function validateCheckbox(value: Array<number | string>) {
   }
 }
 
+/**
+ * To validate latitude
+ * @param value
+ */
+export function validateLatitude(value: any) {
+  const reg = /^-?([0-8]?[0-9]|90)(\.[0-9]{1,10})?$/;
+  if (!value) {
+    return undefined;
+  }
+  return reg.test(value) ? '' : 'Please enter a valid';
+}
+
+/**
+ * To validate longitude
+ * @param value
+ */
+export function validateLongitude(value: any) {
+  const reg = /^-?([0-9]{1,2}|1[0-7][0-9]|180)(\.[0-9]{1,10})?$/;
+  if (!value) {
+    return undefined;
+  }
+  return reg.test(value) ? '' : 'Please enter a valid';
+}
+
 interface IDateOptions {
   month: string;
   format: string;

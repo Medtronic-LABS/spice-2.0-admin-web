@@ -1,6 +1,9 @@
 @import '../../styles/variables';
 
 .sideMenu {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 1rem;
   width: 240px;
   background-color: $full-white;
   border-radius: 0.75rem;

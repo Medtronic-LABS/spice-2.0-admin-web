@@ -8,7 +8,9 @@ import {
   normalizePhone,
   normalizeFloatingNumber,
   validateMobile,
-  validateName
+  validateName,
+  validateLatitude,
+  validateLongitude
 } from '../../utils/validation';
 import SelectInput from '../../components/formFields/SelectInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
@@ -316,7 +318,7 @@ const HealthFacilityDetailsForm = ({
         <Field
           name={`${formName}.latitude`}
           type='text'
-          validate={composeValidators(required)}
+          validate={composeValidators(required, validateLatitude)}
           parse={normalizeFloatingNumber}
           render={({ input, meta }) => (
             <TextInput
@@ -332,7 +334,7 @@ const HealthFacilityDetailsForm = ({
         <Field
           name={`${formName}.longitude`}
           type='text'
-          validate={composeValidators(required)}
+          validate={composeValidators(required, validateLongitude)}
           parse={normalizeFloatingNumber}
           render={({ input, meta }) => (
             <TextInput
@@ -374,7 +376,7 @@ const HealthFacilityDetailsForm = ({
                 valueKey='id'
                 isShowLabel={true}
                 isSelectAll={true}
-                menuPlacement={'bottom'}
+                menuPlacement={'auto'}
                 placeholder=''
                 isModel={true}
                 isMulti={true}
@@ -429,7 +431,7 @@ const HealthFacilityDetailsForm = ({
               isSelectAll={true}
               placeholder=''
               isDefaultSelected={true}
-              menuPlacement={'bottom'}
+              menuPlacement={'auto'}
               isModel={true}
               isMulti={true}
               options={villagesList}
