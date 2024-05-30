@@ -329,6 +329,7 @@ const healthFacilityReducer = (
       return {
         ...state,
         chiefdomList: [],
+        villagesList: [],
         villagesFromHFList: { list: [], hfTenantIds: null }
       };
     default:

@@ -260,6 +260,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const hfUpdateSuccess = () => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS);
     refreshHFDetails();
+    refreshHFUserList();
     closeHFEditModal();
   };
 
@@ -343,6 +344,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS);
           refreshHFUserList();
+          refreshHFDetails();
         },
         failureCb: (e) => {
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_FAIL);

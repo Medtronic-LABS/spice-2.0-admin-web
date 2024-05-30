@@ -111,7 +111,7 @@ const HealthFacilityDetailsForm = ({
   // Peer Supervisor fetch
   useEffect(() => {
     const tenantId = form.getState().values.healthFacility?.district?.tenantId;
-    if (!isEdit && tenantId) {
+    if (isEdit && tenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -362,7 +362,27 @@ const HealthFacilityDetailsForm = ({
           )}
         />
       </div>
-      {!isEdit && (
+      <div className={columnStyle}>
+        <Field
+          name={`${formName}.language`}
+          type='text'
+          validate={required}
+          render={({ input, meta }) => (
+            <SelectInput
+              {...(input as any)}
+              label='Language'
+              errorLabel='language'
+              labelKey='name'
+              valueKey='id'
+              options={languages}
+              loadingOptions={languageLoading}
+              error={(meta.touched && meta.error) || undefined}
+              isModel={isEdit ? true : false}
+            />
+          )}
+        />
+      </div>
+      {isEdit && (
         <div className={columnStyle}>
           <Field
             name={`${formName}.peerSupervisors`}
@@ -394,26 +414,6 @@ const HealthFacilityDetailsForm = ({
           />
         </div>
       )}
-      <div className={columnStyle}>
-        <Field
-          name={`${formName}.language`}
-          type='text'
-          validate={required}
-          render={({ input, meta }) => (
-            <SelectInput
-              {...(input as any)}
-              label='Language'
-              errorLabel='language'
-              labelKey='name'
-              valueKey='id'
-              options={languages}
-              loadingOptions={languageLoading}
-              error={(meta.touched && meta.error) || undefined}
-              isModel={isEdit ? true : false}
-            />
-          )}
-        />
-      </div>
       <div className={columnStyle}>
         <Field
           name={`${formName}.linkedVillages`}
