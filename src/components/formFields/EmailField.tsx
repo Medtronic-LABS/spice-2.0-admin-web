@@ -20,6 +20,7 @@ const EmailField = forwardRef(
       form,
       formName,
       index,
+      isDisabled = false,
       enableAutoPopulate,
       onFindExistingUser
     }: {
@@ -27,6 +28,7 @@ const EmailField = forwardRef(
       name: string;
       form: FormApi<any>;
       formName: string;
+      isDisabled?: boolean | undefined;
       index: number;
       entityName?: string;
       enableAutoPopulate?: boolean;
@@ -116,6 +118,7 @@ const EmailField = forwardRef(
         if (enableAutoPopulate && data?.username === email) {
           onFindExistingUser?.(data);
           setDisabled(true);
+
           setError('');
         } else if (!enableAutoPopulate) {
           setError(data !== null ? alreadyExistError : '');
@@ -187,7 +190,7 @@ const EmailField = forwardRef(
                 validateUser(input.value);
               }}
               onChange={(event) => {
-                if (!(isEdit || disabled)) {
+                if (!(isEdit || isDisabled === undefined ? disabled : isDisabled)) {
                   submitEnabledStatus.current = false;
                   currentEmail.current = event.target.value.trim();
                   setNetworkError(false);
@@ -203,7 +206,7 @@ const EmailField = forwardRef(
                   ? ''
                   : 'email ID'
               }
-              disabled={isEdit || disabled}
+              disabled={isEdit || isDisabled === undefined ? disabled : isDisabled}
               error={(isNetworkError ? 'Email ID is not validated.' : meta.touched && (meta.error || '')) || undefined}
               helpertext={
                 isNetworkError ? (

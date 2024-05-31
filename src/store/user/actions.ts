@@ -138,13 +138,16 @@ export const fetchUserByEmailFail = (): IFetchUserByEmailFail => ({
 });
 
 export const fetchUserRolesAction = ({
+  countryId,
   successCb,
   failureCb
 }: {
+  countryId: number;
   successCb?: (payload: IGroupRoles) => void;
   failureCb?: (error: Error) => void;
 }): IFetchUserRolesRequest => ({
   type: USER_TYPES.FETCH_USER_ROLES_REQUEST,
+  countryId,
   successCb,
   failureCb
 });

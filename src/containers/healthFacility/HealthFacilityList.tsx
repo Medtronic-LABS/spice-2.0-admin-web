@@ -173,6 +173,8 @@ const HealthFacilityList = (): React.ReactElement => {
     [dispatch, fetchList]
   );
 
+  const adminPSRoles = ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'PEER_SUPERVISOR'];
+
   return (
     <>
       {loading && <Loader />}
@@ -213,7 +215,7 @@ const HealthFacilityList = (): React.ReactElement => {
                 cellFormatter: ({ chiefdom }) => chiefdom.name
               }
             ]}
-            isDelete={true}
+            isDelete={!adminPSRoles.includes(role)}
             isEdit={true}
             page={listParams.page}
             rowsPerPage={listParams.rowsPerPage}

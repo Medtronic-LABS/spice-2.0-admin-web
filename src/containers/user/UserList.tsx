@@ -13,7 +13,7 @@ import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import CustomTable from '../../components/customTable/CustomTable';
-import { roleSelector, userDataSelector } from '../../store/user/selectors';
+import { emailSelector, roleSelector, userDataSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageHFList,
@@ -49,6 +49,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const regionData = useSelector(userDataSelector).country;
   const role = useSelector(roleSelector);
+  const email = useSelector(emailSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
   const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
@@ -77,10 +78,10 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   useEffect(() => {
     refreshHFUserList();
     return () => {
-      clearSupervisorList();
-      clearVillageHFList();
+      dispatch(clearSupervisorList());
+      dispatch(clearVillageHFList());
     };
-  }, [refreshHFUserList]);
+  }, [dispatch, refreshHFUserList]);
 
   const handleUserDelete = useCallback(
     ({ data: { id, organizations = [] } }: { data: { id: number; organizations: any[] } }) => {
@@ -319,6 +320,11 @@ const UserList = (props: IMatchProps): React.ReactElement => {
             customTitle='Change Password'
             isCustom={true}
             customIconStyle={{ width: 18 }}
+            actionFormattor={{
+              hideEditIcon: (rowData: any) => rowData.username === email,
+              hideDeleteIcon: (rowData: any) => rowData.username === email,
+              hideCustomIcon: (rowData: any) => rowData.username === email
+            }}
           />
         </DetailCard>
         <ModalForm

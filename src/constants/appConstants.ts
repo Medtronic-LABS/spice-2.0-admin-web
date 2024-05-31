@@ -92,6 +92,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
   CLINICAL_WORKFLOW_FETCH_SUCCESS: 'Unable to load the clinical workflows. Please try after sometime.',
   // USER
+  CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',

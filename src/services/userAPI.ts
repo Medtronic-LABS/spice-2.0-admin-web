@@ -53,10 +53,11 @@ export const validatePhoneNumber = (phoneNumber: string, id: number | null) =>
     }
   });
 
-export const fetchUserRoles = () =>
+export const fetchUserRoles = (countryId: number) =>
   axios({
     method: 'POST',
-    url: '/user-service/user/roles-list'
+    url: '/user-service/user/roles-list',
+    data: { countryId }
   });
 
 export const fetchUserById = ({ id }: IFetchUserByIdRequest['payload']) =>

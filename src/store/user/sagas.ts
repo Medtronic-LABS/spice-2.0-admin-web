@@ -160,11 +160,11 @@ export function* fetchLoggedInUser(): SagaIterator {
 /*
   Worker Saga: Fired on FETCH_LOGGED_IN_USER_REQUEST action
 */
-export function* fetchUserRoles({ successCb, failureCb }: IFetchUserRolesRequest): SagaIterator {
+export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserRolesRequest): SagaIterator {
   try {
     const {
       data: { entity: userRoles }
-    } = yield call(userService.fetchUserRoles);
+    } = yield call(userService.fetchUserRoles, countryId);
     const role = yield select((state: AppState) => state.user.user.role);
     const updatedUserRoles = {
       ...userRoles,

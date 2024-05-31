@@ -355,8 +355,8 @@ const HealthFacilityDetailsForm = ({
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label='Pincode'
-              errorLabel='pin code'
+              label='Facility Id'
+              errorLabel='facility id'
               error={(meta.touched && meta.error) || undefined}
             />
           )}

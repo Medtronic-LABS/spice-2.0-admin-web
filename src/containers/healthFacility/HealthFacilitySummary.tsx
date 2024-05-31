@@ -36,7 +36,7 @@ import {
   healthFacilitySelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { roleSelector, userDataSelector } from '../../store/user/selectors';
+import { emailSelector, roleSelector, userDataSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 
@@ -104,6 +104,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const regionData = useSelector(userDataSelector).country;
   const role = useSelector(roleSelector);
+  const email = useSelector(emailSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
 
   const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
@@ -309,7 +310,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
       ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS
       : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS;
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
-    isHFUserEdit ? refreshHFUserList() : handleSearch('');
+    if (isHFUserEdit) {
+      refreshHFUserList();
+      refreshHFDetails();
+    } else {
+      handleSearch('');
+    }
     setHFUserModal(false);
   };
 
@@ -460,6 +466,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
               handlePageChange={handlePage}
               confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
               deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
+              actionFormattor={{
+                hideEditIcon: (rowData: any) => rowData.username === email,
+                hideDeleteIcon: (rowData: any) => rowData.username === email
+              }}
             />
           </DetailCard>
         </div>
