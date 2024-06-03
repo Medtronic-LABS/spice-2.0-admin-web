@@ -168,6 +168,7 @@ const UserForm = ({
     (fields, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
+      setDisabledRoles([]);
     },
     [initialValue, form.mutators]
   );
@@ -175,6 +176,7 @@ const UserForm = ({
   const [autoFetched, setAutoFetched] = useState<boolean[]>([]);
   const fetchedData = useRef([] as any[]);
   const [emailToBeDisabled, setEmailToBeDisabled] = useState(undefined as boolean | undefined);
+  const [clearEmail, setClearEmail] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -192,11 +194,14 @@ const UserForm = ({
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
     if (isCHWSelected(userData.role) && isHFCreate) {
       setEmailToBeDisabled(false);
+      setClearEmail(true);
+      form.change(`${formName}[${index}].username`, '');
       toastCenter.error(
         ...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE)
       );
     } else {
       setEmailToBeDisabled(true);
+      setClearEmail(false);
       userData.supervisor = {
         ...userData.supervisor,
         name: `${userData.supervisor?.firstName || ''} ${userData.supervisor?.lastName || ''}`
@@ -327,19 +332,16 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
   const selectedSuiteAccess = useRef('');
-  // const allRoleNames = useMemo(
-  //   () => (rolesGrouped[selectedSuiteAccess.current] || []).map((roles) => roles.name),
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [rolesGrouped, selectedSuiteAccess.current]
-  // );
-  // console.log(allRoleNames, selectedSuiteAccess.current);
 
-  const mobileRoles = useMemo(() => ['CHW', 'CHA', 'MCHA', 'SECHN'], []);
-  const adminRoles = useMemo(() => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN'], []);
-  const peerSupervisorRoles = useMemo(() => ['PEER_SUPERVISOR'], []);
-  const superAdminRoles = useMemo(() => ['SUPER_ADMIN'], []);
+  const mobileRoles = useMemo(() => ['CHW', 'CHA', 'MCHA', 'SECHN', 'REPORT_ADMIN'], []);
+  const adminRoles = useMemo(
+    () => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'REPORT_ADMIN'],
+    []
+  );
+  const peerSupervisorRoles = useMemo(() => ['PEER_SUPERVISOR', 'REPORT_ADMIN'], []);
+  const superAdminRoles = useMemo(() => ['SUPER_ADMIN', 'REPORT_ADMIN'], []);
   const hfCreateRoles = useMemo(
-    () => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'PEER_SUPERVISOR'],
+    () => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'PEER_SUPERVISOR', 'REPORT_ADMIN'],
     []
   );
 
@@ -350,29 +352,29 @@ const UserForm = ({
     [mobileRoles]
   );
 
-  const roleDisableFn = useCallback(
-    (index: number) => {
-      const newDisabledRoles = [...disabledRoles];
-      let validRoles: string[] = [];
-      const selectedAllRoles = selectedRoles(index) || [];
-      if (selectedAllRoles.some((ro: IRoles) => mobileRoles.includes(ro.name))) {
-        validRoles = mobileRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => adminRoles.includes(ro.name))) {
-        validRoles = adminRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => peerSupervisorRoles.includes(ro.name))) {
-        validRoles = peerSupervisorRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
-        validRoles = superAdminRoles;
-      } else {
-        validRoles = (roleOptions.current?.[index] || []).map((rr: IRoles) => rr.name) || [];
-      }
-      newDisabledRoles[index] = (roleOptions.current?.[index] || []).filter(
-        (r: IRoles) => !validRoles.includes(r.name)
-      );
+  const roleDisableFn = useCallback((index: number) => {
+    const newDisabledRoles = [...disabledRoles];
+    let validRoles: string[] = [];
+    const selectedAllRoles = [...(selectedRoles(index) || [])];
+    if (selectedAllRoles.some((ro: IRoles) => mobileRoles.includes(ro.name))) {
+      validRoles = mobileRoles;
+    } else if (selectedAllRoles.some((ro: IRoles) => adminRoles.includes(ro.name))) {
+      validRoles = adminRoles;
+    } else if (selectedAllRoles.some((ro: IRoles) => peerSupervisorRoles.includes(ro.name))) {
+      validRoles = peerSupervisorRoles;
+    } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
+      validRoles = superAdminRoles;
+    } else {
+      validRoles = (roleOptions.current?.[index] || []).map((rr: IRoles) => rr.name) || [];
+    }
+    newDisabledRoles[index] = [...(roleOptions.current?.[index] || [])].filter(
+      (r: IRoles) => !validRoles.includes(r.name)
+    );
+    setTimeout(() => {
       setDisabledRoles(newDisabledRoles);
-    },
-    [adminRoles, disabledRoles, mobileRoles, peerSupervisorRoles, selectedRoles, superAdminRoles]
-  );
+    }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isCHWUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
@@ -452,18 +454,10 @@ const UserForm = ({
   }, [autoFetchData]);
 
   useEffect(() => {
-    const users = form.getState().values.users;
-    users.forEach((_: any, index: number) => {
-      roleDisableFn(index);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     if (isEdit) {
       isCHWUserSelectedFn(form.getState().values.users[0]?.role, 0);
     }
-  }, [form, isCHWUserSelectedFn, isEdit, isProfile, roleDisableFn, selectedRoles]);
+  }, [form, isCHWUserSelectedFn, isEdit, isProfile, selectedRoles]);
 
   const roleOptionSelection = useCallback(
     (suite: string, index: number, mandatoryRoles?: IRoles[]) => {
@@ -500,6 +494,13 @@ const UserForm = ({
     initData();
   }, [initData]);
 
+  useEffect(() => {
+    if (isEdit && selectedSuiteAccess.current) {
+      roleOptionSelection(selectedSuiteAccess.current, 0);
+      roleDisableFn(0);
+    }
+  }, [isEdit, roleDisableFn, roleOptionSelection]);
+
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
@@ -518,6 +519,7 @@ const UserForm = ({
               index
             ]?.suiteAccess?.groupName;
             roleOptionSelection(selectedSuiteAccess.current, index);
+            roleDisableFn(index);
           }
           return (
             <span key={`form_${idRefs.current[index]}`}>
@@ -684,6 +686,7 @@ const UserForm = ({
                     form={form}
                     isDisabled={emailToBeDisabled}
                     entityName={entityName}
+                    clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
                     onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
                   />

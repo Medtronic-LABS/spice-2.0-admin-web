@@ -20,6 +20,7 @@ const EmailField = forwardRef(
       form,
       formName,
       index,
+      clearEmail = false,
       isDisabled = false,
       enableAutoPopulate,
       onFindExistingUser
@@ -28,6 +29,7 @@ const EmailField = forwardRef(
       name: string;
       form: FormApi<any>;
       formName: string;
+      clearEmail?: boolean;
       isDisabled?: boolean | undefined;
       index: number;
       entityName?: string;
@@ -80,6 +82,15 @@ const EmailField = forwardRef(
           : ''),
       [error, validating]
     );
+
+    const clearEmailFn = useCallback(() => {
+      if (clearEmail) {
+        lastCheckedEmail.current = '';
+        setError('');
+        setDisabled(false);
+        currentEmail.current = '';
+      }
+    }, [clearEmail]);
 
     const validateDuplication = useCallback(
       (value: string) => {
@@ -185,6 +196,7 @@ const EmailField = forwardRef(
             <TextInput
               {...input}
               onBlur={(event) => {
+                clearEmailFn();
                 input.onBlur(event);
                 submitEnabledStatus.current = false;
                 validateUser(input.value);
