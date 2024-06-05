@@ -20,6 +20,7 @@ import {
   fetchHFSummaryRequest,
   fetchHFUserListRequest,
   fetchUserDetailRequest,
+  fetchWorkflowListRequest,
   updateHFDetailsRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
@@ -110,7 +111,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false
   });
-
+  const [submittedData, setSubmittedData] = useState({ data: {}, isNextClicked: false });
   const [hfUsers, setHFUsers] = useState<ISummaryUsersState>({
     loading: false
   });
@@ -219,7 +220,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
           ...healthFacility,
           type: { id: healthFacility.type, name: healthFacility.type },
           city: { id: healthFacility.cityName, name: healthFacility.cityName },
-          language: { id: healthFacility.language, name: healthFacility.language }
+          language: { id: healthFacility.language, name: healthFacility.language },
+          workflows: healthFacility.clinicalWorkflows.map((wfIds: any) => wfIds.id )
         } as IHealthFacilityForm
       });
     } else {
@@ -227,10 +229,15 @@ const HealthFacilitySummary = (): React.ReactElement => {
     }
   };
 
-  const closeHFEditModal = () => {
-    setEditHFDetailsModal({
-      isOpen: false
-    });
+  const closeHFEditModal = (isFromCloseBtn?: boolean) => {
+    if (submittedData.isNextClicked && !isFromCloseBtn) {
+      setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
+    } else {
+      setEditHFDetailsModal({
+        isOpen: false
+      });
+      setSubmittedData({ ...submittedData, isNextClicked: false});
+    }
   };
 
   const editHFDetailsModalRender = (form: any, ref: HTMLDivElement | null | undefined) => {
@@ -241,21 +248,43 @@ const HealthFacilitySummary = (): React.ReactElement => {
         modalRef={ref}
         isEdit={true}
         data={editHFDetailsModal.data}
+        submittedData={submittedData}
       />
     );
   };
 
   const handleHFEditDetailsSubmit = ({ healthFacility: healthFacilityData }: { healthFacility: IHealthFacility }) => {
     const postData = formatHealthFacility(healthFacilityData, regionData.id);
-    dispatch(
-      updateHFDetailsRequest({
-        data: postData,
-        successCb: hfUpdateSuccess,
-        failureCb: (e) => {
-          fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
-        }
-      })
-    );
+    if (!submittedData.isNextClicked) {
+      dispatch(
+        fetchWorkflowListRequest({
+          countryId: Number(regionData.id),
+          successCb: (flows) => {
+            setSubmittedData({
+              data: {
+                healthFacility: { ...healthFacility, workflows: healthFacility.clinicalWorkflows.map((v: any) => v.id) }
+              },
+              isNextClicked: true
+            });
+          },
+          failureCb: (error) =>
+            toastCenter.error(
+              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+            )
+        })
+      );
+    } else {
+      dispatch(
+        updateHFDetailsRequest({
+          data: postData,
+          successCb: hfUpdateSuccess,
+          failureCb: (e) => {
+            fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
+          }
+        })
+      );
+      closeHFEditModal(true)
+    }
   };
 
   const hfUpdateSuccess = () => {
@@ -476,8 +505,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
         <ModalForm
           show={editHFDetailsModal.isOpen}
           title='Edit Health Facility'
-          cancelText='Cancel'
-          submitText='Submit'
+          cancelText={submittedData?.isNextClicked ? 'Back' : 'Cancel'}
+          submitText={submittedData?.isNextClicked ? 'Submit' : 'Next'}
           handleCancel={closeHFEditModal}
           handleFormSubmit={handleHFEditDetailsSubmit}
           initialValues={{ healthFacility: editHFDetailsModal.data }}

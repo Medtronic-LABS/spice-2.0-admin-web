@@ -17,7 +17,7 @@ export interface IModalProps {
   submitDisabled?: boolean;
   children?: React.ReactElement;
   show: boolean;
-  handleCancel: () => void;
+  handleCancel: (val?: boolean) => void;
   deactivateLabel?: string;
   handleForceSubmit?: boolean;
   hideFooterButton?: boolean;
@@ -54,15 +54,16 @@ const ModalForm = React.memo(
     if (!show) {
       return null;
     }
+    const isFromCloseBtn = true
     return ReactDOM.createPortal(
       <div ref={ref} className={`${styles.modal} modal modal-show`}>
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
           <div className={`modal-content ${styles.modalContent}`}>
-            <div id='modal-header' className='modal-header py-1 px-1dot25'>
+            <div id='modal-header' className='modal-header py-1 px-1dot25 justify-content-between'>
               <h5 className={`modal-title ${styles.modalTitle}`}>{title}</h5>
               <div
                 className={`d-flex justify-content-center align-items-center ${styles.closeIcon}`}
-                onClick={handleCancel}
+                onClick={() => handleCancel(isFromCloseBtn)}
               >
                 <img src={close} alt='close' />
               </div>
@@ -104,7 +105,7 @@ const ModalForm = React.memo(
                             type='button'
                             className='btn secondary-btn me-0dot5'
                             data-dismiss='modal'
-                            onClick={handleCancel}
+                            onClick={() => handleCancel()}
                           >
                             {cancelText}
                           </button>

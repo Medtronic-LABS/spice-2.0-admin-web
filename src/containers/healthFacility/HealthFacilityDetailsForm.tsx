@@ -43,6 +43,9 @@ import {
 import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
 import { IObjectData } from '../../store/healthFacility/types';
+import SiteDetailsIcon from '../../assets/images/info-grey.svg';
+import FormContainer from '../../components/formContainer/FormContainer';
+import Workflows from './Workflows';
 
 interface IAddUserFormProps {
   formName: string;
@@ -50,6 +53,7 @@ interface IAddUserFormProps {
   modalRef?: any;
   isEdit?: boolean;
   data?: any;
+  submittedData?: any;
 }
 
 interface IMatchParams {
@@ -68,7 +72,8 @@ const HealthFacilityDetailsForm = ({
   formName,
   modalRef,
   isEdit = false,
-  data = {}
+  data = {},
+  submittedData
 }: IAddUserFormProps & IMatchParams): React.ReactElement => {
   const dispatch = useDispatch();
   const { regionId } = useParams<{ regionId: string }>();
@@ -152,6 +157,11 @@ const HealthFacilityDetailsForm = ({
   ]);
 
   return (
+    <>      
+    {submittedData?.isNextClicked ? (
+      <FormContainer label='Clinical Workflows Involved' icon={SiteDetailsIcon}>
+        <Workflows formName='healthFacility' form={form} />
+      </FormContainer> ) : (
     <div className='row gx-1dot25 align-items-end'>
       <div className={columnStyle}>
         <Field
@@ -448,6 +458,8 @@ const HealthFacilityDetailsForm = ({
         />
       </div>
     </div>
+    )}
+    </>
   );
 };
 

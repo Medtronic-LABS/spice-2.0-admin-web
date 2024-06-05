@@ -1,5 +1,5 @@
 import { FormApi, Tools } from 'final-form';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
@@ -22,7 +22,6 @@ import {
   workflowListSelector,
   workflowLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IRoles } from '../../store/user/types';
 
 interface IMatchParams {
   regionId?: string;
@@ -48,10 +47,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     },
     isNextClicked: false
   });
-  const [autoFetchData, setAutoFetchData] = useState([] as any[]);
-  const [isCHWUser, setUserAsCHW] = useState([false]);
-  const roleOptions = useRef<IRoles[][]>([]);
-  const [disabledRoles, setDisabledRoles] = useState([] as IRoles[][]);
 
   const { regionId, tenantId } = props.match.params;
 
@@ -173,10 +168,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                     <div className='col-lg-6 col-12'>
                       <FormContainer label='Add User' icon={SiteAddUserIcon}>
                         <UserForm
-                          autoFetchedState={{ autoFetchData, setAutoFetchData }}
-                          chwState={{ isCHWUser, setUserAsCHW }}
-                          disabledRolesState={{ disabledRoles, setDisabledRoles }}
-                          roleOptionsState={roleOptions}
                           countryId={Number(regionId)}
                           form={form}
                           enableAutoPopulate={true}
