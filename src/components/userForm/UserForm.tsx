@@ -108,11 +108,10 @@ const UserForm = ({
   const [isCHWUser, setUserAsCHW] = useState(chwState?.isCHWUser || [false]);
   const roleOptions = useRef<IRoles[][]>(roleOptionsState?.current || []);
   const [disabledRoles, setDisabledRoles] = useState(disabledRolesState?.disabledRoles || ([] as IRoles[][]));
-  // autoFetchedState, chwState, disabledRolesState, roleOptionsState;
-  // const { autoFetchData, setAutoFetchData } = autoFetchedState;
-  // const { isCHWUser, setUserAsCHW } = chwState;
-  // const { disabledRoles, setDisabledRoles } = disabledRolesState;
-  // const roleOptions = roleOptionsState;
+  const [autoFetched, setAutoFetched] = useState<boolean[]>([]);
+  const fetchedData = useRef([] as any[]);
+  const [emailToBeDisabled, setEmailToBeDisabled] = useState(undefined as boolean | undefined);
+  const [clearEmail, setClearEmail] = useState(false);
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -169,14 +168,10 @@ const UserForm = ({
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
       setDisabledRoles([]);
+      setEmailToBeDisabled(false);
     },
     [initialValue, form.mutators]
   );
-
-  const [autoFetched, setAutoFetched] = useState<boolean[]>([]);
-  const fetchedData = useRef([] as any[]);
-  const [emailToBeDisabled, setEmailToBeDisabled] = useState(undefined as boolean | undefined);
-  const [clearEmail, setClearEmail] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -221,10 +216,10 @@ const UserForm = ({
         form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
         form.change(`${formName}[${index}].lastName`, userData.lastName || '');
         form.change(`${formName}[${index}].gender`, userData.gender || '');
-        form.change(`${formName}[${index}].country`, userData.country || {});
+        form.change(`${formName}[${index}].country`, userData.country || null);
         form.change(`${formName}[${index}].countryCode`, userData.countryCode || '');
         form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
-        form.change(`${formName}[${index}].healthFacility`, userData.healthFacility || {});
+        form.change(`${formName}[${index}].healthFacility`, userData.healthFacility || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
         form.change(`${formName}[${index}].villages`, userData.villages || []);
         form.change(`${formName}[${index}].organizations`, userData.organizations || []);
@@ -613,7 +608,7 @@ const UserForm = ({
                             roleDisableFn(index);
                             // fetch HF list based on CHW selection
                             if (isCHWSelected(values)) {
-                              if (!isEdit) {
+                              if (!isEdit && !autoFetched[index]) {
                                 // To clear the Selected village during Add User
                                 form.batch(() => {
                                   form.change(`${formName}[${index}].villages`, {});

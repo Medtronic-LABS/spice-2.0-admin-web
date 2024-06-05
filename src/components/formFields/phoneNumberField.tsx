@@ -126,9 +126,11 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
           <TextInput
             {...input}
             onBlur={(event) => {
-              input.onBlur(event);
-              submitEnabledStatus.current = false;
-              validatePhoneNumberFn(input.value);
+              if (lastCheckedNumber.current !== currentphoneNumber.current) {
+                input.onBlur(event);
+                submitEnabledStatus.current = false;
+                validatePhoneNumberFn(input.value);
+              }
             }}
             onChange={(event) => {
               submitEnabledStatus.current = false;

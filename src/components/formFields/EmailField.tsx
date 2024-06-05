@@ -202,7 +202,7 @@ const EmailField = forwardRef(
                 validateUser(input.value);
               }}
               onChange={(event) => {
-                if (!(isEdit || isDisabled === undefined ? disabled : isDisabled)) {
+                if (!(isEdit || (isDisabled === undefined ? disabled : isDisabled))) {
                   submitEnabledStatus.current = false;
                   currentEmail.current = event.target.value.trim();
                   setNetworkError(false);
@@ -218,7 +218,7 @@ const EmailField = forwardRef(
                   ? ''
                   : 'email ID'
               }
-              disabled={isEdit || isDisabled === undefined ? disabled : isDisabled}
+              disabled={isEdit || (isDisabled === undefined ? disabled : isDisabled)}
               error={(isNetworkError ? 'Email ID is not validated.' : meta.touched && (meta.error || '')) || undefined}
               helpertext={
                 isNetworkError ? (
