@@ -274,16 +274,18 @@ const HealthFacilitySummary = (): React.ReactElement => {
         })
       );
     } else {
-      dispatch(
-        updateHFDetailsRequest({
-          data: postData,
-          successCb: hfUpdateSuccess,
-          failureCb: (e) => {
-            fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
-          }
-        })
-      );
-      closeHFEditModal(true);
+      if(postData.clinicalWorkflowIds.length){
+        dispatch(
+          updateHFDetailsRequest({
+            data: postData,
+            successCb: hfUpdateSuccess,
+            failureCb: (e) => {
+              fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
+            }
+          })
+        );
+        closeHFEditModal(true);
+      }
     }
   };
 
