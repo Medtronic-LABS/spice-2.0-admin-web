@@ -126,7 +126,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
           <TextInput
             {...input}
             onBlur={(event) => {
-              if (lastCheckedNumber.current !== currentphoneNumber.current) {
+              if (currentphoneNumber.current.length === 0 || lastCheckedNumber.current !== currentphoneNumber.current) {
                 input.onBlur(event);
                 submitEnabledStatus.current = false;
                 validatePhoneNumberFn(input.value);

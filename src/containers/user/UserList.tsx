@@ -119,8 +119,10 @@ const UserList = (props: IMatchProps): React.ReactElement => {
           id: Number(value?.id),
           successCb: (user: any) => {
             const postData = { ...user };
-            postData.suiteAccess = user.roles[0] || [];
-            postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+            const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
+            postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
+            postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
+            postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
             postData.supervisor = {
               ...postData.supervisor,
               name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
@@ -135,8 +137,9 @@ const UserList = (props: IMatchProps): React.ReactElement => {
       );
     } else {
       const postData = { ...value };
-      postData.suiteAccess = value.roles[0] || [];
-      postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+      postData.suiteAccess = postData.roles || [];
+      postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
+      postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       userForEdit.current = { users: [{ ...postData }] };
       setIsOpenUserModal({ isOpen: true, isEdit: true });
     }

@@ -98,7 +98,7 @@ const HealthFacilityList = (): React.ReactElement => {
           type: { id: hfDetails.type, name: hfDetails.type },
           city: { id: hfDetails.cityName, name: hfDetails.cityName },
           language: { id: hfDetails.language, name: hfDetails.language },
-          workflows: hfDetails.clinicalWorkflows.map((wfIds: any) => wfIds.id )
+          workflows: hfDetails.clinicalWorkflows.map((wfIds: any) => wfIds.id)
         } as IHealthFacilityForm
       });
     } else {
@@ -114,7 +114,7 @@ const HealthFacilityList = (): React.ReactElement => {
         ...editHealthFacilityModal,
         isOpen: false
       });
-      setSubmittedData({ ...submittedData, isNextClicked: false});
+      setSubmittedData({ ...submittedData, isNextClicked: false });
     }
   };
 
@@ -159,7 +159,7 @@ const HealthFacilityList = (): React.ReactElement => {
       );
     } else {
       const postData = formatHealthFacility(healthFacility, regionData.id);
-      if(postData.clinicalWorkflowIds.length) {
+      if (postData.clinicalWorkflowIds.length) {
         dispatch(
           updateHFDetailsRequest({
             data: postData,
@@ -168,8 +168,8 @@ const HealthFacilityList = (): React.ReactElement => {
               fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
             }
           })
-        ) 
-       closeHealthFacilityEditModal(true)
+        );
+        closeHealthFacilityEditModal(true);
       }
     }
   };
@@ -268,7 +268,7 @@ const HealthFacilityList = (): React.ReactElement => {
         submitText={submittedData?.isNextClicked ? 'Submit' : 'Next'}
         handleCancel={closeHealthFacilityEditModal}
         handleFormSubmit={handleHealthFacilityDetailsSubmit}
-        initialValues={{healthFacility: editHealthFacilityModal.data}}
+        initialValues={{ healthFacility: editHealthFacilityModal.data }}
         mutators={arrayMutators}
         render={editHealthFacilityDetailsModalRender}
         size='modal-lg'

@@ -109,7 +109,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         ...formatHealthFacility({ ...healthFacility }, regionId),
         users: formatHFUserData(users, regionId)
       };
-      if(postData.clinicalWorkflowIds.length) {
+      if (postData.clinicalWorkflowIds.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
       }
     } else {

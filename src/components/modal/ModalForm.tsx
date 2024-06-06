@@ -54,7 +54,7 @@ const ModalForm = React.memo(
     if (!show) {
       return null;
     }
-    const isFromCloseBtn = true
+    const isFromCloseBtn = true;
     return ReactDOM.createPortal(
       <div ref={ref} className={`${styles.modal} modal modal-show`}>
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>

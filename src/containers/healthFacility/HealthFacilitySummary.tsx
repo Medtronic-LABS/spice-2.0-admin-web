@@ -221,7 +221,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           type: { id: healthFacility.type, name: healthFacility.type },
           city: { id: healthFacility.cityName, name: healthFacility.cityName },
           language: { id: healthFacility.language, name: healthFacility.language },
-          workflows: healthFacility.clinicalWorkflows.map((wfIds: any) => wfIds.id )
+          workflows: healthFacility.clinicalWorkflows.map((wfIds: any) => wfIds.id)
         } as IHealthFacilityForm
       });
     } else {
@@ -236,7 +236,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       setEditHFDetailsModal({
         isOpen: false
       });
-      setSubmittedData({ ...submittedData, isNextClicked: false});
+      setSubmittedData({ ...submittedData, isNextClicked: false });
     }
   };
 
@@ -283,7 +283,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           }
         })
       );
-      closeHFEditModal(true)
+      closeHFEditModal(true);
     }
   };
 
@@ -302,8 +302,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
           successCb: (userData: any) => {
             setIsHFUserEdit(true);
             const postData = { ...userData };
-            postData.suiteAccess = userData.roles[0] || [];
-            postData.role = postData.roles.filter((r: IRoles) => r.groupName === postData.suiteAccess.groupName) || [];
+            const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
+            postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
+            postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
+            postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
             postData.supervisor = postData.supervisor && {
               ...postData.supervisor,
               name: `${postData.supervisor.firstName || ''} ${postData.supervisor.lastName || ''}`
