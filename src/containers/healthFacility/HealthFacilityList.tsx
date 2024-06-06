@@ -159,16 +159,18 @@ const HealthFacilityList = (): React.ReactElement => {
       );
     } else {
       const postData = formatHealthFacility(healthFacility, regionData.id);
-      dispatch(
-        updateHFDetailsRequest({
-          data: postData,
-          successCb: hfUpdateSuccess,
-          failureCb: (e) => {
-            fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
-          }
-        })
-      );
-      closeHealthFacilityEditModal(true)
+      if(postData.clinicalWorkflowIds.length) {
+        dispatch(
+          updateHFDetailsRequest({
+            data: postData,
+            successCb: hfUpdateSuccess,
+            failureCb: (e) => {
+              fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
+            }
+          })
+        ) 
+       closeHealthFacilityEditModal(true)
+      }
     }
   };
   const openCreateHealthFacility = () => {

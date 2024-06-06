@@ -133,7 +133,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: 'City/Village', value: healthFacility?.cityName },
       { label: 'Latitude', value: healthFacility?.latitude },
       { label: 'Longitude', value: healthFacility?.longitude },
-      { label: 'Pin code', value: healthFacility?.postalCode },
+      { label: 'Facility ID', value: healthFacility?.postalCode },
       { label: 'Language', value: healthFacility?.language },
       {
         label: 'Linked Peer Supervisor',

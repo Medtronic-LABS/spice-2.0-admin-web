@@ -1,6 +1,6 @@
 import { Field } from 'react-final-form';
 import Checkbox from '../../components/formFields/Checkbox';
-import { convertToCaptilize } from '../../utils/validation';
+import { convertToCaptilize, required } from '../../utils/validation';
 import { useSelector } from 'react-redux';
 import { workflowListSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import Loader from '../../components/loader/Loader';
@@ -9,12 +9,13 @@ import { FormApi } from 'final-form';
 interface IWorkflowsProps {
   form: FormApi<any, Partial<any>>;
   formName: string;
+  submittedData?: any;
 }
 
 const Workflows = (props: IWorkflowsProps) => {
   const workflows = useSelector(workflowListSelector);
   const isWorkflowLoading = useSelector(workflowLoadingSelector);
-
+  const viewScreenError = required(props.form?.getState()?.values?.healthFacility?.workflows);
   return (
     <>
       {isWorkflowLoading && <Loader />}
@@ -31,6 +32,7 @@ const Workflows = (props: IWorkflowsProps) => {
           </div>
         ))}
       </div>
+      {viewScreenError && <p className={'text-danger mt-1'}>Please select a clinical workflow</p>}
     </>
   );
 };
