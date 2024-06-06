@@ -37,7 +37,7 @@ import {
   villagesFromHFLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHealthFacility, IPeerSupervisor, IUserRole, IVillages } from '../../store/healthFacility/types';
-import PhoneNumberField from '../formFields/PhoneNumberField';
+import PhoneNumberField from '../formFields/phoneNumberField';
 
 interface IUserFormProps {
   form: FormApi<any>;
@@ -112,6 +112,8 @@ const UserForm = ({
   const fetchedData = useRef([] as any[]);
   const [emailToBeDisabled, setEmailToBeDisabled] = useState(undefined as boolean | undefined);
   const [clearEmail, setClearEmail] = useState(false);
+  const [selectedSuiteAccessState, setSelectedSuiteAccessState] = useState([]);
+
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -360,16 +362,16 @@ const UserForm = ({
     } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
       validRoles = superAdminRoles;
     } else {
-      validRoles = (roleOptions.current?.[index] || []).map((rr: IRoles) => rr.name) || [];
+      validRoles = (rolesGrouped['SPICE'] || []).map((rr: IRoles) => rr.name) || [];
     }
-    newDisabledRoles[index] = [...(roleOptions.current?.[index] || [])].filter(
+    newDisabledRoles[index] = [...(rolesGrouped['SPICE'] || [])].filter(
       (r: IRoles) => !validRoles.includes(r.name)
-    );
+      );
     setTimeout(() => {
       setDisabledRoles(newDisabledRoles);
     }, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [rolesGrouped]);
 
   const isCHWUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
@@ -521,13 +523,13 @@ const UserForm = ({
               <div className='row gx-1dot25'>
                 <Field name={`${name}.id`} render={() => null} />{' '}
                 {/** A hidden field to store user id if user is auto populated */}
-                <div className='col-sm-6 col-12'>
+                <div className='col-sm-12 col-12'>
                   <Field
                     name={`${name}.suiteAccess`}
                     type='text'
                     validate={required}
                     render={({ input, meta }) => (
-                      <SelectInput
+                      <MultiSelect
                         {...(input as any)}
                         label='SPICE Suite Access'
                         errorLabel='suite access'
@@ -537,98 +539,140 @@ const UserForm = ({
                         disabled={isProfile}
                         loadingOptions={isRolesLoading}
                         error={isError(meta)}
+                        isMulti={true}
                         isModel={true}
-                        onChange={(value) => {
-                          selectedSuiteAccess.current = value.groupName;
-                          // Role option selection
-                          roleOptionSelection(value.groupName, index);
-                          // To store ALL ROLES
-                          form.change(
-                            `${formName}[${index}].role`,
-                            selectedRoles(index).filter(
-                              (userRole: IUserRole) => userRole.groupName === value.groupName
-                            ) || []
-                          );
-                          // CHW User selection
+                        onChange={(values: any) => {
+                          setSelectedSuiteAccessState(values.map((option: any) => option.groupName));
                           isCHWUserSelectedFn(form.getState().values.users[index].role, index);
                           roleDisableFn(index);
-                          input.onChange(value);
+                          input.onChange(values);
                         }}
                       />
                     )}
                   />
                 </div>
-                <div className='col-sm-6 col-12'>
-                  <Field
-                    name={`${name}.role`}
-                    type='text'
-                    validate={required}
-                    render={({ input, meta }) => {
-                      const mandatoryRoles = form.getState().values.users[index].selectedRoles || [];
-                      return (
-                        <MultiSelect
-                          {...(input as any)}
-                          label='Role'
-                          errorLabel='Please select at least one role.'
-                          labelKey='displayName'
-                          valueKey='id'
-                          isShowLabel={true}
-                          isSelectAll={true}
-                          selectAll={false}
-                          menuPlacement={'bottom'}
-                          isDisabled={isProfile}
-                          placeholder=''
-                          isModel={true}
-                          isMulti={true}
-                          isOptionDisabled={(option: any) => {
-                            // console.log(disabledRoles, disabledRoles[index]);
-                            const optionsToBeDisabled = [
-                              ...(autoFetched[index] ? mandatoryRoles : []),
-                              ...(disabledRoles[index] || [])
-                            ];
-                            return optionsToBeDisabled.length
-                              ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
-                              : null;
-                          }}
-                          required={true}
-                          options={roleOptions.current?.[index] || []}
-                          mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
-                          disabledOptions={disabledRoles[index]}
-                          loading={isRolesLoading}
-                          error={isError(meta) && !selectedRoles(index)?.length}
-                          onChange={(values: any) => {
-                            //  Store ALL ROLES on each update
-                            const suiteAccessSelected = form.getState().values.users[index].suiteAccess?.groupName;
-                            const remainingRoles = selectedRoles(index).filter(
-                              (r: IUserRole) => r.groupName !== suiteAccessSelected
-                            );
-                            form.change(`${formName}[${index}].roles`, [...remainingRoles, ...values]);
-                            // CHW User selection
-                            isCHWUserSelectedFn(values, index);
-                            roleDisableFn(index);
-                            // fetch HF list based on CHW selection
-                            if (isCHWSelected(values)) {
-                              if (!isEdit && !autoFetched[index]) {
-                                // To clear the Selected village during Add User
-                                form.batch(() => {
-                                  form.change(`${formName}[${index}].villages`, {});
-                                });
+                {selectedSuiteAccessState.some(groupName => groupName === "SPICE") && 
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.role`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => {
+                        const mandatoryRoles = form.getState().values.users[index].selectedRoles || [];
+                        return (
+                          <MultiSelect
+                            {...(input as any)}
+                            label='SPICE Role'
+                            errorLabel='Please select at least one role.'
+                            labelKey='displayName'
+                            valueKey='id'
+                            isShowLabel={true}
+                            isSelectAll={true}
+                            selectAll={false}
+                            menuPlacement={'bottom'}
+                            isDisabled={isProfile}
+                            placeholder=''
+                            isModel={true}
+                            isMulti={true}
+                            isOptionDisabled={(option: any) => {
+                              const optionsToBeDisabled = [
+                                ...(autoFetched[index] ? mandatoryRoles : []),
+                                ...(disabledRoles[index] || [])
+                              ];
+                              return optionsToBeDisabled.length
+                                ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
+                                : null;
+                            }}
+                            required={true}
+                            options={rolesGrouped['SPICE'] || []}
+                            mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                            disabledOptions={disabledRoles[index]}
+                            loading={isRolesLoading}
+                            error={isError(meta) && !selectedRoles(index)?.length}
+                            onChange={(values: any) => {
+                              //  Store ALL ROLES on each update
+                              const suiteAccessSelected = form.getState().values.users[index].suiteAccess?.groupName;
+                              const remainingRoles = selectedRoles(index).filter(
+                                (r: IUserRole) => r.groupName !== suiteAccessSelected
+                              );
+                              form.change(`${formName}[${index}].roles`, [...values]);
+                              // CHW User selection
+                              isCHWUserSelectedFn(values, index);
+                              roleDisableFn(index);
+                              // fetch HF list based on CHW selection
+                              if (isCHWSelected(values)) {
+                                if (!isEdit && !autoFetched[index]) {
+                                  // To clear the Selected village during Add User
+                                  form.batch(() => {
+                                    form.change(`${formName}[${index}].villages`, {});
+                                  });
+                                }
+                                const tenantIds = [
+                                  ...(initialEditData[index]?.hfTenantIds || []),
+                                  ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
+                                  hfTenantId
+                                ].filter((v: number) => v);
+                                fetchListWithConditions(selectedRoles(index), tenantIds, 'village', index);
+                                fetchListWithConditions(selectedRoles(index), tenantIds, 'supervisor', index);
                               }
-                              const tenantIds = [
-                                ...(initialEditData[index]?.hfTenantIds || []),
-                                ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
-                                hfTenantId
-                              ].filter((v: number) => v);
-                              fetchListWithConditions(selectedRoles(index), tenantIds, 'village', index);
-                              fetchListWithConditions(selectedRoles(index), tenantIds, 'supervisor', index);
-                            }
-                            input.onChange(values);
-                          }}
-                        />
-                      );
-                    }}
-                  />
-                </div>
+                              input.onChange(values);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </div>
+                }
+                {selectedSuiteAccessState.some(groupName => groupName === "SPICE INSIGHTS") &&                 
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.spiceInsightsRole`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => {
+                        const mandatoryRoles = form.getState().values.users[index].selectedRoles || [];
+                        return (
+                          <MultiSelect
+                            {...(input as any)}
+                            label='SPICE Insights Role'
+                            errorLabel='Please select at least one role.'
+                            labelKey='displayName'
+                            valueKey='id'
+                            isShowLabel={true}
+                            isSelectAll={true}
+                            selectAll={false}
+                            menuPlacement={'bottom'}
+                            isDisabled={isProfile}
+                            placeholder=''
+                            isModel={true}
+                            isMulti={true}
+                            isOptionDisabled={(option: any) => {
+                              const optionsToBeDisabled = [
+                                ...(autoFetched[index] ? mandatoryRoles : []),
+                                ...(disabledRoles[index] || [])
+                              ];
+                              return optionsToBeDisabled.length
+                                ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
+                                : null;
+                            }}
+                            required={true}
+                            options={rolesGrouped['SPICE INSIGHTS'] || []}
+                            mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                            disabledOptions={disabledRoles[index]}
+                            loading={isRolesLoading}
+                            error={isError(meta) && !selectedRoles(index)?.length}
+                            onChange={(values: any) => {
+                              const spiceRolesAdded = form.getState().values.users[index].roles;
+                              form.change(`${formName}[${index}].roles`, [...spiceRolesAdded, ...values]);
+                              input.onChange(values);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </div>     
+                }         
+                {selectedSuiteAccessState.length === 1 && <div className='col-sm-6 col-12'></div>}
                 <div className='col-sm-6 col-12'>
                   <Field
                     name={`${name}.firstName`}
