@@ -274,7 +274,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         })
       );
     } else {
-      if(postData.clinicalWorkflowIds.length){
+      if (postData.clinicalWorkflowIds.length) {
         dispatch(
           updateHFDetailsRequest({
             data: postData,

@@ -39,6 +39,10 @@ import {
 import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
 import PhoneNumberField from '../formFields/PhoneNumber';
 
+
+interface IEmailStatus {
+  [index: number]: boolean;
+}
 interface IUserFormProps {
   form: FormApi<any>;
   initialEditValue?: any;
@@ -110,7 +114,7 @@ const UserForm = ({
   const [disabledRoles, setDisabledRoles] = useState(disabledRolesState?.disabledRoles || ([] as IRoles[][]));
   const [autoFetched, setAutoFetched] = useState<boolean[]>([]);
   const fetchedData = useRef([] as any[]);
-  const [emailToBeDisabled, setEmailToBeDisabled] = useState(undefined as boolean | undefined);
+  const [emailToBeDisabled, setEmailToBeDisabled] = useState<IEmailStatus>({});
   const [clearEmail, setClearEmail] = useState(false);
   const [selectedSuiteAccessState, setSelectedSuiteAccessState] = useState([] as any[]);
 
@@ -170,9 +174,9 @@ const UserForm = ({
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
       setDisabledRoles([]);
-      setEmailToBeDisabled(false);
+      setEmailToBeDisabled({...emailToBeDisabled, [index]: false});
     },
-    [initialValue, form.mutators]
+    [form.mutators, initialValue, emailToBeDisabled]
   );
 
   useEffect(() => {
@@ -190,7 +194,7 @@ const UserForm = ({
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
     const emailDisabledFn = (errorMsg: string) => {
-      setEmailToBeDisabled(false);
+      setEmailToBeDisabled({...emailToBeDisabled, [index]: false});
       setClearEmail(true);
       form.change(`${formName}[${index}].username`, '');
       toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
@@ -200,7 +204,7 @@ const UserForm = ({
     } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
-      setEmailToBeDisabled(true);
+      setEmailToBeDisabled({...emailToBeDisabled, [index]: true});
       setClearEmail(false);
       const allSuiteAccess = userData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
       userData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
@@ -270,7 +274,7 @@ const UserForm = ({
 
   const isError = (meta: any) => (meta.touched && meta.error) || undefined;
 
-  const handleShowAddIcon = (isLastChild: boolean, fields: any) => {
+  const handleShowAddIcon = (isLastChild: boolean, fields: any, index: number) => {
     return (
       isLastChild && (
         <div
@@ -280,7 +284,7 @@ const UserForm = ({
               ? undefined
               : () => {
                   idRefs.current.push(new Date().getTime());
-                  setEmailToBeDisabled(false);
+                  setEmailToBeDisabled({...emailToBeDisabled, [index + 1]: false});
                   fields.push({ ...initialValue[0] });
                 }
           }
@@ -315,7 +319,7 @@ const UserForm = ({
   const actionButtons = (fields: any, index: number, isLastChild: boolean, emailFieldRef: any) =>
     !disableOptions && (
       <div className={`col-12 d-flex justify-content-between mt-0dot5 ${isLastChild ? '' : 'mb-2'}`}>
-        {handleShowAddIcon(isLastChild, fields)}
+        {handleShowAddIcon(isLastChild, fields, index)}
         {handleShowRemoveIcon(fields, index)}
         <div
           className='theme-text lh-1dot25 pointer'
@@ -640,6 +644,7 @@ const UserForm = ({
                                 }
                                 const tenantIds = [
                                   ...(initialEditData[index]?.hfTenantIds || []),
+                                  form.getState().values?.users?.[0]?.healthFacility?.tenantId,
                                   ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
                                   hfTenantId
                                 ].filter((v: number) => v);
@@ -758,7 +763,7 @@ const UserForm = ({
                     name={name}
                     isEdit={isEdit}
                     form={form}
-                    isDisabled={emailToBeDisabled}
+                    isDisabled={emailToBeDisabled?.[index] || false}
                     entityName={entityName}
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
