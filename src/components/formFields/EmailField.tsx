@@ -102,7 +102,7 @@ const EmailField = forwardRef(
           const users = form?.getState().values[formName];
           let count = 0;
           users.forEach(({ username }: IHFUserGet, i: number) => {
-            if (username.toLowerCase() === value.toLowerCase()) {
+            if (username.toLowerCase() === (value || '').toLowerCase()) {
               if (smallestDuplicateIndex < 0) {
                 smallestDuplicateIndex = i;
               }

@@ -39,10 +39,6 @@ import {
 import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
 import PhoneNumberField from '../formFields/PhoneNumber';
 
-
-interface IEmailStatus {
-  [index: number]: boolean;
-}
 interface IUserFormProps {
   form: FormApi<any>;
   initialEditValue?: any;
@@ -59,12 +55,18 @@ interface IUserFormProps {
   data?: any[];
   countryId: number;
   hfTenantId?: number;
-  autoFetchedState?: { autoFetchData: any[]; setAutoFetchData: React.Dispatch<React.SetStateAction<any[]>> };
+  autoFetchedDataState?: { autoFetchData: any[]; setAutoFetchData: React.Dispatch<React.SetStateAction<any[]>> };
+  autoFetchedState?: { autoFetch: any[]; setAutoFetchState: React.Dispatch<React.SetStateAction<boolean[]>> };
   chwState?: { isCHWUser: boolean[]; setUserAsCHW: React.Dispatch<React.SetStateAction<boolean[]>> };
   disabledRolesState?: {
     disabledRoles: IRoles[][];
     setDisabledRoles: React.Dispatch<React.SetStateAction<IRoles[][]>>;
   };
+  mandatoryRolesState?: {
+    mandatoryRoles: IRoles[][];
+    setMandatoryRoles: React.Dispatch<React.SetStateAction<IRoles[][]>>;
+  };
+
   roleOptionsState?: React.MutableRefObject<IRoles[][]>;
 }
 
@@ -86,6 +88,7 @@ const UserForm = ({
   countryId,
   hfTenantId,
   data = [],
+  autoFetchedDataState,
   autoFetchedState,
   chwState,
   disabledRolesState,
@@ -108,15 +111,13 @@ const UserForm = ({
   const [peerSupervisors, setPeerSupervisors] = useState([[...peerSupervisorList.list]] as IPeerSupervisor[][]);
   const [villages, setVillages] = useState([[...villagesList.list]] as IVillages[][]);
 
-  const [autoFetchData, setAutoFetchData] = useState(autoFetchedState?.autoFetchData || ([] as any[]));
+  const [autoFetchData, setAutoFetchData] = useState(autoFetchedDataState?.autoFetchData || ([] as any[]));
   const [isCHWUser, setUserAsCHW] = useState(chwState?.isCHWUser || [false]);
   const roleOptions = useRef<IRoles[][]>(roleOptionsState?.current || []);
-  const [disabledRoles, setDisabledRoles] = useState(disabledRolesState?.disabledRoles || ([] as IRoles[][]));
-  const [autoFetched, setAutoFetched] = useState<boolean[]>([]);
+  const disabledRoles = useRef<IRoles[][]>(disabledRolesState?.disabledRoles || ([] as IRoles[][]));
+  const [autoFetched, setAutoFetched] = useState<boolean[]>(autoFetchedState?.autoFetch || ([] as boolean[]));
   const fetchedData = useRef([] as any[]);
-  const [emailToBeDisabled, setEmailToBeDisabled] = useState<IEmailStatus>({});
   const [clearEmail, setClearEmail] = useState(false);
-  const [selectedSuiteAccessState, setSelectedSuiteAccessState] = useState([] as any[]);
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -143,21 +144,30 @@ const UserForm = ({
   useEffect(() => {
     return () => {
       if (autoFetchedState) {
-        autoFetchedState.setAutoFetchData(autoFetchData);
+        autoFetchedState.setAutoFetchState(autoFetched);
       }
       if (chwState) {
         chwState.setUserAsCHW(isCHWUser);
       }
       if (disabledRolesState) {
         setTimeout(() => {
-          disabledRolesState.setDisabledRoles(disabledRoles);
+          disabledRolesState.setDisabledRoles(disabledRoles.current);
         }, 0);
       }
       if (roleOptionsState) {
         roleOptionsState.current = roleOptions.current;
       }
     };
-  }, [autoFetchData, autoFetchedState, chwState, disabledRoles, disabledRolesState, isCHWUser, roleOptionsState]);
+  }, [
+    autoFetchData,
+    autoFetched,
+    autoFetchedState,
+    chwState,
+    disabledRoles,
+    disabledRolesState,
+    isCHWUser,
+    roleOptionsState
+  ]);
 
   const isFormInvalid = form?.getState()?.errors?.[formName]?.length;
   const initialEditData = useMemo<Array<Partial<any>>>(
@@ -173,10 +183,14 @@ const UserForm = ({
     (fields, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
-      setDisabledRoles([]);
-      setEmailToBeDisabled({...emailToBeDisabled, [index]: false});
+      // setDisabledRoles([]);
+      disabledRoles.current = [];
+      const newAutoFetched = [...autoFetched];
+      newAutoFetched[index] = false;
+      setAutoFetched(newAutoFetched);
+      // setEmailToBeDisabled(false);
     },
-    [form.mutators, initialValue, emailToBeDisabled]
+    [form.mutators, initialValue, autoFetched]
   );
 
   useEffect(() => {
@@ -194,7 +208,10 @@ const UserForm = ({
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
     const emailDisabledFn = (errorMsg: string) => {
-      setEmailToBeDisabled({...emailToBeDisabled, [index]: false});
+      // setEmailToBeDisabled(false);
+      const newAutoFetched = [...autoFetched];
+      newAutoFetched[index] = false;
+      setAutoFetched(newAutoFetched);
       setClearEmail(true);
       form.change(`${formName}[${index}].username`, '');
       toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
@@ -204,7 +221,7 @@ const UserForm = ({
     } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
-      setEmailToBeDisabled({...emailToBeDisabled, [index]: true});
+      // setEmailToBeDisabled(true);
       setClearEmail(false);
       const allSuiteAccess = userData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
       userData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
@@ -284,7 +301,7 @@ const UserForm = ({
               ? undefined
               : () => {
                   idRefs.current.push(new Date().getTime());
-                  setEmailToBeDisabled({...emailToBeDisabled, [index + 1]: false});
+                  // setEmailToBeDisabled(false);
                   fields.push({ ...initialValue[0] });
                 }
           }
@@ -341,12 +358,25 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
-  const mobileRoles = useMemo(() => ['CHW', 'CHA', 'MCHA', 'SECHN'], []);
-  const adminRoles = useMemo(() => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN'], []);
+  const mobileRoles = useMemo(() => ['CHW'], []);
+  const adminRoles = useMemo(
+    () => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'SECHN', 'CHA', 'MCHA'],
+    []
+  );
   const peerSupervisorRoles = useMemo(() => ['PEER_SUPERVISOR'], []);
   const superAdminRoles = useMemo(() => ['SUPER_ADMIN'], []);
   const hfCreateRoles = useMemo(
-    () => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'PEER_SUPERVISOR'],
+    () => [
+      'HEALTH_FACILITY_ADMIN',
+      'PROVIDER',
+      'MID_WIFE',
+      'LAB_ASSISTANT',
+      'SRN',
+      'SECHN',
+      'CHA',
+      'MCHA',
+      'PEER_SUPERVISOR'
+    ],
     []
   );
 
@@ -363,10 +393,10 @@ const UserForm = ({
   );
 
   const updateRoleOptionsAndDisableRoles = useCallback(
-    (index: number, mandatoryRoles?: IRoles[]) => {
+    (index: number, mandatoryRoleOptions?: IRoles[]) => {
       // role options
       const newRoleOptions = [...roleOptions.current];
-      if (isHFCreate && (mandatoryRoles ? !isCHWSelected(mandatoryRoles) : true)) {
+      if (isHFCreate && (mandatoryRoleOptions ? !isCHWSelected(mandatoryRoleOptions) : true)) {
         newRoleOptions[index] = (rolesGrouped.SPICE || [])
           .filter((r: IRoles) => hfCreateRoles.includes(r.name))
           .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
@@ -382,7 +412,7 @@ const UserForm = ({
       roleOptions.current = newRoleOptions;
 
       // role disable
-      const newDisabledRoles = [...disabledRoles];
+      const newDisabledRoles = [...disabledRoles.current];
       let validRoles: string[] = [];
       const selectedAllRoles = [...(selectedRoles(index) || [])];
       if (selectedAllRoles.some((ro: IRoles) => mobileRoles.includes(ro.name))) {
@@ -397,7 +427,9 @@ const UserForm = ({
         validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
       }
       newDisabledRoles[index] = [...(newRoleOptions[index] || [])].filter((r: IRoles) => !validRoles.includes(r.name));
-      setDisabledRoles(newDisabledRoles);
+      // form.change(`${formName}[${index}].disabledFormRoles`, newDisabledRoles[index]);
+      disabledRoles.current = newDisabledRoles;
+      // setDisabledRoles(newDisabledRoles);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -521,7 +553,7 @@ const UserForm = ({
         }, 0);
       });
     }
-  }, [autoFetchData, form, isEdit, isHFCreate, updateRoleOptionsAndDisableRoles, selectedSuiteAccessState]);
+  }, [autoFetchData, form, isEdit, isHFCreate, updateRoleOptionsAndDisableRoles]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -533,6 +565,15 @@ const UserForm = ({
           const suiteAccess = Object.keys(rolesGrouped || {})
             .map((userRole: any) => ({ groupName: userRole, id: userRole }))
             .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
+          const {
+            selectedRoles: mandatoryRoles = [],
+            suiteAccess: formSuiteAccess = [],
+            roles: allRoles = [],
+            role: spiceRole = [],
+            spiceInsightsRole = []
+          } = form.getState().values?.users?.[index];
+          const isSPICE = (formSuiteAccess || []).some((v: any) => v.groupName === 'SPICE');
+          const isSPICEInsights = (formSuiteAccess || []).some((v: any) => v.groupName === 'SPICE INSIGHTS');
 
           return (
             <span key={`form_${idRefs.current[index]}`}>
@@ -553,7 +594,8 @@ const UserForm = ({
                         valueKey='groupName'
                         options={suiteAccess || []}
                         placeholder=''
-                        disabled={isProfile}
+                        disabled={isProfile || autoFetched[index]}
+                        isDisabled={isProfile || autoFetched[index]}
                         loadingOptions={isRolesLoading}
                         isShowLabel={true}
                         error={isError(meta)}
@@ -562,8 +604,6 @@ const UserForm = ({
                         required={true}
                         onChange={(values: any[]) => {
                           const selectedGroupName = values.map((option: any) => option.groupName) || [];
-                          setSelectedSuiteAccessState(selectedGroupName);
-                          const allRoles = form.getState().values.users?.[index]?.roles || [];
                           if (!selectedGroupName.includes('SPICE INSIGHTS')) {
                             form.change(`${formName}[${index}].spiceInsightsRole`, []);
                             form.change(
@@ -578,7 +618,7 @@ const UserForm = ({
                               (allRoles || []).filter((v: IRoles) => v.groupName !== 'SPICE')
                             );
                           }
-                          isCHWUserSelectedFn(form.getState().values.users[index].role, index);
+                          isCHWUserSelectedFn(spiceRole, index);
                           updateRoleOptionsAndDisableRoles(index);
                           input.onChange(values);
                         }}
@@ -586,16 +626,13 @@ const UserForm = ({
                     )}
                   />
                 </div>
-                {(form.getState().values?.users?.[index]?.suiteAccess || []).some(
-                  (v: any) => v.groupName === 'SPICE'
-                ) && (
+                {isSPICE && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.role`}
                       type='text'
                       validate={required}
                       render={({ input, meta }) => {
-                        const mandatoryRoles = form.getState().values.users[index].selectedRoles || [];
                         return (
                           <MultiSelect
                             {...(input as any)}
@@ -614,7 +651,7 @@ const UserForm = ({
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] ? mandatoryRoles : []),
-                                ...(disabledRoles[index] || [])
+                                ...(disabledRoles.current[index] || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
@@ -623,14 +660,12 @@ const UserForm = ({
                             required={true}
                             options={roleOptions.current?.[index] || []}
                             mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
-                            disabledOptions={disabledRoles[index]}
+                            disabledOptions={disabledRoles.current[index]}
                             loading={isRolesLoading}
-                            error={isError(meta) && !form.getState().values.users.role?.length}
+                            error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any) => {
                               //  Store ALL ROLES on each update
-                              const spiceInsightsRolesAdded =
-                                form.getState().values.users[index].spiceInsightsRole || [];
-                              form.change(`${formName}[${index}].roles`, [...spiceInsightsRolesAdded, ...values]);
+                              form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, ...values]);
                               // CHW User selection
                               isCHWUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index);
@@ -659,16 +694,13 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {(form.getState().values?.users?.[index]?.suiteAccess || []).some(
-                  (v: any) => v.groupName === 'SPICE INSIGHTS'
-                ) && (
+                {isSPICEInsights && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.spiceInsightsRole`}
                       type='text'
                       validate={required}
                       render={({ input, meta }) => {
-                        const mandatoryRoles = form.getState().values.users[index].selectedRoles || [];
                         return (
                           <MultiSelect
                             {...(input as any)}
@@ -687,7 +719,7 @@ const UserForm = ({
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] ? mandatoryRoles : []),
-                                ...(disabledRoles[index] || [])
+                                ...(disabledRoles.current[index] || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
@@ -696,12 +728,10 @@ const UserForm = ({
                             required={true}
                             options={rolesGrouped['SPICE INSIGHTS'] || []}
                             mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
-                            // disabledOptions={disabledRoles[index]}
                             loading={isRolesLoading}
-                            error={isError(meta) && !form.getState().values.users.spiceInsightsRole?.length}
+                            error={isError(meta) && !spiceInsightsRole?.length}
                             onChange={(values: any) => {
-                              const spiceRolesAdded = form.getState().values.users[index].role;
-                              form.change(`${formName}[${index}].roles`, [...spiceRolesAdded, ...values]);
+                              form.change(`${formName}[${index}].roles`, [...spiceRole, ...values]);
                               input.onChange(values);
                             }}
                           />
@@ -710,9 +740,7 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {(form.getState().values.users[index].suiteAccess || []).length === 1 && (
-                  <div className='col-sm-6 col-12' />
-                )}
+                {(formSuiteAccess || []).length === 1 && <div className='col-sm-6 col-12' />}
                 <div className='col-sm-6 col-12'>
                   <Field
                     name={`${name}.firstName`}
@@ -763,7 +791,7 @@ const UserForm = ({
                     name={name}
                     isEdit={isEdit}
                     form={form}
-                    isDisabled={emailToBeDisabled?.[index] || false}
+                    isDisabled={autoFetched[index]}
                     entityName={entityName}
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}

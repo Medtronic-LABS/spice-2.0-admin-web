@@ -12,7 +12,7 @@ import { IUserRole } from '../../store/healthFacility/types';
 import { fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
-import { IEditUserDetail } from '../../store/user/types';
+import { IEditUserDetail, IRoles } from '../../store/user/types';
 
 const MyProfile = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -80,8 +80,10 @@ const MyProfile = (): React.ReactElement => {
   useEffect(() => {
     if (userDetails && userDetails.id) {
       const postData: any = { ...userDetails };
-      postData.suiteAccess = postData.roles[0] || {};
-      postData.role = postData.roles.filter((r: IUserRole) => r.groupName === postData.suiteAccess.groupName) || [];
+      const allSuiteAccess = postData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
+      postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
+      postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
+      postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       postData.supervisor = {
         ...postData.supervisor,
         name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`

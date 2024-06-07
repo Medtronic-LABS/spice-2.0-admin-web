@@ -48,6 +48,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     isNextClicked: false
   });
 
+  const [autoFetch, setAutoFetchState] = useState([] as any[]);
+
   const { regionId, tenantId } = props.match.params;
 
   useEffect(() => {
@@ -177,6 +179,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           isHFCreate={true}
                           entityName='healthFacility'
                           data={submittedData.data.users}
+                          autoFetchedState={{ autoFetch, setAutoFetchState }}
                         />
                         <></>
                       </FormContainer>
