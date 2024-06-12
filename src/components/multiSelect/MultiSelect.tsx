@@ -208,6 +208,7 @@ const MultiSelect = (props: any) => {
         ...optionStyles,
         ...newProps.optionStyles,
         disabled: true,
+        fontSize: '14px',
         backgroundColor:
           optionProps.isDisabled &&
           (newProps.disabledOptions || []).some((v: any) => v.id === (optionProps as any).value)
@@ -215,7 +216,7 @@ const MultiSelect = (props: any) => {
             : optionProps.isFocused
             ? '#DEEBFF'
             : 'white',
-        color: optionProps.isDisabled ? 'grey' : 'black'
+        color: optionProps.isDisabled ? 'grey' : '#212529'
       };
     }
   };

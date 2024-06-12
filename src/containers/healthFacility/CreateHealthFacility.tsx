@@ -95,6 +95,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const onCreateSuccess = () => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS);
     setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
+    formInstance.change('healthFacility', {});
     onGotoList();
   };
 
@@ -155,7 +156,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
             <form onSubmit={handleSubmit} data-testid='create-site-form'>
               <div className='row g-1dot25'>
                 {submittedData.isNextClicked ? (
-                  <FormContainer label='Clinical Workflows Involved' icon={SiteDetailsIcon}>
+                  <FormContainer label='Clinical Workflows Involved' required={true} icon={SiteDetailsIcon}>
                     <Workflows formName='healthFacility' form={form} />
                   </FormContainer>
                 ) : (

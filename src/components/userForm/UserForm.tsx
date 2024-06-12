@@ -183,12 +183,10 @@ const UserForm = ({
     (fields, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
-      // setDisabledRoles([]);
       disabledRoles.current = [];
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = false;
       setAutoFetched(newAutoFetched);
-      // setEmailToBeDisabled(false);
     },
     [form.mutators, initialValue, autoFetched]
   );
@@ -208,7 +206,6 @@ const UserForm = ({
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
     const emailDisabledFn = (errorMsg: string) => {
-      // setEmailToBeDisabled(false);
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = false;
       setAutoFetched(newAutoFetched);
@@ -216,12 +213,11 @@ const UserForm = ({
       form.change(`${formName}[${index}].username`, '');
       toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
     };
-    if (isRoleExists(userData.role, ['SPICE_ADMIN']) && isHF) {
+    if (isRoleExists(userData.role, ['SPICE_ADMIN', 'SUPER_USER'])) {
       emailDisabledFn(APPCONSTANTS.SPICE_ADMIN_USER_EXCEPTION_HF_CREATE);
     } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
-      // setEmailToBeDisabled(true);
       setClearEmail(false);
       const allSuiteAccess = userData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
       userData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
@@ -301,7 +297,6 @@ const UserForm = ({
               ? undefined
               : () => {
                   idRefs.current.push(new Date().getTime());
-                  // setEmailToBeDisabled(false);
                   fields.push({ ...initialValue[0] });
                 }
           }
@@ -427,9 +422,7 @@ const UserForm = ({
         validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
       }
       newDisabledRoles[index] = [...(newRoleOptions[index] || [])].filter((r: IRoles) => !validRoles.includes(r.name));
-      // form.change(`${formName}[${index}].disabledFormRoles`, newDisabledRoles[index]);
       disabledRoles.current = newDisabledRoles;
-      // setDisabledRoles(newDisabledRoles);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [

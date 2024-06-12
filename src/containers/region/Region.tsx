@@ -12,7 +12,7 @@ import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
 import { downloadFileRequest, regionDetailsRequest, uploadFileRequest } from '../../store/region/actions';
-import { getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
+import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
 import toastCenter from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import arrayMutators from 'final-form-arrays';
@@ -25,6 +25,7 @@ const Region = (): React.ReactElement => {
   const regionData = useSelector(userDataSelector).country;
   const regionDetails = useSelector(getRegionDetailsSelector);
   const loading = useSelector(getLoadingSelector);
+  const uploading = useSelector(getIsUploadingSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
 
   const onDownloadClick = () => {
@@ -80,7 +81,7 @@ const Region = (): React.ReactElement => {
 
   return (
     <>
-      {loading && <Loader />}
+      {(loading || uploading) && <Loader />}
       <div className={` row g-0dot625 position-relative h-100`}>
         {!loading && Array.isArray(regionDetails.list) && !regionDetails.list.length ? (
           <div

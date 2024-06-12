@@ -73,7 +73,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     postalCode: hf.postalCode,
     country: { id: countryId },
     language: hf.language.name,
-    parentTenantId: hf.chiefdom?.id,
+    parentTenantId: hf.chiefdom?.tenantId,
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
