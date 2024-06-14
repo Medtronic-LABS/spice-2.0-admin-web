@@ -111,7 +111,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   const openEditModal = (value: any) => {
     if (
       (value.roles || []).some((userRole: IUserRole) =>
-        ['CHW', 'CHA', 'MCHA', 'SECHN', 'PROVIDER'].includes(userRole.name)
+        ['CHW'].includes(userRole.name)
       )
     ) {
       dispatch(
@@ -137,7 +137,8 @@ const UserList = (props: IMatchProps): React.ReactElement => {
       );
     } else {
       const postData = { ...value };
-      postData.suiteAccess = postData.roles || [];
+      const allSuiteAccess = value.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
+      postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
       postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       userForEdit.current = { users: [{ ...postData }] };
