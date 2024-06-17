@@ -76,7 +76,8 @@ import {
   IDeleteHFSuccess,
   IDeleteHFFailure,
   IClearDependentData,
-  IClearVillagesList
+  IClearVillagesList,
+  IPeerSupervisorValidation
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -487,6 +488,19 @@ export const fetchWorkflowListRequest = ({
   failureCb
 });
 
+export const validationPeerSupervisor = ({
+  ids,
+  tenantId,
+  successCb,
+  failureCb
+}: Omit<IPeerSupervisorValidation, 'type'>): IPeerSupervisorValidation => ({
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+  ids,
+  tenantId,
+  successCb,
+  failureCb,
+});
+
 export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetchWorkflowListSuccess => ({
   type: HF_TYPES.FETCH_WORKFLOW_LIST_SUCCESS,
   payload
@@ -494,6 +508,11 @@ export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetch
 
 export const fetchWorkflowListFailure = (error: Error): IFetchWorkflowListFailure => ({
   type: HF_TYPES.FETCH_WORKFLOW_LIST_FAILURE,
+  error
+});
+
+export const fetchPeerSupervisorValidationsFailure = (error: Error): any => ({
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
   error
 });
 

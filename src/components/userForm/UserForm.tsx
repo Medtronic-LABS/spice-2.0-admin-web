@@ -885,8 +885,8 @@ const UserForm = ({
                               <SelectInput
                                 {...(input as any)}
                                 {...(meta as any)}
-                                label='Selected Peer Supervisor'
-                                errorLabel='selected peer supervisor'
+                                label='Select Peer Supervisor'
+                                errorLabel='select peer supervisor'
                                 labelKey='name'
                                 valueKey='id'
                                 disabled={isProfile}

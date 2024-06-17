@@ -153,6 +153,13 @@ export const fetchWorkflowList = (data: any) =>
     data
   });
 
+export const peerSupervisorValidation = (data: any) =>
+  axios({
+    url: '/user-service/user/validate-peer-supervisors',
+    method: 'POST',
+    data
+  });
+
 export const fetchCultureList = () =>
   axios({
     url: '/admin-service/cultures',

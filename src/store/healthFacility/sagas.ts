@@ -16,6 +16,7 @@ import {
   IFetchVillagesListRequest,
   IFetchPeerSupervisorListRequest,
   IFetchWorkflowListRequest,
+  IPeerSupervisorValidation,
   IPeerSupervisor,
   IFetchHFTypesRequest,
   IFetchVillagesListFromHFRequest,
@@ -60,7 +61,8 @@ import {
   fetchCountryListSuccess,
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
-  deleteHealthFacilityFailure
+  deleteHealthFacilityFailure,
+  fetchPeerSupervisorValidationsFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -81,7 +83,8 @@ import {
   FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
   FETCH_CULTURE_LIST_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
-  DELETE_HEALTH_FACILITY_REQUEST
+  DELETE_HEALTH_FACILITY_REQUEST,
+  FETCH_PEER_SUPERVISOR_VALIDATION
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 
@@ -458,6 +461,27 @@ export function* fetchWorkflowListSagaRequest({
 }
 
 /*
+  Worker Saga: Fired on FETCH_WORKFLOW_LIST_REQUEST action
+*/
+export function* peerSupervisorValidationSagaRequest({
+  ids,
+  tenantId,
+  successCb,
+  failureCb
+}: IPeerSupervisorValidation): SagaIterator {
+  try {
+    const {
+      data
+    } = yield call(hfService.peerSupervisorValidation as any, { ids, tenantId });
+    successCb?.(data);
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchPeerSupervisorValidationsFailure(e));
+    }
+  }
+}
+/*
   Worker Saga: Fired on FETCH_CULTURE_LIST_REQUEST action
 */
 export function* fetchCultureList(): SagaIterator {
@@ -509,6 +533,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST, fetchVillagesListSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_LIST_REQUEST, fetchPeerSupervisorListSagaRequest)]);
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
+  yield all([takeLatest(FETCH_PEER_SUPERVISOR_VALIDATION, peerSupervisorValidationSagaRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_TYPES_REQUEST, fetchHFTypesSaga)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);

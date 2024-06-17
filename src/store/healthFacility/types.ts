@@ -525,6 +525,13 @@ export interface IFetchWorkflowListRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IPeerSupervisorValidation {
+  type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION;
+  ids: number[];
+  tenantId: number;
+  successCb?: (data: IWorkflow[]) => void;
+  failureCb?: (error: Error) => void;
+}
 export interface IFetchWorkflowListSuccess {
   type: typeof ACTION_TYPES.FETCH_WORKFLOW_LIST_SUCCESS;
   payload: { list: IWorkflow[] };
