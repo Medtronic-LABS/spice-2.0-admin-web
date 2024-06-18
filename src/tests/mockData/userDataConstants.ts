@@ -26,7 +26,8 @@ const MOCK_DATA_CONSTANTS = {
   MOCK_LOGIN_REQUEST: {
     username: 'testuser@test.com',
     password: 'Spice123',
-    rememberMe: false
+    rememberMe: false,
+    countryId: 1
   },
   MOCK_TOKEN: '4',
   MOCK_USER_TENANT_ID: '3',
@@ -91,6 +92,14 @@ const MOCK_DATA_CONSTANTS = {
             level: 1,
             suiteAccessName: 'admin',
             displayName: 'Super user',
+            groupName: 'SPICE'
+          },
+          {
+            id: 2,
+            name: 'HEALTH_FACILITY_ADMIN',
+            level: 1,
+            suiteAccessName: 'admin',
+            displayName: 'Admin',
             groupName: 'SPICE'
           }
         ]

@@ -37,7 +37,7 @@ const DragDropFiles = (props: IProps) => {
   };
 
   return (
-    <div className={styles.dragDrop} onDragOver={handleDragOver} onDrop={handleDrop}>
+    <div data-testid='dragDropMainDiv' className={styles.dragDrop} onDragOver={handleDragOver} onDrop={handleDrop}>
       <section>
         <UploadIcon />
         <label>Upload Region Mapping</label>

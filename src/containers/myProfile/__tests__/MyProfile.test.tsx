@@ -1,63 +1,108 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
 import { Provider } from 'react-redux';
-import configureMockStore from 'redux-mock-store';
+import { mount } from 'enzyme';
+import configureStore from 'redux-mock-store';
+import createSagaMiddleware from 'redux-saga';
 import MyProfile from '../MyProfile';
-import { REGION_LIST } from '../../../tests/mockData/healthFacilityConstants';
+import { fetchUserByIdReq } from '../../../store/user/actions';
+import { act } from 'react-dom/test-utils';
 
-const mockStore = configureMockStore();
-const regionList = REGION_LIST;
+// Create the mock store with saga middleware
+const sagaMiddleware = createSagaMiddleware();
+const mockStore = configureStore([sagaMiddleware]);
 
-describe('MyProfile component', () => {
-  it('should render user details', async () => {
-    const store = mockStore({
+describe('MyProfile', () => {
+  let store: any;
+  let component: any;
+
+  beforeEach(() => {
+    // Initialize mock store with state that matches the expected structure
+    const initialState = {
       user: {
         user: {
-          userId: 1
-        }
-      }
-    });
-    render(
-      <Provider store={store}>
-        <MyProfile />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Name')).toBeInTheDocument();
-      expect(screen.getByText('Email ID')).toBeInTheDocument();
-      expect(screen.getByText('Mobile Number')).toBeInTheDocument();
-      expect(screen.getByText('Gender')).toBeInTheDocument();
-      expect(screen.getByText('Role')).toBeInTheDocument();
-    });
-  });
-
-  it('should open edit modal on button click', () => {
-    const store = mockStore({
-      user: {
-        user: {
-          userId: 1
-        },
-        countryList: [
-          { id: 1, countryCode: '91' },
-          {
-            id: 2,
-            countryCode: '232'
+          userId: '123',
+          userData: {
+            country: {
+              id: '1',
+              countryCode: '+1',
+              phoneNumberCode: '+1'
+            }
           }
-        ]
+        }
       },
       healthFacility: {
-        healthFacilityList: regionList
+        healthFacilityList: [],
+        countryList: [],
+        peerSupervisorList: { list: [], hfTenantIds: null },
+        villagesFromHFList: { list: [], hfTenantIds: null }
       }
-    });
-    render(
+    };
+    store = mockStore(initialState);
+    // Render the MyProfile component with the mock store
+    component = mount(
       <Provider store={store}>
         <MyProfile />
       </Provider>
     );
+  });
 
-    fireEvent.click(screen.getByText('Edit My Profile'));
+  it('should dispatch fetchUserByIdReq action on mount', () => {
+    // Check if the fetchUserByIdReq action was dispatched
+    const actions = store.getActions();
+    expect(actions).toContainEqual(
+      fetchUserByIdReq({
+        payload: { id: '123' },
+        successCb: expect.any(Function),
+        failureCb: expect.any(Function)
+      })
+    );
+  });
 
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Submit')).toBeInTheDocument();
+  it('should show edit modal when edit button is clicked', () => {
+    // Simulate the edit button click
+    act(() => {
+      component.find('DetailCard').prop('onButtonClick')();
+    });
+    component.update();
+    // Check if the edit modal is now shown
+    expect(component.find('Memo()').prop('show')).toBe(true);
+  });
+
+  it('should dispatch updateUserRequest action on form submit', () => {
+    // Prepare the form data to submit
+    const formData = {
+      users: [
+        {
+          id: '123',
+          gender: 'Male',
+          firstName: 'John',
+          lastName: 'Doe',
+          countryCode: '+1',
+          phoneNumber: '1234567890',
+          country: { phoneNumberCode: '+1' }
+        }
+      ]
+    };
+    // Simulate form submission
+    act(() => {
+      component.find('Memo()').prop('handleFormSubmit')(formData);
+    });
+    // Check if the updateUserRequest action was dispatched
+    const actions = store.getActions();
+    expect(actions[1]).toEqual(
+      expect.objectContaining({
+        type: 'UPDATE_USER_REQUEST',
+        payload: {
+          id: '123',
+          gender: 'Male',
+          firstName: 'John',
+          lastName: 'Doe',
+          countryCode: '+1',
+          phoneNumber: '1234567890'
+        },
+        successCb: expect.any(Function),
+        failureCb: expect.any(Function)
+      })
+    );
   });
 });

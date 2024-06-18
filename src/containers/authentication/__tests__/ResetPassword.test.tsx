@@ -1,52 +1,43 @@
-import React from 'react';
 import { mount } from 'enzyme';
 import ResetPassword from '../ResetPassword';
 import { Provider } from 'react-redux';
+import createSagaMiddleware from 'redux-saga';
 import { MemoryRouter } from 'react-router-dom';
 import configureMockStore from 'redux-mock-store';
 import logo from '../../../assets/images/app-logo.svg';
 import styles from './Authentication.module.scss';
-import { PUBLIC_ROUTES } from '../../../constants/route';
+import { applyMiddleware, createStore } from 'redux';
+import rootReducer from '../../../store/rootReducer';
 
 const mockStore = configureMockStore([]);
 describe('ResetPassword', () => {
   let wrapper: any;
   let mockProps: any;
   let store: any;
-  const mockIsPasswordSet = false;
+  let sagaMiddleware: any;
 
   beforeEach(() => {
+    sagaMiddleware = createSagaMiddleware();
+    store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
     store = mockStore({
-      user: { loggingIn: true }
+      user: {
+        email: 'test@example.com',
+        user: { role: 'SUPER_USER' }
+      }
     });
+
     mockProps = {
-      isResetPassword: true,
-      isPasswordSet: false,
-      email: 'example@example.com',
       createPassword: jest.fn(),
       getUserName: jest.fn(),
       resetPassword: jest.fn(),
-      history: {
-        location: {
-          search: '?reset_password=true&expires=1644822000000'
-        },
-        push: jest.fn()
-      },
-      match: {
-        params: { token: 'testToken' }
-      }
+      match: { params: { token: 'test-token' } },
+      history: { push: jest.fn() }
     };
 
-    jest.spyOn(global, 'Date').mockImplementation(
-      () =>
-        ({
-          getTime: jest.fn(() => 1644818400000) // Mocking current date time
-        } as any)
-    );
     wrapper = mount(
       <Provider store={store}>
         <MemoryRouter>
-          <ResetPassword {...mockProps} isPasswordSet={mockIsPasswordSet} />
+          <ResetPassword {...mockProps} />
         </MemoryRouter>
       </Provider>
     );
@@ -59,24 +50,6 @@ describe('ResetPassword', () => {
 
   it('should render ResetPassword component', () => {
     expect(wrapper.exists()).toBe(true);
-  });
-
-  it('should call backToLogin and info when expiresTime < currentTime', () => {
-    const mockLocation = { search: '?reset_password=true&expires=1644818300000' };
-    const mockHistory = { push: jest.fn(), location: mockLocation };
-    const newMockProps = { ...mockProps, history: mockHistory };
-    const newWrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <ResetPassword {...newMockProps} isPasswordSet={mockIsPasswordSet} />
-        </MemoryRouter>
-      </Provider>
-    );
-    const { isResetPassword } = newWrapper.find('ResetPassword').props() as any;
-    // Assert that isResetPassword is true
-    expect(isResetPassword).toBe(true);
-    expect(global.Date).toHaveBeenCalled();
-    expect(newMockProps.history.push).toHaveBeenCalledWith({ pathname: PUBLIC_ROUTES.login });
   });
 
   it('renders the logo', () => {

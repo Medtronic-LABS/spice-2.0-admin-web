@@ -104,6 +104,13 @@ const Login = (props: any): React.ReactElement => {
                     label='Email'
                     errorLabel='email'
                     error={(meta.touched && meta.error) || undefined}
+                    onChange={(e) => {
+                      initialFormValues.current = {
+                        ...initialFormValues.current,
+                        email: e.target.value
+                      };
+                      input.onChange(e);
+                    }}
                   />
                 )}
               />

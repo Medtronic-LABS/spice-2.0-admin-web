@@ -247,41 +247,60 @@ describe('Fetch Logged in user', () => {
   });
 });
 
+// Mock the selector function used in the saga
+const mockState = {
+  user: {
+    user: {
+      role: 'SUPER_USER'
+    }
+  }
+};
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn().mockImplementation((selector) => selector(mockState))
+}));
+
 describe('Other User related Sagas', () => {
   it('Fetches the user roles', async () => {
-    const fetchUSerRoles = jest.spyOn(userService, 'fetchUserRoles').mockImplementation(() => {
+    jest.spyOn(userService, 'fetchUserRoles').mockImplementation(() => {
       return Promise.resolve(userRoles as AxiosResponse);
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
       fetchUserRoles,
-      {
-        type: ACTION_TYPES.FETCH_USER_ROLES_REQUEST
-      }
+      { countryId: 1, type: ACTION_TYPES.FETCH_USER_ROLES_REQUEST }
     ).toPromise();
-    expect(fetchUSerRoles).toHaveBeenCalledWith();
-    expect(dispatched).toEqual([loginActions.fetchUserRolesActionSuccess(userRoles.data.entity)]);
+
+    expect(userService.fetchUserRoles).toHaveBeenCalledWith(1);
+    expect(dispatched).toEqual([
+      loginActions.fetchUserRolesActionSuccess({
+        ...userRoles.data.entity
+        // SPICE: [{ id: '',name: 'SUPER_USER' }, { name: 'SUPER_ADMIN' }]
+      })
+    ]);
   });
 
   it('Fetch user roles failure', async () => {
-    const fetchUSerRoles = jest.spyOn(userService, 'fetchUserRoles').mockImplementation(() => {
+    jest.spyOn(userService, 'fetchUserRoles').mockImplementation(() => {
       return Promise.reject(new Error('Error'));
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
       fetchUserRoles,
-      {
-        ...loginRequestMockData,
-        type: ACTION_TYPES.FETCH_USER_ROLES_REQUEST
-      }
+      { countryId: 1, type: ACTION_TYPES.FETCH_USER_ROLES_REQUEST }
     ).toPromise();
-    expect(fetchUSerRoles).toHaveBeenCalledWith();
+
+    expect(userService.fetchUserRoles).toHaveBeenCalledWith(1);
     expect(dispatched).toEqual([loginActions.fetchUserRolesActionFail()]);
   });
 });

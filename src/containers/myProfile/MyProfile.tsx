@@ -22,7 +22,7 @@ const MyProfile = (): React.ReactElement => {
   const [loading, setLoading] = useState<boolean>(false);
   const userForEdit = useRef({ users: [] as IEditUserDetail[] });
 
-  const regionData = useSelector(userDataSelector).country;
+  const regionData = useSelector(userDataSelector);
   const formatRoles = (user: IEditUserDetail) =>
     `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
 
@@ -155,7 +155,7 @@ const MyProfile = (): React.ReactElement => {
               disableOptions={true}
               isProfile={true}
               isEdit={true}
-              countryId={regionData?.id}
+              countryId={regionData?.country?.id}
             />
           );
         }}

@@ -50,6 +50,7 @@ export interface IUserState {
   loggingIn: boolean;
   loggingOut: boolean;
   user: IUser;
+  defaultRole: string[];
   userRoles: IGroupRoles;
   isRolesLoading: boolean;
   error: string | null;

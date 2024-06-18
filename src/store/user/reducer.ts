@@ -19,28 +19,28 @@ const userInitialStateGetter = (): IUser => ({
 
 // This should be function instead of object,
 // so that the isLoggedIn will be recomputed when RESET_STATE action is dispatched
-const initialStateGetter: () => IUserState = () => ({
-  defaultRole: [],
-  token: '',
-  isLoggedIn: Boolean(sessionStorageServices.getItem(APPCONSTANTS.AUTHTOKEN)),
-  loggingIn: false,
-  loggingOut: false,
-  user: userInitialStateGetter(),
-  userRoles: {},
-  isRolesLoading: false,
-  error: null,
-  loading: false,
-  cultureListLoading: false,
-  initializing: false,
-  isPasswordSet: false,
-  email: '',
-  timezoneList: [],
-  errorMessage: '',
-  showLoader: false,
-  userTenantId: ''
-});
+const initialStateGetter = () =>
+  ({
+    defaultRole: [],
+    token: '',
+    isLoggedIn: Boolean(sessionStorageServices.getItem(APPCONSTANTS.AUTHTOKEN)),
+    loggingIn: false,
+    loggingOut: false,
+    user: userInitialStateGetter(),
+    userRoles: {},
+    isRolesLoading: false,
+    error: null,
+    loading: false,
+    cultureListLoading: false,
+    initializing: false,
+    isPasswordSet: false,
+    email: '',
+    errorMessage: '',
+    showLoader: false,
+    userTenantId: ''
+  } as IUserState);
 
-const userReducer = (state = initialStateGetter(), action = {} as UserActions): IUserState => {
+const userReducer = (state: IUserState = initialStateGetter(), action = {} as UserActions) => {
   switch (action.type) {
     case USERTYPES.LOGIN_REQUEST:
       return {
