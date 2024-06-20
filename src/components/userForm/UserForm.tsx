@@ -213,8 +213,8 @@ const UserForm = ({
       form.change(`${formName}[${index}].username`, '');
       toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
     };
-    if (isRoleExists(userData.role, ['SPICE_ADMIN', 'SUPER_USER'])) {
-      emailDisabledFn(APPCONSTANTS.SPICE_ADMIN_USER_EXCEPTION_HF_CREATE);
+    if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
+      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE);
     } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {

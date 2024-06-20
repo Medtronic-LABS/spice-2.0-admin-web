@@ -159,7 +159,7 @@ const HealthFacilityDetailsForm = ({
   return (
     <>
       {submittedData?.isNextClicked ? (
-        <FormContainer label='Clinical Workflows Involved' icon={SiteDetailsIcon}>
+        <FormContainer label='Clinical Workflows Involved' required={true} icon={SiteDetailsIcon}>
           <Workflows formName='healthFacility' form={form} />
         </FormContainer>
       ) : (
