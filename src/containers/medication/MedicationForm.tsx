@@ -32,8 +32,14 @@ export interface IMedicationDataFormValues {
   name: string;
   brand: IList;
   classification: IList;
+  codeDetails: ICodeDetails;
   dosage_form: IList;
   country: string | IList;
+}
+
+export interface ICodeDetails {
+  code: string;
+  url: string;
 }
 
 export interface ICheckDuplicateValidation {
@@ -264,7 +270,7 @@ const MedicationForm = ({
 
   const renderMedicationName = (name: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
         <Field
           name={`${name}.name`}
           type='text'
@@ -290,9 +296,63 @@ const MedicationForm = ({
     );
   };
 
+  const renderCode = (name: any, index: number) => {
+    return (
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+        <Field
+          name={`${name}.codeDetails.code`}
+          type='text'
+          validate={composeValidators(required, validateEntityName)}
+          render={({ input, meta }) => (
+            <TextInput
+              {...input}
+              label='Code'
+              errorLabel='code'
+              error={(meta.touched && meta.error) || undefined}
+              capitalize={true}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                input.onChange(event);
+                const timerId = 0;
+                clearTimeout(timerId);
+                setTimeout(() => detectFieldChange(event.target.value, index), 500);
+              }}
+            />
+          )}
+        />
+      </div>
+    );
+  };
+
+  const renderUrl = (name: any, index: number) => {
+    return (
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+        <Field
+          name={`${name}.codeDetails.url`}
+          type='text'
+          validate={composeValidators(required, validateEntityName)}
+          render={({ input, meta }) => (
+            <TextInput
+              {...input}
+              label='URL'
+              errorLabel='url'
+              error={(meta.touched && meta.error) || undefined}
+              capitalize={true}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                input.onChange(event);
+                const timerId = 0;
+                clearTimeout(timerId);
+                setTimeout(() => detectFieldChange(event.target.value, index), 500);
+              }}
+            />
+          )}
+        />
+      </div>
+    );
+  };
+
   const renderClassification = (name: any, fields: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
         <Field
           name={`${name}.classification`}
           type='text'
@@ -324,7 +384,7 @@ const MedicationForm = ({
 
   const renderBrand = (name: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
         <Field
           name={`${name}.brand`}
           type='text'
@@ -350,7 +410,7 @@ const MedicationForm = ({
 
   const renderDosageForm = (name: any, index: number) => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
         <Field
           name={`${name}.dosage_form`}
           type='text'
@@ -405,6 +465,8 @@ const MedicationForm = ({
                     }`}
                   >
                     {renderMedicationName(name, index)}
+                    {renderCode(name, index)}
+                    {renderUrl(name, index)}
                     {renderClassification(name, fields, index)}
                     {renderBrand(name, index)}
                     {renderDosageForm(name, index)}

@@ -95,6 +95,10 @@ const AddMedication = (props: Props) => {
         classificationName: currentRecord?.classification.name,
         brandId: currentRecord?.brand.id,
         brandName: currentRecord?.brand.name,
+        codeDetails: {
+          code: currentRecord?.codeDetails?.code,
+          url: currentRecord?.codeDetails?.url
+        },
         name: currentRecord?.name,
         dosageFormId: currentRecord?.dosage_form.id,
         dosageFormName: currentRecord?.dosage_form.name,
@@ -216,6 +220,10 @@ const AddMedication = (props: Props) => {
       brandId: medicationData.brand.id,
       brandName: medicationData.brand.name,
       name: medicationData.name,
+      codeDetails: {
+        code: medicationData?.codeDetails?.code,
+        url: medicationData?.codeDetails?.url
+      },
       dosageFormId: medicationData.dosage_form.id,
       dosageFormName: medicationData.dosage_form.name
     }));

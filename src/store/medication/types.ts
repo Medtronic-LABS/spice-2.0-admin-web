@@ -125,10 +125,16 @@ export interface IMedicationPayload {
   classificationId: string;
   classificationName: string;
   brandId: string;
+  code?: ICodeDetailsPayload;
   brandName: string;
   dosageFormId: string;
   dosageFormName: string;
   id?: string;
+}
+
+export interface ICodeDetailsPayload {
+  code: string;
+  url: string;
 }
 
 export interface ICreateMedicationRequestPayload {

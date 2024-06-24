@@ -4,6 +4,14 @@ import CustomTooltip from '../../tooltip';
 import SelectInput, { AsyncSelectInput, handleChange } from '../SelectInput';
 import styles from './SelectInput.module.scss';
 
+jest.mock('react-final-form', () => ({
+  useForm: jest.fn().mockReturnValue(
+    {
+      change: () => {}
+    }
+  ),
+}));
+
 describe('SelectInput', () => {
   const props: any = {
     label: 'Select an option',

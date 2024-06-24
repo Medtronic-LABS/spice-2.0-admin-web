@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { setupInterceptors } from '../interceptors';
-import { resetStore, sessionTimedout } from '../../store/user/actions';
+import { fetchLoggedInUser } from '../../store/user/actions';
 import ApiError from '../ApiError';
 import APPCONSTANTS from '../../constants/appConstants';
 
@@ -71,14 +71,16 @@ describe('setupInterceptors function', () => {
       headers: {},
       statusText: 'Unauthorized'
     };
-    const expectedError = new ApiError({ name: APPCONSTANTS.LOGIN_FAILED_TITLE, message: 'Unauthorized' }, 401);
+    const expectedError = new ApiError({
+      name: APPCONSTANTS.NETWORK_ERROR,
+      message: 'There is an issue with the connection. Please try after sometime.'
+    }, 401);
     try {
       await onResponseRejected(errorResponse);
     } catch (error) {
       // Expectations
       expect(error).toEqual(expectedError);
-      expect(store.dispatch).toHaveBeenCalledWith(sessionTimedout('Unauthorized'));
-      expect(store.dispatch).toHaveBeenCalledWith(resetStore());
+      expect(store.dispatch).toHaveBeenCalledWith(fetchLoggedInUser());
     }
   });
 });

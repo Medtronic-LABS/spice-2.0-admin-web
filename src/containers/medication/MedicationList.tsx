@@ -115,6 +115,10 @@ const MedicationList = (): React.ReactElement => {
    */
   const handleMedicationEditSubmit = ({ medication }: { medication: IMedicationDataFormValues[] }) => {
     const data = JSON.parse(JSON.stringify(medication[0]));
+    const codeDetails = {
+      code: data?.codeDetails?.code,
+      url: data?.codeDetails?.url
+    }
     const postData = {
       countryId: Number(data?.countryId),
       classificationId: data?.classification.id,
@@ -124,7 +128,8 @@ const MedicationList = (): React.ReactElement => {
       dosageFormId: data?.dosage_form.id,
       dosageFormName: data?.dosage_form.name,
       name: data?.name,
-      id: data?.id
+      id: data?.id,
+      codeDetails: codeDetails
     };
     dispatch(
       updateMedication({
