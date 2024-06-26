@@ -89,7 +89,7 @@ import {
 import ApiError from '../../global/ApiError';
 
 /*
-  Worker Saga: Fired on FETCH_REGIONS_REQUEST action
+  Worker Saga: Fired on FETCH_HEALTH_FACILITY_LIST_REQUEST action
 */
 export function* fetchHealthFacilityList({
   countryId,

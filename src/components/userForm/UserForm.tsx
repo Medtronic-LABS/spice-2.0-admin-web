@@ -118,6 +118,8 @@ const UserForm = ({
   const [autoFetched, setAutoFetched] = useState<boolean[]>(autoFetchedState?.autoFetch || ([] as boolean[]));
   const fetchedData = useRef([] as any[]);
   const [clearEmail, setClearEmail] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);  
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -140,6 +142,15 @@ const UserForm = ({
     ],
     []
   );
+
+  useEffect(()=> {
+    if (!isHF && isEdit) {
+      const roleValues = initialEditValue.role;
+      if (!isSuperAdmin) {
+        setIsSuperAdmin(roleValues?.some((element: any) => element.name === 'SUPER_ADMIN'));
+      }
+    }
+  },[initialEditValue, isHF, isEdit, isSuperAdmin]);
 
   useEffect(() => {
     return () => {
@@ -189,6 +200,26 @@ const UserForm = ({
       setAutoFetched(newAutoFetched);
     },
     [form.mutators, initialValue, autoFetched]
+  );
+
+  const SuperAdminToPeerSuperviserFn = useCallback(
+    (roles: IRoles[]) => {
+      if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
+        if (healthFacilityList?.length === 0 ) {
+          dispatch(
+            fetchHFListRequest({
+              countryId,
+              skip: 0,
+              limit: null,
+              userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER)
+            }));
+        }
+        setShowHealthFacilityInput(true);
+      } else {
+        setShowHealthFacilityInput(false);
+      }
+    },
+    [isSuperAdmin, countryId, dispatch, role, healthFacilityList?.length]
   );
 
   useEffect(() => {
@@ -659,6 +690,8 @@ const UserForm = ({
                             onChange={(values: any) => {
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, ...values]);
+                              // User Modified as Peer Superviser from Super Admin
+                              SuperAdminToPeerSuperviserFn(values);                              
                               // CHW User selection
                               isCHWUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index);
@@ -822,12 +855,12 @@ const UserForm = ({
                     index={index}
                   />
                 </div>
-                {!isHFCreate &&
+                {((!isHFCreate &&
                   !isHF &&
                   !isEdit &&
                   !(form.getState().values.users[index].roles || []).some((userRole: IRoles) =>
                     [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(userRole.name)
-                  ) && (
+                  )) || showHealthFacilityInput) && (
                     <div className='col-sm-6 col-12'>
                       <Field
                         name={`${name}.healthFacility`}
