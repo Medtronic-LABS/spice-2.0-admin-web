@@ -18,6 +18,8 @@ import UserList from './containers/user/UserList';
 import MedicationList from './containers/medication/MedicationList';
 import AddMedication from './containers/medication/AddMedication';
 import MyProfile from './containers/myProfile/MyProfile';
+import LabTestList from './containers/labtest/LabtestList';
+import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
 
 interface IRoute {
   path: string;
@@ -91,9 +93,21 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
+      path: PROTECTED_ROUTES.labtestList,
+      exact: false,
+      component: LabTestList,
+      authorisedRoles: SU_SA
+    },
+    {
       path: PROTECTED_ROUTES.profile,
       exact: true,
       component: MyProfile,
+      authorisedRoles: SU_SA_A
+    },
+    {
+      path: PROTECTED_ROUTES.customizeLabTest,
+      exact: true,
+      component: LabTestCustomizationLayout,
       authorisedRoles: SU_SA_A
     }
   ];

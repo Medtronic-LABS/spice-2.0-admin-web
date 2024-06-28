@@ -20,6 +20,7 @@ describe('MyProfile', () => {
     const initialState = {
       user: {
         user: {
+          role: 'SUPER_ADMIN',
           userId: '123',
           userData: {
             country: {

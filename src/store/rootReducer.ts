@@ -3,12 +3,16 @@ import userReducer from './user/reducer';
 import regionReducer from './region/reducer';
 import healthFacilityReducer from './healthFacility/reducer';
 import medicationReducer from './medication/reducer';
+import workflowReducer from './workflow/reducer';
+import labtestReducer from './labTest/reducer';
 
 const appReducer = combineReducers({
   user: userReducer,
   region: regionReducer,
   healthFacility: healthFacilityReducer,
-  medication: medicationReducer
+  medication: medicationReducer,
+  labtest: labtestReducer,
+  workflow: workflowReducer
 });
 
 const rootReducer = (state: any, action: any) => {

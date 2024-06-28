@@ -1,0 +1,228 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { RouteComponentProps, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { PROTECTED_ROUTES } from '../../constants/route';
+import CustomTable from '../../components/customTable/CustomTable';
+import DetailCard from '../../components/detailCard/DetailCard';
+import Loader from '../../components/loader/Loader';
+import APPCONSTANTS from '../../constants/appConstants';
+import { ReactComponent as CustomizeIcon } from '../../assets/images/account-customize.svg';
+import { fetchLabtestsRequest, deleteLabtestRequest, updateLabtestRequest } from '../../store/labTest/actions';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { labtestLoadingSelector, labtestsSelector, labtestCountSelector } from '../../store/labTest/selectors';
+import { ILabTest } from '../../store/labTest/types';
+import { formatDate } from '../../utils/validation';
+import { useTablePaginationHook } from '../../hooks/tablePagination';
+import ModalForm from '../../components/modal/ModalForm';
+import LabtestModalForm from './LabtestModalForm';
+import { camelCase } from 'lodash';
+
+interface IMatchParams {
+  regionId: string;
+  tenantId: string;
+}
+
+interface IModalState {
+  isOpen: boolean;
+  isEdit: boolean;
+  isNextClicked: boolean;
+  data?: any;
+}
+
+export interface ILabTestsEditFormValues {
+  labTest: ILabTest;
+}
+interface IMatchProps extends RouteComponentProps<IMatchParams> {}
+
+/**
+ * Shows the lab test list
+ * @returns {React.ReactElement}
+ */
+const LabTestList = (props: IMatchProps): React.ReactElement => {
+  const { listParams, handleSearch, handlePage } = useTablePaginationHook();
+  const dispatch = useDispatch();
+  const loading = useSelector(labtestLoadingSelector);
+  const labTestList = useSelector(labtestsSelector);
+  const labTestCount = useSelector(labtestCountSelector);
+  const [labTestModalState, setLabTestModalState] = useState<IModalState>({
+    isOpen: false,
+    isEdit: false,
+    isNextClicked: false,
+    data: {}
+  });
+
+  const { regionId, tenantId } = useParams<IMatchParams>();
+
+  const fetchDetails = useCallback(() => {
+    dispatch(
+      fetchLabtestsRequest({
+        data: {
+          skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: listParams.rowsPerPage,
+          searchTerm: listParams.searchTerm,
+          countryId: props.match.params.regionId
+        },
+        failureCb: (e) =>
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.LABTEST_LIST_FETCH_ERROR))
+      })
+    );
+  }, [dispatch, props.match.params.regionId, listParams]);
+
+  useEffect(() => {
+    fetchDetails();
+  }, [dispatch, fetchDetails, props.match.params.tenantId]);
+
+  const openAddLabTest = () => {
+    setLabTestModalState({ isOpen: true, isEdit: false, isNextClicked: false });
+  };
+
+  const handleLabTestDelete = ({ data }: { data: ILabTest }) => {
+    dispatch(
+      deleteLabtestRequest({
+        data: { id: Number(data.id), tenantId: Number(data.tenantId) },
+        successCb: () => {
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.LABTEST_DELETE_SUCCESS);
+          handlePage(APPCONSTANTS.INITIAL_PAGE);
+        },
+        failureCb: (e) =>
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.LABTEST_DELETE_ERROR))
+      })
+    );
+  };
+
+  const handleEdit = (data: any) => {
+    setLabTestModalState({ isOpen: true, isEdit: true, data, isNextClicked: false });
+  };
+
+  const onNextClicked = (data: any, customizeClicked?: boolean) => {
+    if (!customizeClicked) {
+      setLabTestModalState({ ...labTestModalState, isNextClicked: true });
+    }
+    props.history.push(
+      PROTECTED_ROUTES.customizeLabTest
+        .replace(':tenantId', tenantId)
+        .replace(':regionId', regionId as string)
+        .replace(':labTestName', encodeURIComponent(data.testName))
+        .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
+    );
+  };
+
+  // const handleAddLabTestSubmit = (labTest: any) => {
+  // labTestModalState.isEdit ? handleEditLabTestSubmit : handleAddLabTestSubmit;
+  //   const data = {
+  //     ...labTest,
+  //     countryId: props.match.params.regionId,
+  //     tenantId: props.match.params.tenantId
+  //   };
+  //   dispatch(
+  //     createLabtestRequest({
+  //       data,
+  //       successCb: () => {
+  //         toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.LABTEST_CREATION_SUCCESS);
+  //         fetchDetails();
+  //         setLabTestModalState({ isOpen: false, isEdit: false, data: {}, isNextClicked: false });
+  //       },
+  //       failureCb: (e) =>
+  //         toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.LABTEST_CREATION_ERROR))
+  //     })
+  //   );
+  // };
+
+  const handleEditLabTestSubmit = (data: any) => {
+    dispatch(
+      updateLabtestRequest({
+        data,
+        successCb: () => {
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.LABTEST_UPDATE_SUCCESS);
+          fetchDetails();
+          setLabTestModalState({ isOpen: false, isEdit: false, data: {}, isNextClicked: false });
+        },
+        failureCb: (e) =>
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.LABTEST_UPDATE_FAIL))
+      })
+    );
+  };
+
+  const closeLabTestModal = () => {
+    setLabTestModalState({ isOpen: false, isEdit: false, data: {}, isNextClicked: false });
+  };
+
+  const formatUpdatedAt = (data: ILabTest) => {
+    if (data?.updatedAt) {
+      return formatDate(data.updatedAt, { month: 'short', format: 'YYYY-MM-DD' });
+    } else {
+      return '';
+    }
+  };
+
+  return (
+    <>
+      {loading && <Loader />}
+      <div className='row g-0dot625'>
+        <div className='col-12'>
+          <DetailCard
+            buttonLabel='Add Lab Test'
+            header='Lab Test List'
+            isSearch={true}
+            onSearch={handleSearch}
+            onButtonClick={openAddLabTest}
+          >
+            <CustomTable
+              rowData={labTestList}
+              columnsDef={[
+                {
+                  id: 1,
+                  name: 'testName',
+                  label: 'NAME',
+                  width: '140px'
+                },
+                {
+                  id: 2,
+                  name: 'displayOrder',
+                  label: 'DISPLAY ORDER',
+                  width: '125px'
+                },
+                {
+                  id: 3,
+                  name: 'updated_at',
+                  label: 'UPDATED ON',
+                  width: '125px',
+                  cellFormatter: formatUpdatedAt
+                }
+              ]}
+              isEdit={true}
+              isDelete={true}
+              onCustomConfirmed={(data) => onNextClicked(data, true)}
+              CustomIcon={CustomizeIcon}
+              customTitle='Customize Lab Test'
+              isCustom={true}
+              customIconStyle={{ width: 16 }}
+              page={listParams.page}
+              rowsPerPage={listParams.rowsPerPage}
+              count={labTestCount}
+              onRowEdit={handleEdit}
+              onDeleteClick={handleLabTestDelete}
+              confirmationTitle={APPCONSTANTS.LABTEST_DELETE_CONFIRMATION}
+              deleteTitle={APPCONSTANTS.LABTEST_DELETE_TITLE}
+              handlePageChange={handlePage}
+            />
+          </DetailCard>
+        </div>
+      </div>
+      <ModalForm
+        show={labTestModalState.isOpen}
+        title={`${labTestModalState.isEdit ? 'Edit' : 'Add'} Lab Test`}
+        cancelText='Cancel'
+        submitText={labTestModalState.isEdit ? 'Submit' : 'Next'}
+        handleCancel={closeLabTestModal}
+        handleFormSubmit={labTestModalState.isEdit ? handleEditLabTestSubmit : onNextClicked}
+        initialValues={labTestModalState.isEdit ? labTestModalState.data : {}}
+        render={(form) => <LabtestModalForm isEdit={labTestModalState.isEdit} form={form} />}
+        size='modal-lg'
+      />
+    </>
+  );
+};
+
+export default LabTestList;

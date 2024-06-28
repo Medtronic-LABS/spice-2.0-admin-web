@@ -51,7 +51,7 @@ describe('UserMenu', () => {
   it('should render only the permitted menus for a admin', () => {
     const store = mockStore({
       user: {
-        role: 'SITE_ADMIN',
+        role: 'HEALTH_FACILITY_ADMIN',
         formDataId: '123',
         tenantId: 'tenant123'
       }
@@ -59,7 +59,7 @@ describe('UserMenu', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <UserMenu role='SITE_ADMIN' />
+          <UserMenu role='HEALTH_FACILITY_ADMIN' />
         </MemoryRouter>
       </Provider>
     );

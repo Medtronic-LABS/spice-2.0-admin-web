@@ -3,10 +3,14 @@ import userSaga from './user/sagas';
 import regionSaga from './region/sagas';
 import healthFacilitySaga from './healthFacility/sagas';
 import medicationSaga from './medication/sagas';
+import workflowSaga from './workflow/sagas';
+import labtestSaga from './labTest/sagas';
 
 export function* rootSaga() {
   yield all([fork(userSaga)]);
   yield all([fork(regionSaga)]);
   yield all([fork(healthFacilitySaga)]);
   yield all([fork(medicationSaga)]);
+  yield all([fork(labtestSaga)]);
+  yield all([fork(workflowSaga)]);
 }

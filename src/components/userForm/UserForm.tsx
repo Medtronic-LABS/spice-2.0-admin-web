@@ -145,7 +145,7 @@ const UserForm = ({
 
   useEffect(() => {
     if (!isHF && isEdit) {
-      const roleValues = initialEditValue.role;
+      const roleValues = initialEditValue?.role;
       if (!isSuperAdmin) {
         setIsSuperAdmin(roleValues?.some((element: any) => element.name === 'SUPER_ADMIN'));
       }

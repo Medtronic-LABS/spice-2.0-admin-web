@@ -136,34 +136,15 @@ const APPCONSTANTS = {
   NO_RECORDS_FOUND: 'No records found',
   SEARCH_USER_ERROR: 'Unable to search the admin. Please try after sometime.',
 
+  // form Builder
+  VALIDITY_OPTIONS: {
+    gone: { key: 'gone', label: 'Hide' },
+    visible: { key: 'visible', label: 'Show' }
+  },
+
+  //
   ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
-  ADDRESS_USE: [
-    { value: 'Home', label: 'Home' },
-    { value: 'Work', label: 'Work' },
-    { value: 'Temporary', label: 'Temporary' },
-    { value: 'Obsolete', label: 'Obsolete' }
-  ],
-  SITE_ROLES: [
-    { value: 'HEALTH_COACH', label: 'Health Coach' },
-    { value: 'HEALTH_SCREENER', label: 'Health Screener' },
-    { value: 'HRIO', label: 'HRIO' },
-    { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
-    { value: 'NUTRITIONIST', label: 'Nutritionist' },
-    { value: 'PHARMACIST', label: 'Pharmacist' },
-    { value: 'NURSE', label: 'Nurse' },
-    { value: 'PHYSICIAN_PRESCRIBER', label: 'Physician Prescriber' },
-    { value: 'PROVIDER', label: 'Provider' },
-    { value: 'COUNSELOR', label: 'Counselor' }
-  ],
-  SITE_LEVEL: [
-    { label: 'Level 1', value: 'Level 1' },
-    { label: 'Level 2', value: 'Level 2' },
-    { label: 'Level 3', value: 'Level 3' },
-    { label: 'Level 4', value: 'Level 4' },
-    { label: 'Level 5', value: 'Level 5' },
-    { label: 'Level 6', value: 'Level 6' }
-  ],
   SEARCH_BY_NAME_EMAIL: 'Name / Email',
   SEARCH_BY_NAME: 'Search Name',
   SEARCH_BY_EMAIL: 'Search Email',
@@ -171,10 +152,6 @@ const APPCONSTANTS = {
     { value: 'Male', label: 'Male' },
     { value: 'Female', label: 'Female' },
     { value: 'Non-Binary', label: 'Non-Binary' }
-  ],
-  ADDRESS_TYPE: [
-    { value: 'Postal', label: 'Postal' },
-    { value: 'Physical', label: 'Physical' }
   ],
   SESSION_EXPIRED: 'Session got expired. Please login again.',
   LOCKED_USERS_FETCH_ERROR: 'Unable to load the locked users list. Please try after sometime.',
@@ -205,26 +182,7 @@ const APPCONSTANTS = {
   RESET: 'Reset',
   YES: 'Yes',
   NO: 'No',
-  UNLOCK_USER_SUCCESS: 'User unlocked successfully.',
-  UNLOCK_USER_FAIL: 'Unable to unlock the user. Please try after sometime.',
-  ACCOUNT_ACTIVATE_SUCCESS: 'Account activated successfully.',
-  ACCOUNT_ACTIVATE_FAIL: 'Unable to activate the account. Please try after sometime.',
-  ACCOUNT_DEACTIVATE_SUCCESS: 'Account deactivated successfully.',
-  ACCOUNT_DEACTIVATE_FAIL: 'Unable to deactivate the account. Please try after sometime.',
-  ACCOUNT_ADMIN_FETCH_ERROR: 'Unable to load account admins. Please try after sometime.',
-  ACCOUNT_ADMIN_DETAIL_FETCH_ERROR: 'Unable to load account admin details. Please try after sometime.',
-  OPERATING_UNIT_ADMIN_FETCH_ERROR: 'Unable to load operating unit admins. Please try after sometime.',
-  PRIMARY_DISEASE_MANAGED: [
-    { value: 'HTN', label: 'HTN' },
-    { value: 'Diabetes', label: 'Diabetes' }
-  ],
-  GROUP_TYPE: [
-    { value: 'Virtual Group', label: 'Virtual Group' },
-    { value: 'Support Group', label: 'Support Group' },
-    { value: 'Intensive Group', label: 'Intensive Group' },
-    { value: 'Hybrid Group', label: 'Hybrid Group' },
-    { value: 'Mental Health Group', label: 'Mental Health Group' }
-  ],
+
   LABTEST_CREATION_SUCCESS: 'Lab test created successfully.',
   LABTEST_CREATION_ERROR: 'Unable to create lab tests. Please try after sometime.',
   LABTEST_FETCH_ERROR: 'Unable to load lab tests. Please try after sometime.',

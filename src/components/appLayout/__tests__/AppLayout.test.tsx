@@ -9,7 +9,7 @@ const mockStore = configureMockStore();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
-    pathname: 'localhost:3000/region'
+    pathname: 'localhost:3000/region/1/1'
   })
 }));
 
@@ -19,10 +19,14 @@ jest.mock('../../../assets/images/home.svg', () => ({
 
 describe('AppLayout component', () => {
   const store = mockStore({
+    healthFacility: {
+      healthFacility: {}
+    },
     user: {
       initializing: false,
       user: {
-        role: APPCONSTANTS.ROLES.SUPER_ADMIN
+        role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+        country: { id: 1 }
       }
     }
   });
