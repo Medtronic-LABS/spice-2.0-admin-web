@@ -118,7 +118,7 @@ const MedicationList = (): React.ReactElement => {
     const codeDetails = {
       code: data?.codeDetails?.code,
       url: data?.codeDetails?.url
-    }
+    };
     const postData = {
       countryId: Number(data?.countryId),
       classificationId: data?.classification.id,
@@ -129,7 +129,7 @@ const MedicationList = (): React.ReactElement => {
       dosageFormName: data?.dosage_form.name,
       name: data?.name,
       id: data?.id,
-      codeDetails: codeDetails
+      codeDetails
     };
     dispatch(
       updateMedication({

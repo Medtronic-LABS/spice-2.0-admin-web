@@ -47,8 +47,9 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
   };
 
   const validateIfNumberExist = useCallback(
-    (number: string) => error ||
-      ((validating || !submitEnabledStatus.current) && (lastCheckedNumber.current !== number)
+    (phoneNumber: string) =>
+      error ||
+      ((validating || !submitEnabledStatus.current) && lastCheckedNumber.current !== phoneNumber
         ? ' ' // blank space is given as error to block submition till number already exist validation is completed
         : ''),
     [error, submitEnabledStatus, validating]

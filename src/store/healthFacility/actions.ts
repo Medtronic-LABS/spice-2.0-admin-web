@@ -498,7 +498,7 @@ export const validationPeerSupervisor = ({
   ids,
   tenantId,
   successCb,
-  failureCb,
+  failureCb
 });
 
 export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetchWorkflowListSuccess => ({

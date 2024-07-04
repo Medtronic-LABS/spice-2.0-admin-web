@@ -253,31 +253,20 @@ const HealthFacilitySummary = (): React.ReactElement => {
       />
     );
   };
-  const fetchWorkflowList = (healthFacility: any) => dispatch(
-    fetchWorkflowListRequest({
-      countryId: Number(regionData.id),
-      successCb: (flows) => {
-        setSubmittedData({
-          data: {
-            healthFacility: { ...healthFacility, workflows: healthFacility.clinicalWorkflows.map((v: any) => v.id) }
-          },
-          isNextClicked: true
-        });
-      },
-      failureCb: (error) =>
-        toastCenter.error(
-          ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
-        )
-    })
-  );
-
-  const validatePeerSupervisor = (missingIds: number[], tenantId: number, healthFacility: any) =>{
+  const fetchWorkflowList = (healthFacilityParams: any) =>
     dispatch(
-      validationPeerSupervisor({
-        ids: missingIds,
-        tenantId,
-        successCb: () => {
-          fetchWorkflowList(healthFacility)
+      fetchWorkflowListRequest({
+        countryId: Number(regionData.id),
+        successCb: (flows) => {
+          setSubmittedData({
+            data: {
+              healthFacility: {
+                ...healthFacilityParams,
+                workflows: healthFacilityParams.clinicalWorkflows.map((v: any) => v.id)
+              }
+            },
+            isNextClicked: true
+          });
         },
         failureCb: (error) =>
           toastCenter.error(
@@ -285,21 +274,35 @@ const HealthFacilitySummary = (): React.ReactElement => {
           )
       })
     );
-  }
+
+  const validatePeerSupervisor = (missingIds: number[], tenantId: number, healthFacilityParams: any) => {
+    dispatch(
+      validationPeerSupervisor({
+        ids: missingIds,
+        tenantId,
+        successCb: () => {
+          fetchWorkflowList(healthFacilityParams);
+        },
+        failureCb: (error) =>
+          toastCenter.error(
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+          )
+      })
+    );
+  };
 
   const handleHFEditDetailsSubmit = ({ healthFacility: healthFacilityData }: { healthFacility: IHealthFacility }) => {
     const postData = formatHealthFacility(healthFacilityData, regionData.id);
     if (!submittedData.isNextClicked) {
       const peerSupervisors = healthFacilityData?.peerSupervisors ?? [];
       const peerIdsSet = peerSupervisors?.map((obj: any) => obj.id);
-      const missingIds:number[] = [];
+      const missingIds: number[] = [];
       for (const supervisor of editHFDetailsModal?.data?.peerSupervisors) {
         if (!peerIdsSet.includes(supervisor.id)) {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility)
-      
+      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(

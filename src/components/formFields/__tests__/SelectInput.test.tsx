@@ -5,11 +5,11 @@ import SelectInput, { AsyncSelectInput, handleChange } from '../SelectInput';
 import styles from './SelectInput.module.scss';
 
 jest.mock('react-final-form', () => ({
-  useForm: jest.fn().mockReturnValue(
-    {
-      change: () => {}
+  useForm: jest.fn().mockReturnValue({
+    change: () => {
+      //
     }
-  ),
+  })
 }));
 
 describe('SelectInput', () => {

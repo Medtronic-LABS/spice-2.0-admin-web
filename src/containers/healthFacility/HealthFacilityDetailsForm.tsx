@@ -403,7 +403,6 @@ const HealthFacilityDetailsForm = ({
                 <MultiSelect
                   {...(input as any)}
                   label='Linked Peer Supervisor'
-                  errorLabel='linked peer supervisor'
                   labelKey='name'
                   valueKey='id'
                   isShowLabel={true}
@@ -414,7 +413,6 @@ const HealthFacilityDetailsForm = ({
                   isMulti={true}
                   options={peerSupervisorList.list}
                   loading={peerSupervisorLoading}
-                  error={(meta.touched && meta.error) || undefined}
                   controlStyles={{
                     borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
                     '&:focus-visible': {
