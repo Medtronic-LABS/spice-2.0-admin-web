@@ -25,7 +25,6 @@ describe('RadioGroup Container Test Cases', () => {
         isSummary: false,
         isMandatory: false,
         isEnabled: true,
-        isEnrollment: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         condition: [],
         optionsList: [],
@@ -50,7 +49,6 @@ describe('RadioGroup Container Test Cases', () => {
         condition: {},
         errorMessage: {},
         isEnabled: {},
-        isEnrollment: {},
         isEditable: {},
         unitMeasurement: {}
       });

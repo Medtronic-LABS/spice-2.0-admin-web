@@ -13,7 +13,9 @@ const RenderFieldGroups = ({
   isNew,
   newlyAddedIds,
   handleUpdateFieldName,
-  isAccountCustomization,
+  // isAccountCustomization,
+  isFieldNameChangable,
+  addNewFieldDisabled,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName
 }: any) => {
@@ -45,7 +47,9 @@ const RenderFieldGroups = ({
                 isNew={isNew}
                 newlyAddedIds={newlyAddedIds}
                 handleUpdateFieldName={handleUpdateFieldName}
-                isAccountCustomization={isAccountCustomization}
+                // isAccountCustomization={isAccountCustomization}
+                isFieldNameChangable={true}
+                addNewFieldDisabled={false}
                 hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                 hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
               />

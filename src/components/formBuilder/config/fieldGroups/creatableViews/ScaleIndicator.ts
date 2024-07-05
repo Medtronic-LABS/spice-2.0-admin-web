@@ -21,7 +21,6 @@ const getEmptyData = (): IScaleIndicatorFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   isAboveUpperLimit: false,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   isNotDefault: true,
@@ -34,7 +33,6 @@ const getEmptyData = (): IScaleIndicatorFields => ({
 const customizableFieldMeta: IBaseFieldMeta = {
   visibility: {},
   isEnabled: {},
-  isEnrollment: {},
   isMandatory: {},
   isAboveUpperLimit: {},
   startValue: {},

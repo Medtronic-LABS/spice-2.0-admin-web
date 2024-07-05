@@ -13,7 +13,6 @@ describe('ICheckBoxFields', () => {
         isSummary: false,
         isMandatory: false,
         isEnabled: true,
-        isEnrollment: true,
         visibility: expect.any(String),
         condition: [],
         hint: '',

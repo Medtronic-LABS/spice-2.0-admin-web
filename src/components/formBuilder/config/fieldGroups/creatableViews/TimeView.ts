@@ -17,7 +17,6 @@ const getEmptyData = (): ITimeViewFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   isNotDefault: true
 });
@@ -28,7 +27,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isMandatory: {},
   visibility: {},
   isEnabled: {},
-  isEnrollment: {},
   isEditable: {},
   unitMeasurement: {}
 };

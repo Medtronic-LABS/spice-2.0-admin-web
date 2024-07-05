@@ -25,7 +25,6 @@ describe('Age Container Test Cases', () => {
         isSummary: false,
         isMandatory: false,
         isEnabled: true,
-        isEnrollment: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         hint: undefined,
         disableFutureDate: true,
@@ -44,7 +43,6 @@ describe('Age Container Test Cases', () => {
         isMandatory: {},
         disableFutureDate: {},
         isEnabled: {},
-        isEnrollment: {},
         visibility: {},
         isEditable: {},
         unitMeasurement: {}

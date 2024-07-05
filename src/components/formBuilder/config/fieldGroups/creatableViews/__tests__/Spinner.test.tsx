@@ -25,7 +25,6 @@ describe('Spinner Container Test Cases', () => {
         isSummary: false,
         isMandatory: false,
         isEnabled: true,
-        isEnrollment: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         condition: [],
         hint: '',
@@ -44,7 +43,6 @@ describe('Spinner Container Test Cases', () => {
       expect(customizableFieldMeta).toEqual({
         visibility: {},
         isEnabled: {},
-        isEnrollment: {},
         isMandatory: {},
         defaultValue: {},
         title: {},

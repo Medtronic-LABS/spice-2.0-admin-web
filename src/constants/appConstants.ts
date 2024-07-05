@@ -137,6 +137,8 @@ const APPCONSTANTS = {
   SEARCH_USER_ERROR: 'Unable to search the admin. Please try after sometime.',
 
   // form Builder
+  FORM_CUSTOMIZATION_SUCCESS: 'Dynamic customization updated successfully.',
+  FORM_CUSTOMIZATION_ERROR: 'Unable to update the dynamic customization. Please try after sometime.',
   VALIDITY_OPTIONS: {
     gone: { key: 'gone', label: 'Hide' },
     visible: { key: 'visible', label: 'Show' }
@@ -228,7 +230,23 @@ const APPCONSTANTS = {
     { name: 'Assessment Form', isCustomIconInvisible: true }
   ],
   NO_FAMILY: 'NO_FAMILY',
-  INVALID_CREDENTIALS: 'Invalid credentials'
+  INVALID_CREDENTIALS: 'Invalid credentials',
+  // utils
+
+  MONTHS: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
 };
 
 export const ROLE_LABELS = {

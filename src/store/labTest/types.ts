@@ -1,34 +1,47 @@
 import * as ACTION_TYPES from './actionTypes';
 
 export interface ILabTest {
-  id: number | string;
+  id?: number | string;
   testName: string;
   uniqueName: string;
   tenantId: number | string | null;
   countryId: number | string;
-  formInput: string;
+  formInput: string | any;
   updatedAt?: string;
   displayOrder?: number;
 }
 
-export interface ILabTestFormValues {
+export interface ILabTestCustomizationRequest {
+  data: ILabTest;
+  type: typeof ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface ILabTestCustomizationSuccess {
+  type: typeof ACTION_TYPES.LABTEST_CUSTOMIZATION_SUCCESS;
+}
+export interface ILabTestCustomizationFailure {
+  type: typeof ACTION_TYPES.LABTEST_CUSTOMIZATION_FAILURE;
+  error: any;
+}
+
+export interface IFetchLabTestCustomizationRequest {
+  type: typeof ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_REQUEST;
   name: string;
-  active: boolean;
-  labTestResults: ILabResult[];
-  displayOrder: number;
+  countryId?: number;
+  successCb?: (payload: any) => void;
+  failureCb?: (error: Error) => void;
 }
 
-export interface ILabResultRange {
-  id?: string;
-  displayOrder?: number;
-  displayName: string;
-  unitId?: IUnit | number;
-  minimumValue?: number | null;
-  maximumValue?: number | null;
+export interface IFetchLabTestCustomizationSuccess {
+  type: typeof ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_SUCCESS;
+  payload: ILabTest;
 }
 
-export interface ILabResultUnitFormValues {
-  lab_result_units: ILabResultRange[];
+export interface IFetchLabTestCustomizationFailure {
+  type: typeof ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_FAILURE;
+  error: any;
 }
 
 export interface IUnit {
@@ -36,47 +49,15 @@ export interface IUnit {
   unit: string;
 }
 export interface ILabtestState {
-  lab_tests: ILabTest[];
+  labTests: ILabTest[];
   loading: boolean;
   total: number;
   error: string | null | Error;
   units: IUnit[];
   unitsLoading: boolean;
-  labResultRanges: ILabResultRange[];
-}
-
-export interface ILabResult {
-  id?: string;
-  deleted?: boolean;
-  displayOrder: number;
-  name: string;
-  labTestResultRanges?: any;
-}
-export interface ILabTestCreateReqPayload {
-  labTestResults: ILabResult[];
-  name: string;
-  active: boolean;
-  countryId: string;
-  tenantId: string;
-}
-
-export interface ICreateLabtestRequest {
-  type: typeof ACTION_TYPES.CREATE_LABTEST_REQUEST;
-  data: ILabTestCreateReqPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface ICreateLabtestRequestPayload {
-  data: ILabTestCreateReqPayload;
-  successCb: () => void;
-  failureCb: (error: Error) => void;
-}
-export interface ICreateLabtestSuccess {
-  type: typeof ACTION_TYPES.CREATE_LABTEST_SUCCESS;
-}
-export interface ICreateLabtestFailure {
-  type: typeof ACTION_TYPES.CREATE_LABTEST_FAILURE;
+  labTestCustomizationData: ILabTest;
+  customizationLoading: boolean;
+  labtestJson: null | any;
 }
 
 export interface IFetchLabtest {
@@ -108,48 +89,6 @@ export interface IFetchLabtestsFailure {
   error: Error;
 }
 
-export interface IFetchLabtestByIdRequest {
-  type: typeof ACTION_TYPES.FETCH_LABTEST_BY_ID_REQUEST;
-  payload: { id: string; tenantId: string };
-  successCb?: (payload: ILabTest) => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IFetchLabtestByIdSuccess {
-  type: typeof ACTION_TYPES.FETCH_LABTEST_BY_ID_SUCCESS;
-  payload: ILabTest;
-}
-
-export interface IFetchLabtestByIdFailure {
-  type: typeof ACTION_TYPES.FETCH_LABTEST_BY_ID_FAILURE;
-}
-export interface IFetchLabtestDetailReqPayload {
-  tenant_id: string;
-  _id: string;
-  successCb?: (data: ILabTest) => void;
-  failureCb: (error: Error) => void;
-}
-
-export interface IUpdateLabtestRequest {
-  type: typeof ACTION_TYPES.UPDATE_LABTEST_REQUEST;
-  data: ILabTest;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IUpdateLabtestRequestPayload {
-  data: ILabTest;
-  successCb: () => void;
-  failureCb: (error: Error) => void;
-}
-export interface IUpdateLabtestSuccess {
-  type: typeof ACTION_TYPES.UPDATE_LABTEST_SUCCESS;
-}
-export interface IUpdateLabtestFailure {
-  type: typeof ACTION_TYPES.UPDATE_LABTEST_FAILURE;
-  error: Error;
-}
-
 export interface IDeleteLabtestRequestPayload {
   id: number;
   tenantId: number;
@@ -157,7 +96,7 @@ export interface IDeleteLabtestRequestPayload {
 
 export interface IDeleteLabtestRequest {
   type: typeof ACTION_TYPES.DELETE_LABTEST_REQUEST;
-  data: IDeleteLabtestRequestPayload;
+  id: number;
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }
@@ -184,91 +123,19 @@ export interface IFetchUnitListFailure {
   error: Error;
 }
 
-/* List of labtest result units */
-
-export interface IFetchLabResultRangeListRequestPayload {
-  tenantId: string;
-  labtestResultId: string;
-}
-
-export interface IFetchLabResultRangeListRequest {
-  type: typeof ACTION_TYPES.FETCH_LABTEST_RESULT_RANGE_LIST_REQUEST;
-  data: IFetchLabResultRangeListRequestPayload;
-  successCb?: (data: ILabResultRange[]) => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IFetchLabResultRangeListSuccess {
-  type: typeof ACTION_TYPES.FETCH_LABTEST_RESULT_RANGE_LIST_SUCCESS;
-  payload: ILabResultRange[];
-}
-
-export interface IFetchLabResultRangeListFailure {
-  type: typeof ACTION_TYPES.FETCH_LABTEST_RESULT_RANGE_LIST_FAILURE;
-  error: Error;
-}
-
-/* Save & Update labtest result ranges */
-export interface ISaveUpdateLabResultRangesRequestPayload {
-  tenantId: string;
-  labTestResultId: string;
-  labTestResultRanges: ILabResultRange[];
-}
-export interface ISaveUpdateLabResultRangesRequest {
-  type: typeof ACTION_TYPES.SAVE_LABTEST_RESULT_RANGES_REQUEST;
-  data: ISaveUpdateLabResultRangesRequestPayload;
-  isUpdate: boolean;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-export interface ISaveUpdateLabResultRangesSuccess {
-  type: typeof ACTION_TYPES.SAVE_LABTEST_RESULT_RANGES_SUCCESS;
-}
-export interface ISaveUpdateLabResultRangesFailure {
-  type: typeof ACTION_TYPES.SAVE_LABTEST_RESULT_RANGES_FAILURE;
-  error: Error;
-}
-
-export interface ILabTestResultRangeDeleteRequest {
-  type: typeof ACTION_TYPES.LABTEST_RESULT_RANGE_DELETE_REQUEST;
-  data: { id: string; tenantId: string };
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface ILabTestResultRangeDeleteSuccess {
-  type: typeof ACTION_TYPES.LABTEST_RESULT_RANGE_DELETE_SUCCESS;
-}
-export interface ILabTestResultRangeDeleteFailure {
-  type: typeof ACTION_TYPES.LABTEST_RESULT_RANGE_DELETE_FAILURE;
-  error: Error;
-}
-
 export type LabtestActions =
-  | ICreateLabtestRequest
-  | ICreateLabtestSuccess
-  | ICreateLabtestFailure
   | IFetchLabtestsRequest
   | IFetchLabtestsSuccess
   | IFetchLabtestsFailure
-  | IFetchLabtestByIdRequest
-  | IFetchLabtestByIdSuccess
-  | IFetchLabtestByIdFailure
-  | IUpdateLabtestRequest
-  | IUpdateLabtestSuccess
-  | IUpdateLabtestFailure
+  | IFetchLabTestCustomizationRequest
+  | IFetchLabTestCustomizationSuccess
+  | IFetchLabTestCustomizationFailure
+  | ILabTestCustomizationRequest
+  | ILabTestCustomizationSuccess
+  | ILabTestCustomizationFailure
   | IDeleteLabtestRequest
   | IDeleteLabtestSuccess
   | IDeleteLabtestFailure
   | IFetchUnitListRequest
   | IFetchUnitListSuccess
-  | IFetchUnitListFailure
-  | IFetchLabResultRangeListRequest
-  | IFetchLabResultRangeListSuccess
-  | IFetchLabResultRangeListFailure
-  | ISaveUpdateLabResultRangesRequest
-  | ISaveUpdateLabResultRangesSuccess
-  | ISaveUpdateLabResultRangesFailure
-  | ILabTestResultRangeDeleteRequest
-  | ILabTestResultRangeDeleteSuccess
-  | ILabTestResultRangeDeleteFailure;
+  | IFetchUnitListFailure;

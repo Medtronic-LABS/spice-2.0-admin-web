@@ -185,7 +185,6 @@ export function* deactivateConsentForm({
 */
 function* workflowSaga() {
   yield all([takeLatest(FETCH_CUSTOMIZATION_FORM_REQUEST, fetchCustomizationForm)]);
-  // yield all([takeLatest(FETCH_FORM_META_REQUEST, fetchFormMeta)]);
   yield all([takeLatest(CUSTOMIZE_FORM_REQUEST, customizeForm)]);
   yield all([takeLatest(DEACTIVATE_CONSENT_FORM_REQUEST, deactivateConsentForm)]);
 }

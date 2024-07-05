@@ -13,7 +13,6 @@ describe('ScaleIndicator Config Component', () => {
       expect(emptyData.isSummary).toBeFalsy();
       expect(emptyData.isMandatory).toBeFalsy();
       expect(emptyData.isEnabled).toBeTruthy();
-      expect(emptyData.isEnrollment).toBeTruthy();
       expect(emptyData.isAboveUpperLimit).toBeFalsy();
       expect(emptyData.visibility).toEqual(APPCONSTANTS.VALIDITY_OPTIONS.visible.key);
       expect(emptyData.errorMessage).toBeUndefined();
@@ -29,7 +28,6 @@ describe('ScaleIndicator Config Component', () => {
       const expectedFields = {
         visibility: expect.any(Object),
         isEnabled: expect.any(Object),
-        isEnrollment: expect.any(Object),
         isMandatory: expect.any(Object),
         isAboveUpperLimit: expect.any(Object),
         startValue: expect.any(Object),
@@ -55,7 +53,6 @@ describe('ScaleIndicator Config Component', () => {
         inputType: 0,
         isMandatory: true,
         isEnabled: false,
-        isEnrollment: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         startValue: '10',
         endValue: '20',
@@ -69,7 +66,6 @@ describe('ScaleIndicator Config Component', () => {
         isSummary: true,
         isMandatory: true,
         isEnabled: false,
-        isEnrollment: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         startValue: 10,
         endValue: 20,

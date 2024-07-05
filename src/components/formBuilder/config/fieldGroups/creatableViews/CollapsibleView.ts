@@ -23,7 +23,6 @@ const getEmptyData = (): ICollapsibleViewFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   condition: [],
   hint: '',
@@ -37,7 +36,6 @@ const getEmptyData = (): ICollapsibleViewFields => ({
 const customizableFieldMeta: IBaseFieldMeta = {
   visibility: {},
   isEnabled: {},
-  isEnrollment: {},
   isMandatory: {},
   defaultValue: {},
   title: {},

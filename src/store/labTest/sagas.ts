@@ -2,44 +2,14 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as labtestService from '../../services/labtestAPI';
-import {
-  ICreateLabtestRequest,
-  IDeleteLabtestRequest,
-  IFetchLabResultRangeListRequest,
-  IFetchLabtestByIdRequest,
-  IFetchLabtestsRequest,
-  ILabTestResultRangeDeleteRequest,
-  ISaveUpdateLabResultRangesRequest,
-  IUnit,
-  IUpdateLabtestRequest
-} from './types';
+import { IDeleteLabtestRequest, IFetchLabtestsRequest, ILabTestCustomizationRequest, IUnit } from './types';
 import * as labtestActions from './actions';
 import {
-  CREATE_LABTEST_REQUEST,
   DELETE_LABTEST_REQUEST,
-  FETCH_LABTEST_BY_ID_REQUEST,
+  FETCH_LABTEST_CUSTOMIZATION_REQUEST,
   FETCH_LABTEST_REQUEST,
-  FETCH_LABTEST_RESULT_RANGE_LIST_REQUEST,
-  FETCH_UNIT_LIST_REQUEST,
-  LABTEST_RESULT_RANGE_DELETE_REQUEST,
-  SAVE_LABTEST_RESULT_RANGES_REQUEST,
-  UPDATE_LABTEST_REQUEST
+  LABTEST_CUSTOMIZATION_REQUEST
 } from './actionTypes';
-/*
-  Worker Saga: Fired on CREATE_LABTEST_REQUEST action
-*/
-export function* addLabTest({ data, successCb, failureCb }: ICreateLabtestRequest): SagaIterator {
-  try {
-    yield call(labtestService.addLabTest, data);
-    yield put(labtestActions.createLabtestSuccess());
-    successCb?.();
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(labtestActions.createLabtestFailure());
-    }
-  }
-}
 
 /*
   Worker Saga: Fired on FETCH_LABTEST_REQUEST action
@@ -60,45 +30,11 @@ export function* fetchLabTest({ data, failureCb }: IFetchLabtestsRequest): SagaI
 }
 
 /*
-  Worker Saga: Fired on FETCH_LABTEST_BY_ID_REQUEST action
-*/
-export function* fetchLabTestById({ payload, successCb, failureCb }: IFetchLabtestByIdRequest): SagaIterator {
-  try {
-    const {
-      data: { entity: labTest }
-    } = yield call(labtestService.fetchLabTestbyId, payload);
-    yield put(labtestActions.fetchLabtestByIdSuccess(labTest));
-    successCb?.(labTest);
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-    }
-    yield put(labtestActions.fetchLabtestByIdFailure());
-  }
-}
-
-/*
-  Worker Saga: Fired on UPDATE_LABTEST_REQUEST action
-*/
-export function* updateLabTest({ data, successCb, failureCb }: IUpdateLabtestRequest): SagaIterator {
-  try {
-    yield call(labtestService.updateLabTest, data);
-    yield put(labtestActions.updateLabtestSuccess());
-    successCb?.();
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(labtestActions.updateLabtestFailure(e));
-    }
-  }
-}
-
-/*
   Worker Saga: Fired on DELETE_LABTEST_REQUEST action
 */
-export function* deleteLabtest({ data, successCb, failureCb }: IDeleteLabtestRequest): SagaIterator {
+export function* deleteLabtest({ id, successCb, failureCb }: IDeleteLabtestRequest): SagaIterator {
   try {
-    yield call(labtestService.deleteLabtest, data);
+    yield call(labtestService.deleteLabtest, { id });
     yield put(labtestActions.deleteLabtestSuccess());
     successCb?.();
   } catch (e) {
@@ -128,63 +64,38 @@ export function* fetchUnitList(): SagaIterator {
 }
 
 /*
-  Worker Saga: Fired on FETCH_LABTEST_RESULT_RANGE_LIST_REQUEST action
+  Worker Saga: Fired on FETCH_LABTEST_CUSTOMIZATION_REQUEST action
 */
-export function* fetchLabResultUnitList({ data, successCb, failureCb }: IFetchLabResultRangeListRequest): SagaIterator {
+export function* fetchLabTestCustomizationSaga({ name, successCb, failureCb }: any): SagaIterator {
   try {
     const {
-      data: { entityList: labResultRangeList }
-    } = yield call(labtestService.fetchLabTestRange, data);
-    labResultRangeList.map(
-      (labResultRange: any) =>
-        (labResultRange.unitId = {
-          id: labResultRange.unitId,
-          unit: labResultRange.unit
-        })
-    );
-    yield put(labtestActions.fetchLabResultRangeListSuccess(labResultRangeList || []));
-    successCb?.(labResultRangeList || []);
+      data: { entity: data }
+    } = yield call(labtestService.fetchLabtestCustomization, {
+      name
+    } as any);
+    successCb?.(data);
+    const newData = { ...data, formInput: JSON.parse(data?.formInput) };
+    yield put(labtestActions.fetchLabTestCustomizationSuccess({ payload: newData }));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(labtestActions.fetchLabResultRangeListFail(e));
+      yield put(labtestActions.fetchLabTestCustomizationFailure(e));
     }
   }
 }
 
 /*
-  Worker Saga: Fired on SAVE_LABTEST_RESULT_RANGES_REQUEST action
+  Worker Saga: Fired on LABTEST_CUSTOMIZATION_REQUEST action
 */
-export function* saveLabTestResultUnit({
-  data,
-  isUpdate,
-  successCb,
-  failureCb
-}: ISaveUpdateLabResultRangesRequest): SagaIterator {
+export function* labTestCustomizationSaga({ data, successCb, failureCb }: ILabTestCustomizationRequest): SagaIterator {
   try {
-    yield call(labtestService.saveUpdateLabTestResultRanges, data, isUpdate);
-    yield put(labtestActions.saveUpdateLabResultRangesSuccess());
+    yield call(labtestService[data?.id ? 'updateLabTestCustomization' : 'addLabTestCustomization'], data);
+    yield put(labtestActions.labtestCustomizationSuccess());
     successCb?.();
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(labtestActions.saveUpdateLabResultRangesFail(e));
-    }
-  }
-}
-
-/*
-  Worker Saga: Fired on LABTEST_RESULT_RANGE_DELETE_REQUEST action
-*/
-export function* deleteLabTestRange({ data, successCb, failureCb }: ILabTestResultRangeDeleteRequest): SagaIterator {
-  try {
-    yield call(labtestService.deleteLabTestRange, data);
-    yield put(labtestActions.deleteLabTestRangeSuccess());
-    successCb?.();
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(labtestActions.deleteLabTestRangeFaliure(e));
+      yield put(labtestActions.labtestCustomizationFailure(e));
     }
   }
 }
@@ -193,15 +104,11 @@ export function* deleteLabTestRange({ data, successCb, failureCb }: ILabTestResu
   Starts worker saga on latest dispatched specific action.
 */
 function* labtestSaga() {
-  yield all([takeLatest(CREATE_LABTEST_REQUEST, addLabTest)]);
   yield all([takeLatest(FETCH_LABTEST_REQUEST, fetchLabTest)]);
-  yield all([takeLatest(UPDATE_LABTEST_REQUEST, updateLabTest)]);
+  yield all([takeLatest(FETCH_LABTEST_CUSTOMIZATION_REQUEST, fetchLabTestCustomizationSaga)]);
   yield all([takeLatest(DELETE_LABTEST_REQUEST, deleteLabtest)]);
-  yield all([takeLatest(FETCH_LABTEST_BY_ID_REQUEST, fetchLabTestById)]);
-  yield all([takeLatest(FETCH_UNIT_LIST_REQUEST, fetchUnitList)]);
-  yield all([takeLatest(FETCH_LABTEST_RESULT_RANGE_LIST_REQUEST, fetchLabResultUnitList)]);
-  yield all([takeLatest(SAVE_LABTEST_RESULT_RANGES_REQUEST, saveLabTestResultUnit)]);
-  yield all([takeLatest(LABTEST_RESULT_RANGE_DELETE_REQUEST, deleteLabTestRange)]);
+  yield all([takeLatest(LABTEST_CUSTOMIZATION_REQUEST, labTestCustomizationSaga)]);
+  // yield all([takeLatest(FETCH_UNIT_LIST_REQUEST, fetchUnitList)]);
 }
 
 export default labtestSaga;

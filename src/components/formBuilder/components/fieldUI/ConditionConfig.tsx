@@ -58,7 +58,7 @@ const SelectInputComponent = ({
             return eqListData.name;
           });
     };
-    value = (value || []).map((val: any, index: number) => {
+    value = (value || []).map((val: any) => {
       return { name: val, id: val };
     });
   }
@@ -79,14 +79,14 @@ const SelectInputComponent = ({
     parseFn = (val: any) => val?.key;
     value = options?.find(({ key }: any) => item[fieldName] === key) || '';
   }
-  function getButtonClass(condition: string, index: number) {
-    const isSelected = selectedCondition.condition === condition && selectedCondition.index === index;
+  function getButtonClass(condition: string, newIndex: number) {
+    const isSelected = selectedCondition.condition === condition && selectedCondition.index === newIndex;
     const isConfigCondition = config.name === `.${condition}`;
     return isSelected || isConfigCondition ? styles.selectedConditionButton : styles.conditionButton;
   }
 
-  function shouldShowAsterisk(condition: string, index: number) {
-    const isSelected = selectedCondition.condition === condition && selectedCondition.index === index;
+  function shouldShowAsterisk(condition: string, newIndex: number) {
+    const isSelected = selectedCondition.condition === condition && selectedCondition.index === newIndex;
     const isConfigCondition = config.name === `.${condition}`;
     return config.required && (isSelected || isConfigCondition);
   }
@@ -295,8 +295,8 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
     form.mutators.setValue(`${name}`, [initialValue]);
   };
 
-  const getNestedValue = (obj: any, path: string) => {
-    return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+  const getNestedValue = (newObj: any, path: string) => {
+    return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), newObj);
   };
   const handleSelectedCondition = (selectedConditionValue: { condition: string; index: number }) => {
     const formValues = form.getState().values;

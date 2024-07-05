@@ -1,3 +1,5 @@
+import APPCONSTANTS from '../constants/appConstants';
+
 export const isEmpty = (value: string | undefined | null) =>
   value === undefined || value === null || value === '' || value.length === 0;
 
@@ -321,20 +323,7 @@ export function formatDate(value: string | number | Date, options: IDateOptions)
   } else {
     fullDate = value;
   }
-  const longMonthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
+  const longMonthNames = APPCONSTANTS.MONTHS;
 
   function findMonth() {
     const monthIndex = fullDate.getMonth();

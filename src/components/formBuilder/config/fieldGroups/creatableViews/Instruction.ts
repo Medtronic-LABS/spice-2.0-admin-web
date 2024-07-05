@@ -18,7 +18,6 @@ const getEmptyData = (): IInstructionFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   instructions: [],
   isNotDefault: true
@@ -30,7 +29,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   visibility: {},
   isEditable: {},
-  isEnrollment: {},
   unitMeasurement: {}
 };
 

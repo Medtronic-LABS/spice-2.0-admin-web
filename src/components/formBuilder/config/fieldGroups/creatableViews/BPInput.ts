@@ -25,7 +25,6 @@ const getEmptyData = (): IBPInputFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   maxLength: 3,
   totalCount: 2,
@@ -54,7 +53,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEnabled: {},
   visibility: {},
   isEditable: {},
-  isEnrollment: {},
   unitMeasurement: {}
 };
 

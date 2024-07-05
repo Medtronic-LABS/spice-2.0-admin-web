@@ -12,7 +12,6 @@ describe('InstructionConfig', () => {
     expect(emptyData.isSummary).toBeFalsy();
     expect(emptyData.isMandatory).toBeFalsy();
     expect(emptyData.isEnabled).toBeTruthy();
-    expect(emptyData.isEnrollment).toBeTruthy();
     expect(emptyData.visibility).toEqual(APPCONSTANTS.VALIDITY_OPTIONS.visible.key);
     expect(emptyData.instructions).toEqual([]);
     expect(emptyData.isNotDefault).toBeTruthy();
@@ -36,7 +35,6 @@ describe('InstructionConfig', () => {
       isSummary: true,
       isMandatory: true,
       isEnabled: false,
-      isEnrollment: true,
       visibility: 'hidden',
       instructions: ['Instruction 1', 'Instruction 2'],
       isNotDefault: true,
@@ -51,7 +49,6 @@ describe('InstructionConfig', () => {
       isSummary: true,
       isMandatory: true,
       isEnabled: false,
-      isEnrollment: true,
       visibility: 'hidden',
       instructions: ['Instruction 1', 'Instruction 2'],
       isNotDefault: true
@@ -70,7 +67,6 @@ describe('InstructionConfig', () => {
       isSummary: true,
       isMandatory: true,
       isEnabled: false,
-      isEnrollment: true,
       visibility: 'hidden',
       instructions: ['Instruction 1', 'Instruction 2'],
       isNotDefault: true,
@@ -85,7 +81,6 @@ describe('InstructionConfig', () => {
       isSummary: true,
       isMandatory: true,
       isEnabled: false,
-      isEnrollment: true,
       visibility: 'hidden',
       instructions: ['Instruction 1', 'Instruction 2'],
       isNotDefault: true,

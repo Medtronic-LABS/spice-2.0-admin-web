@@ -11,14 +11,9 @@ import RADIO_GROUP_CONFIG from '../../config/fieldGroups/creatableViews/RadioGro
 import SCALE_INDICATOR_CONFIG from '../../config/fieldGroups/creatableViews/ScaleIndicator';
 import SPINNER_CONFIG from '../../config/fieldGroups/creatableViews/Spinner';
 import TIME_VIEW_CONFIG from '../../config/fieldGroups/creatableViews/TimeView';
-import {
-  creatableViews,
-  unitMeasurementFields,
-  isEditableFields,
-  getConfigByViewType,
-  inputTypesSwitch
-} from '../FieldUtils';
+import { creatableViews, unitMeasurementFields, getConfigByViewType, inputTypesSwitch } from '../FieldUtils';
 import INFORMATION_LABEL_CONFIG from '../../config/fieldGroups/creatableViews/InformationLabel';
+import DATE_PICKER_CONFIG from '../../config/fieldGroups/creatableViews/DatePickerView';
 
 describe('Your Module', () => {
   describe('creatableViews', () => {
@@ -34,7 +29,8 @@ describe('Your Module', () => {
         'Slider',
         'Multi Select Input',
         'Instructions',
-        'Information Label'
+        'Information Label',
+        'Date Input'
       ];
       expect(creatableViews.map((view: any) => view.label)).toEqual(expectedLabels);
     });
@@ -51,14 +47,19 @@ describe('Your Module', () => {
         'ScaleIndicator',
         'CheckBox',
         'Instruction',
-        'InformationLabel'
+        'InformationLabel',
+        'DatePicker'
       ];
       expect(creatableViews.map((view: any) => view.value)).toEqual(expectedValues);
     });
 
     it('should have the correct account customization flags', () => {
-      const expectedFlags = [false, true, false, false, false, true, true, true, true, true, false];
-      expect(creatableViews.map((view: any) => view.isAccountCustomizable)).toEqual(expectedFlags);
+      const expectedFlags = [false, true, false, false, false, true, true, true, true, true, false, true];
+      expect(
+        creatableViews.map((view: any) => {
+          return view.isAccountCustomizable;
+        })
+      ).toEqual(expectedFlags);
     });
   });
 
@@ -66,25 +67,6 @@ describe('Your Module', () => {
     it('should have the correct fields', () => {
       const expectedFields = ['glucose', 'hba1c'];
       expect(unitMeasurementFields).toEqual(expectedFields);
-    });
-  });
-
-  describe('isEditableFields', () => {
-    it('should have the correct fields', () => {
-      const expectedFields = [
-        'firstName',
-        'middleName',
-        'lastName',
-        'phoneNumber',
-        'phoneNumberCategory',
-        'landmark',
-        'occupation',
-        'insuranceStatus',
-        'insuranceType',
-        'insuranceId',
-        'otherInsurance'
-      ];
-      expect(isEditableFields).toEqual(expectedFields);
     });
   });
 
@@ -106,6 +88,9 @@ describe('Your Module', () => {
 
     it('should return the correct config for TimeView', () => {
       expect(getConfigByViewType('TimeView')).toEqual(TIME_VIEW_CONFIG);
+    });
+    it('should return the correct config for Date Input', () => {
+      expect(getConfigByViewType('DatePicker')).toEqual(DATE_PICKER_CONFIG);
     });
 
     it('should return the correct config for EditText', () => {

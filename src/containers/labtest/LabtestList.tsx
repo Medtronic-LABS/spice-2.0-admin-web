@@ -8,7 +8,7 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import APPCONSTANTS from '../../constants/appConstants';
 import { ReactComponent as CustomizeIcon } from '../../assets/images/account-customize.svg';
-import { fetchLabtestsRequest, deleteLabtestRequest, updateLabtestRequest } from '../../store/labTest/actions';
+import { fetchLabtestsRequest, deleteLabtestRequest, labtestCustomization } from '../../store/labTest/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { labtestLoadingSelector, labtestsSelector, labtestCountSelector } from '../../store/labTest/selectors';
 import { ILabTest } from '../../store/labTest/types';
@@ -80,7 +80,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
   const handleLabTestDelete = ({ data }: { data: ILabTest }) => {
     dispatch(
       deleteLabtestRequest({
-        data: { id: Number(data.id), tenantId: Number(data.tenantId) },
+        id: Number(data.id),
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.LABTEST_DELETE_SUCCESS);
           handlePage(APPCONSTANTS.INITIAL_PAGE);
@@ -129,17 +129,35 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
   //   );
   // };
 
-  const handleEditLabTestSubmit = (data: any) => {
+  const handleEditLabTestSubmit = (dataParams: any) => {
+    const data = {
+      ...dataParams,
+      formInput: undefined,
+      testName: dataParams.testName
+    };
     dispatch(
-      updateLabtestRequest({
+      labtestCustomization({
         data,
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.LABTEST_UPDATE_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            APPCONSTANTS.FORM_CUSTOMIZATION_SUCCESS.replace(
+              'Dynamic',
+              dataParams.testName.charAt(0).toUpperCase() + dataParams.testName.slice(1)
+            )
+          );
           fetchDetails();
-          setLabTestModalState({ isOpen: false, isEdit: false, data: {}, isNextClicked: false });
+          closeLabTestModal();
         },
-        failureCb: (e) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.LABTEST_UPDATE_FAIL))
+        failureCb: (e) => {
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.ERROR,
+              APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', dataParams.testName)
+            )
+          );
+        }
       })
     );
   };

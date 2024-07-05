@@ -1,3 +1,6 @@
+//
+$app-primary-color: var(--medium-blue);
+
 // Input field variables
 $field-label-color: var(--black-65);
 $field-text-color: var(--black);
@@ -56,3 +59,9 @@ $modal-background: rgba(var(--black-rgb), 0.8);
 
 //divider
 $divider-background-color: var(--black-30);
+
+// date picker
+$today-highlight-color: var(--light-blue);
+$today-highlight-hover-color: var(--medium-light-blue);
+$selected-date-hover-color: var(--medium-blue-140);
+$date-range-color: var(--medium-light-blue);

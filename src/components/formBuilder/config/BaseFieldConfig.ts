@@ -92,7 +92,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
     order: 5.1,
     label: 'Target Fields',
     component: 'TARGET_VIEWS'
-  },  
+  },
   defaultValue: {
     order: 5.2,
     label: 'Default Value',
@@ -100,6 +100,18 @@ export const baseFieldMeta: IBaseFieldMeta = {
     labelKey: 'name',
     valueKey: 'id',
     component: 'SELECT_INPUT'
+  },
+  startDate: {
+    order: 5.3,
+    label: 'Start Date',
+    required: false,
+    component: 'DATE_PICKER'
+  },
+  endDate: {
+    order: 5.4,
+    label: 'End Date',
+    required: false,
+    component: 'DATE_PICKER'
   },
   totalCount: {
     order: 2.8,
@@ -174,7 +186,6 @@ export const baseFieldMeta: IBaseFieldMeta = {
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },
   isEnabled: { order: 15, label: 'Is Enabled', component: 'CHECKBOX' },
-  isEnrollment: { order: 15.1, label: 'Is Enrollment', component: 'CHECKBOX' },
   disableFutureDate: { order: 15.2, label: 'Disable Future Dates', component: 'CHECKBOX' },
   isNeedAction: { order: 15.3, label: 'Action Needed', component: 'CHECKBOX' },
   isNew: { order: 0, label: 'isNew', component: 'CHECKBOX' },

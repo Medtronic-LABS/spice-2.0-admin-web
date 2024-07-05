@@ -2,16 +2,14 @@ import arrayMutators from 'final-form-arrays';
 import { cloneDeep } from 'lodash';
 import { Fragment, useMemo, useRef } from 'react';
 import { Form } from 'react-final-form';
-import { matchPath, useLocation } from 'react-router-dom';
 import BinIcon from '../../../../assets/images/bin.svg';
 import editIcon from '../../../../assets/images/edit.svg';
 import plusIcon from '../../../../assets/images/plus.svg';
 import Accordian from '../../../../components/accordian/Accordian';
 import APPCONSTANTS from '../../../../constants/appConstants';
-import { PROTECTED_ROUTES } from '../../../../constants/route';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
-import { creatableViews, getConfigByViewType, isEditableFields, unitMeasurementFields } from '../../utils/FieldUtils';
+import { creatableViews, getConfigByViewType, unitMeasurementFields } from '../../utils/FieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
 
 interface IAccordinaViewProps {
@@ -31,6 +29,8 @@ interface IAccordinaViewProps {
   hashFieldIdsWithFieldName?: any;
   culture?: any;
   isShow?: boolean;
+  addNewFieldDisabled?: boolean;
+  isFieldNameChangable?: boolean;
 }
 
 export interface IFormValues {
@@ -43,7 +43,8 @@ const AccordianHeader = ({
   currentFamilyGroup,
   setEditGroupedFieldsOrder,
   handleAddNewField,
-  isAccountCustomization,
+  addNewFieldDisabled,
+  isFieldNameChangable,
   isShow
 }: any) => {
   return (
@@ -71,7 +72,7 @@ const AccordianHeader = ({
                 id='newfieldoptions'
                 data-bs-toggle='dropdown'
                 aria-expanded='false'
-                disabled={!isAccountCustomization}
+                disabled={addNewFieldDisabled}
               >
                 <img className='me-0dot5' width='14' height='14' src={plusIcon} alt='plus-icon' />
                 Add New Field
@@ -79,7 +80,7 @@ const AccordianHeader = ({
             )}
             <ul className='dropdown-menu' aria-labelledby='newfieldoptions' id='dropdownMenu'>
               {[...creatableViews]
-                .filter((views) => (isAccountCustomization ? views.isAccountCustomizable : true))
+                .filter((views) => (!addNewFieldDisabled ? views.isAccountCustomizable : true))
                 .sort((a, b) => (a.label > b.label ? 1 : -1))
                 .map((view, index) => {
                   return (
@@ -148,7 +149,9 @@ const AccordianBody = ({
                     newlyAddedIds={newlyAddedIds}
                     isNew={isNew}
                     handleUpdateFieldName={handleUpdateFieldName}
-                    isAccountCustomization={isAccountCustomization}
+                    // isAccountCustomization={isAccountCustomization}
+                    isFieldNameChangable={true}
+                    addNewFieldDisabled={false}
                     hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                     hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
                   />
@@ -193,11 +196,13 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
           </button>
         )}
       </div>
+      {/* ------- JSON viewer ----------- */}
       {/* <div className='mt-1 bg-black p-2'>
         <code>
           <pre style={{ fontSize: '1rem' }}>{JSON.stringify(_presentableJson(cloneDeep(values)), null, 2)}</pre>
         </code>
       </div> */}
+      {/* ------------------------------- */}
     </>
   );
 };
@@ -218,15 +223,14 @@ const AccordianView = ({
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
   culture,
-  isShow
+  isShow,
+  addNewFieldDisabled,
+  isFieldNameChangable
 }: IAccordinaViewProps) => {
   const accordianRef = useRef<any>([]);
   const fieldGroupRef = useRef<any>([]);
   const newlyAddedIdsRef = useRef<any>([]);
   const newlyAddedIds = newlyAddedIdsRef.current;
-
-  const { pathname } = useLocation();
-  const isAccountCustomization = Boolean(matchPath(pathname, { path: '', exact: true }));
 
   const unAddedFields = useMemo(
     () =>
@@ -283,7 +287,7 @@ const AccordianView = ({
     }
 
     // update newly added ids and fieldname value
-    if (isAccountCustomization) {
+    if (isFieldNameChangable) {
       if (fieldGroupName in hashFieldIdsWithFieldName) {
         delete hashFieldIdsWithFieldName[fieldGroupName];
       }
@@ -335,7 +339,7 @@ const AccordianView = ({
     // add newly added ids and fieldname
     newlyAddedIds.push(nxtView.id);
     formValues[family][nxtView.id] = nxtView;
-    if (isAccountCustomization) {
+    if (isFieldNameChangable) {
       hashFieldIdsWithTitle[nxtView.id] = '';
       hashFieldIdsWithFieldName[nxtView.id] = '';
     }
@@ -362,11 +366,11 @@ const AccordianView = ({
       formValues[familyName][newFieldName].fieldName = newFieldLabel;
 
       // toggle fields based on fieldname
-      if (isEditableFields.includes(newFieldName)) {
-        formValues[familyName][newFieldName].isEditable = true;
-      } else if ('isEditable' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].isEditable;
-      }
+      // if (isEditableFields.includes(newFieldName)) {
+      //   formValues[familyName][newFieldName].isEditable = true;
+      // } else if ('isEditable' in formValues[familyName][newFieldName]) {
+      //   delete formValues[familyName][newFieldName].isEditable;
+      // }
       if (unitMeasurementFields.includes(newFieldName)) {
         formValues[familyName][newFieldName].unitMeasurement = undefined;
       } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
@@ -381,7 +385,7 @@ const AccordianView = ({
       }
       newlyAddedIds.push(newFieldName);
       // update newly added ids with fieldname
-      if (isAccountCustomization) {
+      if (isFieldNameChangable) {
         if (currentFieldID in hashFieldIdsWithFieldName) {
           hashFieldIdsWithFieldName[newFieldName] = newFieldLabel;
           hashFieldIdsWithTitle[newFieldName] = currentTitle;
@@ -391,7 +395,7 @@ const AccordianView = ({
       }
     }
     // update newly added ids with title
-    if (isAccountCustomization) {
+    if (isFieldNameChangable) {
       if (currentFieldID in hashFieldIdsWithTitle) {
         hashFieldIdsWithTitle[currentFieldID] = newFieldLabel;
       }
@@ -483,7 +487,9 @@ const AccordianView = ({
                               collapsedGroup={collapsedGroup}
                               setEditGroupedFieldsOrder={setEditGroupedFieldsOrder}
                               handleAddNewField={handleAddNewField}
-                              isAccountCustomization={isAccountCustomization}
+                              // isAccountCustomization={isAccountCustomization}
+                              addNewFieldDisabled={addNewFieldDisabled}
+                              isFieldNameChangable={isFieldNameChangable}
                               isShow={isShow}
                             />
                           }
@@ -498,7 +504,9 @@ const AccordianView = ({
                               targetIds={targetIds}
                               handleUpdateFieldName={handleUpdateFieldName}
                               handleDeleteField={handleDeleteField}
-                              isAccountCustomization={isAccountCustomization}
+                              // isAccountCustomization={isAccountCustomization}
+                              addNewFieldDisabled={addNewFieldDisabled}
+                              isFieldNameChangable={isFieldNameChangable}
                               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
                             />

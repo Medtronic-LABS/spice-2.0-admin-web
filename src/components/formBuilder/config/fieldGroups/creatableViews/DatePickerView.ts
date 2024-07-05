@@ -3,58 +3,47 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface ICheckBoxFields extends IBaseFields {
-  selectAll: boolean;
-  hint?: string;
-  visibility: string;
-  isNew?: boolean;
-  optionsList?: Array<{ name: string; id: string }>;
-  errorMessage?: string;
+export interface IDatePickerFields extends IBaseFields {
   isNotDefault?: boolean;
+  startDate?: string;
+  endDate?: string;
 }
 
-const getEmptyData = (): ICheckBoxFields => ({
-  id: new Date().getTime().toString() + 'CheckBox',
-  viewType: 'CheckBox',
+const getEmptyData = (): IDatePickerFields => ({
+  id: new Date().getTime().toString() + 'DatePicker',
+  viewType: 'DatePicker',
   title: '',
   fieldName: '',
   family: '',
-  selectAll: true,
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
+  startDate: '',
+  endDate: '',
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  condition: [],
-  hint: '',
-  optionsList: [],
-  errorMessage: '',
   isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
-  visibility: {},
-  selectAll: {},
-  isEnabled: {},
-  isMandatory: {},
   title: {},
   fieldName: {},
-  optionsList: {},
-  condition: {},
-  errorMessage: {},
-  isEditable: {},
-  unitMeasurement: {}
+  isMandatory: {},
+  isEnabled: {},
+  visibility: {},
+  startDate: {},
+  endDate: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  json.condition = json.condition?.filter((val: any) => !!val);
+  json.startDate = json.startDate?.label ? json.startDate.label : json.startDate;
   return json;
 };
 
-const CHECKBOX_CONFIG: IComponentConfig = {
+const DATE_PICKER_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default CHECKBOX_CONFIG;
+export default DATE_PICKER_CONFIG;

@@ -16,7 +16,6 @@ const getEmptyData = (): IInformationLabelFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   isNotDefault: true
 });
@@ -26,7 +25,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   fieldName: {},
   isMandatory: {},
   isEnabled: {},
-  isEnrollment: {},
   visibility: {}
 };
 

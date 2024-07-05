@@ -13,7 +13,6 @@ describe('BP_CONFIG', () => {
         isSummary: false,
         isMandatory: false,
         isEnabled: true,
-        isEnrollment: true,
         visibility: 'visible',
         maxLength: 3,
         totalCount: 2,

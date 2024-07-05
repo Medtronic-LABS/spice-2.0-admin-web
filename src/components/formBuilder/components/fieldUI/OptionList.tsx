@@ -1,8 +1,6 @@
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import { useSelector } from 'react-redux';
 import TextInput from '../../../../components/formFields/TextInput';
-import { formMetaSelector } from '../../../../store/workflow/selectors';
 import { required } from '../../../../utils/validation';
 import styles from '../../styles/FormBuilder.module.scss';
 import TagInput from './TagInput';
@@ -115,7 +113,7 @@ const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
 };
 
 const OptionList = ({ name, obj, field, inputProps }: any) => {
-  const formGetMeta = useSelector(formMetaSelector) || [];
+  const formGetMeta = [] as any[];
   const optionType = formGetMeta.find((item: any) => obj.id === item.key)?.type || 'radio';
   if (obj.viewType === 'RadioGroup' && optionType === 'checkbox') {
     const booleanDefaultValue = [

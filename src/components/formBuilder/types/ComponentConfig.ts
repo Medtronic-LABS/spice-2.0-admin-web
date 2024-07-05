@@ -12,6 +12,7 @@ import { ITimeViewFields } from '../config/fieldGroups/creatableViews/TimeView';
 import { ITextLabelFields } from '../config/fieldGroups/TextLabel';
 
 import { IBaseFieldMeta } from './BaseFieldMeta';
+import { IDatePickerFields } from '../config/fieldGroups/creatableViews/DatePickerView';
 
 export type IFieldViewType =
   | IEditTextFields
@@ -25,6 +26,7 @@ export type IFieldViewType =
   | IInstructionFields
   | ICardViewFields
   | ITextLabelFields
+  | IDatePickerFields
   | IInformationLabelFields;
 
 export interface IComponentConfig {

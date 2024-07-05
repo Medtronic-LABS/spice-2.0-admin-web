@@ -18,7 +18,6 @@ const getEmptyData = (): IAgeFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   disableFutureDate: true,
   isNotDefault: true
@@ -30,7 +29,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isMandatory: {},
   disableFutureDate: {},
   isEnabled: {},
-  isEnrollment: {},
   visibility: {},
   isEditable: {},
   unitMeasurement: {}

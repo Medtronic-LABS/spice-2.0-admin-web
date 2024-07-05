@@ -21,7 +21,6 @@ const getEmptyData = (): IRadioGroupFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   condition: [],
   optionsList: [],
@@ -41,7 +40,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   errorMessage: {},
   isEnabled: {},
   isEditable: {},
-  isEnrollment: {},
   unitMeasurement: {}
 };
 

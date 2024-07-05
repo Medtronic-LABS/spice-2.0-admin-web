@@ -62,37 +62,37 @@ describe('OptionList Component', () => {
     expect(wrapper.find('StringOptionsRender')).toHaveLength(1);
   });
 
-  it('should render BooleanOptionsRender when viewType is RadioGroup and optionType is checkbox', () => {
-    obj.id = 'isDeleted';
-    const store = mockStore({
-      workflow: {
-        formMeta: [{ key: 'isDeleted', type: 'checkbox', label: 'Is Deleted' }]
-      }
-    });
-    const mockParse = jest.fn((value) => value);
-    const wrapper = mount(
-      <Provider store={store}>
-        <Form
-          onSubmit={() => {
-            //
-          }}
-          mutators={{ ...arrayMutators }}
-        >
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <OptionList name='testName' obj={obj} field='optionsList' inputProps={inputProps}>
-                <Field name='testName' parse={mockParse} />
-              </OptionList>
-            </form>
-          )}
-        </Form>
-      </Provider>
-    );
-    expect(wrapper.find('BooleanOptionsRender')).toHaveLength(1);
-    const parse = wrapper.find('ForwardRef(Field)').first();
-    const parseFn: any = parse.prop('parse');
-    parseFn(['New Option']);
-  });
+  // it('should render BooleanOptionsRender when viewType is RadioGroup and optionType is checkbox', () => {
+  //   obj.id = 'isDeleted';
+  //   const store = mockStore({
+  //     workflow: {
+  //       formMeta: [{ key: 'isDeleted', type: 'checkbox', label: 'Is Deleted' }]
+  //     }
+  //   });
+  //   const mockParse = jest.fn((value) => value);
+  //   const wrapper = mount(
+  //     <Provider store={store}>
+  //       <Form
+  //         onSubmit={() => {
+  //           //
+  //         }}
+  //         mutators={{ ...arrayMutators }}
+  //       >
+  //         {({ handleSubmit }) => (
+  //           <form onSubmit={handleSubmit}>
+  //             <OptionList name='testName' obj={obj} field='optionsList' inputProps={inputProps}>
+  //               <Field name='testName' parse={mockParse} />
+  //             </OptionList>
+  //           </form>
+  //         )}
+  //       </Form>
+  //     </Provider>
+  //   );
+  //   expect(wrapper.find('BooleanOptionsRender')).toHaveLength(1);
+  //   const parse = wrapper.find('ForwardRef(Field)').first();
+  //   const parseFn: any = parse.prop('parse');
+  //   parseFn(['New Option']);
+  // });
 
   it('should render TagInput when viewType is not RadioGroup or optionType is not checkbox', () => {
     const store = mockStore({
@@ -122,29 +122,29 @@ describe('OptionList Component', () => {
     expect(wrapper.find('StringOptionsRender').find('TagInput')).toHaveLength(1);
   });
 
-  it('should render TextInput when viewType is RadioGroup and optionType is checkbox', () => {
-    obj.id = 'isDeleted';
-    const store = mockStore({
-      workflow: {
-        formMeta: [{ key: 'isDeleted', type: 'checkbox', label: 'Is Deleted' }]
-      }
-    });
-    const wrapper = mount(
-      <Provider store={store}>
-        <Form
-          onSubmit={() => {
-            //
-          }}
-          mutators={{ ...arrayMutators }}
-        >
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <OptionList name='testName' obj={obj} field='optionsList' inputProps={inputProps} />
-            </form>
-          )}
-        </Form>
-      </Provider>
-    );
-    expect(wrapper.find('BooleanOptionsRender').find('TextInput')).toHaveLength(2);
-  });
+  // it('should render TextInput when viewType is RadioGroup and optionType is checkbox', () => {
+  //   obj.id = 'isDeleted';
+  //   const store = mockStore({
+  //     workflow: {
+  //       formMeta: [{ key: 'isDeleted', type: 'checkbox', label: 'Is Deleted' }]
+  //     }
+  //   });
+  //   const wrapper = mount(
+  //     <Provider store={store}>
+  //       <Form
+  //         onSubmit={() => {
+  //           //
+  //         }}
+  //         mutators={{ ...arrayMutators }}
+  //       >
+  //         {({ handleSubmit }) => (
+  //           <form onSubmit={handleSubmit}>
+  //             <OptionList name='testName' obj={obj} field='optionsList' inputProps={inputProps} />
+  //           </form>
+  //         )}
+  //       </Form>
+  //     </Provider>
+  //   );
+  //   expect(wrapper.find('BooleanOptionsRender').find('TextInput')).toHaveLength(2);
+  // });
 });

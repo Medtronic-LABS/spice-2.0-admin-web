@@ -1,10 +1,9 @@
 import { useRef } from 'react';
 import { Field } from 'react-final-form';
-import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
-import { inputTypesSwitch, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
+import { inputTypesSwitch, unitMeasurementFields } from '../utils/FieldUtils';
 import ConditionConfig from './fieldUI/ConditionConfig';
 import OptionList from './fieldUI/OptionList';
 import Questionnaire from './fieldUI/Questionnaire';
@@ -12,19 +11,16 @@ import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
 import TextFieldWrapper from './fieldUI/TextFieldWrapper';
 import TextInputArray from './fieldUI/TextInputArray';
 import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
-
-interface IMatchParams {
-  form: string;
-}
+import DatePickerWrapper from './fieldUI/DatePickerWrapper';
 
 const filterByGetMetaViewTypes: { [K: string]: string[] } = {
   RadioGroup: ['checkbox', 'radio']
 };
 
-const getComponentsByFieldName = (fieldName: string, obj: any, isNew?: boolean, isAccountCustomization?: boolean) => {
+const getComponentsByFieldName = (fieldName: string, obj: any, isNew?: boolean, isFieldNameChangable?: boolean) => {
   let inputProps = {};
   if (fieldName === 'fieldName') {
-    inputProps = { ...inputProps, ...{ component: !isNew || isAccountCustomization ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
+    inputProps = { ...inputProps, ...{ component: !isNew || isFieldNameChangable ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
   }
   // change to questionaire component on mental health view
   if (fieldName === 'optionsList' && obj.viewType === 'MentalHealthView') {
@@ -63,7 +59,8 @@ interface IComponentProps {
   ) => void;
   hashFieldIdsWithTitle?: any;
   hashFieldIdsWithFieldName?: any;
-  isAccountCustomization?: boolean;
+  addNewFieldDisabled?: boolean;
+  isFieldNameChangable?: boolean;
 }
 
 export const CheckboxComponent = ({ name, fieldName, inputProps = {} }: IComponentProps) => {
@@ -208,7 +205,7 @@ export const TextFieldComponent = ({
   handleUpdateFieldName,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isAccountCustomization
+  isFieldNameChangable
 }: IComponentProps) => {
   let parseFn = (value: any) => value;
   let capitalize = false;
@@ -224,7 +221,7 @@ export const TextFieldComponent = ({
   };
   const errorRef = useRef('');
   if (fieldName === 'fieldName' || fieldName === 'title') {
-    if (isAccountCustomization) {
+    if (isFieldNameChangable) {
       inputProps.customValidator = (propsValue: any) => {
         const otherFieldNames = filterDuplicates();
         errorRef.current = '';
@@ -338,27 +335,22 @@ const RenderFields = ({
   isNew,
   newlyAddedIds,
   handleUpdateFieldName,
-  isAccountCustomization,
+  // isAccountCustomization,
+  addNewFieldDisabled,
+  isFieldNameChangable,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName
 }: any) => {
   // Toggle text field component to select component on disable mode
-  const { form: formType } = useParams<IMatchParams>();
-
   inputProps = {
     ...inputProps,
-    ...getComponentsByFieldName(fieldName, obj, isNew, isAccountCustomization)
+    ...getComponentsByFieldName(fieldName, obj, isNew, isFieldNameChangable)
   };
 
-  if (fieldName === 'isEditable' && (!isEditableFields.includes(obj.id) || formType !== 'enrollment')) {
+  if (fieldName === 'isEditable') {
     return null;
   }
   if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
-    return null;
-  }
-
-  if (fieldName === 'isEnrollment' && (isAccountCustomization || formType !== 'assessment')) {
-    obj.isEnrollment = undefined;
     return null;
   }
 
@@ -449,6 +441,27 @@ const RenderFields = ({
         />
       );
     }
+    case 'DATE_PICKER': {
+      let parseFn = (val: any) => val;
+      const value = obj[fieldName] || null;
+      parseFn = (val: any) => val;
+      return (
+        <div className='col-4'>
+          <DatePickerWrapper
+            fieldName={fieldName}
+            name={`${name}.${fieldName}`}
+            obj={obj}
+            form={form}
+            customValue={value}
+            customParseFn={parseFn}
+            inputProps={inputProps}
+            targetIds={targetIds}
+            unAddedFields={unAddedFields}
+            newlyAddedIds={newlyAddedIds}
+          />
+        </div>
+      );
+    }
     case 'TEXT_FIELD':
     default: {
       return (
@@ -463,7 +476,8 @@ const RenderFields = ({
           handleUpdateFieldName={handleUpdateFieldName}
           hashFieldIdsWithTitle={hashFieldIdsWithTitle}
           hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-          isAccountCustomization={isAccountCustomization}
+          // isAccountCustomization={isAccountCustomization}
+          isFieldNameChangable={isFieldNameChangable}
         />
       );
     }

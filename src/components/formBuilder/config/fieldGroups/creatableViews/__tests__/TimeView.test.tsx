@@ -25,7 +25,6 @@ describe('TimeView Container Test Cases', () => {
         isSummary: false,
         isMandatory: false,
         isEnabled: true,
-        isEnrollment: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         isNotDefault: true
       });
@@ -42,7 +41,6 @@ describe('TimeView Container Test Cases', () => {
         isMandatory: {},
         visibility: {},
         isEnabled: {},
-        isEnrollment: {},
         isEditable: {},
         unitMeasurement: {}
       });

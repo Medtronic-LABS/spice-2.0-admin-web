@@ -68,3 +68,28 @@ export const fileDownload = async (data: any, fileName: string, fileType: string
   const blob = new Blob([data], { type: fileType });
   return saveAs(blob, fileName + (fileExtension ? fileExtension : ''), { autoBom: false });
 };
+
+export const convertDate = (date: Date | string) => {
+  function pad(s: any) {
+    return s < 10 ? '0' + s : s;
+  }
+  const d = new Date(date);
+  return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join('-');
+};
+
+export const formatDate = (date: string, format: string = 'YYY-MM-DD') => {
+  const dateArray = date.split(/\D/);
+  let d = '';
+  let m = '';
+  let y = '';
+  dateArray.forEach((part: string) => {
+    if (part.length === 4) {
+      y = part;
+    } else if (part.length === 2 && Number(part) <= 12) {
+      m = part;
+    } else if (part.length === 2 && Number(part) > 12) {
+      d = part;
+    }
+  });
+  return format.replace('YYYY', y).replace('MM', m).replace('DD', d);
+};

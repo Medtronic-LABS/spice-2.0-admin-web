@@ -5,7 +5,7 @@ import { FieldArray } from 'react-final-form-arrays';
 
 import { IMedicationFormValues } from './AddMedication';
 import TextInput from '../../components/formFields/TextInput';
-import { composeValidators, normalizeFloatingNumber, required, validateEntityName } from '../../utils/validation';
+import { composeValidators, required, validateEntityName } from '../../utils/validation';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import BinIcon from '../../assets/images/bin.svg';
 import CloseIcon from '../../assets/images/close-red.svg';

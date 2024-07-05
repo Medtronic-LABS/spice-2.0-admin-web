@@ -14,6 +14,7 @@ import TIME_VIEW_CONFIG from '../config/fieldGroups/creatableViews/TimeView';
 import TEXT_LABEL_CONFIG from '../config/fieldGroups/TextLabel';
 import INFORMATION_LABEL_CONFIG from '../config/fieldGroups/creatableViews/InformationLabel';
 import { IComponentConfig } from '../types/ComponentConfig';
+import DATE_PICKER_CONFIG from '../config/fieldGroups/creatableViews/DatePickerView';
 
 export const creatableViews = [
   { label: 'BP Input', value: 'BP', isAccountCustomizable: false },
@@ -26,24 +27,25 @@ export const creatableViews = [
   { label: 'Slider', value: 'ScaleIndicator', isAccountCustomizable: true },
   { label: 'Multi Select Input', value: 'CheckBox', isAccountCustomizable: true },
   { label: 'Instructions', value: 'Instruction', isAccountCustomizable: true },
-  { label: 'Information Label', value: 'InformationLabel', isAccountCustomizable: false }
+  { label: 'Information Label', value: 'InformationLabel', isAccountCustomizable: false },
+  { label: 'Date Input', value: 'DatePicker', isAccountCustomizable: true }
 ];
 
 export const unitMeasurementFields = ['glucose', 'hba1c'];
 
-export const isEditableFields = [
-  'firstName',
-  'middleName',
-  'lastName',
-  'phoneNumber',
-  'phoneNumberCategory',
-  'landmark',
-  'occupation',
-  'insuranceStatus',
-  'insuranceType',
-  'insuranceId',
-  'otherInsurance'
-];
+// export const isEditableFields = [
+//   'firstName',
+//   'middleName',
+//   'lastName',
+//   'phoneNumber',
+//   'phoneNumberCategory',
+//   'landmark',
+//   'occupation',
+//   'insuranceStatus',
+//   'insuranceType',
+//   'insuranceId',
+//   'otherInsurance'
+// ];
 
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
   switch (viewType) {
@@ -73,6 +75,8 @@ export const getConfigByViewType = (viewType: string): IComponentConfig => {
       return TEXT_LABEL_CONFIG;
     case 'InformationLabel':
       return INFORMATION_LABEL_CONFIG;
+    case 'DatePicker':
+      return DATE_PICKER_CONFIG;
     case 'CardView':
       return CARD_VIEW_CONFIG;
     default:

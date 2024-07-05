@@ -12,7 +12,6 @@ export interface ITextLabelFields extends IBaseFields {
   isNew?: boolean;
   isMandatory?: boolean;
   isEnabled?: boolean;
-  isEnrollment?: boolean;
   isNotDefault?: boolean;
 }
 
@@ -25,7 +24,6 @@ const getEmptyData = (): ITextLabelFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   isNotDefault: true
 });
@@ -34,7 +32,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   isMandatory: {},
   isEnabled: {},
-  isEnrollment: {},
   visibility: {},
   fieldName: {},
   isEditable: {},

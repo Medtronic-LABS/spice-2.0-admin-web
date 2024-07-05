@@ -17,7 +17,8 @@ describe('RenderFieldGroups', () => {
     isNew: true,
     newlyAddedIds: [],
     handleUpdateFieldName: jest.fn(),
-    isAccountCustomization: false,
+    addNewFieldDisabled: false,
+    isFieldNameChangable: true,
     hashFieldIdsWithTitle: {},
     hashFieldIdsWithFieldName: {}
   };

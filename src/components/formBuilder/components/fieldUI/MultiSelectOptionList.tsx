@@ -3,12 +3,12 @@ import Select, { ActionMeta } from 'react-select';
 import { Field } from 'react-final-form'; // Import Field
 import styles from './../../styles/FormBuilder.module.scss';
 
-interface Option {
+interface IOption {
   key: string;
   label: string;
 }
 
-interface MultiSelectOptionListProps {
+interface IMultiSelectOptionListProps {
   field: string;
   name: string;
   obj: any;
@@ -18,15 +18,23 @@ interface MultiSelectOptionListProps {
   label?: string;
 }
 
-const MultiSelectOptionList: React.FC<MultiSelectOptionListProps> = ({ field, name, obj, form, inputProps, targetIds, label }) => {
-  const [selectedValues, setSelectedValues] = useState<Option[]>(obj[field] || []);
-  const options: Option[] = (targetIds || []).map((item: { key: string, label: string }) => ({
+const MultiSelectOptionList: React.FC<IMultiSelectOptionListProps> = ({
+  field,
+  name,
+  obj,
+  form,
+  inputProps,
+  targetIds,
+  label
+}) => {
+  const [selectedValues, setSelectedValues] = useState<IOption[]>(obj[field] || []);
+  const options: IOption[] = (targetIds || []).map((item: { key: string; label: string }) => ({
     value: item.key,
     label: item.label
   }));
 
-  const handleChange = (selectedOptions: any, actionMeta: ActionMeta<Option>) => {
-    const updatedSelectedValues = selectedOptions as Option[];
+  const handleChange = (selectedOptions: any, actionMeta: ActionMeta<IOption>) => {
+    const updatedSelectedValues = selectedOptions as IOption[];
     setSelectedValues(updatedSelectedValues);
     form.mutators.setValue(name, updatedSelectedValues);
   };
@@ -36,11 +44,12 @@ const MultiSelectOptionList: React.FC<MultiSelectOptionListProps> = ({ field, na
     setSelectedValues((prevSelectedValues) => {
       return prevSelectedValues.filter((selectedValue: any) =>
         targetIds.find((targetId: { key: string }) => targetId.key === selectedValue.value)
-      )
+      );
     });
   }, [targetIds.length, targetIds]);
 
-  const validateSelectedValues = (value: Option[], selectedFields: any) => { // Pass selectedFields as an argument
+  const validateSelectedValues = (value: IOption[], selectedFields: any) => {
+    // Pass selectedFields as an argument
     if (!value || value.length === 0) {
       // All selected options are removed
       return 'Please select at least one option.';
@@ -58,26 +67,26 @@ const MultiSelectOptionList: React.FC<MultiSelectOptionListProps> = ({ field, na
           {label && <label htmlFor={name}>{label}</label>}
           {<span className='input-asterisk'>*</span>}
           <Select
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  border: meta.error ? '1px solid red': '1px solid grey',
-                  boxShadow: 'none',
-                  '&:hover': {
-                      border: meta.error ? '1px solid red':'1px solid black',
-                  }
+            styles={{
+              control: (base) => ({
+                ...base,
+                border: meta.error ? '1px solid red' : '1px solid grey',
+                boxShadow: 'none',
+                '&:hover': {
+                  border: meta.error ? '1px solid red' : '1px solid black'
+                }
               }),
               placeholder: (base) => ({
                 ...base,
-                fontSize: '14px',
-              }),
-              }}
+                fontSize: '14px'
+              })
+            }}
             {...input}
-            isMulti
+            isMulti={true}
             options={options}
             value={selectedValues}
             onChange={handleChange}
-            placeholder="Select Fields to add to Collapsible"
+            placeholder='Select Fields to add to Collapsible'
           />
           {meta.error && <div className={styles.error}>{meta.error}</div>}
         </div>

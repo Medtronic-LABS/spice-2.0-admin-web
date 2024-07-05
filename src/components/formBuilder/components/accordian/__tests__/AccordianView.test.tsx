@@ -4,18 +4,18 @@ import AccordianView from '../AccordianView';
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
-    pathname: '/region/4/6/Adfgsrgf/accountCustomize/105/malaria'
+    pathname: '/region/4/6/Adfgsrgf/lab-test/adfgsrgf'
   })
 }));
 
 const props = {
   formRef: {},
   formMeta: {
-    malaria: {
-      malaria: {
-        id: 'malaria',
+    labTest: {
+      labTest: {
+        id: 'labTest',
         viewType: 'CardView',
-        title: 'Malaria',
+        title: 'labTest',
         familyOrder: 0,
         isCustomWorkflow: true
       }
@@ -34,7 +34,9 @@ const props = {
   allowedFields: [],
   hashFieldIdsWithTitle: {},
   hashFieldIdsWithFieldName: {},
-  culture: {}
+  culture: {},
+  addNewFieldDisabled: false,
+  isFieldNameChangable: true
 };
 
 describe('OperatingUnitForm', () => {
@@ -54,7 +56,7 @@ describe('OperatingUnitForm', () => {
   it('Handles add new Field', () => {
     const accordianHeader = wrapper.find('AccordianHeader');
     const handleAddNewFieldElement = accordianHeader.prop('handleAddNewField');
-    handleAddNewFieldElement('malaria', 'Instruction');
+    handleAddNewFieldElement('labTest', 'Instruction');
   });
 
   it('Handles Update Field', () => {
@@ -74,13 +76,13 @@ describe('OperatingUnitForm', () => {
     const accordianBody = wrapper.find('AccordianBody');
     const handleUpdateFieldElement = accordianBody.prop('handleUpdateFieldName');
     const callBack = jest.fn();
-    handleUpdateFieldElement('malaria', 'malaria', 'malaria', 'malaria', 'malaria', false, callBack);
+    handleUpdateFieldElement('labTest', 'labTest', 'labTest', 'labTest', 'labTest', false, callBack);
   });
 
   it('Handles Delete Field', () => {
     const accordianBody = wrapper.find('AccordianBody');
     const handleDeleteFieldElement = accordianBody.prop('handleDeleteField');
-    handleDeleteFieldElement('malaria', 'Fname');
+    handleDeleteFieldElement('labTest', 'Fname');
   });
 
   it('Handles Form Submit', () => {
