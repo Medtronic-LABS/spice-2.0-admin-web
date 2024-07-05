@@ -5,7 +5,7 @@ import { FieldArray } from 'react-final-form-arrays';
 
 import { IMedicationFormValues } from './AddMedication';
 import TextInput from '../../components/formFields/TextInput';
-import { composeValidators, required, validateEntityName } from '../../utils/validation';
+import { composeValidators, normalizeFloatingNumber, required, validateEntityName } from '../../utils/validation';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import BinIcon from '../../assets/images/bin.svg';
 import CloseIcon from '../../assets/images/close-red.svg';
@@ -193,10 +193,10 @@ const MedicationForm = ({
     const addNewRowEnabled = form.getState().valid && !isFieldValueChanged;
     return (
       !disableOptions && (
-        <div className='d-flex justify-content-center flex-row flex-lg-column'>
+        <div className={`d-flex  align-items-center ${styles.actionIconContainer} ps-lg-0dot5`}>
           {/* plus icon to add a new field row and checks for duplicate validation */}
           {isLastChild && (
-            <div className={`${styles.actionIcons} ${isFirstChild ? styles.actionIconTop : ''}`}>
+            <div className={` ${styles.actionIcons} ${isFirstChild ? styles.actionIconTop : ''}`}>
               <div
                 className={`theme-text lh-1dot25 pb-lg-1 ${addNewRowEnabled ? 'pointer' : 'not-allowed'}`}
                 onClick={() => handleAddAnotherMedication(addNewRowEnabled, fields, index, isFirstChild)}
@@ -302,14 +302,14 @@ const MedicationForm = ({
         <Field
           name={`${name}.codeDetails.code`}
           type='text'
-          validate={composeValidators(required, validateEntityName)}
+          parse={(value) => value.replace(/[^0-9a-zA-Z/, ]/g, '')}
+          validate={composeValidators(required)}
           render={({ input, meta }) => (
             <TextInput
               {...input}
               label='Code'
               errorLabel='code'
               error={(meta.touched && meta.error) || undefined}
-              capitalize={true}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 input.onChange(event);
                 const timerId = 0;
@@ -329,14 +329,13 @@ const MedicationForm = ({
         <Field
           name={`${name}.codeDetails.url`}
           type='text'
-          validate={composeValidators(required, validateEntityName)}
+          validate={composeValidators(required)}
           render={({ input, meta }) => (
             <TextInput
               {...input}
               label='URL'
               errorLabel='url'
               error={(meta.touched && meta.error) || undefined}
-              capitalize={true}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 input.onChange(event);
                 const timerId = 0;
@@ -458,9 +457,13 @@ const MedicationForm = ({
             const isFirstChild = !index;
             return (
               <span key={`form_${name}`}>
-                <div className={`position-relative w-100  ${isLastChild ? '' : styles.borderBottom}`}>
+                <div
+                  className={`position-relative w-100 d-flex flex-column flex-lg-row align-items-center  ${
+                    isLastChild ? '' : styles.borderBottom
+                  }`}
+                >
                   <div
-                    className={`row gx-1dot25 ${disableOptions ? 'pe-0 pb-0' : 'pe-lg-3 pb-3 pb-lg-0'} ${
+                    className={`row w-100 gx-1dot25 ${disableOptions ? 'pe-0 pb-0' : 'pe-lg-1 pb-1 pb-lg-1 pb-lg-0'} ${
                       isFirstChild ? '' : 'mt-1dot5'
                     }`}
                   >
