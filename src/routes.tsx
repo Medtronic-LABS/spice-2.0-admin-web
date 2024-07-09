@@ -9,7 +9,7 @@ import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import { authTokenSelector, getIsLoggedInSelector, roleSelector } from './store/user/selectors';
+import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
 import Dashboard from './containers/dashboard/Dashboard';
@@ -24,25 +24,9 @@ import AddMedication from './containers/medication/AddMedication';
 import MyProfile from './containers/myProfile/MyProfile';
 import LabTestList from './containers/labtest/LabtestList';
 import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
-import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
-import DistrictList from './containers/district/DistrictList';
-import CreateDistrict from './containers/createDistrict/CreateDistrict';
-import DistrictSummary from './containers/district/DistrictSummary';
-import DistrictDashboard from './containers/district/DistrictDashboard';
-import LockedUsers from './containers/lockedUsers/LockedUsers';
-import UserList from './containers/user/UserList';
-import Admins from './containers/admins/AdminList';
-import ChiefdomDashboard from './containers/chiefdom/ChiefdomDashboard';
-import CreateChiefdom from './containers/createChiefdom/CreateChiefdom';
-import ChiefdomList from './containers/chiefdom/ChiefdomList';
-import ChiefdomSummary from './containers/chiefdom/ChiefdomSummary';
-import RegionCustomization from './containers/region/RegionCustomization';
-import RegionFormCustomization from './containers/region/RegionFormCustomization';
-import ProgramList from './containers/program/ProgramList';
-import ProgramForm from './containers/program/CreateProgram';
-import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
-import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
-import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
+import LandingPage from './containers/landingPage/LandingPage';
+import Loader from './components/loader/Loader';
+
 interface IRoute {
   path: string;
   exact: boolean;
@@ -66,34 +50,10 @@ export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
     {
-      path: PROTECTED_ROUTES.dashboard,
+      path: PROTECTED_ROUTES.landingPage,
       exact: true,
-      component: Dashboard,
-      authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.profile,
-      exact: true,
-      component: MyProfile,
+      component: LandingPage,
       authorisedRoles: Object.values(APPCONSTANTS.ROLES)
-    },
-    {
-      path: PROTECTED_ROUTES.deactivatedRecords,
-      exact: true,
-      component: DeactivatedRecords,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.lockedUsers,
-      exact: true,
-      component: LockedUsers,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
-    },
-    {
-      path: PROTECTED_ROUTES.regionDashboard,
-      exact: true,
-      component: RegionDashboard,
-      authorisedRoles: SU_SA
     },
     {
       path: PROTECTED_ROUTES.region,
@@ -380,7 +340,24 @@ export const AppRoutes = () => {
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const role = useSelector(roleSelector);
 
-  return isLoggedIn && !!token ? (
+  const params = new URLSearchParams(document.location.search)
+  const url = useRef(params.get('next') || '')
+
+  useEffect(() => {
+    if (isLoggedIn && url.current) {
+      let link = document.createElement('a');
+      link.href = url.current || '';
+      document.body.appendChild(link);
+      link.click();
+      url.current = '';
+    }
+  }, [data, isLoggedIn, url])
+
+  if (isLoggedIn && url.current) {                                                                                                                         
+    return <Loader />                                                                               
+  }                             
+
+  return isLoggedIn && regionId && tenantId ? (
     <AppLayout>
       <Switch>
         {protectedRoutes.map((route: IProtectedRoute, index: number) =>
@@ -395,10 +372,13 @@ export const AppRoutes = () => {
             />
           ) : null
         )}
-        <Redirect exact={true} to={HOME_PAGE_BY_ROLE[role]} />
+        <Redirect
+          exact={true}
+          to={PROTECTED_ROUTES.landingPage}
+        />
       </Switch>
     </AppLayout>
-  ) : (
+  ) : !isLoggedIn ? (
     <Switch>
       {publicRoutes.map((route: any, index: number) => (
         <Route

@@ -82,8 +82,6 @@ export const setupInterceptors = (store: any) => {
     }
   );
 
-  // get logged in user while refresh expect privacy policy page
-  if (document.location.pathname !== PUBLIC_ROUTES.privacyPolicy) {
-    store.dispatch(fetchLoggedInUser());
-  }
+  // get logged in user while refresh
+  store.dispatch(fetchLoggedInUser());
 };

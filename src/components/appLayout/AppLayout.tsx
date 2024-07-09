@@ -41,13 +41,8 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.workflowCustomization }
 ];
 
-const routesWithoutBreadcrumb = [
-  PROTECTED_ROUTES.dashboard,
-  PROTECTED_ROUTES.regionDashboard,
-  PROTECTED_ROUTES.districtDashboard,
-  PROTECTED_ROUTES.chiefdomDashboard,
-  PROTECTED_ROUTES.healthFacilityDashboard
-];
+const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.landingPage }];
+
 const header = (
   isBCDisabled: boolean,
   menuTogglable: boolean,

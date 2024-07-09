@@ -10,8 +10,6 @@ import APPCONSTANTS from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
 import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
-import { goToUrl } from '../../utils/routeUtil';
-import Loader from '../../components/loader/Loader';
 
 const { ADMIN, CFR } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -24,6 +22,24 @@ export interface ISpiceSuite {
   suiteAccessName: string;
 }
 
+const spiceSuites: ISpiceSuite[] = [
+  {
+    id: 1,
+    name: 'Admin',
+    icon: AdminPortalLogo,
+    hasDomain: false,
+    suiteAccessName: ADMIN
+  },
+  {
+    id: 2,
+    name: 'Reports',
+    icon: ReportingPortalLogo,
+    hasDomain: true,
+    suiteAccessName: CFR,
+    domainUrl: process.env.REACT_APP_CFR_URL
+  }
+];
+
 const LandingPage = (): React.ReactElement => {
   const history = useHistory();
   const role = useSelector(roleSelector);
@@ -33,62 +49,31 @@ const LandingPage = (): React.ReactElement => {
     country: { id: regionId, tenantId }
   } = userData;
 
-  const [suites, setSuites] = useState<ISpiceSuite[]>([]);
-
-  const spiceSuites: ISpiceSuite[] = useMemo(
-    () => [
-      {
-        id: 1,
-        name: 'Admin',
-        icon: AdminPortalLogo,
-        hasDomain: false,
-        suiteAccessName: ADMIN,
-        domainUrl:
-          HOME_PAGE_BY_ROLE[role]
-            ?.replace(':regionId', regionId?.toString())
-            .replace(':tenantId', tenantId?.toString()) || '',
-        disabled: false
-      },
-      {
-        id: 2,
-        name: 'Reports',
-        icon: ReportingPortalLogo,
-        hasDomain: true,
-        suiteAccessName: CFR,
-        domainUrl: process.env.REACT_APP_CFR_WEB_URL,
-        disabled: false
-      },
-      {
-        id: 3,
-        name: 'Insights',
-        icon: InsightsLogo,
-        hasDomain: true,
-        suiteAccessName: INSIGHTS,
-        domainUrl: undefined
-      }
-    ],
-    [regionId, tenantId, role]
+  const spiceHomeUrl = useMemo(
+    () => HOME_PAGE_BY_ROLE[role].replace(':regionId', regionId?.toString()).replace(':tenantId', tenantId?.toString()),
+    [role, regionId, tenantId]
   );
+
+  const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
   useEffect(() => {
     const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite: ISpiceSuite) =>
       userSuiteAccess.includes(suite.suiteAccessName)
     );
     if (authorisedSuites.length === 1) {
-      const { hasDomain, domainUrl } = authorisedSuites[0];
-      hasDomain ? goToUrl(domainUrl) : history.push(domainUrl);
+      history.push(spiceHomeUrl);
     }
     setSuites(authorisedSuites);
-  }, [history, userSuiteAccess, spiceSuites]);
+  }, [history, spiceHomeUrl, userSuiteAccess]);
 
   const renderCardContent = (data: ISpiceSuite) => {
     const { name, icon: IconComponent } = data;
     return (
       <>
         <div className='row p-2'>
-          <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
+          <IconComponent className='card-icon' aria-labelledby={`${name} logo`} />
         </div>
-        <div className={`row ${styles.reportCardText} pb-1`}>
+        <div className={`row ${styles.report_card_text} py-1`}>
           <p>{name}</p>
         </div>
       </>
@@ -97,20 +82,16 @@ const LandingPage = (): React.ReactElement => {
 
   return (
     <div className={`position-relative ${styles.landingPageContainer}`}>
-      <div className='row justify-content-center'>
-        {suites.length > 1 ? (
-          suites.map((data) => (
-            <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
-              {!data.hasDomain ? (
-                <Link to={data.domainUrl} children={renderCardContent(data)} />
-              ) : (
-                <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
-              )}
-            </div>
-          ))
-        ) : (
-          <Loader isFullScreen={false} isBackgroundTransparent={false} />
-        )}
+      <div className='row'>
+        {suites.map((data) => (
+          <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
+            {!data.hasDomain ? (
+              <Link to={spiceHomeUrl} children={renderCardContent(data)} />
+            ) : (
+              <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
