@@ -13,13 +13,18 @@ interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
 
-const routesWithoutBreadcrumb = [
-  PROTECTED_ROUTES.regionDashboard,
-  PROTECTED_ROUTES.districtDashboard,
-  PROTECTED_ROUTES.chiefdomDashboard,
-  PROTECTED_ROUTES.healthFacilityDashboard,
-  PROTECTED_ROUTES.landingPage
+const routesWithSideMenu: any[] = [
+  { route: PROTECTED_ROUTES.region },
+  { route: PROTECTED_ROUTES.healthFacilityByAdmin },
+  { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.usersByAdmin },
+  { route: PROTECTED_ROUTES.medicationByRegion },
+  { route: PROTECTED_ROUTES.labtestList },
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
 ];
+
+const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.landingPage }];
+
 const header = (
   isBCDisabled: boolean,
   menuTogglable: boolean,
@@ -63,7 +68,7 @@ export const AppLayout = ({ children }: IAppLayout) => {
     [pathname, role]
   );
   const isBreadcrumbDisabled = useMemo(
-    () => Boolean(routesWithoutBreadcrumb.find((route) => matchPath(pathname, { path: route, exact: true }))),
+    () => Boolean(routesWithoutBreadcrumb.find(({ route }) => matchPath(pathname, { path: route, exact: true }))),
     [pathname]
   );
   const initializingApp = useSelector(initializingSelector);

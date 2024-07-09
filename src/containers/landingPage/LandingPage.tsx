@@ -1,18 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
+import { roleSelector, userDataSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { useHistory } from 'react-router';
 import { HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
 import { ReactComponent as ReportingPortalLogo } from '../../assets/images/reports.svg';
-import { ReactComponent as InsightsLogo } from '../../assets/images/insights.svg';
 
 import APPCONSTANTS from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
-import { goToUrl } from '../../utils/routeUtil';
 
-const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
+const { ADMIN, CFR } = APPCONSTANTS.SUITE_ACCESS;
 
 export interface ISpiceSuite {
   id: number;
@@ -21,67 +19,60 @@ export interface ISpiceSuite {
   hasDomain: boolean;
   domainUrl?: string;
   suiteAccessName: string;
-  disabled?: boolean;
 }
+
+const spiceSuites: ISpiceSuite[] = [
+  {
+    id: 1,
+    name: 'Admin',
+    icon: AdminPortalLogo,
+    hasDomain: false,
+    suiteAccessName: ADMIN
+  },
+  {
+    id: 2,
+    name: 'Reports',
+    icon: ReportingPortalLogo,
+    hasDomain: true,
+    suiteAccessName: CFR,
+    domainUrl: process.env.REACT_APP_CFR_URL
+  }
+];
 
 const LandingPage = (): React.ReactElement => {
   const history = useHistory();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
+  const userData = useSelector(userDataSelector);
+  const {
+    country: { id: regionId, tenantId }
+  } = userData;
+
+  const spiceHomeUrl = useMemo(
+    () => HOME_PAGE_BY_ROLE[role].replace(':regionId', regionId?.toString()).replace(':tenantId', tenantId?.toString()),
+    [role, regionId, tenantId]
+  );
 
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
-
-  const spiceSuites: ISpiceSuite[] = useMemo(
-    () => [
-      {
-        id: 1,
-        name: 'Admin',
-        icon: AdminPortalLogo,
-        hasDomain: false,
-        suiteAccessName: ADMIN,
-        domainUrl: HOME_PAGE_BY_ROLE[role],
-        disabled: false
-      },
-      {
-        id: 2,
-        name: 'Reports',
-        icon: ReportingPortalLogo,
-        hasDomain: true,
-        suiteAccessName: CFR,
-        domainUrl: process.env.REACT_APP_CFR_WEB_URL,
-        disabled: false
-      },
-      {
-        id: 3,
-        name: 'Insights',
-        icon: InsightsLogo,
-        hasDomain: true,
-        suiteAccessName: INSIGHTS,
-        domainUrl: undefined
-      }
-    ],
-    [role]
-  );
 
   useEffect(() => {
     const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite: ISpiceSuite) =>
       userSuiteAccess.includes(suite.suiteAccessName)
     );
     if (authorisedSuites.length === 1) {
-      const { hasDomain, domainUrl } = authorisedSuites[0];
-      hasDomain ? goToUrl(domainUrl) : history.push(domainUrl);
+      history.push(spiceHomeUrl);
     }
     setSuites(authorisedSuites);
-  }, [history, userSuiteAccess, spiceSuites]);
+  }, [history, spiceHomeUrl, userSuiteAccess]);
 
   const renderCardContent = (data: ISpiceSuite) => {
     const { name, icon: IconComponent } = data;
     return (
       <>
         <div className='row p-2'>
-          <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
+          <IconComponent className='card-icon' aria-labelledby={`${name} logo`} />
         </div>
-        <div className={`row ${styles.reportCardText} pb-1`}>
+        <div className={`row ${styles.report_card_text} py-1`}>
           <p>{name}</p>
         </div>
       </>
@@ -90,11 +81,11 @@ const LandingPage = (): React.ReactElement => {
 
   return (
     <div className={`position-relative ${styles.landingPageContainer}`}>
-      <div className='row justify-content-center'>
+      <div className='row'>
         {suites.map((data) => (
           <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
             {!data.hasDomain ? (
-              <Link to={data.domainUrl} children={renderCardContent(data)} />
+              <Link to={spiceHomeUrl} children={renderCardContent(data)} />
             ) : (
               <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
             )}
