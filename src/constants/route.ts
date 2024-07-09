@@ -8,6 +8,7 @@ export const PUBLIC_ROUTES = {
 };
 
 export const PROTECTED_ROUTES = {
+  landingPage: '/home',
   profile: '/profile',
   dashboard: '/home',
   createSuperAdmin: '/super-admin/create',

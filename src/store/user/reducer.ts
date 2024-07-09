@@ -24,7 +24,7 @@ const initialStateGetter = () =>
   ({
     defaultRole: [],
     token: '',
-    isLoggedIn: Boolean(sessionStorageServices.getItem(APPCONSTANTS.AUTHTOKEN)),
+    isLoggedIn: false,
     loggingIn: false,
     loggingOut: false,
     user: userInitialStateGetter(),
@@ -88,12 +88,15 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
       return {
         ...state,
         initializing: false,
+        loggingIn: false,
+        isLoggedIn: true,
         user: action.payload
       };
     case USERTYPES.FETCH_LOGGED_IN_USER_FAILURE:
       return {
         ...state,
-        initializing: false
+        initializing: false,
+        isLoggedIn: false
       };
     case USERTYPES.FETCH_USER_ROLES_REQUEST:
       return {

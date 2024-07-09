@@ -3,7 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import ApiError from './ApiError';
 import ERRORS from '../constants/errors';
 import APPCONSTANTS from '../constants/appConstants';
-import { decryptData } from '../utils/commonUtils';
 import sessionStorageServices from './sessionStorageServices';
 import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/actions';
 
@@ -57,12 +56,11 @@ export const setupInterceptors = (store: any) => {
   axios.defaults.headers.post['Content-Type'] = 'application/json';
   axios.defaults.headers.client = APPCONSTANTS.APP_TYPE;
   axios.defaults.validateStatus = () => true;
+  axios.defaults.withCredentials = true;
 
   axios.interceptors.request.use(
     (request: any) => {
-      const token = store.getState().user.token;
       const tenantId = store.getState().user.userTenantId;
-      request.headers.Authorization = token ? decryptData(token) : '';
       request.headers.tenantId = tenantId || sessionStorageServices.getItem(APPCONSTANTS.USER_TENANTID) || '0';
       return request;
     },
@@ -81,7 +79,5 @@ export const setupInterceptors = (store: any) => {
   );
 
   // get logged in user while refresh
-  if (store.getState().user.token) {
-    store.dispatch(fetchLoggedInUser());
-  }
+  store.dispatch(fetchLoggedInUser());
 };
