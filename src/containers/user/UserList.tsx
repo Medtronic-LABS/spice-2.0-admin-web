@@ -109,11 +109,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
-    if (
-      (value.roles || []).some((userRole: IUserRole) =>
-        ['CHW'].includes(userRole.name)
-      )
-    ) {
+    if ((value.roles || []).some((userRole: IUserRole) => ['CHW'].includes(userRole.name))) {
       dispatch(
         fetchUserDetailRequest({
           id: Number(value?.id),
@@ -324,7 +320,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
             customTitle='Change Password'
             isCustom={true}
             customIconStyle={{ width: 18 }}
-            actionFormattor={{
+            actionFormatter={{
               hideEditIcon: (rowData: any) => rowData.username === email,
               hideDeleteIcon: (rowData: any) => rowData.username === email,
               hideCustomIcon: (rowData: any) => rowData.username === email

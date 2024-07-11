@@ -52,5 +52,5 @@ export const deleteLabtest = (data: { id: number }) =>
 export const fetchUnitList = () =>
   axios({
     method: 'GET',
-    url: '/spice-service/unit'
+    url: '/admin-service/unit/list/LABTEST'
   });

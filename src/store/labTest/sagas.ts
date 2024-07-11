@@ -2,12 +2,13 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as labtestService from '../../services/labtestAPI';
-import { IDeleteLabtestRequest, IFetchLabtestsRequest, ILabTestCustomizationRequest, IUnit } from './types';
+import { IDeleteLabtestRequest, IFetchLabtestsRequest, ILabTestCustomizationRequest } from './types';
 import * as labtestActions from './actions';
 import {
   DELETE_LABTEST_REQUEST,
   FETCH_LABTEST_CUSTOMIZATION_REQUEST,
   FETCH_LABTEST_REQUEST,
+  FETCH_UNIT_LIST_REQUEST,
   LABTEST_CUSTOMIZATION_REQUEST
 } from './actionTypes';
 
@@ -50,11 +51,7 @@ export function* deleteLabtest({ id, successCb, failureCb }: IDeleteLabtestReque
 */
 export function* fetchUnitList(): SagaIterator {
   try {
-    const { data } = yield call(labtestService.fetchUnitList);
-    const units: IUnit[] = data.map(({ name, id }: any) => ({
-      unit: name,
-      id
-    }));
+    const { data: units } = yield call(labtestService.fetchUnitList);
     yield put(labtestActions.fetchUnitListSuccess(units));
   } catch (e) {
     if (e instanceof Error) {
@@ -108,7 +105,7 @@ function* labtestSaga() {
   yield all([takeLatest(FETCH_LABTEST_CUSTOMIZATION_REQUEST, fetchLabTestCustomizationSaga)]);
   yield all([takeLatest(DELETE_LABTEST_REQUEST, deleteLabtest)]);
   yield all([takeLatest(LABTEST_CUSTOMIZATION_REQUEST, labTestCustomizationSaga)]);
-  // yield all([takeLatest(FETCH_UNIT_LIST_REQUEST, fetchUnitList)]);
+  yield all([takeLatest(FETCH_UNIT_LIST_REQUEST, fetchUnitList)]);
 }
 
 export default labtestSaga;

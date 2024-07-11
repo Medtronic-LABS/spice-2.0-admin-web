@@ -31,7 +31,7 @@ export const error = async (
       icon: <WarningIcon />,
       closeButton: true,
       hideProgressBar: true,
-      position: toast.POSITION.BOTTOM_RIGHT,
+      position: 'bottom-right',
       autoClose: 10000,
       toastId: preventDuplicate ? toastId : undefined
     });
@@ -50,7 +50,7 @@ export const success = (brief: string, body?: string) => {
     icon: <SuccessIcon />,
     closeButton: false,
     hideProgressBar: true,
-    position: toast.POSITION.BOTTOM_RIGHT
+    position: 'bottom-right'
   });
 };
 
@@ -65,7 +65,7 @@ export const info = (brief: string, body?: string) => {
     icon: <InfoIcon />,
     closeButton: false,
     hideProgressBar: true,
-    position: toast.POSITION.BOTTOM_RIGHT
+    position: 'bottom-right'
   });
 };
 

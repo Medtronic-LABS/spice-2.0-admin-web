@@ -529,7 +529,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
               handlePageChange={handlePage}
               confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
               deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
-              actionFormattor={{
+              actionFormatter={{
                 hideEditIcon: (rowData: any) => rowData.username === email,
                 hideDeleteIcon: (rowData: any) => rowData.username === email
               }}

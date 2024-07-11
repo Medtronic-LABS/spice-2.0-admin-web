@@ -118,7 +118,7 @@ const MedicationForm = ({
   }, [dispatch, countryId, dosageFormOptions && dosageFormOptions.length]);
 
   const resetBrandField = useCallback(
-    (fields, index: number) => {
+    (fields: any, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}].brand`);
       fields.update(index, { ...form.getState().values.medication[index], brand: undefined });
     },

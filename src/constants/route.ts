@@ -19,7 +19,7 @@ export const PROTECTED_ROUTES = {
   medicationByRegion: '/region/:regionId/medication/list',
   createMedication: '/region/:regionId/medication/create',
   labtestList: '/region/:regionId/:tenantId/lab-test',
-  customizeLabTest: '/region/:regionId/:tenantId/:labTestName/lab-test/:identifier'
+  customizeLabTest: '/region/:regionId/:tenantId/:labTestName/lab-test/:identifier/:testId'
 };
 
 export const HOME_PAGE_BY_ROLE = {

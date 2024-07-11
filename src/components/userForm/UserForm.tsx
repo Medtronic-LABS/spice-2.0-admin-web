@@ -191,7 +191,7 @@ const UserForm = ({
     [initialEditValue, isEdit]
   );
   const resetAdminForm = useCallback(
-    (fields, index: number) => {
+    (fields: any, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
       disabledRoles.current = [];

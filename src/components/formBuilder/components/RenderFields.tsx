@@ -222,7 +222,7 @@ export const TextFieldComponent = ({
   const errorRef = useRef('');
   if (fieldName === 'fieldName' || fieldName === 'title') {
     if (isFieldNameChangable) {
-      inputProps.customValidator = (propsValue: any) => {
+      inputProps.customValidator = (propsValue: any = []) => {
         const otherFieldNames = filterDuplicates();
         errorRef.current = '';
         if (fieldName === 'fieldName') {

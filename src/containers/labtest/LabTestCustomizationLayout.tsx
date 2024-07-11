@@ -14,23 +14,23 @@ import ReorderView from '../../components/formBuilder/components/reorder/Reorder
 import { getConfigByViewType } from '../../components/formBuilder/utils/FieldUtils';
 import useFormCustomization from '../../components/formBuilder/hooks/useFormCustomization';
 import { fetchLabTestCustomizationRequest, labtestCustomization } from '../../store/labTest/actions';
-import { labTestCustomDataSelector, labTestJSONLoadingSelector } from '../../store/labTest/selectors';
+import { labTestJSONLoadingSelector } from '../../store/labTest/selectors';
 
 interface IMatchParams {
   regionId: string;
   tenantId: string;
   labTestName: string;
   identifier: string;
+  testId: string;
 }
 
 const LabTestCustomizationLayout = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { tenantId, regionId, labTestName, identifier: uniqueName } = useParams<IMatchParams>();
+  const { tenantId, regionId, labTestName, identifier: uniqueName, testId: formId } = useParams<IMatchParams>();
   const testName = decodeURIComponent(labTestName);
   const uniqueId = decodeURIComponent(uniqueName);
   const formGetMeta = useSelector(formMetaSelector) || [];
-  const { id: formId } = useSelector(labTestCustomDataSelector) || {};
   const loading = useSelector(labTestJSONLoadingSelector);
 
   const {
@@ -88,7 +88,7 @@ const LabTestCustomizationLayout = () => {
   const onSubmit = (dataParams: any) => {
     const formatData = presentableJson(dataParams);
     const data = {
-      id: formId ? formId : undefined,
+      id: JSON.parse(formId) ? formId : undefined,
       formInput: JSON.stringify({
         time: Date.now(),
         formLayout: formatData

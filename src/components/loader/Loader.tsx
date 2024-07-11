@@ -19,13 +19,14 @@ const Loader = ({
   callBack = (x: boolean) => x
 }: IStateProps) => {
   useEffect(() => {
-    lottie.loadAnimation({
+    const instance = lottie.loadAnimation({
       container: document.querySelector('#mdt-logo') as Element,
       animationData: mdtLogo,
       renderer: 'svg', // "canvas", "html"
       loop: true, // boolean
       autoplay: true // boolean
     });
+    return () => instance.destroy();
   }, []);
   const count = useProgressiveIncrementorHook({ displayProgress: isProgressVisible, callBack });
   return (

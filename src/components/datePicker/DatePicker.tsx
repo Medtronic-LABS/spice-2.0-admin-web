@@ -65,8 +65,8 @@ const DatePickerComponent = ({
           nextMonthButtonDisabled
         }: {
           date: Date;
-          changeYear: (year: number | string) => void;
-          changeMonth: (month: number | string) => void;
+          changeYear: (year: number) => void;
+          changeMonth: (month: number) => void;
           decreaseMonth: () => void;
           increaseMonth: () => void;
           prevMonthButtonDisabled: boolean;
@@ -88,7 +88,7 @@ const DatePickerComponent = ({
               <select
                 className='yearSelect'
                 value={getYear(date)}
-                onChange={({ target: { value: newDate } }) => changeYear(newDate)}
+                onChange={({ target: { value: newDate } }) => changeYear(Number(newDate))}
               >
                 {years.map((option) => (
                   <option key={option} value={option}>

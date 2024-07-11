@@ -1,7 +1,5 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import Pagination from '../index';
-import styles from './Pagination.module.scss';
 import APPCONSTANTS from '../../../constants/appConstants';
 
 describe('Pagination component', () => {
@@ -29,30 +27,32 @@ describe('Pagination component', () => {
     expect(pageLinks).toHaveLength(4);
   });
 
-  it('calls onChangePage when a page link is clicked', () => {
+  it('calls onChangePage when a first page link is clicked', () => {
     props.currentPage = 2;
+    props.initialPage = 2;
     const wrapper = shallow(<Pagination {...props} />);
-    const secondPageLink = wrapper.find(`.${styles.paginationButton}`).at(2);
-
+    const secondPageLink = wrapper.find('[data-testid="firstPage"]');
     secondPageLink.simulate('click');
+    wrapper.update();
     expect(props.onChangePage).toHaveBeenCalledWith(1, 10);
   });
 
-  it('calls onChangePage when a page link is clicked 2', () => {
-    props.currentPage = 2;
+  it('calls onChangePage when a previous page link is clicked', () => {
+    props.currentPage = 4;
+    props.initialPage = 4;
     const wrapper = shallow(<Pagination {...props} />);
-    const secondPageLink = wrapper.find(`.${styles.paginationButton}`).at(1);
-
-    secondPageLink.simulate('click');
-    expect(props.onChangePage).toHaveBeenCalledWith(1, 10);
+    const prevPageLink = wrapper.find('[data-testid="prevPage"]');
+    prevPageLink.simulate('click');
+    wrapper.update();
+    expect(props.onChangePage).toBeCalledWith(props.currentPage - 1, 10);
   });
 
   it('calls onChangePage when a page link is clickedd', () => {
-    props.currentPage = 10;
+    props.currentPage = 6;
     const wrapper = shallow(<Pagination {...props} />);
-    const secondPageLink = wrapper.find(`.${styles.paginationButton}`).last();
-
-    secondPageLink.simulate('click');
-    expect(props.onChangePage).toBeCalledTimes(1);
+    const lastPageLink = wrapper.find('[data-testid="lastPage"]');
+    lastPageLink.simulate('click');
+    wrapper.update();
+    expect(props.onChangePage).toBeCalledWith(10, 10);
   });
 });

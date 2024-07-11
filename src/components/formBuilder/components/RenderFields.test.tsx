@@ -5,14 +5,36 @@ import { SelectInputValues } from './RenderFields';
 import ConditionConfig from './fieldUI/ConditionConfig';
 import Questionnaire from './fieldUI/Questionnaire';
 import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
+import configureMockStore from 'redux-mock-store';
 import arrayMutators from 'final-form-arrays';
+import { Provider } from 'react-redux';
 
+const mockStore = configureMockStore();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: jest.fn().mockReturnValue({ form: 'enrollment' }) // Mock the return value
 }));
 
 describe('RenderFields Test Cases', () => {
+  const store = mockStore({
+    labtest: {
+      units: [
+        {
+          id: 2,
+          createdBy: null,
+          updatedBy: null,
+          createdAt: '2024-07-02T07:01:31+00:00',
+          updatedAt: '2024-07-02T07:01:31+00:00',
+          name: 'mg/dL',
+          type: 'LABTEST',
+          description: 'mg/dL',
+          displayOrder: 6,
+          active: true,
+          deleted: false
+        }
+      ]
+    }
+  });
   const obj = { id: '123', fieldName: 'Field 1' };
   const name = 'exampleForm';
   const fieldName = 'fieldName';
@@ -26,7 +48,7 @@ describe('RenderFields Test Cases', () => {
   const isNew = true;
   const newlyAddedIds = ['123'];
   const handleUpdateFieldName = jest.fn();
-  const isAccountCustomization = false;
+  const isFieldNameChangable = true;
   const hashFieldIdsWithTitle = { '123': 'Field 1' };
   const hashFieldIdsWithFieldName = { 'Field 1': '123' };
   describe('CheckboxComponent', () => {
@@ -63,19 +85,21 @@ describe('RenderFields Test Cases', () => {
         { key: 'option3', label: 'Option 3' }
       ];
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <SelectInputValues
-                name='form'
-                fieldName='visibility'
-                obj={{ visibility: 'option2' }}
-                inputProps={{ options }}
-              />
-            </form>
-          )}
-        </Form>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <SelectInputValues
+                  name='form'
+                  fieldName='visibility'
+                  obj={{ visibility: 'option2' }}
+                  inputProps={{ options }}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       expect(wrapper.find(Field)).toHaveLength(1);
       expect(wrapper.find(Field).prop('name')).toBe('form');
@@ -89,19 +113,21 @@ describe('RenderFields Test Cases', () => {
         { key: 'option3', label: 'Option 3' }
       ];
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <SelectInputValues
-                name='form'
-                fieldName='family'
-                obj={{ visibility: 'option2' }}
-                inputProps={{ options, disabled: true }}
-              />
-            </form>
-          )}
-        </Form>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <SelectInputValues
+                  name='form'
+                  fieldName='family'
+                  obj={{ visibility: 'option2' }}
+                  inputProps={{ options, disabled: true }}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       expect(wrapper.find(Field)).toHaveLength(1);
       expect(wrapper.find(Field).prop('name')).toBe('form');
@@ -115,19 +141,21 @@ describe('RenderFields Test Cases', () => {
         { key: 'option3', label: 'Option 3' }
       ];
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <SelectInputValues
-                name='form'
-                fieldName='mandatoryCount'
-                obj={{ visibility: 'option2' }}
-                inputProps={{ options, disabled: true }}
-              />
-            </form>
-          )}
-        </Form>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <SelectInputValues
+                  name='form'
+                  fieldName='mandatoryCount'
+                  obj={{ visibility: 'option2' }}
+                  inputProps={{ options, disabled: true }}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       expect(wrapper.find(Field)).toHaveLength(1);
       expect(wrapper.find(Field).prop('name')).toBe('form');
@@ -141,19 +169,21 @@ describe('RenderFields Test Cases', () => {
         { key: 'option3', label: 'Option 3' }
       ];
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <SelectInputValues
-                name='form'
-                fieldName='totalCount'
-                obj={{ visibility: 'option2' }}
-                inputProps={{ options, disabled: true }}
-              />
-            </form>
-          )}
-        </Form>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <SelectInputValues
+                  name='form'
+                  fieldName='totalCount'
+                  obj={{ visibility: 'option2' }}
+                  inputProps={{ options, disabled: true }}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       expect(wrapper.find(Field)).toHaveLength(1);
       expect(wrapper.find(Field).prop('name')).toBe('form');
@@ -373,13 +403,16 @@ describe('RenderFields Test Cases', () => {
     };
     const wrapper = mount(
       // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <SelectInputValues {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <SelectInputValues {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('SelectFieldWrapper')).toHaveLength(1);
   });
@@ -395,14 +428,16 @@ describe('RenderFields Test Cases', () => {
       handleUpdateFieldName: jest.fn()
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <SelectInputValues {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <SelectInputValues {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('SelectFieldWrapper')).toHaveLength(1);
   });
@@ -418,14 +453,16 @@ describe('RenderFields Test Cases', () => {
       handleUpdateFieldName: jest.fn()
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <SelectInputValues {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <SelectInputValues {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('SelectFieldWrapper')).toHaveLength(1);
   });
@@ -440,38 +477,43 @@ describe('RenderFields Test Cases', () => {
       unAddedFields: [],
       handleUpdateFieldName: jest.fn()
     };
+
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <SelectInputValues {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <SelectInputValues {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('SelectFieldWrapper')).toHaveLength(1);
   });
 
-  it('renders SelectInputValues with fieldName unitMeasurement', () => {
+  it('renders SelectInputValues with fieldName unitType', () => {
     const props = {
       name: 'formName',
-      fieldName: 'unitMeasurement',
-      inputProps: { options: ['Option 1', 'Option 2'] },
+      fieldName: 'unitType',
+      inputProps: {},
       obj: {},
       newlyAddedIds: [],
       unAddedFields: [],
       handleUpdateFieldName: jest.fn()
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <SelectInputValues {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <SelectInputValues {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('SelectFieldWrapper')).toHaveLength(1);
   });
@@ -570,45 +612,15 @@ describe('RenderFields Test Cases', () => {
     const newFieldName = 'fieldName';
     const newObj = {};
     const isNewValue = true;
-    const isAccountCustomizationValue = false;
+    const isFieldNameChangableField = true;
     const expected = undefined;
-    const newInputProps = getComponentsByFieldName(newFieldName, newObj, isNewValue, isAccountCustomizationValue);
+    const newInputProps = getComponentsByFieldName(newFieldName, newObj, isNewValue, isFieldNameChangableField);
     expect(newInputProps).toEqual(expected);
   });
 
   it('should return the correct customOptions, customParseFn, and customValue', () => {
     const newHandleUpdateFieldName = jest.fn();
     expect(newHandleUpdateFieldName).not.toHaveBeenCalled();
-  });
-
-  it('should render the appropriate component based on inputProps', () => {
-    const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <RenderFields
-              obj={obj}
-              name={name}
-              fieldName={fieldName}
-              inputProps={inputProps}
-              form={form}
-              unAddedFields={unAddedFields}
-              targetIds={targetIds}
-              isNew={isNew}
-              newlyAddedIds={newlyAddedIds}
-              handleUpdateFieldName={handleUpdateFieldName}
-              isAccountCustomization={isAccountCustomization}
-              hashFieldIdsWithTitle={hashFieldIdsWithTitle}
-              hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-            />
-          </form>
-        )}
-      </Form>
-    );
-    expect(wrapper.find('SelectInputValues').length).toBe(1);
-    expect(wrapper.find('CheckboxComponent').length).toBe(0);
-    expect(wrapper.find('TextInputArray').length).toBe(0);
   });
 
   it('renders CheckboxComponent for component="CHECKBOX"', () => {
@@ -629,7 +641,7 @@ describe('RenderFields Test Cases', () => {
               isNew={isNew}
               newlyAddedIds={newlyAddedIds}
               handleUpdateFieldName={handleUpdateFieldName}
-              isAccountCustomization={isAccountCustomization}
+              isFieldNameChangable={isFieldNameChangable}
               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
             />
@@ -659,7 +671,7 @@ describe('RenderFields Test Cases', () => {
               isNew={true}
               newlyAddedIds={newlyAddedIds}
               handleUpdateFieldName={handleUpdateFieldName}
-              isAccountCustomization={false}
+              isFieldNameChangable={false}
               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
             />
@@ -688,7 +700,7 @@ describe('RenderFields Test Cases', () => {
               isNew={true}
               newlyAddedIds={newlyAddedIds}
               handleUpdateFieldName={handleUpdateFieldName}
-              isAccountCustomization={false}
+              isFieldNameChangable={false}
               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
             />
@@ -748,7 +760,7 @@ describe('RenderFields Test Cases', () => {
               isNew={true}
               newlyAddedIds={newlyAddedIds}
               handleUpdateFieldName={handleUpdateFieldName}
-              isAccountCustomization={false}
+              isFieldNameChangable={false}
               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
             />

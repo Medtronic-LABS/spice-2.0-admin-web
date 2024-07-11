@@ -1,5 +1,4 @@
-import React from 'react';
-
+import React, { useState, useRef } from 'react';
 import { ReactComponent as EditIcon } from '../../assets/images/edit.svg';
 import styles from './CustomTable.module.scss';
 import Loader from '../loader/Loader';
@@ -9,11 +8,12 @@ import APPCONSTANTS from '../../constants/appConstants';
 import ConfirmationModalPopup from './ConfirmationModalPopup';
 import Pagination from '../Pagination';
 import CustomTooltip from '../tooltip';
+
 export interface IAnyObject {
   [key: string]: any;
 }
 
-export interface IActionFormattor {
+export interface IActionFormatter {
   hideEditIcon?: (rowData: any) => boolean;
   hideDeleteIcon?: (rowData: any) => boolean;
   hideCustomIcon?: (rowData: any) => boolean;
@@ -24,7 +24,7 @@ interface ICustomTableProps {
   columnsDef: IColumns[];
   rowData: any;
   isEdit: boolean;
-  actionFormattor?: IActionFormattor;
+  actionFormatter?: IActionFormatter;
   isDelete: boolean;
   isActivate?: boolean;
   isCustom?: boolean;
@@ -66,170 +66,174 @@ export interface IColumns {
   align?: 'center' | 'left';
 }
 
-interface ICustomTableState {
-  openDialog: boolean;
-  deleteClicked: boolean;
-  activateClicked: boolean;
-  customIconClicked?: boolean;
-  data?: any;
-}
+const CustomTable: React.FC<ICustomTableProps> = (props) => {
+  const {
+    handlePageChange,
+    columnsDef,
+    rowData,
+    isEdit,
+    actionFormatter,
+    isDelete,
+    isActivate = false,
+    isCustom = false,
+    customTitle = '',
+    CustomIcon = null,
+    customIconStyle,
+    page,
+    count,
+    isRowEdit,
+    onRowEdit,
+    onCustomConfirmed,
+    onActivateClick,
+    isPopupNeeded,
+    confirmationTitle,
+    customConfirmationTitle,
+    customPopupTitle,
+    activateConfirmationTitle,
+    loading,
+    onDeleteClick,
+    showRowHover,
+    rowsPerPage,
+    deleteTitle,
+    activateTitle,
+    handleRowClick
+  } = props;
 
-export default class CustomTable extends React.PureComponent<ICustomTableProps, ICustomTableState> {
-  currentDeleteObj: any = {};
-  currentActivateObj: any = {};
-  tableRef: React.RefObject<HTMLInputElement>;
-  constructor(props: ICustomTableProps) {
-    super(props);
-    this.tableRef = React.createRef();
-    this.state = {
-      openDialog: false,
-      deleteClicked: false,
-      activateClicked: false,
-      customIconClicked: false,
-      data: {} as any
-    };
-  }
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteClicked, setDeleteClicked] = useState(false);
+  const [activateClicked, setActivateClicked] = useState(false);
+  const [customIconClicked, setCustomIconClicked] = useState(false);
+  const [selectedData, setSelectedData] = useState<any>({});
+  const tableRef = useRef<HTMLInputElement>(null);
+  const currentDeleteObj = useRef<any>({});
+  const currentActivateObj = useRef<any>({});
 
-  /**
-   * Handle pagination change of custom table
-   * @param e Mouse event for onchange
-   * @param pageNo Current page number
-   * @param rowsPerPage Row count per page
-   */
-  handlePageChange = (pageNo: number, rowsPerPage: number) => {
-    if (this.tableRef && this.tableRef.current) {
-      this.tableRef.current.scrollTo(0, 0);
+  const handlePageChangeWrapper = (pageNo: number, rowsPerPageValue: number) => {
+    if (tableRef.current) {
+      tableRef.current.scrollTo(0, 0);
     }
-    if (this.props.handlePageChange) {
-      this.props.handlePageChange(pageNo, rowsPerPage);
+    if (handlePageChange) {
+      handlePageChange(pageNo, rowsPerPageValue);
     }
   };
 
-  /**
-   * Handle delete of custom table
-   * @param data Data to delete
-   * @param index Index of data
-   * @param pageNo Current page number
-   */
-  handleDelete = (
+  const handleDelete = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-    data: IAnyObject,
-    index: number,
-    pageNo?: number | undefined
+    rowDataValue: IAnyObject,
+    rowIndex: number,
+    pageNo?: number
   ) => {
     e.stopPropagation();
-    const { rowData } = this.props;
-    if (rowData.length === 1 && pageNo) {
-      this.currentDeleteObj = { data, index, pageNo: pageNo - 1 };
+    if (rowDataValue.length === 1 && pageNo) {
+      currentDeleteObj.current = { data: rowDataValue, index: rowIndex, pageNo: pageNo - 1 };
     } else {
-      this.currentDeleteObj = { data, index, pageNo };
+      currentDeleteObj.current = { data: rowDataValue, index: rowIndex, pageNo };
     }
-    this.setState({ openDialog: true, deleteClicked: true, activateClicked: false });
+    setOpenDialog(true);
+    setDeleteClicked(true);
+    setActivateClicked(false);
   };
 
-  handleEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, data: any, index: number) => {
+  const handleEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, rowDataValue: any, rowIndex: number) => {
     e.stopPropagation();
-    if (this.props.onRowEdit) {
-      this.props.onRowEdit({ ...data, index });
+    if (onRowEdit) {
+      onRowEdit({ ...rowDataValue, index: rowIndex });
     }
   };
 
-  handleCustomIconClick = (
+  const handleCustomIconClick = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-    data: any,
-    index: number,
-    isPopupNeeded = false
+    rowDataValue: any,
+    rowIndex: number,
+    isPopupNeededProp = false
   ) => {
     e.stopPropagation();
-    if (this.props.onCustomConfirmed && !isPopupNeeded) {
-      this.props.onCustomConfirmed({ ...data, index });
+    if (onCustomConfirmed && !isPopupNeededProp) {
+      onCustomConfirmed({ ...rowDataValue, index: rowIndex });
     }
     if (isPopupNeeded) {
-      this.setState({ customIconClicked: true, data: { ...data, index } });
+      setCustomIconClicked(true);
+      setSelectedData({ ...rowDataValue, index: rowIndex });
     }
   };
 
-  handleActivate = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, data: any, index: number) => {
+  const handleActivate = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, rowDataValue: any, rowIndex: number) => {
     e.stopPropagation();
-    this.currentActivateObj = { ...data, index };
-    this.setState({ openDialog: true, deleteClicked: false, activateClicked: true });
+    currentActivateObj.current = { ...rowDataValue, index: rowIndex };
+    setOpenDialog(true);
+    setDeleteClicked(false);
+    setActivateClicked(true);
   };
 
-  /**
-   * Handles cancel event of confirmation dialog
-   */
-  handleConfirmationClose = () => {
-    this.currentDeleteObj = {};
-    this.setState({ openDialog: false, deleteClicked: false, activateClicked: false });
+  const handleConfirmationClose = () => {
+    currentDeleteObj.current = {};
+    setOpenDialog(false);
+    setDeleteClicked(false);
+    setActivateClicked(false);
   };
 
-  handleCustomConfirmationClose = () => {
-    this.setState({ customIconClicked: false, data: {} });
+  const handleCustomConfirmationClose = () => {
+    setCustomIconClicked(false);
+    setSelectedData({});
   };
 
-  handleCustomConfirmed = () => {
-    if (this.props.onCustomConfirmed) {
-      this.props.onCustomConfirmed(this.state.data);
+  const handleCustomConfirmed = () => {
+    if (onCustomConfirmed) {
+      onCustomConfirmed(selectedData);
     }
-    this.handleCustomConfirmationClose();
+    handleCustomConfirmationClose();
   };
 
-  /**
-   * Handles proceed event of confirmation dialog
-   */
-  handleConfirmationSuccess = () => {
-    this.setState({ openDialog: false });
-    const { deleteClicked, activateClicked } = this.state;
-    if (deleteClicked && this.props.onDeleteClick) {
-      this.props.onDeleteClick(this.currentDeleteObj);
-    } else if (activateClicked && this.props.onActivateClick) {
-      this.props.onActivateClick(this.currentActivateObj);
+  const handleConfirmationSuccess = () => {
+    setOpenDialog(false);
+    if (deleteClicked && onDeleteClick) {
+      onDeleteClick(currentDeleteObj.current);
+    } else if (activateClicked && onActivateClick) {
+      onActivateClick(currentActivateObj.current);
     }
-    this.setState({ deleteClicked: false, activateClicked: false });
+    setDeleteClicked(false);
+    setActivateClicked(false);
   };
 
-  handleChangeRowsPerPage = (rowsPerPage: number) => {
-    if (this.tableRef && this.tableRef.current) {
-      this.tableRef.current.scrollTo(0, 0);
+  const handleChangeRowsPerPage = (rowsPerPageValue: number) => {
+    if (tableRef.current) {
+      tableRef.current.scrollTo(0, 0);
     }
-    if (this.props.handlePageChange) {
-      this.props.handlePageChange(1, Number(rowsPerPage));
-    }
-  };
-
-  navigateToDetail = (data: IAnyObject) => {
-    if (this.props.handleRowClick) {
-      this.props.handleRowClick(data);
+    if (handlePageChange) {
+      handlePageChange(1, Number(rowsPerPageValue));
     }
   };
 
-  isAction = () => {
-    const { isEdit, isDelete, isActivate = false, isCustom = false } = this.props;
+  const navigateToDetail = (rowDataValue: IAnyObject) => {
+    if (handleRowClick) {
+      handleRowClick(rowDataValue);
+    }
+  };
+
+  const isAction = () => {
     return isEdit || isDelete || isActivate || isCustom;
   };
 
-  getActionsLength = (actions: boolean) => {
-    const { columnsDef } = this.props;
+  const getActionsLength = (actions: boolean) => {
     return actions ? columnsDef.length + 1 : columnsDef.length;
   };
 
-  handleApplyBorderBotttom = () => {
-    const { count = 0 } = this.props;
-    return count > 10 ? 'pb-1' : '';
+  const handleApplyBorderBottom = () => {
+    return count && count > 10 ? 'pb-1' : '';
   };
 
-  handleShowColumnHeaders = (columnsDef: IColumns[]) => {
+  const handleShowColumnHeaders = (columnsDefProp: IColumns[]) => {
     return (
-      columnsDef &&
-      columnsDef.map((column: IColumns, index: number) => (
-        <th key={index} style={{ width: column.width }}>
+      columnsDefProp &&
+      columnsDefProp.map((column: IColumns, columnIndex: number) => (
+        <th key={columnIndex} style={{ width: column.width }}>
           {column.label}
         </th>
       ))
     );
   };
 
-  handleShowActionHeader = (actions: boolean) => {
+  const handleShowActionHeader = (actions: boolean) => {
     return (
       actions && (
         <th className='text-center' style={{ width: '80px' }}>
@@ -239,24 +243,22 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  handleRowStyle = (isLastChild: boolean) => {
-    const { showRowHover = false, handleRowClick, count = 0, rowsPerPage = 10 } = this.props;
+  const handleRowStyle = (isLastChild: boolean) => {
     return `${showRowHover || handleRowClick ? styles.showRowHover : ''} ${
-      count < rowsPerPage && isLastChild ? '' : styles.showDivider
+      count && count < (rowsPerPage || 10) && isLastChild ? '' : styles.showDivider
     }`;
   };
 
-  handleCursorPointerStyle = () => {
-    const { handleRowClick, isRowEdit } = this.props;
+  const handleCursorPointerStyle = () => {
     return handleRowClick || isRowEdit ? 'pointer' : '';
   };
 
-  handleShowEditIcon = (data: IAnyObject, idx: number) => {
-    const { isEdit, actionFormattor } = this.props;
+  const handleShowEditIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isEdit &&
-      (!actionFormattor?.hideEditIcon || (actionFormattor?.hideEditIcon && !actionFormattor?.hideEditIcon(data))) && (
-        <div className={styles.editIcon} onClick={(e) => this.handleEdit(e, data, idx)}>
+      (!actionFormatter?.hideEditIcon ||
+        (actionFormatter?.hideEditIcon && !actionFormatter?.hideEditIcon(rowDataValue))) && (
+        <div className={styles.editIcon} onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}>
           <CustomTooltip title={'Edit'}>
             <EditIcon aria-labelledby={'edit-icon'} />
           </CustomTooltip>
@@ -265,11 +267,10 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  handleShowActivateIcon = (data: IAnyObject, idx: number) => {
-    const { isActivate = false } = this.props;
+  const handleShowActivateIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isActivate && (
-        <div className={styles.activateIcon} onClick={(e) => this.handleActivate(e, data, idx)}>
+        <div className={styles.activateIcon} onClick={(e) => handleActivate(e, rowDataValue, rowIndex)}>
           <CustomTooltip title={'Activate'}>
             <ActivateIcon aria-labelledby={'activate-icon'} />
           </CustomTooltip>
@@ -278,21 +279,13 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  handleShowCustomIcon = (data: IAnyObject, idx: number) => {
-    const {
-      isCustom = false,
-      actionFormattor,
-      isPopupNeeded = false,
-      customTitle = '',
-      CustomIcon = null,
-      customIconStyle
-    } = this.props;
+  const handleShowCustomIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return isCustom &&
-      (!actionFormattor?.hideCustomIcon ||
-        (actionFormattor?.hideCustomIcon && !actionFormattor?.hideCustomIcon(data))) ? (
+      (!actionFormatter?.hideCustomIcon ||
+        (actionFormatter?.hideCustomIcon && !actionFormatter?.hideCustomIcon(rowDataValue))) ? (
       <div
-        className={data.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
-        onClick={(e) => this.handleCustomIconClick(e, data, idx, isPopupNeeded)}
+        className={rowDataValue.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
+        onClick={(e) => handleCustomIconClick(e, rowDataValue, rowIndex, isPopupNeeded)}
       >
         <CustomTooltip title={customTitle}>
           <CustomIcon style={customIconStyle} aria-labelledby={'custom-icon'} />
@@ -303,13 +296,16 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  handleShowDeleteIcon = (data: IAnyObject, idx: number) => {
-    const { isDelete, actionFormattor } = this.props;
+  const handleShowDeleteIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isDelete &&
-      (!actionFormattor?.hideDeleteIcon ||
-        (actionFormattor?.hideDeleteIcon && !actionFormattor?.hideDeleteIcon(data))) && (
-        <div data-testid='delete-icon' className={styles.deleteIcon} onClick={(e) => this.handleDelete(e, data, idx)}>
+      (!actionFormatter?.hideDeleteIcon ||
+        (actionFormatter?.hideDeleteIcon && !actionFormatter?.hideDeleteIcon(rowDataValue))) && (
+        <div
+          data-testid='delete-icon'
+          className={styles.deleteIcon}
+          onClick={(e) => handleDelete(e, rowDataValue, rowIndex)}
+        >
           <CustomTooltip title={'Delete'}>
             <DeleteIcon aria-labelledby={'delete-icon'} />
           </CustomTooltip>
@@ -318,8 +314,7 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  handleShowPagination = () => {
-    const { page, rowsPerPage, count } = this.props;
+  const handleShowPagination = () => {
     return page && rowsPerPage && count && count > APPCONSTANTS.ROWS_PER_PAGE_OF_TABLE ? (
       <div className={styles.paginationWrapper}>
         <Pagination
@@ -327,16 +322,14 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
           total={count}
           length={rowsPerPage}
           currentPage={page}
-          onChangePage={this.handlePageChange}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          onChangePage={handlePageChangeWrapper}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </div>
     ) : null;
   };
 
-  handleActivateConfirmationPopup = () => {
-    const { confirmationTitle, activateConfirmationTitle, deleteTitle, activateTitle } = this.props;
-    const { openDialog, activateClicked } = this.state;
+  const handleActivateConfirmationPopup = () => {
     return (
       (confirmationTitle || activateConfirmationTitle) && (
         <ConfirmationModalPopup
@@ -345,8 +338,8 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
           cancelText='Cancel'
           submitText='Ok'
           submitTestId='delete-ok-button'
-          handleCancel={this.handleConfirmationClose}
-          handleSubmit={this.handleConfirmationSuccess}
+          handleCancel={handleConfirmationClose}
+          handleSubmit={handleConfirmationSuccess}
           popupSize='modal-md'
           confirmationMessage={activateClicked ? activateConfirmationTitle : confirmationTitle}
         />
@@ -354,18 +347,16 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  handleCustomPopup = () => {
-    const { customConfirmationTitle = '', customPopupTitle = '' } = this.props;
-    const { customIconClicked = false } = this.state;
+  const handleCustomPopup = () => {
     return (
       (customConfirmationTitle || customPopupTitle) && (
         <ConfirmationModalPopup
           isOpen={customIconClicked}
-          popupTitle={customPopupTitle}
+          popupTitle={customPopupTitle || ''}
           cancelText='Cancel'
           submitText='Ok'
-          handleCancel={this.handleCustomConfirmationClose}
-          handleSubmit={this.handleCustomConfirmed}
+          handleCancel={handleCustomConfirmationClose}
+          handleSubmit={handleCustomConfirmed}
           popupSize='modal-md'
           confirmationMessage={customConfirmationTitle}
         />
@@ -373,67 +364,61 @@ export default class CustomTable extends React.PureComponent<ICustomTableProps, 
     );
   };
 
-  render() {
-    const { columnsDef, rowData, loading } = this.props;
-    const actions = this.isAction();
-    const length = this.getActionsLength(actions);
-
-    return (
-      <div className={`${styles.customTable} ${this.handleApplyBorderBotttom()}`}>
-        <table>
-          {
-            <thead>
-              <tr>
-                {this.handleShowColumnHeaders(columnsDef)}
-                {this.handleShowActionHeader(actions)}
-              </tr>
-            </thead>
-          }
-          <tbody className={this.handleCursorPointerStyle()}>
-            {rowData?.length && !loading ? (
-              <>
-                {rowData.map((data: IAnyObject, idx: number) => {
-                  const isLastChild = (rowData.length || 0) === idx + 1;
-                  return (
-                    <tr
-                      key={data.id || idx}
-                      onClick={() => this.navigateToDetail(data)}
-                      className={this.handleRowStyle(isLastChild)}
-                    >
-                      {columnsDef &&
-                        columnsDef.map((column: IColumns, index: number) => (
-                          <td key={column.id || index}>
-                            {column.cellFormatter ? column.cellFormatter(data, column) : data[column.name]}
-                          </td>
-                        ))}
-                      {actions && (
-                        <td key={idx} className='text-center'>
-                          <div className='d-inline-flex'>
-                            {this.handleShowEditIcon(data, idx)}
-                            {this.handleShowActivateIcon(data, idx)}
-                            {this.handleShowCustomIcon(data, idx)}
-                            {this.handleShowDeleteIcon(data, idx)}
-                          </div>
+  return (
+    <div className={`${styles.customTable} ${handleApplyBorderBottom()}`}>
+      <table>
+        <thead>
+          <tr>
+            {handleShowColumnHeaders(columnsDef)}
+            {handleShowActionHeader(isAction())}
+          </tr>
+        </thead>
+        <tbody className={handleCursorPointerStyle()}>
+          {rowData?.length && !loading ? (
+            <>
+              {rowData.map((rowDataItem: IAnyObject, rowIndex: number) => {
+                const isLastChild = (rowData.length || 0) === rowIndex + 1;
+                return (
+                  <tr
+                    key={rowDataItem.id || rowIndex}
+                    onClick={() => navigateToDetail(rowDataItem)}
+                    className={handleRowStyle(isLastChild)}
+                  >
+                    {columnsDef &&
+                      columnsDef.map((column: IColumns, columnIndex: number) => (
+                        <td key={column.id || columnIndex}>
+                          {column.cellFormatter ? column.cellFormatter(rowDataItem, column) : rowDataItem[column.name]}
                         </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </>
-            ) : (
-              <tr className='cursor-default'>
-                <td colSpan={length}>
-                  {loading && <Loader isFullScreen={false} />}
-                  {!loading && <div className='text-center'>{APPCONSTANTS.NO_RECORDS_FOUND}</div>}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        {this.handleCustomPopup()}
-        {this.handleActivateConfirmationPopup()}
-        {this.handleShowPagination()}
-      </div>
-    );
-  }
-}
+                      ))}
+                    {isAction() && (
+                      <td key={rowIndex} className='text-center'>
+                        <div className='d-inline-flex'>
+                          {handleShowEditIcon(rowDataItem, rowIndex)}
+                          {handleShowActivateIcon(rowDataItem, rowIndex)}
+                          {handleShowCustomIcon(rowDataItem, rowIndex)}
+                          {handleShowDeleteIcon(rowDataItem, rowIndex)}
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+            </>
+          ) : (
+            <tr className='cursor-default'>
+              <td colSpan={getActionsLength(isAction())}>
+                {loading && <Loader isFullScreen={false} />}
+                {!loading && <div className='text-center'>{APPCONSTANTS.NO_RECORDS_FOUND}</div>}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+      {handleCustomPopup()}
+      {handleActivateConfirmationPopup()}
+      {handleShowPagination()}
+    </div>
+  );
+};
+
+export default CustomTable;

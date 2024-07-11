@@ -49,14 +49,16 @@ export const loginRequest = ({
   rememberMe,
   successCb,
   failureCb
-}: ILoginRequestPayload): ILoginRequest => ({
-  type: USER_TYPES.LOGIN_REQUEST,
-  username,
-  password,
-  rememberMe,
-  successCb,
-  failureCb
-});
+}: ILoginRequestPayload): ILoginRequest => {
+  return {
+    type: USER_TYPES.LOGIN_REQUEST,
+    username,
+    password,
+    rememberMe,
+    successCb,
+    failureCb
+  };
+};
 
 export const loginSuccess = (payload: ILoginSuccessPayload): ILoginSuccess => ({
   type: USER_TYPES.LOGIN_SUCCESS,

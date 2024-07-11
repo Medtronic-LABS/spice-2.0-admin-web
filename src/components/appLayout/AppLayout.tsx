@@ -19,6 +19,7 @@ const routesWithSideMenu: any[] = [
   { route: PROTECTED_ROUTES.usersBySuperAdmin },
   { route: PROTECTED_ROUTES.usersByAdmin },
   { route: PROTECTED_ROUTES.medicationByRegion },
+  { route: PROTECTED_ROUTES.labtestList },
   { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
 ];
 

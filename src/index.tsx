@@ -1,8 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
-
 import './index.scss';
 import 'bootstrap';
 import App from './App';
@@ -14,9 +13,9 @@ import sessionStorageServices from './global/sessionStorageServices';
 import APPCONSTANTS from './constants/appConstants';
 import { addToken } from './store/user/actions';
 
+// Retrieve the secret token and set up initial state
 const secretToken = sessionStorageServices.getItem(APPCONSTANTS.SECRET_TOKEN);
-
-if (!!secretToken) {
+if (secretToken) {
   store.dispatch(addToken(secretToken));
   sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, secretToken);
 }
@@ -24,7 +23,10 @@ sessionStorageServices.deleteItem(APPCONSTANTS.SECRET_TOKEN);
 
 setupInterceptors(store);
 
-ReactDOM.render(
+// Create root and render the app using React 18 API
+const container = document.getElementById('root');
+const root = createRoot(container!);
+root.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
@@ -33,11 +35,8 @@ ReactDOM.render(
         </ErrorBoundary>
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
+// Service worker registration
 serviceWorker.unregister();
