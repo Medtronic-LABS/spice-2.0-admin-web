@@ -1,4 +1,3 @@
-import { FormApi } from 'final-form';
 import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -385,7 +384,7 @@ export interface IUserDetail {
   redRisk?: boolean;
   isUpdated?: boolean;
   roleName?: string | ISelectOption;
-  countryCode?: IPhoneNumberCode;
+  countryCode?: string;
   village?: string;
 }
 
@@ -424,20 +423,22 @@ export interface IUserState {
   totalLockedUsers?: number;
   userTenantId: string;
   cultureList?: ICulture[];
-  isResetPasswordLoading: boolean;
-  defaultRole: string[];
-  userRoles: IGroupRoles;
-  isRolesLoading: boolean;
-  communityList: [];
-  islockedUsersLoading?: boolean;
 }
 
 export interface ILoginFailurePayload {
   error: string;
 }
 
+// export interface ILoginRequestPayload {
+//   username: string;
+//   password: string;
+//   rememberMe: boolean;
+//   successCb?: (payload: ILoginSuccessPayload) => void;
+//   failureCb?: (error: Error) => void;
+// }
+
 export interface ITimezone {
-  id: string | number;
+  id: string;
   description?: string;
 }
 
@@ -474,6 +475,14 @@ export interface ILoginSuccess {
 export interface ILoginFailure {
   type: typeof USER_TYPES.LOGIN_FAILURE;
   payload: ILoginFailurePayload;
+}
+
+export interface IAddToken {
+  type: typeof USER_TYPES.AUTH_TOKEN;
+  payload: string;
+}
+export interface IRemoveToken {
+  type: typeof USER_TYPES.REMOVE_TOKEN;
 }
 export interface IAddUserTenantId {
   type: typeof USER_TYPES.ADD_USER_TENANT_ID;
@@ -676,9 +685,6 @@ export interface IFetchCultureListRequest {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_REQUEST;
 }
 
-export interface IFetchCommunityList {
-  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST_REQUEST;
-}
 export interface IFetchCultureListSuccess {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_SUCCESS;
   payload: IFetchCultureListSuccessPayload;
@@ -708,20 +714,11 @@ export interface ILockedUsers {
   email: string;
 }
 
-export interface ICommunity {
-  id: string;
-  name: string;
-}
-
 export interface IFetchLockedUsersPayload {
   lockedUsers: ILockedUsers[];
   totalCount: number;
 }
 
-export interface IFetchCommunityListPayload {
-  entityList: ICommunity[];
-  totalCount: number;
-}
 export interface IFetchLockedUsersRequest {
   type: typeof USER_TYPES.FETCH_LOCKED_USERS_REQUEST;
   skip: number;
@@ -733,13 +730,6 @@ export interface IFetchLockedUsersRequest {
   failureCb?: (error: Error) => void;
 }
 
-export interface IFetchCommunityList {
-  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST_REQUEST;
-  countryId: number;
-  search?: string;
-  successCb?: (payload: IFetchCommunityListPayload) => void;
-  failureCb?: (error: Error) => void;
-}
 export interface IFetchLockedUsersSuccess {
   type: typeof USER_TYPES.FETCH_LOCKED_USERS_SUCCESS;
   payload: IFetchLockedUsersPayload;
@@ -764,13 +754,6 @@ export interface IUnlockUsersFailure {
   type: typeof USER_TYPES.UNLOCK_USERS_FAILURE;
 }
 
-export interface IUnlockUsersRequest {
-  type: typeof USER_TYPES.UNLOCK_USERS_REQUEST;
-  userId: string;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -784,7 +767,9 @@ export type UserActions =
   | IFetchLoggedInUserFailure
   | ISessionTimeout
   | IResetStore
+  | IAddToken
   | IAddUserTenantId
+  | IRemoveToken
   | IFetchUserRolesRequest
   | IFetchUserRolesSuccess
   | IFetchUserRolesFailure
@@ -821,7 +806,6 @@ export type UserActions =
   | IFetchCultureListRequest
   | IFetchCultureListSuccess
   | IFetchCultureListFailure
-  | IFetchCommunityList
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
   | IFetchCountryListFailure
@@ -835,6 +819,7 @@ export type UserActions =
   | IUpdatePasswordReq
   | IUpdatePasswordSuccess
   | IUpdatePasswordFail
+  | ILoginRequestPayload
   | IFetchCultureListSuccessPayload
   | IFetchTimezoneListSuccessPayload
   | IFetchTimezoneListSuccessPayload

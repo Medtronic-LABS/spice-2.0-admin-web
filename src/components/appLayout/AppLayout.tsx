@@ -13,18 +13,61 @@ interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
 
-const routesWithSideMenu: any[] = [
-  { route: PROTECTED_ROUTES.region },
+const routesWithSideMenu = [
+  { route: PROTECTED_ROUTES.accountByRegion },
+  { route: PROTECTED_ROUTES.accountAdminByRegion },
   { route: PROTECTED_ROUTES.healthFacilityByAdmin },
-  { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin },
   { route: PROTECTED_ROUTES.usersByAdmin },
+  { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.OUByRegion },
+  { route: PROTECTED_ROUTES.OUByAccount },
+
+  { route: PROTECTED_ROUTES.OUAdminByRegion },
+  { route: PROTECTED_ROUTES.OUAdminByAccount },
+
+  { route: PROTECTED_ROUTES.siteByRegion },
+  { route: PROTECTED_ROUTES.siteByAccount },
+  { route: PROTECTED_ROUTES.siteByOU },
+
+  { route: PROTECTED_ROUTES.siteAdminByRegion },
+  { route: PROTECTED_ROUTES.siteAdminByAccount },
+  { route: PROTECTED_ROUTES.siteAdminByOU },
+
+  { route: PROTECTED_ROUTES.groupByRegion },
+  { route: PROTECTED_ROUTES.groupByAccount },
+  { route: PROTECTED_ROUTES.groupByOU },
+  { route: PROTECTED_ROUTES.groupBySite },
+
+  { route: PROTECTED_ROUTES.programByRegion },
+
+  { route: PROTECTED_ROUTES.userByRegion },
+  { route: PROTECTED_ROUTES.userByAccount },
+  { route: PROTECTED_ROUTES.userByOU },
+
+  { route: PROTECTED_ROUTES.regionSummary },
+  // { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
+  // { route: PROTECTED_ROUTES.OUSummary, disabledRoles: [APPCONSTANTS.ROLES.OPERATING_UNIT_ADMIN] },
+  { route: PROTECTED_ROUTES.siteSummary },
+
+  { route: PROTECTED_ROUTES.workflowByRegion },
+  { route: PROTECTED_ROUTES.workflowByAccount },
+
   { route: PROTECTED_ROUTES.medicationByRegion },
   { route: PROTECTED_ROUTES.labtestList },
-  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] },
+  { route: PROTECTED_ROUTES.labTestByRegion },
+  { route: PROTECTED_ROUTES.customizationByRegion },
+  { route: PROTECTED_ROUTES.accountWorkflowCustomization }
 ];
 
-const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.landingPage }];
-
+const routesWithoutBreadcrumb = [
+  PROTECTED_ROUTES.regionDashboard,
+  PROTECTED_ROUTES.accountDashboard,
+  PROTECTED_ROUTES.OUDashboard,
+  PROTECTED_ROUTES.siteDashboard,
+  PROTECTED_ROUTES.dashboard
+];
 const header = (
   isBCDisabled: boolean,
   menuTogglable: boolean,

@@ -32,8 +32,12 @@ const APPCONSTANTS = {
     SUPER_ADMIN: 'SUPER_ADMIN',
     HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
     PEER_SUPERVISOR: 'PEER_SUPERVISOR',
+    REGION_ADMIN: 'REGION_ADMIN',
+    ACCOUNT_ADMIN: 'ACCOUNT_ADMIN',
+    OPERATING_UNIT_ADMIN: 'OPERATING_UNIT_ADMIN',
+    LAB_TECHNICIAN: 'LAB_TECHNICIAN',
     REPORT_ADMIN: 'REPORT_ADMIN',
-    FACILITY_REPORT_ADMIN: 'FACILITY_REPORT_ADMIN'
+    SITE_ADMIN: 'SITE_ADMIN'
   },
   ROUTE_NAMES: {
     REGION: 'region',
@@ -220,11 +224,16 @@ const APPCONSTANTS = {
     { value: 'Yes', label: 'Yes' },
     { value: 'No', label: 'No' }
   ],
-  DEACTIVATED_RECORDS_FETCH_ERROR: 'Unable to load deactivated records. Please try after sometime.',
-
-  UNLOCK_USER_SUCCESS: 'User unlocked successfully.',
-  UNLOCK_USER_FAIL: 'Unable to unlock the user. Please try after sometime.',
-
+  ACCOUNT_FETCH_ERROR: 'Unable to load accounts. Please try after sometime.',
+  ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
+  ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
+  ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
+  ACCOUNT_WORKFLOW_MODULE_UPDATE_FAIL: 'Unable to update account workflow module. Please try after sometime.',
+  ACCOUNT_WORKFLOW_DELETE_TITLE: 'Delete Account workflow',
+  ACCOUNT_WORKFLOW_DELETE_CONFIRMATION: 'Are you sure you want to delete the account workflow?',
+  ACCOUNT_WORKFLOW_DELETE_SUCCESS: 'Account workflow module deleted successfully.',
+  ACCOUNT_WORKFLOW_DELETE_ERROR: 'Unable to delete the account workflow. Please try after sometime.',
+  ACCOUNT_WORKFLOW_ALREADY_EXISTS: 'Account workflow name already exists.',
   DEFAULT_CULTURE: { id: 1, name: 'English - India' },
   FORM_ID: 'formId',
   COUNTRY_ID: 'ci',
@@ -348,6 +357,13 @@ export const NAME_CONSTANTS = {
     s: 'Health Facility',
     p: 'Health Facilities'
   }
+};
+
+export const ROLE_LABELS = {
+  [APPCONSTANTS.ROLES.SUPER_USER]: 'Super User',
+  [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
+  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
+  [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
 };
 
 export default APPCONSTANTS;

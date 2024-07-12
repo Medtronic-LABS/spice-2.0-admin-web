@@ -110,12 +110,11 @@ const MyProfile = (): React.ReactElement => {
       firstName: user.firstName.trim(),
       lastName: user.lastName.trim(),
       gender: user.gender,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      countryCode: user?.country?.phoneNumberCode,
       phoneNumber: user.phoneNumber,
-      username: user.email,
-      countryCode: user?.countryCode?.phoneNumberCode,
-      country: { id: countryId },
-      roleIds: [roleId?.id],
-      timezone: { id: Number(user.timezone.id) }
+      timezone: []
     };
     setLoading(true);
     dispatch(

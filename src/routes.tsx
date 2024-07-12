@@ -20,7 +20,7 @@ import {
 } from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
-import CreateRegion from './containers/createRegion/CreateRegion';
+import Dashboard from './containers/dashboard/Dashboard';
 import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
@@ -59,10 +59,16 @@ export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
     {
-      path: PROTECTED_ROUTES.landingPage,
+      path: PROTECTED_ROUTES.dashboard,
       exact: true,
-      component: LandingPage,
-      authorisedRoles: Object.values(APPCONSTANTS.ROLES)
+      component: Dashboard,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.regionDashboard,
+      exact: true,
+      component: RegionDashboard,
+      authorisedRoles: SU_SA
     },
     {
       path: PROTECTED_ROUTES.region,

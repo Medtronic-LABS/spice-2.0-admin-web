@@ -17,6 +17,8 @@ const userInitialStateGetter = (): IUser => ({
   country: {},
   suiteAccess: [],
   countryId: undefined
+  suiteAccess: [],
+  countryId: undefined
 });
 
 // This should be function instead of object,
@@ -40,13 +42,7 @@ const initialStateGetter = () =>
     email: '',
     errorMessage: '',
     showLoader: false,
-    userTenantId: '',
-    timezoneList: [],
-    cultureList: [],
-    communityList: [],
-    isLockedUserLoading: false,
-    lockedUsers: [],
-    totalLockedUers: 0
+    userTenantId: ''
   } as unknown as IUserState);
 
 const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {
@@ -189,36 +185,20 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         cultureListLoading: false,
         cultureList: action.payload
       };
-    case USERTYPES.FETCH_COMMUNITY_LIST_REQUEST:
-      return {
-        ...state,
-        communityListLoading: true,
-        communityList: action.payload
-      };
-    case USERTYPES.FETCH_COMMUNITY_LIST_SUCCESS:
-      return {
-        ...state,
-        communityListLoading: false,
-        communityList: action.payload.entityList
-      };
     case USERTYPES.UPDATE_PASSWORD_REQUEST:
     case USERTYPES.CREATE_PASSWORD_REQUEST:
+    case USERTYPES.FETCH_LOCKED_USERS_REQUEST:
     case USERTYPES.UNLOCK_USERS_REQUEST:
       return {
         ...state,
         loading: true
       };
-    case USERTYPES.FETCH_LOCKED_USERS_REQUEST:
-      return {
-        ...state,
-        isLockedUserLoading: true
-      };
     case USERTYPES.FETCH_LOCKED_USERS_SUCCESS:
       return {
         ...state,
+        loading: false,
         lockedUsers: action.payload.lockedUsers,
-        totalLockedUsers: action.payload.totalCount,
-        isLockedUserLoading: false
+        totalLockedUsers: action.payload.totalCount
       };
     case USERTYPES.UNLOCK_USERS_SUCCESS:
     case USERTYPES.UNLOCK_USERS_FAILURE:
@@ -231,8 +211,7 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
     case USERTYPES.FETCH_USER_BY_EMAIL:
       return {
         ...state,
-        showLoader: true,
-        loading: false
+        showLoader: true
       };
     case USERTYPES.FETCH_USER_BY_EMAIL_SUCCESS:
     case USERTYPES.FETCH_USER_BY_EMAIL_FAIL:
