@@ -39,31 +39,39 @@ const LandingDashboard = (): React.ReactElement => {
     },
     {
       label: 'Health Facility',
-      route: PROTECTED_ROUTES.healthFacilityByRegion,
+      route: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
       disabled: false,
       childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
     },
     {
       label: 'Users',
-      route: PROTECTED_ROUTES.userByRegion,
-      disabled: false
-    },
-    {
-      label: 'Admins',
-      route: PROTECTED_ROUTES.adminByRegion,
+      route: PROTECTED_ROUTES.usersBySuperAdmin,
       disabled: false
     }
   ];
 
-  const { regionId, tenantId, healthFacilityId } = useRouteParams({
+  const adminRoutes: ISideMenuItem[] = [
+    {
+      label: 'Health Facility',
+      route: PROTECTED_ROUTES.healthFacilityByAdmin,
+      childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
+    },
+    {
+      label: 'Users',
+      route: PROTECTED_ROUTES.usersByAdmin
+    }
+  ];
+
+  const { regionId, tenantId, healthFacilityId, hfTenantId } = useRouteParams({
+    adminRoutes,
     superAdminRoutes,
     role,
     regionData
   });
   const dashboardMenu = [
     { name: 'Admin', logo: admin, link: PROTECTED_ROUTES.regionDashboard },
-    { name: 'Reports', logo: report, link: '#' },
-    { name: 'Insights', logo: insights, link: '#' }
+    { name: 'Reports', logo: report, link: PROTECTED_ROUTES.region },
+    { name: 'Insights', logo: insights, link: PROTECTED_ROUTES.region }
   ];
 
   return (

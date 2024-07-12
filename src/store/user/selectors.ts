@@ -23,14 +23,12 @@ const getUserRoles = (state: AppState) => state.user.userRoles;
 const getIsUserRolesLoading = (state: AppState) => state.user.isRolesLoading;
 const getIsPasswordSet = (state: AppState) => state.user.isPasswordSet;
 const getTimezoneList = (state: AppState) => state.user.timezoneList;
-const getCountry = (state: AppState) => state.user.user?.country;
+const getCountryId = (state: AppState) => state.user.user?.countryId;
 const getCountryList = (state: AppState) => state.user.countryList;
 const getCultureList = (state: AppState) => state.user.cultureList;
 const getCultureListLoading = (state: AppState) => state.user.cultureListLoading;
 const getLockedUsers = (state: AppState) => state.user.lockedUsers;
 const getLockedUsersCount = (state: AppState) => state.user.totalLockedUsers;
-const getcommunityList = (state: AppState) => state.user.communityList;
-const getRoleDetail = (state: AppState) => state.user.user.roleDetail;
 
 export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
 export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
@@ -53,9 +51,8 @@ export const userRolesSelector = createSelector(getUserRoles, (roles) => roles);
 export const isUserRolesLoading = createSelector(getIsUserRolesLoading, (loading) => loading);
 export const isPasswordSetSelector = createSelector(getIsPasswordSet, (passwordSet) => passwordSet);
 export const timezoneListSelector = createSelector(getTimezoneList, (timezoneList) => timezoneList);
-export const countryIdSelector = createSelector(getCountry, (country) => country);
+export const countryIdSelector = createSelector(getCountryId, (countryId) => countryId);
 export const cultureListSelector = createSelector(getCultureList, (cultureList) => cultureList);
-export const communityListSelector = createSelector(getcommunityList, (communityList) => communityList);
 export const cultureListLoadingSelector = createSelector(
   getCultureListLoading,
   (cultureListLoading) => cultureListLoading
@@ -63,4 +60,3 @@ export const cultureListLoadingSelector = createSelector(
 export const countryListSelector = createSelector(getCountryList, (countryList) => countryList);
 export const lockedUsers = createSelector(getLockedUsers, (users) => users);
 export const lockedUsersCount = createSelector(getLockedUsersCount, (total) => total);
-export const roleDetailSelector = createSelector(getRoleDetail, (roleDetail) => roleDetail);

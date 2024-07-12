@@ -5,7 +5,7 @@ import APPCONSTANTS from '../constants/appConstants';
 const useRouteParams = ({ adminRoutes, superAdminRoutes, role, regionData }: any) => {
   const { pathname } = useLocation();
 
-  const { regionId, tenantId, healthFacilityId } = useMemo(() => {
+  const { regionId, tenantId, healthFacilityId, hfTenantId } = useMemo(() => {
     const matchedRoute = (
       role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ? [...adminRoutes] : [...superAdminRoutes]
     ).find(({ route, childRoutes }) => {
@@ -28,14 +28,15 @@ const useRouteParams = ({ adminRoutes, superAdminRoutes, role, regionData }: any
       return {
         regionId: allParams[0]?.regionId || regionData?.id,
         tenantId: allParams[0]?.tenantId || regionData?.tenantId,
-        healthFacilityId: allParams[0]?.healthFacilityId
+        healthFacilityId: allParams[0]?.healthFacilityId,
+        hfTenantId: allParams[0]?.hfTenantId
       };
     }
 
     return {};
   }, [pathname, regionData, role, adminRoutes, superAdminRoutes]);
 
-  return { regionId, tenantId, healthFacilityId };
+  return { regionId, tenantId, healthFacilityId, hfTenantId };
 };
 
 export default useRouteParams;

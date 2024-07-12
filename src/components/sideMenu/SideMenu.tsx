@@ -10,13 +10,17 @@ import {
   hfWithSideMenu
 } from '../../constants/route';
 import styles from './SideMenu.module.scss';
-import { fetchSideMenuRequest, clearSideMenu, setSideMenu } from '../../store/common/actions';
-import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
-import { ISideMenu } from '../../store/common/types';
-import Loader from '../loader/Loader';
-import { countryIdSelector, roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
-import toastCenter from '../../utils/toastCenter';
+import { useSelector } from 'react-redux';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
+import APPCONSTANTS from '../../constants/appConstants';
+import useRouteParams from '../../hooks/useRouteParams';
+
+interface ISideMenuItem {
+  label: string;
+  route: string;
+  disabled?: boolean;
+  childRoutes?: string[];
+}
 
 interface ISideMenuProps {
   className?: string;
@@ -72,128 +76,41 @@ const SideMenu = ({ className }: ISideMenuProps) => {
 
   const { list: sideMenuList } = useSelector(getSideMenuSelector);
 
-  const [name, route] =
-    Object.entries(PROTECTED_ROUTES).find(([key, value]: [string, string]) =>
-      matchPath(pathname, { path: value, exact: true })
-    ) || [];
-  const { regionId, districtId, chiefdomId, healthFacilityId, tenantId } = matchPath(pathname, {
-    path: route,
-    exact: true
-  })?.params as any;
+  const { regionId, tenantId, healthFacilityId, hfTenantId } = useRouteParams({
+    adminRoutes,
+    superAdminRoutes,
+    role,
+    regionData
+  });
 
-  let formName: string = '';
-  if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-    formName = NAMING_VARIABLES.country;
-  } else if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-    formName = NAMING_VARIABLES.district;
-  } else if (role === APPCONSTANTS.ROLES.DISTRICT_ADMIN) {
-    formName = NAMING_VARIABLES.chiefdom;
-  } else if (role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-    formName = NAMING_VARIABLES.healthFacility;
-  }
-
-  const fetchSideMenu = useCallback(
-    () =>
-      dispatch(
-        fetchSideMenuRequest({
-          countryId: regionId || countryIdValue || null,
-          tenantId,
-          formName,
-          successCb: (payload: any) => {
-            const {
-              list: rawSideMenu,
-              routeIds: { id: routeId, tenantId: routeTenantId }
-            } = payload;
-
-            const sideMenuWithRoute = [...rawSideMenu]?.map((menu: ISideMenu) => {
-              menu = { ...menu };
-              const menuName = menu.name;
-              const routeObj = Object.entries(SIDE_MENU_MAPPER).find(([key]) => key === menuName);
-              menu.route = routeObj?.[1];
-              return menu;
-            });
-
-            let choosenRoutes: ISideMenu[] = [...sideMenuWithRoute];
-            const pathParams: Array<[string, string]> = [];
-            if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-              pathParams.push([':regionId', regionId || routeId], [':tenantId', routeTenantId || tenantId]);
+  const sideMenu = useMemo(() => {
+    let choosenRoutes: ISideMenuItem[] = [];
+    const pathParams: Array<[string, string]> = [];
+    const newMenu = [
+      ...(role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ? [...adminRoutes] : [...superAdminRoutes])
+    ].map((routes) => ({ ...routes, childRoutes: [...(routes.childRoutes || [])] }));
+    choosenRoutes = newMenu;
+    pathParams.push(
+      [':regionId', regionId],
+      [':healthFacilityId', healthFacilityId],
+      [':tenantId', tenantId],
+      [':hfTenantId', hfTenantId]
+    );
+    return choosenRoutes.map((menu: ISideMenuItem) => {
+      menu = { ...menu };
+      pathParams.forEach(([paramName, paramValue]) => {
+        if (paramValue) {
+          menu.route = menu.route.replace(paramName, paramValue);
+          menu.childRoutes?.forEach((childRoute, i) => {
+            if (menu.childRoutes?.length) {
+              menu.childRoutes[i] = childRoute.replace(paramName, paramValue);
             }
-            if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-              pathParams.push([':districtId', districtId || routeId], [':tenantId', routeTenantId || tenantId]);
-            }
-            if (role === APPCONSTANTS.ROLES.DISTRICT_ADMIN) {
-              pathParams.push([':chiefdomId', chiefdomId || routeId], [':tenantId', routeTenantId || tenantId]);
-            }
-            if (role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-              pathParams.push(
-                [':healthFacilityId', healthFacilityId || routeId],
-                [':tenantId', routeTenantId || tenantId]
-              );
-            }
-            choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
-              menu = { ...menu };
-              pathParams.forEach(([paramName, paramValue]) => {
-                menu.route = menu?.route?.replace(paramName, paramValue);
-              });
-              return menu;
-            });
-            dispatch(
-              setSideMenu({
-                list: choosenRoutes
-              })
-            );
-          },
-          failureCb: () => {
-            toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_SIDEMENU_ERROR);
-          }
-        })
-      ),
-    [chiefdomId, countryIdValue, dispatch, districtId, formName, healthFacilityId, regionId, role, tenantId]
-  );
-
-  useEffect(() => {
-    if (!sideMenuList.length && tenantId) {
-      fetchSideMenu();
-    }
-  }, [dispatch, fetchSideMenu, role, sideMenuList.length, tenantId]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearSideMenu());
-    };
-  }, []);
-
-  const checkActive = (currentRoute: string, currentRouteName: string) => {
-    const isCurrentRouteActive = matchPath(pathname, { exact: true, path: currentRoute });
-    if (isCurrentRouteActive) {
-      return true;
-    } else {
-      if (
-        regionRoutesWithSideMenu.find((regionRoute) => matchPath(pathname, { path: regionRoute, exact: true })) &&
-        currentRouteName.includes('REGION_BY')
-      ) {
-        return true;
-      }
-      if (
-        districtRoutesWithSideMenu.find((districtRoute) => matchPath(pathname, { path: districtRoute, exact: true })) &&
-        (currentRouteName.includes('DISTRICT_BY') || currentRouteName === 'DISTRICT_SUMMARY')
-      ) {
-        return true;
-      }
-      if (
-        chiefdomWithSideMenu.find((chiefdomRoute) => matchPath(pathname, { path: chiefdomRoute, exact: true })) &&
-        (currentRouteName.includes('CHIEFDOM_BY') || currentRouteName === 'CHIEFDOM_SUMMARY')
-      ) {
-        return true;
-      }
-      if (
-        hfWithSideMenu.find((hfRoute) => matchPath(pathname, { path: hfRoute, exact: true })) &&
-        (currentRouteName.includes('HEALTH_FACILITY_BY') || currentRouteName === 'HEALTH_FACILITY_SUMMARY')
-      ) {
-        return true;
-      }
-    }
-  };
+          });
+        }
+      });
+      return menu;
+    });
+  }, [role, regionId, healthFacilityId, tenantId, hfTenantId]);
 
   return (
     <>

@@ -1,24 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
 import Searchbar from '../../components/searchbar/Searchbar';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import Dropdown from '../../components/dropdown/Dropdown';
+import APPCONSTANTS from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
   clearRegionDetail,
   fetchRegionsRequest,
-  setRegionDetail
-} from '../../store/region/actions';
+  setRegionDetails
+} from '../../store/regionDashboard/actions';
 import {
   getRegionsCountSelector,
   getRegionsLoadingMoreSelector,
-  getLoadingSelector,
+  getRegionsLoadingSelector,
   getRegionsSelector
-} from '../../store/region/selectors';
+} from '../../store/regionDashboard/selectors';
 import { appendZeroBefore } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
@@ -26,12 +26,20 @@ import styles from './Region.module.scss';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { fetchTimezoneListRequest } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
-import { clearHFSummary } from '../../store/healthFacility/actions';
-import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
-import { clearChiefdomDetail } from '../../store/chiefdom/actions';
-import { IRegionDetail } from '../../store/region/types';
-import { getClinicalWorkflowSelector } from '../../store/district/selectors';
+import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
+import { clearAccountDetails, resetClinicalWorkflow } from '../../store/county/actions';
+import { clearOperatingUnitDetail } from '../../store/subCounty/actions';
+import { IRegionDetail } from '../../store/regionDashboard/types';
+import { getClinicalWorkflowSelector } from '../../store/county/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
+
+const regionDropdownMenuItems = [
+  {
+    route: PROTECTED_ROUTES.createSuperAdmin,
+    menuText: 'Super Admin'
+  },
+  { route: PROTECTED_ROUTES.createRegion, menuText: 'Region' }
+];
 
 /**
  * Lists all the regions
@@ -43,19 +51,10 @@ const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const regions = useSelector(getRegionsSelector);
   const regionsCount = useSelector(getRegionsCountSelector);
-  const loading = useSelector(getLoadingSelector);
+  const loading = useSelector(getRegionsLoadingSelector);
   const loadingMore = useSelector(getRegionsLoadingMoreSelector);
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
-  const { push } = useHistory();
-
-  const {
-    region: { s: regionSName, p: regionPName },
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
-
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,
     itemsPerPage: APPCONSTANTS.REGIONS_PER_PAGE,
@@ -87,20 +86,14 @@ const Region = (): React.ReactElement => {
     }
   }, [clinicalWorkflows.length, dispatch]);
 
-  useEffect(() => {
-    if (!timezoneList?.length) {
-      dispatch(fetchTimezoneListRequest());
-    }
-  }, [dispatch, timezoneList?.length]);
-
   /**
-   * To remove Region, District, Chiefdom, Site Details cache in store
+   * To remove Region, Account, OU, Site Details cache in store
    */
   useEffect(() => {
     dispatch(clearRegionDetail());
-    dispatch(clearDistrictDetails());
-    dispatch(clearChiefdomDetail());
-    dispatch(clearHFSummary());
+    dispatch(clearAccountDetails());
+    dispatch(clearOperatingUnitDetail());
+    dispatch(clearSiteSummary());
     dispatch(clearClientRegistryStatus());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -111,7 +104,7 @@ const Region = (): React.ReactElement => {
   const onDashboardExit = useCallback(
     (partialRegionDetail: Partial<IRegionDetail>) => {
       dispatch(clearRegionDetail());
-      dispatch(setRegionDetail(partialRegionDetail));
+      dispatch(setRegionDetails(partialRegionDetail));
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, partialRegionDetail.id);
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, partialRegionDetail.tenantId);
     },
@@ -138,7 +131,7 @@ const Region = (): React.ReactElement => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      regions.map(({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId }: any) => ({
+      regions.map(({ ouCount, siteCount, accountsCount, name, tenantId, id: regionId }: any) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId }),
@@ -147,27 +140,25 @@ const Region = (): React.ReactElement => {
         data: [
           {
             type: 'number',
-            value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
-            label: districtSName,
+            value: Number(accountsCount) ? appendZeroBefore(accountsCount, 2) : '-',
+            label: 'Account',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.accountByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {
             type: 'number',
-            value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-            label: chiefdomSName,
-            route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            value: Number(ouCount) ? appendZeroBefore(ouCount, 2) : '-',
+            label: 'Operating Unit',
+            route: PROTECTED_ROUTES.OUByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {
             type: 'number',
-            value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-            label: healthFacilitySName,
+            value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
+            label: 'Site',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.healthFacilityByRegion
-              .replace(':regionId', regionId)
-              .replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.siteByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           }
         ]
@@ -185,15 +176,15 @@ const Region = (): React.ReactElement => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column`}>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{regionPName}</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>Regions</h4>
           {!noRegionsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${regionSName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder='Search Region' onSearch={onSearch} isOutlined={false} />
               </span>
-              <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
-                Create {regionSName}
-              </button>
+              <span className='ms-sm-1dot5'>
+                <Dropdown label='Create new' menuItems={regionDropdownMenuItems} />
+              </span>
             </>
           )}
         </div>
@@ -209,15 +200,13 @@ const Region = (): React.ReactElement => {
         {noRegionsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionSName}</div>
-            <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
-              Create {regionSName}
-            </button>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new region or super admin</div>
+            <Dropdown label='Create new' menuItems={regionDropdownMenuItems} className='mx-auto' />
           </div>
         )}
         {noSearchResultAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {regionPName} available</div>
+            <div className='fw-bold highlight-text'>No regions available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

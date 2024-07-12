@@ -1,5 +1,10 @@
 import axios from 'axios';
-import { IFetchRegionAdmins, IFetchRegionDetailReqPayload, IRegionInfo, IRegionPayload } from '../store/region/types';
+import {
+  IFetchRegionAdmins,
+  IFetchRegionDetailReqPayload,
+  IRegionInfo,
+  IRegionPayload
+} from '../store/regionDashboard/types';
 
 export const uploadFile = (file: any) => {
   const data = new FormData();
@@ -51,9 +56,9 @@ export const createRegion = (data: IRegionPayload) =>
     data
   });
 
-export const getCountryDetail = (data: IFetchRegionDetailReqPayload) =>
+export const getRegionDetail = (data: IFetchRegionDetailReqPayload) =>
   axios({
-    url: '/admin-service/country/details',
+    url: '/admin-service/data/country/details',
     method: 'POST',
     data
   });
