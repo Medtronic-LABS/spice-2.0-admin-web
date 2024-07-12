@@ -25,6 +25,7 @@ import LabTestList from './containers/labtest/LabtestList';
 import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
 import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
+import { goToUrl } from './utils/routeUtil';
 
 interface IRoute {
   path: string;
@@ -311,10 +312,7 @@ export const AppRoutes = () => {
 
   useEffect(() => {
     if (isLoggedIn && url.current) {
-      let link = document.createElement('a');
-      link.href = url.current || '';
-      document.body.appendChild(link);
-      link.click();
+      goToUrl(url.current);
       url.current = '';
     }
   }, [data, isLoggedIn, url])

@@ -25,7 +25,8 @@ const APPCONSTANTS = {
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
     ADMIN: 'admin',
-    CFR: 'cfr'
+    CFR: 'cfr',
+    INSIGHTS: 'insights'
   },
   ROLES: {
     SUPER_USER: 'SUPER_USER',
