@@ -153,7 +153,7 @@ const Breadcrumb = (): React.ReactElement => {
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
-        to={HOME_PAGE_BY_ROLE[role].replace(':regionId', region?.id).replace(':tenantId', region?.tenantId)}
+        to={'/home'}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

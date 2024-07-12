@@ -14,7 +14,8 @@ const userInitialStateGetter = (): IUser => ({
   tenantId: '',
   formDataId: '',
   country: {},
-  suiteAccess: []
+  suiteAccess: [],
+  countryId: undefined
 });
 
 // This should be function instead of object,
@@ -38,9 +39,9 @@ const initialStateGetter = () =>
     errorMessage: '',
     showLoader: false,
     userTenantId: ''
-  } as IUserState);
+  } as unknown as IUserState);
 
-const userReducer = (state: IUserState = initialStateGetter(), action = {} as UserActions) => {
+const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {
   switch (action.type) {
     case USERTYPES.LOGIN_REQUEST:
       return {
@@ -171,7 +172,72 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as Us
         loading: false
       };
     }
+    case USERTYPES.FETCH_TIMEZONE_LIST_SUCCESS:
+      return {
+        ...state,
+        timezoneList: action.payload
+      };
+    case USERTYPES.FETCH_COUNTRY_LIST_SUCCESS:
+      return {
+        ...state,
+        countryList: action.payload
+      };
+    case USERTYPES.FETCH_CULTURE_LIST_SUCCESS:
+      return {
+        ...state,
+        cultureListLoading: false,
+        cultureList: action.payload
+      };
+    case USERTYPES.UPDATE_PASSWORD_REQUEST:
+    case USERTYPES.CREATE_PASSWORD_REQUEST:
+    case USERTYPES.FETCH_LOCKED_USERS_REQUEST:
+    case USERTYPES.UNLOCK_USERS_REQUEST:
+      return {
+        ...state,
+        loading: true
+      };
+    case USERTYPES.FETCH_LOCKED_USERS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        lockedUsers: action.payload.lockedUsers,
+        totalLockedUsers: action.payload.totalCount
+      };
+    case USERTYPES.UNLOCK_USERS_SUCCESS:
+    case USERTYPES.UNLOCK_USERS_FAILURE:
+    case USERTYPES.CHANGE_PASSWORD_FAIL:
+    case USERTYPES.UPDATE_PASSWORD_FAIL:
+    case USERTYPES.UPDATE_PASSWORD_SUCCESS:
+    case USERTYPES.CREATE_PASSWORD_SUCCESS:
+    case USERTYPES.CREATE_PASSWORD_FAIL:
+    case USERTYPES.FETCH_LOCKED_USERS_FAILURE:
+    case USERTYPES.FETCH_USER_BY_EMAIL:
+      return {
+        ...state,
+        showLoader: true
+      };
+    case USERTYPES.FETCH_USER_BY_EMAIL_SUCCESS:
+    case USERTYPES.FETCH_USER_BY_EMAIL_FAIL:
+      return {
+        ...state,
+        showLoader: false
+      };
+    case USERTYPES.REMOVE_USER_TENANT_ID:
+      return {
+        ...state,
+        userTenantId: ''
+      };
+    case USERTYPES.FETCH_CULTURE_LIST_REQUEST:
+      return {
+        ...state,
+        cultureListLoading: true
+      };
     case USERTYPES.RESET_STORE:
+    case USERTYPES.FETCH_TIMEZONE_LIST_REQUEST:
+    case USERTYPES.FETCH_TIMEZONE_LIST_FAILURE:
+    case USERTYPES.FETCH_COUNTRY_LIST_REQUEST:
+    case USERTYPES.FETCH_COUNTRY_LIST_FAILURE:
+    case USERTYPES.FETCH_CULTURE_LIST_FAILURE:
     default:
       return {
         ...state

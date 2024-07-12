@@ -1,0 +1,30 @@
+@import '../../styles/variables';
+
+.dashboard-icon {
+  width: 100%;
+  max-width: 40px;
+  height: auto;
+}
+
+.cardCustom {
+  max-width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.cardBody {
+  padding: 0;
+}
+
+.cardTitle {
+  color: #3f51b5;
+  font-weight: bold;
+  margin: 0;
+}
+

@@ -22,9 +22,9 @@ const Loader = ({
     const instance = lottie.loadAnimation({
       container: document.querySelector('#mdt-logo') as Element,
       animationData: mdtLogo,
-      renderer: 'svg', // "canvas", "html"
-      loop: true, // boolean
-      autoplay: true // boolean
+      renderer: 'svg',
+      loop: true,
+      autoplay: true
     });
     return () => instance.destroy();
   }, []);

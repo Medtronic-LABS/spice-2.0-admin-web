@@ -103,7 +103,8 @@ const MyProfile = (): React.ReactElement => {
       firstName: user.firstName,
       lastName: user.lastName,
       countryCode: user?.country?.phoneNumberCode,
-      phoneNumber: user.phoneNumber
+      phoneNumber: user.phoneNumber,
+      timezone: []
     };
     setLoading(true);
     dispatch(

@@ -9,6 +9,8 @@ import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
 import { authTokenSelector, getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
 import Region from './containers/region/Region';
+import RegionDashboard from './containers/region/RegionDashboard';
+import Dashboard from './containers/dashboard/Dashboard';
 import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
@@ -38,6 +40,18 @@ export const A = [HEALTH_FACILITY_ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
+    {
+      path: PROTECTED_ROUTES.dashboard,
+      exact: true,
+      component: Dashboard,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.regionDashboard,
+      exact: true,
+      component: RegionDashboard,
+      authorisedRoles: SU_SA
+    },
     {
       path: PROTECTED_ROUTES.region,
       exact: true,

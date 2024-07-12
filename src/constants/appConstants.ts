@@ -1,3 +1,4 @@
+
 const APPCONSTANTS = {
   APP_TYPE: 'admin',
   HASH_ALGORITM: 'sha512',
@@ -27,13 +28,13 @@ const APPCONSTANTS = {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
     HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
-    PEER_SUPERVISOR: 'PEER_SUPERVISOR'
-  },
-  ALL_ROLES: {
-    SUPER_USER: 'SUPER_USER',
-    SUPER_ADMIN: 'SUPER_ADMIN',
-    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
-    PEER_SUPERVISOR: 'PEER_SUPERVISOR'
+    PEER_SUPERVISOR: 'PEER_SUPERVISOR',
+    REGION_ADMIN: 'REGION_ADMIN',
+    ACCOUNT_ADMIN: 'ACCOUNT_ADMIN',
+    OPERATING_UNIT_ADMIN: 'OPERATING_UNIT_ADMIN',
+    LAB_TECHNICIAN: 'LAB_TECHNICIAN',
+    REPORT_ADMIN: 'REPORT_ADMIN',
+    SITE_ADMIN: 'SITE_ADMIN'
   },
   ROUTE_NAMES: {
     REGION: 'region'
@@ -152,8 +153,7 @@ const APPCONSTANTS = {
   SEARCH_BY_EMAIL: 'Search Email',
   GENDER_OPTIONS: [
     { value: 'Male', label: 'Male' },
-    { value: 'Female', label: 'Female' },
-    { value: 'Non-Binary', label: 'Non-Binary' }
+    { value: 'Female', label: 'Female' }
   ],
   SESSION_EXPIRED: 'Session got expired. Please login again.',
   LOCKED_USERS_FETCH_ERROR: 'Unable to load the locked users list. Please try after sometime.',
@@ -161,6 +161,7 @@ const APPCONSTANTS = {
     { value: 'Yes', label: 'Yes' },
     { value: 'No', label: 'No' }
   ],
+  ACCOUNT_FETCH_ERROR: 'Unable to load accounts. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
@@ -250,10 +251,10 @@ const APPCONSTANTS = {
 };
 
 export const ROLE_LABELS = {
-  [APPCONSTANTS.ALL_ROLES.SUPER_USER]: 'Super User',
-  [APPCONSTANTS.ALL_ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
-  [APPCONSTANTS.ALL_ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
+  [APPCONSTANTS.ROLES.SUPER_USER]: 'Super User',
+  [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
+  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
+  [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
 };
 
 export default APPCONSTANTS;

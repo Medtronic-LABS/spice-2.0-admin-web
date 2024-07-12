@@ -1,25 +1,16 @@
 import * as USER_TYPES from './actionTypes';
 import {
-  ILoginSuccessPayload,
-  ILoginFailurePayload,
   ILoginRequest,
   ILoginSuccess,
   ILoginFailure,
   ILogoutRequest,
   ILogoutSuccess,
   ILogoutFailure,
-  ILoginRequestPayload,
-  IUser,
   IAddToken,
-  IRemoveToken,
   IAddUserTenantId,
-  IRemoveUserTenantId,
-  IFetchUserRolesSuccess,
-  IGroupRoles,
+  IRemoveToken,
   IFetchUserRolesRequest,
-  IFetchUserByEmail,
-  IFetchUserByEmailSuccess,
-  IFetchUserByEmailFail,
+  IFetchUserRolesSuccess,
   IFetchUserByIdRequest,
   IFetchUserByIdSuccess,
   IFetchUserByIdFailure,
@@ -40,7 +31,32 @@ import {
   IResetPasswordFail,
   IGetUserNameReq,
   IGetUserNameSuccess,
-  IGetUserNameFail
+  IGetUserNameFail,
+  ICreatePasswordReq,
+  ICreatePasswordSuccess,
+  ICreatePasswordFail,
+  IFetchUserByEmail,
+  IFetchUserByEmailSuccess,
+  IFetchUserByEmailFail,
+  IRemoveUserTenantId,
+  IFetchLockedUsersRequest,
+  IFetchLockedUsersSuccess,
+  IFetchLockedUsersFailure,
+  IUnlockUsersRequest,
+  IUnlockUsersSuccess,
+  IUnlockUsersFailure,
+  IUpdatePasswordReq,
+  IUpdatePasswordSuccess,
+  IUpdatePasswordFail,
+  ILoginRequestPayload,
+  ILoginFailurePayload,
+  IFetchTimezoneListSuccessPayload,
+  IFetchCultureListSuccessPayload,
+  IFetchLockedUsersPayload,
+  IFetchCountryListSuccessPayload,
+  ILoginSuccessPayload,
+  IUser,
+  IGroupRoles
 } from './types';
 
 export const loginRequest = ({
@@ -189,7 +205,7 @@ export const updateUserRequest = ({
   payload,
   successCb,
   failureCb
-}: Omit<IUpdateUserRequest, 'type'>): IUpdateUserRequest => ({
+}: Omit<any, 'type'>): any => ({
   type: USER_TYPES.UPDATE_USER_REQUEST,
   payload,
   successCb,
@@ -286,7 +302,7 @@ export const resetPasswordFail = (error: any): IResetPasswordFail => ({
 
 export const getUserName = (
   token: string,
-  successCB?: () => void,
+  successCB: () => void,
   failureCB?: (error: Error) => void
 ): IGetUserNameReq => ({
   type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET,
@@ -296,10 +312,154 @@ export const getUserName = (
 });
 
 export const getUserNameSuccess = (): IGetUserNameSuccess => ({
-  type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS
+  type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS,
+  response: {
+    email: '',
+    username: '',
+    is_password_set: false
+  }
 });
 
 export const getUserNameFail = (error: any): IGetUserNameFail => ({
   type: USER_TYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL,
   error
+});
+
+export const updatePassword = (data: {
+  user: string;
+  oldPassword: string;
+  newPassword: string;
+  tenantId: string;
+  successCB: () => void;
+  failureCb?: (error: Error) => void;
+}): IUpdatePasswordReq => ({
+  type: USER_TYPES.UPDATE_PASSWORD_REQUEST,
+  data
+});
+
+export const updatePasswordSuccess = (): IUpdatePasswordSuccess => ({
+  type: USER_TYPES.UPDATE_PASSWORD_SUCCESS
+});
+
+export const updatePasswordFail = (error: any): IUpdatePasswordFail => ({
+  type: USER_TYPES.UPDATE_PASSWORD_FAIL,
+  error
+});
+
+export const createPasswordRequest = (
+  data: { email: string; password: string },
+  id: string,
+  successCB: () => void
+): ICreatePasswordReq => ({
+  type: USER_TYPES.CREATE_PASSWORD_REQUEST,
+  data,
+  id,
+  successCB
+});
+
+export const createPasswordSuccess = (): ICreatePasswordSuccess => ({
+  type: USER_TYPES.CREATE_PASSWORD_SUCCESS
+});
+
+export const createpasswordFail = (error: ILoginFailurePayload): ICreatePasswordFail => ({
+  type: USER_TYPES.CREATE_PASSWORD_FAIL,
+  error
+});
+
+export const fetchTimezoneListRequest = () => ({
+  type: USER_TYPES.FETCH_TIMEZONE_LIST_REQUEST
+});
+
+export const fetchCultureListRequest = () => ({
+  type: USER_TYPES.FETCH_CULTURE_LIST_REQUEST
+});
+
+export const fetchCultureListSuccess = (payload: IFetchCultureListSuccessPayload) => ({
+  type: USER_TYPES.FETCH_CULTURE_LIST_SUCCESS,
+  payload
+});
+
+export const fetchCultureListFailure = () => ({
+  type: USER_TYPES.FETCH_CULTURE_LIST_FAILURE
+});
+
+export const fetchTimezoneListSuccess = (payload: IFetchTimezoneListSuccessPayload) => ({
+  type: USER_TYPES.FETCH_TIMEZONE_LIST_SUCCESS,
+  payload
+});
+
+export const fetchTimezoneListFailure = () => ({
+  type: USER_TYPES.FETCH_TIMEZONE_LIST_FAILURE
+});
+
+export const fetchCountryListRequest = () => ({
+  type: USER_TYPES.FETCH_COUNTRY_LIST_REQUEST
+});
+
+export const fetchCountryListSuccess = (payload: IFetchCountryListSuccessPayload) => ({
+  type: USER_TYPES.FETCH_COUNTRY_LIST_SUCCESS,
+  payload
+});
+
+export const fetchCountryListFailure = () => ({
+  type: USER_TYPES.FETCH_COUNTRY_LIST_FAILURE
+});
+
+export const fetchLockedUsersRequest = ({
+  tenantId,
+  skip,
+  limit,
+  search,
+  role,
+  successCb,
+  failureCb
+}: {
+  tenantId?: string;
+  skip: number;
+  limit: number | null;
+  search?: string;
+  role?: string;
+  successCb?: (payload: IFetchLockedUsersPayload) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchLockedUsersRequest => ({
+  type: USER_TYPES.FETCH_LOCKED_USERS_REQUEST,
+  tenantId,
+  skip,
+  limit,
+  search,
+  role,
+  successCb,
+  failureCb
+});
+
+export const fetchLockedUsersSuccess = (payload: IFetchLockedUsersPayload): IFetchLockedUsersSuccess => ({
+  type: USER_TYPES.FETCH_LOCKED_USERS_SUCCESS,
+  payload
+});
+
+export const fetchLockedUsersFailure = (): IFetchLockedUsersFailure => ({
+  type: USER_TYPES.FETCH_LOCKED_USERS_FAILURE
+});
+
+export const unlockUsersRequest = ({
+  userId,
+  successCb,
+  failureCb
+}: {
+  userId: string;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}): IUnlockUsersRequest => ({
+  type: USER_TYPES.UNLOCK_USERS_REQUEST,
+  userId,
+  successCb,
+  failureCb
+});
+
+export const unlockUsersSuccess = (): IUnlockUsersSuccess => ({
+  type: USER_TYPES.UNLOCK_USERS_SUCCESS
+});
+
+export const unlockUsersFailure = (): IUnlockUsersFailure => ({
+  type: USER_TYPES.UNLOCK_USERS_FAILURE
 });

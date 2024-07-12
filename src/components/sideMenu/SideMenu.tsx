@@ -6,6 +6,7 @@ import styles from './SideMenu.module.scss';
 import { useSelector } from 'react-redux';
 import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
+import useRouteParams from '../../hooks/useRouteParams';
 
 interface ISideMenuItem {
   label: string;
@@ -63,34 +64,12 @@ const SideMenu = ({ className }: ISideMenuProps) => {
   const role = useSelector(roleSelector);
   const regionData = useSelector(userDataSelector).country;
 
-  const { regionId, tenantId, healthFacilityId, hfTenantId } = useMemo(() => {
-    const matchedRoute = (
-      role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ? [...adminRoutes] : [...superAdminRoutes]
-    ).find(({ route, childRoutes }) => {
-      return [...(childRoutes || []), route]
-        .filter((v) => v)
-        .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true }));
-    });
-    if (matchedRoute) {
-      const params = matchPath(pathname, { path: matchedRoute.route, exact: true })?.params as any;
-      let childParams: any[] = [];
-      if (!params) {
-        childParams =
-          matchedRoute.childRoutes?.map(
-            (childRoute) => matchPath(pathname, { path: childRoute, exact: true })?.params as any
-          ) || [];
-      }
-      const allParams: any[] = [...childParams, params].filter((param) => param);
-
-      return {
-        regionId: allParams?.[0]?.regionId || regionData?.id,
-        tenantId: allParams?.[0]?.tenantId || regionData?.tenantId,
-        healthFacilityId: allParams?.[0]?.healthFacilityId,
-        hfTenantId: allParams?.[0]?.hfTenantId
-      };
-    }
-    return {};
-  }, [pathname, regionData, role]);
+  const { regionId, tenantId, healthFacilityId, hfTenantId } = useRouteParams({
+    adminRoutes,
+    superAdminRoutes,
+    role,
+    regionData
+  });
 
   const sideMenu = useMemo(() => {
     let choosenRoutes: ISideMenuItem[] = [];

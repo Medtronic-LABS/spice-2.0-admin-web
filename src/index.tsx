@@ -27,7 +27,7 @@ setupInterceptors(store);
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
-  <React.StrictMode>
+  <React.Fragment>
     <Provider store={store}>
       <BrowserRouter>
         <ErrorBoundary>
@@ -35,7 +35,7 @@ root.render(
         </ErrorBoundary>
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>
+  </React.Fragment>
 );
 
 // Service worker registration

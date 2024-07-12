@@ -13,18 +13,61 @@ interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
 
-const routesWithSideMenu: any[] = [
-  { route: PROTECTED_ROUTES.region },
+const routesWithSideMenu = [
+  { route: PROTECTED_ROUTES.accountByRegion },
+  { route: PROTECTED_ROUTES.accountAdminByRegion },
   { route: PROTECTED_ROUTES.healthFacilityByAdmin },
-  { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin },
   { route: PROTECTED_ROUTES.usersByAdmin },
+  { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.OUByRegion },
+  { route: PROTECTED_ROUTES.OUByAccount },
+
+  { route: PROTECTED_ROUTES.OUAdminByRegion },
+  { route: PROTECTED_ROUTES.OUAdminByAccount },
+
+  { route: PROTECTED_ROUTES.siteByRegion },
+  { route: PROTECTED_ROUTES.siteByAccount },
+  { route: PROTECTED_ROUTES.siteByOU },
+
+  { route: PROTECTED_ROUTES.siteAdminByRegion },
+  { route: PROTECTED_ROUTES.siteAdminByAccount },
+  { route: PROTECTED_ROUTES.siteAdminByOU },
+
+  { route: PROTECTED_ROUTES.groupByRegion },
+  { route: PROTECTED_ROUTES.groupByAccount },
+  { route: PROTECTED_ROUTES.groupByOU },
+  { route: PROTECTED_ROUTES.groupBySite },
+
+  { route: PROTECTED_ROUTES.programByRegion },
+
+  { route: PROTECTED_ROUTES.userByRegion },
+  { route: PROTECTED_ROUTES.userByAccount },
+  { route: PROTECTED_ROUTES.userByOU },
+
+  { route: PROTECTED_ROUTES.regionSummary },
+  // { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
+  // { route: PROTECTED_ROUTES.OUSummary, disabledRoles: [APPCONSTANTS.ROLES.OPERATING_UNIT_ADMIN] },
+  { route: PROTECTED_ROUTES.siteSummary },
+
+  { route: PROTECTED_ROUTES.workflowByRegion },
+  { route: PROTECTED_ROUTES.workflowByAccount },
+
   { route: PROTECTED_ROUTES.medicationByRegion },
   { route: PROTECTED_ROUTES.labtestList },
-  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] }
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] },
+  { route: PROTECTED_ROUTES.labTestByRegion },
+  { route: PROTECTED_ROUTES.customizationByRegion },
+  { route: PROTECTED_ROUTES.accountWorkflowCustomization }
 ];
 
-const routesWithoutBreadcrumb: any[] = [{ route: PROTECTED_ROUTES.region }];
-
+const routesWithoutBreadcrumb = [
+  PROTECTED_ROUTES.regionDashboard,
+  PROTECTED_ROUTES.accountDashboard,
+  PROTECTED_ROUTES.OUDashboard,
+  PROTECTED_ROUTES.siteDashboard,
+  PROTECTED_ROUTES.dashboard
+];
 const header = (
   isBCDisabled: boolean,
   menuTogglable: boolean,
@@ -61,21 +104,16 @@ export const AppLayout = ({ children }: IAppLayout) => {
     () =>
       !Boolean(
         routesWithSideMenu.find(
-          ({ route, childRoutes, disabledRoles }) =>
-            [...(childRoutes || []), route]
-              .filter((v) => v)
-              .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
-            !disabledRoles?.includes(role)
+          ({ route, disabledRoles }: any) =>
+            matchPath(pathname, { path: route, exact: true }) && !disabledRoles?.includes(role)
         )
       ),
     [pathname, role]
   );
-
   const isBreadcrumbDisabled = useMemo(
     () => Boolean(routesWithoutBreadcrumb.find((route) => matchPath(pathname, { path: route, exact: true }))),
     [pathname]
   );
-
   const initializingApp = useSelector(initializingSelector);
 
   // menu toggling in low resolution device
@@ -112,8 +150,14 @@ export const AppLayout = ({ children }: IAppLayout) => {
   return (
     <div className={`position-relative ${pyChange} ${styles.layout} ${pxForSideMenu} d-flex justify-content-center`}>
       {!initializingApp && (
-        <div className={`px-1  ${styles.contentCenter}`}>
-          {header(isBreadcrumbDisabled, isMenuTogglable, isSideMenuDisabled, isStyleVisible, setIsMenuVisible)}
+        <div className={`px-md-3 px-1  ${styles.contentCenter}`}>
+          {header(
+            isBreadcrumbDisabled,
+            isMenuTogglable,
+            isSideMenuDisabled,
+            isStyleVisible,
+            setIsMenuVisible
+          )}
           <div className={`row gx-1dot25 ${styles.body}`}>
             {!isSideMenuDisabled && (
               <div className={`col-auto ${styles.sidemenu} ${isMenuTogglable && styles.togglable} ${isStyleVisible}`}>
