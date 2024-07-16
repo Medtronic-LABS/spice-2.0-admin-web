@@ -151,6 +151,8 @@ describe('userReducer', () => {
     };
     const expectedState = {
       initializing: false,
+      loggingIn: false,
+      isLoggedIn: true,
       user: { email: 'test@example.com', firstName: 'John', lastName: 'Doe' }
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
@@ -164,7 +166,8 @@ describe('userReducer', () => {
       type: USERTYPES.FETCH_LOGGED_IN_USER_FAILURE
     };
     const expectedState = {
-      initializing: false
+      initializing: false,
+      isLoggedIn: false,
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
