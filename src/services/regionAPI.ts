@@ -1,10 +1,5 @@
 import axios from 'axios';
-import {
-  IFetchRegionAdmins,
-  IFetchRegionDetailReqPayload,
-  IRegionInfo,
-  IRegionPayload
-} from '../store/regionDashboard/types';
+import { IFetchRegionAdmins, IFetchRegionDetailReqPayload, IRegionInfo, IRegionPayload } from '../store/region/types';
 
 export const uploadFile = (file: any) => {
   const data = new FormData();

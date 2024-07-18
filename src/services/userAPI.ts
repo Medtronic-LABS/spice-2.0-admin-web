@@ -114,36 +114,3 @@ export const fetchTimezoneList = () =>
     method: 'GET',
     url: '/spice-service/timezone'
   });
-
-export const fetchLockedUsers = (
-  tenantId: number,
-  skip: number,
-  limit: number | null,
-  search?: string,
-  role?: string
-) =>
-  axios({
-    method: 'POST',
-    url: '/user-service/user/locked-users',
-    data: {
-      tenantId,
-      skip,
-      limit,
-      roleType: role,
-      searchTerm: search || ''
-    }
-  });
-
-export const unlockUsers = (id: string) =>
-  axios({
-    method: 'POST',
-    url: '/user-service/user/unlock',
-    data: { id }
-  });
-
-export const fetchCommunityListRequest = (countryId: number) =>
-  axios({
-    method: 'POST',
-    url: '/admin-service/community-units',
-    data: { countryId }
-  });

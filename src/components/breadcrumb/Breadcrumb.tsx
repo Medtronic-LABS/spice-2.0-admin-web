@@ -5,19 +5,15 @@ import { matchPath, useLocation } from 'react-router';
 import { ReactComponent as HomeIcon } from '../../assets/images/home.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRegionDetailsSelector } from '../../store/region/selectors';
-import { districtSelector } from '../../store/district/selectors';
-import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
-import { healthFacilitySelector } from '../../store/healthFacility/selectors';
 import { roleSelector } from '../../store/user/selectors';
-import { clearDistrictDetails, setDistrictDetails } from '../../store/district/actions';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 
 import styles from './Breadcrumb.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { clearRegionDetail, setRegionDetail } from '../../store/region/actions';
-import { clearChiefdomDetail, setChiefdomDetails } from '../../store/chiefdom/actions';
-import { clearHFSummary, setHFSummary } from '../../store/healthFacility/actions';
+import { healthFacilitySelector } from '../../store/healthFacility/selectors';
+import { clearHealthFaciliityDetail } from '../../store/healthFacility/actions';
+import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { clearRegionDetail } from '../../store/region/actions';
 
 interface ISection {
   route: string;
@@ -79,8 +75,6 @@ const Breadcrumb = (): React.ReactElement => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const region = useSelector(getRegionDetailsSelector);
-  const district = useSelector(districtSelector);
-  const chiefdom = useSelector(getChiefdomDetailSelector);
   const healthFacility = useSelector(healthFacilitySelector);
   const role = useSelector(roleSelector);
 
@@ -361,10 +355,7 @@ const Breadcrumb = (): React.ReactElement => {
 
   const clearData = useCallback(() => {
     dispatch(clearRegionDetail());
-    dispatch(clearDistrictDetails());
-    dispatch(clearChiefdomDetail());
-    dispatch(clearHFSummary());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // clear county, sub county and facility details
   }, []);
 
   return (
@@ -372,6 +363,7 @@ const Breadcrumb = (): React.ReactElement => {
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
         to={PROTECTED_ROUTES.landingPage}
+        onClick={clearData}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

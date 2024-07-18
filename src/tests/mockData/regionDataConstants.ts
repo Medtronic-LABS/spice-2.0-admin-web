@@ -3,14 +3,14 @@ const MOCK_ENTITY_LIST = {
   countrytenantid: 2,
   countryname: 'Kenya',
   countrycode: '2',
-  districtid: 1,
-  districttenantid: 3,
-  districtname: 'Nyanza',
-  districtcode: null,
-  chiefdomid: 1,
-  chiefdomtenantid: 4,
-  chiefdomname: 'Oyugis',
-  chiefdomcode: '1',
+  countyid: 1,
+  countytenantid: 3,
+  countyname: 'Nyanza',
+  countycode: null,
+  subcountyid: 1,
+  subcountytenantid: 4,
+  subcountyname: 'Oyugis',
+  subcountycode: '1',
   villageid: 1,
   villagename: 'Ogembo',
   villagetype: null,
@@ -33,16 +33,16 @@ const MOCK_DATA_CONSTANTS = {
         id: 1,
         tenantId: 1,
         name: 'Kenya',
-        districtCount: 2,
-        chiefdomCount: 2,
+        countyCount: 2,
+        subCountyCount: 2,
         healthFacilityCount: 2
       },
       {
         id: 2,
         tenantId: 2,
         name: 'Tanzania',
-        districtCount: 2,
-        chiefdomCount: 2,
+        countyCount: 2,
+        subCountyCount: 2,
         healthFacilityCount: 2
       }
     ],
@@ -79,17 +79,6 @@ const MOCK_DATA_CONSTANTS = {
         }
       }
     ]
-  },
-  ID_AND_TENANT_ID_REQUEST_PAYLOAD: {
-    id: '1',
-    tenantId: '4'
-  },
-  COUNTRY_DETAILS_RESPONSE: {
-    id: '1',
-    tenantId: '2',
-    name: 'Kenya',
-    list: [],
-    total: 2
   }
 };
 

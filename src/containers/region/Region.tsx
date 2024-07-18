@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
-import { downloadFileRequest, regionDetailsRequest, uploadFileRequest } from '../../store/region/actions';
+import { downloadFileRequest, uploadFileRequest, regionDetailsRequest } from '../../store/region/actions';
 import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
@@ -18,11 +18,13 @@ import arrayMutators from 'final-form-arrays';
 import { fileDownload } from '../../utils/commonUtils';
 import { useParams } from 'react-router-dom';
 import { IMatchParams } from '../../store/region/types';
+import { useParams } from 'react-router-dom';
+import { IMatchParams } from '../../store/region/types';
 
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const { regionId, tenantId } = useParams<IMatchParams>();
+  const { regionId } = useParams<IMatchParams>();
   const regionDetails = useSelector(getRegionDetailsSelector);
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
@@ -65,7 +67,7 @@ const Region = (): React.ReactElement => {
     );
 
   const fetchRegionDetails = useCallback(() => {
-    if (regionData?.id) {
+    if (regionId) {
       dispatch(
         regionDetailsRequest({
           countryId: Number(regionId),
@@ -78,7 +80,7 @@ const Region = (): React.ReactElement => {
         })
       );
     }
-  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]);
 
   useEffect(() => {
     fetchRegionDetails();
@@ -120,13 +122,13 @@ const Region = (): React.ReactElement => {
                 columnsDef={[
                   {
                     id: 1,
-                    name: 'districtname',
-                    label: districtSName
+                    name: 'countyname',
+                    label: 'COUNTY'
                   },
                   {
                     id: 2,
-                    name: 'chiefdomname',
-                    label: chiefdomSName
+                    name: 'subcountyname',
+                    label: 'SUB COUNTY'
                   },
                   {
                     id: 3,

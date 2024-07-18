@@ -7,8 +7,7 @@ import {
   getRegionsSelector,
   getRegionsCountSelector,
   getRegionsLoadingMoreSelector,
-  getClientRegistryStatusSelector,
-  getRegionIdSelector
+  getClientRegistryStatusSelector
 } from '../selectors';
 import { initialState as mainInitialState } from '../reducer';
 

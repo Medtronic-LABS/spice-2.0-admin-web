@@ -309,32 +309,6 @@ export function* getUsername(action: IActionProps): SagaIterator {
 }
 
 /*
-  Worker Saga: Fired on FETCH_LOCKED_USERS_REQUEST action
-*/
-export function* fetchLockedUsers({
-  tenantId,
-  skip,
-  limit,
-  search,
-  role,
-  successCb,
-  failureCb
-}: IFetchLockedUsersRequest): SagaIterator {
-  try {
-    const {
-      data: { entityList: lockedUsers, totalCount }
-    } = yield call(userService.fetchLockedUsers as any, tenantId, skip, limit, search, role);
-    successCb?.(lockedUsers || []);
-    yield put(userActions.fetchLockedUsersSuccess({ lockedUsers: lockedUsers || [], totalCount }));
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(userActions.fetchLockedUsersFailure());
-    }
-  }
-}
-
-/*
   Worker Saga: Fired on FETCH_TIMEZONE_LIST_REQUEST action
 */
 export function* fetchTimezoneList(): SagaIterator {
@@ -343,37 +317,6 @@ export function* fetchTimezoneList(): SagaIterator {
     yield put(userActions.fetchTimezoneListSuccess(timezoneList));
   } catch (e) {
     yield put(userActions.fetchTimezoneListFailure());
-  }
-}
-
-/*
-  Worker Saga: Fired on FETCH_COMMUNITY_LIST_REQUEST action
-*/
-export function* fetchCommunityListRequest(action: IActionProps): SagaIterator {
-  const { countryId, successCB, failureCB } = action;
-  try {
-    const { data: entityList } = yield call(userService.fetchCommunityListRequest, countryId);
-    yield put(userActions.fetchCommunityListSuccess(entityList));
-    successCB?.(entityList);
-  } catch (e) {
-    failureCB?.(e);
-    yield put(userActions.fetchCommunityListFailure());
-  }
-}
-
-/*
-  Worker Saga: Fired on UNLOCK_USERS_REQUEST action
-*/
-export function* unlockUsers({ userId, successCb, failureCb }: IUnlockUsersRequest): SagaIterator {
-  try {
-    yield call(userService.unlockUsers as any, userId);
-    successCb?.();
-    yield put(userActions.unlockUsersSuccess());
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(userActions.unlockUsersFailure());
-    }
   }
 }
 
@@ -394,9 +337,6 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.CHANGE_PASSWORD_REQUEST, changePassword)]);
   yield all([takeLatest(USERTYPES.CHANGE_OWN_PASSWORD_REQUEST, updatePassword)]);
   yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
-  yield all([takeLatest(USERTYPES.FETCH_LOCKED_USERS_REQUEST, fetchLockedUsers)]);
-  yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST_REQUEST, fetchCommunityListRequest)]);
-  yield all([takeLatest(USERTYPES.UNLOCK_USERS_REQUEST, unlockUsers)]);
 }
 
 export default userSaga;

@@ -9,8 +9,7 @@ import {
   IFetchClientRegistryStatusReq,
   IUploadFileRequest,
   IDownloadFileRequest,
-  IRegionDetailsRequest,
-  IFetchCountryDetailReq
+  IRegionDetailsRequest
 } from './types';
 import {
   createRegionSuccess,
@@ -18,9 +17,7 @@ import {
   fetchRegionsSuccess,
   createRegionFailure,
   fetchClientRegistryStatusSuccess,
-  fetchClientRegistryStatusFail,
-  fetchCountryDetailSuccess,
-  fetchCountryDetailFail
+  fetchClientRegistryStatusFail
 } from './actions';
 import {
   CREATE_REGION_REQUEST,
@@ -28,8 +25,7 @@ import {
   FETCH_CLIENT_REGISTRY_STATUS_REQUEST,
   UPLOAD_FILE_REQUEST,
   DOWNLOAD_FILE_REQUEST,
-  FETCH_REGION_DETAIL_REQUEST,
-  FETCH_COUNTRY_DETAILS_REQUEST
+  FETCH_REGION_DETAIL_REQUEST
 } from './actionTypes';
 
 /*
@@ -151,25 +147,6 @@ export function* regionDetailsSaga({
 }
 
 /*
-  Worker Saga: Fired on FETCH_COUNTRY_DETAILS_REQUEST action
-*/
-export function* fetchCountryDetail(action: IFetchCountryDetailReq): SagaIterator {
-  const { tenantId, id, failureCb } = action.payload;
-  try {
-    const response = yield call(regionService.getCountryDetail, {
-      tenantId,
-      id
-    });
-    yield put(fetchCountryDetailSuccess(response.data.entity));
-  } catch (e: any) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(fetchCountryDetailFail(e));
-    }
-  }
-}
-
-/*
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
@@ -180,7 +157,6 @@ function* regionSaga() {
   yield all([takeLatest(FETCH_CLIENT_REGISTRY_STATUS_REQUEST, fetchClientRegistryStatus)]);
   yield all([takeLatest(UPLOAD_FILE_REQUEST, uploadFileSaga)]);
   yield all([takeLatest(DOWNLOAD_FILE_REQUEST, downloadFileSaga)]);
-  yield all([takeLatest(FETCH_COUNTRY_DETAILS_REQUEST, fetchCountryDetail)]);
 }
 
 export default regionSaga;
