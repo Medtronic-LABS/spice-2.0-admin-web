@@ -1,7 +1,6 @@
 import { combineReducers } from 'redux';
 import userReducer from './user/reducer';
 import regionReducer from './region/reducer';
-import regionDashboardReducer from './regionDashboard/reducer';
 import healthFacilityReducer from './healthFacility/reducer';
 import medicationReducer from './medication/reducer';
 import workflowReducer from './workflow/reducer';
@@ -20,7 +19,6 @@ const appReducer = combineReducers({
   medication: medicationReducer,
   labtest: labtestReducer,
   workflow: workflowReducer,
-  regionDashboardReducer: regionDashboardReducer,
   county: countyReducer,
   subCounty: subCountyReducer,
   healthFacilityDashboardReducer: healthFacilityDashboardReducer

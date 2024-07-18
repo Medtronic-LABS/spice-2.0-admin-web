@@ -21,6 +21,7 @@ import {
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
 import Dashboard from './containers/dashboard/Dashboard';
+import CreateRegion from './containers/createRegion/CreateRegion';
 import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
@@ -74,6 +75,12 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.region,
       exact: true,
       component: Region,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.createRegion,
+      exact: true,
+      component: CreateRegion,
       authorisedRoles: SU_SA
     },
     {

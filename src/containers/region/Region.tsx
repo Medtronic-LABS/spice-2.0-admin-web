@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
-import { downloadFileRequest, regionDetailsRequest, uploadFileRequest } from '../../store/region/actions';
+import { downloadFileRequest, uploadFileRequest, regionDetailsRequest } from '../../store/region/actions';
 import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
@@ -22,7 +22,7 @@ import { IMatchParams } from '../../store/region/types';
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const { regionId, tenantId } = useParams<IMatchParams>();
+  const { regionId } = useParams<IMatchParams>();
   const regionDetails = useSelector(getRegionDetailsSelector);
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
@@ -76,13 +76,15 @@ const Region = (): React.ReactElement => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DETAIL_FETCH_ERROR));
           }
         })
-      );
-    }
-  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+      ),
+    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]
+  );
 
   useEffect(() => {
-    fetchRegionDetails();
-  }, [fetchRegionDetails]);
+    if (regionDetails.id) {
+      fetchRegionDetails();
+    }
+  }, [dispatch, fetchRegionDetails, listParams, regionDetails.id]);
 
   return (
     <>
@@ -120,13 +122,13 @@ const Region = (): React.ReactElement => {
                 columnsDef={[
                   {
                     id: 1,
-                    name: 'districtname',
-                    label: districtSName
+                    name: 'countyname',
+                    label: 'COUNTY'
                   },
                   {
                     id: 2,
-                    name: 'chiefdomname',
-                    label: chiefdomSName
+                    name: 'subcountyname',
+                    label: 'SUB COUNTY'
                   },
                   {
                     id: 3,

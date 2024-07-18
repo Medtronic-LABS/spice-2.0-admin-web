@@ -1,5 +1,6 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import MOCK_DATA_CONSTANTS from '../../tests/mockData/userDataConstants';
 import * as USERTYPES from './actionTypes';
 import { lockedUsers } from './selectors';
 
@@ -42,7 +43,8 @@ const initialStateGetter = () =>
     email: '',
     errorMessage: '',
     showLoader: false,
-    userTenantId: ''
+    userTenantId: '',
+    timezoneList: []
   } as unknown as IUserState);
 
 const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {

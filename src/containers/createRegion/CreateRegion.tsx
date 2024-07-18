@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import RegionForm from './RegionForm';
 import FormContainer from '../../components/formContainer/FormContainer';
+import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { AppState } from '../../store/rootReducer';
@@ -15,14 +16,28 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import RegionFormIcon from '../../assets/images/info-grey.svg';
 import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
-import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
-import { IRoles } from '../../store/user/types';
-import { fetchCountryListRequest } from '../../store/healthFacility/actions';
+import UserForm from './UserForm';
+
+export interface IUserFormValues {
+  email: string;
+  firstName: string;
+  lastName: string;
+  countryCode: string | { countryCode: string };
+  username: string;
+  phoneNumber: string;
+  timezone: { id: string; description: string };
+  gender: string;
+  country: { countryCode: string };
+}
 
 export interface IRegionFormValues {
   region: {
     name: string;
     countryCode: string;
+    geographicFields: ISelectOption;
+    unitMeasurement: ISelectOption;
+    algorithms: ISelectOption;
+    tenantId?: string;
   };
   users: IUserFormValues[];
 }
@@ -52,32 +67,19 @@ const CreateRegion: React.FC = () => {
     ({ region, users }: IRegionFormValues) => {
       const data = {
         ...region,
-        users: users.map((user: any) => {
-          let insightsIds: number[] = [];
-          if (user.roles) {
-            insightsIds = user.roles
-              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
-              ?.map((role: IRoles) => role.id);
-          }
-          return {
-            ...user,
-            firstName: user.firstName.trim(),
-            lastName: user.lastName.trim(),
-            username: user.email,
-            gender: user.gender,
-            phoneNumber: user.phoneNumber,
-            countryCode: user.countryCode,
-            timezone: { id: Number(user.timezone.id) },
-            roleIds: [user.role[0].id, ...insightsIds]
-          };
-        })
+        users: users.map((user) => ({
+          ...user,
+          firstName: user.firstName.trim(),
+          lastName: user.lastName.trim(),
+          username: user.email,
+          timezone: { id: user.timezone.id }
+        }))
       };
 
       dispatch(
         createRegionRequest({
           data,
           successCb: () => {
-            dispatch(fetchCountryListRequest());
             history.push(PROTECTED_ROUTES.regionDashboard);
             toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_CREATION_SUCCESS);
           },
@@ -108,13 +110,7 @@ const CreateRegion: React.FC = () => {
                 </div>
                 <div className='col-lg-6 col-12'>
                   <FormContainer label='Region Admin' icon={RegionAdminFormIcon}>
-                    <UserForm
-                      isRegionCreate={true}
-                      isAdminForm={true}
-                      form={form}
-                      defaultSelectedRole={APPCONSTANTS.ROLES.REGION_ADMIN}
-                      enableAutoPopulate={true}
-                    />
+                    <UserForm form={form} />
                   </FormContainer>
                 </div>
               </div>

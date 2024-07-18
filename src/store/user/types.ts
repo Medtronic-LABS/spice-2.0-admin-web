@@ -438,7 +438,7 @@ export interface ILoginFailurePayload {
 // }
 
 export interface ITimezone {
-  id: string;
+  id: string | number;
   description?: string;
 }
 
