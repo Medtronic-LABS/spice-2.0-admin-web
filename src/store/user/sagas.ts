@@ -303,6 +303,18 @@ export function* getUsername(action: IActionProps): SagaIterator {
 }
 
 /*
+  Worker Saga: Fired on FETCH_TIMEZONE_LIST_REQUEST action
+*/
+export function* fetchTimezoneList(): SagaIterator {
+  try {
+    const { data: timezoneList } = yield call(userService.fetchTimezoneList);
+    yield put(userActions.fetchTimezoneListSuccess(timezoneList));
+  } catch (e) {
+    yield put(userActions.fetchTimezoneListFailure());
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
@@ -318,6 +330,7 @@ function* userSaga() {
   yield takeLatest(USERTYPES.FETCH_USER_ROLES_REQUEST, fetchUserRoles);
   yield all([takeLatest(USERTYPES.CHANGE_PASSWORD_REQUEST, changePassword)]);
   yield all([takeLatest(USERTYPES.CHANGE_OWN_PASSWORD_REQUEST, updatePassword)]);
+  yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
 }
 
 export default userSaga;

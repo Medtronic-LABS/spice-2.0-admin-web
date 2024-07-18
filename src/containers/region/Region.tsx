@@ -7,22 +7,22 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { userDataSelector } from '../../store/user/selectors';
 import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
-import { downloadFileRequest, regionDetailsRequest, uploadFileRequest } from '../../store/region/actions';
+import { downloadFileRequest, uploadFileRequest, regionDetailsRequest } from '../../store/region/actions';
 import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
 import toastCenter from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import arrayMutators from 'final-form-arrays';
 import { fileDownload } from '../../utils/commonUtils';
+import { useParams } from 'react-router-dom';
+import { IMatchParams } from '../../store/region/types';
 
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-
-  const regionData = useSelector(userDataSelector).country;
+  const { regionId } = useParams<IMatchParams>();
   const regionDetails = useSelector(getRegionDetailsSelector);
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
@@ -31,9 +31,9 @@ const Region = (): React.ReactElement => {
   const onDownloadClick = () => {
     dispatch(
       downloadFileRequest({
-        countryId: Number(regionData.id),
+        countryId: Number(regionId),
         successCb: (data) => {
-          const filename = regionData.name;
+          const filename = regionDetails.name;
           fileDownload(data, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_DOWNLOAD_SUCCESS);
         },
@@ -63,21 +63,21 @@ const Region = (): React.ReactElement => {
     () =>
       dispatch(
         regionDetailsRequest({
-          countryId: Number(regionData.id),
+          countryId: Number(regionId),
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           search: listParams.searchTerm,
           failureCb: (e) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DETAIL_FETCH_ERROR)
         })
       ),
-    [dispatch, listParams, regionData.id]
+    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]
   );
 
   useEffect(() => {
-    if (regionData.id) {
+    if (regionDetails.id) {
       fetchRegionDetails();
     }
-  }, [dispatch, fetchRegionDetails, listParams, regionData.id]);
+  }, [dispatch, fetchRegionDetails, listParams, regionDetails.id]);
 
   return (
     <>
@@ -115,23 +115,18 @@ const Region = (): React.ReactElement => {
                 columnsDef={[
                   {
                     id: 1,
-                    name: 'districtname',
-                    label: 'DISTRICT'
+                    name: 'countyname',
+                    label: 'COUNTY'
                   },
                   {
                     id: 2,
-                    name: 'chiefdomname',
-                    label: 'CHIEFDOM'
+                    name: 'subcountyname',
+                    label: 'SUB COUNTY'
                   },
                   {
                     id: 3,
                     name: 'villagename',
                     label: 'VILLAGE'
-                  },
-                  {
-                    id: 4,
-                    name: 'villagetype',
-                    label: 'VILLAGE TYPE'
                   }
                 ]}
                 isEdit={false}

@@ -1,15 +1,39 @@
-import USER_MOCK_DATA from '../../../tests/mockData/regionDataConstants';
 import {
   getFileSelector,
   getIsDownloadingSelector,
   getIsUploadingSelector,
   getLoadingSelector,
-  getRegionDetailsSelector
+  getRegionDetailsSelector,
+  getRegionsSelector,
+  getRegionsCountSelector,
+  getRegionsLoadingMoreSelector,
+  getClientRegistryStatusSelector
 } from '../selectors';
+import { initialState as mainInitialState } from '../reducer';
 
 const initialState: any = {
-  region: USER_MOCK_DATA.INITIAL_STATE
+  region: mainInitialState // to mock it's region obj from redux
 };
+
+// Test getRegionsSelector
+test('getRegionsSelector should return regions from state', () => {
+  return expect(getRegionsSelector(initialState)).toEqual(initialState.region.regions);
+});
+
+// Test getRegionsCountSelector
+test('getRegionsCountSelector should return region count from state', () => {
+  return expect(getRegionsCountSelector(initialState)).toEqual(initialState.region.total);
+});
+
+// Test getRegionsLoadingMoreSelector
+test('getRegionsLoadingMoreSelector should return region loading more from state', () => {
+  return expect(getRegionsLoadingMoreSelector(initialState)).toEqual(initialState.region.loadingMore);
+});
+
+// Test getClientRegistryStatusSelector
+test('getClientRegistryStatusSelector should return client registry from state', () => {
+  return expect(getClientRegistryStatusSelector(initialState)).toEqual(initialState.region.isClientRegistryEnabled);
+});
 
 // Test getFileSelector
 test('getFileSelector should return file from state', () => {

@@ -1,69 +1,133 @@
-import * as REGIONTYPES from './actionTypes';
+import * as REGION_TYPES from './actionTypes';
 
-import { IRegionState, RegionActions } from './types';
+import { RegionActions, IRegionState } from './types';
 
-const initialStateGetter: () => IRegionState = () => ({
+export const initialState: IRegionState = {
+  regions: [],
+  total: 0,
+  loading: false,
+  loadingMore: false,
+  error: null,
+  detail: {
+    id: '',
+    tenantId: '',
+    name: '',
+    list: [],
+    total: 0
+  },
+  isClientRegistryEnabled: undefined,
   file: {},
   uploading: false,
-  downloading: false,
-  error: null,
-  loading: false,
-  regionDetails: { list: [], total: 0 }
-});
+  downloading: false
+};
 
-const regionReducer = (state = initialStateGetter(), action = {} as RegionActions): IRegionState => {
+const regionReducer = (state = initialState, action = {} as RegionActions): IRegionState => {
   switch (action.type) {
-    case REGIONTYPES.UPLOAD_FILE_REQUEST:
+    case REGION_TYPES.FETCH_REGION_DETAIL_REQUEST:
+    case REGION_TYPES.CREATE_REGION_REQUEST:
+    case REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_REQUEST:
+      return {
+        ...state,
+        loading: true
+      };
+    case REGION_TYPES.CREATE_REGION_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: null
+      };
+    case REGION_TYPES.CREATE_REGION_FAILURE:
+    case REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    case REGION_TYPES.FETCH_REGIONS_FAILURE:
+    case REGION_TYPES.FETCH_REGION_DETAIL_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        loadingMore: false,
+        error: action.error,
+        detail: initialState.detail
+      };
+    case REGION_TYPES.UPLOAD_FILE_REQUEST:
       return {
         ...state,
         uploading: true
       };
-    case REGIONTYPES.UPLOAD_FILE_SUCCESS:
+    case REGION_TYPES.FETCH_REGIONS_REQUEST:
+      return {
+        ...state,
+        [action.isLoadMore ? 'loadingMore' : 'loading']: true
+      };
+    case REGION_TYPES.FETCH_REGIONS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        loadingMore: false,
+        regions: action.payload.isLoadMore
+          ? [...state.regions, ...(action.payload.regions || [])]
+          : action.payload.regions || [],
+        total: action.payload.total ? action.payload.total : state.total,
+        error: null
+      };
+    case REGION_TYPES.FETCH_REGION_DETAIL_SUCCESS:
+      return {
+        ...state,
+        detail: { ...state.detail, ...action.payload },
+        loading: false
+      };
+    case REGION_TYPES.CLEAR_REGION_DETAIL:
+      return {
+        ...state,
+        detail: initialState.detail
+      };
+    case REGION_TYPES.CLEAR_CLIENT_REGISTRY_STATUS:
+      return {
+        ...state,
+        isClientRegistryEnabled: undefined
+      };
+    case REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        isClientRegistryEnabled: action.payload.isClientRegistryEnabled
+      };
+    case REGION_TYPES.SET_REGION_DETAILS:
+      return {
+        ...state,
+        detail: { ...state.detail, ...action.data }
+      };
+    case REGION_TYPES.UPLOAD_FILE_SUCCESS:
       return {
         ...state,
         uploading: false,
         file: action.payload,
         error: null
       };
-    case REGIONTYPES.UPLOAD_FILE_FAILURE:
+    case REGION_TYPES.UPLOAD_FILE_FAILURE:
       return {
         ...state,
         uploading: false,
         error: action.payload.error
       };
-    case REGIONTYPES.DOWNLOAD_FILE_REQUEST:
+    case REGION_TYPES.DOWNLOAD_FILE_REQUEST:
       return {
         ...state,
         downloading: true
       };
-    case REGIONTYPES.DOWNLOAD_FILE_SUCCESS:
+    case REGION_TYPES.DOWNLOAD_FILE_SUCCESS:
       return {
         ...state,
         downloading: false,
         error: null
       };
-    case REGIONTYPES.DOWNLOAD_FILE_FAILURE:
+    case REGION_TYPES.DOWNLOAD_FILE_FAILURE:
       return {
         ...state,
         downloading: false,
-        error: action.payload.error
-      };
-    case REGIONTYPES.REGION_DETAILS_REQUEST:
-      return {
-        ...state,
-        loading: true
-      };
-    case REGIONTYPES.REGION_DETAILS_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        regionDetails: action.payload,
-        error: null
-      };
-    case REGIONTYPES.REGION_DETAILS_FAILURE:
-      return {
-        ...state,
-        loading: false,
         error: action.payload.error
       };
     default:

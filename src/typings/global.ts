@@ -1,5 +1,6 @@
 import { CallEffect, PutEffect } from 'redux-saga/effects';
 import { AxiosResponse } from 'axios';
+import { ITimezone } from '../store/user/types';
 
 export interface IActionProps {
   type: string;
@@ -55,4 +56,9 @@ export interface IUpdateAdminReqPayload {
   address: string;
   timezone: string;
   _id: string;
+}
+
+export interface IAdminsFormValues extends Omit<IAdminReqPayload, 'timezone'> {
+  timezone: ITimezone;
+  count?: number;
 }

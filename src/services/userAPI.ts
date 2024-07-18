@@ -107,3 +107,9 @@ export const getUsername = (token: string) =>
     method: 'post',
     url: `/user-service/user/verify-token/${token}`
   });
+
+export const fetchTimezoneList = () =>
+  axios({
+    method: 'GET',
+    url: '/spice-service/timezone'
+  });

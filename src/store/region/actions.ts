@@ -1,57 +1,92 @@
-import * as USER_TYPES from './actionTypes';
+import * as REGION_TYPES from './actionTypes';
 import {
+  IFetchRegionsRequest,
+  IFetchRegionsSuccess,
+  IFetchRegionsFailure,
+  IFetchRegionsSuccessPayload,
+  ICreateRegionRequest,
+  ICreateRegionFailure,
+  ICreateRegionSuccess,
+  ICreateRegionRequestPayload,
+  IRegionDetail,
+  IRegionInfo,
+  IDeleteRegionAdminPayload,
+  IDeactivateReqPayload,
+  ISetRegionDetails,
+  IRegionAdminAddPayload,
+  IClearRegionDetail,
+  IFetchClientRegistryStatusReq,
+  IFetchClientRegistryStatusReqPayload,
+  IFetchClientRegistryStatusSuccess,
+  IFetchClientRegistryStatusFail,
+  IClearClientRegistryStatus,
   IUploadFileRequest,
   IUploadFileSuccess,
   IUploadFileFailure,
-  IUploadFilePayload,
   IRegionDetailsRequest,
   IRegionDetailsSuccess,
   IRegionDetailsFailure,
-  IRegionDetails,
+  IRegionDetailList,
   IDownloadFileRequest,
   IDownloadFileSuccess,
-  IDownloadFileFailure
+  IDownloadFileFailure,
+  IUploadFilePayload
 } from './types';
 
-export const uploadFileRequest = ({ file, successCb, failureCb }: IUploadFilePayload): IUploadFileRequest => ({
-  type: USER_TYPES.UPLOAD_FILE_REQUEST,
-  file,
-  successCb,
-  failureCb
-});
-
-export const uploadFileSuccess = (payload: any): IUploadFileSuccess => ({
-  type: USER_TYPES.UPLOAD_FILE_SUCCESS,
-  payload
-});
-
-export const uploadFileFailure = (payload: any): IUploadFileFailure => ({
-  type: USER_TYPES.UPLOAD_FILE_FAILURE,
-  payload
-});
-export const downloadFileRequest = ({
-  countryId,
+export const fetchRegionsRequest = ({
+  skip,
+  limit,
+  isLoadMore,
+  search,
   successCb,
   failureCb
 }: {
-  countryId: number;
-  successCb?: (payload: any) => void;
+  skip: number;
+  limit: number | null;
+  isLoadMore?: boolean;
+  search?: string;
+  successCb?: (payload: IFetchRegionsSuccessPayload) => void;
   failureCb?: (error: Error) => void;
-}): IDownloadFileRequest => ({
-  type: USER_TYPES.DOWNLOAD_FILE_REQUEST,
-  countryId,
+}): IFetchRegionsRequest => {
+  return {
+    type: REGION_TYPES.FETCH_REGIONS_REQUEST,
+    skip,
+    limit,
+    isLoadMore,
+    search,
+    successCb,
+    failureCb
+  };
+};
+
+export const fetchRegionsSuccess = (payload: IFetchRegionsSuccessPayload): IFetchRegionsSuccess => ({
+  type: REGION_TYPES.FETCH_REGIONS_SUCCESS,
+  payload
+});
+
+export const fetchRegionsFailure = (error: Error): IFetchRegionsFailure => ({
+  type: REGION_TYPES.FETCH_REGIONS_FAILURE,
+  error
+});
+
+export const createRegionRequest = ({
+  data,
+  successCb,
+  failureCb
+}: ICreateRegionRequestPayload): ICreateRegionRequest => ({
+  type: REGION_TYPES.CREATE_REGION_REQUEST,
+  data,
   successCb,
   failureCb
 });
 
-export const downloadFileSuccess = (payload: any): IDownloadFileSuccess => ({
-  type: USER_TYPES.DOWNLOAD_FILE_SUCCESS,
-  payload
+export const createRegionSuccess = (): ICreateRegionSuccess => ({
+  type: REGION_TYPES.CREATE_REGION_SUCCESS
 });
 
-export const downloadFileFailure = (payload: any): IDownloadFileFailure => ({
-  type: USER_TYPES.DOWNLOAD_FILE_FAILURE,
-  payload
+export const createRegionFailure = (error: Error): ICreateRegionFailure => ({
+  type: REGION_TYPES.CREATE_REGION_FAILURE,
+  error
 });
 
 export const regionDetailsRequest = ({
@@ -69,7 +104,7 @@ export const regionDetailsRequest = ({
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }): IRegionDetailsRequest => ({
-  type: USER_TYPES.REGION_DETAILS_REQUEST,
+  type: REGION_TYPES.FETCH_REGION_DETAIL_REQUEST,
   skip,
   limit,
   search,
@@ -78,12 +113,86 @@ export const regionDetailsRequest = ({
   failureCb
 });
 
-export const regionDetailsSuccess = (payload: { list: IRegionDetails[]; total: number }): IRegionDetailsSuccess => ({
-  type: USER_TYPES.REGION_DETAILS_SUCCESS,
+export const regionDetailsSuccess = (payload: { list: IRegionDetailList[], total: number }): IRegionDetailsSuccess => ({
+  type: REGION_TYPES.FETCH_REGION_DETAIL_SUCCESS,
   payload
 });
 
-export const regionDetailsFailure = (payload: any): IRegionDetailsFailure => ({
-  type: USER_TYPES.REGION_DETAILS_FAILURE,
+export const regionDetailsFailure = (error: Error): IRegionDetailsFailure => ({
+  type: REGION_TYPES.FETCH_REGION_DETAIL_FAILURE,
+  error
+});
+
+export const clearRegionDetail = (): IClearRegionDetail => ({
+  type: REGION_TYPES.CLEAR_REGION_DETAIL
+});
+
+export const setRegionDetail = (data?: Partial<IRegionDetail>): ISetRegionDetails => ({
+  type: REGION_TYPES.SET_REGION_DETAILS,
+  data
+});
+
+export const fetchClientRegistryStatusReq = (
+  payload: IFetchClientRegistryStatusReqPayload
+): IFetchClientRegistryStatusReq => ({
+  type: REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_REQUEST,
+  payload
+});
+
+export const fetchClientRegistryStatusSuccess = (
+  isClientRegistryEnabled: boolean
+): IFetchClientRegistryStatusSuccess => ({
+  type: REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_SUCCESS,
+  payload: { isClientRegistryEnabled }
+});
+
+export const fetchClientRegistryStatusFail = (error: Error): IFetchClientRegistryStatusFail => ({
+  type: REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_FAIL,
+  error
+});
+
+export const clearClientRegistryStatus = (): IClearClientRegistryStatus => ({
+  type: REGION_TYPES.CLEAR_CLIENT_REGISTRY_STATUS
+});
+
+export const uploadFileRequest = ({ file, successCb, failureCb }: IUploadFilePayload): IUploadFileRequest => ({
+  type: REGION_TYPES.UPLOAD_FILE_REQUEST,
+  file,
+  successCb,
+  failureCb
+});
+
+export const uploadFileSuccess = (payload: any): IUploadFileSuccess => ({
+  type: REGION_TYPES.UPLOAD_FILE_SUCCESS,
+  payload
+});
+
+export const uploadFileFailure = (payload: any): IUploadFileFailure => ({
+  type: REGION_TYPES.UPLOAD_FILE_FAILURE,
+  payload
+});
+
+export const downloadFileRequest = ({
+  countryId,
+  successCb,
+  failureCb
+}: {
+  countryId: number;
+  successCb?: (payload: any) => void;
+  failureCb?: (error: Error) => void;
+}): IDownloadFileRequest => ({
+  type: REGION_TYPES.DOWNLOAD_FILE_REQUEST,
+  countryId,
+  successCb,
+  failureCb
+});
+
+export const downloadFileSuccess = (payload: any): IDownloadFileSuccess => ({
+  type: REGION_TYPES.DOWNLOAD_FILE_SUCCESS,
+  payload
+});
+
+export const downloadFileFailure = (payload: any): IDownloadFileFailure => ({
+  type: REGION_TYPES.DOWNLOAD_FILE_FAILURE,
   payload
 });

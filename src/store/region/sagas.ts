@@ -1,10 +1,93 @@
 import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
-import * as USERTYPES from './actionTypes';
-import { IDownloadFileRequest, IRegionDetails, IRegionDetailsRequest, IUploadFileRequest } from './types';
 import * as regionService from '../../services/regionAPI';
 import * as regionActions from './actions';
+import {
+  ICreateRegionRequest,
+  IFetchRegionsRequest,
+  IFetchClientRegistryStatusReq,
+  IUploadFileRequest,
+  IDownloadFileRequest,
+  IRegionDetailsRequest
+} from './types';
+import {
+  createRegionSuccess,
+  fetchRegionsFailure,
+  fetchRegionsSuccess,
+  createRegionFailure,
+  fetchClientRegistryStatusSuccess,
+  fetchClientRegistryStatusFail
+} from './actions';
+import {
+  CREATE_REGION_REQUEST,
+  FETCH_REGIONS_REQUEST,
+  FETCH_CLIENT_REGISTRY_STATUS_REQUEST,
+  UPLOAD_FILE_REQUEST,
+  DOWNLOAD_FILE_REQUEST,
+  FETCH_REGION_DETAIL_REQUEST
+} from './actionTypes';
+
+/*
+  Worker Saga: Fired on FETCH_REGIONS_REQUEST action
+*/
+export function* fetchRegionsSaga({
+  isLoadMore,
+  skip,
+  limit,
+  search,
+  successCb,
+  failureCb
+}: IFetchRegionsRequest): SagaIterator {
+  try {
+    const {
+      data: { entityList: regions, totalCount: total }
+    } = yield call(regionService.fetchRegions as any, limit, skip, undefined, search);
+    const payload = { regions: regions || [], total, isLoadMore };
+    successCb?.(payload);
+    yield put(fetchRegionsSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchRegionsFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on CREATE_REGION_REQUEST action
+*/
+export function* createRegion({ data, successCb, failureCb }: ICreateRegionRequest): SagaIterator {
+  try {
+    yield call(regionService.createRegion as any, data);
+    successCb?.();
+    yield put(createRegionSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(createRegionFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_CLIENT_REGISTRY_STATUS_REQUEST action
+*/
+
+export function* fetchClientRegistryStatus(action: IFetchClientRegistryStatusReq): SagaIterator {
+  const { countryId } = action.payload;
+  try {
+    const {
+      data: { isClientRegistryEnabled }
+    } = yield call(regionService.getRegionDetailById, countryId);
+    yield put(fetchClientRegistryStatusSuccess(!!isClientRegistryEnabled));
+  } catch (e) {
+    yield put(fetchClientRegistryStatusSuccess(false));
+    if (e instanceof Error) {
+      yield put(fetchClientRegistryStatusFail(e));
+    }
+  }
+}
 
 /*
   Worker Saga: Fired on UPLOAD_FILE_REQUEST action
@@ -35,7 +118,7 @@ export function* downloadFileSaga({ countryId, successCb, failureCb }: IDownload
 }
 
 /*
-  Worker Saga: Fired on REGION_DETAILS_REQUEST action
+  Worker Saga: Fired on FETCH_REGION_DETAIL_REQUEST action
 */
 export function* regionDetailsSaga({
   skip,
@@ -47,31 +130,33 @@ export function* regionDetailsSaga({
 }: IRegionDetailsRequest): SagaIterator {
   try {
     const {
-      data: { entityList: regionDetails, totalCount }
+      data: { entityList: list, totalCount: total }
     } = yield call(regionService.regionDetails, countryId, limit, skip, search);
     const payload = {
-      list:
-        regionDetails === null || regionDetails[0]?.id
-          ? regionDetails
-          : regionDetails.map((d: IRegionDetails, id: number) => ({ ...d, id: id + 1 })),
-      total: totalCount
+      list,
+      total
     };
     successCb?.(payload);
     yield put(regionActions.regionDetailsSuccess(payload));
-  } catch (e: any) {
-    failureCb?.(e);
-    yield put(regionActions.regionDetailsFailure(e));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(regionActions.regionDetailsFailure(e));
+    }
   }
 }
 
 /*
-  Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
+  Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
-function* userSaga() {
-  yield all([takeLatest(USERTYPES.UPLOAD_FILE_REQUEST, uploadFileSaga)]);
-  yield all([takeLatest(USERTYPES.DOWNLOAD_FILE_REQUEST, downloadFileSaga)]);
-  yield all([takeLatest(USERTYPES.REGION_DETAILS_REQUEST, regionDetailsSaga)]);
+function* regionSaga() {
+  yield all([takeLatest(FETCH_REGIONS_REQUEST, fetchRegionsSaga)]);
+  yield all([takeLatest(FETCH_REGION_DETAIL_REQUEST, regionDetailsSaga)]);
+  yield all([takeLatest(CREATE_REGION_REQUEST, createRegion)]);
+  yield all([takeLatest(FETCH_CLIENT_REGISTRY_STATUS_REQUEST, fetchClientRegistryStatus)]);
+  yield all([takeLatest(UPLOAD_FILE_REQUEST, uploadFileSaga)]);
+  yield all([takeLatest(DOWNLOAD_FILE_REQUEST, downloadFileSaga)]);
 }
 
-export default userSaga;
+export default regionSaga;

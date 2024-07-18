@@ -11,14 +11,14 @@ import {
   clearClientRegistryStatus,
   clearRegionDetail,
   fetchRegionsRequest,
-  setRegionDetails
-} from '../../store/regionDashboard/actions';
+  setRegionDetail
+} from '../../store/region/actions';
 import {
   getRegionsCountSelector,
   getRegionsLoadingMoreSelector,
-  getRegionsLoadingSelector,
+  getLoadingSelector,
   getRegionsSelector
-} from '../../store/regionDashboard/selectors';
+} from '../../store/region/selectors';
 import { appendZeroBefore } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
@@ -29,7 +29,7 @@ import { timezoneListSelector } from '../../store/user/selectors';
 import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
 import { clearAccountDetails, resetClinicalWorkflow } from '../../store/county/actions';
 import { clearOperatingUnitDetail } from '../../store/subCounty/actions';
-import { IRegionDetail } from '../../store/regionDashboard/types';
+import { IRegionDetail } from '../../store/region/types';
 import { getClinicalWorkflowSelector } from '../../store/county/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 
@@ -51,7 +51,7 @@ const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const regions = useSelector(getRegionsSelector);
   const regionsCount = useSelector(getRegionsCountSelector);
-  const loading = useSelector(getRegionsLoadingSelector);
+  const loading = useSelector(getLoadingSelector);
   const loadingMore = useSelector(getRegionsLoadingMoreSelector);
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
@@ -86,6 +86,12 @@ const Region = (): React.ReactElement => {
     }
   }, [clinicalWorkflows.length, dispatch]);
 
+  useEffect(() => {
+    if (!timezoneList?.length) {
+      dispatch(fetchTimezoneListRequest());
+    }
+  }, [dispatch, timezoneList?.length]);
+
   /**
    * To remove Region, Account, OU, Site Details cache in store
    */
@@ -104,7 +110,7 @@ const Region = (): React.ReactElement => {
   const onDashboardExit = useCallback(
     (partialRegionDetail: Partial<IRegionDetail>) => {
       dispatch(clearRegionDetail());
-      dispatch(setRegionDetails(partialRegionDetail));
+      dispatch(setRegionDetail(partialRegionDetail));
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, partialRegionDetail.id);
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, partialRegionDetail.tenantId);
     },

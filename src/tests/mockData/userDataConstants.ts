@@ -229,6 +229,20 @@ const MOCK_DATA_CONSTANTS = {
       id: 2,
       name: 'Bengali - Bangladesh'
     }
+  ],
+  TIME_ZONE_RESPONSE: [
+    {
+      id: 1,
+      createdBy: 1,
+      updatedBy: 1,
+      createdAt: '2022-12-08T19:11:09+00:00',
+      updatedAt: '2022-12-08T19:11:09+00:00',
+      abbreviation: 'IST',
+      description: '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi',
+      offset: '+05:30',
+      active: true,
+      deleted: false
+    }
   ]
 };
 
