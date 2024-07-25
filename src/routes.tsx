@@ -340,15 +340,13 @@ export const AppRoutes = () => {
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const role = useSelector(roleSelector);
 
-  const params = new URLSearchParams(document.location.search)
+  const params = new URLSearchParams(JSON.stringify(document.location.search))
   const url = useRef(params.get('next') || '')
 
   useEffect(() => {
     if (isLoggedIn && url.current) {
-      let link = document.createElement('a');
-      link.href = url.current || '';
-      document.body.appendChild(link);
-      link.click();
+      const data:any = decryptData(url.current)
+      goToUrl(data?.redirectUrl);
       url.current = '';
     }
   }, [data, isLoggedIn, url])
