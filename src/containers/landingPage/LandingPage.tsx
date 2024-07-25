@@ -52,7 +52,7 @@ const LandingPage = (): React.ReactElement => {
         icon: ReportingPortalLogo,
         hasDomain: true,
         suiteAccessName: CFR,
-        domainUrl: process.env.REACT_APP_CFR_URL,
+        domainUrl: process.env.REACT_APP_CFR_WEB_URL,
         disabled: false
       },
       {
