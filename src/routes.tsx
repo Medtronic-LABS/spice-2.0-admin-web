@@ -308,20 +308,20 @@ export const AppRoutes = () => {
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const role = useSelector(roleSelector);
 
-  const params = new URLSearchParams(JSON.stringify(document.location.search))
+  const params = new URLSearchParams(document.location.search)
   const url = useRef(params.get('next') || '')
 
   useEffect(() => {
     if (isLoggedIn && url.current) {
-      const data:any = decryptData(url.current)
-      goToUrl(data?.redirectUrl);
+      const data: any = JSON.parse(decryptData(url.current));
+      goToUrl(data.redirectUrl);
       url.current = '';
     }
   }, [data, isLoggedIn, url])
 
-  if (isLoggedIn && url.current) {                                                                                                                         
-    return <Loader />                                                                               
-  }                             
+  if (isLoggedIn && url.current) {
+    return <Loader />
+  }
 
   return isLoggedIn && regionId && tenantId ? (
     <AppLayout>
