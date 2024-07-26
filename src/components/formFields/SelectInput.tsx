@@ -51,6 +51,7 @@ interface ISelectBoxProps {
   isShowLabel?: boolean;
   isMulti?: boolean;
   autoSelect?: boolean;
+  autoSelect?: boolean;
   name?: string;
   menuPlacement?: string;
   autoSelect?: boolean;
@@ -96,8 +97,6 @@ const SelectInput = ({
   isMulti = false,
   menuPlacement = 'auto',
   autoSelect = true,
-  optionPropStyles,
-  isOptionDisabled,
   name = '',
   ...rest
 }: ISelectBoxProps): React.ReactElement => {

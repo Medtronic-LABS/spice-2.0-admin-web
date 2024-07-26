@@ -2,6 +2,7 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
 import * as accountService from '../../services/accountAPI';
+import { fetchAccountAdmins as fetchAccountAdminsApi } from '../../services/accountAPI';
 import {
   IFetchAccountsRequest,
   ICreateAccountRequest,
@@ -44,7 +45,6 @@ import {
   UPDATE_ACCOUNT_WORKFLOW_MODULE_REQUEST,
   DELETE_ACCOUNT_WORKFLOW_MODULE_REQUEST
 } from './actionTypes';
-import { fetchAccountAdmins as fetchAccountAdminsApi } from '../../services/accountAPI';
 import { AppState } from '../rootReducer';
 
 /*
@@ -78,6 +78,55 @@ export function* fetchAccounts({
     const payload = { accounts: response?.entityList || [], total: response.totalCount };
     successCb?.(payload);
     yield put(accountActions.fetchAccountsSuccess(payload));
+    // const payload = {
+    //   accounts: [
+    //     {
+    //       id: 53,
+    //       name: 'Test1',
+    //       tenantId: 159,
+    //       users: [],
+    //       updatedAt: '2024-07-08T15:13:09+05:30'
+    //     },
+    //     {
+    //       id: 52,
+    //       name: 'Test',
+    //       tenantId: 158,
+    //       users: [],
+    //       updatedAt: '2024-07-08T15:07:59+05:30'
+    //     },
+    //     {
+    //       id: 51,
+    //       name: 'Demo059aa',
+    //       tenantId: 157,
+    //       users: [],
+    //       updatedAt: '2024-07-08T15:02:35+05:30'
+    //     },
+    //     {
+    //       id: 50,
+    //       name: 'Demo059a',
+    //       tenantId: 156,
+    //       users: [],
+    //       updatedAt: '2024-07-08T13:35:55+05:30'
+    //     },
+    //     {
+    //       id: 49,
+    //       name: 'Demo059',
+    //       tenantId: 155,
+    //       users: [],
+    //       updatedAt: '2024-07-08T13:31:08+05:30'
+    //     },
+    //     {
+    //       id: 48,
+    //       name: 'Demo058',
+    //       tenantId: 154,
+    //       users: [],
+    //       updatedAt: '2024-07-08T13:25:52+05:30'
+    //     }
+    //   ],
+    //   total: 10
+    // };
+    // successCb?.(payload as any);
+    // yield put(accountActions.fetchAccountsSuccess(payload as any));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -124,6 +173,244 @@ export function* fetchAccountDetail(action: IFetchAccountDetailReq): SagaIterato
       });
       yield put(accountActions.fetchAccountDetailSuccess(response.data?.entity));
       successCb?.(response.data?.entity);
+      // const response = {
+      //   data: {
+      //     entity: {
+      //       id: 41,
+      //       name: 'Makueni County',
+      //       maxNoOfUsers: 100,
+      //       tenantId: 413,
+      //       country: {
+      //         id: 4,
+      //         name: 'Kenya',
+      //         countryCode: '254',
+      //         unitMeasurement: 'metric',
+      //         isOfflineEnabled: null,
+      //         tenantId: 1,
+      //         isClientRegistryEnabled: null,
+      //         abbreviation: null
+      //       },
+      //       clinicalWorkflow: [
+      //         {
+      //           id: 1,
+      //           name: 'Pregnancy ANC',
+      //           workflow: 'pregnancyAnc',
+      //           moduleType: 'clinical',
+      //           default: false
+      //         },
+      //         {
+      //           id: 5,
+      //           name: 'mental health',
+      //           workflow: 'phq4',
+      //           moduleType: 'clinical',
+      //           default: false
+      //         },
+      //         {
+      //           id: 3,
+      //           name: 'hypertension',
+      //           workflow: 'bpLog',
+      //           moduleType: 'clinical',
+      //           default: true
+      //         },
+      //         {
+      //           id: 4,
+      //           name: 'diabetics',
+      //           workflow: 'glucoseLog',
+      //           moduleType: 'clinical',
+      //           default: true
+      //         },
+      //         {
+      //           id: 23,
+      //           name: 'Suicide Screener',
+      //           workflow: 'suicideScreener',
+      //           moduleType: 'clinical',
+      //           default: false
+      //         },
+      //         {
+      //           id: 24,
+      //           name: 'Substance Abuse',
+      //           workflow: 'substanceAbuse',
+      //           moduleType: 'clinical',
+      //           default: false
+      //         }
+      //       ],
+      //       customizedWorkflow: [],
+      //       users: [
+      //         {
+      //           id: 4742,
+      //           username: 'dmutai@path.org',
+      //           firstName: 'Dominic',
+      //           lastName: 'Mutai',
+      //           gender: 'Male',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '0722608505',
+      //           timezone: {
+      //             id: 48,
+      //             offset: '+10:00',
+      //             description: '(UTC+10:00) Brisbane'
+      //           }
+      //         },
+      //         {
+      //           id: 8338,
+      //           username: 'marietahpeter@gmail.com',
+      //           firstName: 'Marietta',
+      //           lastName: 'Peter',
+      //           gender: 'Male',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '0724071047',
+      //           timezone: {
+      //             id: 16,
+      //             offset: '+03:00',
+      //             description: '(UTC+03:00) Nairobi'
+      //           }
+      //         },
+      //         {
+      //           id: 5769,
+      //           username: 'trizahgitahi@gmail.com',
+      //           firstName: 'Teresiah',
+      //           lastName: 'Gitahi',
+      //           gender: 'Female',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '705679731',
+      //           timezone: {
+      //             id: 48,
+      //             offset: '+10:00',
+      //             description: '(UTC+10:00) Brisbane'
+      //           }
+      //         },
+      //         {
+      //           id: 9964,
+      //           username: 'jasperkituku@yahoo.com',
+      //           firstName: 'Jasper',
+      //           lastName: 'Kituku',
+      //           gender: 'Male',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '713809969',
+      //           timezone: {
+      //             id: 16,
+      //             offset: '+03:00',
+      //             description: '(UTC+03:00) Nairobi'
+      //           }
+      //         },
+      //         {
+      //           id: 9965,
+      //           username: 'skavisi@yahoo.com',
+      //           firstName: 'Simon',
+      //           lastName: 'Kavisi',
+      //           gender: 'Male',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '721469269',
+      //           timezone: {
+      //             id: 16,
+      //             offset: '+03:00',
+      //             description: '(UTC+03:00) Nairobi'
+      //           }
+      //         },
+      //         {
+      //           id: 9982,
+      //           username: 'joshuamutuku45@gmail.com',
+      //           firstName: 'Joshua',
+      //           lastName: 'Mutuku',
+      //           gender: 'Male',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '721567427',
+      //           timezone: {
+      //             id: 16,
+      //             offset: '+03:00',
+      //             description: '(UTC+03:00) Nairobi'
+      //           }
+      //         },
+      //         {
+      //           id: 9995,
+      //           username: 'abigailjacob99@gmail.com',
+      //           firstName: 'Abigail',
+      //           lastName: 'Jacob',
+      //           gender: 'Female',
+      //           country: {
+      //             id: 4,
+      //             name: 'Kenya',
+      //             countryCode: '254',
+      //             unitMeasurement: 'metric',
+      //             isOfflineEnabled: null,
+      //             tenantId: 1,
+      //             isClientRegistryEnabled: null,
+      //             abbreviation: null
+      //           },
+      //           countryCode: '254',
+      //           phoneNumber: '714657562',
+      //           timezone: {
+      //             id: 16,
+      //             offset: '+03:00',
+      //             description: '(UTC+03:00) Nairobi'
+      //           }
+      //         }
+      //       ],
+      //       countryCode: '254'
+      //     }
+      //   }
+      // };
+      // yield put(accountActions.fetchAccountDetailSuccess(response.data?.entity as any));
+      // successCb?.(response.data?.entity as any);
     }
   } catch (e: any) {
     if (e instanceof Error) {

@@ -8,6 +8,7 @@ import Breadcrumb from '../breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 import SideMenu from '../sideMenu/SideMenu';
 import styles from './AppLayout.module.scss';
+import APPCONSTANTS from '../../constants/appConstants';
 
 interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
@@ -46,7 +47,7 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.userByOU },
 
   { route: PROTECTED_ROUTES.regionSummary },
-  // { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
+  { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
   // { route: PROTECTED_ROUTES.OUSummary, disabledRoles: [APPCONSTANTS.ROLES.OPERATING_UNIT_ADMIN] },
   { route: PROTECTED_ROUTES.siteSummary },
 

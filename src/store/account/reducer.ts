@@ -2,14 +2,19 @@ import * as ACCOUNT_TYPES from './actionTypes';
 
 import { AccountActions, IAccountState } from './types';
 
-const initialState: IAccountState = {
+export const initialState: IAccountState = {
   account: {
     name: '',
     id: '',
     tenantId: '',
     maxNoOfUsers: '',
     users: [],
-    updatedAt: ''
+    updatedAt: '',
+    country: {
+      countryCode: '',
+      tenantId: '',
+      id: ''
+    }
   },
   accounts: [],
   accountOptions: [],

@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { appendZeroBefore } from '../../utils/commonUtils';
@@ -14,9 +14,9 @@ import {
   accDashboardListSelector,
   accDashboardLoadingMoreSelector,
   accountsLoadingSelector
-} from '../../store/county/selectors';
-import { IAccountDetail, IDashboardAccounts } from '../../store/county/types';
-import { clearAccountDetails, fetchAccountsDashboardList, setAccountDetails } from '../../store/county/actions';
+} from '../../store/account/selectors';
+import { IAccountDetail, IDashboardAccounts } from '../../store/account/types';
+import { clearAccountDetails, fetchAccountsDashboardList, setAccountDetails } from '../../store/account/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { countryIdSelector, formDataIdSelector, tenantIdSelector } from '../../store/user/selectors';
 
@@ -33,6 +33,7 @@ const AccountDashboard = () => {
   const loadingMore = useSelector(accDashboardLoadingMoreSelector);
   const countryId = useSelector(countryIdSelector);
   const { push } = useHistory();
+  const moduleName = NAME_CONSTANTS.county;
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: count,
     itemsPerPage: APPCONSTANTS.ACCOUNTS_PER_PAGE,
@@ -133,14 +134,14 @@ const AccountDashboard = () => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className='col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column'>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>Accounts</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{moduleName}s</h4>
           {!noAccountsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder='Search Account' onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${moduleName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <button className='ms-sm-1dot5 btn primary-btn' onClick={navigateToCreateAcc}>
-                Create Account
+                Create {moduleName}
               </button>
             </>
           )}
@@ -157,9 +158,9 @@ const AccountDashboard = () => {
         {noAccountsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an account</div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {moduleName.toLowerCase()}</div>
             <button className='btn primary-btn mx-auto' onClick={navigateToCreateAcc}>
-              Create Account
+              Create {moduleName}
             </button>
           </div>
         )}

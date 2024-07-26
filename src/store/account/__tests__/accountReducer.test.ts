@@ -168,7 +168,12 @@ describe('accountReducer', () => {
         name: '',
         tenantId: '',
         updatedAt: '',
-        users: []
+        users: [],
+        country: {
+          countryCode: '',
+          tenantId: '',
+          id: ''
+        }
       }
     };
 
@@ -447,7 +452,12 @@ describe('accountReducer', () => {
         maxNoOfUsers: '',
         tenantId: '',
         updatedAt: '',
-        users: []
+        users: [],
+        country: {
+          countryCode: '',
+          tenantId: '',
+          id: ''
+        }
       },
       admins: [],
       total: 0,

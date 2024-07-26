@@ -1,11 +1,11 @@
-import { memo, useCallback, useEffect } from 'react';
-import { NavLink, matchPath, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { SIDE_MENU_MAPPER, routesWithSideMenu } from '../../constants/route';
-import styles from './SideMenu.module.scss';
+import { useMemo } from 'react';
+import { matchPath, NavLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { roleSelector, userDataSelector } from '../../store/user/selectors';
+
 import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import styles from './SideMenu.module.scss';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
 import useRouteParams from '../../hooks/useRouteParams';
 
 interface ISideMenuItem {
@@ -13,6 +13,7 @@ interface ISideMenuItem {
   route: string;
   disabled?: boolean;
   childRoutes?: string[];
+  collapsible?: boolean;
 }
 
 interface ISideMenuProps {
@@ -23,6 +24,12 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Region',
     route: PROTECTED_ROUTES.region,
+    disabled: false
+  },
+  {
+    label: 'County',
+    route: PROTECTED_ROUTES.accountByRegion,
+    collapsible: true,
     disabled: false
   },
   {

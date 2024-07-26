@@ -19,7 +19,7 @@ import {
 } from '../sagas';
 import * as accountService from '../../../services/accountAPI';
 import * as accountActions from '../actions';
-import * as siteActions from '../../site/actions';
+import * as siteActions from '../../healthFacilityDashboard/actions';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
 import * as ACTION_TYPES from '../actionTypes';
 import { AxiosPromise, AxiosResponse } from 'axios';
