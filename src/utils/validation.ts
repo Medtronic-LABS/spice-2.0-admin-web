@@ -328,9 +328,9 @@ export function formatDate(value: string | number | Date, options: IDateOptions)
   function findMonth() {
     const monthIndex = fullDate.getMonth();
     if (options?.month === 'short') {
-      return longMonthNames[monthIndex].substring(0, 3);
+      return longMonthNames?.[monthIndex].substring(0, 3);
     } else if (options?.month === 'long') {
-      return longMonthNames[monthIndex];
+      return longMonthNames?.[monthIndex];
     } else if (options?.month === 'numeric') {
       return monthIndex < 10 ? `0${monthIndex}` : monthIndex;
     }

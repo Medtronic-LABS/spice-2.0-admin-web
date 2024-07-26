@@ -216,7 +216,8 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
     case USERTYPES.FETCH_USER_BY_EMAIL:
       return {
         ...state,
-        showLoader: true
+        showLoader: true,
+        loading: false
       };
     case USERTYPES.FETCH_USER_BY_EMAIL_SUCCESS:
     case USERTYPES.FETCH_USER_BY_EMAIL_FAIL:

@@ -9,7 +9,7 @@ import {
   IDeleteAccountWorkflowModuleReqPayload,
   IFetchClinicalWorkflowReqPayload,
   IFetchAccountOptionsPayload
-} from '../store/county/types';
+} from '../store/account/types';
 
 export const fetchAccounts = (
   tenantId: number,
@@ -20,7 +20,7 @@ export const fetchAccounts = (
 ) =>
   axios({
     method: 'POST',
-    url: '/admin-service/account/account-list',
+    url: '/admin-service/county/county-list',
     data: {
       tenantId,
       skip,
@@ -39,12 +39,12 @@ export const fetchDeactivatedAccounts = (
 ) =>
   axios({
     method: 'POST',
-    url: '/admin-service/account/deactivate-list',
+    url: '/admin-service/county/deactivate-list',
     data: {
       skip,
       limit,
       sort,
-      ...(search ? { searchTerm: search } : {}),
+      search: search || '',
       tenantId
     }
   });
@@ -59,21 +59,21 @@ export const createAccount = (data: IAccountPayload) =>
 export const fetchAccountDetails = (data: { tenantId: number; id: number }) =>
   axios({
     method: 'POST',
-    url: '/admin-service/account/details',
+    url: '/admin-service/county/details',
     data
   });
 
 export const fetchDashboardAccounts = (data: { skip: number; limit: number; tenantId: string; searchTerm: string }) =>
   axios({
     method: 'POST',
-    url: '/admin-service/account/list',
+    url: '/admin-service/county/list',
     data
   });
 
 export const updateAccount = (data: IAccountInfo) =>
   axios({
-    method: 'PUT',
-    url: '/admin-service/account/update',
+    method: 'POST',
+    url: '/admin-service/county/update',
     data
   });
 
@@ -100,15 +100,15 @@ export const deleteAccountAdmin = (data: { tenantId: string | number; id: string
 
 export const activateAccount = (data: { tenantId: number }) =>
   axios({
-    url: '/admin-service/account/activate',
+    url: '/admin-service/county/activate',
     method: 'PUT',
     data
   });
 
 export const deactivateAccount = (data: IAccountDeactivate) =>
   axios({
-    url: '/admin-service/account/deactivate',
-    method: 'PUT',
+    url: '/admin-service/county/deactivate',
+    method: 'POST',
     data
   });
 

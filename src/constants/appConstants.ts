@@ -30,7 +30,7 @@ const APPCONSTANTS = {
     HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
     PEER_SUPERVISOR: 'PEER_SUPERVISOR',
     REGION_ADMIN: 'REGION_ADMIN',
-    ACCOUNT_ADMIN: 'ACCOUNT_ADMIN',
+    ACCOUNT_ADMIN: 'COUNTY_ADMIN',
     OPERATING_UNIT_ADMIN: 'OPERATING_UNIT_ADMIN',
     LAB_TECHNICIAN: 'LAB_TECHNICIAN',
     REPORT_ADMIN: 'REPORT_ADMIN',
@@ -67,6 +67,35 @@ const APPCONSTANTS = {
   REGION_CREATION_ERROR: 'Unable to create region. Please try after sometime.',
   REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
   REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
+  // ACCOUNT
+  ACTIVATE_ACCOUNT_CONFIRMATION: 'Are you sure want to activate the account?',
+  ACTIVATE_ACCOUNT_TITLE: 'Activate Account',
+  ACCOUNT_ACTIVATE_SUCCESS: 'Account activated successfully.',
+  ACCOUNT_ACTIVATE_FAIL: 'Unable to activate the account. Please try after sometime.',
+  ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
+  ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
+  ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
+  ACCOUNT_WORKFLOW_MODULE_UPDATE_FAIL: 'Unable to update account workflow module. Please try after sometime.',
+  ACCOUNT_WORKFLOW_DELETE_TITLE: 'Delete Account workflow',
+  ACCOUNT_WORKFLOW_DELETE_CONFIRMATION: 'Are you sure you want to delete the account workflow?',
+  ACCOUNT_WORKFLOW_DELETE_SUCCESS: 'Account workflow module deleted successfully.',
+  ACCOUNT_WORKFLOW_DELETE_ERROR: 'Unable to delete the account workflow. Please try after sometime.',
+  ACCOUNT_WORKFLOW_ALREADY_EXISTS: 'Account workflow name already exists.',
+  ACCOUNT_UPDATE_SUCCESS: 'Account summary updated successfully.',
+  ACCOUNT_UPDATE_FAIL: 'Unable to update account summary. Please try after sometime.',
+  ACCOUNT_DEACTIVATE_SUCCESS: 'Account deactivated successfully.',
+  ACCOUNT_DEACTIVATE_FAIL: 'Unable to deactivate the account. Please try after sometime.',
+  ACCOUNT_CREATION_SUCCESS: 'Account created successfully.',
+  ACCOUNT_CREATION_FAIL: 'Unable to create account. Please try after sometime.',
+  ACCOUNT_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete account admin?',
+  ACCOUNT_ADMIN_DELETE_TITLE: 'Delete Account Admin',
+  ACCOUNT_DETAIL_FETCH_ERROR: 'Unable to load account summary. Please try after sometime.',
+  ACCOUNT_ADMIN_CREATE_SUCCESS: 'Account admin added successfully.',
+  ACCOUNT_ADMIN_CREATE_FAIL: 'Unable to add account admin. Please try after sometime',
+  ACCOUNT_ADMIN_UPDATE_SUCCESS: 'Account admin updated successfully.',
+  ACCOUNT_ADMIN_UPDATE_FAIL: 'Unable to update account admin. Please try after sometime',
+  ACCOUNT_ADMIN_DELETE_SUCCESS: 'Account admin deleted successfully.',
+  ACCOUNT_ADMIN_DELETE_FAIL: 'Unable to delete account admin. Please try after sometime.',
   // HF
   HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load health facilities. Please try after sometime.',
   HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load health facility users. Please try after sometime.',
@@ -162,15 +191,11 @@ const APPCONSTANTS = {
     { value: 'No', label: 'No' }
   ],
   ACCOUNT_FETCH_ERROR: 'Unable to load accounts. Please try after sometime.',
-  ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
-  ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
-  ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
-  ACCOUNT_WORKFLOW_MODULE_UPDATE_FAIL: 'Unable to update account workflow module. Please try after sometime.',
-  ACCOUNT_WORKFLOW_DELETE_TITLE: 'Delete Account workflow',
-  ACCOUNT_WORKFLOW_DELETE_CONFIRMATION: 'Are you sure you want to delete the account workflow?',
-  ACCOUNT_WORKFLOW_DELETE_SUCCESS: 'Account workflow module deleted successfully.',
-  ACCOUNT_WORKFLOW_DELETE_ERROR: 'Unable to delete the account workflow. Please try after sometime.',
-  ACCOUNT_WORKFLOW_ALREADY_EXISTS: 'Account workflow name already exists.',
+  DEACTIVATED_RECORDS_FETCH_ERROR: 'Unable to load deactivated records. Please try after sometime.',
+
+  UNLOCK_USER_SUCCESS: 'User unlocked successfully.',
+  UNLOCK_USER_FAIL: 'Unable to unlock the user. Please try after sometime.',
+
   DEFAULT_CULTURE: { id: 1, name: 'English - India' },
   FORM_ID: 'formId',
   COUNTRY_ID: 'ci',
@@ -225,6 +250,18 @@ const APPCONSTANTS = {
   PROGRAM_FETCH_ERROR: 'Unable to load programs. Please try after sometime.',
   PROGRAM_DELETE_SUCCESS: 'Program deleted successfully.',
   PROGRAM_DELETE_ERROR: 'Unable to delete the program. Please try after sometime.',
+
+  // consent form values
+  FETCH_CONSENT_FORM_ERROR: 'Unable to fetch the consent form data. Please try after sometime.',
+  CONSENT_FORM_CUSTOMIZATION_SUCCESS: 'consent form updated successfully.',
+  CONSENT_FORM_CUSTOMIZATION_ERROR: 'consent form updation failed. Please try after sometime.',
+  CONSENT_FORM_EMPTY_ERROR: 'Consent data should not be empty.',
+  DEACTIVATE_CONSENT_SUCCESS: 'consent form deleted successfully.',
+  DEACTIVATE_CONSENT_FAILURE: 'consent form deletion failed. Please try after sometime.',
+  DEACTIVATE_CONSENT_NO_DATA: 'consent data not found. Please try after sometime.',
+  DELETE_CONSENT_TITLE: 'Delete confirmation',
+  DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the county consent form?',
+
   REGION_CUSTOMIZATION_SCREENS: [
     { name: 'Screening Form' },
     { name: 'Enrollment Form' },
@@ -232,6 +269,26 @@ const APPCONSTANTS = {
   ],
   NO_FAMILY: 'NO_FAMILY',
   INVALID_CREDENTIALS: 'Invalid credentials',
+  DEACTIVATE_REASON: [
+    { label: 'Unable to pay', value: 'Unable to pay' },
+    { label: 'Contract expired', value: 'Contract expired' },
+    { label: 'Site closure', value: 'Site closure' },
+    { label: 'Inactive site', value: 'Inactive site' },
+    { label: 'Other', value: 'Other' }
+  ],
+  SITE_ROLES: [
+    { value: 'HEALTH_COACH', label: 'Health Coach' },
+    { value: 'HEALTH_SCREENER', label: 'Health Screener' },
+    { value: 'HRIO', label: 'HRIO' },
+    { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
+    { value: 'NUTRITIONIST', label: 'Nutritionist' },
+    { value: 'PHARMACIST', label: 'Pharmacist' },
+    { value: 'NURSE', label: 'Nurse' },
+    { value: 'PHYSICIAN_PRESCRIBER', label: 'Physician Prescriber' },
+    { value: 'PROVIDER', label: 'Provider' },
+    { value: 'COUNSELOR', label: 'Counselor' },
+    { value: 'SITE_ADMIN', label: 'Site Admin' }
+  ],
   // utils
 
   MONTHS: [
@@ -248,6 +305,13 @@ const APPCONSTANTS = {
     'November',
     'December'
   ]
+};
+
+export const NAME_CONSTANTS = {
+  region: 'Region',
+  county: 'County',
+  subCounty: 'Sub County',
+  healthFacility: 'Health Facility'
 };
 
 export const ROLE_LABELS = {

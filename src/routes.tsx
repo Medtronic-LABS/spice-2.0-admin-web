@@ -23,6 +23,12 @@ import AddMedication from './containers/medication/AddMedication';
 import MyProfile from './containers/myProfile/MyProfile';
 import LabTestList from './containers/labtest/LabtestList';
 import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
+import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
+import AccountList from './containers/account/AccountList';
+import CreateAccount from './containers/createAccount/CreateAccount';
+import AccountSummary from './containers/account/AccountSummary';
+import AccountDashboard from './containers/account/AccountDashboard';
+
 
 interface IRoute {
   path: string;
@@ -34,9 +40,21 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN } = APPCONSTANTS.ROLES;
+export const {
+  SUPER_USER,
+  SUPER_ADMIN,
+  HEALTH_FACILITY_ADMIN,
+  REGION_ADMIN,
+  ACCOUNT_ADMIN,
+  OPERATING_UNIT_ADMIN,
+  SITE_ADMIN
+} = APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
-export const SU_SA_A = [...SU_SA, HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
+export const SU_SA_RA_AA = [...SU_SA_RA, ACCOUNT_ADMIN];
+export const SU_SA_HFA = [...SU_SA, HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA_AA_OUA = [...SU_SA_RA_AA, OPERATING_UNIT_ADMIN];
+export const SU_SA_RA_AA_OUA_SIA = [...SU_SA_RA_AA_OUA, SITE_ADMIN];
 export const A = [HEALTH_FACILITY_ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
@@ -66,6 +84,30 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
+      path: PROTECTED_ROUTES.accountByRegion,
+      exact: true,
+      component: AccountList,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.createAccountByRegion,
+      exact: true,
+      component: CreateAccount,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.accountSummary,
+      exact: true,
+      component: AccountSummary,
+      authorisedRoles: SU_SA_RA_AA
+    },
+    {
+      path: PROTECTED_ROUTES.accountDashboard,
+      exact: true,
+      component: AccountDashboard,
+      authorisedRoles: [REGION_ADMIN]
+    },
+    {
       path: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
       exact: true,
       component: HealthFacilityList,
@@ -75,7 +117,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
-      authorisedRoles: SU_SA_A
+      authorisedRoles: SU_SA_HFA
     },
     {
       path: PROTECTED_ROUTES.createHealthFacility,
@@ -123,13 +165,19 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.profile,
       exact: true,
       component: MyProfile,
-      authorisedRoles: SU_SA_A
+      authorisedRoles: SU_SA_HFA
     },
     {
       path: PROTECTED_ROUTES.customizeLabTest,
       exact: true,
       component: LabTestCustomizationLayout,
-      authorisedRoles: SU_SA_A
+      authorisedRoles: SU_SA_HFA
+    },
+    {
+      path: PROTECTED_ROUTES.deactivatedRecords,
+      exact: true,
+      component: DeactivatedRecords,
+      authorisedRoles: SU_SA_RA
     }
   ];
 })();
@@ -155,12 +203,8 @@ export const AppRoutes = () => {
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const token = useSelector(authTokenSelector);
   const role = useSelector(roleSelector);
-  const data = useSelector(userDataSelector);
-  const {
-    country: { id: regionId, tenantId }
-  } = data;
 
-  return isLoggedIn && regionId && tenantId && !!token ? (
+  return isLoggedIn && !!token ? (
     <AppLayout>
       <Switch>
         {protectedRoutes.map((route: IProtectedRoute, index: number) =>
@@ -175,15 +219,10 @@ export const AppRoutes = () => {
             />
           ) : null
         )}
-        <Redirect
-          exact={true}
-          to={HOME_PAGE_BY_ROLE[role]
-            .replace(':regionId', regionId?.toString())
-            .replace(':tenantId', tenantId?.toString())}
-        />
+        <Redirect exact={true} to={HOME_PAGE_BY_ROLE[role]}/>
       </Switch>
     </AppLayout>
-  ) : !isLoggedIn || !token ? (
+  ) : (
     <Switch>
       {publicRoutes.map((route: any, index: number) => (
         <Route
@@ -197,5 +236,5 @@ export const AppRoutes = () => {
       ))}
       <Redirect exact={true} to={PUBLIC_ROUTES.login} />
     </Switch>
-  ) : null;
+  );
 };

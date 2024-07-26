@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
@@ -27,6 +27,7 @@ const Region = (): React.ReactElement => {
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
+  const countyModuleName = NAME_CONSTANTS.county;
 
   const onDownloadClick = () => {
     dispatch(
@@ -116,7 +117,7 @@ const Region = (): React.ReactElement => {
                   {
                     id: 1,
                     name: 'countyname',
-                    label: 'COUNTY'
+                    label: countyModuleName
                   },
                   {
                     id: 2,

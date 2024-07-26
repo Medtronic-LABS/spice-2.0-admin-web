@@ -27,7 +27,10 @@ const adminRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.he
 const customBreadcrumbs = [
   { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
   { route: PROTECTED_ROUTES.createHealthFacility, label: 'Add Health Facility', appendParent: true },
-  { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true }
+  { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true },
+  { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
+  { route: PROTECTED_ROUTES.createAccountByRegion, label: 'Create County', appendParent: true },
+  { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' }
 ];
 
 /**

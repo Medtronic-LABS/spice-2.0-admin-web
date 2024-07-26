@@ -113,3 +113,22 @@ export const fetchTimezoneList = () =>
     method: 'GET',
     url: '/spice-service/timezone'
   });
+
+export const fetchLockedUsers = (
+  tenantId: number,
+  skip: number,
+  limit: number | null,
+  search?: string,
+  role?: string
+) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/locked-users',
+    data: {
+      tenantId,
+      skip,
+      limit,
+      roleType: role,
+      ...(search ? { searchTerm: search } : {})
+    }
+  });
