@@ -39,6 +39,7 @@ import AccountList from './containers/account/AccountList';
 import CreateAccount from './containers/createAccount/CreateAccount';
 import AccountSummary from './containers/account/AccountSummary';
 import AccountDashboard from './containers/account/AccountDashboard';
+import LockedUsers from './containers/lockedUsers/LockedUsers';
 
 interface IRoute {
   path: string;
@@ -332,6 +333,12 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: DeactivatedRecords,
       authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.lockedUsers,
+      exact: true,
+      component: LockedUsers,
+      authorisedRoles: SU_SA_RA_AA_OUA_SIA
     }
   ];
 })();
