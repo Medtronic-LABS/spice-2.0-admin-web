@@ -9,15 +9,7 @@ import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import {
-  getIsLoggedInSelector,
-  roleSelector,
-  userDataSelector,
-  initializingSelector,
-  getIsLoggingInSelector,
-  getIsLoggingOutSelector,
-  loadingSelector
-} from './store/user/selectors';
+import { authTokenSelector, getIsLoggedInSelector, roleSelector } from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
 import Dashboard from './containers/dashboard/Dashboard';
@@ -37,6 +29,7 @@ import AccountList from './containers/account/AccountList';
 import CreateAccount from './containers/createAccount/CreateAccount';
 import AccountSummary from './containers/account/AccountSummary';
 import AccountDashboard from './containers/account/AccountDashboard';
+import LockedUsers from './containers/lockedUsers/LockedUsers';
 
 interface IRoute {
   path: string;
@@ -336,6 +329,12 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: DeactivatedRecords,
       authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.lockedUsers,
+      exact: true,
+      component: LockedUsers,
+      authorisedRoles: SU_SA_RA_AA_OUA_SIA
     }
   ];
 })();
