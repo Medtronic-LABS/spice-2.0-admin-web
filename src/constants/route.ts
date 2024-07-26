@@ -38,7 +38,7 @@ export const PROTECTED_ROUTES = {
   customizationByRegion: '/region/:regionId/:tenantId/customize',
   accountWorkflowCustomization: '/region/:regionId/:tenantId/customize/accountWorkflow',
 
-  accountByRegion: '/region/:regionId/:tenantId/account',
+  accountByRegion: '/region/:regionId/:tenantId/county',
 
   accountAdminByRegion: '/region/:regionId/:tenantId/account-admin',
 
@@ -90,11 +90,12 @@ export const PROTECTED_ROUTES = {
   superAdmin: '/super-admin',
   deactivatedRecords: '/deactivated-records',
   lockedUsers: '/locked-users',
-  legalTerms: '/legal-terms'
+  legalTerms: '#'
 };
 
 export const HOME_PAGE_BY_ROLE = {
   [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.dashboard,
   [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.dashboard,
+  [APPCONSTANTS.ROLES.REGION_ADMIN]: PROTECTED_ROUTES.accountDashboard,
   [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: PROTECTED_ROUTES.healthFacilityByAdmin
 };

@@ -5,6 +5,7 @@ import healthFacilitySaga from './healthFacility/sagas';
 import medicationSaga from './medication/sagas';
 import workflowSaga from './workflow/sagas';
 import labtestSaga from './labTest/sagas';
+import accountSaga from './account/sagas';
 
 export function* rootSaga() {
   yield all([fork(userSaga)]);
@@ -13,8 +14,5 @@ export function* rootSaga() {
   yield all([fork(medicationSaga)]);
   yield all([fork(labtestSaga)]);
   yield all([fork(workflowSaga)]);
-  yield all([fork(districtSaga)]);
-  yield all([fork(chiefdomSaga)]);
-  yield all([fork(programSaga)]);
-  yield all([fork(commonSaga)]);
+  yield all([fork(accountSaga)]);
 }

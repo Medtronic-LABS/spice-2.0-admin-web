@@ -5,12 +5,9 @@ import healthFacilityReducer from './healthFacility/reducer';
 import medicationReducer from './medication/reducer';
 import workflowReducer from './workflow/reducer';
 import labtestReducer from './labTest/reducer';
-import countyReducer from './county/reducer';
+import accountReducer from './account/reducer';
 import subCountyReducer from './subCounty/reducer';
 import healthFacilityDashboardReducer from './healthFacilityDashboard/reducer';
-// import superAdminReducer from './superAdmin/reducer';
-// import programReducer from './program/reducer';
-// import workflowReducer from './workflow/reducer';
 
 const appReducer = combineReducers({
   user: userReducer,
@@ -19,13 +16,9 @@ const appReducer = combineReducers({
   medication: medicationReducer,
   labtest: labtestReducer,
   workflow: workflowReducer,
-  county: countyReducer,
+  account: accountReducer,
   subCounty: subCountyReducer,
-  healthFacilityDashboardReducer: healthFacilityDashboardReducer
-  // program: programReducer,
-  // superAdmin: superAdminReducer,
-  // labtest: labtestReducer,
-  // workflow: workflowReducer
+  healthFacilityDashboardReducer
 });
 
 const rootReducer = (state: any, action: any) => {

@@ -34,6 +34,11 @@ import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizatio
 import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
 import { goToUrl } from './utils/routeUtil';
+import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
+import AccountList from './containers/account/AccountList';
+import CreateAccount from './containers/createAccount/CreateAccount';
+import AccountSummary from './containers/account/AccountSummary';
+import AccountDashboard from './containers/account/AccountDashboard';
 
 interface IRoute {
   path: string;
@@ -45,15 +50,22 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } =
-  APPCONSTANTS.ROLES;
+export const {
+  SUPER_USER,
+  SUPER_ADMIN,
+  HEALTH_FACILITY_ADMIN,
+  REGION_ADMIN,
+  ACCOUNT_ADMIN,
+  OPERATING_UNIT_ADMIN,
+  SITE_ADMIN
+} = APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
 export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
-export const SU_SA_RA_DA = [...SU_SA_RA, DISTRICT_ADMIN];
+export const SU_SA_RA_AA = [...SU_SA_RA, ACCOUNT_ADMIN];
 export const SU_SA_HFA = [...SU_SA, HEALTH_FACILITY_ADMIN];
-export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
-export const CDA_HFA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
-export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA_AA_OUA = [...SU_SA_RA_AA, OPERATING_UNIT_ADMIN];
+export const SU_SA_RA_AA_OUA_SIA = [...SU_SA_RA_AA_OUA, SITE_ADMIN];
+export const A = [HEALTH_FACILITY_ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
@@ -86,6 +98,30 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: CreateRegion,
       authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.accountByRegion,
+      exact: true,
+      component: AccountList,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.createAccountByRegion,
+      exact: true,
+      component: CreateAccount,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.accountSummary,
+      exact: true,
+      component: AccountSummary,
+      authorisedRoles: SU_SA_RA_AA
+    },
+    {
+      path: PROTECTED_ROUTES.accountDashboard,
+      exact: true,
+      component: AccountDashboard,
+      authorisedRoles: [REGION_ADMIN]
     },
     {
       path: PROTECTED_ROUTES.createRegion,
@@ -163,7 +199,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+      authorisedRoles: SU_SA_HFA
     },
     {
       path: PROTECTED_ROUTES.healthFacilityByRegion,
@@ -280,33 +316,21 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
+      path: PROTECTED_ROUTES.profile,
+      exact: true,
+      component: MyProfile,
+      authorisedRoles: SU_SA_HFA
+    },
+    {
       path: PROTECTED_ROUTES.customizeLabTest,
       exact: true,
       component: LabTestCustomizationLayout,
       authorisedRoles: SU_SA_HFA
     },
     {
-      path: PROTECTED_ROUTES.programByRegion,
+      path: PROTECTED_ROUTES.deactivatedRecords,
       exact: true,
-      component: ProgramList,
-      authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.createProgramByRegion,
-      exact: true,
-      component: ProgramForm,
-      authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.workflowByRegion,
-      exact: true,
-      component: WorkflowCustomization,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.workflowCustomization,
-      exact: true,
-      component: WorkflowFormCustomization,
+      component: DeactivatedRecords,
       authorisedRoles: SU_SA_RA
     }
   ];
@@ -350,7 +374,7 @@ export const AppRoutes = () => {
     return <Loader />;
   }
 
-  return isLoggedIn && regionId && tenantId ? (
+  return isLoggedIn ? (
     <AppLayout>
       <Switch>
         {protectedRoutes.map((route: IProtectedRoute, index: number) =>
@@ -365,10 +389,10 @@ export const AppRoutes = () => {
             />
           ) : null
         )}
-        <Redirect exact={true} to={PROTECTED_ROUTES.landingPage} />
+        <Redirect exact={true} to={HOME_PAGE_BY_ROLE[role]} />
       </Switch>
     </AppLayout>
-  ) : !isLoggedIn ? (
+  ) : (
     <Switch>
       {publicRoutes.map((route: any, index: number) => (
         <Route

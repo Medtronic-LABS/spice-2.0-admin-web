@@ -1,18 +1,18 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
 
-const getLoading = (state: AppState) => state.county.loading;
-const getAccounts = (state: AppState) => state.county.accounts;
-const getAccount = (state: AppState) => state.county.account;
-const getAccountOptions = (state: AppState) => state.county.accountOptions;
-const getAccountOptionsLoading = (state: AppState) => state.county.loadingOptions;
+const getLoading = (state: AppState) => state.account.loading;
+const getAccounts = (state: AppState) => state.account.accounts;
+const getAccount = (state: AppState) => state.account.account;
+const getAccountOptions = (state: AppState) => state.account.accountOptions;
+const getAccountOptionsLoading = (state: AppState) => state.account.loadingOptions;
 
-const getAccountsCount = (state: AppState) => state.county.total;
-const getAccountDashboardList = (state: AppState) => state.county.dashboardList;
-const getLoadMore = (state: AppState) => state.county.loadingMore;
-const getAccountAdmins = (state: AppState) => state.county.admins;
-const getClinicalWorkflows = (state: AppState) => state.county.clinicalWorkflows;
-const getClinicalWorkflowsCount = (state: AppState) => state.county.clinicalWorkflowsCount;
+const getAccountsCount = (state: AppState) => state.account.total;
+const getAccountDashboardList = (state: AppState) => state.account.dashboardList;
+const getLoadMore = (state: AppState) => state.account.loadingMore;
+const getAccountAdmins = (state: AppState) => state.account.admins;
+const getClinicalWorkflows = (state: AppState) => state.account.clinicalWorkflows;
+const getClinicalWorkflowsCount = (state: AppState) => state.account.clinicalWorkflowsCount;
 
 export const accountsLoadingSelector = createSelector(getLoading, (loading) => loading);
 
@@ -20,7 +20,7 @@ export const getAccountsSelector = createSelector(getAccounts, (accounts) => acc
 
 export const accountsCountSelector = createSelector(getAccountsCount, (accountCount) => accountCount);
 
-export const accountSelector = createSelector(getAccount, (county) => county);
+export const accountSelector = createSelector(getAccount, (account) => account);
 
 export const accDashboardListSelector = createSelector(getAccountDashboardList, (dashboardList) => dashboardList);
 

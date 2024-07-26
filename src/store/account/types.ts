@@ -58,7 +58,7 @@ export interface IAccountState {
 export interface IAccountInfo {
   id: string;
   name: string;
-  maxNoOfUsers: string;
+  maxNoOfUsers?: string;
   tenantId: string;
 }
 

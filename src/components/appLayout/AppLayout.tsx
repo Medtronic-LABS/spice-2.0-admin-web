@@ -47,7 +47,7 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.userByOU },
 
   { route: PROTECTED_ROUTES.regionSummary },
-  // { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
+  { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
   // { route: PROTECTED_ROUTES.OUSummary, disabledRoles: [APPCONSTANTS.ROLES.OPERATING_UNIT_ADMIN] },
   { route: PROTECTED_ROUTES.siteSummary },
 
