@@ -1,22 +1,20 @@
-import { memo, useCallback, useEffect } from 'react';
-import { NavLink, matchPath, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  PROTECTED_ROUTES,
-  SIDE_MENU_MAPPER,
-  regionRoutesWithSideMenu,
-  districtRoutesWithSideMenu,
-  chiefdomWithSideMenu,
-  hfWithSideMenu
-} from '../../constants/route';
+import { useMemo } from 'react';
+import { matchPath, NavLink, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
 import styles from './SideMenu.module.scss';
-import { fetchSideMenuRequest, clearSideMenu, setSideMenu } from '../../store/common/actions';
-import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
-import { ISideMenu } from '../../store/common/types';
-import Loader from '../loader/Loader';
-import { countryIdSelector, roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
-import toastCenter from '../../utils/toastCenter';
+import { roleSelector, userDataSelector } from '../../store/user/selectors';
+import useRouteParams from '../../hooks/useRouteParams';
+
+interface ISideMenuItem {
+  label: string;
+  route: string;
+  disabled?: boolean;
+  childRoutes?: string[];
+  collapsible?: boolean;
+}
 
 interface ISideMenuProps {
   className?: string;
@@ -26,6 +24,12 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Region',
     route: PROTECTED_ROUTES.region,
+    disabled: false
+  },
+  {
+    label: 'County',
+    route: PROTECTED_ROUTES.accountByRegion,
+    collapsible: true,
     disabled: false
   },
   {

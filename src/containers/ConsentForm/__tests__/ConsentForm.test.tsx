@@ -22,13 +22,13 @@ describe('ConsentForm', () => {
     setEditorContent: jest.fn()
   };
 
-  it('should render a SelectInput component when isDistrict prop is true', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
+  it('should render a SelectInput component when isAccount prop is true', () => {
+    const wrapper = mount(<ConsentForm {...props} isAccount={true} />);
     expect(wrapper.find(SelectInput)).toHaveLength(1);
   });
 
-  it('should not render a SelectInput component when isDistrict prop is false', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={false} />);
+  it('should not render a SelectInput component when isAccount prop is false', () => {
+    const wrapper = mount(<ConsentForm {...props} isAccount={false} />);
     expect(wrapper.find(SelectInput)).toHaveLength(0);
   });
 
@@ -46,27 +46,27 @@ describe('ConsentForm', () => {
     expect(deleteButton.prop('disabled')).toBe(true);
   });
 
-  it('should enable the submit button when isDistrict is false', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={false} />);
+  it('should enable the submit button when isAccount is false', () => {
+    const wrapper = mount(<ConsentForm {...props} isAccount={false} />);
     const submitButton = wrapper.find('button.primary-btn');
     expect(submitButton).toHaveLength(1);
     expect(submitButton.prop('disabled')).toBe(false);
   });
-  it('should enable the submit button when both editor content and isDistrict empty', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={false} editorContent={'test'} />);
+  it('should enable the submit button when both editor content and isAccount empty', () => {
+    const wrapper = mount(<ConsentForm {...props} isAccount={false} editorContent={'test'} />);
     const submitButton = wrapper.find('button.primary-btn');
     expect(submitButton).toHaveLength(1);
     expect(submitButton.prop('disabled')).toBe(false);
   });
-  it('should disable the submit button when isDistrict is true and form type is not selected', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
+  it('should disable the submit button when isAccount is true and form type is not selected', () => {
+    const wrapper = mount(<ConsentForm {...props} isAccount={true} />);
     const submitButton = wrapper.find('button.primary-btn');
     expect(submitButton).toHaveLength(1);
     expect(submitButton.prop('disabled')).toBe(true);
   });
 
-  it('should enable the submit button when isDistrict is true and form type is selected', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
+  it('should enable the submit button when isAccount is true and form type is selected', () => {
+    const wrapper = mount(<ConsentForm {...props} isAccount={true} />);
     const selectInput = wrapper.find(SelectInput);
     selectInput.prop('input').onChange({ name: 'Screening', id: 0 });
     wrapper.update();
@@ -75,7 +75,7 @@ describe('ConsentForm', () => {
     expect(submitButton.prop('disabled')).toBe(false);
   });
   it('handle onClick handleSubmit', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
+    const wrapper = mount(<ConsentForm {...props} isAccount={true} />);
     const selectInput: any = wrapper.find('button.primary-btn').props();
     selectInput.onClick('test');
     waitFor(() => {

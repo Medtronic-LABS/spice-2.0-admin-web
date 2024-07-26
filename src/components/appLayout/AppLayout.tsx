@@ -16,6 +16,17 @@ interface IAppLayout {
 
 const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.regionSummary },
+  { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
+  // { route: PROTECTED_ROUTES.OUSummary, disabledRoles: [APPCONSTANTS.ROLES.OPERATING_UNIT_ADMIN] },
+  { route: PROTECTED_ROUTES.siteSummary },
+
+  { route: PROTECTED_ROUTES.workflowByRegion },
+  { route: PROTECTED_ROUTES.workflowByAccount },
+
+  { route: PROTECTED_ROUTES.medicationByRegion },
+  { route: PROTECTED_ROUTES.labtestList },
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] },
+  { route: PROTECTED_ROUTES.labTestByRegion },
   { route: PROTECTED_ROUTES.customizationByRegion },
   { route: PROTECTED_ROUTES.districtSummary, disabledRoles: [APPCONSTANTS.ROLES.DISTRICT_ADMIN] },
   { route: PROTECTED_ROUTES.districtByRegion },

@@ -8,6 +8,9 @@ import IconLegal from '../../assets/images/icon-legal.svg';
 import IconDeactivated from '../../assets/images/icon-deactivated.svg';
 import LockedUserIcon from '../../assets/images/user-lock.svg';
 import IconLegal from '../../assets/images/icon-legal.svg';
+import IconDeactivated from '../../assets/images/icon-deactivated.svg';
+import LockedUserIcon from '../../assets/images/user-lock.svg';
+import IconLegal from '../../assets/images/icon-legal.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import PasswordChangeIcon from '../../assets/images/reset-password.svg';
 import ResetPasswordFields, { generatePassword } from '../../containers/authentication/ResetPasswordFields';
@@ -18,7 +21,7 @@ import { emailSelector, getUserSuiteAccessSelector, userIdSelector } from '../..
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
-import { SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
+import { SU_SA_RA, SU_SA_RA_AA, SU_SA_RA_AA_OUA_SIA } from '../../routes';
 
 interface IUserMenuItem {
   label: string;
@@ -49,13 +52,13 @@ const UserMenu = ({ role }: any) => {
           label: 'Locked Users',
           icon: LockedUserIcon,
           route: PROTECTED_ROUTES.lockedUsers,
-          roles: SU_SA_RA_DA_CDA_HFA
+          roles: SU_SA_RA_AA_OUA_SIA
         },
         {
           label: 'Legal Terms',
           icon: IconLegal,
           route: PROTECTED_ROUTES.legalTerms,
-          roles: SU_SA_RA_DA
+          roles: SU_SA_RA_AA
         },
         {
           label: 'My Profile',

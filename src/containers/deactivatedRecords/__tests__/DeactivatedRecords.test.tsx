@@ -1,10 +1,10 @@
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import ACCOUNT_MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
+import ACCOUNT_MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
 import DeactivatedRecords from '../DeactivatedRecords';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { IDistrict, IDistrictAdmin, IAdminEditFormValues } from '../../../store/district/types';
-import { initialState } from '../../../store/district/reducer';
+import { IAccount, IAccountAdmin, IAdminEditFormValues } from '../../../store/account/types';
+import { initialState } from '../../../store/account/reducer';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
@@ -15,8 +15,8 @@ jest.mock('../../../constants/appConstants', () => ({
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
     REGION_ADMIN: 'REGION_ADMIN',
-    DISTRICT_ADMIN: 'DISTRICT_ADMIN',
-    CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN'
+    ACCOUNT_ADMIN: 'ACCOUNT_ADMIN',
+    OPERATING_UNIT_ADMIN: 'OPERATING_UNIT_ADMIN'
   },
   ACTIVATE_ACCOUNT_CONFIRMATION: undefined
 }));
@@ -29,9 +29,9 @@ jest.mock('../../../components/customTable/CustomTable', () => (props: any) => {
 
 describe('DeactivatedRecords component', () => {
   const store = mockStore({
-    district: {
+    account: {
       ...initialState,
-      districtList: [ACCOUNT_MOCK_DATA_CONSTANTS.FETCH_DISTRICT_LIST_RESPONSE_PAYLOAD],
+      accounts: [ACCOUNT_MOCK_DATA_CONSTANTS.FETCH_ACCOUNTS_RESPONSE_PAYLOAD],
       total: 2
     },
     user: {
@@ -89,7 +89,7 @@ describe('DeactivatedRecords component', () => {
     });
 
     const actions = store.getActions();
-    const mockDeactivateRecordsType = actions.find((action) => action.type === 'ACTIVATE_DISTRICT_REQUEST');
+    const mockDeactivateRecordsType = actions.find((action) => action.type === 'ACTIVATE_ACCOUNT_REQUEST');
     mockDeactivateRecordsType.successCb('Success', 'Account activated successfully');
     mockDeactivateRecordsType.failureCb({ message: 'error' });
 
@@ -121,17 +121,16 @@ describe('DeactivatedRecords component', () => {
       countryCode: 'US',
       timezone: { id: 'test', description: 'test' },
       country: { countryCode: 'US' },
-      tenantId: 'tenant123',
-      roles: []
+      tenantId: 'tenant123'
     };
 
     // Define the mock data for the account admin
-    const mockAccountAdmin: IDistrictAdmin = {
+    const mockAccountAdmin: IAccountAdmin = {
       ...mockAdminEditFormValues,
       timezone: 'UTC+0'
     };
 
-    const mockAccount: IDistrict = {
+    const mockAccount: IAccount = {
       id: 'account123',
       users: [mockAccountAdmin],
       name: 'Example Account',

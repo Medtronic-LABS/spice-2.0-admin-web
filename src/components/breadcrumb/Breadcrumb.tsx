@@ -41,34 +41,13 @@ const districtRoutes = [
   PROTECTED_ROUTES.createHealthFacilityByDistrict
 ];
 
-const regionRoutes = [
-  PROTECTED_ROUTES.regionSummary,
-  PROTECTED_ROUTES.districtByRegion,
-  PROTECTED_ROUTES.chiefdomByRegion,
-  PROTECTED_ROUTES.healthFacilityByRegion,
-  PROTECTED_ROUTES.userByRegion,
-  PROTECTED_ROUTES.createDistrictByRegion,
-  PROTECTED_ROUTES.createChiefdomByRegion,
-  PROTECTED_ROUTES.createHealthFacilityByRegion,
-  PROTECTED_ROUTES.createMedication,
-  PROTECTED_ROUTES.createLabTest,
-  PROTECTED_ROUTES.medicationByRegion,
-  PROTECTED_ROUTES.labTestByRegion,
-  PROTECTED_ROUTES.programByRegion,
-  PROTECTED_ROUTES.createProgramByRegion,
-  PROTECTED_ROUTES.customizationByRegion,
-  PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
-  PROTECTED_ROUTES.workflowCustomization,
-  PROTECTED_ROUTES.workflowByRegion
-];
-
-const siteRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.healthFacilityByRegion];
-
-const dashboardRoutes = [
-  PROTECTED_ROUTES.regionDashboard,
-  PROTECTED_ROUTES.districtDashboard,
-  PROTECTED_ROUTES.chiefdomDashboard,
-  PROTECTED_ROUTES.healthFacilityDashboard
+const customBreadcrumbs = [
+  { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
+  { route: PROTECTED_ROUTES.createHealthFacility, label: 'Add Health Facility', appendParent: true },
+  { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true },
+  { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
+  { route: PROTECTED_ROUTES.createAccountByRegion, label: 'Create County', appendParent: true },
+  { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' }
 ];
 
 /**

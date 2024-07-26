@@ -4,6 +4,7 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
@@ -29,10 +30,7 @@ const Region = (): React.ReactElement => {
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
-  const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  const countyModuleName = NAME_CONSTANTS.county;
 
   const onDownloadClick = () => {
     dispatch(
@@ -121,8 +119,8 @@ const Region = (): React.ReactElement => {
                 columnsDef={[
                   {
                     id: 1,
-                    name: 'districtname',
-                    label: districtSName
+                    name: 'countyname',
+                    label: countyModuleName
                   },
                   {
                     id: 2,

@@ -26,10 +26,12 @@ export const PROTECTED_ROUTES = {
   customizationByRegion: '/region/:regionId/:tenantId/customize',
   accordianViewRegionCustomizationForm: '/region/:regionId/:tenantId/:form/regionCustomize',
 
-  districtDashboard: '/district',
-  createDistrictByRegion: '/region/:regionId/:tenantId/district/create',
-  districtByRegion: '/region/:regionId/:tenantId/district',
-  districtSummary: '/district/:districtId/:tenantId',
+  accountByRegion: '/region/:regionId/:tenantId/county',
+
+  accountAdminByRegion: '/region/:regionId/:tenantId/account-admin',
+
+  OUByRegion: '/region/:regionId/:tenantId/OU',
+  OUByAccount: '/account/:accountId/:tenantId/OU',
 
   chiefdomDashboard: '/chiefdom',
   createChiefdomByRegion: '/region/:regionId/:tenantId/chiefdom/create',
@@ -63,69 +65,15 @@ export const PROTECTED_ROUTES = {
   createLabTest: '/region/:regionId/:tenantId/lab-test/create',
   editLabTest: '/region/:regionId/:tenantId/lab-test/:labTestId/:labTestTenantId',
 
-  createMedication: '/region/:regionId/:tenantId/medication/create',
-  medicationByRegion: '/region/:regionId/:tenantId/medication/list',
-
-  programByRegion: '/region/:regionId/:tenantId/program',
-  createProgramByRegion: '/region/:regionId/:tenantId/program/create',
-
-  workflowByRegion: '/region/:regionId/:tenantId/workflow',
-  workflowCustomization: '/region/:regionId/:tenantId/:form/workflowCustomize/:clinicalWorkflowId/:workflowId'
+  superAdmin: '/super-admin',
+  deactivatedRecords: '/deactivated-records',
+  lockedUsers: '/locked-users',
+  legalTerms: '#'
 };
-
-export const SIDE_MENU_MAPPER = {
-  REGION_BY_SUPER_ADMIN: PROTECTED_ROUTES.regionSummary,
-  REGION_CUSTOMIZATION_BY_SUPER_ADMIN: PROTECTED_ROUTES.customizationByRegion,
-  DISTRICT_BY_REGION: PROTECTED_ROUTES.districtByRegion,
-  CHIEFDOM_BY_REGION: PROTECTED_ROUTES.chiefdomByRegion,
-  HEALTH_FACILITY_BY_REGION: PROTECTED_ROUTES.healthFacilityByRegion,
-  ADMINS_BY_SUPER_ADMIN: PROTECTED_ROUTES.adminByRegion,
-  USERS_BY_SUPER_ADMIN: PROTECTED_ROUTES.userByRegion,
-  PROGRAM_BY_SUPER_ADMIN: PROTECTED_ROUTES.programByRegion,
-  LAB_TEST_DATABASE_BY_SUPER_ADMIN: PROTECTED_ROUTES.labTestByRegion,
-  MEDICATION_DATABASE_BY_SUPER_ADMIN: PROTECTED_ROUTES.medicationByRegion,
-  WORKFLOW_BY_SUPER_ADMIN: PROTECTED_ROUTES.workflowByRegion,
-
-  DISTRICT_SUMMARY: PROTECTED_ROUTES.districtSummary,
-  CHIEFDOM_BY_DISTRICT: PROTECTED_ROUTES.chiefdomByDistrict,
-  HEALTH_FACILITY_BY_DISTRICT: PROTECTED_ROUTES.healthFacilityByDistrict,
-  ADMINS_BY_REGION_ADMIN: PROTECTED_ROUTES.adminByDistrict,
-  USERS_BY_REGION_ADMIN: PROTECTED_ROUTES.userByDistrict,
-
-  CHIEFDOM_SUMMARY: PROTECTED_ROUTES.chiefdomSummary,
-  HEALTH_FACILITY_BY_CHIEFDOM: PROTECTED_ROUTES.healthFacilityByChiefdom,
-  ADMINS_BY_DISTRICT_ADMIN: PROTECTED_ROUTES.adminByChiefdom,
-  USERS_BY_DISTRICT_ADMIN: PROTECTED_ROUTES.userByChiefdom,
-
-  HEALTH_FACILITY_SUMMARY: PROTECTED_ROUTES.healthFacilitySummary,
-  ADMINS_BY_CHIEFDOM_ADMIN: PROTECTED_ROUTES.adminByHealthFacility,
-  USERS_BY_CHIEFDOM_ADMIN: PROTECTED_ROUTES.userByHealthFacility,
-
-  USERS_BY_HEALTH_FACILITY_ADMIN: PROTECTED_ROUTES.userByHealthFacility
-};
-
-export const regionRoutesWithSideMenu = [PROTECTED_ROUTES.region, PROTECTED_ROUTES.regionSummary];
-
-export const districtRoutesWithSideMenu = [PROTECTED_ROUTES.districtByRegion, PROTECTED_ROUTES.districtSummary];
-
-export const chiefdomWithSideMenu = [
-  PROTECTED_ROUTES.chiefdomByRegion,
-  PROTECTED_ROUTES.chiefdomByDistrict,
-  PROTECTED_ROUTES.chiefdomSummary
-];
-
-export const hfWithSideMenu = [
-  PROTECTED_ROUTES.healthFacilityByRegion,
-  PROTECTED_ROUTES.healthFacilityByDistrict,
-  PROTECTED_ROUTES.healthFacilityByChiefdom,
-  PROTECTED_ROUTES.healthFacilitySummary
-];
 
 export const HOME_PAGE_BY_ROLE = {
   [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.dashboard,
   [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.dashboard,
-  [APPCONSTANTS.ROLES.REGION_ADMIN]: PROTECTED_ROUTES.districtDashboard,
-  [APPCONSTANTS.ROLES.DISTRICT_ADMIN]: PROTECTED_ROUTES.chiefdomDashboard,
-  [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN]: PROTECTED_ROUTES.healthFacilityDashboard,
-  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: PROTECTED_ROUTES.healthFacilityDashboard
+  [APPCONSTANTS.ROLES.REGION_ADMIN]: PROTECTED_ROUTES.accountDashboard,
+  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: PROTECTED_ROUTES.healthFacilityByAdmin
 };
