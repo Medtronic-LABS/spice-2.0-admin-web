@@ -74,9 +74,7 @@ const props = {
         family: 'labTest',
         isMandatory: true,
         isEnabled: true,
-        minDays: 10,
-        maxDays: 10,
-        disableFutureDate: false,
+        testValidityDays: '20',
         visibility: 'visible',
         isDefault: false,
         isDeletable: false,
@@ -104,7 +102,7 @@ const props = {
   isFieldNameChangable: true
 };
 
-describe('ChiefdomForm', () => {
+describe('AccordianViewForm', () => {
   let wrapper: any;
   beforeEach(() => {
     wrapper = mount(

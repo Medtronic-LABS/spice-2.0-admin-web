@@ -11,6 +11,7 @@ export interface IBaseFields {
   visibility: string;
   isMandatory?: boolean;
   condition?: ICondition[];
+  ranges?: ICondition[];
   isNeededDefault?: string;
   totalCount?: number;
   isEditable?: boolean;

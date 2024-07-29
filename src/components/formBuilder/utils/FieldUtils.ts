@@ -52,7 +52,8 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     url: true,
     resource: true,
     unitList: true,
-    condition: true
+    condition: true,
+    ranges: true
   };
   let finalFields: any = {};
   if (fieldValue) {
@@ -73,7 +74,7 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     }
   }
   if (isResult) {
-    finalFields = { ...finalFields, ...resultFields };
+    finalFields = { ...finalFields, ...{ ...resultFields, ranges: obj.viewType === 'EditText' } };
     Object.keys(fieldValue ? inputTypeRelatedFields : {}).forEach((key: any) => {
       finalFields[key] = false;
     });
@@ -95,8 +96,8 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
   });
 };
 
-// Condition unit and gender filter
-interface ICondition {
+// Ranges unit and gender filter
+interface IRanges {
   unitType: string;
   gender: string;
   minRange: number;
@@ -126,13 +127,13 @@ interface IRemovedUnits {
   genders: { [unitType: string]: IGender[] };
 }
 
-export const filterUnitsandGender = (conditions: ICondition[], unitList: IUnit[]) => {
+export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
   // Create a dictionary to keep track of the genders associated with each unitType
   const unitGenderMap: { [unitType: string]: Set<string> } = {};
 
-  // Populate the dictionary with the genders from the conditions array
-  (conditions || []).forEach((condition) => {
-    const { unitType, gender } = condition;
+  // Populate the dictionary with the genders from the ranges array
+  (ranges || []).forEach((range) => {
+    const { unitType, gender } = range;
     if (!unitGenderMap[unitType]) {
       unitGenderMap[unitType] = new Set<string>();
     }
