@@ -5,18 +5,15 @@ import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
-import { inputTypesSwitch, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
+import { resultSwitch } from '../utils/FieldUtils';
 import ConditionConfig from './fieldUI/ConditionConfig';
 import OptionList from './fieldUI/OptionList';
 import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
 import TextFieldWrapper from './fieldUI/TextFieldWrapper';
 import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
 import DatePickerWrapper from './fieldUI/DatePickerWrapper';
-import APPCONSTANTS from '../../../constants/appConstants';
-
-interface IMatchParams {
-  form: string;
-}
+import { unitsSelector } from '../../../store/labTest/selectors';
+import { useSelector } from 'react-redux';
 
 const filterByGetMetaViewTypes: { [K: string]: string[] } = {
   RadioGroup: ['checkbox', 'radio']
@@ -33,18 +30,13 @@ const getComponentsByFieldName = (
   if (fieldName === 'fieldName') {
     inputProps = { ...inputProps, ...{ component: !isNew || isFieldNameChangable ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
   }
-  if (fieldName === 'isResult') {
-    inputProps = { ...inputProps, ...{ disabled: true } };
-    obj.isResult = true;
-  }
   // disabled fields based on run time conditions
   if (!isNew && (fieldName === 'fieldName' || fieldName === 'inputType')) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
   if (
     obj.fieldName === 'TestedOn' &&
-    obj.orderId === 1 &&
-    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title', 'maxDays', 'disableFutureDate'].includes(fieldName)
+    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title'].includes(fieldName)
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
@@ -80,7 +72,7 @@ interface IComponentProps {
   isRegionCustomizeForm?: boolean;
 }
 
-export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj }: IComponentProps) => {
+export const CheckboxComponent = ({ name, fieldName, inputProps = {}, obj }: IComponentProps) => {
   const checkBoxChange = useCallback(
     (isChecked: boolean) => {
       if (fieldName === 'isResult') {
@@ -89,19 +81,8 @@ export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj 
     },
     [fieldName, obj]
   );
-
   useEffect(() => {
-    if (obj?.disableFutureDate) {
-      // For old records
-      if (!obj.minDays) {
-        form.change(`${name}.minDays`, null);
-      }
-      form.change(`${name}.maxDays`, null);
-    }
-  }, [obj?.disableFutureDate, obj.minDays, form, name]);
-
-  useEffect(() => {
-    checkBoxChange(obj?.isResult);
+    checkBoxChange(obj.isResult);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -448,34 +429,9 @@ const RenderFields = ({
     ...getComponentsByFieldName(fieldName, obj, isNew, isFieldNameChangable, isRegionCustomizeForm)
   };
 
-  if (
-    fieldName === 'isEditable' &&
-    (!isRegionCustomizeForm || (isEditableFields.includes(obj.id) && formType === 'enrollment'))
-  ) {
-    return null;
-  }
-  if (fieldName === 'readOnly' && isRegionCustomizeForm) {
-    return null;
-  }
-  if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
-    return null;
-  }
-
-  if (fieldName === 'isEnrollment' && isRegionCustomizeForm && formType !== 'assessment') {
-    obj.isEnrollment = undefined;
-    return null;
-  }
-
-  if (
-    fieldName === 'condition' &&
-    !['Spinner', 'RadioGroup', 'EditText', 'SingleSelectionView'].includes(obj.viewType)
-  ) {
-    return null;
-  }
-
   switch (inputProps?.component) {
     case 'CHECKBOX': {
-      return <CheckboxComponent form={form} name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
+      return <CheckboxComponent name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
     }
     case 'SELECT_INPUT': {
       return (
@@ -492,29 +448,6 @@ const RenderFields = ({
       );
     }
 
-    // Custom Field UI
-    case 'INSTRUCTIONS': {
-      const fieldVal = obj[fieldName]?.length ? obj[fieldName] : [''];
-      return (
-        <div className='col-12'>
-          <Field name={`${name}.${fieldName}`}>
-            {(_props) => (
-              <>
-                <TextInputArray
-                  label={inputProps?.label || ''}
-                  defaultValue={fieldVal as unknown as string[]}
-                  required={false}
-                  obj={obj}
-                  onChange={(value: string[]) => {
-                    form.mutators.setValue(`${name}.${fieldName}`, value);
-                  }}
-                />
-              </>
-            )}
-          </Field>
-        </div>
-      );
-    }
     case 'OPTION_LIST': {
       return (
         <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
@@ -537,9 +470,9 @@ const RenderFields = ({
         </div>
       );
     }
-    case 'RANGES_CONFIG': {
+    case 'CONDITION_CONFIG': {
       return (
-        <RangesConfig
+        <ConditionConfig
           field={fieldName}
           name={`${name}.${fieldName}`}
           obj={obj}

@@ -9,13 +9,15 @@ import Accordian from '../../../../components/accordian/Accordian';
 import APPCONSTANTS from '../../../../constants/appConstants';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
-import { creatableViews, getConfigByViewType, isEditableFields, unitMeasurementFields } from '../../utils/FieldUtils';
+import { creatableViews, getConfigByViewType } from '../../utils/FieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
 import { containsOnlyLettersAndNumbers } from '../../../../utils/validation';
 
 interface IAccordinaViewProps {
   formRef: any;
   formMeta: any;
+  accordianRef: any;
+  newlyAddedIdsRef: any;
   accordianRef: any;
   newlyAddedIdsRef: any;
   setFormMeta: any;
@@ -223,9 +225,8 @@ const AccordianBody = ({
                     newlyAddedIds={newlyAddedIds}
                     isNew={isNew}
                     handleUpdateFieldName={handleUpdateFieldName}
-                    // isAccountCustomization={isAccountCustomization}
-                    isFieldNameChangable={isFieldNameChangable}
-                    addNewFieldDisabled={addNewFieldDisabled}
+                    isFieldNameChangable={true}
+                    addNewFieldDisabled={false}
                     hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                     hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
                     isRegionCustomizeForm={isRegionCustomizeForm}
@@ -274,11 +275,11 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
         )}
       </div>
       {/* ------- JSON viewer ----------- */}
-      {/* <div className='mt-1 bg-black p-2'>
+      <div className='mt-1 bg-black p-2'>
         <code>
           <pre style={{ fontSize: '1rem' }}>{JSON.stringify(_presentableJson(cloneDeep(values)), null, 2)}</pre>
         </code>
-      </div> */}
+      </div>
       {/* ------------------------------- */}
     </>
   );
@@ -290,7 +291,7 @@ const AccordianView = ({
   setFormMeta,
   onCancel,
   targetIds,
-  onSubmit: onSubmitFinal,
+  onSubmit,
   accordianRef,
   newlyAddedIdsRef,
   setEditGroupedFieldsOrder,
@@ -451,17 +452,6 @@ const AccordianView = ({
       formValues[familyName][newFieldName].id = newFieldName;
       formValues[familyName][newFieldName].fieldName = newFieldLabel;
 
-      // toggle fields based on fieldname
-      if (isEditableFields.includes(newFieldName) && isRegionCustomizeForm) {
-        formValues[familyName][newFieldName].isEditable = true;
-      } else if ('isEditable' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].isEditable;
-      }
-      if (unitMeasurementFields.includes(newFieldName)) {
-        formValues[familyName][newFieldName].unitMeasurement = undefined;
-      } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].unitMeasurement;
-      }
       delete formValues[familyName][currentFieldID];
 
       // update newly added ids

@@ -37,9 +37,7 @@ const customizableFieldMeta: IBaseFieldMeta = {
   optionsList: {},
   errorMessage: {},
   isEnabled: {},
-  isEditable: {},
-  isEnrollment: {},
-  unitMeasurement: {}
+  isEditable: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {

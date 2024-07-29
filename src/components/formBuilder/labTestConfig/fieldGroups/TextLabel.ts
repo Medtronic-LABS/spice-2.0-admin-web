@@ -12,8 +12,7 @@ export interface ITextLabelFields extends IBaseFields {
   isNew?: boolean;
   isMandatory?: boolean;
   isEnabled?: boolean;
-  isEnrollment?: boolean;
-  isNotDefault?: boolean;
+  isDefault?: boolean;
 }
 
 const getEmptyData = (): ITextLabelFields => ({

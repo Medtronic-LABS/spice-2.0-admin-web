@@ -97,6 +97,8 @@ const SelectInput = ({
   isMulti = false,
   menuPlacement = 'auto',
   autoSelect = true,
+  optionPropStyles,
+  isOptionDisabled,
   name = '',
   ...rest
 }: ISelectBoxProps): React.ReactElement => {

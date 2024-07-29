@@ -47,8 +47,7 @@ export interface IBaseFieldMeta {
   inputType?: ISelectAttributeProps;
   orientation?: ISelectAttributeProps;
   defaultValue?: ISelectAttributeProps;
-  minDays?: ITextAttributeProps;
-  maxDays?: ITextAttributeProps;
+  testValidityDays?: ITextAttributeProps;
   unitList?: ISelectAttributeProps;
   code?: ITextAttributeProps;
   url?: ITextAttributeProps;

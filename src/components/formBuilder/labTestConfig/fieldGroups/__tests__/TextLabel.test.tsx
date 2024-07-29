@@ -18,7 +18,7 @@ describe('TEXT_LABEL_CONFIG', () => {
       isMandatory: false,
       isEnabled: true,
       visibility: 'visible',
-      isDefault: true
+      isDefault: false
     });
   });
 

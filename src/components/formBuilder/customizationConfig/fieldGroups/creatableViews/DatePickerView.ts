@@ -5,6 +5,7 @@ import { IComponentConfig, IFieldViewType } from '../../../types/CustomizationCo
 
 export interface IDatePickerFields extends IBaseFields {
   isDefault?: boolean;
+  isDefault?: boolean;
   startDate?: string;
   endDate?: string;
   testValidityDays?: string;
@@ -27,9 +28,9 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   isMandatory: {},
-  disableFutureDate: {},
-  minDays: {},
-  maxDays: {}
+  isEnabled: {},
+  visibility: {},
+  testValidityDays: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {

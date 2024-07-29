@@ -16,7 +16,7 @@ describe('ICheckBoxFields', () => {
         hint: '',
         optionsList: [],
         errorMessage: '',
-        isDefault: false
+        isDefault: true
       };
       const result = CHECKBOX_CONFIG.getEmptyData();
       expect(result).toEqual(expected);

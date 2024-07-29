@@ -26,11 +26,15 @@ export const unitMeasurementOptions = [
   { label: '%', key: '%' }
 ];
 
-export const resourceOptions: IResourceOptions = {
-  [InputTypes.DECIMAL]: [{ label: 'Quantity', key: 'Quantity' }],
-  [InputTypes.NUMBER]: [{ label: 'Quantity', key: 'Quantity' }],
-  [InputTypes.DEFAULT]: [{ label: 'String', key: 'String' }]
-};
+export const resourceOptions = [
+  { label: 'Boolean', key: 'Boolean' },
+  { label: 'Code', key: 'Code' },
+  { label: 'Date', key: 'Date' },
+  { label: 'Integer', key: 'Integer' },
+  { label: 'Quantity', key: 'Quantity' },
+  { label: 'Range', key: 'Range' },
+  { label: 'String', key: 'String' }
+];
 
 export const baseFieldMeta: IBaseFieldMeta = {
   family: {
@@ -63,21 +67,21 @@ export const baseFieldMeta: IBaseFieldMeta = {
     order: 1.4,
     label: 'Code',
     type: 'text',
-    required: false,
+    required: true,
     component: 'TEXT_FIELD'
   },
   url: {
     order: 1.5,
     label: 'URL',
     type: 'text',
-    required: false,
+    required: true,
     component: 'TEXT_FIELD'
   },
   action: { order: 1.6, label: 'Action', type: 'text', required: false, component: 'TEXT_FIELD' },
   resource: {
     order: 1.7,
-    label: 'Field Type',
-    options: resourceOptions as IResourceOptions,
+    label: 'Resource',
+    options: resourceOptions,
     required: true,
     labelKey: 'label',
     valueKey: 'key',
@@ -144,14 +148,20 @@ export const baseFieldMeta: IBaseFieldMeta = {
     type: 'number',
     component: 'TEXT_FIELD'
   },
+  testValidityDays: {
+    order: 5.3,
+    label: 'Test Validity in Days',
+    required: true,
+    component: 'TEXT_FIELD'
+  },
   startDate: {
-    order: 5.5,
+    order: 5.4,
     label: 'Start Date',
     required: false,
     component: 'DATE_PICKER'
   },
   endDate: {
-    order: 5.6,
+    order: 5.5,
     label: 'End Date',
     required: false,
     component: 'DATE_PICKER'
@@ -222,7 +232,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },
   isEnabled: { order: 15, label: 'Is Enabled', component: 'CHECKBOX' },
-  isEnrollment: { order: 15.1, label: 'Is Enrollment', component: 'CHECKBOX' },
+  isResult: { order: 15.6, label: 'Is Result', component: 'CHECKBOX' },
   disableFutureDate: { order: 15.2, label: 'Disable Future Dates', component: 'CHECKBOX' },
   isNeedAction: { order: 15.3, label: 'Action Needed', component: 'CHECKBOX' },
   isNew: { order: 0, label: 'isNew', component: 'CHECKBOX' },

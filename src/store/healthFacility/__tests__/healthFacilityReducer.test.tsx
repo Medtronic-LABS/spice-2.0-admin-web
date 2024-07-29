@@ -39,9 +39,6 @@ const initialState: IHealthFacilityState = {
   chiefdomTotal: 0,
   chiefdomLoading: false,
   villagesList: [],
-  unlinkedVillagesList: [],
-  unlinkedVillagesTotal: 0,
-  unlinkedVillagesLoading: false,
   villagesTotal: 0,
   villagesLoading: false,
   villagesFromHFList: { list: [], hfTenantIds: null },
@@ -614,7 +611,6 @@ describe('healthFacilityReducer', () => {
     };
     const expectedState = {
       ...initialState,
-      healthFacility: {},
       chiefdomList: [],
       villagesList: [],
       villagesFromHFList: { list: [], hfTenantIds: null }

@@ -307,6 +307,7 @@ const HealthFacilityList = (): React.ReactElement => {
                 label: chiefdomSName,
                 width: '30%',
                 cellFormatter: ({ chiefdom }) => chiefdom?.name
+                cellFormatter: ({ chiefdom }) => chiefdom?.name
               }
             ]}
             isDelete={false}

@@ -38,19 +38,19 @@ const CLINICAL_WORKFLOWS = [
 
 const HF_TYPES = [
   {
-    id: 'Community Health Post',
+    id: 1,
     name: 'Community Health Post',
     active: true,
     deleted: false
   },
   {
-    id: 'Community Health Centre',
+    id: 2,
     name: 'Community Health Centre',
     active: true,
     deleted: false
   },
   {
-    id: 'Maternity and Child Health Post',
+    id: 3,
     name: 'Maternity and Child Health Post',
     active: true,
     deleted: false
@@ -344,9 +344,7 @@ const HF_ID_TIS = {
 
 const HF_IDS_TI = {
   ids: [757],
-  tenantId: 349,
-  healthFacilityId: 23,
-  linkedVillageIds: [1, 2]
+  tenantId: 349
 };
 
 const HF_CI_DI = {

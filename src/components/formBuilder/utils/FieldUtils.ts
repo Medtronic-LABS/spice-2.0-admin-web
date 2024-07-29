@@ -12,64 +12,21 @@ import DIALOG_CHECKBOX_CONFIG from '../config/fieldGroups/creatableViews/DialogC
 import MENTAL_HEALTH_CONFIG from '../config/fieldGroups/MentalHealthView';
 
 export const creatableViews = [
-  { label: 'BP Input', value: 'BP', isAccountCustomizable: false },
-  { label: 'Radio Input', value: 'RadioGroup', isAccountCustomizable: true },
-  { label: 'Age Input', value: 'Age', isAccountCustomizable: false },
-  { label: 'Height Input', value: 'Height', isAccountCustomizable: false },
-  { label: 'Time View', value: 'TimeView', isAccountCustomizable: false },
-  { label: 'Text Input', value: 'EditText', isAccountCustomizable: true },
-  { label: 'Select Input', value: 'Spinner', isAccountCustomizable: true },
-  { label: 'Slider', value: 'ScaleIndicator', isAccountCustomizable: true },
-  { label: 'Multi Select Input', value: 'CheckBox', isAccountCustomizable: true },
-  { label: 'Single Selection', value: 'SingleSelectionView', isAccountCustomizable: true },
-  { label: 'Dialog Checkbox', value: 'DialogCheckbox', isAccountCustomizable: false },
-  { label: 'Instructions', value: 'Instruction', isAccountCustomizable: true },
-  { label: 'Information Label', value: 'InformationLabel', isAccountCustomizable: false },
-  { label: 'Date Input', value: 'DatePicker', isAccountCustomizable: true }
-];
-
-export const unitMeasurementFields = ['glucose', 'hba1c'];
-
-export const isEditableFields = [
-  'firstName',
-  'middleName',
-  'lastName',
-  'phoneNumber',
-  'phoneNumberCategory',
-  'landmark',
-  'occupation',
-  'insuranceStatus',
-  'insuranceType',
-  'insuranceId',
-  'otherInsurance'
+  { label: 'Text', value: 'EditText' },
+  { label: 'Dropdown', value: 'Spinner' },
+  { label: 'Date', value: 'DatePicker' }
 ];
 
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
   switch (viewType) {
     case 'RadioGroup':
       return RADIO_GROUP_CONFIG;
-    case 'SingleSelectionView':
-      return SINGLE_SELECTION_VIEW_CONFIG;
-    case 'Age':
-      return AGE_CONFIG;
-    case 'Height':
-      return HEIGHT_CONFIG;
-    case 'TimeView':
-      return TIME_VIEW_CONFIG;
     case 'EditText':
       return EDIT_TEXT_CONFIG;
     case 'Spinner':
       return DROPDOWN_CONFIG;
     case 'CheckBox':
       return CHECKBOX_CONFIG;
-    case 'DialogCheckbox':
-      return DIALOG_CHECKBOX_CONFIG;
-    case 'ScaleIndicator':
-      return SCALE_INDICATOR_CONFIG;
-    case 'Instruction':
-      return INSTRUCTION_CONFIG;
-    case 'MentalHealthView':
-      return MENTAL_HEALTH_CONFIG;
     case 'TextLabel':
       return TEXT_LABEL_CONFIG;
     case 'DatePicker':
@@ -95,8 +52,7 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     url: true,
     resource: true,
     unitList: true,
-    condition: true,
-    ranges: true
+    condition: true
   };
   let finalFields: any = {};
   if (fieldValue) {
@@ -117,11 +73,10 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     }
   }
   if (isResult) {
-    finalFields = {
-      ...finalFields,
-      ...inputTypeRelatedFields,
-      ...{ ...resultFields, ranges: obj.viewType === 'EditText', unitList: obj.viewType === 'EditText' }
-    };
+    finalFields = { ...finalFields, ...resultFields };
+    Object.keys(fieldValue ? inputTypeRelatedFields : {}).forEach((key: any) => {
+      finalFields[key] = false;
+    });
   } else {
     Object.keys(resultFields).forEach((key: any) => {
       finalFields[key] = false;
@@ -140,8 +95,8 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
   });
 };
 
-// Ranges unit and gender filter
-interface IRanges {
+// Condition unit and gender filter
+interface ICondition {
   unitType: string;
   gender: string;
   minRange: number;
@@ -171,18 +126,21 @@ interface IRemovedUnits {
   genders: { [unitType: string]: IGender[] };
 }
 
-export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
+export const filterUnitsandGender = (conditions: ICondition[], unitList: IUnit[]) => {
   // Create a dictionary to keep track of the genders associated with each unitType
   const unitGenderMap: { [unitType: string]: Set<string> } = {};
 
-  // Populate the dictionary with the genders from the ranges array
-  (ranges || []).forEach((range) => {
-    const { unitType, gender } = range;
+  // Populate the dictionary with the genders from the conditions array
+  (conditions || []).forEach((condition) => {
+    const { unitType, gender } = condition;
     if (!unitGenderMap[unitType]) {
       unitGenderMap[unitType] = new Set<string>();
     }
     unitGenderMap[unitType].add(gender);
   });
+
+  // Function to check if a unitType has both genders
+  const hasBothGenders = (unitType: string) => unitGenderMap[unitType] && unitGenderMap[unitType].size === 2;
 
   // Function to check if a unitType has both genders
   const hasBothGenders = (unitType: string) =>

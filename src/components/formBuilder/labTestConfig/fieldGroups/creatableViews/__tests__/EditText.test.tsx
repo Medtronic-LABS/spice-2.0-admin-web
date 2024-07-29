@@ -28,7 +28,6 @@ describe('EditTextConfig', () => {
       errorMessage: '',
       inputType: -1,
       isDefault: false,
-      isResult: true,
       minLength: undefined,
       maxLength: undefined
     });

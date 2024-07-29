@@ -20,7 +20,7 @@ export interface IEditTextFields extends IBaseFields {
   code?: string;
   url?: string;
   resource?: string;
-  ranges?: any[];
+  condition?: any[];
 }
 
 const getEmptyData = (): IEditTextFields => ({
@@ -31,15 +31,16 @@ const getEmptyData = (): IEditTextFields => ({
   family: '',
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
+  isResult: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   hint: '',
   errorMessage: '',
   inputType: -1,
   isDefault: false,
+  isDefault: false,
   minLength: undefined,
   maxLength: undefined,
-  ranges: []
+  condition: []
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -59,6 +60,7 @@ const customizableFieldMeta: IBaseFieldMeta = {
   code: {},
   url: {},
   resource: {},
+  errorMessage: {},
   minValue: {},
   maxValue: {},
   inputType: {},
