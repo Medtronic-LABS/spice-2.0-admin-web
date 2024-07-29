@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
@@ -13,7 +13,11 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ReorderView from '../../components/formBuilder/components/reorder/ReorderView';
 import { getConfigByViewType } from '../../components/formBuilder/utils/FieldUtils';
 import useFormCustomization from '../../components/formBuilder/hooks/useFormCustomization';
-import { fetchLabTestCustomizationRequest, labtestCustomization } from '../../store/labTest/actions';
+import {
+  fetchLabTestCustomizationRequest,
+  fetchUnitListRequest,
+  labtestCustomization
+} from '../../store/labTest/actions';
 import { labTestJSONLoadingSelector } from '../../store/labTest/selectors';
 
 interface IMatchParams {
@@ -57,13 +61,17 @@ const LabTestCustomizationLayout = () => {
   } = useFormCustomization();
 
   useEffect(() => {
+    dispatch(fetchUnitListRequest());
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(
       fetchLabTestCustomizationRequest({
         name: uniqueId,
         successCb: ({ formInput }: { formInput: any }) => {
           const formJSON = JSON.parse(formInput)?.formLayout;
           if (formJSON) {
-            handleAddDefaultFamily(testName, formJSON[0].id);
+            setCollapsedGroup(resetCollapsedCalculation([formJSON[0].id]));
             setFormData(groupViewsByFamily(formJSON));
           } else {
             handleAddDefaultFamily(testName);
@@ -128,6 +136,9 @@ const LabTestCustomizationLayout = () => {
     );
   };
 
+  const accordianRef = useRef<any>([]);
+  const newlyAddedIdsRef = useRef<any>([]);
+
   const handleAddDefaultFamily = (familyName: string, formID?: any) => {
     const formValues: any = {};
     const id = formID || camelCase(familyName) + Date.now();
@@ -136,9 +147,20 @@ const LabTestCustomizationLayout = () => {
     nxtView.id = id;
     nxtView.title = familyName;
     nxtView.familyOrder = 0;
-    nxtView.isCustomWorkflow = true;
     formValues[id] = {};
     formValues[id][id] = nxtView;
+
+    // mandatory "Tested On" field
+    const dateView: any = getConfigByViewType('DatePicker').getEmptyData();
+    dateView.viewType = 'DatePicker';
+    dateView.id = 'TestedOn';
+    dateView.fieldName = 'TestedOn';
+    dateView.title = 'Tested On';
+    dateView.family = id;
+    dateView.isDeletable = false;
+    dateView.isMandatory = true;
+    dateView.orderId = 1;
+    formValues[id][dateView.id] = dateView;
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));
     setFormData(formValues);
   };
@@ -155,6 +177,8 @@ const LabTestCustomizationLayout = () => {
             targetIds={targetIdsForAccount}
             onSubmit={onSubmit}
             onCancel={onCancel}
+            accordianRef={accordianRef}
+            newlyAddedIdsRef={newlyAddedIdsRef.current}
             setEditGroupedFieldsOrder={setEditGroupedFieldsOrder}
             presentableJson={presentableJson}
             collapsedGroup={collapsedGroup}

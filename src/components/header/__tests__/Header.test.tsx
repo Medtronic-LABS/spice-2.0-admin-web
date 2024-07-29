@@ -8,6 +8,10 @@ import LogoutIcon from '../../../assets/images/power-switch.svg';
 
 const mockStore = configureMockStore();
 
+jest.mock('../../../assets/images/nav-bar-logo.svg', () => ({
+  ReactComponent: 'NavBarLogo'
+}));
+
 jest.mock('react', () => ({
   ...jest.requireActual('react'),
   useState: jest.fn().mockReturnValue([true, jest.fn()])
@@ -35,8 +39,8 @@ describe('Header component', () => {
   });
 
   it('should render the logo', () => {
-    const logo = wrapper.find('img');
-    expect(logo).toHaveLength(8);
+    const logo = wrapper.find('NavBarLogo');
+    expect(logo.exists()).toBe(true);
   });
   it('should display the name', () => {
     const initials = wrapper.find(`.${styles.name}`);
@@ -62,8 +66,8 @@ describe('Header component', () => {
   });
 
   it('should render the Logout icon', () => {
-    const icon = wrapper.find('img[src="' + LogoutIcon + '"]');
-    expect(icon).toHaveLength(8);
+    const icon = wrapper.find('img[data-testid="logoutIcon"]');
+    expect(icon.exists()).toBe(true);
   });
 
   it('should display the text "Logout"', () => {

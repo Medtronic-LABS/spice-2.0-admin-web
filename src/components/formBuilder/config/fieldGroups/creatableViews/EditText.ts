@@ -2,7 +2,6 @@ import APPCONSTANTS from '../../../../../constants/appConstants';
 import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
-import { unitMeasurementFields } from '../../../utils/FieldUtils';
 
 export interface IEditTextFields extends IBaseFields {
   hint?: string;
@@ -15,7 +14,13 @@ export interface IEditTextFields extends IBaseFields {
   minValue?: number;
   maxValue?: number;
   isNeedAction?: boolean;
-  isNotDefault?: boolean;
+  isDefault?: boolean;
+  isResult?: boolean;
+  unitList?: Array<{ name: string; id: string }>;
+  code?: string;
+  url?: string;
+  resource?: string;
+  condition?: any[];
 }
 
 const getEmptyData = (): IEditTextFields => ({
@@ -24,18 +29,17 @@ const getEmptyData = (): IEditTextFields => ({
   title: '',
   fieldName: '',
   family: '',
-  isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  isEnrollment: true,
+  isResult: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  condition: [],
   hint: '',
   errorMessage: '',
   inputType: -1,
-  isNotDefault: true,
+  isDefault: false,
   minLength: undefined,
-  maxLength: undefined
+  maxLength: undefined,
+  condition: []
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -50,6 +54,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   startsWith: {},
   defaultValue: { disabled: true },
   hint: {},
+  isResult: {},
+  unitList: {},
+  code: {},
+  url: {},
+  resource: {},
   errorMessage: {},
   minValue: {},
   maxValue: {},
@@ -57,14 +66,10 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   condition: {},
   fieldName: {},
-  unitMeasurement: {},
   isEditable: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
-  if (json.id && !unitMeasurementFields.includes(json.id)) {
-    delete json.unitMeasurement;
-  }
   if (json.inputType === 0) {
     delete json.inputType;
   }

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import ReactGa from 'react-ga';
+import ReactGa from 'react-ga4';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
@@ -36,7 +36,7 @@ const App = () => {
      * to report the page view
      * pathname is the current url location pathname
      */
-    ReactGa.pageview(pathname);
+    ReactGa.send({ hitType: 'pageview', page: pathname });
   }, [pathname]);
 
   useEffect(() => {

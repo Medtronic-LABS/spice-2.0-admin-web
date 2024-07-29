@@ -13,7 +13,6 @@ describe('OptionList Component', () => {
     title: '',
     fieldName: '',
     family: 'flu',
-    isSummary: false,
     isMandatory: false,
     isEnabled: true,
     visibility: 'visible',
@@ -22,7 +21,7 @@ describe('OptionList Component', () => {
     optionsList: [],
     errorMessage: '',
     defaultValue: null,
-    isNotDefault: true,
+    isDefault: false,
     orderId: 1
   };
   const inputProps = {

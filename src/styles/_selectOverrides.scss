@@ -9,16 +9,23 @@
   border-radius: 0.5rem !important;
   .select-field__option {
     padding: 0.625rem 1rem !important;
-    &:hover:not(.select-field__option--is-selected) {
+
+    &:hover:not(.select-field__option--is-disabled),
+    :hover:not(.select-field__option--is-selected) {
       background-color: $dropdown-item-hover-background-color !important;
       color: $dropdown-item-hover-color !important;
     }
-    &.select-field__option--is-focused:not(.select-field__option--is-selected) {
+    &.select-field__option--is-focused:not(.select-field__option--is-selected, .select-field__option--is-disabled) {
       color: $dropdown-item-hover-color !important;
     }
     &.select-field__option--is-selected {
       background-color: var(--medium-blue) !important;
       color: $full-white !important;
+    }
+    &.select-field__option--is-disabled {
+      pointer-events: none;
+      color: $dropdown-item-disabled-color !important;
+      background-color: $dropdown-item-disabled-background-color !important;
     }
   }
 }

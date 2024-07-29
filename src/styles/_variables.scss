@@ -39,6 +39,8 @@ $dropdown-item-hover-background-color: var(--medium-blue-3);
 $dropdown-item-hover-color: var(--medium-blue);
 $dropdown-border-color: var(--black-30);
 $dropdown-box-shadow: 0px 8px 16px rgba(83, 86, 90, 0.2);
+$dropdown-item-disabled-color: var(--disabled-grey);
+$dropdown-item-disabled-background-color: var(--option-disabled);
 
 // header height
 $app-navbar-height: 4.125rem;

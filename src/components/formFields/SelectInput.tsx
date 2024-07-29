@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import Select, { CSSObjectWithLabel } from 'react-select';
+import Select, { CSSObjectWithLabel, GroupBase, OptionProps } from 'react-select';
 import Async from 'react-select/async';
 
 import InfoIcon from '../../assets/images/info-grey.svg';
@@ -31,10 +31,12 @@ interface ISelectBoxProps {
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onChange?: (e: any) => void;
+  isOptionDisabled?: (data: any) => boolean;
   value?: { value: string; label: string };
   options: any;
   showOnlyDropdown?: boolean;
   defaultValue?: any;
+  optionPropStyles?: any;
   loadingOptions?: boolean;
   nestedObject?: boolean;
   labelKey?: string | string[];
@@ -50,6 +52,7 @@ interface ISelectBoxProps {
   autoSelect?: boolean;
   name?: string;
   menuPlacement?: string;
+  autoSelect?: boolean;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {
@@ -92,6 +95,8 @@ const SelectInput = ({
   isMulti = false,
   menuPlacement = 'auto',
   autoSelect = true,
+  optionPropStyles,
+  isOptionDisabled,
   name = '',
   ...rest
 }: ISelectBoxProps): React.ReactElement => {
@@ -129,7 +134,25 @@ const SelectInput = ({
 
   const defaultStyles = () => {
     return {
-      valueContainer: (base: CSSObjectWithLabel) => ({ ...base, maxHeight: '200px', overflowY: 'auto' })
+      valueContainer: (base: CSSObjectWithLabel) => ({ ...base, maxHeight: '200px', overflowY: 'auto' }),
+      option: (optionStyles: CSSObjectWithLabel, optionProps: OptionProps<unknown, false, GroupBase<unknown>>) => {
+        return {
+          ...optionStyles,
+          ...optionPropStyles,
+          fontSize: '14px',
+          pointer: 'none',
+          color: optionProps.isDisabled
+            ? '#e6e6e6 !important'
+            : optionProps.isFocused
+            ? '#e6e6e6 !important'
+            : '#212529',
+          backgroundColor: optionProps.isDisabled ? '#e6e6e6 !important' : optionProps.isFocused ? '#DEEBFF' : 'white',
+          '&:focus': {
+            color: optionProps.isDisabled ? '#e6e6e6 !important' : '#212529',
+            backgroundColor: optionProps.isDisabled ? '#e6e6e6 !important' : '#deebff'
+          }
+        };
+      }
     };
   };
 
@@ -169,6 +192,7 @@ const SelectInput = ({
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         isDisabled={disabled}
+        isOptionDisabled={isOptionDisabled}
       />
       {!showOnlyDropdown && (
         <div className={styles.error}>

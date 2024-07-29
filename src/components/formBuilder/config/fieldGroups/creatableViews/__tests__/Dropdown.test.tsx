@@ -1,11 +1,11 @@
 import APPCONSTANTS from '../../../../../../constants/appConstants';
 import { IBaseFieldMeta } from '../../../../types/BaseFieldMeta';
 import { IFieldViewType } from '../../../../types/ComponentConfig';
-import SPINNER_CONFIG from '../Spinner';
+import DROPDOWN_CONFIG from '../Dropdown';
 
 describe('Spinner Container Test Cases', () => {
   it('should export an object with the expected properties', () => {
-    expect(SPINNER_CONFIG).toEqual({
+    expect(DROPDOWN_CONFIG).toEqual({
       getEmptyData: expect.any(Function),
       customizableFieldMeta: expect.any(Object),
       getJSON: expect.any(Function)
@@ -14,7 +14,7 @@ describe('Spinner Container Test Cases', () => {
 
   describe('getEmptyData', () => {
     it('should return an object with the expected properties', () => {
-      const emptyData: any = SPINNER_CONFIG.getEmptyData();
+      const emptyData: any = DROPDOWN_CONFIG.getEmptyData();
 
       expect(emptyData).toEqual({
         id: expect.any(String),
@@ -22,7 +22,6 @@ describe('Spinner Container Test Cases', () => {
         title: '',
         fieldName: '',
         family: '',
-        isSummary: false,
         isMandatory: false,
         isEnabled: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
@@ -31,14 +30,14 @@ describe('Spinner Container Test Cases', () => {
         optionsList: [],
         errorMessage: '',
         defaultValue: '',
-        isNotDefault: true
+        isDefault: false
       });
     });
   });
 
   describe('customizableFieldMeta', () => {
     it('should be an object with the expected properties', () => {
-      const customizableFieldMeta: IBaseFieldMeta = SPINNER_CONFIG.customizableFieldMeta;
+      const customizableFieldMeta: IBaseFieldMeta = DROPDOWN_CONFIG.customizableFieldMeta;
 
       expect(customizableFieldMeta).toEqual({
         visibility: {},
@@ -50,8 +49,7 @@ describe('Spinner Container Test Cases', () => {
         optionsList: {},
         condition: {},
         errorMessage: {},
-        isEditable: {},
-        unitMeasurement: {}
+        isEditable: {}
       });
     });
   });
@@ -70,8 +68,8 @@ describe('Spinner Container Test Cases', () => {
         fieldName: 'Spinner',
         condition: ['new']
       };
-      if (SPINNER_CONFIG.getJSON) {
-        const result: IFieldViewType = SPINNER_CONFIG.getJSON(inputObject);
+      if (DROPDOWN_CONFIG.getJSON) {
+        const result: IFieldViewType = DROPDOWN_CONFIG.getJSON(inputObject);
         expect(result).toEqual(expectedOutput);
       } else {
         fail('getJSON is not defined');
@@ -85,8 +83,8 @@ describe('Spinner Container Test Cases', () => {
         fieldName: 'Spinner',
         condition: ['new']
       };
-      if (SPINNER_CONFIG.getJSON) {
-        const result: IFieldViewType = SPINNER_CONFIG.getJSON(inputObject);
+      if (DROPDOWN_CONFIG.getJSON) {
+        const result: IFieldViewType = DROPDOWN_CONFIG.getJSON(inputObject);
         expect(result).toBe(inputObject);
       } else {
         fail('getJSON is not defined');

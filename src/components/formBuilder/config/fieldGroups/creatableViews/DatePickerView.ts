@@ -4,9 +4,10 @@ import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
 export interface IDatePickerFields extends IBaseFields {
-  isNotDefault?: boolean;
+  isDefault?: boolean;
   startDate?: string;
   endDate?: string;
+  testValidityDays?: string;
 }
 
 const getEmptyData = (): IDatePickerFields => ({
@@ -15,13 +16,11 @@ const getEmptyData = (): IDatePickerFields => ({
   title: '',
   fieldName: '',
   family: '',
-  isSummary: false,
   isMandatory: false,
   isEnabled: true,
-  startDate: '',
-  endDate: '',
+  testValidityDays: '',
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  isNotDefault: true
+  isDefault: false
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -30,13 +29,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isMandatory: {},
   isEnabled: {},
   visibility: {},
-  startDate: {},
-  endDate: {}
+  testValidityDays: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  json.startDate = json.startDate?.label ? json.startDate.label : json.startDate;
   return json;
 };
 

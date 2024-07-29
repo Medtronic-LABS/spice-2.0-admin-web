@@ -12,7 +12,10 @@ const SelectFieldWrapper = ({
   customParseFn,
   customFormatFn,
   customValue,
-  customError
+  customError,
+  autoSelect,
+  isOptionDisabled,
+  onChange
 }: any) => {
   const options: any = customOptions || inputProps?.options || [];
   const parseFn = customParseFn ? customParseFn : (val: any) => val;
@@ -38,6 +41,8 @@ const SelectFieldWrapper = ({
           required={inputProps?.required || false}
           options={options}
           isMulti={isMulti}
+          autoSelect={autoSelect}
+          isOptionDisabled={isOptionDisabled}
           error={
             (meta.error && customError && customError.toString()) ||
             (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label.toLowerCase()) ||
@@ -50,6 +55,7 @@ const SelectFieldWrapper = ({
               obj = object;
             }
           }}
+          onChange={(event) => (onChange ? onChange(event, input) : input.onChange(event))}
         />
       )}
     />

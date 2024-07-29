@@ -22,7 +22,6 @@ describe('RadioGroup Container Test Cases', () => {
         title: '',
         fieldName: '',
         family: '',
-        isSummary: false,
         isMandatory: false,
         isEnabled: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
@@ -30,7 +29,7 @@ describe('RadioGroup Container Test Cases', () => {
         optionsList: [],
         orientation: 0,
         errorMessage: '',
-        isNotDefault: true
+        isDefault: false
       });
     });
   });
@@ -49,8 +48,7 @@ describe('RadioGroup Container Test Cases', () => {
         condition: {},
         errorMessage: {},
         isEnabled: {},
-        isEditable: {},
-        unitMeasurement: {}
+        isEditable: {}
       });
     });
   });

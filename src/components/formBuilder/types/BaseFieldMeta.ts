@@ -18,6 +18,7 @@ export interface ISelectAttributeProps extends IAttributeProps {
   options?: any[];
   labelKey?: string;
   valueKey?: string;
+  isMulti?: boolean;
 }
 
 export interface IBaseFieldMeta {
@@ -44,12 +45,17 @@ export interface IBaseFieldMeta {
   inputType?: ISelectAttributeProps;
   orientation?: ISelectAttributeProps;
   defaultValue?: ISelectAttributeProps;
+  testValidityDays?: ITextAttributeProps;
+  unitList?: ISelectAttributeProps;
+  code?: ITextAttributeProps;
+  url?: ITextAttributeProps;
+  resource?: ISelectAttributeProps;
+  isResult?: IAttributeProps;
   totalCount?: ISelectAttributeProps;
   mandatoryCount?: ISelectAttributeProps;
   visibility?: ISelectAttributeProps;
   targetViews?: IAttributeProps;
   family?: ISelectAttributeProps;
-  unitMeasurement?: ISelectAttributeProps;
   isMandatory?: IAttributeProps;
   isEnabled?: IAttributeProps;
   isEnrollment?: IAttributeProps;
@@ -62,7 +68,6 @@ export interface IBaseFieldMeta {
   optionType?: IAttributeProps;
   optionsList?: IAttributeProps;
   startsWith?: IAttributeProps;
-  isSummary?: IAttributeProps;
   condition?: IAttributeProps;
   readOnly?: IAttributeProps;
   startDate?: IAttributeProps;

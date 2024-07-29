@@ -1,122 +1,61 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 import BinIcon from '../../../../assets/images/bin.svg';
 import PlusIcon from '../../../../assets/images/plus_blue.svg';
 import CustomTooltip from '../../../../components/tooltip';
-import APPCONSTANTS from '../../../../constants/appConstants';
-import { camel2Title, required } from '../../../../utils/validation';
+import { required } from '../../../../utils/validation';
 import styles from '../../styles/FormBuilder.module.scss';
 import SelectFieldWrapper from './SelectFieldWrapper';
 import TextFieldWrapper from './TextFieldWrapper';
+import { filterUnitsandGender, IUnit } from '../../utils/FieldUtils';
 
-const visibilityOptions = [{ ...APPCONSTANTS.VALIDITY_OPTIONS.gone }, { ...APPCONSTANTS.VALIDITY_OPTIONS.visible }];
-
-const enabledOptions = [
-  { label: 'True', key: true },
-  { label: 'False', key: false }
-];
-
-const SelectInputComponent = ({
-  form,
-  name,
-  fieldName,
-  item,
-  obj,
-  config,
-  index,
-  newlyAddedIds,
-  unAddedFields,
-  targetIds,
-  selectedCondition,
-  handleSelectedCondition
-}: any) => {
+const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index }: any) => {
   let options: any = config?.options || [];
   let parseFn = (val: any) => val;
   let value = item[fieldName] || null;
-  let isMulti = fieldName === 'eqList';
-  if (fieldName === 'enabled' || fieldName === 'visibility') {
-    options = config?.options;
-    parseFn = (val: any) => val?.key;
-    value = options?.find(({ key }: any) => item[fieldName] === key) || null;
-  }
+  let disabledUnits: IUnit[] = [];
+  let disabledGenders: IUnit[] = [];
 
-  if (fieldName === 'eq') {
-    options = config?.options?.filter((optionItem: any) => optionItem.name !== '');
+  if (fieldName === 'unitType') {
+    const { removedUnits } = filterUnitsandGender(obj?.condition, obj?.unitList);
+    const { units: removedUnit } = removedUnits;
+    disabledUnits = removedUnit;
+    options = obj?.unitList?.filter((optionItem: any) => optionItem.name !== '');
     parseFn = (val) => val?.name;
     value = options?.find(({ name: optionName }: any) => item[fieldName] === optionName) || null;
   }
-
-  if (fieldName === 'eqList') {
-    isMulti = true;
-    options = config?.options?.filter((optionItem: any) => {
-      return optionItem.name !== '';
-    });
-    parseFn = (eqLists) => {
-      return eqLists?.name
-        ? eqLists.name
-        : eqLists.map((eqListData: any) => {
-            return eqListData.name;
-          });
-    };
-    value = (value || []).map((val: any) => {
-      return { name: val, id: val };
-    });
-  }
-  if (fieldName === 'targetId') {
-    // filter items which has valid field Ids
-    const unAddedFieldIds = unAddedFields.map((fieldItem: any) => fieldItem?.key);
-    const filteredValidIds = newlyAddedIds.filter((key: string) => unAddedFieldIds.includes(key));
-    // create newly added field ids as target id
-    let filteredOptions = filteredValidIds.map((id: any) => ({
-      key: id,
-      label: camel2Title(id)
-    }));
-    // ignore current obj Id
-    const filteredTargetIds = targetIds.filter(({ key }: any) => obj.id !== key);
-    // concat newly add fields to target Ids
-    filteredOptions = filteredOptions.concat(filteredTargetIds);
-    options = filteredOptions.sort((a: any, b: any) => (a.label > b.label ? 1 : -1));
-    parseFn = (val: any) => val?.key;
-    value = options?.find(({ key }: any) => item[fieldName] === key) || '';
-  }
-  function getButtonClass(condition: string, newIndex: number) {
-    const isSelected = selectedCondition.condition === condition && selectedCondition.index === newIndex;
-    const isConfigCondition = config.name === `.${condition}`;
-    return isSelected || isConfigCondition ? styles.selectedConditionButton : styles.conditionButton;
+  if (fieldName === 'gender') {
+    const { removedUnits } = filterUnitsandGender(obj?.condition, obj?.unitList);
+    const { genders } = removedUnits;
+    disabledGenders = genders[item.unitType] || [];
+    options = config?.options?.filter((optionItem: any) => optionItem.name !== '');
+    parseFn = (val) => val?.id;
+    value = options?.find(({ id: gender }: any) => item[fieldName] === gender) || null;
   }
 
-  function shouldShowAsterisk(condition: string, newIndex: number) {
-    const isSelected = selectedCondition.condition === condition && selectedCondition.index === newIndex;
-    const isConfigCondition = config.name === `.${condition}`;
-    return config.required && (isSelected || isConfigCondition);
-  }
   return (
-    <div className='col-4'>
-      {config.isLabelButton && (
-        <div className='d-flex flex-row justify-content-start gap-1'>
-          {['eq', 'eqList'].map((condition) => (
-            <button
-              key={condition}
-              type='button'
-              className={`mb-0dot5 badge border-0 ${getButtonClass(condition, index)}`}
-              onClick={() => handleSelectedCondition({ condition, index })}
-            >
-              {condition === 'eq' ? 'Equal To' : 'Equal List'}
-              {shouldShowAsterisk(condition, index) && <span className='input-asterisk'>*</span>}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className={config.colSize}>
       <SelectFieldWrapper
         name={`${name}[${index}]${config?.name}`}
-        isMulti={isMulti}
-        form={form}
-        obj={obj}
+        autoSelect={false}
         customValue={value}
         customError={config.error}
         customOptions={options}
         customParseFn={parseFn}
         inputProps={config}
+        isOptionDisabled={(option: any) => {
+          const existing = (config.name === 'gender' ? disabledGenders : disabledUnits).findIndex(
+            (optionItem: any) => optionItem.name === option.name
+          );
+          return existing >= 0;
+        }}
+        onChange={(event: any, input: any) => {
+          const newItem = { ...item };
+          if (newItem.unitType !== event?.name) {
+            form.mutators.setValue(`${name}[${index}].gender`, '');
+          }
+          input.onChange(event);
+        }}
       />
     </div>
   );
@@ -129,9 +68,9 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
     parseFn = (newParseValue: any) => (!!Number(newParseValue) ? Number(newParseValue) : null);
   }
   return (
-    <div className='col-4'>
+    <div className={config.colSize}>
       <TextFieldWrapper
-        name={`${name}[${index}]${config.name}`}
+        name={`${name}[${index}].${config.name}`}
         customValue={value}
         customError={config.error}
         customParseFn={parseFn}
@@ -141,199 +80,144 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
   );
 };
 
-const ConditionFieldsComponent = ({
-  form,
-  item,
-  name,
-  obj,
-  index,
-  conditionFieldConfigs,
-  newlyAddedIds,
-  unAddedFields,
-  targetIds,
-  handleSelectedCondition,
-  selectedCondition
-}: any) => {
-  return (
-    <>
-      {Object.keys(item)
-        .sort((a, b) => conditionFieldConfigs?.[a]?.order - conditionFieldConfigs?.[b]?.order)
-        .map((fieldName: any) => {
-          if (fieldName in conditionFieldConfigs) {
-            const config = conditionFieldConfigs[fieldName];
-            switch (config?.component) {
-              case 'MULTI_SELECT_INPUT':
-              case 'SELECT_INPUT': {
-                return (
-                  <Fragment key={fieldName}>
-                    <SelectInputComponent
-                      form={form}
-                      name={name}
-                      key={fieldName}
-                      fieldName={fieldName}
-                      item={item}
-                      obj={obj}
-                      config={config}
-                      index={index}
-                      newlyAddedIds={newlyAddedIds}
-                      unAddedFields={unAddedFields}
-                      targetIds={targetIds}
-                      selectedCondition={selectedCondition}
-                      handleSelectedCondition={handleSelectedCondition}
-                    />
-                  </Fragment>
-                );
-              }
-              case 'TEXT_INPUT':
-              default: {
-                return (
-                  <Fragment key={fieldName}>
-                    <TextInputComponent
-                      name={name}
-                      key={fieldName}
-                      fieldName={fieldName}
-                      item={item}
-                      config={config}
-                      index={index}
-                    />
-                  </Fragment>
-                );
-              }
-            }
-          } else {
-            return <></>;
+const ConditionFieldsComponent = ({ form, item, name, obj, index, conditionFieldConfigs }: any) => {
+  useEffect(() => {
+    const unitExists = (obj.unitList || []).find((unit: any) => item.unitType === unit.name);
+    if (!unitExists?.name) {
+      form.mutators.setValue(`${name}[${index}].unitType`, '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [obj.unitList]);
+
+  return Object.keys(item)
+    .sort((a, b) => conditionFieldConfigs?.[a]?.order - conditionFieldConfigs?.[b]?.order)
+    .map((fieldName: any) => {
+      if (fieldName in conditionFieldConfigs) {
+        const config = conditionFieldConfigs[fieldName];
+        switch (config?.component) {
+          case 'SELECT_INPUT': {
+            return (
+              <Fragment key={fieldName}>
+                <SelectInputComponent
+                  form={form}
+                  name={name}
+                  key={fieldName}
+                  fieldName={fieldName}
+                  item={item}
+                  obj={obj}
+                  config={config}
+                  index={index}
+                />
+              </Fragment>
+            );
           }
-        })}
-    </>
-  );
+          case 'TEXT_INPUT':
+          default: {
+            return (
+              <Fragment key={fieldName}>
+                <TextInputComponent
+                  name={name}
+                  key={fieldName}
+                  fieldName={fieldName}
+                  item={item}
+                  config={config}
+                  index={index}
+                />
+              </Fragment>
+            );
+          }
+        }
+      } else {
+        return <></>;
+      }
+    });
 };
 
-const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, newlyAddedIds }: any) => {
-  const [selectedCondition, setSelectedCondition] = useState({});
-  const conditionFieldConfigs: any = {
-    lengthGreaterThan: {
-      name: '.lengthGreaterThan',
-      type: 'number',
-      label: 'Length Greater Than',
-      error: 'Please enter a valid number',
-      required: true,
-      disabledValidation: true,
-      component: 'TEXT_INPUT'
-    },
-    targetId: {
-      name: '.targetId',
-      label: 'Target Id',
-      labelKey: 'label',
-      valueKey: 'key',
-      options: enabledOptions,
-      error: 'Please select the target id',
-      required: true,
-      disabledValidation: true,
-      component: 'SELECT_INPUT'
-    },
-    enabled: {
-      name: '.enabled',
-      label: 'Enabled',
-      labelKey: 'label',
-      valueKey: 'key',
-      options: enabledOptions,
-      error: 'Please select the enabled option',
-      required: true,
-      disabledValidation: true,
-      component: 'SELECT_INPUT'
-    },
-    eq: {
-      name: '.eq',
-      label: 'Equal To',
+const ConditionConfig = ({ name, obj, field, form }: any) => {
+  const conditionFieldConfigs = {
+    unitType: {
+      name: 'unitType',
+      label: 'Unit',
       labelKey: 'name',
       valueKey: 'id',
-      options: obj.optionsList,
-      error: 'Please select the equal to value',
+      options: obj.unitList || [],
       required: true,
       disabledValidation: true,
-      order: 1,
+      error: 'Please select the unit',
       component: 'SELECT_INPUT',
-      isLabelButton: true
+      colSize: 'col-6 col-md-4 col-lg-3'
     },
-    eqList: {
-      name: '.eqList',
-      label: 'Equal To List',
+    gender: {
+      name: 'gender',
+      label: 'Gender',
       labelKey: 'name',
       valueKey: 'id',
-      options: obj.optionsList,
-      error: 'Please select the equal list value',
+      options: [
+        { name: 'Male', id: 'Male' },
+        { name: 'Female', id: 'Female' }
+      ],
       required: true,
       disabledValidation: true,
-      order: 1,
-      component: 'MULTI_SELECT_INPUT',
-      isLabelButton: true
+      error: 'Please select the gender',
+      component: 'SELECT_INPUT',
+      colSize: 'col-6 col-md-4 col-lg-2'
     },
-    visibility: {
-      name: '.visibility',
-      label: 'Visibility',
-      options: visibilityOptions,
-      error: 'Please select the visibility',
+    minRange: {
+      name: 'minRange',
+      type: 'number',
+      label: 'Min Value',
       required: true,
       disabledValidation: true,
-      component: 'SELECT_INPUT'
+      error: 'Please enter a valid number',
+      component: 'TEXT_INPUT',
+      colSize: 'col-6 col-md-4 col-lg-2'
+    },
+    maxRange: {
+      name: 'maxRange',
+      type: 'number',
+      label: 'Max Value',
+      required: true,
+      disabledValidation: true,
+      component: 'TEXT_INPUT',
+      error: 'Please enter a valid number',
+      colSize: 'col-6 col-md-4 col-lg-2'
+    },
+    displayRange: {
+      name: 'displayRange',
+      type: 'text',
+      label: 'Display Range',
+      required: true,
+      disabledValidation: true,
+      component: 'TEXT_INPUT',
+      error: 'Please enter a valid display range',
+      colSize: 'col-6 col-md-4 col-lg-3'
     }
   };
 
-  const editTextConditionInitialValue = {
-    lengthGreaterThan: '',
-    targetId: '',
-    enabled: ''
+  const initialValue = {
+    unitType: '',
+    gender: '',
+    minRange: '',
+    maxRange: '',
+    displayRange: ''
   };
-
-  const otherConditionInitialValue = {
-    eq: '',
-    targetId: '',
-    visibility: ''
-  };
-
-  const initialValue = obj.viewType === 'EditText' ? editTextConditionInitialValue : otherConditionInitialValue;
 
   const onAddNewCondition = () => {
     form.mutators.setValue(`${name}`, [initialValue]);
-  };
-
-  const getNestedValue = (newObj: any, path: string) => {
-    return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), newObj);
-  };
-  const handleSelectedCondition = (selectedConditionValue: { condition: string; index: number }) => {
-    const formValues = form.getState().values;
-    const valueAtNamePath = getNestedValue(formValues, name);
-    const conditionObject = valueAtNamePath[`${selectedConditionValue.index}`];
-    if (selectedConditionValue.condition === 'eq') {
-      delete conditionObject.eqList;
-      form.mutators.setValue(`${name}[${selectedConditionValue.index}]`, {
-        [selectedConditionValue.condition]: '',
-        ...conditionObject
-      });
-    } else {
-      delete conditionObject.eq;
-      form.mutators.setValue(`${name}[${selectedConditionValue.index}]`, {
-        [selectedConditionValue.condition]: [],
-        ...conditionObject
-      });
-    }
-    setSelectedCondition(selectedConditionValue);
   };
 
   return (
     <div className='col-4 col-12'>
       <div className='d-flex align-items-center '>
         <div
-          className={`d-flex mt-1 mb-0dot5 theme-text lh-1dot25 ${
-            !!obj.fieldName && !obj.readOnly ? 'pointer' : 'not-allowed'
-          }`}
-          onClick={!!obj.fieldName && !obj[field].length && !obj.readOnly ? onAddNewCondition : () => null}
+          className={`d-flex mt-1 mb-0dot5 theme-text lh-1dot25 ${!!obj.fieldName ? 'pointer' : 'not-allowed'}`}
+          onClick={!!obj.fieldName && !(obj[field] || []).length ? onAddNewCondition : () => null}
         >
           <CustomTooltip title={`${!!obj.fieldName ? 'Add' : 'Please select a field name'}`}>
             <span className={`${styles.label} m-0 `}>Conditions</span>
             <img
               className={`ms-0dot5 ${!!obj.fieldName ? '' : 'no-pointer-events'} ${
-                !obj[field].length ? 'visible' : 'invisible'
+                !(obj[field] || []).length ? 'visible' : 'invisible'
               }`}
               src={PlusIcon}
               alt='plus-icon'
@@ -341,7 +225,7 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
           </CustomTooltip>
         </div>
       </div>
-      {obj[field].length ? (
+      {(obj[field] || []).length ? (
         <div className={`${styles.conditionsContainer}`}>
           <FieldArray
             name={name}
@@ -366,59 +250,51 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
           >
             {({ fields, meta }) =>
               obj[field].map((item: any, index: any) => {
-                if (!!item.targetId && !!item.targetOption) {
-                  return null;
-                } else {
-                  return (
-                    <div key={index}>
-                      <div className='position-relative w-100 d-flex px-1' key={`${obj.family}_${obj.id}_${name}`}>
-                        <div className='row d-flex w-100 gx-1dot25 pe-lg-1'>
-                          <ConditionFieldsComponent
-                            form={form}
-                            item={item}
-                            name={name}
-                            obj={obj}
-                            index={index}
-                            conditionFieldConfigs={conditionFieldConfigs}
-                            newlyAddedIds={newlyAddedIds}
-                            unAddedFields={unAddedFields}
-                            targetIds={targetIds}
-                            handleSelectedCondition={handleSelectedCondition}
-                            selectedCondition={selectedCondition}
-                          />
+                return (
+                  <Fragment key={index}>
+                    <div className='row position-relative ' key={`${obj.family}_${obj.id}_${name}`}>
+                      <div className='col-11 row d-flex gx-1 pe-lg-1'>
+                        <ConditionFieldsComponent
+                          form={form}
+                          item={item}
+                          name={name}
+                          obj={obj}
+                          index={index}
+                          conditionFieldConfigs={conditionFieldConfigs}
+                        />
+                      </div>
+                      <div className={`col-1 d-flex align-items-center ${styles.actionIcons}`}>
+                        <div
+                          className='danger-text lh-1dot25 pointer m-0dot5'
+                          onClick={() => {
+                            fields?.value?.length > 1
+                              ? fields.remove(index)
+                              : form.mutators.setValue(`${obj.family}.${obj.id}`, {
+                                  ...obj,
+                                  condition: []
+                                });
+                          }}
+                        >
+                          <CustomTooltip title='Delete'>
+                            <img className='me-0dot5' src={BinIcon} alt='delete-icon' />
+                          </CustomTooltip>
                         </div>
-                        <div className={`d-flex align-items-center ${styles.actionIcons}`}>
+                        {obj[field].length - 1 === index && !meta.error && (
                           <div
-                            className='danger-text lh-1dot25 pointer m-0dot5'
+                            className={`theme-text lh-1dot25 pointer m-0dot5`}
                             onClick={() => {
-                              if (fields.length === 1) {
-                                form.change(name, []);
-                              } else {
-                                fields.remove(index);
-                              }
+                              fields.push(initialValue);
                             }}
                           >
-                            <CustomTooltip title='Delete'>
-                              <img className='me-0dot5' src={BinIcon} alt='delete-icon' />
+                            <CustomTooltip title='Add'>
+                              <img className={`me-0dot5`} src={PlusIcon} alt='plus-icon' />
                             </CustomTooltip>
                           </div>
-                          {obj[field].length - 1 === index && !meta.error && (
-                            <div
-                              className={`theme-text lh-1dot25 m-0dot5`}
-                              onClick={() => {
-                                fields.push(initialValue);
-                              }}
-                            >
-                              <CustomTooltip title='Add'>
-                                <img className={`me-0dot5`} src={PlusIcon} alt='plus-icon' />
-                              </CustomTooltip>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
-                  );
-                }
+                  </Fragment>
+                );
               })
             }
           </FieldArray>

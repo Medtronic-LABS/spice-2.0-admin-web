@@ -19,6 +19,16 @@ export const unitMeasurementOptions = [
   { label: '%', key: '%' }
 ];
 
+export const resourceOptions = [
+  { label: 'Boolean', key: 'Boolean' },
+  { label: 'Code', key: 'Code' },
+  { label: 'Date', key: 'Date' },
+  { label: 'Integer', key: 'Integer' },
+  { label: 'Quantity', key: 'Quantity' },
+  { label: 'Range', key: 'Range' },
+  { label: 'String', key: 'String' }
+];
+
 export const baseFieldMeta: IBaseFieldMeta = {
   family: {
     label: 'Family',
@@ -46,12 +56,37 @@ export const baseFieldMeta: IBaseFieldMeta = {
     required: true,
     component: 'TEXT_FIELD'
   },
-  isSummary: { order: 0, label: 'Shown In Summary', component: 'CHECKBOX' },
+  code: {
+    order: 1.4,
+    label: 'Code',
+    type: 'text',
+    required: true,
+    component: 'TEXT_FIELD'
+  },
+  url: {
+    order: 1.5,
+    label: 'URL',
+    type: 'text',
+    required: true,
+    component: 'TEXT_FIELD'
+  },
   action: { order: 1.6, label: 'Action', type: 'text', required: false, component: 'TEXT_FIELD' },
-  unitMeasurement: {
-    order: 2,
-    label: 'Unit Measurement',
-    options: unitMeasurementOptions,
+  resource: {
+    order: 1.7,
+    label: 'Resource',
+    options: resourceOptions,
+    required: true,
+    labelKey: 'label',
+    valueKey: 'key',
+    component: 'SELECT_INPUT'
+  },
+  unitList: {
+    order: 1.7,
+    label: 'Unit Types',
+    required: true,
+    isMulti: true,
+    labelKey: 'name',
+    valueKey: 'name',
     component: 'SELECT_INPUT'
   },
   minValue: { order: 2.1, label: 'Min Value', type: 'number', required: true, component: 'TEXT_FIELD' },
@@ -66,7 +101,6 @@ export const baseFieldMeta: IBaseFieldMeta = {
     order: 1.3,
     label: 'Input Type',
     options: [
-      { key: InputTypes.PHONE_NUMBER, label: 'Phone number' },
       { key: InputTypes.NUMBER, label: 'Number' },
       { key: InputTypes.DECIMAL, label: 'Decimal values' },
       { key: InputTypes.DEFAULT, label: 'Text' }
@@ -101,14 +135,20 @@ export const baseFieldMeta: IBaseFieldMeta = {
     valueKey: 'id',
     component: 'SELECT_INPUT'
   },
-  startDate: {
+  testValidityDays: {
     order: 5.3,
+    label: 'Test Validity in Days',
+    required: true,
+    component: 'TEXT_FIELD'
+  },
+  startDate: {
+    order: 5.4,
     label: 'Start Date',
     required: false,
     component: 'DATE_PICKER'
   },
   endDate: {
-    order: 5.4,
+    order: 5.5,
     label: 'End Date',
     required: false,
     component: 'DATE_PICKER'
@@ -186,7 +226,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },
   isEnabled: { order: 15, label: 'Is Enabled', component: 'CHECKBOX' },
-  isEnrollment: { order: 15.1, label: 'Is Enrollment', component: 'CHECKBOX' },
+  isResult: { order: 15.6, label: 'Is Result', component: 'CHECKBOX' },
   disableFutureDate: { order: 15.2, label: 'Disable Future Dates', component: 'CHECKBOX' },
   isNeedAction: { order: 15.3, label: 'Action Needed', component: 'CHECKBOX' },
   isNew: { order: 0, label: 'isNew', component: 'CHECKBOX' },

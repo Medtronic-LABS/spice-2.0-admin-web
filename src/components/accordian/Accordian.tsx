@@ -25,7 +25,10 @@ const Accordian = ({ header, body, collapsed, defaultCollapsed, onToggle: onTogg
   return (
     <div className='accordion'>
       <div className='accordion-item'>
-        <div className={`accordion-header ${show ? styles.headerBorder : ''}`} onClick={handleToggle}>
+        <div
+          className={`accordion-header ${show ? styles.headerBorder : styles.headerBorderonHide}`}
+          onClick={handleToggle}
+        >
           <div className={`accordion-button bg-light ${show ? 'collapsed' : ''}`}>{header}</div>
         </div>
         <div className={`accordion-collapse collapse ${show ? 'show' : ''}`}>

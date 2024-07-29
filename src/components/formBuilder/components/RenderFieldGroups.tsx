@@ -13,7 +13,6 @@ const RenderFieldGroups = ({
   isNew,
   newlyAddedIds,
   handleUpdateFieldName,
-  // isAccountCustomization,
   isFieldNameChangable,
   addNewFieldDisabled,
   hashFieldIdsWithTitle,

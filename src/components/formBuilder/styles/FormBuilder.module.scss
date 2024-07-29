@@ -166,11 +166,11 @@ label {
   border: 1px solid $field-border-color;
   border-radius: 10px;
   padding-top: 1rem;
+  padding-left: 1rem;
 }
 
 .actionIcons {
-  width: 5rem;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .trueLabel {

@@ -12,8 +12,7 @@ export interface ITextLabelFields extends IBaseFields {
   isNew?: boolean;
   isMandatory?: boolean;
   isEnabled?: boolean;
-  isEnrollment?: boolean;
-  isNotDefault?: boolean;
+  isDefault?: boolean;
 }
 
 const getEmptyData = (): ITextLabelFields => ({
@@ -22,12 +21,11 @@ const getEmptyData = (): ITextLabelFields => ({
   title: '',
   fieldName: '',
   family: '',
-  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  isNotDefault: true
+  isDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -37,8 +35,7 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEnrollment: {},
   visibility: {},
   fieldName: {},
-  isEditable: {},
-  unitMeasurement: {}
+  isEditable: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {

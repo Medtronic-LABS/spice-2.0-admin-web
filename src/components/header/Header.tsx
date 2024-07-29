@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import NavBarLogo from '../../assets/images/nav-bar-logo.svg';
+import { ReactComponent as NavBarLogo } from '../../assets/images/nav-bar-logo.svg';
 import LogoutIcon from '../../assets/images/power-switch.svg';
 import CaretDownIcon from '../../assets/images/caret-down-grey.svg';
 import UserMenu from './UserMenu';
@@ -24,7 +24,7 @@ export default function Header() {
         className={`navbar navbar-expand navbar-light bg-light ps-sm-3dot125 ps-1 pe-sm-1dot5 pe-1 ${styles.appNavbar}`}
       >
         <Link to='/' className={`${styles.navbarLogo} navbar-brand`}>
-          <img src={NavBarLogo} alt='logo' width={108} height={40} />
+          <NavBarLogo aria-labelledby='navbar-logo' className={styles.navBarLogoImg} />
         </Link>
         <div className={`nav-item dropdown ms-auto`}>
           <div
@@ -56,7 +56,7 @@ export default function Header() {
                 onClick={() => dispatch(logoutRequest())}
               >
                 <div className={`${styles.iconWrapper} me-0dot75 d-flex align-items-center justify-content-center`}>
-                  <img src={LogoutIcon} alt='' width={16} height={16} />
+                  <img data-testid='logoutIcon' src={LogoutIcon} alt='' width={16} height={16} />
                 </div>
                 Logout
               </div>

@@ -13,34 +13,94 @@ describe('ConditionConfig Component', () => {
     targetId: 'field1'
   };
 
-  const store = mockStore({});
+  const store = mockStore({
+    labtest: {
+      units: [
+        {
+          id: 1,
+          createdBy: 1,
+          updatedBy: 1,
+          createdAt: '2022-04-18T20:39:27+00:00',
+          updatedAt: '2022-04-18T20:39:27+00:00',
+          name: 'mg/dL',
+          type: 'LABTEST',
+          description: 'mg/dL',
+          displayOrder: 6,
+          active: true,
+          deleted: false
+        }
+      ]
+    }
+  });
   const conditionFieldConfigs = {
-    lengthGreaterThan: {
-      name: '.lengthGreaterThan',
+    unitType: {
+      name: '.unitType',
+      label: 'Unit',
+      labelKey: 'name',
+      valueKey: 'id',
+      options: [
+        {
+          id: 1,
+          createdBy: 1,
+          updatedBy: 1,
+          createdAt: '2022-04-18T20:39:27+00:00',
+          updatedAt: '2022-04-18T20:39:27+00:00',
+          name: 'mg/dL',
+          type: 'LABTEST',
+          description: 'mg/dL',
+          displayOrder: 6,
+          active: true,
+          deleted: false
+        }
+      ],
+      error: 'Please select the unit',
+      required: true,
+      disabledValidation: true,
+      order: 1,
+      component: 'SELECT_INPUT',
+      isLabelButton: true,
+      colSize: 'col-6 col-md-4 col-lg-2'
+    },
+    minRange: {
+      name: '.minRange',
       type: 'number',
-      label: 'Length Greater Than',
+      label: 'Min Value',
       error: 'Please enter a valid number',
       required: true,
       disabledValidation: true,
-      component: 'TEXT_INPUT'
+      component: 'TEXT_INPUT',
+      colSize: 'col-6 col-md-4 col-lg-3'
     },
-    targetId: {
-      name: '.targetId',
-      label: 'Target Id',
-      labelKey: 'label',
-      valueKey: 'key',
-      options: [
-        { key: 'field1', label: 'Field 1' },
-        { key: 'field2', label: 'Field 2' }
-      ],
-      component: 'SELECT_INPUT'
+    maxRange: {
+      name: '.maxRange',
+      type: 'number',
+      label: 'Max Value',
+      error: 'Please enter a valid number',
+      required: true,
+      disabledValidation: true,
+      component: 'TEXT_INPUT',
+      colSize: 'col-6 col-md-4 col-lg-3'
     },
-    array: [
-      {
-        targetId: '1',
-        targetOption: 'option'
-      }
-    ]
+    displayRange: {
+      name: '.displayRange',
+      type: 'text',
+      label: 'Display Range',
+      error: 'Please enter a valid display range',
+      required: true,
+      disabledValidation: true,
+      component: 'TEXT_INPUT',
+      colSize: 'col-6 col-md-4 col-lg-3'
+    },
+    order: {
+      name: '.order',
+      type: 'text',
+      label: 'Order',
+      error: 'Invalid order',
+      required: true,
+      disabledValidation: true,
+      component: 'TEXT_INPUT',
+      colSize: 'col-6 col-md-4 col-lg-1'
+    }
   };
 
   const props = {
@@ -178,13 +238,7 @@ describe('ConditionConfig Component', () => {
     config: [],
     field: 'array',
     index: 0,
-    conditionFieldConfigs,
-    newlyAddedIds: ['field1', 'field2'],
-    unAddedFields: [{ key: 'field3', label: 'Field 3' }],
-    targetIds: [
-      { key: 'field1', label: 'Field 1' },
-      { key: 'field2', label: 'Field 2' }
-    ]
+    conditionFieldConfigs
   };
 
   it('renders without error', () => {

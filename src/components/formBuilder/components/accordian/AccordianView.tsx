@@ -9,12 +9,14 @@ import Accordian from '../../../../components/accordian/Accordian';
 import APPCONSTANTS from '../../../../constants/appConstants';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
-import { creatableViews, getConfigByViewType, isEditableFields, unitMeasurementFields } from '../../utils/FieldUtils';
+import { creatableViews, getConfigByViewType } from '../../utils/FieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
 
 interface IAccordinaViewProps {
   formRef: any;
   formMeta: any;
+  accordianRef: any;
+  newlyAddedIdsRef: any;
   setFormMeta: any;
   targetIds: any;
   onSubmit: any;
@@ -37,6 +39,56 @@ interface IAccordinaViewProps {
 export interface IFormValues {
   jsonForm: IViewType[];
 }
+
+export const addNewFieldFn = ({
+  family,
+  view,
+  formRef,
+  newlyAddedIds,
+  isFieldNameChangable,
+  hashFieldIdsWithTitle,
+  hashFieldIdsWithFieldName,
+  accordianRef,
+  setFormMeta,
+  isDeletable = undefined
+}: {
+  family: string;
+  view: string;
+  formRef: any;
+  newlyAddedIds: any;
+  isFieldNameChangable: boolean;
+  hashFieldIdsWithTitle: any;
+  hashFieldIdsWithFieldName: any;
+  accordianRef: React.MutableRefObject<any>;
+  setFormMeta: any;
+  isDeletable?: boolean;
+}) => {
+  const finalFormState = { ...formRef.current.getState() };
+  const formValues = cloneDeep(finalFormState.values);
+  // enable add field options dropdown
+  const element = document.getElementById('dropdownMenu');
+  element?.classList.remove('show');
+  const dropdownelement = document.getElementById('newfieldoptions');
+  dropdownelement?.classList.remove('show');
+  // add new field to form meta
+  const nxtView: any = getConfigByViewType(view).getEmptyData();
+  nxtView.family = family;
+  nxtView.orderId = Object.values(formValues[family]).filter((item: any) => item.viewType !== 'CardView').length + 1;
+  if (isDeletable !== undefined) {
+    nxtView.isDeletable = isDeletable;
+  }
+  // add newly added ids and fieldname
+  newlyAddedIds.push(nxtView.id);
+  formValues[family][nxtView.id] = nxtView;
+  if (isFieldNameChangable) {
+    hashFieldIdsWithTitle[nxtView.id] = '';
+    hashFieldIdsWithFieldName[nxtView.id] = '';
+  }
+  setFormMeta(formValues);
+  setTimeout(() => {
+    accordianRef?.current[family].scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, 0);
+};
 
 const AccordianHeader = ({
   collapsedGroup,
@@ -81,7 +133,6 @@ const AccordianHeader = ({
             )}
             <ul className='dropdown-menu' aria-labelledby='newfieldoptions' id='dropdownMenu'>
               {[...creatableViews]
-                .filter((views) => (!addNewFieldDisabled ? views.isAccountCustomizable : true))
                 .sort((a, b) => (a.label > b.label ? 1 : -1))
                 .map((view, index) => {
                   return (
@@ -153,25 +204,26 @@ const AccordianBody = ({
                     newlyAddedIds={newlyAddedIds}
                     isNew={isNew}
                     handleUpdateFieldName={handleUpdateFieldName}
-                    // isAccountCustomization={isAccountCustomization}
-                    isFieldNameChangable={isFieldNameChangable}
-                    addNewFieldDisabled={addNewFieldDisabled}
+                    isFieldNameChangable={true}
+                    addNewFieldDisabled={false}
                     hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                     hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
                     isRegionCustomizeForm={isRegionCustomizeForm}
                   />
                 </div>
-                {(isNew || currentFamilyGroup[fieldGroupName]?.isNotDefault) && (
-                  <div className={`col-12 d-flex justify-content-end mt-1 danger-text lh-1dot25`}>
-                    <div
-                      onClick={() => handleDeleteField(familyName, fieldGroupName)}
-                      className='pointer d-flex align-items-center'
-                    >
-                      <img className='me-0dot5' title='Delete' src={BinIcon} alt='' />
-                      <span className={`${styles.customizationFont}`}>Delete</span>
-                    </div>
-                  </div>
-                )}
+                {currentFamilyGroup[fieldGroupName]?.isDeletable !== undefined
+                  ? currentFamilyGroup[fieldGroupName]?.deletable
+                  : (isNew || !currentFamilyGroup[fieldGroupName]?.isDefault) && (
+                      <div className={`col-12 d-flex justify-content-end mt-1 danger-text lh-1dot25`}>
+                        <div
+                          onClick={() => handleDeleteField(familyName, fieldGroupName)}
+                          className='pointer d-flex align-items-center'
+                        >
+                          <img className='me-0dot5' title='Delete' src={BinIcon} alt='' />
+                          <span className={`${styles.customizationFont}`}>Delete</span>
+                        </div>
+                      </div>
+                    )}
               </div>
               {Object.keys(currentFamilyGroup).length - 1 > index && <div className='col-12 divider m-0dot125' />}
             </Fragment>
@@ -202,11 +254,11 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
         )}
       </div>
       {/* ------- JSON viewer ----------- */}
-      {/* <div className='mt-1 bg-black p-2'>
+      <div className='mt-1 bg-black p-2'>
         <code>
           <pre style={{ fontSize: '1rem' }}>{JSON.stringify(_presentableJson(cloneDeep(values)), null, 2)}</pre>
         </code>
-      </div> */}
+      </div>
       {/* ------------------------------- */}
     </>
   );
@@ -219,6 +271,8 @@ const AccordianView = ({
   onCancel,
   targetIds,
   onSubmit,
+  accordianRef,
+  newlyAddedIdsRef,
   setEditGroupedFieldsOrder,
   presentableJson,
   collapsedGroup,
@@ -233,10 +287,8 @@ const AccordianView = ({
   isFieldNameChangable,
   isRegionCustomizeForm = false
 }: IAccordinaViewProps) => {
-  const accordianRef = useRef<any>([]);
   const fieldGroupRef = useRef<any>([]);
-  const newlyAddedIdsRef = useRef<any>([]);
-  const newlyAddedIds = newlyAddedIdsRef.current;
+  const newlyAddedIds = newlyAddedIdsRef;
 
   const unAddedFields = useMemo(
     () =>
@@ -331,28 +383,17 @@ const AccordianView = ({
   };
 
   const handleAddNewField = (family: string, view: string) => {
-    const finalFormState = { ...formRef.current.getState() };
-    const formValues = cloneDeep(finalFormState.values);
-    // enable add field options dropdown
-    const element = document.getElementById('dropdownMenu');
-    element?.classList.remove('show');
-    const dropdownelement = document.getElementById('newfieldoptions');
-    dropdownelement?.classList.remove('show');
-    // add new field to form meta
-    const nxtView: any = getConfigByViewType(view).getEmptyData();
-    nxtView.family = family;
-    nxtView.orderId = Object.values(formValues[family]).filter((item: any) => item.viewType !== 'CardView').length + 1;
-    // add newly added ids and fieldname
-    newlyAddedIds.push(nxtView.id);
-    formValues[family][nxtView.id] = nxtView;
-    if (isFieldNameChangable) {
-      hashFieldIdsWithTitle[nxtView.id] = '';
-      hashFieldIdsWithFieldName[nxtView.id] = '';
-    }
-    setFormMeta(formValues);
-    setTimeout(() => {
-      accordianRef?.current[family].scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }, 0);
+    addNewFieldFn({
+      family,
+      view,
+      formRef,
+      newlyAddedIds,
+      isFieldNameChangable: true,
+      hashFieldIdsWithTitle,
+      hashFieldIdsWithFieldName,
+      accordianRef,
+      setFormMeta
+    });
   };
 
   const handleUpdateFieldName = (
@@ -371,17 +412,6 @@ const AccordianView = ({
       formValues[familyName][newFieldName].id = newFieldName;
       formValues[familyName][newFieldName].fieldName = newFieldLabel;
 
-      // toggle fields based on fieldname
-      if (isEditableFields.includes(newFieldName) && isRegionCustomizeForm) {
-        formValues[familyName][newFieldName].isEditable = true;
-      } else if ('isEditable' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].isEditable;
-      }
-      if (unitMeasurementFields.includes(newFieldName)) {
-        formValues[familyName][newFieldName].unitMeasurement = undefined;
-      } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].unitMeasurement;
-      }
       delete formValues[familyName][currentFieldID];
 
       // update newly added ids

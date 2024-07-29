@@ -38,7 +38,7 @@ const MOCK_DATA_CONSTANTS = {
         minLength: 1,
         errorMessage: 'First name is required and must be length of 1 to 100',
         inputType: 96,
-        isNotDefault: false,
+        isDefault: true,
         orderId: 1
       },
       lastName: {
@@ -58,7 +58,7 @@ const MOCK_DATA_CONSTANTS = {
         minLength: 1,
         errorMessage: 'Last name is required and  must be length of 1 to 100',
         inputType: 96,
-        isNotDefault: false,
+        isDefault: true,
         orderId: 3
       },
       phoneNumber: {
@@ -77,7 +77,7 @@ const MOCK_DATA_CONSTANTS = {
         contentLength: 10,
         errorMessage: 'Mobile number is required and must be of 10 digits',
         inputType: 3,
-        isNotDefault: false,
+        isDefault: true,
         orderId: 4
       },
       phoneNumberCategory: {
@@ -107,7 +107,7 @@ const MOCK_DATA_CONSTANTS = {
             id: 'Friend'
           }
         ],
-        isNotDefault: false,
+        isDefault: true,
         errorMessage: 'Please select a category',
         orderId: 5
       },
@@ -127,7 +127,7 @@ const MOCK_DATA_CONSTANTS = {
         minLength: 1,
         errorMessage: '',
         inputType: -1,
-        isNotDefault: false,
+        isDefault: true,
         orderId: 6
       },
       nationalId: {
@@ -147,7 +147,7 @@ const MOCK_DATA_CONSTANTS = {
         minLength: 1,
         errorMessage: 'National ID is required',
         inputType: -1,
-        isNotDefault: false,
+        isDefault: true,
         isNeedAction: true,
         orderId: 7
       }
@@ -220,7 +220,7 @@ const MOCK_DATA_CONSTANTS = {
         inputType: 8192,
         minValue: 50,
         maxValue: 300,
-        isNotDefault: true,
+        isDefault: true,
         orderId: 3
       },
       weight: {
@@ -239,7 +239,7 @@ const MOCK_DATA_CONSTANTS = {
         inputType: 8192,
         minValue: 10,
         maxValue: 400,
-        isNotDefault: false,
+        isDefault: true,
         orderId: 4
       }
     },
@@ -389,7 +389,7 @@ const MOCK_DATA_CONSTANTS = {
         inputType: 8192,
         minValue: 0.6,
         maxValue: 33,
-        isNotDefault: false,
+        isDefault: true,
         unitMeasurement: 'mmol/L',
         orderId: 2
       },
@@ -403,7 +403,7 @@ const MOCK_DATA_CONSTANTS = {
         isMandatory: false,
         isEnabled: false,
         visibility: 'visible',
-        isNotDefault: false,
+        isDefault: true,
         orderId: 3
       }
     },

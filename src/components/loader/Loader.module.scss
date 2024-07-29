@@ -13,7 +13,9 @@
     left: 0;
     right: 0;
   }
-  background: transparent;
+  & {
+    background: transparent;
+  }
   .loaderContainer {
     min-width: 100%;
     color: var(--medium-blue);

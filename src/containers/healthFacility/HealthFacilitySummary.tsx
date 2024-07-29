@@ -521,7 +521,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   <div className='fs-0dot875 charcoal-grey-text'>{label}</div>
                   {Array.isArray(value) ? (
                     <ol className='row'>
-                      {(value || []).map((data: IPeerSupervisor | IVillages) => (
+                      {([...value] || []).map((data: IPeerSupervisor | IVillages) => (
                         <li
                           key={subKey && (data as any)[subKey] ? (data as any)[subKey] : JSON.stringify(data)}
                           className={`${style?.subCol ? style?.subCol : 'col-3'}`}

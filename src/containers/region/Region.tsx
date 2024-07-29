@@ -74,8 +74,8 @@ const Region = (): React.ReactElement => {
       })
     );
 
-  const fetchRegionDetails = useCallback(
-    () =>
+  const fetchRegionDetails = useCallback(() => {
+    if (regionData?.id) {
       dispatch(
         regionDetailsRequest({
           countryId: Number(regionId),
@@ -84,30 +84,13 @@ const Region = (): React.ReactElement => {
           search: listParams.searchTerm,
           failureCb: (e) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DETAIL_FETCH_ERROR)
         })
-      ),
-    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]
-  );
+      );
+    }
+  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
 
   useEffect(() => {
-    if (regionId) {
-      fetchRegionDetails();
-    }
-  }, [dispatch, fetchRegionDetails, listParams, regionId]);
-
-  const getCountryDetails = useCallback(() => {
-    dispatch(
-      fetchCountryDetailReq({
-        id: regionId,
-        tenantId
-      })
-    );
-  }, [dispatch, regionId, tenantId]);
-
-  useEffect(() => {
-    if (regionId && tenantId && !regionDetailsId) {
-      getCountryDetails();
-    }
-  }, [getCountryDetails, regionDetailsId, regionId, tenantId]);
+    fetchRegionDetails();
+  }, [fetchRegionDetails]);
 
   return (
     <>

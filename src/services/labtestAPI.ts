@@ -18,7 +18,8 @@ export const fetchLabtestCustomization = ({ name }: { name: any }) =>
     method: 'POST',
     url: `/admin-service/lab-test-customization/get-by-unique-name`,
     data: {
-      name
+      name,
+      countryId: '1'
     }
   });
 

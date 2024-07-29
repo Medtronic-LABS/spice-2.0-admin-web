@@ -1,18 +1,11 @@
 import { InputTypes } from '../../config/BaseFieldConfig';
 import CARD_VIEW_CONFIG from '../../config/fieldGroups/CardView';
 import TEXT_LABEL_CONFIG from '../../config/fieldGroups/TextLabel';
-import AGE_CONFIG from '../../config/fieldGroups/creatableViews/Age';
-import BP_CONFIG from '../../config/fieldGroups/creatableViews/BPInput';
 import CHECKBOX_CONFIG from '../../config/fieldGroups/creatableViews/CheckBox';
 import EDIT_TEXT_CONFIG from '../../config/fieldGroups/creatableViews/EditText';
-import HEIGHT_CONFIG from '../../config/fieldGroups/creatableViews/Height';
-import INSTRUCTION_CONFIG from '../../config/fieldGroups/creatableViews/Instruction';
 import RADIO_GROUP_CONFIG from '../../config/fieldGroups/creatableViews/RadioGroup';
-import SCALE_INDICATOR_CONFIG from '../../config/fieldGroups/creatableViews/ScaleIndicator';
-import SPINNER_CONFIG from '../../config/fieldGroups/creatableViews/Spinner';
-import TIME_VIEW_CONFIG from '../../config/fieldGroups/creatableViews/TimeView';
-import { creatableViews, unitMeasurementFields, getConfigByViewType, inputTypesSwitch } from '../FieldUtils';
-import INFORMATION_LABEL_CONFIG from '../../config/fieldGroups/creatableViews/InformationLabel';
+import DROPDOWN_CONFIG from '../../config/fieldGroups/creatableViews/Dropdown';
+import { creatableViews, getConfigByViewType, resultSwitch } from '../FieldUtils';
 import DATE_PICKER_CONFIG from '../../config/fieldGroups/creatableViews/DatePickerView';
 
 describe('Your Module', () => {
@@ -63,32 +56,11 @@ describe('Your Module', () => {
     });
   });
 
-  describe('unitMeasurementFields', () => {
-    it('should have the correct fields', () => {
-      const expectedFields = ['glucose', 'hba1c'];
-      expect(unitMeasurementFields).toEqual(expectedFields);
-    });
-  });
-
   describe('getConfigByViewType', () => {
-    it('should return the correct config for BP', () => {
-      expect(getConfigByViewType('BP')).toEqual(BP_CONFIG);
-    });
-
     it('should return the correct config for RadioGroup', () => {
       expect(getConfigByViewType('RadioGroup')).toEqual(RADIO_GROUP_CONFIG);
     });
 
-    it('should return the correct config for Age', () => {
-      expect(getConfigByViewType('Age')).toEqual(AGE_CONFIG);
-    });
-    it('should return the correct config for Height', () => {
-      expect(getConfigByViewType('Height')).toEqual(HEIGHT_CONFIG);
-    });
-
-    it('should return the correct config for TimeView', () => {
-      expect(getConfigByViewType('TimeView')).toEqual(TIME_VIEW_CONFIG);
-    });
     it('should return the correct config for Date Input', () => {
       expect(getConfigByViewType('DatePicker')).toEqual(DATE_PICKER_CONFIG);
     });
@@ -98,22 +70,11 @@ describe('Your Module', () => {
     });
 
     it('should return the correct config for Spinner', () => {
-      expect(getConfigByViewType('Spinner')).toEqual(SPINNER_CONFIG);
+      expect(getConfigByViewType('Spinner')).toEqual(DROPDOWN_CONFIG);
     });
 
     it('should return the correct config for CheckBox', () => {
       expect(getConfigByViewType('CheckBox')).toEqual(CHECKBOX_CONFIG);
-    });
-
-    it('should return the correct config for ScaleIndicator', () => {
-      expect(getConfigByViewType('ScaleIndicator')).toEqual(SCALE_INDICATOR_CONFIG);
-    });
-
-    it('should return the correct config for Instruction', () => {
-      expect(getConfigByViewType('Instruction')).toEqual(INSTRUCTION_CONFIG);
-    });
-    it('should return the correct config for Information Label', () => {
-      expect(getConfigByViewType('InformationLabel')).toEqual(INFORMATION_LABEL_CONFIG);
     });
 
     it('should return the correct config for TextLabel', () => {
@@ -130,28 +91,28 @@ describe('Your Module', () => {
   });
 });
 
-describe('inputTypesSwitch', () => {
+describe('resultSwitch', () => {
   it('should correctly set inputTypeRelatedFields for InputTypes.DEFAULT', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    inputTypesSwitch(InputTypes.DEFAULT, obj);
+    resultSwitch(InputTypes.DEFAULT, obj);
     expect(obj).toEqual({ minLength: null, maxLength: null });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.NUMBER', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    inputTypesSwitch(InputTypes.NUMBER, obj);
+    resultSwitch(InputTypes.NUMBER, obj);
     expect(obj).toEqual({ minValue: null, maxValue: null });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.DECIMAL', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    inputTypesSwitch(InputTypes.DECIMAL, obj);
+    resultSwitch(InputTypes.DECIMAL, obj);
     expect(obj).toEqual({ minValue: null, maxValue: null });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.PHONE_NUMBER', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    inputTypesSwitch(InputTypes.PHONE_NUMBER, obj);
+    resultSwitch(InputTypes.PHONE_NUMBER, obj);
     expect(obj).toEqual({ contentLength: null, startsWith: null });
   });
 });

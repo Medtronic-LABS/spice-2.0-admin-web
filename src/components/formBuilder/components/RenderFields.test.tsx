@@ -54,18 +54,20 @@ describe('RenderFields Test Cases', () => {
   describe('CheckboxComponent', () => {
     it('renders checkbox with label and disabled state', () => {
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <CheckboxComponent
-                name='form'
-                fieldName='disableFutureDate'
-                inputProps={{ label: 'Disable Future Date', disabled: true }}
-              />
-            </form>
-          )}
-        </Form>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <CheckboxComponent
+                  name='form'
+                  fieldName='disableFutureDate'
+                  inputProps={{ label: 'Disable Future Date', disabled: true }}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       expect(wrapper.find(CheckboxComponent)).toHaveLength(1);
       expect(wrapper.find(Field).prop('name')).toBe('form.disableFutureDate');
@@ -193,16 +195,18 @@ describe('RenderFields Test Cases', () => {
     it('calls the onChange prop when input value is changed', () => {
       const mockOnChange = jest.fn();
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <Field name='testField'>
-                {({ input: inputValue }) => <input {...inputValue} onChange={mockOnChange} />}
-              </Field>
-            </form>
-          )}
-        </Form>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <Field name='testField'>
+                  {({ input: inputValue }) => <input {...inputValue} onChange={mockOnChange} />}
+                </Field>
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       const input = wrapper.find('input');
       input.simulate('change', { target: { value: 'test' } });
@@ -211,7 +215,63 @@ describe('RenderFields Test Cases', () => {
 
     it('renders the correct number of fields', () => {
       const wrapper = mount(
-        // tslint:disable-next-line:no-empty
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <ConditionConfig
+                  field='testField'
+                  name='testField'
+                  obj={{ testField: {} }}
+                  form={{ mutators: {} }}
+                  targetIds={[]}
+                  unAddedFields={[]}
+                  newlyAddedIds={[]}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
+      );
+      expect(wrapper.find('Field')).toHaveLength(0);
+    });
+
+    it('renders text input with default value and onChange handler', () => {
+      const objValue = { name: 'John Doe' };
+      const newInputProps = { label: 'Name' };
+      const wrapper = mount(
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <TextFieldComponent
+                  form={{ mutators: { setValue: jest.fn() } }}
+                  name='form'
+                  fieldName='fieldName'
+                  obj={objValue}
+                  inputProps={newInputProps}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
+      );
+      expect(wrapper.find(Field)).toHaveLength(1);
+      expect(wrapper.find(Field).prop('name')).toBe('form.fieldName');
+      expect(wrapper.find(Field).prop('type')).toEqual('text');
+      expect(wrapper.find('input').prop('value')).toEqual('');
+      wrapper.find('input').simulate('change', { target: { value: 'Jane Doe' } });
+      expect(wrapper.find('input').prop('value')).toEqual('Jane Doe');
+      expect(wrapper.find('input').prop('name')).toEqual('form.fieldName');
+      expect(wrapper.find('input').prop('disabled')).toBeFalsy();
+    });
+  });
+  it('renders the correct number of fields', () => {
+    const wrapper = mount(
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
         <Form onSubmit={() => {}}>
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -227,78 +287,30 @@ describe('RenderFields Test Cases', () => {
             </form>
           )}
         </Form>
-      );
-      expect(wrapper.find('Field')).toHaveLength(0);
-    });
-
-    it('renders text input with default value and onChange handler', () => {
-      const objValue = { name: 'John Doe' };
-      const newInputProps = { label: 'Name' };
-      const wrapper = mount(
-        // tslint:disable-next-line:no-empty
-        <Form onSubmit={() => {}}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <TextFieldComponent
-                form={{ mutators: { setValue: jest.fn() } }}
-                name='form'
-                fieldName='fieldName'
-                obj={objValue}
-                inputProps={newInputProps}
-              />
-            </form>
-          )}
-        </Form>
-      );
-      expect(wrapper.find(Field)).toHaveLength(1);
-      expect(wrapper.find(Field).prop('name')).toBe('form.fieldName');
-      expect(wrapper.find(Field).prop('type')).toEqual('text');
-      expect(wrapper.find('input').prop('value')).toEqual('');
-      wrapper.find('input').simulate('change', { target: { value: 'Jane Doe' } });
-      expect(wrapper.find('input').prop('value')).toEqual('Jane Doe');
-      expect(wrapper.find('input').prop('name')).toEqual('form.fieldName');
-      expect(wrapper.find('input').prop('disabled')).toBeFalsy();
-    });
-  });
-  it('renders the correct number of fields', () => {
-    const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <ConditionConfig
-              field='testField'
-              name='testField'
-              obj={{ testField: {} }}
-              form={{ mutators: {} }}
-              targetIds={[]}
-              unAddedFields={[]}
-              newlyAddedIds={[]}
-            />
-          </form>
-        )}
-      </Form>
+      </Provider>
     );
     expect(wrapper.find('CustomTooltip')).toHaveLength(1);
   });
   it('renders Questionnaire component with default value and onChange handler', () => {
     const newObj = { questionnaire: ['question1', 'question2'] };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <Questionnaire
-              label='Questionnaire'
-              defaultValue={newObj.questionnaire}
-              required={false}
-              onChange={(value) => {
-                newObj.questionnaire = value;
-              }}
-            />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Questionnaire
+                label='Questionnaire'
+                defaultValue={newObj.questionnaire}
+                required={false}
+                onChange={(value) => {
+                  newObj.questionnaire = value;
+                }}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find(Questionnaire)).toHaveLength(1);
     expect(wrapper.find(Questionnaire).prop('label')).toBe('Questionnaire');
@@ -316,19 +328,21 @@ describe('RenderFields Test Cases', () => {
       inputProps: { disabled: false, label: 'Your Label' }
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <Field
-              name={props.name}
-              render={({ input }) => (
-                <CheckboxComponent name={props.name} fieldName={props.fieldName} inputProps={props.inputProps} />
-              )}
-            />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Field
+                name={props.name}
+                render={({ input }) => (
+                  <CheckboxComponent name={props.name} fieldName={props.fieldName} inputProps={props.inputProps} />
+                )}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('CheckboxComponent').props().name).toBe(props.name);
   });
@@ -344,14 +358,16 @@ describe('RenderFields Test Cases', () => {
       component: CheckboxComponent
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <Field {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Field {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('input[type="checkbox"]').length).toEqual(1);
     expect(wrapper.find('input[type="checkbox"]').prop('disabled')).toBeFalsy();
@@ -378,14 +394,16 @@ describe('RenderFields Test Cases', () => {
       obj: newObj
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <Field {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Field {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('select').length).toEqual(0);
     expect(wrapper.find('option').length).toEqual(0);
@@ -532,14 +550,16 @@ describe('RenderFields Test Cases', () => {
       hashFieldIdsWithFieldName: {}
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <TextFieldComponent {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <TextFieldComponent {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('TextFieldWrapper')).toHaveLength(1);
   });
@@ -558,14 +578,16 @@ describe('RenderFields Test Cases', () => {
       hashFieldIdsWithFieldName: {}
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <TextFieldComponent {...props} />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <TextFieldComponent {...props} />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('TextFieldWrapper')).toHaveLength(1);
   });
@@ -585,20 +607,22 @@ describe('RenderFields Test Cases', () => {
       options: customOptions
     };
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <SelectFieldWrapper
-              name={newName}
-              customValue={customValue}
-              customOptions={customOptions}
-              customParseFn={customParseFn}
-              inputProps={newInputProps}
-            />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <SelectFieldWrapper
+                name={newName}
+                customValue={customValue}
+                customOptions={customOptions}
+                customParseFn={customParseFn}
+                inputProps={newInputProps}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     expect(wrapper.find('select').exists()).toBe(false);
     expect(wrapper.find('option')).toHaveLength(0);
@@ -624,28 +648,30 @@ describe('RenderFields Test Cases', () => {
   it('renders CheckboxComponent for component="CHECKBOX"', () => {
     inputProps.component = 'INSTRUCTIONS';
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <RenderFields
-              obj={obj}
-              name={name}
-              fieldName={fieldName}
-              inputProps={inputProps}
-              form={form}
-              unAddedFields={unAddedFields}
-              targetIds={targetIds}
-              isNew={isNew}
-              newlyAddedIds={newlyAddedIds}
-              handleUpdateFieldName={handleUpdateFieldName}
-              isFieldNameChangable={isFieldNameChangable}
-              hashFieldIdsWithTitle={hashFieldIdsWithTitle}
-              hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-            />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <RenderFields
+                obj={obj}
+                name={name}
+                fieldName={fieldName}
+                inputProps={inputProps}
+                form={form}
+                unAddedFields={unAddedFields}
+                targetIds={targetIds}
+                isNew={isNew}
+                newlyAddedIds={newlyAddedIds}
+                handleUpdateFieldName={handleUpdateFieldName}
+                isFieldNameChangable={isFieldNameChangable}
+                hashFieldIdsWithTitle={hashFieldIdsWithTitle}
+                hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     const textInputArray = wrapper.find('TextInputArray');
     expect(textInputArray).toHaveLength(0);
@@ -654,28 +680,30 @@ describe('RenderFields Test Cases', () => {
 
   it('renders INSTRUCTIONS', () => {
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <RenderFields
-              obj={obj}
-              name={name}
-              fieldName={'defaultValue'}
-              inputProps={{ ...inputProps, component: 'INSTRUCTIONS' }}
-              form={form}
-              unAddedFields={unAddedFields}
-              targetIds={targetIds}
-              isNew={true}
-              newlyAddedIds={newlyAddedIds}
-              handleUpdateFieldName={handleUpdateFieldName}
-              isFieldNameChangable={false}
-              hashFieldIdsWithTitle={hashFieldIdsWithTitle}
-              hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-            />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <RenderFields
+                obj={obj}
+                name={name}
+                fieldName={'defaultValue'}
+                inputProps={{ ...inputProps, component: 'INSTRUCTIONS' }}
+                form={form}
+                unAddedFields={unAddedFields}
+                targetIds={targetIds}
+                isNew={true}
+                newlyAddedIds={newlyAddedIds}
+                handleUpdateFieldName={handleUpdateFieldName}
+                isFieldNameChangable={false}
+                hashFieldIdsWithTitle={hashFieldIdsWithTitle}
+                hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     const textInputArray = wrapper.find('TextInputArray');
     expect(textInputArray).toHaveLength(1);
@@ -712,59 +740,55 @@ describe('RenderFields Test Cases', () => {
 
   it('renders CONDITION CONFIG', () => {
     const wrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}} mutators={{ ...arrayMutators }}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <RenderFields
-              obj={{
-                id: 'Qerq',
-                viewType: 'CheckBox',
-                title: 'Qerq',
-                fieldName: 'Qerq',
-                family: 'testflow',
-                selectAll: true,
-                isSummary: false,
-                isMandatory: true,
-                isEnabled: true,
-                visibility: 'visible',
-                condition: [
-                  {
-                    eq: 'no',
-                    visibility: 'visible'
-                  }
-                ],
-                hint: '',
-                optionsList: [
-                  {
-                    name: 'yes',
-                    id: 'yes'
-                  },
-                  {
-                    name: 'no',
-                    id: 'no'
-                  }
-                ],
-                errorMessage: 'eewqeqw',
-                isNotDefault: true,
-                orderId: 1
-              }}
-              name={name}
-              fieldName={'condition'}
-              inputProps={{ ...inputProps, component: 'CONDITION_CONFIG' }}
-              form={form}
-              unAddedFields={unAddedFields}
-              targetIds={targetIds}
-              isNew={true}
-              newlyAddedIds={newlyAddedIds}
-              handleUpdateFieldName={handleUpdateFieldName}
-              isFieldNameChangable={false}
-              hashFieldIdsWithTitle={hashFieldIdsWithTitle}
-              hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-            />
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}} mutators={{ ...arrayMutators }}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <RenderFields
+                obj={{
+                  id: 'Diastolic',
+                  viewType: 'EditText',
+                  title: 'Diastolic',
+                  fieldName: 'Diastolic',
+                  family: 'bloodPressure1721133296951',
+                  isMandatory: false,
+                  isEnabled: true,
+                  visibility: 'visible',
+                  condition: [
+                    {
+                      unitType: 'mmol/L',
+                      minRange: 1,
+                      maxRange: 200,
+                      displayRange: '1 - 200',
+                      order: '1'
+                    }
+                  ],
+                  hint: 'Diastolic',
+                  errorMessage: 'Please enter a valid diastolic value',
+                  inputType: -1,
+                  isDefault: false,
+                  minLength: 1,
+                  maxLength: 200,
+                  orderId: 3
+                }}
+                name={name}
+                fieldName={'condition'}
+                inputProps={{ ...inputProps, component: 'CONDITION_CONFIG' }}
+                form={form}
+                unAddedFields={unAddedFields}
+                targetIds={targetIds}
+                isNew={true}
+                newlyAddedIds={newlyAddedIds}
+                handleUpdateFieldName={handleUpdateFieldName}
+                isFieldNameChangable={false}
+                hashFieldIdsWithTitle={hashFieldIdsWithTitle}
+                hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
     const textInputArray = wrapper.find('TextInputArray');
     expect(textInputArray).toHaveLength(0);

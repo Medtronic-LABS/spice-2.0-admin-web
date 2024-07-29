@@ -3,49 +3,53 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface ICollapsibleViewFields extends IBaseFields {
+export interface IDropdownFields extends IBaseFields {
   hint?: string;
   visibility: string;
   defaultValue?: string;
   isNew?: boolean;
   optionsList?: Array<{ name: string; id: string }>;
   errorMessage?: string;
-  isNotDefault?: boolean;
-  targetViews: Array<{ name: string; id: string }>;
+  isDefault?: boolean;
+  isResult?: boolean;
 }
 
-const getEmptyData = (): ICollapsibleViewFields => ({
-  id: new Date().getTime().toString() + 'CollapsibleView',
-  viewType: 'CollapsibleView',
+const getEmptyData = (): IDropdownFields => ({
+  id: new Date().getTime().toString() + 'Spinner',
+  viewType: 'Spinner',
   title: '',
   fieldName: '',
   family: '',
-  isSummary: false,
   isMandatory: false,
   isEnabled: true,
+  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   condition: [],
   hint: '',
   optionsList: [],
-  targetViews: [],
   errorMessage: '',
   defaultValue: '',
-  isNotDefault: true
+  isDefault: false,
+  isResult: false
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
   visibility: {},
   isEnabled: {},
+  isEnrollment: {},
   isMandatory: {},
   defaultValue: {},
   title: {},
   fieldName: {},
   optionsList: {},
-  targetViews: {},
   condition: {},
   errorMessage: {},
   isEditable: {},
-  unitMeasurement: {}
+  isResult: {},
+  unitList: {},
+  code: {},
+  url: {},
+  resource: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
@@ -54,10 +58,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const COLLAPSIBLE_VIEW_CONFIG: IComponentConfig = {
+const DROPDOWN_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default COLLAPSIBLE_VIEW_CONFIG;
+export default DROPDOWN_CONFIG;

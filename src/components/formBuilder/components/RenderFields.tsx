@@ -1,23 +1,18 @@
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
 import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
-import { inputTypesSwitch, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
+import { resultSwitch } from '../utils/FieldUtils';
 import ConditionConfig from './fieldUI/ConditionConfig';
 import OptionList from './fieldUI/OptionList';
-import Questionnaire from './fieldUI/Questionnaire';
 import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
 import TextFieldWrapper from './fieldUI/TextFieldWrapper';
-import TextInputArray from './fieldUI/TextInputArray';
 import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
 import DatePickerWrapper from './fieldUI/DatePickerWrapper';
-import APPCONSTANTS from '../../../constants/appConstants';
-
-interface IMatchParams {
-  form: string;
-}
+import { unitsSelector } from '../../../store/labTest/selectors';
+import { useSelector } from 'react-redux';
 
 const filterByGetMetaViewTypes: { [K: string]: string[] } = {
   RadioGroup: ['checkbox', 'radio']
@@ -34,17 +29,13 @@ const getComponentsByFieldName = (
   if (fieldName === 'fieldName') {
     inputProps = { ...inputProps, ...{ component: !isNew || isFieldNameChangable ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
   }
-  // change to questionaire component on mental health view
-  if (fieldName === 'optionsList' && obj.viewType === 'MentalHealthView') {
-    inputProps = { ...inputProps, ...{ component: 'QUESTIONNAIRE' } };
-  }
   // disabled fields based on run time conditions
   if (!isNew && (fieldName === 'fieldName' || fieldName === 'inputType')) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
   if (
-    obj?.isNeededDefault &&
-    (fieldName === 'isMandatory' || fieldName === 'visibility' || fieldName === 'isEnabled')
+    obj.fieldName === 'TestedOn' &&
+    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title'].includes(fieldName)
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
@@ -80,9 +71,21 @@ interface IComponentProps {
   isRegionCustomizeForm?: boolean;
 }
 
-export const CheckboxComponent = ({ name, fieldName, inputProps = {} }: IComponentProps) => {
+export const CheckboxComponent = ({ name, fieldName, inputProps = {}, obj }: IComponentProps) => {
+  const checkBoxChange = useCallback(
+    (isChecked: boolean) => {
+      if (fieldName === 'isResult') {
+        resultSwitch(Number(obj.inputType), obj, isChecked);
+      }
+    },
+    [fieldName, obj]
+  );
+  useEffect(() => {
+    checkBoxChange(obj.isResult);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
-    <div className={`col-sm-4 ${fieldName === 'disableFutureDate' ? 'col-4' : 'col-lg-2'}`}>
+    <div className={`col-sm-4 ${fieldName === 'disableFutureDate' ? 'col-12 col-md-6 col-lg-4 col-xl-3' : 'col-lg-2'}`}>
       <div className='h-100 d-flex align-item-center py-1'>
         <Field
           name={`${name}.${fieldName}`}
@@ -94,6 +97,12 @@ export const CheckboxComponent = ({ name, fieldName, inputProps = {} }: ICompone
               switchCheckbox={false}
               label={inputProps?.label}
               {...input}
+              onChange={(e: any) => {
+                if (fieldName === 'isResult') {
+                  checkBoxChange(e.target.checked);
+                }
+                input.onChange(e);
+              }}
             />
           )}
         />
@@ -111,6 +120,7 @@ export const SelectInputValues = ({
   unAddedFields,
   handleUpdateFieldName
 }: IComponentProps) => {
+  const unitsList = useSelector(unitsSelector);
   let options: any = inputProps?.options || [];
   let parseFn = (val: any) => val;
   let value = obj[fieldName] || null;
@@ -138,25 +148,29 @@ export const SelectInputValues = ({
     parseFn = (val: any) => val?.id;
     value = options?.find(({ id }: any) => obj[fieldName] === id) || null;
   }
+  if (fieldName === 'unitList') {
+    options = unitsList || [];
+    parseFn = (val: any) => {
+      const units = val.map((unit: any) => ({ name: unit.name, id: unit.name }));
+      return inputProps.isMulti ? units : val?.name;
+    };
+  }
+  if (fieldName === 'resource') {
+    options = inputProps?.options;
+    parseFn = (val: any) => val?.key;
+    value = options?.find(({ key: resource }: any) => obj[fieldName] === resource) || null;
+  }
   // parse with custom logic
   if (fieldName === 'inputType') {
     options = inputProps?.options;
     parseFn = (val: any) => {
-      inputTypesSwitch(Number(val?.key), obj);
+      resultSwitch(Number(val?.key), obj, obj.isResult);
       return Number(val?.key);
     };
     value = options?.find(({ key }: any) => obj[fieldName] === Number(key)) || {
       key: -1,
       label: 'Text'
     };
-  }
-  if (fieldName === 'unitMeasurement') {
-    options = inputProps?.options;
-    parseFn = (val: any) => {
-      inputTypesSwitch(obj.inputType, obj);
-      return val?.key;
-    };
-    value = options?.find(({ key }: any) => obj[fieldName] === key) || inputProps?.options[0];
   }
   // parse with custom options list
   if (fieldName === 'fieldName') {
@@ -172,13 +186,14 @@ export const SelectInputValues = ({
     value = customValue;
   }
   return (
-    <div className='col-4'>
+    <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
       <SelectFieldWrapper
         name={name}
         customValue={value}
         customOptions={options}
         customParseFn={parseFn}
         inputProps={inputProps}
+        isMulti={inputProps?.isMulti}
       />
     </div>
   );
@@ -342,7 +357,7 @@ export const TextFieldComponent = ({
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
   return (
-    <div className='col-4'>
+    <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
       <TextFieldWrapper
         name={`${name}.${fieldName}`}
         customValue={obj.fieldName}
@@ -368,7 +383,6 @@ const RenderFields = ({
   isNew,
   newlyAddedIds,
   handleUpdateFieldName,
-  // isAccountCustomization,
   addNewFieldDisabled,
   isFieldNameChangable,
   hashFieldIdsWithTitle,
@@ -383,34 +397,9 @@ const RenderFields = ({
     ...getComponentsByFieldName(fieldName, obj, isNew, isFieldNameChangable, isRegionCustomizeForm)
   };
 
-  if (
-    fieldName === 'isEditable' &&
-    (!isRegionCustomizeForm || (isEditableFields.includes(obj.id) && formType === 'enrollment'))
-  ) {
-    return null;
-  }
-  if (fieldName === 'readOnly' && isRegionCustomizeForm) {
-    return null;
-  }
-  if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
-    return null;
-  }
-
-  if (fieldName === 'isEnrollment' && isRegionCustomizeForm && formType !== 'assessment') {
-    obj.isEnrollment = undefined;
-    return null;
-  }
-
-  if (
-    fieldName === 'condition' &&
-    !['Spinner', 'RadioGroup', 'EditText', 'SingleSelectionView'].includes(obj.viewType)
-  ) {
-    return null;
-  }
-
   switch (inputProps?.component) {
     case 'CHECKBOX': {
-      return <CheckboxComponent name={name} fieldName={fieldName} inputProps={inputProps} />;
+      return <CheckboxComponent name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
     }
     case 'SELECT_INPUT': {
       return (
@@ -426,39 +415,16 @@ const RenderFields = ({
       );
     }
 
-    // Custom Field UI
-    case 'INSTRUCTIONS': {
-      const fieldVal = obj[fieldName]?.length ? obj[fieldName] : [''];
-      return (
-        <div className='col-12'>
-          <Field name={`${name}.${fieldName}`}>
-            {(_props) => (
-              <>
-                <TextInputArray
-                  label={inputProps?.label || ''}
-                  defaultValue={fieldVal as unknown as string[]}
-                  required={false}
-                  obj={obj}
-                  onChange={(value: string[]) => {
-                    form.mutators.setValue(`${name}.${fieldName}`, value);
-                  }}
-                />
-              </>
-            )}
-          </Field>
-        </div>
-      );
-    }
     case 'OPTION_LIST': {
       return (
-        <div className='col-4'>
+        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <OptionList field={fieldName} name={`${name}.${fieldName}`} obj={obj} form={form} inputProps={inputProps} />
         </div>
       );
     }
     case 'TARGET_VIEWS': {
       return (
-        <div className='col-4'>
+        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <MultiSelectOptionList
             label={'Target Views'}
             field={fieldName}
@@ -469,18 +435,6 @@ const RenderFields = ({
             targetIds={targetIds}
           />
         </div>
-      );
-    }
-    case 'QUESTIONNAIRE': {
-      return (
-        <Questionnaire
-          label={'Questionnaire'}
-          defaultValue={obj[fieldName]}
-          required={false}
-          onChange={(value: any) => {
-            fieldName[fieldName] = value;
-          }}
-        />
       );
     }
     case 'CONDITION_CONFIG': {
@@ -501,7 +455,7 @@ const RenderFields = ({
       const value = obj[fieldName] || null;
       parseFn = (val: any) => val;
       return (
-        <div className='col-4'>
+        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <DatePickerWrapper
             fieldName={fieldName}
             name={`${name}.${fieldName}`}
@@ -531,7 +485,6 @@ const RenderFields = ({
           handleUpdateFieldName={handleUpdateFieldName}
           hashFieldIdsWithTitle={hashFieldIdsWithTitle}
           hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-          // isAccountCustomization={isAccountCustomization}
           isFieldNameChangable={isFieldNameChangable}
           isRegionCustomizeForm={isRegionCustomizeForm}
         />
