@@ -24,13 +24,12 @@ const getEmptyData = (): IDropdownFields => ({
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  condition: [],
   hint: '',
   optionsList: [],
   errorMessage: '',
   defaultValue: '',
   isDefault: false,
-  isResult: false
+  isResult: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -42,7 +41,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   optionsList: {},
-  condition: {},
   errorMessage: {},
   isEditable: {},
   isResult: {},
@@ -54,7 +52,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  json.condition = json.condition?.filter((val: any) => !!val);
   return json;
 };
 

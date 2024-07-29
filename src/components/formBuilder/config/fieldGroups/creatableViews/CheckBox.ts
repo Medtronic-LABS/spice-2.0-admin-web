@@ -24,7 +24,6 @@ const getEmptyData = (): ICheckBoxFields => ({
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  condition: [],
   hint: '',
   optionsList: [],
   errorMessage: '',
@@ -40,14 +39,12 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   optionsList: {},
-  condition: {},
   errorMessage: {},
   isEditable: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  json.condition = json.condition?.filter((val: any) => !!val);
   return json;
 };
 

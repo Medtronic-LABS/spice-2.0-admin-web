@@ -11,48 +11,13 @@ import DATE_PICKER_CONFIG from '../../config/fieldGroups/creatableViews/DatePick
 describe('Your Module', () => {
   describe('creatableViews', () => {
     it('should have the correct labels', () => {
-      const expectedLabels = [
-        'BP Input',
-        'Radio Input',
-        'Age Input',
-        'Height Input',
-        'Time View',
-        'Text Input',
-        'Select Input',
-        'Slider',
-        'Multi Select Input',
-        'Instructions',
-        'Information Label',
-        'Date Input'
-      ];
+      const expectedLabels = ['Text', 'Dropdown', 'Date'];
       expect(creatableViews.map((view: any) => view.label)).toEqual(expectedLabels);
     });
 
     it('should have the correct values', () => {
-      const expectedValues = [
-        'BP',
-        'RadioGroup',
-        'Age',
-        'Height',
-        'TimeView',
-        'EditText',
-        'Spinner',
-        'ScaleIndicator',
-        'CheckBox',
-        'Instruction',
-        'InformationLabel',
-        'DatePicker'
-      ];
+      const expectedValues = ['EditText', 'Spinner', 'DatePicker'];
       expect(creatableViews.map((view: any) => view.value)).toEqual(expectedValues);
-    });
-
-    it('should have the correct account customization flags', () => {
-      const expectedFlags = [false, true, false, false, false, true, true, true, true, true, false, true];
-      expect(
-        creatableViews.map((view: any) => {
-          return view.isAccountCustomizable;
-        })
-      ).toEqual(expectedFlags);
     });
   });
 
@@ -94,25 +59,25 @@ describe('Your Module', () => {
 describe('resultSwitch', () => {
   it('should correctly set inputTypeRelatedFields for InputTypes.DEFAULT', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.DEFAULT, obj);
-    expect(obj).toEqual({ minLength: null, maxLength: null });
+    resultSwitch(InputTypes.DEFAULT, obj, false);
+    expect(obj).toEqual({ minLength: 10, maxLength: 20 });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.NUMBER', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.NUMBER, obj);
-    expect(obj).toEqual({ minValue: null, maxValue: null });
+    resultSwitch(InputTypes.NUMBER, obj, false);
+    expect(obj).toEqual({ minValue: 1, maxValue: 2 });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.DECIMAL', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.DECIMAL, obj);
-    expect(obj).toEqual({ minValue: null, maxValue: null });
+    resultSwitch(InputTypes.DECIMAL, obj, false);
+    expect(obj).toEqual({ minValue: 1, maxValue: 2 });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.PHONE_NUMBER', () => {
-    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.PHONE_NUMBER, obj);
-    expect(obj).toEqual({ contentLength: null, startsWith: null });
+    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2, startsWith: '123' };
+    resultSwitch(InputTypes.PHONE_NUMBER, obj, false);
+    expect(obj).toEqual({ contentLength: 30, startsWith: '123' });
   });
 });

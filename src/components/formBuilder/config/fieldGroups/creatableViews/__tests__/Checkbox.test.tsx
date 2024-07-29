@@ -13,11 +13,10 @@ describe('ICheckBoxFields', () => {
         isMandatory: false,
         isEnabled: true,
         visibility: expect.any(String),
-        condition: [],
         hint: '',
         optionsList: [],
         errorMessage: '',
-        isDefault: true
+        isDefault: false
       };
       const result = CHECKBOX_CONFIG.getEmptyData();
       expect(result).toEqual(expected);
@@ -28,13 +27,11 @@ describe('ICheckBoxFields', () => {
     it('should correctly format the input object', () => {
       const input = {
         fieldName: { label: 'test label' },
-        selectAll: true,
-        condition: [null, undefined]
+        selectAll: true
       };
       const expected = {
         fieldName: 'test label',
-        selectAll: true,
-        condition: []
+        selectAll: true
       };
       if (CHECKBOX_CONFIG.getJSON) {
         const result = CHECKBOX_CONFIG.getJSON(input);

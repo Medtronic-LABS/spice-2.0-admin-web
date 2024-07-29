@@ -1,10 +1,34 @@
 import { mount } from 'enzyme';
 import AccordianView from '../AccordianView';
+import { Provider } from 'react-redux';
+import configureMockStore from 'redux-mock-store';
+
+const mockStore = configureMockStore();
+
+const store = mockStore({
+  labtest: {
+    units: [
+      {
+        id: 1,
+        createdBy: 1,
+        updatedBy: 1,
+        createdAt: '2022-04-18T20:39:27+00:00',
+        updatedAt: '2022-04-18T20:39:27+00:00',
+        name: 'mg/dL',
+        type: 'LABTEST',
+        description: 'mg/dL',
+        displayOrder: 6,
+        active: true,
+        deleted: false
+      }
+    ]
+  }
+});
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
-    pathname: '/region/4/6/Adfgsrgf/lab-test/adfgsrgf'
+    pathname: '/region/4/6/labTest/lab-test/adfgsrgf'
   })
 }));
 
@@ -16,8 +40,21 @@ const props = {
         id: 'labTest',
         viewType: 'CardView',
         title: 'labTest',
-        familyOrder: 0,
-        isCustomWorkflow: true
+        familyOrder: 0
+      },
+      TestedOn: {
+        id: 'TestedOn',
+        viewType: 'DatePicker',
+        title: 'Tested On',
+        fieldName: 'TestedOn',
+        family: 'labTest',
+        isMandatory: true,
+        isEnabled: true,
+        testValidityDays: '20',
+        visibility: 'visible',
+        isDefault: false,
+        isDeletable: false,
+        orderId: 1
       }
     }
   },
@@ -35,14 +72,20 @@ const props = {
   hashFieldIdsWithTitle: {},
   hashFieldIdsWithFieldName: {},
   culture: {},
+  accordianRef: {},
+  newlyAddedIdsRef: [],
   addNewFieldDisabled: false,
   isFieldNameChangable: true
 };
 
-describe('ChiefdomForm', () => {
+describe('AccordianViewForm', () => {
   let wrapper: any;
   beforeEach(() => {
-    wrapper = mount(<AccordianView {...props} />);
+    wrapper = mount(
+      <Provider store={store}>
+        <AccordianView {...props} />
+      </Provider>
+    );
   });
 
   it('renders Accordian View without errors', () => {

@@ -12,9 +12,10 @@ jest.mock('react-router-dom', () => ({
   })
 }));
 
-jest.mock('react-ga', () => ({
+jest.mock('react-ga4', () => ({
   initialize: jest.fn(),
-  pageview: jest.fn()
+  pageview: jest.fn(),
+  send: jest.fn()
 }));
 
 jest.mock('./assets/images/app-logo.svg', () => ({
@@ -23,7 +24,7 @@ jest.mock('./assets/images/app-logo.svg', () => ({
 
 describe('App Component', () => {
   beforeEach(() => {
-    process.env.REACT_APP_GA_TRACKING_ID = 'UA-220096139-1';
+    process.env.REACT_APP_GA_TRACKING_ID = 'G-12345ABCDE';
   });
 
   afterEach(() => {

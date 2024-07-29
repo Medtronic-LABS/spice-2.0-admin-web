@@ -3,6 +3,10 @@ import * as ACTION_TYPES from './actionTypes';
 export interface ILabTest {
   id?: number | string;
   testName: string;
+  codeDetails?: {
+    code: string;
+    url: string;
+  };
   uniqueName: string;
   tenantId: number | string | null;
   countryId: number | string;

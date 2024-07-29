@@ -25,12 +25,13 @@ describe('Spinner Container Test Cases', () => {
         isMandatory: false,
         isEnabled: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-        condition: [],
+        ranges: [],
         hint: '',
         optionsList: [],
         errorMessage: '',
         defaultValue: '',
-        isDefault: false
+        isDefault: false,
+        isResult: false
       });
     });
   });
@@ -47,9 +48,14 @@ describe('Spinner Container Test Cases', () => {
         title: {},
         fieldName: {},
         optionsList: {},
-        condition: {},
         errorMessage: {},
-        isEditable: {}
+        isEditable: {},
+        code: {},
+        isResult: {},
+        ranges: {},
+        resource: {},
+        unitList: {},
+        url: {}
       });
     });
   });

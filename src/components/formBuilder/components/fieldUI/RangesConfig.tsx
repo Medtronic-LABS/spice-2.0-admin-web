@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 import BinIcon from '../../../../assets/images/bin.svg';
 import PlusIcon from '../../../../assets/images/plus_blue.svg';
-import CustomTooltip from '../../../../components/tooltip';
+import CustomTooltip from '../../../tooltip';
 import { required } from '../../../../utils/validation';
 import styles from '../../styles/FormBuilder.module.scss';
 import SelectFieldWrapper from './SelectFieldWrapper';
@@ -17,7 +17,7 @@ const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index 
   let disabledGenders: IUnit[] = [];
 
   if (fieldName === 'unitType') {
-    const { removedUnits } = filterUnitsandGender(obj?.condition, obj?.unitList);
+    const { removedUnits } = filterUnitsandGender(obj?.ranges, obj?.unitList);
     const { units: removedUnit } = removedUnits;
     disabledUnits = removedUnit;
     options = obj?.unitList?.filter((optionItem: any) => optionItem.name !== '');
@@ -25,7 +25,7 @@ const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index 
     value = options?.find(({ name: optionName }: any) => item[fieldName] === optionName) || null;
   }
   if (fieldName === 'gender') {
-    const { removedUnits } = filterUnitsandGender(obj?.condition, obj?.unitList);
+    const { removedUnits } = filterUnitsandGender(obj?.ranges, obj?.unitList);
     const { genders } = removedUnits;
     disabledGenders = genders[item.unitType] || [];
     options = config?.options?.filter((optionItem: any) => optionItem.name !== '');
@@ -80,7 +80,7 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
   );
 };
 
-const ConditionFieldsComponent = ({ form, item, name, obj, index, conditionFieldConfigs }: any) => {
+const RangesFieldsComponent = ({ form, item, name, obj, index, rangesFieldConfigs }: any) => {
   useEffect(() => {
     const unitExists = (obj.unitList || []).find((unit: any) => item.unitType === unit.name);
     if (!unitExists?.name) {
@@ -90,10 +90,10 @@ const ConditionFieldsComponent = ({ form, item, name, obj, index, conditionField
   }, [obj.unitList]);
 
   return Object.keys(item)
-    .sort((a, b) => conditionFieldConfigs?.[a]?.order - conditionFieldConfigs?.[b]?.order)
+    .sort((a, b) => rangesFieldConfigs?.[a]?.order - rangesFieldConfigs?.[b]?.order)
     .map((fieldName: any) => {
-      if (fieldName in conditionFieldConfigs) {
-        const config = conditionFieldConfigs[fieldName];
+      if (fieldName in rangesFieldConfigs) {
+        const config = rangesFieldConfigs[fieldName];
         switch (config?.component) {
           case 'SELECT_INPUT': {
             return (
@@ -133,8 +133,8 @@ const ConditionFieldsComponent = ({ form, item, name, obj, index, conditionField
     });
 };
 
-const ConditionConfig = ({ name, obj, field, form }: any) => {
-  const conditionFieldConfigs = {
+const RangesConfig = ({ name, obj, field, form }: any) => {
+  const rangesFieldConfigs = {
     unitType: {
       name: 'unitType',
       label: 'Unit',
@@ -202,7 +202,7 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
     displayRange: ''
   };
 
-  const onAddNewCondition = () => {
+  const onAddNewRange = () => {
     form.mutators.setValue(`${name}`, [initialValue]);
   };
 
@@ -211,10 +211,10 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
       <div className='d-flex align-items-center '>
         <div
           className={`d-flex mt-1 mb-0dot5 theme-text lh-1dot25 ${!!obj.fieldName ? 'pointer' : 'not-allowed'}`}
-          onClick={!!obj.fieldName && !(obj[field] || []).length ? onAddNewCondition : () => null}
+          onClick={!!obj.fieldName && !(obj[field] || []).length ? onAddNewRange : () => null}
         >
           <CustomTooltip title={`${!!obj.fieldName ? 'Add' : 'Please select a field name'}`}>
-            <span className={`${styles.label} m-0 `}>Conditions</span>
+            <span className={`${styles.label} m-0 `}>Ranges</span>
             <img
               className={`ms-0dot5 ${!!obj.fieldName ? '' : 'no-pointer-events'} ${
                 !(obj[field] || []).length ? 'visible' : 'invisible'
@@ -226,12 +226,12 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
         </div>
       </div>
       {(obj[field] || []).length ? (
-        <div className={`${styles.conditionsContainer}`}>
+        <div className={`${styles.rangesContainer}`}>
           <FieldArray
             name={name}
             validate={(values) => {
               // custom validation to check all fields are valid
-              const conditions: any = [];
+              const ranges: any = [];
               (values || []).forEach((item: any) => {
                 const errors: any = {};
                 Object.keys(item).forEach((key: any) => {
@@ -240,12 +240,12 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
                     errors[key] = error;
                   }
                 });
-                conditions.push(Object.keys(errors).length ? errors : null);
+                ranges.push(Object.keys(errors).length ? errors : null);
               });
-              if (conditions.every((element: any) => element === null)) {
+              if (ranges.every((element: any) => element === null)) {
                 return;
               }
-              return conditions;
+              return ranges;
             }}
           >
             {({ fields, meta }) =>
@@ -254,13 +254,13 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
                   <Fragment key={index}>
                     <div className='row position-relative ' key={`${obj.family}_${obj.id}_${name}`}>
                       <div className='col-11 row d-flex gx-1 pe-lg-1'>
-                        <ConditionFieldsComponent
+                        <RangesFieldsComponent
                           form={form}
                           item={item}
                           name={name}
                           obj={obj}
                           index={index}
-                          conditionFieldConfigs={conditionFieldConfigs}
+                          rangesFieldConfigs={rangesFieldConfigs}
                         />
                       </div>
                       <div className={`col-1 d-flex align-items-center ${styles.actionIcons}`}>
@@ -271,7 +271,7 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
                               ? fields.remove(index)
                               : form.mutators.setValue(`${obj.family}.${obj.id}`, {
                                   ...obj,
-                                  condition: []
+                                  ranges: []
                                 });
                           }}
                         >
@@ -304,4 +304,4 @@ const ConditionConfig = ({ name, obj, field, form }: any) => {
   );
 };
 
-export default ConditionConfig;
+export default RangesConfig;

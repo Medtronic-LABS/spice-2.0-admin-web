@@ -2,17 +2,12 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import arrayMutators from 'final-form-arrays';
-import ConditionConfig from '../ConditionConfig';
+import RangesConfig from '../RangesConfig';
 import { Form } from 'react-final-form';
 import configureMockStore from 'redux-mock-store';
 
 const mockStore = configureMockStore();
-describe('ConditionConfig Component', () => {
-  const item = {
-    lengthGreaterThan: 5,
-    targetId: 'field1'
-  };
-
+describe('RangesConfig Component', () => {
   const store = mockStore({
     labtest: {
       units: [
@@ -32,7 +27,7 @@ describe('ConditionConfig Component', () => {
       ]
     }
   });
-  const conditionFieldConfigs = {
+  const rangesFieldConfigs = {
     unitType: {
       name: '.unitType',
       label: 'Unit',
@@ -90,155 +85,74 @@ describe('ConditionConfig Component', () => {
       disabledValidation: true,
       component: 'TEXT_INPUT',
       colSize: 'col-6 col-md-4 col-lg-3'
-    },
-    order: {
-      name: '.order',
-      type: 'text',
-      label: 'Order',
-      error: 'Invalid order',
-      required: true,
-      disabledValidation: true,
-      component: 'TEXT_INPUT',
-      colSize: 'col-6 col-md-4 col-lg-1'
     }
   };
 
   const props = {
-    item,
     name: 'myFormName',
     obj: {
+      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
       id: 'myId',
-      array: [
-        {
-          targetId: 0,
-          targetOption: 'option'
-        }
-      ]
+      optionsList: [{ name: 'option', id: 1 }]
     },
-    config: [],
     field: 'array',
-    index: 0,
-    conditionFieldConfigs,
-    newlyAddedIds: ['field1', 'field2'],
-    unAddedFields: [{ key: 'field3', label: 'Field 3' }],
-    targetIds: [
-      { key: 'field1', label: 'Field 1' },
-      { key: 'field2', label: 'Field 2' }
-    ]
+    rangesFieldConfigs
   };
 
   const propsWithTextInput = {
-    item,
     name: 'myFormName',
     obj: {
+      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
       id: 'myId',
-      array: [
-        {
-          lengthGreaterThan: 0,
-          targetOption: 'option'
-        }
-      ]
+      optionsList: [{ name: 'option', id: 1 }]
     },
-    config: [],
     field: 'array',
-    index: 0,
-    conditionFieldConfigs,
-    newlyAddedIds: ['field1', 'field2'],
-    unAddedFields: [{ key: 'field3', label: 'Field 3' }],
-    targetIds: [
-      { key: 'field1', label: 'Field 1' },
-      { key: 'field2', label: 'Field 2' }
-    ]
+    rangesFieldConfigs,
+    config: []
   };
 
-  const propsWithFieldNameEnabled = {
-    item,
+  const propsWithMinRange = {
     name: 'myFormName',
     obj: {
+      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
       id: 'myId',
-      array: [
-        {
-          enabled: false,
-          targetOption: 'option'
-        }
-      ]
+      optionsList: [{ name: 'option', id: 1 }]
     },
-    config: [],
     field: 'array',
-    index: 0,
-    conditionFieldConfigs,
-    newlyAddedIds: ['field1', 'field2'],
-    unAddedFields: [{ key: 'field3', label: 'Field 3' }],
-    targetIds: [
-      { key: 'field1', label: 'Field 1' },
-      { key: 'field2', label: 'Field 2' }
-    ]
+    rangesFieldConfigs
   };
 
-  const propsWithFieldNameVisibilty = {
-    item,
+  const propsWithMaxRange = {
     name: 'myFormName',
     obj: {
+      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
       id: 'myId',
-      array: [
-        {
-          visibility: false,
-          targetOption: 'option'
-        }
-      ]
+      optionsList: [{ name: 'option', id: 1 }]
     },
-    config: [],
     field: 'array',
-    index: 0,
-    conditionFieldConfigs,
-    newlyAddedIds: ['field1', 'field2'],
-    unAddedFields: [{ key: 'field3', label: 'Field 3' }],
-    targetIds: [
-      { key: 'field1', label: 'Field 1' },
-      { key: 'field2', label: 'Field 2' }
-    ]
+    rangesFieldConfigs
   };
 
-  const propsWithFieldNameEq = {
-    item,
+  const propsWithDisplayName = {
     name: 'myFormName',
     obj: {
+      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
       id: 'myId',
-      array: [
-        {
-          eq: false,
-          targetOption: 'option'
-        }
-      ]
+      optionsList: [{ name: 'option', id: 1 }]
     },
-    config: [],
     field: 'array',
-    index: 0,
-    conditionFieldConfigs,
-    newlyAddedIds: ['field1', 'field2'],
-    unAddedFields: [{ key: 'field3', label: 'Field 3' }],
-    targetIds: [
-      { key: 'field1', label: 'Field 1' },
-      { key: 'field2', label: 'Field 2' }
-    ]
+    rangesFieldConfigs
   };
 
   const propsWithoutComponent = {
-    item,
     name: 'myFormName',
     obj: {
+      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
       id: 'myId',
-      array: [
-        {
-          targetId: 1,
-          targetOption: 'option'
-        }
-      ]
+      optionsList: [{ name: 'option', id: 1 }]
     },
-    config: [],
     field: 'array',
-    index: 0,
-    conditionFieldConfigs
+    rangesFieldConfigs
   };
 
   it('renders without error', () => {
@@ -251,7 +165,7 @@ describe('ConditionConfig Component', () => {
             }}
             mutators={{ ...arrayMutators }}
           >
-            {({ handleSubmit }) => <ConditionConfig {...props} />}
+            {({ handleSubmit, form }) => <RangesConfig {...props} form={form} />}
           </Form>
         </MemoryRouter>
       </Provider>
@@ -269,7 +183,7 @@ describe('ConditionConfig Component', () => {
             }}
             mutators={{ ...arrayMutators }}
           >
-            {({ handleSubmit }) => <ConditionConfig {...propsWithTextInput} />}
+            {({ handleSubmit }) => <RangesConfig {...propsWithTextInput} />}
           </Form>
         </MemoryRouter>
       </Provider>
@@ -277,7 +191,7 @@ describe('ConditionConfig Component', () => {
     expect(wrapper.exists()).toBe(true);
   });
 
-  it('renders with fieldName as enabled', () => {
+  it('renders with fieldName as unitType', () => {
     const wrapper = mount(
       <Provider store={store}>
         <MemoryRouter>
@@ -287,7 +201,7 @@ describe('ConditionConfig Component', () => {
             }}
             mutators={{ ...arrayMutators }}
           >
-            {({ handleSubmit }) => <ConditionConfig {...propsWithFieldNameEnabled} />}
+            {({ handleSubmit }) => <RangesConfig {...propsWithMinRange} />}
           </Form>
         </MemoryRouter>
       </Provider>
@@ -305,7 +219,7 @@ describe('ConditionConfig Component', () => {
             }}
             mutators={{ ...arrayMutators }}
           >
-            {({ handleSubmit }) => <ConditionConfig {...propsWithFieldNameVisibilty} />}
+            {({ handleSubmit }) => <RangesConfig {...propsWithMaxRange} />}
           </Form>
         </MemoryRouter>
       </Provider>
@@ -323,7 +237,7 @@ describe('ConditionConfig Component', () => {
             }}
             mutators={{ ...arrayMutators }}
           >
-            {({ handleSubmit }) => <ConditionConfig {...propsWithFieldNameEq} />}
+            {({ handleSubmit }) => <RangesConfig {...propsWithDisplayName} />}
           </Form>
         </MemoryRouter>
       </Provider>
@@ -341,7 +255,7 @@ describe('ConditionConfig Component', () => {
             }}
             mutators={{ ...arrayMutators }}
           >
-            {({ handleSubmit }) => <ConditionConfig {...propsWithoutComponent} />}
+            {({ handleSubmit }) => <RangesConfig {...propsWithoutComponent} />}
           </Form>
         </MemoryRouter>
       </Provider>

@@ -25,7 +25,6 @@ describe('RadioGroup Container Test Cases', () => {
         isMandatory: false,
         isEnabled: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-        condition: [],
         optionsList: [],
         orientation: 0,
         errorMessage: '',
@@ -45,7 +44,6 @@ describe('RadioGroup Container Test Cases', () => {
         fieldName: {},
         isMandatory: {},
         optionsList: {},
-        condition: {},
         errorMessage: {},
         isEnabled: {},
         isEditable: {}
@@ -58,14 +56,12 @@ describe('RadioGroup Container Test Cases', () => {
       const inputObject: any = {
         foo: 'bar',
         baz: 42,
-        fieldName: { label: 'RadioGroup' },
-        condition: ['new']
+        fieldName: { label: 'RadioGroup' }
       };
       const expectedOutput: any = {
         foo: 'bar',
         baz: 42,
-        fieldName: 'RadioGroup',
-        condition: ['new']
+        fieldName: 'RadioGroup'
       };
       if (RADIO_GROUP_CONFIG.getJSON) {
         const result: IFieldViewType = RADIO_GROUP_CONFIG.getJSON(inputObject);
@@ -79,8 +75,7 @@ describe('RadioGroup Container Test Cases', () => {
       const inputObject: any = {
         foo: 'bar',
         baz: 42,
-        fieldName: 'RadioGroup',
-        condition: ['new']
+        fieldName: 'RadioGroup'
       };
       if (RADIO_GROUP_CONFIG.getJSON) {
         const result: IFieldViewType = RADIO_GROUP_CONFIG.getJSON(inputObject);

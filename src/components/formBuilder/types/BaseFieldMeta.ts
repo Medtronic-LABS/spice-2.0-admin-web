@@ -69,7 +69,7 @@ export interface IBaseFieldMeta {
   optionsList?: IAttributeProps;
   startsWith?: IAttributeProps;
   condition?: IAttributeProps;
-  readOnly?: IAttributeProps;
+  ranges?: IAttributeProps;
   startDate?: IAttributeProps;
   endDate?: IAttributeProps;
 }

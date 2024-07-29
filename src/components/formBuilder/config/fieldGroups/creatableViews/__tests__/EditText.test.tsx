@@ -23,11 +23,12 @@ describe('EditTextConfig', () => {
       isMandatory: false,
       isEnabled: true,
       visibility: 'visible',
-      condition: [],
+      ranges: [],
       hint: '',
       errorMessage: '',
       inputType: -1,
       isDefault: false,
+      isResult: true,
       minLength: undefined,
       maxLength: undefined
     });

@@ -109,32 +109,12 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
-  // const handleAddLabTestSubmit = (labTest: any) => {
-  // labTestModalState.isEdit ? handleEditLabTestSubmit : handleAddLabTestSubmit;
-  //   const data = {
-  //     ...labTest,
-  //     countryId: props.match.params.regionId,
-  //     tenantId: props.match.params.tenantId
-  //   };
-  //   dispatch(
-  //     createLabtestRequest({
-  //       data,
-  //       successCb: () => {
-  //         toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.LABTEST_CREATION_SUCCESS);
-  //         fetchDetails();
-  //         setLabTestModalState({ isOpen: false, isEdit: false, data: {}, isNextClicked: false });
-  //       },
-  //       failureCb: (e) =>
-  //         toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.LABTEST_CREATION_ERROR))
-  //     })
-  //   );
-  // };
-
   const handleEditLabTestSubmit = (dataParams: any) => {
     const data = {
       ...dataParams,
       formInput: undefined,
-      testName: dataParams.testName
+      testName: dataParams.testName,
+      codeDetails: { code: dataParams.code, url: dataParams.url }
     };
     dispatch(
       labtestCustomization({

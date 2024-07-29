@@ -5,7 +5,7 @@ import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
 import { resultSwitch } from '../utils/FieldUtils';
-import ConditionConfig from './fieldUI/ConditionConfig';
+import RangesConfig from './fieldUI/RangesConfig';
 import OptionList from './fieldUI/OptionList';
 import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
 import TextFieldWrapper from './fieldUI/TextFieldWrapper';
@@ -81,7 +81,7 @@ export const CheckboxComponent = ({ name, fieldName, inputProps = {}, obj }: ICo
     [fieldName, obj]
   );
   useEffect(() => {
-    checkBoxChange(obj.isResult);
+    checkBoxChange(obj?.isResult);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -437,9 +437,9 @@ const RenderFields = ({
         </div>
       );
     }
-    case 'CONDITION_CONFIG': {
+    case 'RANGES_CONFIG': {
       return (
-        <ConditionConfig
+        <RangesConfig
           field={fieldName}
           name={`${name}.${fieldName}`}
           obj={obj}
