@@ -1,12 +1,12 @@
-import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
-import CARD_VIEW_CONFIG from '../../labTestConfig/fieldGroups/CardView';
-import TEXT_LABEL_CONFIG from '../../labTestConfig/fieldGroups/TextLabel';
-import CHECKBOX_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/CheckBox';
-import EDIT_TEXT_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/EditText';
-import RADIO_GROUP_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/RadioGroup';
-import DROPDOWN_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/Dropdown';
+import { InputTypes } from '../../config/BaseFieldConfig';
+import CARD_VIEW_CONFIG from '../../config/fieldGroups/CardView';
+import TEXT_LABEL_CONFIG from '../../config/fieldGroups/TextLabel';
+import CHECKBOX_CONFIG from '../../config/fieldGroups/creatableViews/CheckBox';
+import EDIT_TEXT_CONFIG from '../../config/fieldGroups/creatableViews/EditText';
+import RADIO_GROUP_CONFIG from '../../config/fieldGroups/creatableViews/RadioGroup';
+import DROPDOWN_CONFIG from '../../config/fieldGroups/creatableViews/Dropdown';
 import { creatableViews, getConfigByViewType, resultSwitch } from '../FieldUtils';
-import DATE_PICKER_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/DatePickerView';
+import DATE_PICKER_CONFIG from '../../config/fieldGroups/creatableViews/DatePickerView';
 
 describe('Your Module', () => {
   describe('creatableViews', () => {
@@ -18,6 +18,15 @@ describe('Your Module', () => {
     it('should have the correct values', () => {
       const expectedValues = ['EditText', 'Spinner', 'DatePicker'];
       expect(creatableViews.map((view: any) => view.value)).toEqual(expectedValues);
+    });
+
+    it('should have the correct account customization flags', () => {
+      const expectedFlags = [false, true, false, false, false, true, true, true, true, true, false, true];
+      expect(
+        creatableViews.map((view: any) => {
+          return view.isAccountCustomizable;
+        })
+      ).toEqual(expectedFlags);
     });
   });
 
@@ -59,25 +68,25 @@ describe('Your Module', () => {
 describe('resultSwitch', () => {
   it('should correctly set inputTypeRelatedFields for InputTypes.DEFAULT', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.DEFAULT, obj, false);
-    expect(obj).toEqual({ minLength: 10, maxLength: 20 });
+    resultSwitch(InputTypes.DEFAULT, obj);
+    expect(obj).toEqual({ minLength: null, maxLength: null });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.NUMBER', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.NUMBER, obj, false);
-    expect(obj).toEqual({ minValue: 1, maxValue: 2 });
+    resultSwitch(InputTypes.NUMBER, obj);
+    expect(obj).toEqual({ minValue: null, maxValue: null });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.DECIMAL', () => {
     const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.DECIMAL, obj, false);
-    expect(obj).toEqual({ minValue: 1, maxValue: 2 });
+    resultSwitch(InputTypes.DECIMAL, obj);
+    expect(obj).toEqual({ minValue: null, maxValue: null });
   });
 
   it('should correctly set inputTypeRelatedFields for InputTypes.PHONE_NUMBER', () => {
-    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2, startsWith: '123' };
-    resultSwitch(InputTypes.PHONE_NUMBER, obj, false);
-    expect(obj).toEqual({ contentLength: 30, startsWith: '123' });
+    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
+    resultSwitch(InputTypes.PHONE_NUMBER, obj);
+    expect(obj).toEqual({ contentLength: null, startsWith: null });
   });
 });

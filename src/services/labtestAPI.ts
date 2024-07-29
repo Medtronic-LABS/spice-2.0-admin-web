@@ -19,7 +19,7 @@ export const fetchLabtestCustomization = ({ name, countryId }: { name: any; coun
     url: `/admin-service/lab-test-customization/get-by-unique-name`,
     data: {
       name,
-      countryId
+      countryId: '1'
     }
   });
 

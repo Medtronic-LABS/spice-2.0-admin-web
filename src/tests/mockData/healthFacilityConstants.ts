@@ -39,49 +39,60 @@ const CLINICAL_WORKFLOWS = [
 const HF_TYPES = [
   {
     id: 1,
-    name: 'Community Health Post'
+    name: 'Community Health Post',
+    active: true,
+    deleted: false
   },
   {
     id: 2,
-    name: 'Community Health Centre'
+    name: 'Community Health Centre',
+    active: true,
+    deleted: false
   },
   {
     id: 3,
-    name: 'Maternity and Child Health Post'
+    name: 'Maternity and Child Health Post',
+    active: true,
+    deleted: false
   }
 ];
 
 const HF_USERS_REQUEST = {
   countryId: 1,
   tenantId: '349',
-  skip: 0,
   limit: 10,
+  skip: 0,
   searchTerm: '',
-  roleNames: ['CHP'],
-  isSiteUsers: true,
-  tenantIds: [1]
+  userBased: false,
+  tenantBased: true
 };
 
 const HF_USER = {
   id: 682,
   firstName: 'Mariot',
-  lastName: 'CHO',
-  gender: 'Male',
-  phoneNumber: '2873458398',
-  username: 'mari_cho@spice.com',
-  countryCode: '232',
   roles: [
     {
       id: 6,
       name: 'PROVIDER',
+      level: 2,
       groupName: 'SPICE',
       displayName: 'Community Health Officer',
       suiteAccessName: 'mob'
     }
   ],
-  tenantId: 324,
-  villages: [],
-  supervisor: null,
+  lastName: 'CHO',
+  gender: 'Male',
+  phoneNumber: '2873458398',
+  username: 'mari_cho@spice.com',
+  countryCode: '232',
+  country: {
+    id: 1,
+    name: 'Sierra Leone',
+    phoneNumberCode: '232',
+    unitMeasurement: null,
+    regionCode: '1',
+    tenantId: 1
+  },
   organizations: [
     {
       id: 324,
@@ -90,7 +101,11 @@ const HF_USER = {
       sequence: null,
       parentOrganizationId: 323
     }
-  ]
+  ],
+  tenantId: 324,
+  fhirId: '111331',
+  suiteAccess: ['mob'],
+  villages: []
 };
 
 const HF_USERS = [HF_USER];
@@ -208,25 +223,32 @@ const HF_SUMMARY = {
 
 const HF_LIST = [HF_SUMMARY];
 
-const HF_DASHBOARD_LIST = [
-  {
-    id: 1,
-    name: 'HF 1',
-    type: 'village',
-    tenantId: 1
-  }
-];
-
 const CHIEF_DOM_LIST = [
   {
     id: 1,
     name: 'South Chennai',
-    tenantId: '3'
+    code: '0001',
+    tenantId: 3,
+    district: {
+      id: 1,
+      name: null,
+      code: null,
+      tenantId: null,
+      country: null
+    }
   },
   {
     id: 13,
     name: 'North Chennai',
-    tenantId: '83'
+    code: '2012',
+    tenantId: 83,
+    district: {
+      id: 1,
+      name: null,
+      code: null,
+      tenantId: null,
+      country: null
+    }
   }
 ];
 
@@ -322,9 +344,7 @@ const HF_ID_TIS = {
 
 const HF_IDS_TI = {
   ids: [757],
-  tenantId: 349,
-  healthFacilityId: 23,
-  linkedVillageIds: [1, 2]
+  tenantId: 349
 };
 
 const HF_CI_DI = {
@@ -357,6 +377,5 @@ export {
   HF_USERS_REQUEST,
   HF_CI_DI,
   HF_CI_DI_CDI,
-  HF_IDS_TI,
-  HF_DASHBOARD_LIST
+  HF_IDS_TI
 };

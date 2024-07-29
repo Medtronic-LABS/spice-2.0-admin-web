@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import Select, { CSSObjectWithLabel, GroupBase, OptionProps } from 'react-select';
+import Select, { CSSObjectWithLabel, GroupBase, OptionProps } from 'react-select';
 import Async from 'react-select/async';
 
 import InfoIcon from '../../assets/images/info-grey.svg';
@@ -52,7 +53,7 @@ interface ISelectBoxProps {
   autoSelect?: boolean;
   name?: string;
   menuPlacement?: string;
-  autoSelectValue?: any;
+  autoSelect?: boolean;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {
@@ -95,7 +96,6 @@ const SelectInput = ({
   isMulti = false,
   menuPlacement = 'auto',
   autoSelect = true,
-  autoSelectValue = '',
   optionPropStyles,
   isOptionDisabled,
   name = '',

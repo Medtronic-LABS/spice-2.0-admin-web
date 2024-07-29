@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
 import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
-import { InputTypes } from '../labTestConfig/BaseFieldConfig';
+import { InputTypes } from '../config/BaseFieldConfig';
 import { resultSwitch } from '../utils/FieldUtils';
-import { isEditableFields, unitMeasurementFields } from '../utils/CustomizationFieldUtils';
 import ConditionConfig from './fieldUI/ConditionConfig';
 import RangesConfig from './fieldUI/RangesConfig';
 import OptionList from './fieldUI/OptionList';
@@ -15,13 +15,6 @@ import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
 import DatePickerWrapper from './fieldUI/DatePickerWrapper';
 import { unitsSelector } from '../../../store/labTest/selectors';
 import { useSelector } from 'react-redux';
-import APPCONSTANTS from '../../../constants/appConstants';
-import TextInputArray from './fieldUI/TextInputArray';
-import Questionnaire from './fieldUI/Questionnaire';
-
-interface IMatchParams {
-  form: string;
-}
 
 const filterByGetMetaViewTypes: { [K: string]: string[] } = {
   RadioGroup: ['checkbox', 'radio']
@@ -45,8 +38,7 @@ const getComponentsByFieldName = (
   }
   if (
     obj.fieldName === 'TestedOn' &&
-    obj.orderId === 1 &&
-    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title', 'maxDays', 'disableFutureDate'].includes(fieldName)
+    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title'].includes(fieldName)
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
@@ -94,14 +86,7 @@ interface IComponentProps {
   isCustomizationForm?: boolean;
 }
 
-export const CheckboxComponent = ({
-  form,
-  name,
-  fieldName,
-  inputProps = {},
-  obj,
-  isCustomizationForm
-}: IComponentProps) => {
+export const CheckboxComponent = ({ name, fieldName, inputProps = {}, obj }: IComponentProps) => {
   const checkBoxChange = useCallback(
     (isChecked: boolean) => {
       if (fieldName === 'isResult') {
@@ -110,31 +95,12 @@ export const CheckboxComponent = ({
     },
     [fieldName, obj]
   );
-
   useEffect(() => {
-    if (obj?.disableFutureDate) {
-      // For old records
-      if (!obj.minDays) {
-        form.change(`${name}.minDays`, null);
-      }
-      form.change(`${name}.maxDays`, null);
-    }
-  }, [obj?.disableFutureDate, obj.minDays, form, name]);
-
-  useEffect(() => {
-    checkBoxChange(obj?.isResult);
+    checkBoxChange(obj.isResult);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div
-      className={`col-sm-4 ${
-        fieldName === 'disableFutureDate'
-          ? isCustomizationForm
-            ? 'col-4'
-            : 'col-12 col-md-6 col-lg-4 col-xl-3'
-          : 'col-lg-2'
-      }`}
-    >
+    <div className={`col-sm-4 ${fieldName === 'disableFutureDate' ? 'col-12 col-md-6 col-lg-4 col-xl-3' : 'col-lg-2'}`}>
       <div className='h-100 d-flex align-item-center py-1'>
         <Field
           name={`${name}.${fieldName}`}
@@ -207,10 +173,9 @@ export const SelectInputValues = ({
     };
   }
   if (fieldName === 'resource') {
-    options = inputProps?.options[obj?.viewType === 'Spinner' ? InputTypes.DEFAULT : obj?.inputType] || [];
+    options = inputProps?.options;
     parseFn = (val: any) => val?.key;
     value = options?.find(({ key: resource }: any) => obj[fieldName] === resource) || null;
-    autoSelectValue = options.length === 1 ? options[0]?.key : null;
   }
   // parse with custom logic
   if (fieldName === 'inputType') {
@@ -238,7 +203,7 @@ export const SelectInputValues = ({
     value = customValue;
   }
   return (
-    <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+    <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
       <SelectFieldWrapper
         name={name}
         customValue={value}
@@ -246,7 +211,6 @@ export const SelectInputValues = ({
         customParseFn={parseFn}
         inputProps={inputProps}
         isMulti={inputProps?.isMulti}
-        autoSelectValue={autoSelectValue}
       />
     </div>
   );
@@ -437,7 +401,7 @@ export const TextFieldComponent = ({
   };
 
   return (
-    <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+    <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
       <TextFieldWrapper
         name={`${name}.${fieldName}`}
         customValue={obj.fieldName}
@@ -490,42 +454,9 @@ const RenderFields = ({
     )
   };
 
-  if (isCustomizationForm) {
-    if (fieldName === 'isEditable' && (!isEditableFields.includes(obj.id) || formType !== 'enrollment')) {
-      return null;
-    }
-    if (fieldName === 'readOnly') {
-      return null;
-    }
-    if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
-      return null;
-    }
-
-    if (fieldName === 'isEnrollment' && isCustomizationForm && formType !== 'assessment') {
-      obj.isEnrollment = undefined;
-      return null;
-    }
-
-    if (
-      fieldName === 'condition' &&
-      !['Spinner', 'RadioGroup', 'EditText', 'SingleSelectionView'].includes(obj.viewType)
-    ) {
-      return null;
-    }
-  }
-
   switch (inputProps?.component) {
     case 'CHECKBOX': {
-      return (
-        <CheckboxComponent
-          form={form}
-          name={name}
-          fieldName={fieldName}
-          inputProps={inputProps}
-          obj={obj}
-          isCustomizationForm={isCustomizationForm}
-        />
-      );
+      return <CheckboxComponent name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
     }
     case 'SELECT_INPUT': {
       return (
@@ -542,38 +473,16 @@ const RenderFields = ({
       );
     }
 
-    case 'INSTRUCTIONS': {
-      const fieldVal = obj[fieldName]?.length ? obj[fieldName] : [''];
-      return (
-        <div className='col-12'>
-          <Field name={`${name}.${fieldName}`}>
-            {(_props) => (
-              <>
-                <TextInputArray
-                  label={inputProps?.label || ''}
-                  defaultValue={fieldVal as unknown as string[]}
-                  required={false}
-                  onChange={(value: string[]) => {
-                    form.mutators.setValue(`${name}.${fieldName}`, value);
-                  }}
-                />
-              </>
-            )}
-          </Field>
-        </div>
-      );
-    }
-
     case 'OPTION_LIST': {
       return (
-        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <OptionList field={fieldName} name={`${name}.${fieldName}`} obj={obj} form={form} inputProps={inputProps} />
         </div>
       );
     }
     case 'TARGET_VIEWS': {
       return (
-        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <MultiSelectOptionList
             label={'Target Views'}
             field={fieldName}
@@ -584,18 +493,6 @@ const RenderFields = ({
             targetIds={targetIds}
           />
         </div>
-      );
-    }
-    case 'QUESTIONNAIRE': {
-      return (
-        <Questionnaire
-          label={'Questionnaire'}
-          defaultValue={obj[fieldName]}
-          required={false}
-          onChange={(value: any) => {
-            fieldName[fieldName] = value;
-          }}
-        />
       );
     }
     case 'CONDITION_CONFIG': {
@@ -628,7 +525,7 @@ const RenderFields = ({
       const parseFn = (val: any) => val;
       const value = obj[fieldName] || null;
       return (
-        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <DatePickerWrapper
             fieldName={fieldName}
             name={`${name}.${fieldName}`}

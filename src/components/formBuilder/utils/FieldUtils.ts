@@ -1,14 +1,17 @@
-import { InputTypes } from '../labTestConfig/BaseFieldConfig';
-import CARD_VIEW_CONFIG from '../labTestConfig/fieldGroups/CardView';
-import EDIT_TEXT_CONFIG from '../labTestConfig/fieldGroups/creatableViews/EditText';
-import RADIO_GROUP_CONFIG from '../labTestConfig/fieldGroups/creatableViews/RadioGroup';
-import DROPDOWN_CONFIG from '../labTestConfig/fieldGroups/creatableViews/Dropdown';
-import CHECKBOX_CONFIG from '../labTestConfig/fieldGroups/creatableViews/CheckBox';
-import TEXT_LABEL_CONFIG from '../labTestConfig/fieldGroups/TextLabel';
+import { InputTypes } from '../config/BaseFieldConfig';
+import CARD_VIEW_CONFIG from '../config/fieldGroups/CardView';
+import EDIT_TEXT_CONFIG from '../config/fieldGroups/creatableViews/EditText';
+import RADIO_GROUP_CONFIG from '../config/fieldGroups/creatableViews/RadioGroup';
+import DROPDOWN_CONFIG from '../config/fieldGroups/creatableViews/Dropdown';
+import CHECKBOX_CONFIG from '../config/fieldGroups/creatableViews/CheckBox';
+import TEXT_LABEL_CONFIG from '../config/fieldGroups/TextLabel';
 import { IComponentConfig } from '../types/ComponentConfig';
 import DATE_PICKER_CONFIG from '../labTestConfig/fieldGroups/creatableViews/DatePickerView';
 
 export const creatableViews = [
+  { label: 'Text', value: 'EditText' },
+  { label: 'Dropdown', value: 'Spinner' },
+  { label: 'Date', value: 'DatePicker' }
   { label: 'Text', value: 'EditText' },
   { label: 'Dropdown', value: 'Spinner' },
   { label: 'Date', value: 'DatePicker' }
@@ -42,14 +45,13 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     maxLength: false,
     minLength: false,
     contentLength: false,
-    startsWith: false,
-    unitList: false,
-    ranges: false
+    startsWith: false
   };
   const resultFields = {
     code: true,
     url: true,
     resource: true,
+    unitList: true,
     condition: true
   };
   let finalFields: any = {};
@@ -59,29 +61,22 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
       case InputTypes.DECIMAL:
         inputTypeRelatedFields.minValue = true;
         inputTypeRelatedFields.maxValue = true;
-        inputTypeRelatedFields.unitList = true;
-        inputTypeRelatedFields.ranges = true;
         break;
       case InputTypes.PHONE_NUMBER:
         inputTypeRelatedFields.contentLength = true;
         inputTypeRelatedFields.startsWith = true;
-        inputTypeRelatedFields.unitList = true;
-        inputTypeRelatedFields.ranges = true;
         break;
       case InputTypes.DEFAULT:
       default:
         inputTypeRelatedFields.minLength = true;
         inputTypeRelatedFields.maxLength = true;
-        inputTypeRelatedFields.unitList = false;
-        inputTypeRelatedFields.ranges = false;
     }
   }
   if (isResult) {
-    finalFields = {
-      ...finalFields,
-      ...inputTypeRelatedFields,
-      ...resultFields
-    };
+    finalFields = { ...finalFields, ...resultFields };
+    Object.keys(fieldValue ? inputTypeRelatedFields : {}).forEach((key: any) => {
+      finalFields[key] = false;
+    });
   } else {
     Object.keys(resultFields).forEach((key: any) => {
       finalFields[key] = false;
@@ -100,8 +95,8 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
   });
 };
 
-// Ranges unit and gender filter
-interface IRanges {
+// Condition unit and gender filter
+interface ICondition {
   unitType: string;
   gender: string;
   minRange: number;
@@ -130,18 +125,21 @@ interface IRemovedUnits {
   genders: { [unitType: string]: IGender[] };
 }
 
-export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
+export const filterUnitsandGender = (conditions: ICondition[], unitList: IUnit[]) => {
   // Create a dictionary to keep track of the genders associated with each unitType
   const unitGenderMap: { [unitType: string]: Set<string> } = {};
 
-  // Populate the dictionary with the genders from the ranges array
-  (ranges || []).forEach((range) => {
-    const { unitType, gender } = range;
+  // Populate the dictionary with the genders from the conditions array
+  (conditions || []).forEach((condition) => {
+    const { unitType, gender } = condition;
     if (!unitGenderMap[unitType]) {
       unitGenderMap[unitType] = new Set<string>();
     }
     unitGenderMap[unitType].add(gender);
   });
+
+  // Function to check if a unitType has both genders
+  const hasBothGenders = (unitType: string) => unitGenderMap[unitType] && unitGenderMap[unitType].size === 2;
 
   // Filter the unitList based on the genders associated with each unitType
   const filteredUnitList: IUnit[] = [];
@@ -149,10 +147,8 @@ export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
 
   (unitList || []).forEach((unit, index) => {
     const unitType = unit.id;
-    if (unitGenderMap[unitType]) {
-      if (unitGenderMap[unitType].size === genderList.length) {
-        removedUnits.units.push(unit);
-      }
+    if (hasBothGenders(unitType)) {
+      removedUnits.units.push(unit);
       removedUnits.indices.push(index);
       removedUnits.genders[unitType] = genderList.filter((gender) => unitGenderMap[unitType].has(gender.id));
     } else {

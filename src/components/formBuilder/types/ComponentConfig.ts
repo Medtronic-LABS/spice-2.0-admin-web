@@ -1,9 +1,9 @@
-import { ICardViewFields } from '../labTestConfig/fieldGroups/CardView';
-import { ICheckBoxFields } from '../labTestConfig/fieldGroups/creatableViews/CheckBox';
-import { IEditTextFields } from '../labTestConfig/fieldGroups/creatableViews/EditText';
-import { IRadioGroupFields } from '../labTestConfig/fieldGroups/creatableViews/RadioGroup';
-import { IDropdownFields } from '../labTestConfig/fieldGroups/creatableViews/Dropdown';
-import { ITextLabelFields } from '../labTestConfig/fieldGroups/TextLabel';
+import { ICardViewFields } from '../config/fieldGroups/CardView';
+import { ICheckBoxFields } from '../config/fieldGroups/creatableViews/CheckBox';
+import { IEditTextFields } from '../config/fieldGroups/creatableViews/EditText';
+import { IRadioGroupFields } from '../config/fieldGroups/creatableViews/RadioGroup';
+import { IDropdownFields } from '../config/fieldGroups/creatableViews/Dropdown';
+import { ITextLabelFields } from '../config/fieldGroups/TextLabel';
 
 import { IBaseFieldMeta } from './BaseFieldMeta';
 import { IDatePickerFields } from '../labTestConfig/fieldGroups/creatableViews/DatePickerView';
@@ -11,6 +11,7 @@ import { IDatePickerFields } from '../labTestConfig/fieldGroups/creatableViews/D
 export type IFieldViewType =
   | IEditTextFields
   | IRadioGroupFields
+  | IDropdownFields
   | IDropdownFields
   | ICheckBoxFields
   | ICardViewFields

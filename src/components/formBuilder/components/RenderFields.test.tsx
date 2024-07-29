@@ -67,6 +67,20 @@ describe('RenderFields Test Cases', () => {
             )}
           </Form>
         </Provider>
+        <Provider store={store}>
+          {/* tslint:disable-next-line:no-empty */}
+          <Form onSubmit={() => {}}>
+            {({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <CheckboxComponent
+                  name='form'
+                  fieldName='disableFutureDate'
+                  inputProps={{ label: 'Disable Future Date', disabled: true }}
+                />
+              </form>
+            )}
+          </Form>
+        </Provider>
       );
       expect(wrapper.find(CheckboxComponent)).toHaveLength(1);
       expect(wrapper.find(Field).prop('name')).toBe('form.disableFutureDate');
@@ -219,7 +233,7 @@ describe('RenderFields Test Cases', () => {
           <Form onSubmit={() => {}}>
             {({ handleSubmit }) => (
               <form onSubmit={handleSubmit}>
-                <RangesConfig
+                <ConditionConfig
                   field='testField'
                   name='testField'
                   obj={{ testField: {} }}
@@ -274,7 +288,7 @@ describe('RenderFields Test Cases', () => {
         <Form onSubmit={() => {}}>
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
-              <RangesConfig
+              <ConditionConfig
                 field='testField'
                 name='testField'
                 obj={{ testField: {} }}
@@ -289,6 +303,35 @@ describe('RenderFields Test Cases', () => {
       </Provider>
     );
     expect(wrapper.find('CustomTooltip')).toHaveLength(1);
+  });
+  it('renders Questionnaire component with default value and onChange handler', () => {
+    const newObj = { questionnaire: ['question1', 'question2'] };
+    const wrapper = mount(
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Questionnaire
+                label='Questionnaire'
+                defaultValue={newObj.questionnaire}
+                required={false}
+                onChange={(value) => {
+                  newObj.questionnaire = value;
+                }}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
+    );
+    expect(wrapper.find(Questionnaire)).toHaveLength(1);
+    expect(wrapper.find(Questionnaire).prop('label')).toBe('Questionnaire');
+    expect(wrapper.find(Questionnaire).prop('defaultValue')).toEqual(['question1', 'question2']);
+    expect(wrapper.find(Questionnaire).prop('required')).toBe(false);
+    const newValue = ['question2', 'question3', 'question4'];
+    wrapper.find(Questionnaire).prop('onChange')?.(newValue);
+    expect(newObj.questionnaire).toEqual(newValue);
   });
 
   it('should render CheckboxComponent correctly', () => {
@@ -655,6 +698,66 @@ describe('RenderFields Test Cases', () => {
     const wrapper = mount(
       <Provider store={store}>
         {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <RenderFields
+                obj={obj}
+                name={name}
+                fieldName={'defaultValue'}
+                inputProps={{ ...inputProps, component: 'INSTRUCTIONS' }}
+                form={form}
+                unAddedFields={unAddedFields}
+                targetIds={targetIds}
+                isNew={true}
+                newlyAddedIds={newlyAddedIds}
+                handleUpdateFieldName={handleUpdateFieldName}
+                isFieldNameChangable={false}
+                hashFieldIdsWithTitle={hashFieldIdsWithTitle}
+                hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+              />
+            </form>
+          )}
+        </Form>
+      </Provider>
+    );
+    const textInputArray = wrapper.find('TextInputArray');
+    expect(textInputArray).toHaveLength(1);
+  });
+
+  it('renders QUESTIONNAIRE', () => {
+    const wrapper = mount(
+      // tslint:disable-next-line:no-empty
+      <Form onSubmit={() => {}}>
+        {({ handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
+            <RenderFields
+              obj={{ ...obj, viewType: 'MentalHealthView' }}
+              name={name}
+              fieldName={'optionsList'}
+              inputProps={inputProps}
+              form={form}
+              unAddedFields={unAddedFields}
+              targetIds={targetIds}
+              isNew={true}
+              newlyAddedIds={newlyAddedIds}
+              handleUpdateFieldName={handleUpdateFieldName}
+              isFieldNameChangable={false}
+              hashFieldIdsWithTitle={hashFieldIdsWithTitle}
+              hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+            />
+          </form>
+        )}
+      </Form>
+    );
+    const textInputArray = wrapper.find('TextInputArray');
+    expect(textInputArray).toHaveLength(0);
+  });
+
+  it('renders CONDITION CONFIG', () => {
+    const wrapper = mount(
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
         <Form onSubmit={() => {}} mutators={{ ...arrayMutators }}>
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -668,7 +771,7 @@ describe('RenderFields Test Cases', () => {
                   isMandatory: false,
                   isEnabled: true,
                   visibility: 'visible',
-                  ranges: [
+                  condition: [
                     {
                       unitType: 'mmol/L',
                       minRange: 1,
@@ -686,8 +789,8 @@ describe('RenderFields Test Cases', () => {
                   orderId: 3
                 }}
                 name={name}
-                fieldName={'ranges'}
-                inputProps={{ ...inputProps, component: 'RANGES_CONFIG' }}
+                fieldName={'condition'}
+                inputProps={{ ...inputProps, component: 'CONDITION_CONFIG' }}
                 form={form}
                 unAddedFields={unAddedFields}
                 targetIds={targetIds}

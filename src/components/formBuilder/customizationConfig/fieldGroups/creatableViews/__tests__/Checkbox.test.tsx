@@ -10,7 +10,6 @@ describe('ICheckBoxFields', () => {
         fieldName: '',
         family: '',
         selectAll: true,
-        isSummary: false,
         isMandatory: false,
         isEnabled: true,
         visibility: expect.any(String),
@@ -18,7 +17,7 @@ describe('ICheckBoxFields', () => {
         hint: '',
         optionsList: [],
         errorMessage: '',
-        isNotDefault: true
+        isDefault: true
       };
       const result = CHECKBOX_CONFIG.getEmptyData();
       expect(result).toEqual(expected);

@@ -15,8 +15,7 @@ const SelectFieldWrapper = ({
   customError,
   autoSelect,
   isOptionDisabled,
-  onChange,
-  autoSelectValue
+  onChange
 }: any) => {
   const options: any = customOptions || inputProps?.options || [];
   const parseFn = customParseFn ? customParseFn : (val: any) => val;
@@ -43,7 +42,6 @@ const SelectFieldWrapper = ({
           options={options}
           isMulti={isMulti}
           autoSelect={autoSelect}
-          autoSelectValue={autoSelectValue}
           isOptionDisabled={isOptionDisabled}
           error={
             (meta.error && customError && customError.toString()) ||

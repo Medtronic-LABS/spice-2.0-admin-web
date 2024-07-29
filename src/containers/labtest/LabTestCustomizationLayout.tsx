@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
@@ -168,7 +169,6 @@ const LabTestCustomizationLayout = () => {
     dateView.family = id;
     dateView.isDeletable = false;
     dateView.isMandatory = true;
-    dateView.disableFutureDate = true;
     dateView.orderId = 1;
     formValues[id][dateView.id] = dateView;
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));

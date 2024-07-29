@@ -20,7 +20,6 @@ describe('EditTextConfig', () => {
       title: '',
       fieldName: '',
       family: '',
-      isSummary: false,
       isMandatory: false,
       isEnabled: true,
       visibility: 'visible',
@@ -28,7 +27,7 @@ describe('EditTextConfig', () => {
       hint: '',
       errorMessage: '',
       inputType: -1,
-      isNotDefault: true,
+      isDefault: false,
       minLength: undefined,
       maxLength: undefined
     });
@@ -41,7 +40,6 @@ describe('EditTextConfig', () => {
       title: 'Test Title',
       fieldName: 'Test Field Name',
       family: 'Test Family',
-      isSummary: true,
       isMandatory: true,
       isEnabled: true,
       visibility: 'hidden',
@@ -59,7 +57,6 @@ describe('EditTextConfig', () => {
       title: 'Test Title',
       fieldName: 'Test Field Name',
       family: 'Test Family',
-      isSummary: true,
       isMandatory: true,
       isEnabled: true,
       visibility: 'hidden',

@@ -1,67 +1,60 @@
 import healthFacilityReducer from '../reducer';
 import * as actionTypes from '../actionTypes';
 import * as MOCK_DATA from '../../../tests/mockData/healthFacilityConstants';
-import { initialState } from '../reducer';
-
+import { IChiefdom, IDistrict, IHFUserGet, IHealthFacility, IHealthFacilityState } from '../types';
+const initialState: IHealthFacilityState = {
+  hfTotal: 0,
+  loading: false,
+  healthFacility: {
+    id: 0,
+    name: '',
+    type: '',
+    phuFocalPersonName: '',
+    phuFocalPersonNumber: '',
+    address: '',
+    district: {} as IDistrict,
+    chiefdom: {} as IChiefdom,
+    cityName: '',
+    latitude: '',
+    longitude: '',
+    postalCode: '',
+    language: '',
+    tenantId: 0,
+    peerSupervisors: [],
+    linkedVillages: [],
+    clinicalWorkflows: []
+  },
+  hfTypes: [],
+  hfTypesLoading: false,
+  healthFacilityList: [] as IHealthFacility[],
+  healthFacilityUserList: [],
+  hfUser: {} as IHFUserGet,
+  hfUserDetailLoading: false,
+  hfUsersTotal: 0,
+  hfUsersLoading: false,
+  districtList: [],
+  districtTotal: 0,
+  districtLoading: false,
+  chiefdomList: [],
+  chiefdomTotal: 0,
+  chiefdomLoading: false,
+  villagesList: [],
+  villagesTotal: 0,
+  villagesLoading: false,
+  villagesFromHFList: { list: [], hfTenantIds: null },
+  villagesFromHFLoading: false,
+  peerSupervisorList: { list: [], hfTenantIds: null },
+  peerSupervisorTotal: 0,
+  peerSupervisorLoading: false,
+  cultureListLoading: false,
+  countryListLoading: false,
+  cultureList: [],
+  countryList: [],
+  clinicalWorkflowList: [],
+  clinicalWorkflowLoading: false,
+  error: null
+};
 describe('healthFacilityReducer', () => {
-  it('should handle FETCH_HF_DASHBOARD_LIST_REQUEST with loadMore true', () => {
-    const action: any = {
-      type: actionTypes.FETCH_HF_DASHBOARD_LIST_REQUEST,
-      isLoadMore: true
-    };
-    const expectedState = {
-      ...initialState,
-      loadingMore: true
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-  it('should handle FETCH_HF_DASHBOARD_LIST_REQUEST with loadMore false', () => {
-    const action: any = {
-      type: actionTypes.FETCH_HF_DASHBOARD_LIST_REQUEST,
-      isLoadMore: false
-    };
-    const expectedState = {
-      ...initialState,
-      loading: true
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-  it('should handle FETCH_HF_DASHBOARD_LIST_SUCCESS with loadMore false', () => {
-    const action: any = {
-      type: actionTypes.FETCH_HF_DASHBOARD_LIST_SUCCESS,
-      payload: {
-        isLoadMore: false,
-        total: MOCK_DATA.HF_DASHBOARD_LIST.length,
-        siteDashboardList: MOCK_DATA.HF_DASHBOARD_LIST
-      }
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false,
-      loadingMore: false,
-      hfDashboardList: MOCK_DATA.HF_DASHBOARD_LIST,
-      hfTotal: MOCK_DATA.HF_DASHBOARD_LIST.length
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-  it('should handle FETCH_HF_DASHBOARD_LIST_SUCCESS with loadMore true', () => {
-    const action: any = {
-      type: actionTypes.FETCH_HF_DASHBOARD_LIST_SUCCESS,
-      payload: {
-        isLoadMore: true,
-        total: MOCK_DATA.HF_DASHBOARD_LIST.length,
-        siteDashboardList: MOCK_DATA.HF_DASHBOARD_LIST
-      }
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false,
-      loadingMore: false,
-      hfDashboardList: [...initialState.hfDashboardList, ...MOCK_DATA.HF_DASHBOARD_LIST],
-      hfTotal: initialState.hfTotal
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
   it('should handle FETCH_HEALTH_FACILITY_LIST_REQUEST', () => {
     const action: any = {
       type: actionTypes.FETCH_HEALTH_FACILITY_LIST_REQUEST
@@ -161,28 +154,6 @@ describe('healthFacilityReducer', () => {
   it('should handle DELETE_HEALTH_FACILITY_SUCCESS', () => {
     const action: any = {
       type: actionTypes.DELETE_HEALTH_FACILITY_SUCCESS
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle LINKED_RESTRICTIONS_VALIDATION_SUCCESS', () => {
-    const action: any = {
-      type: actionTypes.LINKED_RESTRICTIONS_VALIDATION_SUCCESS
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle LINKED_RESTRICTIONS_VALIDATION_FAILURE', () => {
-    const action: any = {
-      type: actionTypes.LINKED_RESTRICTIONS_VALIDATION_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -493,7 +464,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_CHIEFDOM_LIST_REQUEST', () => {
     const action: any = {
-      type: actionTypes.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF
+      type: actionTypes.FETCH_CHIEFDOM_LIST_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -504,7 +475,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_CHIEFDOM_LIST_SUCCESS', () => {
     const action: any = {
-      type: actionTypes.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF,
+      type: actionTypes.FETCH_CHIEFDOM_LIST_SUCCESS,
       payload: { list: MOCK_DATA.CHIEF_DOM_LIST, total: MOCK_DATA.CHIEF_DOM_LIST.length }
     };
     const expectedState = {
@@ -518,7 +489,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_CHIEFDOM_LIST_FAILURE', () => {
     const action: any = {
-      type: actionTypes.FETCH_CHIEFDOM_LIST_FAILURE_FOR_HF
+      type: actionTypes.FETCH_CHIEFDOM_LIST_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -529,7 +500,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_DISTRICT_LIST_REQUEST', () => {
     const action: any = {
-      type: actionTypes.FETCH_DISTRICT_LIST_REQUEST_FOR_HF
+      type: actionTypes.FETCH_DISTRICT_LIST_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -540,7 +511,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_DISTRICT_LIST_SUCCESS', () => {
     const action: any = {
-      type: actionTypes.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF,
+      type: actionTypes.FETCH_DISTRICT_LIST_SUCCESS,
       payload: { list: MOCK_DATA.DISTRICT_LIST, total: MOCK_DATA.DISTRICT_LIST.length }
     };
     const expectedState = {
@@ -554,7 +525,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_DISTRICT_LIST_FAILURE', () => {
     const action: any = {
-      type: actionTypes.FETCH_DISTRICT_LIST_FAILURE_FOR_HF
+      type: actionTypes.FETCH_DISTRICT_LIST_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -565,7 +536,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_VILLAGES_LIST_REQUEST', () => {
     const action: any = {
-      type: actionTypes.FETCH_VILLAGES_LIST_REQUEST_FOR_HF
+      type: actionTypes.FETCH_VILLAGES_LIST_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -576,7 +547,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_VILLAGES_LIST_SUCCESS', () => {
     const action: any = {
-      type: actionTypes.FETCH_VILLAGES_LIST_SUCCESS_FOR_HF,
+      type: actionTypes.FETCH_VILLAGES_LIST_SUCCESS,
       payload: { list: MOCK_DATA.VILLAGES_LIST, total: MOCK_DATA.VILLAGES_LIST.length }
     };
     const expectedState = {
@@ -590,7 +561,7 @@ describe('healthFacilityReducer', () => {
 
   it('should handle FETCH_VILLAGES_LIST_FAILURE', () => {
     const action: any = {
-      type: actionTypes.FETCH_VILLAGES_LIST_FAILURE_FOR_HF
+      type: actionTypes.FETCH_VILLAGES_LIST_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -637,20 +608,6 @@ describe('healthFacilityReducer', () => {
   it('should handle CLEAR_ALL_DEPENDENT_DATA', () => {
     const action: any = {
       type: actionTypes.CLEAR_ALL_DEPENDENT_DATA
-    };
-    const expectedState = {
-      ...initialState,
-      healthFacility: {},
-      chiefdomList: [],
-      villagesList: [],
-      villagesFromHFList: { list: [], hfTenantIds: null }
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle CLEAR_HF_FORM_DATA', () => {
-    const action: any = {
-      type: actionTypes.CLEAR_HF_FORM_DATA
     };
     const expectedState = {
       ...initialState,
@@ -846,83 +803,6 @@ describe('healthFacilityReducer', () => {
     const expectedState = {
       ...initialState,
       countryListLoading: false
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle SET_HF_SUMMARY', () => {
-    const action: any = {
-      type: actionTypes.SET_HF_SUMMARY,
-      data: { id: 1, tenantId: 1 }
-    };
-    const expectedState = {
-      ...initialState,
-      healthFacility: { ...initialState.healthFacility, id: 1, tenantId: 1 },
-      loading: false
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-  it('should handle FETCH_HEALTH_FACILITY_USER_CLEAR_LIST_REQUEST', () => {
-    const action: any = {
-      type: actionTypes.FETCH_HEALTH_FACILITY_USER_CLEAR_LIST_REQUEST
-    };
-    const expectedState = {
-      ...initialState,
-      hfTotal: 0,
-      healthFacilityList: []
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle FETCH_UNLINKED_VILLAGES_REQUEST', () => {
-    const action: any = {
-      type: actionTypes.FETCH_UNLINKED_VILLAGES_REQUEST
-    };
-    const expectedState = {
-      ...initialState,
-      unlinkedVillagesLoading: true
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-  it('should handle FETCH_UNLINKED_VILLAGES_SUCCESS', () => {
-    const action: any = {
-      type: actionTypes.FETCH_UNLINKED_VILLAGES_SUCCESS,
-      payload: {
-        list: [],
-        total: 0
-      }
-    };
-    const expectedState = {
-      ...initialState,
-      unlinkedVillagesLoading: false,
-      unlinkedVillagesList: [],
-      unlinkedVillagesTotal: 0
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle FETCH_UNLINKED_VILLAGES_FAILURE', () => {
-    const action: any = {
-      type: actionTypes.FETCH_UNLINKED_VILLAGES_FAILURE
-    };
-    const expectedState = {
-      ...initialState,
-      unlinkedVillagesLoading: false
-    };
-    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle CLEAR_HF_DROPDOWN_OPTIONS', () => {
-    const action: any = {
-      type: actionTypes.CLEAR_HF_DROPDOWN_OPTIONS
-    };
-    const expectedState = {
-      ...initialState,
-      hfDropdownLoading: false,
-      hfDropdownOptions: {
-        list: [],
-        regionTenantId: ''
-      }
     };
     expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
   });

@@ -3,11 +3,6 @@ import { IComponentConfig } from '../types/ComponentConfig';
 import { IComponentConfig as IRegionComponentConfig } from '../types/CustomizationComponentConfig';
 import { FormApi } from 'final-form';
 import { getConfigByViewType } from '../utils/FieldUtils';
-import {
-  isEditableFields,
-  unitMeasurementFields,
-  getConfigByViewType as getRegionConfigViewType
-} from '../utils/CustomizationFieldUtils';
 import { ISelectFormOptions } from '../../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { camel2Title } from '../../../utils/validation';
@@ -101,14 +96,6 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
 
       if (!isRegionFormCustomization) {
         return;
-      }
-      if (isRegionFormCustomization) {
-        if (formType === 'enrollment' && isEditableFields.includes(view.id) && !('isEditable' in view)) {
-          view.isEditable = true;
-        }
-        if (unitMeasurementFields.includes(view.id) && !('unitMeasurement' in view)) {
-          view.unitMeasurement = undefined;
-        }
       }
     });
     sethashFieldIdsWithFieldName(newhashFieldIdsWithFieldName);
