@@ -24,6 +24,30 @@ const store = mockStore({
     ]
   }
 });
+import { Provider } from 'react-redux';
+import configureMockStore from 'redux-mock-store';
+
+const mockStore = configureMockStore();
+
+const store = mockStore({
+  labtest: {
+    units: [
+      {
+        id: 1,
+        createdBy: 1,
+        updatedBy: 1,
+        createdAt: '2022-04-18T20:39:27+00:00',
+        updatedAt: '2022-04-18T20:39:27+00:00',
+        name: 'mg/dL',
+        type: 'LABTEST',
+        description: 'mg/dL',
+        displayOrder: 6,
+        active: true,
+        deleted: false
+      }
+    ]
+  }
+});
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -50,9 +74,7 @@ const props = {
         family: 'labTest',
         isMandatory: true,
         isEnabled: true,
-        minDays: 10,
-        maxDays: 10,
-        disableFutureDate: false,
+        testValidityDays: '20',
         visibility: 'visible',
         isDefault: false,
         isDeletable: false,

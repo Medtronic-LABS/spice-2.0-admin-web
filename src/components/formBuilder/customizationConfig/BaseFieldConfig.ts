@@ -232,8 +232,8 @@ export const baseFieldMeta: IBaseFieldMeta = {
   isNew: { order: 0, label: 'isNew', component: 'CHECKBOX' },
   isEditable: { order: 15.4, label: 'Is Editable', component: 'CHECKBOX' },
   instructions: { order: 15.5, label: 'Instructions', component: 'INSTRUCTIONS' },
-  readOnly: { order: 15.6, label: 'readOnly', component: 'CHECKBOX' },
-  condition: { order: 16.0, label: 'Condition', component: 'CONDITION_CONFIG' },
+  ranges: { order: 16.0, label: 'Ranges', component: 'RANGES_CONFIG' },
+  // condition: { order: 16.0, label: 'Condition', component: 'CONDITION_CONFIG' },
   familyOrder: {
     order: 0,
     type: 'number',

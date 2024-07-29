@@ -20,7 +20,7 @@ export interface IEditTextFields extends IBaseFields {
   code?: string;
   url?: string;
   resource?: string;
-  condition?: any[];
+  ranges?: any[];
 }
 
 const getEmptyData = (): IEditTextFields => ({
@@ -39,7 +39,7 @@ const getEmptyData = (): IEditTextFields => ({
   isDefault: false,
   minLength: undefined,
   maxLength: undefined,
-  condition: []
+  ranges: []
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -64,7 +64,7 @@ const customizableFieldMeta: IBaseFieldMeta = {
   maxValue: {},
   inputType: {},
   title: {},
-  condition: {},
+  ranges: {},
   fieldName: {},
   isEditable: {}
 };
@@ -74,7 +74,7 @@ const getJSON = (json: any): IFieldViewType => {
     delete json.inputType;
   }
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  json.condition = json.condition?.filter((val: any) => !!val);
+  json.ranges = json.ranges?.filter((val: any) => !!val);
   if (json.minValue) {
     json.minValue = Number(json.minValue);
   }

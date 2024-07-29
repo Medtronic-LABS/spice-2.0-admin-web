@@ -112,32 +112,6 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
-  const onNextClicked = (data: any, customizeClicked?: boolean) => {
-    if (!customizeClicked) {
-      setLabTestModalState({ ...labTestModalState, isNextClicked: true });
-      dispatch(
-        validateLabtestRequest({
-          name: data.testName,
-          countryId: Number(props.match.params.regionId || 0),
-          successCb: () => {
-            routeToLabtestCustomizationPage(data);
-          },
-          failureCb: (error: any) => {
-            toastCenter.error(
-              ...getErrorToastArgs(
-                error,
-                APPCONSTANTS.ERROR,
-                APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', data.testName).replace('update', 'create')
-              )
-            );
-          }
-        })
-      );
-    } else {
-      routeToLabtestCustomizationPage(data);
-    }
-  };
-
   const handleEditLabTestSubmit = (dataParams: any) => {
     let formInput = JSON.parse(dataParams.formInput || '');
     const formLayout = (formInput?.formLayout || []).map((item: any) => {
@@ -149,9 +123,9 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     formInput = { ...formInput, formLayout };
     const data = {
       ...dataParams,
-      formInput: JSON.stringify(formInput),
+      formInput: undefined,
       testName: dataParams.testName,
-      codeDetails: { code: dataParams.codeDetails?.code, url: dataParams.codeDetails?.url }
+      codeDetails: { code: dataParams.code, url: dataParams.url }
     };
     dispatch(
       labtestCustomization({

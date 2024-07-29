@@ -8,7 +8,6 @@ import styles from '../../styles/FormBuilder.module.scss';
 import SelectFieldWrapper from './SelectFieldWrapper';
 import TextFieldWrapper from './TextFieldWrapper';
 import { filterUnitsandGender, IUnit } from '../../utils/FieldUtils';
-import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
 
 const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index }: any) => {
   let options: any = config?.options || [];
@@ -73,10 +72,9 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
       <TextFieldWrapper
         name={`${name}[${index}].${config.name}`}
         customValue={value}
-        formError={config.error}
+        customError={config.error}
         customParseFn={parseFn}
         inputProps={config}
-        obj={config}
       />
     </div>
   );
@@ -136,7 +134,7 @@ const RangesFieldsComponent = ({ form, item, name, obj, index, rangesFieldConfig
 };
 
 const RangesConfig = ({ name, obj, field, form }: any) => {
-  const rangesFieldConfigs: any = {
+  const rangesFieldConfigs = {
     unitType: {
       name: 'unitType',
       label: 'Unit',
@@ -167,7 +165,6 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
     minRange: {
       name: 'minRange',
       type: 'number',
-      inputType: InputTypes.DECIMAL,
       label: 'Min Value',
       required: true,
       disabledValidation: true,
@@ -178,7 +175,6 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
     maxRange: {
       name: 'maxRange',
       type: 'number',
-      inputType: InputTypes.DECIMAL,
       label: 'Max Value',
       required: true,
       disabledValidation: true,
@@ -236,17 +232,14 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
             validate={(values) => {
               // custom validation to check all fields are valid
               const ranges: any = [];
-              (values || []).forEach((item: any, index: number) => {
+              (values || []).forEach((item: any) => {
                 const errors: any = {};
                 Object.keys(item).forEach((key: any) => {
                   const error = required(item[key]);
                   if (error) {
-                    errors[key] = error + rangesFieldConfigs[key]?.label?.toLowerCase();
+                    errors[key] = error;
                   }
                 });
-                if (!errors.maxRange && Number(values[index]?.minRange) >= Number(values[index]?.maxRange)) {
-                  errors.maxRange = 'Max value should be greater than min value';
-                }
                 ranges.push(Object.keys(errors).length ? errors : null);
               });
               if (ranges.every((element: any) => element === null)) {
