@@ -17,6 +17,7 @@ export const PROTECTED_ROUTES = {
   createHealthFacility: '/region/:regionId/healthFacility/create',
   usersBySuperAdmin: '/region/:regionId/users/list',
   usersByAdmin: '/users/list',
+  adminBySuperAdmin: '/region/:regionId/admin/list',
   medicationByRegion: '/region/:regionId/medication/list',
   createMedication: '/region/:regionId/medication/create',
   labtestList: '/region/:regionId/:tenantId/lab-test',

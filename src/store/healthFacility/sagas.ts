@@ -241,8 +241,9 @@ export function* fetchHFUserList({
   skip,
   limit,
   searchTerm,
-  userBased,
-  tenantBased,
+  roleNames,
+  siteUsers,
+  tenantIds,
   successCb,
   failureCb
 }: IFetchHFUserListRequest): SagaIterator {
@@ -255,8 +256,9 @@ export function* fetchHFUserList({
       limit,
       skip,
       searchTerm,
-      userBased,
-      tenantBased
+      roleNames,
+      siteUsers,
+      tenantIds
     });
     const payload = { users: hfUsers || [], total, limit };
     yield put(fetchHFUserListSuccess(payload));
@@ -393,16 +395,18 @@ export function* fetchVillagesListSagaRequest({
   Worker Saga: Fired on FETCH_VILLAGES_LIST_FOR_HF_REQUEST action
 */
 export function* fetchVillagesListFromHFSagaRequest({
-  tenantIds,
+  countryId,
+  countyId,
+  subCountyId,
   successCb,
   failureCb
 }: IFetchVillagesListFromHFRequest): SagaIterator {
   try {
     const {
       data: { entity: list }
-    } = yield call(hfService.fetchVillagesListfromHF as any, tenantIds);
-    successCb?.({ list, hfTenantIds: tenantIds });
-    yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: tenantIds } }));
+    } = yield call(hfService.fetchVillagesList as any, countryId, countyId, subCountyId);
+    successCb?.({ list, hfTenantIds: [countryId] });
+    yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: [countryId] } }));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -470,9 +474,7 @@ export function* peerSupervisorValidationSagaRequest({
   failureCb
 }: IPeerSupervisorValidation): SagaIterator {
   try {
-    const {
-      data
-    } = yield call(hfService.peerSupervisorValidation as any, { ids, tenantId });
+    const { data } = yield call(hfService.peerSupervisorValidation as any, { ids, tenantId });
     successCb?.(data);
   } catch (e) {
     if (e instanceof Error) {

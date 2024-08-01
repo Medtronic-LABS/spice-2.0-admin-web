@@ -12,19 +12,22 @@ import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
+import { columnDef } from './userListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
-import { emailSelector, roleSelector, userDataSelector } from '../../store/user/selectors';
+import { emailSelector, roleSelector, userDataSelector, userRolesSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
   deleteHFUserRequest,
+  fetchHFListRequest,
   fetchHFUserListRequest,
   fetchUserDetailRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
+  healthFacilityListSelector,
   healthFacilityListUsersTotalSelector,
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
@@ -34,15 +37,13 @@ import {
 import { IRoles } from '../../store/user/types';
 import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
-import { changePassword } from '../../store/user/actions';
+import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 
 interface IMatchParams {
   tenantId: string;
 }
 
-interface IMatchProps extends RouteComponentProps<IMatchParams> {}
-
-const UserList = (props: IMatchProps): React.ReactElement => {
+const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -50,29 +51,33 @@ const UserList = (props: IMatchProps): React.ReactElement => {
   const regionData = useSelector(userDataSelector).country;
   const role = useSelector(roleSelector);
   const email = useSelector(emailSelector);
+  const rolesGrouped = useSelector(userRolesSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
   const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
-
+  const healthFacilityList = useSelector(healthFacilityListSelector);
+  const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
+
   const refreshHFUserList = useCallback(
-    () =>
+    (selectedIds?:{roleNameList: string[], facilityTenantIds: string[]}) =>
       dispatch(
         fetchHFUserListRequest({
           countryId: regionData.id,
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
-          userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
-          tenantBased: false,
+          roleNames: selectedIds?.roleNameList || [],
+          siteUsers: true,
+          tenantIds: selectedIds?.facilityTenantIds || [],
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
           }
         })
       ),
-    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id, role]
+    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]
   );
 
   useEffect(() => {
@@ -82,6 +87,17 @@ const UserList = (props: IMatchProps): React.ReactElement => {
       dispatch(clearVillageHFList());
     };
   }, [dispatch, refreshHFUserList]);
+
+  useEffect(() => {
+    if (!rolesGrouped?.hasOwnProperty('SPICE')) {
+      dispatch(
+        fetchUserRolesAction({
+          countryId: regionData.id,
+          failureCb: (_) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR)
+        })
+      );
+    }
+  }, [regionData.id, dispatch, rolesGrouped]);
 
   const handleUserDelete = useCallback(
     ({ data: { id, organizations = [] } }: { data: { id: number; organizations: any[] } }) => {
@@ -205,13 +221,6 @@ const UserList = (props: IMatchProps): React.ReactElement => {
     [isOpenUserModal.isEdit, onSubmitHandler, regionData.id, siteUserSuccess, tenantId]
   );
 
-  const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
-
-  const formatRoles = (user: IHFUserGet) =>
-    `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
-
-  const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(', ')}`;
-
   const userFormRenderer = (form?: FormApi<any>) => {
     return (
       <UserForm
@@ -222,6 +231,7 @@ const UserList = (props: IMatchProps): React.ReactElement => {
         countryId={regionData.id}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
+        isSiteUser={true}
       />
     );
   };
@@ -255,6 +265,31 @@ const UserList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
+  const requestFailure = (e: Error, errorMessage: string) =>
+    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, errorMessage));
+
+  const fetchList = useCallback(() => {
+    dispatch(
+      fetchHFListRequest({
+        countryId: regionData.id,
+        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+        limit: -1,
+        searchTerm: listParams.searchTerm,
+        userBased: !isSuperUser,
+        failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
+      })
+    );
+  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+
+  const onFilter = (selectedIds: any) => {
+    refreshHFUserList(selectedIds);
+  }
+
+  useEffect(() => {
+    fetchList();
+  }, [listParams, dispatch, fetchList]);
+
+  const roletest = rolesGrouped?.SPICE?.filter((data: { suiteAccessName: string }) => data.suiteAccessName !== 'admin');
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
@@ -266,45 +301,16 @@ const UserList = (props: IMatchProps): React.ReactElement => {
           onSearch={handleSearch}
           searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
           onButtonClick={handleAddUserClick}
+          onFilter={onFilter}
+          isFilter={true}
+          onFilterData={[
+            { name: 'Filter by Facility', isFacility: true, isSearchable: true, data: healthFacilityList },
+            { name: 'Filter by Role', isFacility: false, isSearchable: false, data: roletest }
+          ]}
         >
           <CustomTable
             rowData={hfUserList}
-            columnsDef={[
-              {
-                id: 1,
-                name: 'name',
-                label: 'Name',
-                width: '20%',
-                cellFormatter: formatName
-              },
-              {
-                id: 2,
-                name: 'role',
-                label: 'ROLE',
-                width: '20%',
-                cellFormatter: formatRoles
-              },
-              {
-                id: 3,
-                name: 'healthFacility',
-                label: 'HEALTH FACILITY',
-                width: '20%',
-                cellFormatter: formatHealthFacility
-              },
-              {
-                id: 4,
-                name: 'gender',
-                label: 'GENDER',
-                width: '10%'
-              },
-              {
-                id: 5,
-                name: 'phoneNumber',
-                label: 'CONTACT NUMBER',
-                width: '18%',
-                cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
-              }
-            ]}
+            columnsDef={columnDef}
             isDelete={true}
             isEdit={true}
             onRowEdit={openEditModal}

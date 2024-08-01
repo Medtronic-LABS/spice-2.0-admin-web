@@ -80,7 +80,7 @@ test('roleSelector should return role from state', () => {
 
 // Test userRolesSelector
 test('userRolesSelector should return userRoles from state', () => {
-  expect(userRolesSelector(initialState)).toEqual(initialState.user.userRoles);
+  expect(userRolesSelector(initialState)).toEqual(initialState.user?.userRoles);
 });
 
 // Test showLoaderSelector

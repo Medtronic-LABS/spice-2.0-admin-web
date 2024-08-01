@@ -83,22 +83,25 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
   return postData;
 };
 
-export const formatHFUserData = (userData: any[], countryId: number | string, tenantId?: number | string) =>
-  userData.map((user: any) => ({
+export const formatHFUserData = (userData: any[], countryId: number | string, tenantId?: number | string) => {
+  return userData.map((user: any) => ({
     id: Number(user?.id),
     firstName: user.firstName,
     lastName: user.lastName,
     gender: user.gender,
     username: user.username,
     phoneNumber: user.phoneNumber,
+    culture: user.culture,
     countryCode: user.country.phoneNumberCode || user.countryCode,
     country: { id: Number(countryId) },
     tenantId: user?.healthFacility?.tenantId ? Number(user.healthFacility.tenantId) : Number(tenantId) || user.tenantId,
     supervisorId: Number(user.supervisor?.id),
-    roleIds: Array.isArray(user.roles) ? (user.roles || []).map(({ id }: { id: any }) => id) : [user.roles.id],
-    villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id)
+    roleIds: Array.isArray(user.role) ? (user.role || []).map(({ id }: { id: any }) => id) : [user.role.id],
+    villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
+    village: user?.village,
+    timezone: user?.timezone
   }));
-
+};
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { healthFacilityId, hfTenantId } = useParams<IMatchParams>();

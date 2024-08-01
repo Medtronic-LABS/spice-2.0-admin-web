@@ -132,3 +132,10 @@ export const fetchLockedUsers = (
       ...(search ? { searchTerm: search } : {})
     }
   });
+
+export const fetchCommunityListRequest = (countryId: number) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/community-units',
+    data: { countryId }
+  });

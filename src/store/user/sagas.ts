@@ -178,8 +178,8 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
     const updatedUserRoles = {
       ...userRoles,
       SPICE: [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
-        ? userRoles.SPICE
-        : userRoles.SPICE.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
+        ? userRoles?.SPICE
+        : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
     };
     successCb?.(updatedUserRoles);
     yield put(userActions.fetchUserRolesActionSuccess(updatedUserRoles));
@@ -348,6 +348,21 @@ export function* fetchTimezoneList(): SagaIterator {
 }
 
 /*
+  Worker Saga: Fired on FETCH_TIMEZONE_LIST_REQUEST action
+*/
+export function* fetchCommunityListRequest(action: IActionProps): SagaIterator {
+  const { countryId, successCB, failureCB } = action;
+  try {
+    const {data: entityList}  = yield call(userService.fetchCommunityListRequest, countryId);
+    yield put(userActions.fetchCommunityListSuccess(entityList));
+    successCB?.(entityList);
+  } catch (e) {
+    failureCB?.(e);
+    yield put(userActions.fetchCommunityListFailure());
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
@@ -365,6 +380,7 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.CHANGE_OWN_PASSWORD_REQUEST, updatePassword)]);
   yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
   yield all([takeLatest(USERTYPES.FETCH_LOCKED_USERS_REQUEST, fetchLockedUsers)]);
+  yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST, fetchCommunityListRequest)]);
 }
 
 export default userSaga;

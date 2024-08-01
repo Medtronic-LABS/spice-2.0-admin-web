@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
+import { IHealthFacility } from './types';
 
 const getHealthFacility = (state: AppState) => state.healthFacility.healthFacility;
 const getLoading = (state: AppState) => state.healthFacility.loading;
@@ -39,6 +40,7 @@ export const hfTypesSelector = createSelector(getHFTypes, (types) => types);
 export const hfTypesLoadingSelector = createSelector(getHFTYpesLoading, (loading) => loading);
 export const healthFacilityListTotalSelector = createSelector(getHFTotal, (total) => total);
 export const healthFacilityListSelector = createSelector(getHFListDetails, (hfList) => hfList);
+
 export const healthFacilityUserListSelector = createSelector(getHFUserList, (siteUserList) => siteUserList);
 export const healthFacilityUsersLoadingSelector = createSelector(getHFUserLoading, (hfUsersLoading) => hfUsersLoading);
 export const healthFacilityListUsersTotalSelector = createSelector(getHFUsersTotal, (total) => total);

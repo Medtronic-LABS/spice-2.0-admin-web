@@ -1,3 +1,4 @@
+import { FormApi } from 'final-form';
 import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -5,6 +6,39 @@ import { IPeerSupervisor, IUserRole, IVillages } from '../healthFacility/types';
 import * as USER_TYPES from './actionTypes';
 
 export type roleType = (typeof APPCONSTANTS.ROLES)[keyof typeof APPCONSTANTS.ROLES];
+
+export interface IUserFormProps {
+  form: FormApi<any>;
+  initialEditValue?: any;
+  disableOptions?: boolean;
+  isProfile?: boolean;
+  isEdit?: boolean;
+  isHF?: boolean;
+  isHFCreate?: boolean;
+  isRegionUser?: boolean;
+  account?: { id: string; tenantId: string };
+  isDropdownDisable?: boolean;
+  entityName?: string;
+  enableAutoPopulate?: boolean;
+  data?: any[];
+  countryId: number;
+  hfTenantId?: number;
+  autoFetchedDataState?: { autoFetchData: any[]; setAutoFetchData: React.Dispatch<React.SetStateAction<any[]>> };
+  autoFetchedState?: { autoFetch: any[]; setAutoFetchState: React.Dispatch<React.SetStateAction<boolean[]>> };
+  chwState?: { isCHAUser: boolean[]; setUserAsCHW: React.Dispatch<React.SetStateAction<boolean[]>> };
+  disabledRolesState?: {
+    disabledRoles: IRoles[][];
+    setDisabledRoles: React.Dispatch<React.SetStateAction<IRoles[][]>>;
+  };
+  mandatoryRolesState?: {
+    mandatoryRoles: IRoles[][];
+    setMandatoryRoles: React.Dispatch<React.SetStateAction<IRoles[][]>>;
+  };
+
+  roleOptionsState?: React.MutableRefObject<IRoles[][]>;
+  isSiteUser?: boolean;
+}
+
 export interface IUser {
   userId: string;
   email: string;
@@ -35,10 +69,10 @@ export interface IUserDetail {
 export interface IUpdateUserDetail
   extends Omit<IUserDetail, 'username' | 'email' | 'roles' | 'villages' | 'supervisor'> {}
 
-  export interface IUserDetails extends Omit<IUserDetail, 'timezone'> {
-    timezone: string;
-    cultureId?: number;
-  }
+export interface IUserDetails extends Omit<IUserDetail, 'timezone'> {
+  timezone: string;
+  cultureId?: number;
+}
 export interface IEditUserDetail extends IUserDetail {
   country?: ICountry;
 }
@@ -68,6 +102,7 @@ export interface IUserState {
   showLoader: boolean;
   token: string;
   userTenantId: string;
+  communityList: [];
 }
 
 export type ILoginSuccessPayload = IUser;
@@ -380,7 +415,6 @@ export interface IUserState {
   cultureList?: ICulture[];
 }
 
-
 export interface ILoginFailurePayload {
   error: string;
 }
@@ -641,6 +675,9 @@ export interface IFetchCultureListRequest {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_REQUEST;
 }
 
+export interface IFetchCommunityList {
+  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST;
+}
 export interface IFetchCultureListSuccess {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_SUCCESS;
   payload: IFetchCultureListSuccessPayload;
@@ -670,11 +707,20 @@ export interface ILockedUsers {
   email: string;
 }
 
+export interface ICommunity {
+  id: string;
+  name: string;
+}
+
 export interface IFetchLockedUsersPayload {
   lockedUsers: ILockedUsers[];
   totalCount: number;
 }
 
+export interface IFetchCommunityListPayload {
+  entityList: ICommunity[];
+  totalCount: number;
+}
 export interface IFetchLockedUsersRequest {
   type: typeof USER_TYPES.FETCH_LOCKED_USERS_REQUEST;
   skip: number;
@@ -686,6 +732,13 @@ export interface IFetchLockedUsersRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IFetchCommunityList {
+  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST;
+  countryId: number;
+  search?: string
+  successCb?: (payload: IFetchCommunityListPayload) => void;
+  failureCb?: (error: Error) => void;
+}
 export interface IFetchLockedUsersSuccess {
   type: typeof USER_TYPES.FETCH_LOCKED_USERS_SUCCESS;
   payload: IFetchLockedUsersPayload;
@@ -710,77 +763,77 @@ export interface IUnlockUsersFailure {
   type: typeof USER_TYPES.UNLOCK_USERS_FAILURE;
 }
 
-
 export type UserActions =
-| ILoginRequest
-| ILoginSuccess
-| ILoginFailure
-| ILogoutRequest
-| ILogoutSuccess
-| ILogoutFailure
-| ILoginRequestPayload
-| IFetchLoggedInUserRequest
-| IFetchLoggedInUserSuccess
-| IFetchLoggedInUserFailure
-| ISessionTimeout
-| IResetStore
-| IAddToken
-| IAddUserTenantId
-| IRemoveToken
-| IFetchUserRolesRequest
-| IFetchUserRolesSuccess
-| IFetchUserRolesFailure
-| IFetchUserByIdRequest
-| IFetchUserByIdSuccess
-| IFetchUserByIdFailure
-| IUpdateUserRequest
-| IUpdateUserSuccess
-| IUpdateUserFailure
-| IChangePasswordReq
-| IChangePasswordSuccess
-| IChangePasswordFail
-| IChangeOwnPasswordReq
-| IChangeOwnPasswordSuccess
-| IChangeOwnPasswordFail
-| IForgotPasswordReq
-| IForgotPasswordSuccess
-| IForgotPasswordFailure
-| IResetPasswordReq
-| IResetPasswordSuccess
-| IResetPasswordFail
-| IGetUserNameReq
-| IGetUserNameSuccess
-| IGetUserNameFail
-| ICreatePasswordReq
-| ICreatePasswordSuccess
-| ICreatePasswordFail
-| IFetchTimezoneListRequest
-| IFetchTimezoneListSuccess
-| IFetchTimezoneListFailure
-| IFetchUserByEmail
-| IFetchUserByEmailSuccess
-| IFetchUserByEmailFail
-| IFetchCultureListRequest
-| IFetchCultureListSuccess
-| IFetchCultureListFailure
-| IFetchCountryListRequest
-| IFetchCountryListSuccess
-| IFetchCountryListFailure
-| IRemoveUserTenantId
-| IFetchLockedUsersRequest
-| IFetchLockedUsersSuccess
-| IFetchLockedUsersFailure
-| IUnlockUsersRequest
-| IUnlockUsersSuccess
-| IUnlockUsersFailure
-| IUpdatePasswordReq
-| IUpdatePasswordSuccess
-| IUpdatePasswordFail
-| ILoginRequestPayload
-| IFetchCultureListSuccessPayload
-| IFetchTimezoneListSuccessPayload
-| IFetchTimezoneListSuccessPayload
-| IFetchLockedUsersPayload
-| IFetchCountryListSuccessPayload
-| ILoginSuccessPayload
-| IGroupRoles;
+  | ILoginRequest
+  | ILoginSuccess
+  | ILoginFailure
+  | ILogoutRequest
+  | ILogoutSuccess
+  | ILogoutFailure
+  | ILoginRequestPayload
+  | IFetchLoggedInUserRequest
+  | IFetchLoggedInUserSuccess
+  | IFetchLoggedInUserFailure
+  | ISessionTimeout
+  | IResetStore
+  | IAddToken
+  | IAddUserTenantId
+  | IRemoveToken
+  | IFetchUserRolesRequest
+  | IFetchUserRolesSuccess
+  | IFetchUserRolesFailure
+  | IFetchUserByIdRequest
+  | IFetchUserByIdSuccess
+  | IFetchUserByIdFailure
+  | IUpdateUserRequest
+  | IUpdateUserSuccess
+  | IUpdateUserFailure
+  | IChangePasswordReq
+  | IChangePasswordSuccess
+  | IChangePasswordFail
+  | IChangeOwnPasswordReq
+  | IChangeOwnPasswordSuccess
+  | IChangeOwnPasswordFail
+  | IForgotPasswordReq
+  | IForgotPasswordSuccess
+  | IForgotPasswordFailure
+  | IResetPasswordReq
+  | IResetPasswordSuccess
+  | IResetPasswordFail
+  | IGetUserNameReq
+  | IGetUserNameSuccess
+  | IGetUserNameFail
+  | ICreatePasswordReq
+  | ICreatePasswordSuccess
+  | ICreatePasswordFail
+  | IFetchTimezoneListRequest
+  | IFetchTimezoneListSuccess
+  | IFetchTimezoneListFailure
+  | IFetchUserByEmail
+  | IFetchUserByEmailSuccess
+  | IFetchUserByEmailFail
+  | IFetchCultureListRequest
+  | IFetchCultureListSuccess
+  | IFetchCultureListFailure
+  | IFetchCommunityList
+  | IFetchCountryListRequest
+  | IFetchCountryListSuccess
+  | IFetchCountryListFailure
+  | IRemoveUserTenantId
+  | IFetchLockedUsersRequest
+  | IFetchLockedUsersSuccess
+  | IFetchLockedUsersFailure
+  | IUnlockUsersRequest
+  | IUnlockUsersSuccess
+  | IUnlockUsersFailure
+  | IUpdatePasswordReq
+  | IUpdatePasswordSuccess
+  | IUpdatePasswordFail
+  | ILoginRequestPayload
+  | IFetchCultureListSuccessPayload
+  | IFetchTimezoneListSuccessPayload
+  | IFetchTimezoneListSuccessPayload
+  | IFetchLockedUsersPayload
+  | IFetchCountryListSuccessPayload
+  | ILoginSuccessPayload
+  | IGroupRoles;

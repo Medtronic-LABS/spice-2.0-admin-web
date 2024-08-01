@@ -304,12 +304,12 @@ export const updateHFUserFailure = (error: Error): IUpdateHFUserFailure => ({
 
 export const fetchHFUserListRequest = ({
   countryId,
-  tenantId,
   skip,
   limit,
   searchTerm,
-  userBased,
-  tenantBased,
+  roleNames,
+  siteUsers,
+  tenantIds,
   successCb,
   failureCb
 }: Omit<IFetchHFUserListRequest, 'type'>): IFetchHFUserListRequest => ({
@@ -317,10 +317,10 @@ export const fetchHFUserListRequest = ({
   skip,
   limit,
   countryId,
-  tenantId,
   searchTerm,
-  userBased,
-  tenantBased,
+  roleNames,
+  siteUsers,
+  tenantIds,
   successCb,
   failureCb
 });
@@ -429,12 +429,16 @@ export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailur
 
 // VILLAGES LIST FROM HF
 export const fetchVillagesListFromHFRequest = ({
-  tenantIds,
+  countryId,
+  countyId,
+  subCountyId,
   successCb,
   failureCb
 }: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
-  tenantIds,
+  countryId,
+  countyId,
+  subCountyId,
   successCb,
   failureCb
 });
@@ -456,12 +460,14 @@ export const fetchPeerSupervisorListRequest = ({
   tenantIds,
   successCb,
   failureCb
-}: Omit<IFetchPeerSupervisorListRequest, 'type'>): IFetchPeerSupervisorListRequest => ({
-  type: HF_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
-  tenantIds,
-  successCb,
-  failureCb
-});
+}: Omit<IFetchPeerSupervisorListRequest, 'type'>): IFetchPeerSupervisorListRequest => {
+  return {
+    type: HF_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
+    tenantIds,
+    successCb,
+    failureCb
+  };
+};
 
 export const fetchPeerSupervisorListSuccess = (payload: {
   data: { list: IPeerSupervisor[]; hfTenantIds: number[] };

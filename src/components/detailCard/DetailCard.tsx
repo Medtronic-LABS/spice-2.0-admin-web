@@ -1,16 +1,16 @@
 import React from 'react';
-
 import APPCONSTANTS from '../../constants/appConstants';
 import IconButton from '../button/IconButton';
 import Searchbar from '../searchbar/Searchbar';
 import CustomTooltip from '../tooltip';
 import styles from './DetailCard.module.scss';
+import Filter from '../filter/Filter';
 
 interface IDetailCardProps {
   header: string;
   buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-  buttonCustomStyle?: any;
-  buttonCustomClass?: any;
+  buttonCustomStyle?: React.CSSProperties;
+  buttonCustomClass?: string;
   buttonLabel?: string;
   customLabel?: string;
   customIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -22,13 +22,23 @@ interface IDetailCardProps {
   isSearch?: boolean;
   onButtonClick?: () => void;
   onCustomClick?: (data: any) => void;
+  isFilter?: boolean;
+  onFilterData?: IFilteredData[];
   className?: string;
   bodyClassName?: string;
+  onFilter?: (selectedIds: {roleNameList: string[], facilityTenantIds: string[]}) => void;
+}
+
+interface IFilteredData {
+  name: string;
+  isSearchable: boolean;
+  isFacility: boolean;
+  data: any[];
 }
 
 /**
  * The component for card detail with searchbar and button.
- * @param param
+ * @param param0 - Props for the DetailCard component.
  * @returns React.ReactElement
  */
 const DetailCard = ({
@@ -47,22 +57,42 @@ const DetailCard = ({
   isSearch = false,
   onButtonClick,
   onCustomClick,
+  isFilter,
+  onFilterData,
   className = '',
-  bodyClassName = ''
+  bodyClassName = '',
+  onFilter
 }: IDetailCardProps): React.ReactElement => {
   const buttonClass = `${buttonLabel && onButtonClick ? 'me-1 mt-1' : 'mt-0'} mt-lg-0`;
-  const searchClass = `${isSearch ? 'mt-1' : ''}  mt-lg-0`;
+  const searchClass = `${isSearch ? 'mt-1' : ''} mt-lg-0`;
 
+  /**
+   * Renders the search bar if isSearch is true and onSearch is provided.
+   * @returns React.ReactElement | null
+   */
   const renderSearchBar = () => {
     return isSearch && onSearch ? (
       <div className={buttonClass}>
         <Searchbar placeholder={searchPlaceholder} onSearch={onSearch} />
       </div>
-    ) : (
-      <span />
-    );
+    ) : null;
   };
 
+  /**
+   * Renders the filter component if isFilter is true.
+   * @param filteredData - Data for the filter component.
+   * @returns React.ReactElement | null
+   */
+  const renderFilter = (isFacility: boolean, filteredData: IFilteredData) => {
+    return isFilter && onFilter ? (
+      <Filter filterData={filteredData} onFilter={onFilter} isFacility={isFacility} />
+    ) : null;
+  };
+
+  /**
+   * Renders the custom icon if customLabel and onCustomClick are provided.
+   * @returns React.ReactElement | null
+   */
   const renderCustomIcon = () => {
     return customLabel && onCustomClick ? (
       <div className={`${customIcon ? styles.customIcon : searchClass} me-1`} onClick={onCustomClick}>
@@ -95,10 +125,11 @@ const DetailCard = ({
           }  ${isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'} flex-grow-md-0`}
         >
           {renderSearchBar()}
+          {onFilterData?.map((data: IFilteredData) => data.data && renderFilter(data.isFacility, data))}
           <div className='d-flex'>
             {renderCustomIcon()}
             {buttonLabel && onButtonClick ? (
-              <div className={searchClass}>
+              <div className={`${searchClass}`}>
                 <IconButton customIcon={buttonIcon} label={buttonLabel} isEdit={isEdit} handleClick={onButtonClick} />
               </div>
             ) : null}

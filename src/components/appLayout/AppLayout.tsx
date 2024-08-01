@@ -21,6 +21,7 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin },
   { route: PROTECTED_ROUTES.usersByAdmin },
   { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.adminBySuperAdmin },
   { route: PROTECTED_ROUTES.OUByRegion },
   { route: PROTECTED_ROUTES.OUByAccount },
 
@@ -152,13 +153,7 @@ export const AppLayout = ({ children }: IAppLayout) => {
     <div className={`position-relative ${pyChange} ${styles.layout} ${pxForSideMenu} d-flex justify-content-center`}>
       {!initializingApp && (
         <div className={`px-md-3 px-1  ${styles.contentCenter}`}>
-          {header(
-            isBreadcrumbDisabled,
-            isMenuTogglable,
-            isSideMenuDisabled,
-            isStyleVisible,
-            setIsMenuVisible
-          )}
+          {header(isBreadcrumbDisabled, isMenuTogglable, isSideMenuDisabled, isStyleVisible, setIsMenuVisible)}
           <div className={`row gx-1dot25 ${styles.body}`}>
             {!isSideMenuDisabled && (
               <div className={`col-auto ${styles.sidemenu} ${isMenuTogglable && styles.togglable} ${isStyleVisible}`}>

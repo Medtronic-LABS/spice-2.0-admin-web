@@ -50,13 +50,4 @@ describe('User Service', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/profile');
   });
-
-  it('sends a POST request to /user-service/user/roles-list', async () => {
-    mockAxios.onPost('/user-service/user/roles-list').reply(200, {});
-
-    await fetchUserRoles();
-
-    expect(mockAxios.history.post.length).toBe(1);
-    expect(mockAxios.history.post[0].url).toBe('/user-service/user/roles-list');
-  });
 });

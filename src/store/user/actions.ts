@@ -14,7 +14,6 @@ import {
   IFetchUserByIdRequest,
   IFetchUserByIdSuccess,
   IFetchUserByIdFailure,
-  IUpdateUserRequest,
   IUpdateUserSuccess,
   IUpdateUserFailure,
   IChangePasswordReq,
@@ -56,7 +55,9 @@ import {
   IFetchCountryListSuccessPayload,
   ILoginSuccessPayload,
   IUser,
-  IGroupRoles
+  IGroupRoles,
+  IFetchCommunityListPayload,
+  IFetchCommunityList
 } from './types';
 
 export const loginRequest = ({
@@ -163,12 +164,14 @@ export const fetchUserRolesAction = ({
   countryId: number;
   successCb?: (payload: IGroupRoles) => void;
   failureCb?: (error: Error) => void;
-}): IFetchUserRolesRequest => ({
-  type: USER_TYPES.FETCH_USER_ROLES_REQUEST,
-  countryId,
-  successCb,
-  failureCb
-});
+}): IFetchUserRolesRequest => {
+  return {
+    type: USER_TYPES.FETCH_USER_ROLES_REQUEST,
+    countryId,
+    successCb,
+    failureCb
+  };
+};
 
 export const fetchUserRolesActionSuccess = (payload: IGroupRoles): IFetchUserRolesSuccess => ({
   type: USER_TYPES.FETCH_USER_ROLES_SUCCESS,
@@ -201,11 +204,7 @@ export const fetchUserByIdFailure = (): IFetchUserByIdFailure => ({
   type: USER_TYPES.FETCH_USER_BY_ID_FAILURE
 });
 
-export const updateUserRequest = ({
-  payload,
-  successCb,
-  failureCb
-}: Omit<any, 'type'>): any => ({
+export const updateUserRequest = ({ payload, successCb, failureCb }: Omit<any, 'type'>): any => ({
   type: USER_TYPES.UPDATE_USER_REQUEST,
   payload,
   successCb,
@@ -381,6 +380,32 @@ export const fetchCultureListSuccess = (payload: IFetchCultureListSuccessPayload
 
 export const fetchCultureListFailure = () => ({
   type: USER_TYPES.FETCH_CULTURE_LIST_FAILURE
+});
+export const fetchCommunityListRequest = ({
+  countryId,
+  search,
+  successCb,
+  failureCb
+}: {
+  countryId: number;
+  search?: string;
+  successCb?: (payload: any) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchCommunityList => ({
+  type: USER_TYPES.FETCH_COMMUNITY_LIST,
+  countryId,
+  search,
+  successCb,
+  failureCb
+});
+
+export const fetchCommunityListSuccess = (payload: IFetchCommunityListPayload) => ({
+  type: USER_TYPES.FETCH_COMMUNITY_LIST_SUCCESS,
+  payload
+});
+
+export const fetchCommunityListFailure = () => ({
+  type: USER_TYPES.FETCH_COMMUNITY_LIST_FAILURE
 });
 
 export const fetchTimezoneListSuccess = (payload: IFetchTimezoneListSuccessPayload) => ({
