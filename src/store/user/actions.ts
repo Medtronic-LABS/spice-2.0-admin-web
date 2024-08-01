@@ -55,7 +55,9 @@ import {
   IFetchCountryListSuccessPayload,
   ILoginSuccessPayload,
   IUser,
-  IGroupRoles
+  IGroupRoles,
+  IFetchCommunityListPayload,
+  IFetchCommunityList
 } from './types';
 
 export const loginRequest = ({
@@ -370,6 +372,32 @@ export const fetchCultureListSuccess = (payload: IFetchCultureListSuccessPayload
 
 export const fetchCultureListFailure = () => ({
   type: USER_TYPES.FETCH_CULTURE_LIST_FAILURE
+});
+export const fetchCommunityListRequest = ({
+  countryId,
+  search,
+  successCb,
+  failureCb
+}: {
+  countryId: number;
+  search?: string;
+  successCb?: (payload: any) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchCommunityList => ({
+  type: USER_TYPES.FETCH_COMMUNITY_LIST,
+  countryId,
+  search,
+  successCb,
+  failureCb
+});
+
+export const fetchCommunityListSuccess = (payload: IFetchCommunityListPayload) => ({
+  type: USER_TYPES.FETCH_COMMUNITY_LIST_SUCCESS,
+  payload
+});
+
+export const fetchCommunityListFailure = () => ({
+  type: USER_TYPES.FETCH_COMMUNITY_LIST_FAILURE
 });
 
 export const fetchTimezoneListSuccess = (payload: IFetchTimezoneListSuccessPayload) => ({

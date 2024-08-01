@@ -16,12 +16,11 @@ export const DynamicCHForm = ({
   isError,
   isChaUser,
   isChpUser,
-  communityList,
-  isHFCreate
+  communityList
 }: any) => {
   return (
     <>
-      {isChpUser && !isHFCreate && (
+      {isChpUser && (
         <>
           <div className='col-sm-6 col-12'>
             <Field
@@ -32,8 +31,8 @@ export const DynamicCHForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label='Community health assistant'
-                  errorLabel='Community health assistant'
+                  label='Select Peer Supervisor'
+                  errorLabel='select peer supervisor'
                   labelKey='name'
                   valueKey='id'
                   disabled={isProfile}

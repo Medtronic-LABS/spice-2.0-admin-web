@@ -1,16 +1,19 @@
 import { useCallback } from 'react';
 import { IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
-import APPCONSTANTS from '../../constants/appConstants';
 
 const useUserFormUtils = () => {
-  const { mobileRoles, isCHPRole, isHFAdminRole } = UserFormMeta();
+  const { mobileRoles, isCHPRole } = UserFormMeta();
   const isCHASelected = useCallback(
-    (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
+    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
     [mobileRoles]
   );
 
   const isCHPSelected = useCallback(
+    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
+    [isCHPRole]
+  );
+  const isCountySelected = useCallback(
     (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
     [isCHPRole]
   );
@@ -28,29 +31,7 @@ const useUserFormUtils = () => {
       input.onChange(v);
     }
   };
-
-  const getSuiteAccessList = (rolesGrouped: any) =>
-    Object.keys(rolesGrouped || {})
-      .map((userRole: any) => ({
-        groupName: userRole,
-        id: userRole,
-        isFixed: APPCONSTANTS.spiceRole.spiceInsights !== userRole
-      }))
-      .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
-
-  const isHFAdminSelected = useCallback(
-    (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => isHFAdminRole.includes(userRole.name)),
-    [isHFAdminRole]
-  );
-  return {
-    isCHASelected,
-    isCHPSelected,
-    isRoleExists,
-    disableSiteRoles,
-    siteRolesChange,
-    getSuiteAccessList,
-    isHFAdminSelected
-  };
+  return { isCHASelected, isCHPSelected, isRoleExists, disableSiteRoles, siteRolesChange };
 };
 
 export default useUserFormUtils;

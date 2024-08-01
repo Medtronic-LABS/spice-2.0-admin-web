@@ -217,6 +217,7 @@ export interface IUserRole {
   displayName?: string;
   groupName?: string;
   suiteAccessName?: string;
+  suiteAccessName?: string;
 }
 
 export interface IHFUserPost {
@@ -230,13 +231,10 @@ export interface IHFUserPost {
   countryCode?: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
-  district?: string | number;
-  chiefdom?: string;
   village?: string;
   supervisorId?: number;
   villageIds?: number[];
   timezone?: { id: number };
-  redRisk?: boolean;
 }
 
 export interface IOptionsResponse {
@@ -450,7 +448,7 @@ export interface IFetchHFUserListRequest {
   userBased?: boolean;
   tenantBased?: boolean;
   roleNames?: string[];
-  isSiteUsers?: boolean | null;
+  siteUsers?: boolean;
   tenantIds?: string[];
   successCb?: (data: IHFUserGet[], total: number) => void;
   failureCb?: (error: Error) => void;
@@ -604,16 +602,8 @@ export interface IFetchUnlinkedVillagesFailure {
 export interface IFetchVillagesListFromHFRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
   countryId: number;
-  districtId: number;
-  chiefdomId: number;
-  successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IFetchVillagesListUserLinked {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED;
-  tenantIds: number[];
-  userId?: number;
+  countyId: number;
+  subCountyId: number;
   successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
   failureCb?: (error: Error) => void;
 }

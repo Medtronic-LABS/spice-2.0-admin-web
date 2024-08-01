@@ -18,7 +18,7 @@ import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
 import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
-import CreateHealthFacility from './containers/createHealthFacility/CreateHealthFacility';
+import CreateHealthFacility from './containers/healthFacility/CreateHealthFacility';
 import MedicationList from './containers/medication/MedicationList';
 import AddMedication from './containers/medication/AddMedication';
 import MyProfile from './containers/myProfile/MyProfile';
@@ -30,6 +30,7 @@ import CreateAccount from './containers/createAccount/CreateAccount';
 import AccountSummary from './containers/account/AccountSummary';
 import AccountDashboard from './containers/account/AccountDashboard';
 import LockedUsers from './containers/lockedUsers/LockedUsers';
+import UserList from './containers/user/UserList';
 
 interface IRoute {
   path: string;
@@ -251,48 +252,6 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: UserList,
       authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.userByDistrict,
-      exact: true,
-      component: UserList,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.userByChiefdom,
-      exact: true,
-      component: UserList,
-      authorisedRoles: SU_SA_RA_DA
-    },
-    {
-      path: PROTECTED_ROUTES.userByHealthFacility,
-      exact: true,
-      component: UserList,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
-    },
-    {
-      path: PROTECTED_ROUTES.adminByRegion,
-      exact: true,
-      component: Admins,
-      authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.adminByDistrict,
-      exact: true,
-      component: Admins,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.adminByChiefdom,
-      exact: true,
-      component: Admins,
-      authorisedRoles: SU_SA_RA_DA
-    },
-    {
-      path: PROTECTED_ROUTES.adminByHealthFacility,
-      exact: true,
-      component: Admins,
-      authorisedRoles: SU_SA_RA_DA_CDA
     },
     {
       path: PROTECTED_ROUTES.createMedication,
