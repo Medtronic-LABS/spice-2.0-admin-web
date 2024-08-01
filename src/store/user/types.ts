@@ -1,3 +1,4 @@
+import { FormApi } from 'final-form';
 import { ISelectOption } from '../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -20,7 +21,7 @@ export interface IUserFormProps {
   entityName?: string;
   enableAutoPopulate?: boolean;
   data?: any[];
-  countryId?: number;
+  countryId: number;
   hfTenantId?: number;
   autoFetchedDataState?: { autoFetchData: any[]; setAutoFetchData: React.Dispatch<React.SetStateAction<any[]>> };
   autoFetchedState?: { autoFetch: any[]; setAutoFetchState: React.Dispatch<React.SetStateAction<boolean[]>> };
@@ -36,18 +37,6 @@ export interface IUserFormProps {
 
   roleOptionsState?: React.MutableRefObject<IRoles[][]>;
   isSiteUser?: boolean;
-  isAdminForm?: boolean;
-  defaultSelectedRole?: string;
-  isRegionCreate?: boolean;
-  parentOrgId?: string;
-  ignoreTenantId?: string;
-}
-
-export interface IOrganizations {
-  id: number;
-  name: string;
-  formName: string;
-  parentOrganizationId: number;
 }
 
 export interface IUser {
@@ -114,6 +103,7 @@ export interface IUserState {
   showLoader: boolean;
   token: string;
   userTenantId: string;
+  communityList: [];
   isResetPasswordLoading: boolean;
 }
 
@@ -681,6 +671,9 @@ export interface IFetchCultureListRequest {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_REQUEST;
 }
 
+export interface IFetchCommunityList {
+  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST;
+}
 export interface IFetchCultureListSuccess {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_SUCCESS;
   payload: IFetchCultureListSuccessPayload;
@@ -710,11 +703,20 @@ export interface ILockedUsers {
   email: string;
 }
 
+export interface ICommunity {
+  id: string;
+  name: string;
+}
+
 export interface IFetchLockedUsersPayload {
   lockedUsers: ILockedUsers[];
   totalCount: number;
 }
 
+export interface IFetchCommunityListPayload {
+  entityList: ICommunity[];
+  totalCount: number;
+}
 export interface IFetchLockedUsersRequest {
   type: typeof USER_TYPES.FETCH_LOCKED_USERS_REQUEST;
   skip: number;
@@ -726,6 +728,13 @@ export interface IFetchLockedUsersRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IFetchCommunityList {
+  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST;
+  countryId: number;
+  search?: string;
+  successCb?: (payload: IFetchCommunityListPayload) => void;
+  failureCb?: (error: Error) => void;
+}
 export interface IFetchLockedUsersSuccess {
   type: typeof USER_TYPES.FETCH_LOCKED_USERS_SUCCESS;
   payload: IFetchLockedUsersPayload;
@@ -802,6 +811,7 @@ export type UserActions =
   | IFetchCultureListRequest
   | IFetchCultureListSuccess
   | IFetchCultureListFailure
+  | IFetchCommunityList
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
   | IFetchCountryListFailure

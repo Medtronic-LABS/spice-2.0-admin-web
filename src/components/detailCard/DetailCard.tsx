@@ -1,10 +1,10 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
 import IconButton from '../button/IconButton';
 import Searchbar from '../searchbar/Searchbar';
 import CustomTooltip from '../tooltip';
 import styles from './DetailCard.module.scss';
-import Filter from '../tableFilter/Filter';
+import Filter from '../filter/Filter';
 
 // Type for the setter functions
 type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
@@ -26,19 +26,18 @@ interface IDetailCardProps {
   onCustomClick?: (data: any) => void;
   isFilter?: boolean;
   onFilterData?: IFilteredData[];
+  isFilter?: boolean;
+  onFilterData?: IFilteredData[];
   className?: string;
   bodyClassName?: string;
-  setSelectedRole?: SetSelectedState;
-  setSelectedFacility?: SetSelectedState;
+  onFilter?: (selectedIds: { roleNameList: string[]; facilityTenantIds: string[] }) => void;
 }
 
 interface IFilteredData {
-  id: number;
   name: string;
   isSearchable: boolean;
   isFacility: boolean;
   data: any[];
-  isShow: boolean;
 }
 
 /**
@@ -64,10 +63,11 @@ const DetailCard = ({
   onCustomClick,
   isFilter,
   onFilterData,
+  isFilter,
+  onFilterData,
   className = '',
   bodyClassName = '',
-  setSelectedRole,
-  setSelectedFacility
+  onFilter
 }: IDetailCardProps): React.ReactElement => {
   const buttonClass = `${buttonLabel && onButtonClick ? 'me-1 mt-1' : 'mt-0'} mt-lg-0`;
   const searchClass = `${isSearch ? 'mt-1' : ''} mt-lg-0`;
@@ -90,14 +90,8 @@ const DetailCard = ({
    * @returns React.ReactElement | null
    */
   const renderFilter = (isFacility: boolean, filteredData: IFilteredData) => {
-    return isFilter ? (
-      <Filter
-        filterData={filteredData}
-        isFacility={isFacility}
-        setSelectedRole={setSelectedRole}
-        setSelectedFacility={setSelectedFacility}
-        key={filteredData?.id}
-      />
+    return isFilter && onFilter ? (
+      <Filter filterData={filteredData} onFilter={onFilter} isFacility={isFacility} />
     ) : null;
   };
 

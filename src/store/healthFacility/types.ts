@@ -214,6 +214,7 @@ export interface IUserRole {
   displayName?: string;
   groupName?: string;
   suiteAccessName?: string;
+  suiteAccessName?: string;
 }
 
 export interface IHFUserPost {
@@ -227,13 +228,10 @@ export interface IHFUserPost {
   countryCode: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
-  district?: string | number;
-  chiefdom?: string;
   village?: string;
   supervisorId?: number;
   villageIds?: number[];
   timezone?: { id: number };
-  redRisk?: boolean;
 }
 
 export interface IOptionsResponse {
@@ -573,8 +571,9 @@ export interface IFetchUnlinkedVillagesFailure {
 }
 export interface IFetchVillagesListFromHFRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
-  tenantIds: number[];
-  userId?: number;
+  countryId: number;
+  countyId: number;
+  subCountyId: number;
   successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
   failureCb?: (error: Error) => void;
 }

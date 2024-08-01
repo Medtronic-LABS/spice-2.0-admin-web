@@ -24,6 +24,7 @@ const EmailField = forwardRef(
       isDisabled = false,
       enableAutoPopulate,
       onFindExistingUser,
+      parentOrgId,
       tenantId
     }: {
       isEdit: boolean | undefined;
@@ -36,7 +37,8 @@ const EmailField = forwardRef(
       entityName?: string;
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
-      tenantId?: number;
+      parentOrgId?: string;
+      tenantId?: string;
     },
     ref
   ) => {

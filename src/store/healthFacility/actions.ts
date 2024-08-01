@@ -357,7 +357,6 @@ export const fetchHFUserListRequest = ({
   searchTerm,
   roleNames,
   siteUsers,
-  tenantId,
   tenantIds,
   successCb,
   failureCb
@@ -369,7 +368,6 @@ export const fetchHFUserListRequest = ({
   searchTerm,
   roleNames,
   siteUsers,
-  tenantId,
   tenantIds,
   successCb,
   failureCb
@@ -508,14 +506,16 @@ export const fetchUnlinkedVillagesListFailure = (error: Error): IFetchUnlinkedVi
 
 // VILLAGES LIST FROM HF
 export const fetchVillagesListFromHFRequest = ({
-  tenantIds,
-  userId,
+  countryId,
+  countyId,
+  subCountyId,
   successCb,
   failureCb
 }: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
-  tenantIds,
-  userId,
+  countryId,
+  countyId,
+  subCountyId,
   successCb,
   failureCb
 });

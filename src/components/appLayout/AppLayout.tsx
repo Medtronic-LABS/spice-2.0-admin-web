@@ -21,6 +21,7 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin },
   { route: PROTECTED_ROUTES.usersByAdmin },
   { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.adminBySuperAdmin },
   { route: PROTECTED_ROUTES.OUByRegion },
   { route: PROTECTED_ROUTES.OUByAccount },
 

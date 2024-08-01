@@ -2,6 +2,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import MOCK_DATA_CONSTANTS from '../../tests/mockData/userDataConstants';
 import * as USERTYPES from './actionTypes';
+import { communityListSelector } from './selectors';
 
 import { IUserState, IUser } from './types';
 
@@ -43,7 +44,9 @@ const initialStateGetter = () =>
     errorMessage: '',
     showLoader: false,
     userTenantId: '',
-    timezoneList: []
+    timezoneList: [],
+    cultureList: [],
+    communityList: []
   } as unknown as IUserState);
 
 const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {
@@ -185,6 +188,18 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         ...state,
         cultureListLoading: false,
         cultureList: action.payload
+      };
+    case USERTYPES.FETCH_COMMUNITY_LIST:
+      return {
+        ...state,
+        communityListLoading: true,
+        communityList: action.payload
+      };
+    case USERTYPES.FETCH_COMMUNITY_LIST_SUCCESS:
+      return {
+        ...state,
+        communityListLoading: true,
+        communityList: action.payload.entityList
       };
     case USERTYPES.UPDATE_PASSWORD_REQUEST:
     case USERTYPES.CREATE_PASSWORD_REQUEST:

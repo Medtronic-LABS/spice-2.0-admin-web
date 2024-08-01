@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
+import { IHealthFacility } from './types';
 
 const getHealthFacility = (state: AppState) => state.healthFacility.healthFacility;
 const getLoading = (state: AppState) => state.healthFacility.loading;

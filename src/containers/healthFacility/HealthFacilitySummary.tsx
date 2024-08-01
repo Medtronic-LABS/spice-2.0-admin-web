@@ -84,59 +84,24 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
   return postData;
 };
 
-export const formatHFUserData = (
-  userData: any[],
-  countryId: number | string,
-  tenantId?: number | string | undefined,
-  isHFCreate = false
-) => {
-  return userData.map((user: any) => {
-    let roleIds: number[] = [];
-    if (isHFCreate) {
-      roleIds = Array.isArray(user.roles)
-        ? (user.roles || [])
-            .map((id: any) => {
-              return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-            })
-            .flat()
-        : [user.role.id];
-    } else {
-      let spiceInsightsIds: number[] = [];
-      let spiceId: number[] = [];
-      if (user.role) {
-        spiceId = [user.role.id];
-      }
-      if (user.roles) {
-        spiceInsightsIds = user.roles
-          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
-          ?.map((role: IRoles) => role.id);
-      }
-      roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
-    }
-    const isSuperAdmin = user.roles.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
-    return {
-      id: Number(user?.id),
-      firstName: user.firstName,
-      lastName: user.lastName,
-      gender: user.gender,
-      username: user.username,
-      phoneNumber: user.phoneNumber,
-      culture: user.culture,
-      countryCode: user?.country?.phoneNumberCode || user?.countryCode,
-      country: isSuperAdmin ? null : { id: Number(countryId) },
-      tenantId: user?.healthfacility?.tenantId
-        ? Number(user.healthfacility.tenantId)
-        : Number(tenantId) || user.tenantId,
-      supervisorId: Number(user.supervisor?.id),
-      roleIds,
-      villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
-      village: user?.village,
-      timezone: user?.timezone,
-      district: user?.district,
-      chiefdom: user?.chiefdom,
-      redRisk: user?.redRisk
-    };
-  });
+export const formatHFUserData = (userData: any[], countryId: number | string, tenantId?: number | string) => {
+  return userData.map((user: any) => ({
+    id: Number(user?.id),
+    firstName: user.firstName,
+    lastName: user.lastName,
+    gender: user.gender,
+    username: user.username,
+    phoneNumber: user.phoneNumber,
+    culture: user.culture,
+    countryCode: user.country.phoneNumberCode || user.countryCode,
+    country: { id: Number(countryId) },
+    tenantId: user?.healthFacility?.tenantId ? Number(user.healthFacility.tenantId) : Number(tenantId) || user.tenantId,
+    supervisorId: Number(user.supervisor?.id),
+    roleIds: Array.isArray(user.role) ? (user.role || []).map(({ id }: { id: any }) => id) : [user.role.id],
+    villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
+    village: user?.village,
+    timezone: user?.timezone
+  }));
 };
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();

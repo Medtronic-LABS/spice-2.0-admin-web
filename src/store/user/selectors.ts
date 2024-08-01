@@ -29,6 +29,7 @@ const getCultureList = (state: AppState) => state.user.cultureList;
 const getCultureListLoading = (state: AppState) => state.user.cultureListLoading;
 const getLockedUsers = (state: AppState) => state.user.lockedUsers;
 const getLockedUsersCount = (state: AppState) => state.user.totalLockedUsers;
+const getcommunityList = (state: AppState) => state.user.communityList;
 
 export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
 export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
@@ -53,6 +54,7 @@ export const isPasswordSetSelector = createSelector(getIsPasswordSet, (passwordS
 export const timezoneListSelector = createSelector(getTimezoneList, (timezoneList) => timezoneList);
 export const countryIdSelector = createSelector(getCountryId, (countryId) => countryId);
 export const cultureListSelector = createSelector(getCultureList, (cultureList) => cultureList);
+export const communityListSelector = createSelector(getcommunityList, (communityList) => communityList);
 export const cultureListLoadingSelector = createSelector(
   getCultureListLoading,
   (cultureListLoading) => cultureListLoading
