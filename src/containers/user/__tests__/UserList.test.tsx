@@ -100,5 +100,4 @@ describe('UserList Component', () => {
     await waitFor(() => expect(changePassword).toHaveBeenCalled());
   });
 
-  // Additional test cases can be added for other functionalities
 });

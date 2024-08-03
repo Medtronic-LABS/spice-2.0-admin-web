@@ -195,16 +195,8 @@ export interface IHFUserGet {
   tenantId: number;
   villages?: number[];
   supervisor: string | null;
-  district?: { tenantId: string | number };
   county?: { tenantId: string | number };
-  organizations: Array<{
-    formName: string;
-    displayName: boolean;
-    id: number;
-    name: string;
-    parentOrganizationId: number | null;
-    formDataId: number;
-  }>;
+  organizations: Array<{ id: number; name: string; parentOrganizationId: number | null; formDataId: number }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
 }
 
@@ -228,6 +220,7 @@ export interface IHFUserPost {
   countryCode: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
+  county: string | number;
   village?: string;
   supervisorId?: number;
   villageIds?: number[];

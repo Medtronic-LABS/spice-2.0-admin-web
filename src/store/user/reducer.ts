@@ -189,7 +189,7 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         cultureListLoading: false,
         cultureList: action.payload
       };
-    case USERTYPES.FETCH_COMMUNITY_LIST:
+    case USERTYPES.FETCH_COMMUNITY_LIST_REQUEST:
       return {
         ...state,
         communityListLoading: true,

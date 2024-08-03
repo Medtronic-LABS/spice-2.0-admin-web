@@ -100,7 +100,8 @@ export const formatHFUserData = (userData: any[], countryId: number | string, te
     roleIds: Array.isArray(user.role) ? (user.role || []).map(({ id }: { id: any }) => id) : [user.role.id],
     villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
     village: user?.village,
-    timezone: user?.timezone
+    timezone: user?.timezone,
+    county: user?.county
   }));
 };
 const HealthFacilitySummary = (): React.ReactElement => {

@@ -42,7 +42,7 @@ import {
   fetchPeerSupervisorListRequest,
   fetchVillagesListFromHFRequest
 } from '../../store/healthFacility/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
+import { getAccountsSelector } from '../../store/account/selectors';
 import {
   countryListSelector,
   countryLoadingSelector,
@@ -65,6 +65,7 @@ import PhoneNumberField from '../formFields/PhoneNumber';
 import useUserFormUtils from './userFormUtils';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import { SiteUserForm } from './userConditionalFields/SiteUserForm';
+import { fetchAccountsRequest } from '../../store/account/actions';
 
 /**
  * Form for region admin creation
@@ -96,6 +97,7 @@ const UserForm = ({
   const dispatch = useDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
   const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange } = useUserFormUtils();
+  const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, OPERATING_UNIT_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const hfLoading = useSelector(healthFacilityLoadingSelector);
@@ -114,7 +116,7 @@ const UserForm = ({
   const [autoFetchData, setAutoFetchData] = useState(autoFetchedDataState?.autoFetchData || ([] as any[]));
   const [isCHAUser, setUserAsCHA] = useState(chwState?.isCHAUser || [false]);
   const [isCHPUser, setUserAsCHP] = useState([false]);
-  const [selectedAdmins, setSelectedAdmins] = useState<string>();
+  const [selectedAdmins, setSelectedAdmins] = useState<string>('');
   const roleOptions = useRef<IRoles[][]>(roleOptionsState?.current || []);
   const disabledRoles = useRef<IRoles[][]>(disabledRolesState?.disabledRoles || ([] as IRoles[][]));
   const [autoFetched, setAutoFetched] = useState<boolean[]>(autoFetchedState?.autoFetch || ([] as boolean[]));
@@ -123,6 +125,7 @@ const UserForm = ({
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
   const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles } = userMeta();
+  const accountList = useSelector(getAccountsSelector);
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
     () => [
@@ -172,8 +175,12 @@ const UserForm = ({
       if (!isSuperAdmin) {
         setIsSuperAdmin(roleValues?.some((element: any) => element.name === 'SUPER_ADMIN'));
       }
+      if (!isSiteUser) {
+        const [selectedAdminRole] = initialEditValue.role;
+        getSelectedAdmin(selectedAdminRole);
+      }
     }
-  }, [initialEditValue, isHF, isEdit, isSuperAdmin]);
+  }, [initialEditValue, isHF, isEdit, isSuperAdmin, isSiteUser]);
 
   useEffect(() => {
     return () => {
@@ -482,11 +489,12 @@ const UserForm = ({
   const isCHUserSelectedFn = useCallback(
   const isCHUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
+      // getting CHA user selected status
       const newChaStatus = [...isCHAUser];
       newChaStatus[index] = isCHASelected(roles);
       setUserAsCHA(newChaStatus);
 
-      //chp
+      // getting CHP user selected status
       const newChpStatus = [...isCHPUser];
       newChpStatus[index] = isCHPSelected(roles);
       setUserAsCHP(newChpStatus);
@@ -516,13 +524,13 @@ const UserForm = ({
   const fetchVillagesList = useCallback(
     (tenantIds: number[], index: number) => {
       if (tenantIds.length) {
-        const getSelectedHFDetails: any = healthFacilityList.filter((data: any) => {
-          return data.tenantId === tenantIds[index];
+        const getSelectedHFDetails: any = healthFacilityList.filter((HFData: any) => {
+          return HFData.tenantId === tenantIds[index];
         });
         const [HFDetails] = getSelectedHFDetails || [];
         dispatch(
           fetchVillagesListFromHFRequest({
-            countryId: countryId,
+            countryId,
             countyId: HFDetails?.county?.id,
             subCountyId: HFDetails?.subCounty?.id,
             successCb: ({ list }: { list: IVillages[] }) => {
@@ -627,19 +635,38 @@ const UserForm = ({
   }, [autoFetchData, form, isEdit, isHFCreate, updateRoleOptionsAndDisableRoles]);
 
   const getAdminRoles = () => {
-    const filteredRoles = roleOptions.current?.[0]?.filter((data: any) => {
+    const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
       if (isSiteUser) {
-        return data.suiteAccessName.toLowerCase() !== 'admin';
+        return roleData.suiteAccessName.toLowerCase() !== 'admin';
       } else {
-        return data.suiteAccessName.toLowerCase() === 'admin';
+        return roleData.suiteAccessName.toLowerCase() === 'admin';
       }
     });
     return filteredRoles || [];
   };
 
-  const getSelectedAdmin = (value: any, index: number) => {
+  const getSelectedAdmin = (value: any) => {
     setSelectedAdmins(value.name);
   };
+
+  const fetchDetails = useCallback(() => {
+    dispatch(
+      fetchAccountsRequest({
+        tenantId: String(countryId),
+        isActive: true,
+        failureCb: (e) =>
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ACCOUNT_FETCH_ERROR))
+      })
+    );
+  }, [countryId, dispatch]);
+
+  useEffect(() => {
+    if ([ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, OPERATING_UNIT_ADMIN].includes(selectedAdmins)) {
+      fetchDetails();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, fetchDetails, selectedAdmins]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -761,7 +788,7 @@ const UserForm = ({
                               // CHW User selection
                               isCHUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index, values);
-                              getSelectedAdmin(values, index);
+                              getSelectedAdmin(values);
                               // fetch HF list based on CHW selection
                               if (isCHPSelected(values)) {
                                 if (!isEdit && !autoFetched[index]) {
@@ -808,7 +835,7 @@ const UserForm = ({
                             onChange={(values: any) => {
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, values]);
-                              getSelectedAdmin(values, index);
+                              getSelectedAdmin(values);
                               // fetch HF list based on CHW selection
                               input.onChange(values);
                             }}
@@ -1070,8 +1097,9 @@ const UserForm = ({
                   isTmezoneListLoading={isTmezoneListLoading}
                   timezoneList={timezoneList}
                   communityList={communityList}
-                  countyAdminList={timezoneList}
+                  countyAdminList={accountList}
                   siteRolesChange={siteRolesChange}
+                  selectedAdmins={selectedAdmins}
                   fields={fields}
                   role={role}
                   isSiteUser={isSiteUser}

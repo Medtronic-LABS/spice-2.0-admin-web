@@ -343,7 +343,7 @@ export function* fetchTimezoneList(): SagaIterator {
 }
 
 /*
-  Worker Saga: Fired on FETCH_TIMEZONE_LIST_REQUEST action
+  Worker Saga: Fired on FETCH_COMMUNITY_LIST_REQUEST action
 */
 export function* fetchCommunityListRequest(action: IActionProps): SagaIterator {
   const { countryId, successCB, failureCB } = action;
@@ -375,7 +375,7 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.CHANGE_OWN_PASSWORD_REQUEST, updatePassword)]);
   yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
   yield all([takeLatest(USERTYPES.FETCH_LOCKED_USERS_REQUEST, fetchLockedUsers)]);
-  yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST, fetchCommunityListRequest)]);
+  yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST_REQUEST, fetchCommunityListRequest)]);
 }
 
 export default userSaga;

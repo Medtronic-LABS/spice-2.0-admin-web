@@ -4,7 +4,6 @@ import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 
 interface IFilteredData {
-  isShow: any;
   name: string;
   isSearchable: boolean;
   data: any[];
@@ -12,9 +11,8 @@ interface IFilteredData {
 
 interface ITableFilterProps {
   filterData: IFilteredData;
+  onFilter: (selectedIds: { roleNameList: string[]; facilityTenantIds: string[] }) => void;
   isFacility: boolean;
-  setSelectedRole: any;
-  setSelectedFacility: any;
 }
 
 interface IOption {
@@ -22,13 +20,10 @@ interface IOption {
   tenantId: string;
 }
 
-const TableFilter: React.FC<ITableFilterProps> = ({
-  filterData,
-  isFacility,
-  setSelectedFacility,
-  setSelectedRole
-}: ITableFilterProps) => {
+const TableFilter: React.FC<ITableFilterProps> = ({ filterData, onFilter, isFacility }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [roleNameList, setRoleNameList] = useState<string[]>([]);
+  const [facilityTenantIds, setFacilityTenantIds] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -41,26 +36,30 @@ const TableFilter: React.FC<ITableFilterProps> = ({
    */
 
   const handleSelectChange = (option: IOption) => {
+    setSelectedOptions((prev) => {
+      if (prev.includes(option.name)) {
+        return prev.filter((item) => item !== option.name);
+      } else {
+        return [...prev, option.name];
+      }
+    });
     if (isFacility) {
-      setSelectedFacility((prev: string[]) => {
-        const updatedFacilityTenantIds = prev?.includes(option?.tenantId)
-          ? prev.filter((tenantId) => tenantId !== option?.tenantId)
-          : [...(prev || []), option?.tenantId];
-        return updatedFacilityTenantIds;
+      setFacilityTenantIds((prev) => {
+        const updatedOptions = prev.includes(option.tenantId)
+          ? prev.filter((item) => item !== option.tenantId)
+          : [...prev, option.tenantId];
+        onFilter({ roleNameList, facilityTenantIds: updatedOptions });
+        return updatedOptions;
       });
     } else {
-      setSelectedRole((prev: string[]) => {
-        const updatedRoleNameList = prev?.includes(option?.name)
-          ? prev.filter((name) => name !== option?.name)
-          : [...(prev || []), option?.name];
-        return updatedRoleNameList;
+      setRoleNameList((prev) => {
+        const updatedOptions = prev.includes(option.name)
+          ? prev.filter((item) => item !== option.name)
+          : [...prev, option.name];
+        onFilter({ roleNameList: updatedOptions, facilityTenantIds });
+        return updatedOptions;
       });
     }
-
-    // Update the selected options state for UI purposes
-    setSelectedOptions((prev) => {
-      return prev.includes(option.name) ? prev.filter((name) => name !== option.name) : [...prev, option.name];
-    });
   };
 
   /**
@@ -119,55 +118,51 @@ const TableFilter: React.FC<ITableFilterProps> = ({
    */
   const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(', ')}`;
   return (
-    <>
-      {filterData.isShow && (
-        <div className={styles.selectHeader}>
-          <div
-            className={`${styles.selectHeader} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1`}
-            onClick={handleDropdownToggle}
-          >
-            <div className='d-flex align-items-center'>
-              <FilterListIcon />
-              <span className='text-secondary py-0dot25 px-1'>{filterData.name}</span>
-            </div>
-            <div className={`text-secondary ${styles.arrow} ${isOpen ? 'open' : ''}`} />
-          </div>
-          {isOpen && (
-            <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded p-0dot5`}>
-              {filterData.isSearchable && (
-                <input
-                  type='text'
-                  placeholder='Search Facility'
-                  className='form-control mb-1'
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                />
-              )}
-              <ul className='list-unstyled mb-0'>
-                {filteredOptions.map((option) => (
-                  <li
-                    key={option.id}
-                    className={`${styles.selectOption} px-1 py-0dot5 ${
-                      selectedOptions.includes(option.name) && styles.selectedDropdown
-                    }`}
-                  >
-                    <label className='d-flex align-items-center fs-6'>
-                      <input
-                        type='checkbox'
-                        value={option.id}
-                        checked={selectedOptions.includes(option.name)}
-                        onChange={() => handleSelectChange(option)}
-                        className='mr-2'
-                      />
-                      {!isFacility ? option.displayName : option.name} {formatHealthFacility(option)}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
+    <div className={styles.selectHeader}>
+      <div
+        className={`${styles.selectHeader} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1`}
+        onClick={handleDropdownToggle}
+      >
+        <div className='d-flex align-items-center'>
+          <FilterListIcon />
+          <span className='text-secondary py-0dot25 px-1'>{filterData.name}</span>
+        </div>
+        <div className={`text-secondary ${styles.arrow} ${isOpen ? 'open' : ''}`} />
+      </div>
+      {isOpen && (
+        <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded p-0dot5`}>
+          {filterData.isSearchable && (
+            <input
+              type='text'
+              placeholder='Search Facility'
+              className='form-control mb-1'
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
           )}
+          <ul className='list-unstyled mb-0'>
+            {filteredOptions.map((option) => (
+              <li
+                key={option.id}
+                className={`${styles.selectOption} px-1 py-0dot5 ${
+                  selectedOptions.includes(option.name) && styles.selectedDropdown
+                }`}
+              >
+                <label className='d-flex align-items-center fs-6'>
+                  <input
+                    type='checkbox'
+                    value={option.id}
+                    checked={selectedOptions.includes(option.name)}
+                    onChange={() => handleSelectChange(option)}
+                    className='mr-2'
+                  />
+                  {!isFacility ? option.displayName : option.name} {formatHealthFacility(option)}
+                </label>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
