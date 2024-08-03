@@ -9,23 +9,18 @@ interface IFilteredData {
   data: any[];
 }
 
-interface FacilitySelectProps {
+interface ITableFilterProps {
   filterData: IFilteredData;
   onFilter: (selectedIds: { roleNameList: string[]; facilityTenantIds: string[] }) => void;
   isFacility: boolean;
 }
 
-interface Option {
+interface IOption {
   name: string;
-  tenantId: string
+  tenantId: string;
 }
 
-interface SelectedIds {
-  roleNameList: string[];
-  facilityTenantIds: string[];
-}
-
-const FacilitySelect: React.FC<FacilitySelectProps> = ({ filterData, onFilter, isFacility }: FacilitySelectProps) => {
+const TableFilter: React.FC<ITableFilterProps> = ({ filterData, onFilter, isFacility }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [roleNameList, setRoleNameList] = useState<string[]>([]);
   const [facilityTenantIds, setFacilityTenantIds] = useState<string[]>([]);
@@ -40,7 +35,7 @@ const FacilitySelect: React.FC<FacilitySelectProps> = ({ filterData, onFilter, i
    * @param {string} option.name - The name of the selected option.
    */
 
-  const handleSelectChange = (option: Option) => {
+  const handleSelectChange = (option: IOption) => {
     setSelectedOptions((prev) => {
       if (prev.includes(option.name)) {
         return prev.filter((item) => item !== option.name);
@@ -72,13 +67,13 @@ const FacilitySelect: React.FC<FacilitySelectProps> = ({ filterData, onFilter, i
    * @param func The function to be debounced.
    * @param wait The debounce wait time in milliseconds.
    */
-  const debounce = useCallback((func: Function, wait: number) => {
+  const debounce = <T extends unknown[]>(func: (...args: T) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
-    return (...args: any[]) => {
+    return (...args: T) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => func(...args), wait);
     };
-  }, []);
+  };
 
   /**
    * Toggles the dropdown open/close.
@@ -171,4 +166,4 @@ const FacilitySelect: React.FC<FacilitySelectProps> = ({ filterData, onFilter, i
   );
 };
 
-export default FacilitySelect;
+export default TableFilter;

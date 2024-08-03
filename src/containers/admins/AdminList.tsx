@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
 import { FormApi } from 'final-form';
-
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
@@ -12,7 +11,7 @@ import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
-import { columnDef } from './userListMeta';
+import { columnDef } from './adminListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
 import {
   countryIdSelector,
@@ -55,7 +54,6 @@ const UserList = (): React.ReactElement => {
   const { tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
-  const regionData = useSelector(userDataSelector).country;
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const role = useSelector(roleSelector);
@@ -79,7 +77,7 @@ const UserList = (): React.ReactElement => {
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
           roleNames: selectedIds?.roleNameList || [],
-          siteUsers: true,
+          siteUsers: false,
           tenantIds: selectedIds?.facilityTenantIds || [],
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
@@ -207,7 +205,8 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      const userObj = formatHFUserData(users, countryIdValue, tenantId);
+      const [selectedUser] = users
+      const userObj = formatHFUserData(users, countryIdValue, tenantId || selectedUser.county?.tenantId);
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
         data,
@@ -240,7 +239,7 @@ const UserList = (): React.ReactElement => {
         countryId={countryIdValue}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
-        isSiteUser={true}
+        isSiteUser={false}
       />
     );
   };
@@ -298,24 +297,21 @@ const UserList = (): React.ReactElement => {
     fetchList();
   }, [listParams, dispatch, fetchList]);
 
-  const roletest = rolesGrouped?.SPICE?.filter((data: { suiteAccessName: string }) => data.suiteAccessName !== 'admin');
+  const roleList = rolesGrouped?.SPICE?.filter((data: { suiteAccessName: string }) => data.suiteAccessName === 'admin');
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel='Add User'
-          header='Users'
+          buttonLabel='Add Admin'
+          header='Admins'
           isSearch={true}
           onSearch={handleSearch}
           searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
           onButtonClick={handleAddUserClick}
           onFilter={onFilter}
           isFilter={true}
-          onFilterData={[
-            { name: 'Filter by Facility', isFacility: true, isSearchable: true, data: healthFacilityList },
-            { name: 'Filter by Role', isFacility: false, isSearchable: false, data: roletest }
-          ]}
+          onFilterData={[{ name: 'Filter by Admin', isFacility: false, isSearchable: false, data: roleList }]}
         >
           <CustomTable
             rowData={hfUserList}
@@ -344,7 +340,7 @@ const UserList = (): React.ReactElement => {
         </DetailCard>
         <ModalForm
           show={isOpenUserModal.isOpen}
-          title={`${isOpenUserModal.isEdit ? 'Edit' : 'Add'} User`}
+          title={`${isOpenUserModal.isEdit ? 'Edit' : 'Add'} Admin`}
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}

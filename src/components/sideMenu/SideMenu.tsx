@@ -35,22 +35,27 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Medication Database',
     route: PROTECTED_ROUTES.medicationByRegion,
-    disabled: false
+    disabled: true
   },
   {
     label: 'Lab Test Database',
     route: PROTECTED_ROUTES.labtestList,
-    disabled: false
+    disabled: true
   },
   {
     label: 'Health Facility',
     route: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
-    disabled: false,
+    disabled: true,
     childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
   },
   {
     label: 'Users',
     route: PROTECTED_ROUTES.usersBySuperAdmin,
+    disabled: false
+  },
+  {
+    label: 'Admins',
+    route: PROTECTED_ROUTES.adminBySuperAdmin,
     disabled: false
   }
 ];

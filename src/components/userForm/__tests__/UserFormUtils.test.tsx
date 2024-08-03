@@ -2,21 +2,16 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import useUserFormUtils from '../userFormUtils';
 import { IRoles } from '../../../store/user/types';
 
-
 jest.mock('../userFormMeta', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     mobileRoles: ['MobileUser', 'MobileAdmin'],
-    isCHPRole: ['CHPUser', 'CHPAdmin'],
-  })),
+    isCHPRole: ['CHPUser', 'CHPAdmin']
+  }))
 }));
 
 describe('useUserFormUtils', () => {
-  const mockRoles = [
-    { name: 'MobileUser' },
-    { name: 'Admin' },
-    { name: 'CHPUser' },
-  ] as IRoles[];
+  const mockRoles = [{ name: 'MobileUser' }, { name: 'Admin' }, { name: 'CHPUser' }] as IRoles[];
 
   test('should return true if a mobile role is selected', () => {
     const { result } = renderHook(() => useUserFormUtils());
@@ -31,10 +26,12 @@ describe('useUserFormUtils', () => {
     const { result } = renderHook(() => useUserFormUtils());
 
     const { isCHASelected } = result.current;
-    const isSelected = isCHASelected([{
-      name: 'Admin',
-      id: 0
-    }]);
+    const isSelected = isCHASelected([
+      {
+        name: 'Admin',
+        id: 0
+      }
+    ]);
 
     expect(isSelected).toBe(false);
   });
@@ -52,10 +49,12 @@ describe('useUserFormUtils', () => {
     const { result } = renderHook(() => useUserFormUtils());
 
     const { isCHPSelected } = result.current;
-    const isSelected = isCHPSelected([{
-      name: 'Admin',
-      id: 0
-    }]);
+    const isSelected = isCHPSelected([
+      {
+        name: 'Admin',
+        id: 0
+      }
+    ]);
 
     expect(isSelected).toBe(false);
   });
@@ -73,10 +72,12 @@ describe('useUserFormUtils', () => {
     const { result } = renderHook(() => useUserFormUtils());
 
     const { isRoleExists } = result.current;
-    const exists = isRoleExists([{
-      name: 'User',
-      id: 0
-    }]);
+    const exists = isRoleExists([
+      {
+        name: 'User',
+        id: 0
+      }
+    ]);
 
     expect(exists).toBe(false);
   });

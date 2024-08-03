@@ -141,6 +141,7 @@ export interface IHFUserGet {
   tenantId: number;
   villages?: number[];
   supervisor: string | null;
+  county?: {tenantId: string | number};
   organizations: Array<{ id: number; name: string; parentOrganizationId: number | null; formDataId: number }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
 }
@@ -164,10 +165,11 @@ export interface IHFUserPost {
   countryCode: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
+  county: string | number;
   village?: string;
   supervisorId?: number;
   villageIds?: number[];
-  timezone?: {id: number}
+  timezone?: { id: number };
 }
 
 export interface IOptionsResponse {

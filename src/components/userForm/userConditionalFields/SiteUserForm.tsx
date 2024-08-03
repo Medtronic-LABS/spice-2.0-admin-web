@@ -15,7 +15,7 @@ export const SiteUserForm = ({
   fields,
   isSiteUser,
   selectedAdmins,
-  countyAdminList,
+  countyAdminList
 }: any) => {
   const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, OPERATING_UNIT_ADMIN, REGION_ADMIN, SUPER_ADMIN } = APPCONSTANTS.ROLES;
 
@@ -86,7 +86,7 @@ export const SiteUserForm = ({
                     {...(input as any)}
                     label='County'
                     errorLabel='county'
-                    labelKey='description'
+                    labelKey='name'
                     valueKey='id'
                     options={countyAdminList}
                     loadingOptions={isTmezoneListLoading}
@@ -108,28 +108,6 @@ export const SiteUserForm = ({
                     {...(input as any)}
                     label='Sub County'
                     errorLabel='subCounty'
-                    labelKey='description'
-                    valueKey='id'
-                    options={timezoneList}
-                    loadingOptions={isTmezoneListLoading}
-                    error={isError(meta)}
-                    isModel={true}
-                  />
-                )}
-              />
-            </div>
-          )}
-          {[HEALTH_FACILITY_ADMIN].includes(selectedAdmins) && (
-            <div className='col-sm-6 col-12'>
-              <Field
-                name={`${name}.healthfacility`}
-                type='text'
-                validate={required}
-                render={({ input, meta }) => (
-                  <SelectInput
-                    {...(input as any)}
-                    label='Health Facility'
-                    errorLabel='healthfacility'
                     labelKey='description'
                     valueKey='id'
                     options={timezoneList}

@@ -47,6 +47,11 @@ const LandingDashboard = (): React.ReactElement => {
       label: 'Users',
       route: PROTECTED_ROUTES.usersBySuperAdmin,
       disabled: false
+    },
+    {
+      label: 'Admins',
+      route: PROTECTED_ROUTES.adminBySuperAdmin,
+      disabled: false
     }
   ];
 

@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { MemoryRouter, Route } from 'react-router-dom';
-import UserList from '../UserList';
+import UserList from '../AdminList';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { fetchHFUserListRequest, deleteHFUserRequest } from '../../../store/healthFacility/actions';
 import { IHFUserGet } from '../../../store/healthFacility/types';
