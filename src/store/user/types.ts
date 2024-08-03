@@ -679,7 +679,7 @@ export interface IFetchCultureListRequest {
 }
 
 export interface IFetchCommunityList {
-  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST;
+  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST_REQUEST;
 }
 export interface IFetchCultureListSuccess {
   type: typeof USER_TYPES.FETCH_CULTURE_LIST_SUCCESS;
@@ -736,7 +736,7 @@ export interface IFetchLockedUsersRequest {
 }
 
 export interface IFetchCommunityList {
-  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST;
+  type: typeof USER_TYPES.FETCH_COMMUNITY_LIST_REQUEST;
   countryId: number;
   search?: string;
   successCb?: (payload: IFetchCommunityListPayload) => void;

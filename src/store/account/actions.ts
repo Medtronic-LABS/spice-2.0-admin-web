@@ -80,8 +80,8 @@ export const fetchAccountsRequest = ({
 }: {
   tenantId: string;
   isActive: boolean;
-  skip: number;
-  limit: number | null;
+  skip?: number;
+  limit?: number | null;
   search?: string;
   successCb?: (payload: IFetchAccountsSuccessPayload) => void;
   failureCb?: (error: Error) => void;

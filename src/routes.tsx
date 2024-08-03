@@ -31,6 +31,7 @@ import AccountSummary from './containers/account/AccountSummary';
 import AccountDashboard from './containers/account/AccountDashboard';
 import LockedUsers from './containers/lockedUsers/LockedUsers';
 import UserList from './containers/user/UserList';
+import Admins from './containers/admins/AdminList';
 
 interface IRoute {
   path: string;
@@ -293,6 +294,12 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.lockedUsers,
       exact: true,
       component: LockedUsers,
+      authorisedRoles: SU_SA_RA_AA_OUA_SIA
+    },
+    {
+      path: PROTECTED_ROUTES.adminBySuperAdmin,
+      exact: true,
+      component: Admins,
       authorisedRoles: SU_SA_RA_AA_OUA_SIA
     }
   ];

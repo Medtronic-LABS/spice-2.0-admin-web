@@ -4,7 +4,7 @@ import IconButton from '../button/IconButton';
 import Searchbar from '../searchbar/Searchbar';
 import CustomTooltip from '../tooltip';
 import styles from './DetailCard.module.scss';
-import Filter from '../filter/Filter';
+import Filter from '../tableFilter/Filter';
 
 // Type for the setter functions
 type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;

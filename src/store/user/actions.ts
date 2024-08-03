@@ -384,7 +384,7 @@ export const fetchCommunityListRequest = ({
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }): IFetchCommunityList => ({
-  type: USER_TYPES.FETCH_COMMUNITY_LIST,
+  type: USER_TYPES.FETCH_COMMUNITY_LIST_REQUEST,
   countryId,
   search,
   successCb,

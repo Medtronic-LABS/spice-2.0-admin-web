@@ -15,7 +15,13 @@ import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/t
 import { columnDef } from './userListMeta';
 import { columnDef } from './userListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
-import { emailSelector, roleSelector, userDataSelector, userRolesSelector } from '../../store/user/selectors';
+import {
+  countryIdSelector,
+  emailSelector,
+  roleSelector,
+  userDataSelector,
+  userRolesSelector
+} from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageHFList,
@@ -40,6 +46,7 @@ import { IRoles } from '../../store/user/types';
 import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
+import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IMatchParams {
   tenantId: string;
@@ -53,6 +60,7 @@ const UserList = (): React.ReactElement => {
   const { tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
+  const regionData = useSelector(userDataSelector).country;
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const role = useSelector(roleSelector);
@@ -71,7 +79,7 @@ const UserList = (): React.ReactElement => {
     (selectedIds?: { roleNameList: string[]; facilityTenantIds: string[] }) =>
       dispatch(
         fetchHFUserListRequest({
-          countryId: regionData.id,
+          countryId: countryIdValue,
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
@@ -83,7 +91,7 @@ const UserList = (): React.ReactElement => {
           }
         })
       ),
-    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]
+    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]
   );
 
   useEffect(() => {
@@ -98,12 +106,12 @@ const UserList = (): React.ReactElement => {
     if (!rolesGrouped?.hasOwnProperty('SPICE')) {
       dispatch(
         fetchUserRolesAction({
-          countryId: regionData.id,
+          countryId: countryIdValue,
           failureCb: (_) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR)
         })
       );
     }
-  }, [regionData.id, dispatch, rolesGrouped]);
+  }, [countryIdValue, dispatch, rolesGrouped]);
 
   const handleUserDelete = useCallback(
     ({ data: { id, organizations = [] } }: { data: { id: number; organizations: any[] } }) => {
@@ -204,9 +212,6 @@ const UserList = (): React.ReactElement => {
    */
   const handleUserSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      const [getRedRisk] = spiceUserRole?.filter(
-        (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
-      );
       const userObj = formatHFUserData(users, countryIdValue, tenantId);
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
@@ -298,7 +303,7 @@ const UserList = (): React.ReactElement => {
   const fetchList = useCallback(() => {
     dispatch(
       fetchHFListRequest({
-        countryId: regionData.id,
+        countryId: countryIdValue,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: -1,
         searchTerm: listParams.searchTerm,
@@ -306,7 +311,7 @@ const UserList = (): React.ReactElement => {
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
 
   const onFilter = (selectedIds: any) => {
     refreshHFUserList(selectedIds);

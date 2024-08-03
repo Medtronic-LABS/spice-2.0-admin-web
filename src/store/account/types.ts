@@ -113,8 +113,8 @@ export interface IAccountPayload {
 export interface IFetchAccountsRequest {
   type: typeof ACTION_TYPES.FETCH_ACCOUNTS_REQUEST;
   isActive: boolean;
-  skip: number;
-  limit: number | null;
+  skip?: number;
+  limit?: number | null;
   tenantId?: string;
   search?: string;
   successCb?: (payload: IFetchAccountsSuccessPayload) => void;
