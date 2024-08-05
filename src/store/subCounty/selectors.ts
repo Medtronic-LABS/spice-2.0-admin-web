@@ -1,56 +1,56 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
 
-const getOperatingUnitDashboardList = (state: AppState) => state.subCounty.operatingUnitDashboardList;
-const getOperatingUnitList = (state: AppState) => state.subCounty.operatingUnitList;
-const getOperatingUnitCount = (state: AppState) => state.subCounty.total;
-const getOperatingUnitListCount = (state: AppState) => state.subCounty.listTotal;
-const getOperatingUnitLoading = (state: AppState) => state.subCounty.loading;
-const getOperatingUnitLoadingMore = (state: AppState) => state.subCounty.loadingMore;
-const getOperatingUnitDetail = (state: AppState) => state.subCounty.operatingUnitDetail;
+const getSubCountyDashboardList = (state: AppState) => state.subCounty.subCountyDashboardList;
+const getSubCountyList = (state: AppState) => state.subCounty.subCountyList;
+const getSubCountyCount = (state: AppState) => state.subCounty.total;
+const getSubCountyListCount = (state: AppState) => state.subCounty.listTotal;
+const getSubCountyLoading = (state: AppState) => state.subCounty.loading;
+const getSubCountyLoadingMore = (state: AppState) => state.subCounty.loadingMore;
+const getSubCountyDetail = (state: AppState) => state.subCounty.subCountyDetail;
 const getOuAdmins = (state: AppState) => state.subCounty.admins;
-const getOperatingUnitAdminList = (state: AppState) => state.subCounty.operatingUnitAdmins;
-const getOperatingUnitForDropdown = (state: AppState) => state.subCounty.dropdownOUList;
-const getOperatingUnitDropdownLoading = (state: AppState) => state.subCounty.dropdownOUListLoading;
+const getSubCountyAdminList = (state: AppState) => state.subCounty.subCountyAdmins;
+const getSubCountyForDropdown = (state: AppState) => state.subCounty.dropdownSubCountyList;
+const getSubCountyDropdownLoading = (state: AppState) => state.subCounty.dropdownSubCountyListLoading;
 
-export const operatingUnitDashboardListSelector = createSelector(
-  getOperatingUnitDashboardList,
-  (operatingUnitDashboardList) => operatingUnitDashboardList
+export const subCountyDashboardListSelector = createSelector(
+  getSubCountyDashboardList,
+  (subCountyDashboardList) => subCountyDashboardList
 );
 
-export const operatingUnitListSelector = createSelector(getOperatingUnitList, (operatingUnitList) => operatingUnitList);
+export const subCountyListSelector = createSelector(getSubCountyList, (subCountyList) => subCountyList);
 
-export const operatingUnitCountSelector = createSelector(
-  getOperatingUnitCount,
-  (operatingUnitCount) => operatingUnitCount
+export const subCountyCountSelector = createSelector(
+  getSubCountyCount,
+  (subCountyCount) => subCountyCount
 );
-export const operatingUnitListCountSelector = createSelector(
-  getOperatingUnitListCount,
-  (operatingUnitListCount) => operatingUnitListCount
-);
-
-export const operatingUnitLoadingSelector = createSelector(
-  getOperatingUnitLoading,
-  (operatingUnitLoading) => operatingUnitLoading
+export const subCountyListCountSelector = createSelector(
+  getSubCountyListCount,
+  (subCountyListCount) => subCountyListCount
 );
 
-export const operatingUnitLoadingMoreSelector = createSelector(
-  getOperatingUnitLoadingMore,
-  (operatingUnitLoadingMore) => operatingUnitLoadingMore
+export const subCountyLoadingSelector = createSelector(
+  getSubCountyLoading,
+  (subCountyLoading) => subCountyLoading
 );
 
-export const getOperatingUnitDetailSelector = createSelector(getOperatingUnitDetail, (detail) => detail);
+export const subCountyLoadingMoreSelector = createSelector(
+  getSubCountyLoadingMore,
+  (subCountyLoadingMore) => subCountyLoadingMore
+);
+
+export const getSubCountyDetailSelector = createSelector(getSubCountyDetail, (detail) => detail);
 
 export const getOuAdminsSelector = createSelector(getOuAdmins, (ouAdmins) => ouAdmins);
-export const operatingUnitAdminListSelector = createSelector(
-  getOperatingUnitAdminList,
-  (operatingUnitAdminList) => operatingUnitAdminList
+export const subCountyAdminListSelector = createSelector(
+  getSubCountyAdminList,
+  (subCountyAdminList) => subCountyAdminList
 );
-export const operatingUnitDropdownSelector = createSelector(
-  getOperatingUnitForDropdown,
-  (operatingUnitDropdown) => operatingUnitDropdown
+export const subCountyDropdownSelector = createSelector(
+  getSubCountyForDropdown,
+  (subCountyDropdown) => subCountyDropdown
 );
-export const operatingUnitDropdownLoadingSelector = createSelector(
-  getOperatingUnitDropdownLoading,
-  (operatingUnitDropdownLoading) => operatingUnitDropdownLoading
+export const subCountyDropdownLoadingSelector = createSelector(
+  getSubCountyDropdownLoading,
+  (subCountyDropdownLoading) => subCountyDropdownLoading
 );

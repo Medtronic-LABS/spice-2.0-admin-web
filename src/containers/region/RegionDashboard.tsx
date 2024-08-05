@@ -28,7 +28,7 @@ import { fetchTimezoneListRequest } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
 import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
 import { clearAccountDetails, resetClinicalWorkflow } from '../../store/account/actions';
-import { clearOperatingUnitDetail } from '../../store/subCounty/actions';
+import { clearSubCountyDetail } from '../../store/subCounty/actions';
 import { IRegionDetail } from '../../store/region/types';
 import { getClinicalWorkflowSelector } from '../../store/account/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -48,15 +48,14 @@ const Region = (): React.ReactElement => {
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
 
-  const moduleName = NAME_CONSTANTS.region;
-  const countyModuleName = NAME_CONSTANTS.county;
+  const { region: regionModuleName, county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
 
   const regionDropdownMenuItems = [
     {
       route: PROTECTED_ROUTES.createSuperAdmin,
       menuText: 'Super Admin'
     },
-    { route: PROTECTED_ROUTES.createRegion, menuText: moduleName }
+    { route: PROTECTED_ROUTES.createRegion, menuText: regionModuleName }
   ];
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
@@ -102,7 +101,7 @@ const Region = (): React.ReactElement => {
   useEffect(() => {
     dispatch(clearRegionDetail());
     dispatch(clearAccountDetails());
-    dispatch(clearOperatingUnitDetail());
+    dispatch(clearSubCountyDetail());
     dispatch(clearSiteSummary());
     dispatch(clearClientRegistryStatus());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,7 +140,7 @@ const Region = (): React.ReactElement => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      regions.map(({ ouCount, siteCount, countyCount, name, tenantId, id: regionId }: any) => ({
+      regions.map(({ subCountyCount, siteCount, countyCount, name, tenantId, id: regionId }: any) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId }),
@@ -158,9 +157,9 @@ const Region = (): React.ReactElement => {
           },
           {
             type: 'number',
-            value: Number(ouCount) ? appendZeroBefore(ouCount, 2) : '-',
-            label: 'Operating Unit',
-            route: PROTECTED_ROUTES.OUByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            value: Number(subCountyCount) ? appendZeroBefore(subCountyCount, 2) : '-',
+            label: subCountyModuleName,
+            route: PROTECTED_ROUTES.subCountyByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {
@@ -186,11 +185,11 @@ const Region = (): React.ReactElement => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column`}>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{moduleName}</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{regionModuleName}</h4>
           {!noRegionsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${moduleName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${regionModuleName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <span className='ms-sm-1dot5'>
                 <Dropdown label='Create new' menuItems={regionDropdownMenuItems} />
@@ -210,7 +209,7 @@ const Region = (): React.ReactElement => {
         {noRegionsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {moduleName} or super admin</div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionModuleName} or super admin</div>
             <Dropdown label='Create new' menuItems={regionDropdownMenuItems} className='mx-auto' />
           </div>
         )}

@@ -22,11 +22,11 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.usersByAdmin },
   { route: PROTECTED_ROUTES.usersBySuperAdmin },
   { route: PROTECTED_ROUTES.adminBySuperAdmin },
-  { route: PROTECTED_ROUTES.OUByRegion },
-  { route: PROTECTED_ROUTES.OUByAccount },
+  { route: PROTECTED_ROUTES.subCountyByRegion },
+  { route: PROTECTED_ROUTES.subCountyByAccount },
 
-  { route: PROTECTED_ROUTES.OUAdminByRegion },
-  { route: PROTECTED_ROUTES.OUAdminByAccount },
+  { route: PROTECTED_ROUTES.subCountyAdminByRegion },
+  { route: PROTECTED_ROUTES.subCountyAdminByAccount },
 
   { route: PROTECTED_ROUTES.siteByRegion },
   { route: PROTECTED_ROUTES.siteByAccount },
@@ -49,7 +49,7 @@ const routesWithSideMenu = [
 
   { route: PROTECTED_ROUTES.regionSummary },
   { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
-  // { route: PROTECTED_ROUTES.OUSummary, disabledRoles: [APPCONSTANTS.ROLES.OPERATING_UNIT_ADMIN] },
+  { route: PROTECTED_ROUTES.SubCountySummary, disabledRoles: [APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN] },
   { route: PROTECTED_ROUTES.siteSummary },
 
   { route: PROTECTED_ROUTES.workflowByRegion },
@@ -66,7 +66,7 @@ const routesWithSideMenu = [
 const routesWithoutBreadcrumb = [
   PROTECTED_ROUTES.regionDashboard,
   PROTECTED_ROUTES.accountDashboard,
-  PROTECTED_ROUTES.OUDashboard,
+  PROTECTED_ROUTES.SubCountyDashboard,
   PROTECTED_ROUTES.siteDashboard,
   PROTECTED_ROUTES.dashboard
 ];

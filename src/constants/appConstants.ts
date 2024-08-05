@@ -34,7 +34,7 @@ const APPCONSTANTS = {
     PEER_SUPERVISOR: 'PEER_SUPERVISOR',
     REGION_ADMIN: 'REGION_ADMIN',
     ACCOUNT_ADMIN: 'COUNTY_ADMIN',
-    OPERATING_UNIT_ADMIN: 'SUB_COUNTY_ADMIN',
+    SUB_COUNTY_ADMIN: 'SUB_COUNTY_ADMIN',
     LAB_TECHNICIAN: 'LAB_TECHNICIAN',
     REPORT_ADMIN: 'REPORT_ADMIN',
     SITE_ADMIN: 'SITE_ADMIN'
@@ -48,7 +48,7 @@ const APPCONSTANTS = {
   IS_SIDEMENU_COLLAPSED: 'isSmCollapsed',
   REGIONS_PER_PAGE: 10,
   MEDICATION_LIST_PER_PAGE: 10,
-  CHIEFDOM_PER_PAGE: 15,
+  SUB_COUNTY_PER_PAGE: 15,
   SUPERADMINS_PER_PAGE: 10,
   DISTRICT_PER_PAGE: 10,
   HF_PER_PAGE: 15,
@@ -101,6 +101,25 @@ const APPCONSTANTS = {
   ACCOUNT_ADMIN_UPDATE_FAIL: 'Unable to update account admin. Please try after sometime',
   ACCOUNT_ADMIN_DELETE_SUCCESS: 'Account admin deleted successfully.',
   ACCOUNT_ADMIN_DELETE_FAIL: 'Unable to delete account admin. Please try after sometime.',
+  // Sub County
+  SUB_COUNTY_CREATION_SUCCESS: 'Module_Name created successfully.',
+  SUB_COUNTY_CREATION_FAIL: 'Unable to create module_name. Please try after sometime.',
+  SUB_COUNTY_ADMIN_FETCH_ERROR: 'Unable to load module_name admins. Please try after sometime.',
+  SUB_COUNTY_ADMIN_DELETE_SUCCESS: 'Module_Name admin deleted successfully.',
+  SUB_COUNTY_ADMIN_DELETE_FAIL: 'Unable to delete module_name admin. Please try after sometime.',
+  SUB_COUNTY_ADMIN_UPDATE_FAIL: 'Unable to update module_name admin. Please try after sometime.',
+  SUB_COUNTY_ADMIN_UPDATE_SUCCESS: 'Module_Name admin updated successfully.',
+  SUB_COUNTY_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete the module_name admin?',
+  SUB_COUNTY_ADMIN_DELETE_TITLE: 'Delete Module_Name Admin',
+  OU_FETCH_ERROR: 'Unable to load module_names. Please try after sometime.',
+  SUB_COUNTY_LIST_FETCH_ERROR: 'Unable to load module_name list. Please try after sometime.',
+  SUB_COUNTY_UPDATE_FAIL: 'Unable to update module_name. Please try after sometime.',
+  SUB_COUNTY_UPDATE_SUCCESS: 'Module_Name updated successfully.',
+  SUB_COUNTY_DELETE_CONFIRMATION: 'Are you sure want to delete the module_name?',
+  SUB_COUNTY_DELETE_TITLE: 'Delete Module_Name',
+  SUB_COUNTY_DETAIL_FETCH_ERROR: 'Unable to load module_name summary. Please try after sometime.',
+  SUB_COUNTY_ADMIN_CREATE_SUCCESS: 'Module_Name admin created successfully.',
+  SUB_COUNTY_ADMIN_CREATE_FAIL: 'Unable to create module_name admin. Please try after sometime.',
   // HF
   HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load health facilities. Please try after sometime.',
   HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load health facility users. Please try after sometime.',
@@ -359,6 +378,5 @@ export const ROLE_LABELS = {
   [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
   [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
 };
-
 
 export default APPCONSTANTS;

@@ -37,6 +37,8 @@ export interface IUserFormProps {
 
   roleOptionsState?: React.MutableRefObject<IRoles[][]>;
   isSiteUser?: boolean;
+  isAdminForm?: boolean;
+  defaultSelectedRole?: string;
 }
 
 export interface IUser {
