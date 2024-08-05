@@ -26,7 +26,6 @@ import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizatio
 import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
 import { goToUrl } from './utils/routeUtil';
-import { decryptData } from './utils/commonUtils';
 
 interface IRoute {
   path: string;
@@ -313,9 +312,7 @@ export const AppRoutes = () => {
 
   useEffect(() => {
     if (isLoggedIn && url.current) {
-      const data: any = JSON.parse(decryptData(url.current));
-      goToUrl(data.redirectUrl);
-      url.current = '';
+      goToUrl(url.current);
     }
   }, [data, isLoggedIn, url])
 
