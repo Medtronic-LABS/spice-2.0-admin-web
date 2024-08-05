@@ -1,186 +1,185 @@
-import { OperatingUnitActions, IOperatingUnitState } from './types';
+import { SubCountyActions, ISubCountyState } from './types';
 import * as ACTION_TYPES from './actionTypes';
 
-const initialState: IOperatingUnitState = {
-  operatingUnitList: [],
+export const initialState: ISubCountyState = {
+  subCountyList: [],
   listTotal: 0,
-  operatingUnitDetail: {
+  subCountyDetail: {
     id: '',
     name: '',
     tenantId: '',
+    countryId: '',
+    countyName: '',
     account: {
       id: '',
-      name: ''
-    },
-    county: {
-      id: '',
-      name: ''
+      name: '',
+      tenantId: ''
     }
   },
   admins: [],
-  operatingUnitDashboardList: [],
+  subCountyDashboardList: [],
   error: null,
   total: 0,
   loading: false,
   loadingMore: false,
-  operatingUnitAdmins: [],
-  dropdownOUList: [],
-  dropdownOUListLoading: false
+  subCountyAdmins: [],
+  dropdownSubCountyList: [],
+  dropdownSubCountyListLoading: false
 };
 
-const operatingUnitReducer = (
-  state: IOperatingUnitState = initialState,
-  action = {} as OperatingUnitActions
-): IOperatingUnitState => {
+const subCountyReducer = (
+  state: ISubCountyState = initialState,
+  action = {} as SubCountyActions
+): ISubCountyState => {
   switch (action.type) {
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DASHBOARD_LIST_REQUEST:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_REQUEST:
       return {
         ...state,
         [action.isLoadMore ? 'loadingMore' : 'loading']: true
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DASHBOARD_LIST_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_SUCCESS:
       return {
         ...state,
         loading: false,
         loadingMore: false,
-        operatingUnitDashboardList: action.payload.isLoadMore
-          ? [...state.operatingUnitDashboardList, ...action.payload.operatingUnitDashboardList]
-          : action.payload.operatingUnitDashboardList,
+        subCountyDashboardList: action.payload.isLoadMore
+          ? [...state.subCountyDashboardList, ...action.payload.subCountyDashboardList]
+          : action.payload.subCountyDashboardList,
         total: action.payload.isLoadMore ? state.total : action.payload.total
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DASHBOARD_LIST_FAILURE:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_FAILURE:
       return {
         ...state,
         loading: false,
         loadingMore: false
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_LIST_REQUEST:
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DETAIL_REQUEST:
-    case ACTION_TYPES.CREATE_OPERATING_UNIT_REQUEST:
-    case ACTION_TYPES.UPDATE_OPERATING_UNIT_REQUEST:
-    case ACTION_TYPES.UPDATE_OPERATING_UNIT_ADMIN_REQUEST:
-    case ACTION_TYPES.CREATE_OPERATING_UNIT_ADMIN_REQUEST:
-    case ACTION_TYPES.DELETE_OPERATING_UNIT_ADMIN_REQUEST:
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_BY_ID_REQUEST:
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_ADMIN_LIST_REQUEST:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_LIST_REQUEST:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_REQUEST:
+    case ACTION_TYPES.CREATE_SUB_COUNTY_REQUEST:
+    case ACTION_TYPES.UPDATE_SUB_COUNTY_REQUEST:
+    case ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_REQUEST:
+    case ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_REQUEST:
+    case ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_REQUEST:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_REQUEST:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST:
       return {
         ...state,
         loading: true
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DETAIL_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_SUCCESS:
       return {
         ...state,
-        operatingUnitDetail: action.payload.operatingUnitDetail,
-        admins: action.payload.operatingUnitAdmins,
+        subCountyDetail: action.payload.subCountyDetail,
+        admins: action.payload.subCountyAdmins,
         loading: false
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DETAIL_FAILURE:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_FAILURE:
       return {
         ...state,
         loading: false,
         error: action.error,
-        operatingUnitDetail: initialState.operatingUnitDetail
+        subCountyDetail: initialState.subCountyDetail
       };
-    case ACTION_TYPES.SEARCH_OPERATING_UNIT_USER_SUCCESS:
+    case ACTION_TYPES.SEARCH_SUB_COUNTY_USER_SUCCESS:
       return {
         ...state,
         loading: false,
         admins: action.payload
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_LIST_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_LIST_SUCCESS:
       return {
         ...state,
-        operatingUnitList: action.payload.operatingUnitList,
+        subCountyList: action.payload.subCountyList,
         listTotal: action.payload.total,
         loading: false
       };
-    case ACTION_TYPES.CLEAR_OPERATING_UNIT_LIST:
+    case ACTION_TYPES.CLEAR_SUB_COUNTY_LIST:
       return {
         ...state,
-        operatingUnitList: [],
+        subCountyList: [],
         listTotal: 0
       };
-    case ACTION_TYPES.UPDATE_OPERATING_UNIT_SUCCESS:
+    case ACTION_TYPES.UPDATE_SUB_COUNTY_SUCCESS:
       return {
         ...state,
         loading: false,
-        operatingUnitDetail: action.payload
+        subCountyDetail: action.payload
           ? {
-              ...state.operatingUnitDetail,
+              ...state.subCountyDetail,
               ...action.payload
             }
-          : state.operatingUnitDetail
+          : state.subCountyDetail
       };
-    case ACTION_TYPES.UPDATE_OPERATING_UNIT_ADMIN_SUCCESS:
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_LIST_FAILURE:
-    case ACTION_TYPES.CREATE_OPERATING_UNIT_SUCCESS:
-    case ACTION_TYPES.CREATE_OPERATING_UNIT_FAILURE:
-    case ACTION_TYPES.UPDATE_OPERATING_UNIT_FAILURE:
-    case ACTION_TYPES.UPDATE_OPERATING_UNIT_ADMIN_FAILURE:
-    case ACTION_TYPES.CREATE_OPERATING_UNIT_ADMIN_SUCCESS:
-    case ACTION_TYPES.CREATE_OPERATING_UNIT_ADMIN_FAILURE:
-    case ACTION_TYPES.DELETE_OPERATING_UNIT_ADMIN_SUCCESS:
-    case ACTION_TYPES.DELETE_OPERATING_UNIT_ADMIN_FAILURE:
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_BY_ID_SUCCESS:
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_BY_ID_FAILURE:
+    case ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_LIST_FAILURE:
+    case ACTION_TYPES.CREATE_SUB_COUNTY_SUCCESS:
+    case ACTION_TYPES.CREATE_SUB_COUNTY_FAILURE:
+    case ACTION_TYPES.UPDATE_SUB_COUNTY_FAILURE:
+    case ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_FAILURE:
+    case ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_SUCCESS:
+    case ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_FAILURE:
+    case ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_SUCCESS:
+    case ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_FAILURE:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_FAILURE:
       return {
         ...state,
         loading: false
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_ADMIN_LIST_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_SUCCESS:
       return {
         ...state,
         loading: false,
-        operatingUnitAdmins: action.payload.operatingUnitAdmins,
+        subCountyAdmins: action.payload.subCountyAdmins,
         total: action.payload.total,
         error: null
       };
-    case ACTION_TYPES.CLEAR_OPERATING_UNIT_ADMIN_LIST:
+    case ACTION_TYPES.CLEAR_SUB_COUNTY_ADMIN_LIST:
       return {
         ...state,
-        operatingUnitAdmins: [],
+        subCountyAdmins: [],
         total: 0
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_ADMIN_LIST_FAILURE:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_FAILURE:
       return {
         ...state,
         loading: false,
         error: action.error
       };
-    case ACTION_TYPES.CLEAR_OPERATING_UNIT_DETAIL:
-      return { ...state, operatingUnitDetail: initialState.operatingUnitDetail, admins: [] };
-    case ACTION_TYPES.SET_OPERATING_UNIT_DETAILS:
+    case ACTION_TYPES.CLEAR_SUB_COUNTY_DETAIL:
+      return { ...state, subCountyDetail: initialState.subCountyDetail, admins: [] };
+    case ACTION_TYPES.SET_SUB_COUNTY_DETAILS:
       return {
         ...state,
-        operatingUnitDetail: { ...state.operatingUnitDetail, ...action.data }
+        subCountyDetail: { ...state.subCountyDetail, ...action.data }
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DROPDOWN_REQUEST:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST:
       return {
         ...state,
-        dropdownOUList: [],
-        dropdownOUListLoading: true
+        dropdownSubCountyList: [],
+        dropdownSubCountyListLoading: true
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DROPDOWN_SUCCESS:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_SUCCESS:
       return {
         ...state,
-        dropdownOUListLoading: false,
-        dropdownOUList: action.payload.operatingUnitList || []
+        dropdownSubCountyListLoading: false,
+        dropdownSubCountyList: action.payload.subCountyList || []
       };
-    case ACTION_TYPES.FETCH_OPERATING_UNIT_DROPDOWN_FAIL:
+    case ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAIL:
       return {
         ...state,
-        dropdownOUListLoading: false,
+        dropdownSubCountyListLoading: false,
         error: action.error
       };
     case ACTION_TYPES.CLEAR_DROPDOWN_VALUES:
       return {
         ...state,
-        dropdownOUListLoading: false,
-        dropdownOUList: []
+        dropdownSubCountyListLoading: false,
+        dropdownSubCountyList: []
       };
     default:
       return state;
   }
 };
 
-export default operatingUnitReducer;
+export default subCountyReducer;

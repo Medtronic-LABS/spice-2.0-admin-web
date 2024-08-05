@@ -33,6 +33,12 @@ const superAdminRoutes: ISideMenuItem[] = [
     disabled: false
   },
   {
+    label: 'Sub County',
+    route: PROTECTED_ROUTES.subCountyByRegion,
+    collapsible: true,
+    disabled: false
+  },
+  {
     label: 'Medication Database',
     route: PROTECTED_ROUTES.medicationByRegion,
     disabled: true

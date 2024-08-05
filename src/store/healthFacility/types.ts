@@ -220,7 +220,7 @@ export interface IHFUserPost {
   countryCode: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
-  county: string | number;
+  county?: string | number;
   village?: string;
   supervisorId?: number;
   villageIds?: number[];

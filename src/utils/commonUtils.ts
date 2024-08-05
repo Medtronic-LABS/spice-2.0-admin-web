@@ -94,8 +94,6 @@ export const formatDate = (date: string, format: string = 'YYY-MM-DD') => {
   return format.replace('YYYY', y).replace('MM', m).replace('DD', d);
 };
 
-export const formatCountryCode = (value: string) => (value ? `+${value}` : '');
-
 /**
  * Formats a message by replacing occurrences of a specified text with a replacement text.
  *
@@ -119,7 +117,7 @@ export const formatUserToastMsg = (
     { regex: new RegExp(textToReplace.toUpperCase(), 'g'), replacement: replacementText.toUpperCase() } // upper case
   ];
   replacements.forEach(({ regex, replacement }) => {
-    msg = msg?.replace(regex, replacement);
+    msg = msg.replace(regex, replacement);
   });
   return msg;
 };
