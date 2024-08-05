@@ -1,47 +1,47 @@
 import {
-  IFetchOperatingUnitDetailFail,
-  IFetchOperatingUnitDetailSuccess,
-  IFetchOperaingUnitAdminsSuccess,
-  IFetchOUDashboardListFailure,
-  IFetchOUDashboardListRequest,
-  IFetchOUDashboardListSuccess,
-  IFetchOUDashboardListSuccessPayload,
-  ICreateOperatingUnitRequest,
-  IFetchOperatingUnitAdminsRequest,
-  IFetchOperatingUnitAdminsSuccessPayload,
-  IFetchOperatingUnitDetailReq,
-  IFetchOperatingUnitDetailReqPayload,
-  IOperatingUnitAdmin,
-  ISearchOperatingUnitAdminSuccess,
-  IFetchOperatingUnitListRequest,
-  IFetchOperatingUnitListSuccess,
-  IFetchOperatingUnitListFailure,
-  IFetchOperatingUnitListSuccessPayload,
-  IUpdateOperatingUnitSuccess,
-  IUpdateOperatingUnitFailure,
-  IUpdateOperatingUnitRequest,
-  IUpdateOperatingUnitAdminRequest,
-  IUpdateOperatingUnitAdminSuccess,
-  IUpdateOperatingUnitAdminFailure,
-  IFetchOperatingUnitDetailSuccessPayload,
-  IOperatingUnitDetail,
-  ICreateOperatingUnitAdminRequest,
-  ICreateOperatingUnitAdminSuccess,
-  ICreateOperatingUnitAdminFailure,
-  IDeleteOperatingUnitAdminRequest,
-  IDeleteOperatingUnitAdminSuccess,
-  IDeleteOperatingUnitAdminFailure,
-  IFetchOperatingUnitByIdFailure,
-  IFetchOperatingUnitByIdSuccess,
-  IFetchOperatingUnitByIdRequest,
-  IFetchOperaingUnitAdminsFailure,
-  ISetOperatingUnitDetails,
-  IClearOperatingUnitAdminList,
-  IClearOperatingUnitList,
-  IOperatingUnitDropdownRequest,
-  IOperatingUnitDropdownFailure,
-  IOperatingUnitDropdownSuccess,
-  IOperatingUnitDropdownSuccessPayload
+  IFetchSubCountyDetailFail,
+  IFetchSubCountyDetailSuccess,
+  IFetchSubCountyAdminsSuccess,
+  IFetchSubCountyDashboardListFailure,
+  IFetchSubCountyDashboardListRequest,
+  IFetchSubCountyDashboardListSuccess,
+  IFetchSubCountyDashboardListSuccessPayload,
+  ICreateSubCountyRequest,
+  IFetchSubCountyAdminsRequest,
+  IFetchSubCountyAdminsSuccessPayload,
+  IFetchSubCountyDetailReq,
+  IFetchSubCountyDetailReqPayload,
+  ISubCountyAdmin,
+  ISearchSubCountyAdminSuccess,
+  IFetchSubCountyListRequest,
+  IFetchSubCountyListSuccess,
+  IFetchSubCountyListFailure,
+  IFetchSubCountyListSuccessPayload,
+  IUpdateSubCountySuccess,
+  IUpdateSubCountyFailure,
+  IUpdateSubCountyRequest,
+  IUpdateSubCountyAdminRequest,
+  IUpdateSubCountyAdminSuccess,
+  IUpdateSubCountyAdminFailure,
+  IFetchSubCountyDetailSuccessPayload,
+  ISubCountyDetail,
+  ICreateSubCountyAdminRequest,
+  ICreateSubCountyAdminSuccess,
+  ICreateSubCountyAdminFailure,
+  IDeleteSubCountyAdminRequest,
+  IDeleteSubCountyAdminSuccess,
+  IDeleteSubCountyAdminFailure,
+  IFetchSubCountyByIdFailure,
+  IFetchSubCountyByIdSuccess,
+  IFetchSubCountyByIdRequest,
+  IFetchSubCountyAdminsFailure,
+  ISetSubCountyDetails,
+  IClearSubCountyAdminList,
+  IClearSubCountyList,
+  ISubCountyDropdownRequest,
+  ISubCountyDropdownFailure,
+  ISubCountyDropdownSuccess,
+  ISubCountyDropdownSuccessPayload
 } from './types';
 import * as ACTION_TYPES from './actionTypes';
 
@@ -52,8 +52,8 @@ export const fetchOUDashboardListRequest = ({
   search,
   successCb,
   failureCb
-}: Omit<IFetchOUDashboardListRequest, 'type'>): IFetchOUDashboardListRequest => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DASHBOARD_LIST_REQUEST,
+}: Omit<IFetchSubCountyDashboardListRequest, 'type'>): IFetchSubCountyDashboardListRequest => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_REQUEST,
   skip,
   limit,
   isLoadMore,
@@ -63,42 +63,42 @@ export const fetchOUDashboardListRequest = ({
 });
 
 export const fetchOUDashboardListSuccess = (
-  payload: IFetchOUDashboardListSuccessPayload
-): IFetchOUDashboardListSuccess => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DASHBOARD_LIST_SUCCESS,
+  payload: IFetchSubCountyDashboardListSuccessPayload
+): IFetchSubCountyDashboardListSuccess => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_SUCCESS,
   payload
 });
 
-export const fetchOUDashboardListFailure = (error: Error): IFetchOUDashboardListFailure => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DASHBOARD_LIST_FAILURE,
+export const fetchOUDashboardListFailure = (error: Error): IFetchSubCountyDashboardListFailure => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_FAILURE,
   error
 });
 
-export const fetchOperatingUnitDetail = (
-  payload: IFetchOperatingUnitDetailReqPayload
-): IFetchOperatingUnitDetailReq => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DETAIL_REQUEST,
+export const fetchSubCountyDetail = (
+  payload: IFetchSubCountyDetailReqPayload
+): IFetchSubCountyDetailReq => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_REQUEST,
   payload
 });
 
-export const fetchOperatingUnitDetailSuccess = (
-  payload: IFetchOperatingUnitDetailSuccessPayload
-): IFetchOperatingUnitDetailSuccess => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DETAIL_SUCCESS,
+export const fetchSubCountyDetailSuccess = (
+  payload: IFetchSubCountyDetailSuccessPayload
+): IFetchSubCountyDetailSuccess => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_SUCCESS,
   payload
 });
 
-export const fetchOperatingUnitDetailFail = (error: Error): IFetchOperatingUnitDetailFail => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DETAIL_FAILURE,
+export const fetchSubCountyDetailFail = (error: Error): IFetchSubCountyDetailFail => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_FAILURE,
   error
 });
 
-export const searchUserSuccess = (payload: IOperatingUnitAdmin[]): ISearchOperatingUnitAdminSuccess => ({
-  type: ACTION_TYPES.SEARCH_OPERATING_UNIT_USER_SUCCESS,
+export const searchUserSuccess = (payload: ISubCountyAdmin[]): ISearchSubCountyAdminSuccess => ({
+  type: ACTION_TYPES.SEARCH_SUB_COUNTY_USER_SUCCESS,
   payload
 });
 
-export const fetchOperatingUnitListRequest = ({
+export const fetchSubCountyListRequest = ({
   tenantId,
   skip,
   limit,
@@ -110,8 +110,8 @@ export const fetchOperatingUnitListRequest = ({
   limit: number | null;
   search?: string;
   failureCb?: (error: Error) => void;
-}): IFetchOperatingUnitListRequest => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_LIST_REQUEST,
+}): IFetchSubCountyListRequest => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_LIST_REQUEST,
   tenantId,
   skip,
   limit,
@@ -119,197 +119,197 @@ export const fetchOperatingUnitListRequest = ({
   failureCb
 });
 
-export const fetchOperatingUnitListSuccess = (
-  payload: IFetchOperatingUnitListSuccessPayload
-): IFetchOperatingUnitListSuccess => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_LIST_SUCCESS,
+export const fetchSubCountyListSuccess = (
+  payload: IFetchSubCountyListSuccessPayload
+): IFetchSubCountyListSuccess => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_LIST_SUCCESS,
   payload
 });
 
-export const fetchOperatingUnitListFailure = (error: Error): IFetchOperatingUnitListFailure => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_LIST_FAILURE,
+export const fetchSubCountyListFailure = (error: Error): IFetchSubCountyListFailure => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_LIST_FAILURE,
   error
 });
 
-export const createOperatingUnitRequest = ({
+export const createSubCountyRequest = ({
   payload,
   successCb,
   failureCb
-}: Omit<ICreateOperatingUnitRequest, 'type'>): ICreateOperatingUnitRequest => ({
-  type: ACTION_TYPES.CREATE_OPERATING_UNIT_REQUEST,
+}: Omit<ICreateSubCountyRequest, 'type'>): ICreateSubCountyRequest => ({
+  type: ACTION_TYPES.CREATE_SUB_COUNTY_REQUEST,
   payload,
   successCb,
   failureCb
 });
 
-export const createOperatingUnitSuccess = () => ({
-  type: ACTION_TYPES.CREATE_OPERATING_UNIT_SUCCESS
+export const createSubCountySuccess = () => ({
+  type: ACTION_TYPES.CREATE_SUB_COUNTY_SUCCESS
 });
 
-export const createOperatingUnitFailure = () => ({
-  type: ACTION_TYPES.CREATE_OPERATING_UNIT_FAILURE
+export const createSubCountyFailure = () => ({
+  type: ACTION_TYPES.CREATE_SUB_COUNTY_FAILURE
 });
 
-export const updateOperatingUnitReq = ({
-  payload,
-  isSuccessPayloadNeeded,
-  successCb,
-  failureCb
-}: Omit<IUpdateOperatingUnitRequest, 'type'>): IUpdateOperatingUnitRequest => ({
-  type: ACTION_TYPES.UPDATE_OPERATING_UNIT_REQUEST,
+export const updateSubCountyReq = ({
   payload,
   isSuccessPayloadNeeded,
   successCb,
   failureCb
+}: Omit<IUpdateSubCountyRequest, 'type'>): IUpdateSubCountyRequest => ({
+  type: ACTION_TYPES.UPDATE_SUB_COUNTY_REQUEST,
+  payload,
+  isSuccessPayloadNeeded,
+  successCb,
+  failureCb
 });
 
-export const updateOperatingUnitSuccess = (payload?: Partial<IOperatingUnitDetail>): IUpdateOperatingUnitSuccess => ({
-  type: ACTION_TYPES.UPDATE_OPERATING_UNIT_SUCCESS,
+export const updateSubCountySuccess = (payload?: Partial<ISubCountyDetail>): IUpdateSubCountySuccess => ({
+  type: ACTION_TYPES.UPDATE_SUB_COUNTY_SUCCESS,
   payload
 });
 
-export const updateOperatingUnitFailure = (): IUpdateOperatingUnitFailure => ({
-  type: ACTION_TYPES.UPDATE_OPERATING_UNIT_FAILURE
+export const updateSubCountyFailure = (): IUpdateSubCountyFailure => ({
+  type: ACTION_TYPES.UPDATE_SUB_COUNTY_FAILURE
 });
 
-export const updateOperatingUnitAdminReq = ({
+export const updateSubCountyAdminReq = ({
   payload,
   successCb,
   failureCb
-}: Omit<IUpdateOperatingUnitAdminRequest, 'type'>): IUpdateOperatingUnitAdminRequest => ({
-  type: ACTION_TYPES.UPDATE_OPERATING_UNIT_ADMIN_REQUEST,
-  payload,
-  successCb,
-  failureCb
-});
-
-export const updateOperatingUnitAdminSuccess = (): IUpdateOperatingUnitAdminSuccess => ({
-  type: ACTION_TYPES.UPDATE_OPERATING_UNIT_ADMIN_SUCCESS
-});
-
-export const updateOperatingUnitAdminFailure = (): IUpdateOperatingUnitAdminFailure => ({
-  type: ACTION_TYPES.UPDATE_OPERATING_UNIT_ADMIN_FAILURE
-});
-
-export const createOperatingUnitAdminReq = ({
-  payload,
-  successCb,
-  failureCb
-}: Omit<ICreateOperatingUnitAdminRequest, 'type'>): ICreateOperatingUnitAdminRequest => ({
-  type: ACTION_TYPES.CREATE_OPERATING_UNIT_ADMIN_REQUEST,
+}: Omit<IUpdateSubCountyAdminRequest, 'type'>): IUpdateSubCountyAdminRequest => ({
+  type: ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_REQUEST,
   payload,
   successCb,
   failureCb
 });
 
-export const createOperatingUnitAdminSuccess = (): ICreateOperatingUnitAdminSuccess => ({
-  type: ACTION_TYPES.CREATE_OPERATING_UNIT_ADMIN_SUCCESS
+export const updateSubCountyAdminSuccess = (): IUpdateSubCountyAdminSuccess => ({
+  type: ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_SUCCESS
 });
 
-export const createOperatingUnitAdminFailure = (): ICreateOperatingUnitAdminFailure => ({
-  type: ACTION_TYPES.CREATE_OPERATING_UNIT_ADMIN_FAILURE
+export const updateSubCountyAdminFailure = (): IUpdateSubCountyAdminFailure => ({
+  type: ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_FAILURE
 });
 
-export const deleteOperatingUnitAdminReq = ({
+export const createSubCountyAdminReq = ({
   payload,
   successCb,
   failureCb
-}: Omit<IDeleteOperatingUnitAdminRequest, 'type'>): IDeleteOperatingUnitAdminRequest => ({
-  type: ACTION_TYPES.DELETE_OPERATING_UNIT_ADMIN_REQUEST,
-  payload,
-  successCb,
-  failureCb
-});
-
-export const deleteOperatingUnitAdminSuccess = (): IDeleteOperatingUnitAdminSuccess => ({
-  type: ACTION_TYPES.DELETE_OPERATING_UNIT_ADMIN_SUCCESS
-});
-
-export const deleteOperatingUnitAdminFailure = (): IDeleteOperatingUnitAdminFailure => ({
-  type: ACTION_TYPES.DELETE_OPERATING_UNIT_ADMIN_FAILURE
-});
-
-export const fetchOperatingUnitByIdReq = ({
-  payload,
-  successCb,
-  failureCb
-}: Omit<IFetchOperatingUnitByIdRequest, 'type'>): IFetchOperatingUnitByIdRequest => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_BY_ID_REQUEST,
+}: Omit<ICreateSubCountyAdminRequest, 'type'>): ICreateSubCountyAdminRequest => ({
+  type: ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_REQUEST,
   payload,
   successCb,
   failureCb
 });
 
-export const fetchOperatingUnitByIdSuccess = (): IFetchOperatingUnitByIdSuccess => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_BY_ID_SUCCESS
+export const createSubCountyAdminSuccess = (): ICreateSubCountyAdminSuccess => ({
+  type: ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_SUCCESS
 });
 
-export const fetchOperatingUnitByIdFailure = (): IFetchOperatingUnitByIdFailure => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_BY_ID_FAILURE
+export const createSubCountyAdminFailure = (): ICreateSubCountyAdminFailure => ({
+  type: ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_FAILURE
 });
 
-export const fetchOperatingUnitAdminRequest = ({
+export const deleteSubCountyAdminReq = ({
+  payload,
+  successCb,
+  failureCb
+}: Omit<IDeleteSubCountyAdminRequest, 'type'>): IDeleteSubCountyAdminRequest => ({
+  type: ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_REQUEST,
+  payload,
+  successCb,
+  failureCb
+});
+
+export const deleteSubCountyAdminSuccess = (): IDeleteSubCountyAdminSuccess => ({
+  type: ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_SUCCESS
+});
+
+export const deleteSubCountyAdminFailure = (): IDeleteSubCountyAdminFailure => ({
+  type: ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_FAILURE
+});
+
+export const fetchSubCountyByIdReq = ({
+  payload,
+  successCb,
+  failureCb
+}: Omit<IFetchSubCountyByIdRequest, 'type'>): IFetchSubCountyByIdRequest => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_REQUEST,
+  payload,
+  successCb,
+  failureCb
+});
+
+export const fetchSubCountyByIdSuccess = (): IFetchSubCountyByIdSuccess => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_SUCCESS
+});
+
+export const fetchSubCountyByIdFailure = (): IFetchSubCountyByIdFailure => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_FAILURE
+});
+
+export const fetchSubCountyAdminRequest = ({
   payload,
   successCb,
   failureCb
 }: {
   payload: { skip: number; limit: number | null; searchTerm?: string; tenantId: string };
-  successCb?: (payload: IFetchOperatingUnitAdminsSuccessPayload) => void;
+  successCb?: (payload: IFetchSubCountyAdminsSuccessPayload) => void;
   failureCb?: (error: Error) => void;
-}): IFetchOperatingUnitAdminsRequest => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_ADMIN_LIST_REQUEST,
+}): IFetchSubCountyAdminsRequest => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST,
   payload,
   successCb,
   failureCb
 });
 
-export const fetchOperatingUnitAdminsSuccess = (
-  payload: IFetchOperatingUnitAdminsSuccessPayload
-): IFetchOperaingUnitAdminsSuccess => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_ADMIN_LIST_SUCCESS,
+export const fetchSubCountyAdminsSuccess = (
+  payload: IFetchSubCountyAdminsSuccessPayload
+): IFetchSubCountyAdminsSuccess => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_SUCCESS,
   payload
 });
 
-export const fetchOperatingUnitAdminsFailure = (error: Error): IFetchOperaingUnitAdminsFailure => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_ADMIN_LIST_FAILURE,
+export const fetchSubCountyAdminsFailure = (error: Error): IFetchSubCountyAdminsFailure => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_FAILURE,
   error
 });
 
-export const clearOperatingUnitDetail = () => ({
-  type: ACTION_TYPES.CLEAR_OPERATING_UNIT_DETAIL
+export const clearSubCountyDetail = () => ({
+  type: ACTION_TYPES.CLEAR_SUB_COUNTY_DETAIL
 });
 
-export const setOperatingUnitDetails = (data?: Partial<IOperatingUnitDetail>): ISetOperatingUnitDetails => ({
-  type: ACTION_TYPES.SET_OPERATING_UNIT_DETAILS,
+export const setSubCountyDetails = (data?: Partial<ISubCountyDetail>): ISetSubCountyDetails => ({
+  type: ACTION_TYPES.SET_SUB_COUNTY_DETAILS,
   data
 });
 
-export const clearOperatingUnitList = (): IClearOperatingUnitList => ({
-  type: ACTION_TYPES.CLEAR_OPERATING_UNIT_LIST
+export const clearSubCountyList = (): IClearSubCountyList => ({
+  type: ACTION_TYPES.CLEAR_SUB_COUNTY_LIST
 });
 
-export const clearOperatingUnitAdminList = (): IClearOperatingUnitAdminList => ({
-  type: ACTION_TYPES.CLEAR_OPERATING_UNIT_ADMIN_LIST
+export const clearSubCountyAdminList = (): IClearSubCountyAdminList => ({
+  type: ACTION_TYPES.CLEAR_SUB_COUNTY_ADMIN_LIST
 });
 
-export const fetchOperatingUnitDropdownRequest = ({
+export const fetchSubCountyDropdownRequest = ({
   tenantId
 }: {
   tenantId: string;
-}): IOperatingUnitDropdownRequest => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DROPDOWN_REQUEST,
+}): ISubCountyDropdownRequest => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST,
   tenantId
 });
 
-export const fetchOperatingUnitDropdownSuccess = (
-  payload: IOperatingUnitDropdownSuccessPayload
-): IOperatingUnitDropdownSuccess => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DROPDOWN_SUCCESS,
+export const fetchSubCountyDropdownSuccess = (
+  payload: ISubCountyDropdownSuccessPayload
+): ISubCountyDropdownSuccess => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_SUCCESS,
   payload
 });
 
-export const fetchOperatingUnitDropdownFailure = (error: Error): IOperatingUnitDropdownFailure => ({
-  type: ACTION_TYPES.FETCH_OPERATING_UNIT_DROPDOWN_FAIL,
+export const fetchSubCountyDropdownFailure = (error: Error): ISubCountyDropdownFailure => ({
+  type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAIL,
   error
 });
 

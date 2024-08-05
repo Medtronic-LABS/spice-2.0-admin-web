@@ -45,6 +45,8 @@ const TextInput = ({
       className='input'
       {...props}
       autoComplete='off'
+      id={props.name}
+      aria-label={props.name}
     />
   );
   return (

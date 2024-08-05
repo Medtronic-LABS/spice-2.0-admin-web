@@ -115,7 +115,7 @@ export const deactivateAccount = (data: IAccountDeactivate) =>
 export const fetchAccountOptions = (data: IFetchAccountOptionsPayload) =>
   axios({
     method: 'POST',
-    url: '/admin-service/account/account-list',
+    url: '/admin-service/county/county-list',
     data
   });
 

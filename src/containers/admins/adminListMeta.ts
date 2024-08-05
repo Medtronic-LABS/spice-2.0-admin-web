@@ -2,7 +2,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
 
 
-const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, OPERATING_UNIT_ADMIN } = APPCONSTANTS.ROLES;
+const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN } = APPCONSTANTS.ROLES;
 /**
  * Formats the user's full name by concatenating the first name and last name.
  *
@@ -54,13 +54,13 @@ const formatCounty = (user: IHFUserGet): string =>
   formatOrganizations(user, ACCOUNT_ADMIN);
 
 /**
- * Formats sub-county names for the user with the OPERATING_UNIT_ADMIN role.
+ * Formats sub-county names for the user with the SUB_COUNTY_ADMIN role.
  *
  * @param {IHFUserGet} user - The user object containing roles and organizations.
- * @returns {string} A comma-separated list of sub-county names if the user has the OPERATING_UNIT_ADMIN role.
+ * @returns {string} A comma-separated list of sub-county names if the user has the SUB_COUNTY_ADMIN role.
  */
 const formatSubCounty = (user: IHFUserGet): string =>
-  formatOrganizations(user, OPERATING_UNIT_ADMIN);
+  formatOrganizations(user, SUB_COUNTY_ADMIN);
 
 export const columnDef = [
   {

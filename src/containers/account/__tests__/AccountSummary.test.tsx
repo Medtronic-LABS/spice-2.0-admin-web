@@ -28,9 +28,9 @@ jest.mock('../../../constants/appConstants', () => ({
     SUPER_ADMIN: 'SUPER_ADMIN',
     REGION_ADMIN: 'REGION_ADMIN',
     ACCOUNT_ADMIN: 'ACCOUNT_ADMIN',
-    OPERATING_UNIT_ADMIN: 'OPERATING_UNIT_ADMIN'
+    SUB_COUNTY_ADMIN: 'SUB_COUNTY_ADMIN'
   },
-  OPERATING_UNIT_DELETE_CONFIRMATION: undefined,
+  SUB_COUNTY_DELETE_CONFIRMATION: undefined,
   DELETE_CONSENT_TITLE: 'Delete confirmation',
   DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the account consent form?'
 }));

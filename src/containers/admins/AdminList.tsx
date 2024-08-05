@@ -205,7 +205,7 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      const [selectedUser] = users
+      const [selectedUser] = users;
       const userObj = formatHFUserData(users, countryIdValue, tenantId || selectedUser.county?.tenantId);
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(

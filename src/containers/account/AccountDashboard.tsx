@@ -108,7 +108,7 @@ const AccountDashboard = () => {
             value: Number(ouCount) ? appendZeroBefore(ouCount, 2) : '-',
             label: 'Operating Unit',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.OUByAccount.replace(':accountId', formDataId).replace(':tenantId', _id),
+            route: PROTECTED_ROUTES.subCountyByAccount.replace(':accountId', formDataId).replace(':tenantId', _id),
             onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
           },
           {

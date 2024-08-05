@@ -30,7 +30,7 @@ export const PROTECTED_ROUTES = {
     '/region/:regionId/:tenantId/:form/accountCustomize/:clinicalWorkflowId/:workflowId',
   regionDashboard: '/region',
   accountDashboard: '/account',
-  OUDashboard: '/OU',
+  SubCountyDashboard: '/sub-county',
   siteDashboard: '/site',
   createAccountByRegion: '/region/:regionId/:tenantId/account/create',
   createOUByRegion: '/region/:regionId/:tenantId/OU/create',
@@ -42,11 +42,11 @@ export const PROTECTED_ROUTES = {
 
   accountAdminByRegion: '/region/:regionId/:tenantId/account-admin',
 
-  OUByRegion: '/region/:regionId/:tenantId/OU',
-  OUByAccount: '/account/:accountId/:tenantId/OU',
+  subCountyByRegion: '/region/:regionId/:tenantId/sub-county',
+  subCountyByAccount: '/account/:accountId/:tenantId/sub-county',
 
-  OUAdminByRegion: '/region/:regionId/:tenantId/ouAdmin',
-  OUAdminByAccount: '/account/:accountId/:tenantId/ou-admin',
+  subCountyAdminByRegion: '/region/:regionId/:tenantId/sub-county-admin',
+  subCountyAdminByAccount: '/account/:accountId/:tenantId/sub-county-admin',
 
   siteAdminByRegion: '/region/:regionId/:tenantId/siteAdmin',
   siteAdminByAccount: '/account/:accountId/:tenantId/siteAdmin',
@@ -77,7 +77,7 @@ export const PROTECTED_ROUTES = {
 
   regionSummary: '/region/:regionId/:tenantId',
   accountSummary: '/account/:accountId/:tenantId',
-  OUSummary: '/OU/:OUId/:tenantId',
+  SubCountySummary: '/OU/:OUId/:tenantId',
   siteSummary: '/site/:siteId/:tenantId',
 
   workflowByRegion: '/region/:regionId/:tenantId/workflow',
@@ -98,5 +98,6 @@ export const HOME_PAGE_BY_ROLE = {
   [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.dashboard,
   [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.dashboard,
   [APPCONSTANTS.ROLES.REGION_ADMIN]: PROTECTED_ROUTES.accountDashboard,
+  [APPCONSTANTS.ROLES.ACCOUNT_ADMIN]: PROTECTED_ROUTES.SubCountyDashboard,
   [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: PROTECTED_ROUTES.healthFacilityByAdmin
 };

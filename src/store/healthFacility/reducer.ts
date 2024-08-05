@@ -9,7 +9,7 @@ import {
   IHealthFacilityState
 } from './types';
 
-const initialState: IHealthFacilityState = {
+export const initialState: IHealthFacilityState = {
   hfTotal: 0,
   loading: false,
   healthFacility: {

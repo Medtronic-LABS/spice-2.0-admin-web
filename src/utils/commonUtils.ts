@@ -93,3 +93,31 @@ export const formatDate = (date: string, format: string = 'YYY-MM-DD') => {
   });
   return format.replace('YYYY', y).replace('MM', m).replace('DD', d);
 };
+
+/**
+ * Formats a message by replacing occurrences of a specified text with a replacement text.
+ *
+ * @param {string} msg - The message to be formatted.
+ * @param {string} replacementText - The text to replace the specified text with.
+ * @param {string} [textToReplace='Module_Name'] - The text to be replaced in the message.
+ * @returns {string} - The formatted message with the replacements applied.
+ */
+export const formatUserToastMsg = (
+  msg: string,
+  replacementText: string,
+  textToReplace: string = 'Module_Name'
+): string => {
+  const replacements = [
+    { regex: new RegExp(textToReplace, 'g'), replacement: replacementText }, // exact match
+    { regex: new RegExp(textToReplace.toLowerCase(), 'g'), replacement: replacementText.toLowerCase() }, // lower case
+    {
+      regex: new RegExp(textToReplace.charAt(0).toUpperCase() + textToReplace.slice(1).toLowerCase(), 'g'),
+      replacement: replacementText.charAt(0).toUpperCase() + replacementText.slice(1).toLowerCase()
+    }, // capitalized
+    { regex: new RegExp(textToReplace.toUpperCase(), 'g'), replacement: replacementText.toUpperCase() } // upper case
+  ];
+  replacements.forEach(({ regex, replacement }) => {
+    msg = msg.replace(regex, replacement);
+  });
+  return msg;
+};

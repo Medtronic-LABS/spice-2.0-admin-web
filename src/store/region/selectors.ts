@@ -11,6 +11,7 @@ const getFileData = (state: AppState) => state.region.file;
 const getIsUploading = (state: AppState) => state.region.uploading;
 const getIsDownloading = (state: AppState) => state.region.downloading;
 const getRegionDetails = (state: AppState) => state.region.detail;
+const getRegionId = (state: AppState) => state.region.detail.id;
 
 export const getRegionsSelector = createSelector(getRegions, (regions) => regions);
 export const getRegionsCountSelector = createSelector(getRegionsCount, (regiosCount) => regiosCount);
@@ -25,3 +26,4 @@ export const getIsUploadingSelector = createSelector(getIsUploading, (uploading)
 export const getIsDownloadingSelector = createSelector(getIsDownloading, (downloading) => downloading);
 export const getLoadingSelector = createSelector(getLoading, (loading) => loading);
 export const getRegionDetailsSelector = createSelector(getRegionDetails, (regionDetails) => regionDetails);
+export const getRegionIdSelector = createSelector(getRegionId, (regionId) => regionId);
