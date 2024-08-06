@@ -143,7 +143,14 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_TITLE: 'Delete Health Facility',
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
-  CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
+  CLINICAL_WORKFLOW_FETCH_SUCCESS: 'Unable to load the clinical workflows. Please try after sometime.',
+  WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select a clinical workflow',
+  CUSTOMIZED_WORKFLOW: 'Customized Workflow',
+  CLINICAL_WORKFLOW: 'Clinical Workflow',
+  WORKFLOW_MODULE: {
+    clinical: 'clinical',
+    customized: 'customized'
+  },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',

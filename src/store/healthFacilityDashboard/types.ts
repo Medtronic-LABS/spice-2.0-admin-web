@@ -56,7 +56,7 @@ export interface ISiteList {
   tenantId: number;
   cultureName?: string;
   siteLevel: string;
-  operatingUnitName: string;
+  subCountyName: string;
 }
 
 export interface ISiteListState {
@@ -211,7 +211,6 @@ export interface ISiteFormValues {
   siteType: ISelectOption;
   email: string;
   account: ISiteDropdownList;
-  operatingUnit: ISiteDropdownList;
   address1: string;
   address2: string;
   county: ISiteCountyList;
@@ -244,7 +243,7 @@ export interface ICreateSiteRequestPayload {
   siteType: string;
   email: string;
   accountId: number;
-  operatingUnit: object;
+  subCounty: object;
   address1: string;
   address2: string;
   countyId: number;
@@ -266,9 +265,9 @@ export interface ICreateSiteRequestPayload {
 }
 
 export interface ISiteUpdateReqPayload
-  extends Omit<ICreateSiteRequestPayload, 'users' | 'parentOrganizationId' | 'operatingUnit' | 'account'> {
+  extends Omit<ICreateSiteRequestPayload, 'users' | 'parentOrganizationId' | 'subCounty' | 'account'> {
   id: string;
-  operatingUnit: object;
+  subCounty: object;
   accountId: number;
   users?: any[];
 }
@@ -277,8 +276,6 @@ export interface ISiteSummary {
   name: string;
   siteType: string;
   email: string;
-  account: ISiteDropdownList;
-  operatingUnit: ISiteDropdownList;
   address1: string;
   address2: string;
   county: ISiteCountyList;

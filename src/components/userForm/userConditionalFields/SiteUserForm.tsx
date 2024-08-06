@@ -15,7 +15,8 @@ export const SiteUserForm = ({
   fields,
   isSiteUser,
   selectedAdmins,
-  countyAdminList
+  countyDetails,
+  subCountyDetails
 }: any) => {
   const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN, REGION_ADMIN, SUPER_ADMIN } = APPCONSTANTS.ROLES;
 
@@ -88,8 +89,8 @@ export const SiteUserForm = ({
                     errorLabel='county'
                     labelKey='name'
                     valueKey='id'
-                    options={countyAdminList}
-                    loadingOptions={isTmezoneListLoading}
+                    options={countyDetails.list}
+                    loadingOptions={countyDetails.loaing}
                     error={isError(meta)}
                     isModel={true}
                   />
@@ -108,10 +109,10 @@ export const SiteUserForm = ({
                     {...(input as any)}
                     label='Sub County'
                     errorLabel='subCounty'
-                    labelKey='description'
+                    labelKey='name'
                     valueKey='id'
-                    options={timezoneList}
-                    loadingOptions={isTmezoneListLoading}
+                    options={subCountyDetails.list}
+                    loadingOptions={subCountyDetails.loading}
                     error={isError(meta)}
                     isModel={true}
                   />

@@ -48,7 +48,12 @@ const Region = (): React.ReactElement => {
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
 
-  const { region: regionModuleName, county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
+  const {
+    region: regionModuleName,
+    county: countyModuleName,
+    subCounty: subCountyModuleName,
+    healthFacility
+  } = NAME_CONSTANTS;
 
   const regionDropdownMenuItems = [
     {
@@ -140,7 +145,7 @@ const Region = (): React.ReactElement => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      regions.map(({ subCountyCount, siteCount, countyCount, name, tenantId, id: regionId }: any) => ({
+      regions.map(({ subCountyCount, healthFacilityCount, countyCount, name, tenantId, id: regionId }: any) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId }),
@@ -164,8 +169,8 @@ const Region = (): React.ReactElement => {
           },
           {
             type: 'number',
-            value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
-            label: 'Site',
+            value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
+            label: healthFacility,
             disableEllipsis: true,
             route: PROTECTED_ROUTES.siteByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })

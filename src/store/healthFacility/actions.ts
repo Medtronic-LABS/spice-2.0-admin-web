@@ -74,12 +74,9 @@ import {
   IDeleteHFFailure,
   IClearDependentData,
   IClearVillagesList,
-  IValidateLinkedRestrictions,
-  IFetchUnlinkedVillagesRequest,
-  IFetchUnlinkedVillagesFailure,
-  IFetchUnlinkedVillagesSuccess,
-  IValidateLinkedRestrictionsFailure,
-  IValidateLinkedRestrictionsSuccess
+  IPeerSupervisorValidation,
+  ISubCounty,
+  ICounty
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -418,8 +415,8 @@ export const fetchDistrictListRequest = ({
   failureCb
 });
 
-export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF,
+export const fetchDistrictListSuccess = (payload: { list: ICounty[]; total: number }): IFetchDistrictListSuccess => ({
+  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
   payload
 });
 
@@ -442,8 +439,11 @@ export const fetchChiefdomListRequest = ({
   failureCb
 });
 
-export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
-  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF,
+export const fetchChiefdomListSuccess = (payload: {
+  list: ISubCounty[];
+  total: number;
+}): IFetchChiefdomListSuccess => ({
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
   payload
 });
 

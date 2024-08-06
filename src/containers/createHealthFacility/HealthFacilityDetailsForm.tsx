@@ -43,9 +43,10 @@ import { userDataSelector } from '../../store/user/selectors';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from './Workflows';
-import { IVillages } from '../../store/healthFacility/types';
-import toastCenter from '../../utils/toastCenter';
-import APPCONSTANTS from '../../constants/appConstants';
+import { fetchAccountsRequest } from '../../store/account/actions';
+import { accountsLoadingSelector, getAccountsSelector } from '../../store/account/selectors';
+import { fetchSubCountyListRequest } from '../../store/subCounty/actions';
+import { subCountyListSelector, subCountyLoadingSelector } from '../../store/subCounty/selectors';
 
 interface IAddUserFormProps {
   formName: string;
@@ -76,68 +77,22 @@ const HealthFacilityDetailsForm = ({
   submittedData
 }: IAddUserFormProps): React.ReactElement => {
   const dispatch = useDispatch();
-  const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
+  const { regionId } = useParams<{ regionId: string }>();
+  const regionData = useSelector(userDataSelector).country;
   const hfTypesList = useSelector(hfTypesSelector);
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
-  const unlinkedVillagesList = useSelector(unlinkedVillagesListSelector);
-  const unlinkedVillagesLoading = useSelector(unlinkedVillagesLoadingSelector);
+  const countyList = useSelector(getAccountsSelector);
+  const subCountyList = useSelector(subCountyListSelector);
+  const countyLoading = useSelector(accountsLoadingSelector);
+  const subCountyLoading = useSelector(subCountyLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
   const languages = useSelector(cultureListSelector);
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
-  const country = useSelector(countryIdSelector);
-  const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
-  const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
-
-  const chiefdom = useSelector(getChiefdomDetailSelector);
-  useEffect(() => {
-    if (!isEdit && chiefdomId && Number(chiefdom?.id) !== Number(chiefdomId)) {
-      dispatch(
-        fetchChiefdomDetail({
-          tenantId,
-          id: chiefdomId
-        })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  if (!isEdit && chiefdomId) {
-    const { values: formValues = {} } = form?.getState?.() || {};
-    const chiefdomFormValue = (formValues as any)?.formName?.chiefdom;
-    if (!chiefdomFormValue && Number(chiefdom?.id) === Number(chiefdomId)) {
-      form?.change(`${formName}.district` as any, chiefdom.district);
-      form?.change(`${formName}.chiefdom` as any, chiefdom);
-    }
-  }
-
-  // Logic for district autoselecting when the route is createHealthFacilityByDistrict
-  // route is createhealthFacilityByDistrict, if isEdit = false and the route contains districtId param
-  const district = useSelector(districtSelector);
-  useEffect(() => {
-    if (!isEdit && districtId && district?.id !== districtId) {
-      dispatch(
-        fetchDistrictDetailReq({
-          tenantId,
-          id: districtId
-        })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  if (!isEdit && districtId) {
-    const { values: formValues = {} } = form?.getState?.() || {};
-    const districtFormValue = (formValues as any)?.formName?.district;
-    if (!districtFormValue && Number(district?.id) === Number(districtId)) {
-      form?.change(`${formName}.district` as any, district);
-    }
-  }
+  const countryId = Number(regionId || regionData?.id);
 
   // Culture list fetch
   useEffect(() => {
@@ -153,52 +108,41 @@ const HealthFacilityDetailsForm = ({
     }
   }, [dispatch, hfTypesList.length]);
 
-  // District fetch
+  // County fetch
   useEffect(() => {
-    dispatch(fetchDistrictListRequest({ countryId }));
-  }, [countryId, dispatch]);
+    if (!countyList.length) {
+      dispatch(fetchAccountsRequest({ tenantId: String(countryId), isActive: true }));
+    }
+  }, [dispatch, countyList.length, countryId]);
 
   // Peer Supervisor fetch
   useEffect(() => {
-    const tenantId = form.getState().values?.healthFacility?.district?.tenantId;
+    const tenantId = form.getState().values.healthFacility?.county?.tenantId;
     if (tenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.tenantId]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.county?.tenantId]);
 
-  // Chiefdom fetch
+  // SubCounty fetch
   useEffect(() => {
-    const districtId = form.getState().values?.healthFacility?.district?.id;
-    if (districtId) {
-      dispatch(fetchChiefdomListRequest({ countryId, districtId: Number(districtId) }));
+    const countyId = form.getState().values.healthFacility?.county?.tenantId;
+    if (countyId) {
+      dispatch(fetchSubCountyListRequest({ tenantId: countyId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.id]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.county?.id]);
 
   // Villages fetch
   useEffect(() => {
-    const districtId = form.getState().values?.healthFacility?.district?.id;
-    const chiefdomId = form.getState().values?.healthFacility?.chiefdom?.id;
-    if (chiefdomId && districtId) {
+    const countyId = form.getState().values.healthFacility.county?.id;
+    const subCountyId = form.getState().values.healthFacility.subCounty?.id;
+    if (subCountyId && countyId) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
-          districtId: Number(selectedDistrictId),
-          chiefdomId: Number(selectedChiefdomId)
-        })
-      );
-      dispatch(
-        fetchUnlinkedVillagesRequest({
-          countryId,
-          districtId: Number(selectedDistrictId),
-          chiefdomId: Number(selectedChiefdomId),
-          healthFacilityId: data?.id ? data.id : undefined,
-          successCb: (list: IVillages[]) => {
-            if (!list.length) {
-              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
-            }
-          }
+          districtId: Number(countyId),
+          chiefdomId: Number(subCountyId)
         })
       );
       dispatch(
@@ -220,9 +164,9 @@ const HealthFacilityDetailsForm = ({
     countryId,
     dispatch,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values?.healthFacility?.district?.id,
+    form.getState().values.healthFacility?.county?.id,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values?.healthFacility?.chiefdom?.id,
+    form.getState().values.healthFacility?.subCounty?.id,
     regionId
   ]);
 
@@ -335,7 +279,7 @@ const HealthFacilityDetailsForm = ({
           </div>
           <div className={columnStyle}>
             <Field
-              name={`${formName}.district`}
+              name={`${formName}.county`}
               type='text'
               validate={required}
               render={({ input, meta }) => {
@@ -343,17 +287,15 @@ const HealthFacilityDetailsForm = ({
                   <SelectInput
                     {...(input as any)}
                     {...(meta as any)}
-                    disabled={Boolean(isEdit || chiefdomId || districtId)}
-                    label={districtSName}
-                    errorLabel={districtSName.toLowerCase()}
+                    label='County'
+                    errorLabel='county'
                     labelKey='name'
                     valueKey='id'
-                    disabled={isEdit}
-                    options={districtList || []}
-                    loadingOptions={districtLoading}
+                    options={countyList || []}
+                    loadingOptions={countyLoading}
                     error={(meta.touched && meta.error) || undefined}
                     onChange={(value: any) => {
-                      form.change(`${formName}.chiefdom`, undefined);
+                      form.change(`${formName}.subCounty`, undefined);
                       form.change(`${formName}.peerSupervisors`, undefined);
                       form.change(`${formName}.linkedVillages`, undefined);
                       form.change(`${formName}.city`, undefined);
@@ -370,21 +312,18 @@ const HealthFacilityDetailsForm = ({
           <div className={columnStyle}>
             <Field
               required={true}
-              name={`${formName}.chiefdom`}
-              type='text'
+              name={`${formName}.subCounty`}
               validate={required}
               render={({ input, meta }) => (
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  disabled={Boolean(isEdit || chiefdomId)}
-                  label={chiefdomSName}
-                  errorLabel={chiefdomSName.toLowerCase()}
+                  label='Sub County'
+                  errorLabel='Sub County'
                   labelKey='name'
                   valueKey='id'
-                  disabled={isEdit}
-                  options={chiefdomList}
-                  loadingOptions={chiefdomLoading}
+                  options={subCountyList}
+                  loadingOptions={subCountyLoading}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(value: any) => {
                     form.change(`${formName}.peerSupervisors`, undefined);

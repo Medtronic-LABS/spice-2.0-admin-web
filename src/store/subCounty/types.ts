@@ -159,8 +159,8 @@ export interface IFetchSubCountyListSuccessPayload {
 export interface IFetchSubCountyListRequest {
   type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_LIST_REQUEST;
   tenantId: string;
-  skip: number;
-  limit: number | null;
+  skip?: number;
+  limit?: number | null;
   search?: string;
   failureCb?: (error: Error) => void;
 }

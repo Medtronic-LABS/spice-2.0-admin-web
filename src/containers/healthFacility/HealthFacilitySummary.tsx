@@ -40,6 +40,7 @@ import {
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { countryIdSelector, emailSelector, roleSelector } from '../../store/user/selectors';
+import { countryIdSelector, emailSelector, roleSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -68,15 +69,15 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     phuFocalPersonName: hf.phuFocalPersonName,
     phuFocalPersonNumber: hf.phuFocalPersonNumber,
     address: hf.address,
-    district: hf.district,
-    chiefdom: hf.chiefdom,
+    county: hf.county,
+    subCounty: hf.subCounty,
     cityName: hf.city.name,
     latitude: hf.latitude,
     longitude: hf.longitude,
     postalCode: hf.postalCode,
     country: { id: countryId },
     language: hf.language.name,
-    parentTenantId: hf.chiefdom?.tenantId,
+    parentTenantId: hf.subCounty?.tenantId,
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
@@ -140,8 +141,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: `${healthFacilitySName} Type`, value: healthFacility?.type },
       { label: 'PHU Focal Person Name', value: healthFacility?.phuFocalPersonName },
       { label: 'PHU Focal Person No', value: healthFacility?.phuFocalPersonNumber },
-      { label: districtSName, value: healthFacility?.district?.name },
-      { label: chiefdomSName, value: healthFacility?.chiefdom?.name },
+      { label: 'County', value: healthFacility?.county?.name },
+      { label: 'Sub County', value: healthFacility?.subCounty?.name },
       { label: 'Address', value: healthFacility?.address },
       { label: 'City/Village', value: healthFacility?.cityName },
       { label: 'Latitude', value: healthFacility?.latitude },
@@ -201,8 +202,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     dispatch(
       fetchHFUserListRequest({
         countryId: countryIdValue,
-        tenantIds: [tenantId],
-        roleNames: [],
+        tenantId: hfTenantId,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
@@ -379,7 +379,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId);
+    const userObj = formatHFUserData(users, countryIdValue, hfTenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -413,7 +413,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
+    const userObj = formatHFUserData(users, countryIdValue, hfTenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({
