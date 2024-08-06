@@ -8,8 +8,6 @@ const initialState: ISiteState = {
     name: '',
     siteType: '',
     email: '',
-    account: { id: '', name: '', email: '', tenantId: '' },
-    operatingUnit: { id: '', name: '', email: '', tenantId: '' },
     address1: '',
     address2: '',
     county: {
@@ -49,7 +47,7 @@ const initialState: ISiteState = {
       tenantId: 0,
       cultureName: '',
       siteLevel: '',
-      operatingUnitName: ''
+      subCountyName: ''
     }
   ],
   siteDashboardList: [

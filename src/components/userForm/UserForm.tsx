@@ -42,7 +42,7 @@ import {
   fetchPeerSupervisorListRequest,
   fetchVillagesListFromHFRequest
 } from '../../store/healthFacility/actions';
-import { getAccountsSelector } from '../../store/account/selectors';
+import { accountsLoadingSelector, getAccountsSelector } from '../../store/account/selectors';
 import {
   countryListSelector,
   countryLoadingSelector,
@@ -66,6 +66,8 @@ import useUserFormUtils from './userFormUtils';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import { SiteUserForm } from './userConditionalFields/SiteUserForm';
 import { fetchAccountsRequest } from '../../store/account/actions';
+import { fetchSubCountyListRequest } from '../../store/subCounty/actions';
+import { subCountyListSelector, subCountyLoadingSelector } from '../../store/subCounty/selectors';
 
 export interface IUserFormValues {
   email: string;
@@ -122,6 +124,9 @@ const UserForm = ({
   const cultureList = useSelector(cultureListSelector);
   const communityList = useSelector(communityListSelector);
   const isCultureListLoading = useSelector(cultureListLoadingSelector);
+  const subCountyList = useSelector(subCountyListSelector);
+  const subCountyLoading = useSelector(subCountyLoadingSelector);
+  const countyLoading = useSelector(accountsLoadingSelector);
   const role = useSelector(roleSelector);
   const countryList = useSelector(countryListSelector);
   const isCountryListLoading = useSelector(countryLoadingSelector);
@@ -139,7 +144,7 @@ const UserForm = ({
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
   const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles } = userMeta();
-  const accountList = useSelector(getAccountsSelector);
+  const countyList = useSelector(getAccountsSelector);
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
     () => [
@@ -693,6 +698,14 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, fetchDetails, selectedAdmins]);
 
+  useEffect(() => {
+    const countyId = form.getState().values.users?.[0]?.county?.tenantId;
+    if (countyId) {
+      dispatch(fetchSubCountyListRequest({ tenantId: countyId }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, countryId, form.getState().values.users?.[0]?.county?.tenantId]);
+
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
@@ -768,7 +781,7 @@ const UserForm = ({
                   </div>
                 )}
                 {(isSPICE || isAdminForm) && (
-                  <div className={`${!isAdminForm && 'col-sm-6'} col-12`}>
+                  <div className={`${!isAdminForm ? 'col-sm-6' : 'col-12'} `}>
                     <Field
                       name={`${name}.role`}
                       type='text'
@@ -1118,7 +1131,8 @@ const UserForm = ({
                   isTmezoneListLoading={isTmezoneListLoading}
                   timezoneList={timezoneList}
                   communityList={communityList}
-                  countyAdminList={accountList}
+                  countyDetails={{ list: countyList || [], loading: countyLoading }}
+                  subCountyDetails={{ list: subCountyList || [], loading: subCountyLoading }}
                   siteRolesChange={siteRolesChange}
                   selectedAdmins={selectedAdmins}
                   fields={fields}

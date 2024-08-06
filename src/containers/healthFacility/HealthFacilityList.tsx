@@ -28,6 +28,7 @@ import {
   healthFacilityLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
+import { countryIdSelector, roleSelector } from '../../store/user/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { formatHealthFacility } from './HealthFacilitySummary';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -231,14 +232,8 @@ const HealthFacilityList = (): React.ReactElement => {
     }
   };
   const openCreateHealthFacility = () => {
-    const url = ((regionId && PROTECTED_ROUTES.createHealthFacilityByRegion) ||
-      (districtId && PROTECTED_ROUTES.createHealthFacilityByDistrict) ||
-      (chiefdomId && PROTECTED_ROUTES.createHealthFacilityByChiefdom)) as string;
-    history.push(
-      url
-        .replace(':tenantId', tenantId)
-        .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
-    );
+    const url = PROTECTED_ROUTES.createHealthFacility;
+    history.push(url.replace(':regionId', countryIdValue as string));
   };
 
   const handleRowClick = (data: any) => {
@@ -296,18 +291,17 @@ const HealthFacilityList = (): React.ReactElement => {
               },
               {
                 id: 3,
-                name: 'district',
-                label: districtSName,
+                name: 'county',
+                label: 'County',
                 width: '30%',
-                cellFormatter: ({ district }) => district?.name
+                cellFormatter: ({ county }) => county.name
               },
               {
-                id: 4,
-                name: 'chiefdom',
-                label: chiefdomSName,
+                id: 3,
+                name: 'subcounty',
+                label: 'Sub County',
                 width: '30%',
-                cellFormatter: ({ chiefdom }) => chiefdom?.name
-                cellFormatter: ({ chiefdom }) => chiefdom?.name
+                cellFormatter: ({ subCounty }) => subCounty.name
               }
             ]}
             isDelete={false}

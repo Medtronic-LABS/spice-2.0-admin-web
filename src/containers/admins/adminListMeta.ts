@@ -92,12 +92,6 @@ export const columnDef = [
     cellFormatter: formatHealthFacility
   },
   {
-    id: 4,
-    name: 'gender',
-    label: 'GENDER',
-    width: '10%'
-  },
-  {
     id: 5,
     name: 'phoneNumber',
     label: 'CONTACT NUMBER',

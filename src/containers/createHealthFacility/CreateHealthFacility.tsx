@@ -192,6 +192,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           enableAutoPopulate={true}
                           isHFCreate={true}
                           entityName='healthFacility'
+                          isAdminForm={true}
+                          defaultSelectedRole={APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN}
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
                           parentOrgId={chiefdomId}

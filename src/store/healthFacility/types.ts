@@ -13,10 +13,10 @@ export interface IHealthFacilityState {
   hfUserDetailLoading: boolean;
   hfUsersLoading: boolean;
   hfUsersTotal: number;
-  districtList: IDistrict[];
+  districtList: ICounty[];
   districtTotal: number;
   districtLoading: boolean;
-  chiefdomList: IChiefdom[];
+  chiefdomList: ISubCounty[];
   chiefdomTotal: number;
   chiefdomLoading: boolean;
   cultureListLoading: boolean;
@@ -75,8 +75,8 @@ export interface IHealthFacility {
   phuFocalPersonName: string;
   phuFocalPersonNumber: string;
   address: string;
-  district: IDistrict;
-  chiefdom: IChiefdom;
+  county: ICounty;
+  subCounty: ISubCounty;
   cityName: string;
   latitude: string;
   longitude: string;
@@ -106,8 +106,8 @@ export interface IHealthFacilityPost {
   phuFocalPersonName: string;
   phuFocalPersonNumber: string;
   address: string;
-  district: IDistrict;
-  chiefdom: IChiefdom;
+  county: ICounty;
+  subCounty: ISubCounty;
   cityName?: string;
   latitude: string;
   longitude: string;
@@ -196,6 +196,7 @@ export interface IHFUserGet {
   villages?: number[];
   supervisor: string | null;
   county?: { tenantId: string | number };
+  county?: { tenantId: string | number };
   organizations: Array<{ id: number; name: string; parentOrganizationId: number | null; formDataId: number }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
 }
@@ -221,6 +222,7 @@ export interface IHFUserPost {
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
   county?: string | number;
+  subCounty?: string;
   village?: string;
   supervisorId?: number;
   villageIds?: number[];
@@ -475,7 +477,7 @@ export interface IDeleteHFUserFailure {
   error: Error;
 }
 
-export interface IDistrict {
+export interface ICounty {
   id: number;
   name: string;
   tenantId: number;
@@ -484,13 +486,13 @@ export interface IDistrict {
 export interface IFetchDistrictListRequest {
   type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF;
   countryId: number;
-  successCb?: (data: IDistrict[], total: number) => void;
+  successCb?: (data: ICounty[], total: number) => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IFetchDistrictListSuccess {
-  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF;
-  payload: { list: IDistrict[]; total: number };
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS;
+  payload: { list: ICounty[]; total: number };
 }
 
 export interface IFetchDistrictListFailure {
@@ -498,8 +500,7 @@ export interface IFetchDistrictListFailure {
   error: Error;
 }
 
-export interface IChiefdom {
-  tenantId: string | undefined;
+export interface ISubCounty {
   id: number;
   name: string;
 }
@@ -508,13 +509,13 @@ export interface IFetchChiefdomListRequest {
   type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF;
   countryId: number;
   districtId?: number;
-  successCb?: (data: IChiefdom[], total: number) => void;
+  successCb?: (data: ISubCounty[], total: number) => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IFetchChiefdomListSuccess {
-  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF;
-  payload: { list: IChiefdom[]; total: number };
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS;
+  payload: { list: ISubCounty[]; total: number };
 }
 
 export interface IFetchChiefdomListFailure {
