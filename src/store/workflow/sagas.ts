@@ -16,7 +16,7 @@ import {
 export function* fetchCustomizationForm({
   tenantId,
   countryId,
-  accountId,
+  countyId,
   formType,
   category,
   cultureId,
@@ -30,7 +30,7 @@ export function* fetchCustomizationForm({
     } = yield call(workflowService.fetchCustomizationForm, {
       tenantId,
       countryId,
-      accountId,
+      countyId,
       formType,
       category,
       cultureId,
@@ -120,7 +120,7 @@ export function* customizeForm({
   payload,
   tenantId,
   countryId,
-  accountId,
+  countyId,
   cultureId,
   clinicalWorkflowId,
   workflowId,
@@ -136,7 +136,7 @@ export function* customizeForm({
       payload,
       tenantId,
       countryId,
-      accountId,
+      countyId,
       clinicalWorkflowId,
       workflowId,
       cultureId

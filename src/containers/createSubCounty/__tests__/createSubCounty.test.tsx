@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { MemoryRouter, Route } from 'react-router-dom';
-import CreateSubCounty, { IOUFormValues } from '../CreateSubCounty';
+import CreateSubCounty, { ISubCountyFormValues } from '../CreateSubCounty';
 import { Provider } from 'react-redux';
 import { Form } from 'react-final-form';
 import configureMockStore from 'redux-mock-store';
@@ -15,7 +15,7 @@ describe('CreateSubCounty', () => {
   let history: any;
   const createSubCounty = jest.fn();
   const formValues: any = {
-    operatingUnit: {
+    subCounty: {
       name: 'Test Unit',
       account: {
         id: '1',
@@ -51,7 +51,7 @@ describe('CreateSubCounty', () => {
   beforeEach(() => {
     history = createMemoryHistory();
     store = mockStore({
-      operatingUnit: {
+      subCounty: {
         loading: false
       },
       user: {
@@ -108,9 +108,7 @@ describe('CreateSubCounty', () => {
     const submitButton = wrapper.find('button[type="submit"]').first();
     expect(submitButton).toHaveLength(1);
 
-    wrapper
-      .find('input[name="operatingUnit.name"]')
-      .simulate('change', { target: { value: formValues.operatingUnit.name } });
+    wrapper.find('input[name="subCounty.name"]').simulate('change', { target: { value: formValues.subCounty.name } });
     wrapper
       .find('input[name="users[0].firstName"]')
       .simulate('change', { target: { value: formValues.users[0].firstName } });
@@ -118,7 +116,7 @@ describe('CreateSubCounty', () => {
       .find('input[name="users[0].lastName"]')
       .simulate('change', { target: { value: formValues.users[0].lastName } });
 
-    expect(wrapper.find('input[name="operatingUnit.name"]').prop('value')).toEqual('Test Unit');
+    expect(wrapper.find('input[name="subCounty.name"]').prop('value')).toEqual('Test Unit');
     expect(wrapper.find('input[name="users[0].firstName"]').prop('value')).toEqual('John');
     expect(wrapper.find('input[name="users[0].lastName"]').prop('value')).toEqual('Doe');
 
@@ -128,10 +126,8 @@ describe('CreateSubCounty', () => {
   it('should submit the form when submit button is clicked', () => {
     const onSubmit = jest.fn();
 
-    wrapper
-      .find('input[name="operatingUnit.name"]')
-      .simulate('change', { target: { value: formValues.operatingUnit.name } });
-    expect(wrapper.find('input[name="operatingUnit.name"]').prop('value')).toEqual('Test Unit');
+    wrapper.find('input[name="subCounty.name"]').simulate('change', { target: { value: formValues.subCounty.name } });
+    expect(wrapper.find('input[name="subCounty.name"]').prop('value')).toEqual('Test Unit');
     const submitButton = wrapper.find('button[type="submit"]').last();
     submitButton.simulate('submit');
 
@@ -139,8 +135,8 @@ describe('CreateSubCounty', () => {
   });
 
   it('should render an SubCountyForm', () => {
-    const operatingUnitForm = wrapper.find('SubCountyForm');
-    expect(operatingUnitForm).toHaveLength(1);
+    const subCountyForm = wrapper.find('SubCountyForm');
+    expect(subCountyForm).toHaveLength(1);
   });
 
   it('should render a UserForm', () => {
@@ -150,7 +146,7 @@ describe('CreateSubCounty', () => {
 
   it('should submit the form', () => {
     const form = wrapper.find(Form);
-    const values: IOUFormValues = {
+    const values: ISubCountyFormValues = {
       subCounty: {
         name: 'Test Operating Unit'
       },
@@ -231,8 +227,8 @@ describe('CreateSubCounty', () => {
     const createSubCountyMock = jest.fn();
     wrapper.setProps({ createSubCounty: createSubCountyMock });
 
-    const operatingUnitData = { name: 'Test OU', users: [{ firstName: 'John', lastName: 'Doe' }] };
-    const eventData = { operatingUnit: operatingUnitData, users: [] };
+    const subCountyData = { name: 'Test OU', users: [{ firstName: 'John', lastName: 'Doe' }] };
+    const eventData = { subCounty: subCountyData, users: [] };
 
     wrapper.find('form').first().simulate('submit', { preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
@@ -243,8 +239,8 @@ describe('CreateSubCounty', () => {
     const createSubCountyMock = jest.fn();
     wrapper.setProps({ createSubCounty: createSubCountyMock });
 
-    const operatingUnitData = { name: 'Test OU', users: [{ firstName: 'John', lastName: 'Doe' }] };
-    const eventData = { operatingUnit: operatingUnitData, users: [] };
+    const subCountyData = { name: 'Test OU', users: [{ firstName: 'John', lastName: 'Doe' }] };
+    const eventData = { subCounty: subCountyData, users: [] };
 
     wrapper.find('form').last().simulate('submit', { preventDefault: jest.fn(), stopPropagation: jest.fn() });
 

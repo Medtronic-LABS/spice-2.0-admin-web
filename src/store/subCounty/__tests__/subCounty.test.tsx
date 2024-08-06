@@ -25,25 +25,21 @@ const fetchSubCountyDetailResponseMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNT
 const fetchSubCountyAdminsResponseMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_ADMINS_RESPONSE_PAYLOAD;
 const updateOperatingtRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_SUB_COUNTY_REQUEST_PAYLOAD;
 const fetchDashboardSubCountysRequestMockData = MOCK_DATA_CONSTANTS.FETCH_DASHBOARD_SUB_COUNTYS_REQUEST_PAYLOAD;
-const fetchDashboardSubCountysResponseMockData =
-  MOCK_DATA_CONSTANTS.FETCH_DASHBOARD_SUB_COUNTYS_RESPONSE_PAYLOAD;
+const fetchDashboardSubCountysResponseMockData = MOCK_DATA_CONSTANTS.FETCH_DASHBOARD_SUB_COUNTYS_RESPONSE_PAYLOAD;
 const fetchSubCountysRequestMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_LIST_REQUEST_PAYLOAD;
 const fetchSubCountysResponseMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_LIST_RESPONSE_PAYLOAD;
 const createSubCountyRequestMockData = MOCK_DATA_CONSTANTS.CREATE_SUB_COUNTY_REQUEST_PAYLOAD;
 const fetchSubCountyByIdRequestMockData = MOCK_DATA_CONSTANTS.ID_AND_TENANT_ID_REQUEST_PAYLOAD;
 const fetchSubCountyByIdResponseMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_BY_ID_REQUEST_PAYLOAD;
-const fetchDropdownSubCountysRequestMockData =
-  MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_DROPDOWN_LIST_REQUEST_PAYLOAD;
+const fetchDropdownSubCountysRequestMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_DROPDOWN_LIST_REQUEST_PAYLOAD;
 const subCountyAdminRequestMockData = MOCK_DATA_CONSTANTS.SUB_COUNTY_ADMIN_REQUEST_PAYLOAD;
 const deleteSubCountyAdminRequestMockData = MOCK_DATA_CONSTANTS.ID_AND_TENANT_ID_REQUEST_PAYLOAD;
 
 describe('Fetch Operating Unit Detail', () => {
   it('Fetches a list of Operating Unit Admins and dispatches success', async () => {
-    const fetchSubCountyDetailSpy = jest
-      .spyOn(subCountyService, 'fetchSubCountyAdmins')
-      .mockImplementation(() => {
-        return Promise.resolve({ data: { entityList: fetchSubCountyAdminsResponseMockData } } as AxiosResponse);
-      });
+    const fetchSubCountyDetailSpy = jest.spyOn(subCountyService, 'fetchSubCountyAdmins').mockImplementation(() => {
+      return Promise.resolve({ data: { entityList: fetchSubCountyAdminsResponseMockData } } as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {
@@ -60,18 +56,16 @@ describe('Fetch Operating Unit Detail', () => {
   });
 
   it('Fetches operating unit details and dispatches success', async () => {
-    const fetchSubCountyDetailSpy = jest
-      .spyOn(subCountyService, 'getSubCountyDetails')
-      .mockImplementation(() => {
-        return Promise.resolve({
-          data: {
-            entity: {
-              ...fetchSubCountyDetailResponseMockData,
-              users: fetchSubCountyDetailResponseMockData.users
-            }
+    const fetchSubCountyDetailSpy = jest.spyOn(subCountyService, 'getSubCountyDetails').mockImplementation(() => {
+      return Promise.resolve({
+        data: {
+          entity: {
+            ...fetchSubCountyDetailResponseMockData,
+            users: fetchSubCountyDetailResponseMockData.users
           }
-        } as AxiosResponse);
-      });
+        }
+      } as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {
@@ -85,9 +79,7 @@ describe('Fetch Operating Unit Detail', () => {
     ).toPromise();
     expect(fetchSubCountyDetailSpy).toHaveBeenCalledWith(fetchSubCountyDetailRequestMockData);
     const { users: subCountyAdmins, ...subCountyDetail } = fetchSubCountyDetailResponseMockData;
-    expect(dispatched).toEqual([
-      subCountyActions.fetchSubCountyDetailSuccess({ subCountyAdmins, subCountyDetail })
-    ]);
+    expect(dispatched).toEqual([subCountyActions.fetchSubCountyDetailSuccess({ subCountyAdmins, subCountyDetail })]);
   });
   it('Fails to fetch operating unit and dispatches failure', async () => {
     const error = new Error('Failed to operating unit');
@@ -109,13 +101,11 @@ describe('Fetch Operating Unit Detail', () => {
 
 describe('Fetch Operating Unit Admin List', () => {
   it('Fetches a list of Operating Unit Admins and dispatches success', async () => {
-    const fetchSubCountyAdminListSpy = jest
-      .spyOn(subCountyService, 'fetchSubCountyAdmins')
-      .mockImplementation(() => {
-        return Promise.resolve({
-          data: { entityList: fetchSubCountyAdminsResponseMockData, totalCount: 10 }
-        } as AxiosResponse);
-      });
+    const fetchSubCountyAdminListSpy = jest.spyOn(subCountyService, 'fetchSubCountyAdmins').mockImplementation(() => {
+      return Promise.resolve({
+        data: { entityList: fetchSubCountyAdminsResponseMockData, totalCount: 10 }
+      } as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {
@@ -245,7 +235,7 @@ describe('Fetch Operating Unit List in Dashboard', () => {
       total: 10,
       isLoadMore: false
     };
-    expect(dispatched).toEqual([subCountyActions.fetchOUDashboardListSuccess(payload)]);
+    expect(dispatched).toEqual([subCountyActions.fetchSubCountyDashboardListSuccess(payload)]);
   });
 
   it('Fails to fetch list of Operating Units for Dashboard and dispatches failure', async () => {
@@ -266,19 +256,17 @@ describe('Fetch Operating Unit List in Dashboard', () => {
       }
     ).toPromise();
     expect(fetchSubCountyDashboardListSpy).toHaveBeenCalledWith('4', null, 0, undefined, 'Sample');
-    expect(dispatched).toEqual([subCountyActions.fetchOUDashboardListFailure(error)]);
+    expect(dispatched).toEqual([subCountyActions.fetchSubCountyDashboardListFailure(error)]);
   });
 });
 
 describe('Fetch Operating Unit List', () => {
   it('Fetches a list of Operating Units and dispatches success', async () => {
-    const fetchSubCountyListSpy = jest
-      .spyOn(subCountyService, 'fetchSubCountyList')
-      .mockImplementation(() => {
-        return Promise.resolve({
-          data: { entityList: fetchSubCountysResponseMockData, totalCount: 10 }
-        } as AxiosResponse);
-      });
+    const fetchSubCountyListSpy = jest.spyOn(subCountyService, 'fetchSubCountyList').mockImplementation(() => {
+      return Promise.resolve({
+        data: { entityList: fetchSubCountysResponseMockData, totalCount: 10 }
+      } as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {
@@ -455,11 +443,9 @@ describe('Fetch Operating Unit Drpodown List', () => {
 
 describe('Creates an Operating Unit Admin', () => {
   it('Creates Operating Unit admin and dispatches success', async () => {
-    const createSubCountyAdminSpy = jest
-      .spyOn(subCountyService, 'createSubCountyAdmin')
-      .mockImplementation(() => {
-        return Promise.resolve({} as AxiosResponse);
-      });
+    const createSubCountyAdminSpy = jest.spyOn(subCountyService, 'createSubCountyAdmin').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {
@@ -498,11 +484,9 @@ describe('Creates an Operating Unit Admin', () => {
 
 describe('Updates an Operating Unit Admin', () => {
   it('Updates Operating Unit admin and dispatches success', async () => {
-    const updateSubCountyAdminSpy = jest
-      .spyOn(subCountyService, 'updateSubCountyAdmin')
-      .mockImplementation(() => {
-        return Promise.resolve({} as AxiosResponse);
-      });
+    const updateSubCountyAdminSpy = jest.spyOn(subCountyService, 'updateSubCountyAdmin').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {
@@ -541,11 +525,9 @@ describe('Updates an Operating Unit Admin', () => {
 
 describe('Deletes an Operating Unit Admin', () => {
   it('Deletes Operating Unit admin and dispatches success', async () => {
-    const deleteSubCountyAdminSpy = jest
-      .spyOn(subCountyService, 'deleteSubCountyAdmin')
-      .mockImplementation(() => {
-        return Promise.resolve({} as AxiosResponse);
-      });
+    const deleteSubCountyAdminSpy = jest.spyOn(subCountyService, 'deleteSubCountyAdmin').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
+    });
     const dispatched: any = [];
     await runSaga(
       {

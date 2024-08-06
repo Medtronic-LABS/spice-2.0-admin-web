@@ -93,7 +93,7 @@ export const fetchSubCountyById = (data: IFetchSubCountyByIdRequest['payload']) 
     data: { ...data, is_user_not_required: true }
   });
 
-export const fetchSubCountyAdmins = (data: IFetchSubCountyAdminsRequest['payload']) =>
+export const fetchSubCountyAdmins = (data: IFetchSubCountyAdminsRequest) =>
   axios({
     method: 'POST',
     url: '/user-service/user/admin-users',

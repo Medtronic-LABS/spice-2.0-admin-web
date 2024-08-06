@@ -23,10 +23,10 @@ import MyProfile from './containers/myProfile/MyProfile';
 import LabTestList from './containers/labtest/LabtestList';
 import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
 import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
-import AccountList from './containers/account/AccountList';
-import CreateAccount from './containers/createAccount/CreateAccount';
-import AccountSummary from './containers/account/AccountSummary';
-import AccountDashboard from './containers/account/AccountDashboard';
+import CountyList from './containers/county/CountyList';
+import CreateAccount from './containers/createCounty/CreateCounty';
+import CountySummary from './containers/county/CountySummary';
+import CountyDashboard from './containers/county/CountyDashboard';
 import LockedUsers from './containers/lockedUsers/LockedUsers';
 import UserList from './containers/user/UserList';
 import Admins from './containers/admins/AdminList';
@@ -34,7 +34,6 @@ import SubCountyDashboard from './containers/subCounty/SubCountyDashboard';
 import CreateSubCounty from './containers/createSubCounty/CreateSubCounty';
 import SubCountyList from './containers/subCounty/SubCountyList';
 import SubCountySummary from './containers/subCounty/SubCountySummary';
-
 
 interface IRoute {
   path: string;
@@ -46,14 +45,8 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const {
-  SUPER_USER,
-  SUPER_ADMIN,
-  HEALTH_FACILITY_ADMIN,
-  REGION_ADMIN,
-  ACCOUNT_ADMIN,
-  SUB_COUNTY_ADMIN
-} = APPCONSTANTS.ROLES;
+export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, ACCOUNT_ADMIN, SUB_COUNTY_ADMIN } =
+  APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
 export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
 export const SU_SA_RA_AA = [...SU_SA_RA, ACCOUNT_ADMIN];
@@ -78,9 +71,9 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.accountDashboard,
+      path: PROTECTED_ROUTES.CountyDashboard,
       exact: true,
-      component: AccountDashboard,
+      component: CountyDashboard,
       authorisedRoles: [REGION_ADMIN]
     },
     {
@@ -102,21 +95,21 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.accountByRegion,
+      path: PROTECTED_ROUTES.countyByRegion,
       exact: true,
-      component: AccountList,
+      component: CountyList,
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.createAccountByRegion,
+      path: PROTECTED_ROUTES.createCountyByRegion,
       exact: true,
       component: CreateAccount,
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.accountSummary,
+      path: PROTECTED_ROUTES.countySummary,
       exact: true,
-      component: AccountSummary,
+      component: CountySummary,
       authorisedRoles: SU_SA_RA_AA
     },
     {
@@ -126,7 +119,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.createOUByAccount,
+      path: PROTECTED_ROUTES.createSubCountyByCounty,
       exact: true,
       component: CreateSubCounty,
       authorisedRoles: SU_SA_RA_AA
@@ -138,7 +131,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.subCountyByAccount,
+      path: PROTECTED_ROUTES.subCountyByCounty,
       exact: true,
       component: SubCountyList,
       authorisedRoles: SU_SA_RA_AA
@@ -273,7 +266,7 @@ export const AppRoutes = () => {
             />
           ) : null
         )}
-        <Redirect exact={true} to={HOME_PAGE_BY_ROLE[role]}/>
+        <Redirect exact={true} to={HOME_PAGE_BY_ROLE[role]} />
       </Switch>
     </AppLayout>
   ) : (

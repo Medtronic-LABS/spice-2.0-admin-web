@@ -18,7 +18,7 @@ const WORKFLOW_MOCK_DATA = {
     ...FETCH_FORM_DATA_INITIAL_PAYLOAD,
     category: 'Input_form'
   },
-  FETCH_INPUT_FORM_ACCOUNT_REQ_PAYLOAD: {
+  FETCH_INPUT_FORM_COUNTY_REQ_PAYLOAD: {
     ...FETCH_FORM_DATA_INITIAL_PAYLOAD,
     category: 'Input_form',
     clinicalWorkflowId: '11'
@@ -27,7 +27,7 @@ const WORKFLOW_MOCK_DATA = {
     ...FETCH_FORM_DATA_INITIAL_PAYLOAD,
     category: 'Consent_form'
   },
-  FETCH_CONSENT_FORM_ACCOUNT_REQ_PAYLOAD: {
+  FETCH_CONSENT_FORM_COUNTY_REQ_PAYLOAD: {
     ...FETCH_FORM_DATA_INITIAL_PAYLOAD,
     category: 'Consent_form',
     accountId: '12'

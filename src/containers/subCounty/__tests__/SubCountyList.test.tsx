@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { MemoryRouter, Route } from 'react-router-dom';
 import SubCountyList from '../SubCountyList';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/countyDataConstants';
 import { ISubCountyDetail, ISubCountyList } from '../../../store/subCounty/types';
 import { waitFor } from '@testing-library/react';
 
@@ -56,8 +56,8 @@ describe('SubCounty List', () => {
   };
   beforeEach(() => {
     store = mockStore({
-      operatingUnit: {
-        operatingUnitList: [
+      subCounty: {
+        subCountyList: [
           { id: 1, name: 'OU one' },
           { id: 2, name: 'OU two' }
         ],
@@ -68,7 +68,7 @@ describe('SubCounty List', () => {
         account: {
           id: '1',
           clinicalWorkflow: [1],
-          users: MOCK_DATA_CONSTANTS.ACCOUNT_DETAIL_RESPONSE_PAYLOAD.users,
+          users: MOCK_DATA_CONSTANTS.COUNTY_DETAIL_RESPONSE_PAYLOAD.users,
           name: 'AccountOne',
           maxNoOfUsers: '22',
           tenantId: '1'
@@ -151,9 +151,7 @@ describe('SubCounty List', () => {
     });
     componentWrapper.update();
     const actions = store.getActions();
-    const OUModalAction = actions.find(
-      (action: { type: string }) => action.type === 'FETCH_SUB_COUNTY_BY_ID_REQUEST'
-    );
+    const OUModalAction = actions.find((action: { type: string }) => action.type === 'FETCH_SUB_COUNTY_BY_ID_REQUEST');
     OUModalAction.successCb(mockSubCountyDetail);
     OUModalAction.failureCb({ message: 'error' });
     expect(OUModalAction).toBeDefined();
@@ -204,7 +202,7 @@ describe('SubCounty List', () => {
       id: '1',
       tenantId: 'tenant-1',
       name: 'Operating Unit 1',
-      email: 'operatingunit1@example.com',
+      email: 'subcounty1@example.com',
       county: 'County 1',
       account: {
         name: 'Account 1'

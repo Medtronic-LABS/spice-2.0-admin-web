@@ -3,8 +3,8 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { MemoryRouter, Route } from 'react-router-dom';
-import AccountSummary from '../AccountSummary';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
+import CountySummary from '../CountySummary';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/countyDataConstants';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/edit.svg', () => ({
@@ -63,7 +63,7 @@ describe('Account Summary', () => {
         account: {
           id: '1',
           clinicalWorkflow: [1],
-          users: MOCK_DATA_CONSTANTS.ACCOUNT_DETAIL_RESPONSE_PAYLOAD.users,
+          users: MOCK_DATA_CONSTANTS.COUNTY_DETAIL_RESPONSE_PAYLOAD.users,
           name: 'AccountOne',
           maxNoOfUsers: '22',
           tenantId: '1'
@@ -101,7 +101,7 @@ describe('Account Summary', () => {
       <Provider store={store}>
         <MemoryRouter initialEntries={['/tenant/1']}>
           <Route path='/tenant/:tenantId'>
-            <AccountSummary {...props} />
+            <CountySummary {...props} />
           </Route>
         </MemoryRouter>
       </Provider>
@@ -123,7 +123,7 @@ describe('Account Summary', () => {
   it('should handle render methods in Edit Account Admin ModalForm', () => {
     const ModalForm = wrapper.find('Memo()').at(1);
     const handleAdminSubmit = ModalForm.prop('handleFormSubmit');
-    handleAdminSubmit({ users: [MOCK_DATA_CONSTANTS.ACCOUNT_ADMIN] });
+    handleAdminSubmit({ users: [MOCK_DATA_CONSTANTS.COUNTY_ADMIN] });
     const handleCancelClick = ModalForm.prop('handleCancel');
     handleCancelClick();
     const editModalRender = ModalForm.prop('render');
@@ -135,11 +135,11 @@ describe('Account Summary', () => {
   it('should handle render methods in Deactivate Account ModalForm', () => {
     const ModalForm = wrapper.find('Memo()').at(2);
     const handleAdminSubmit = ModalForm.prop('handleFormSubmit');
-    handleAdminSubmit({ account: MOCK_DATA_CONSTANTS.CREATE_ACCOUNT_PAYLOAD });
+    handleAdminSubmit({ account: MOCK_DATA_CONSTANTS.CREATE_COUNTY_PAYLOAD });
     const showDeactivateModal = ModalForm.prop('handleDeactivate');
     showDeactivateModal();
     const handleDeactivateSubmit = ModalForm.prop('handleFormSubmit');
-    handleDeactivateSubmit({ account: MOCK_DATA_CONSTANTS.CREATE_ACCOUNT_PAYLOAD });
+    handleDeactivateSubmit({ account: MOCK_DATA_CONSTANTS.CREATE_COUNTY_PAYLOAD });
     const editDeactivateModalRender = ModalForm.prop('render');
     editDeactivateModalRender(jest.fn());
 

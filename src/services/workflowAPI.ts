@@ -12,19 +12,19 @@ export const fetchCustomizationForm = ({
   category,
   cultureId,
   countryId,
-  accountId,
+  countyId,
   clinicalWorkflowId
 }: IFetchCustomizationFormRequest) =>
   axios({
     method: 'POST',
-    url: `/admin-service/${accountId || clinicalWorkflowId ? 'account' : 'region'}-customization/details`,
+    url: `/admin-service/${countyId || clinicalWorkflowId ? 'workflow' : 'region'}-customization/details`,
     data: {
       tenantId,
       type: formType,
       category,
       cultureId,
       countryId,
-      accountId,
+      countyId,
       clinicalWorkflowId
     }
   });
@@ -42,21 +42,21 @@ export const updateCustomizationForm = ({
   tenantId,
   payload,
   countryId,
-  accountId,
+  countyId,
   workflowId,
   clinicalWorkflowId,
   cultureId
 }: ICustomizeFormRequest) =>
   axios({
     method: formId ? 'PUT' : 'POST',
-    url: `/admin-service/${accountId || clinicalWorkflowId ? 'account' : 'region'}-customization/${
+    url: `/admin-service/${countyId || clinicalWorkflowId ? 'workflow' : 'region'}-customization/${
       formId ? 'update' : 'create'
     }`,
     data: {
       type: formType,
       countryId,
       tenantId,
-      accountId,
+      countyId,
       category,
       formInput: payload,
       id: formId,
@@ -69,7 +69,7 @@ export const updateCustomizationForm = ({
 export const deactivateConsentForm = ({ formType, formId, category, tenantId }: IDeactivateConsentRequest) =>
   axios({
     method: 'PUT',
-    url: `/admin-service/account-customization/remove`,
+    url: `/admin-service/workflow-customization/remove`,
     data: {
       type: formType,
       tenantId,

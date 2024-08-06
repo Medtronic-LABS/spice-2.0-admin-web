@@ -15,15 +15,15 @@ describe('SubCountyDashboard', () => {
   let wrapper: any;
 
   const initialState = {
-    operatingUnit: {
-      operatingUnitDashboardList: [
+    subCounty: {
+      subCountyDashboardList: [
         { name: 'OU1', id: '1', tenantId: '1', siteCount: 5 },
         { name: 'OU2', id: '2', tenantId: '2', siteCount: 10 }
       ],
-      operatingUnitCount: 2,
-      operatingUnitLoading: false,
-      operatingUnitLoadingMore: false,
-      operatingUnitDetail: {}
+      subCountyCount: 2,
+      subCountyLoading: false,
+      subCountyLoadingMore: false,
+      subCountyDetail: {}
     },
     user: {
       countryId: { id: 1 },
@@ -66,12 +66,12 @@ describe('SubCountyDashboard', () => {
 
   it('renders the no data message when there are no operating units available', () => {
     const state = {
-      operatingUnit: {
-        operatingUnitDashboardList: [],
-        operatingUnitCount: 2,
-        operatingUnitLoading: false,
-        operatingUnitLoadingMore: false,
-        operatingUnitDetail: {}
+      subCounty: {
+        subCountyDashboardList: [],
+        subCountyCount: 2,
+        subCountyLoading: false,
+        subCountyLoadingMore: false,
+        subCountyDetail: {}
       },
       user: {
         countryId: { id: 1 },

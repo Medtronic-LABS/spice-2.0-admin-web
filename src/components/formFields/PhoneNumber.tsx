@@ -24,7 +24,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
   const currentphoneNumber = useRef(
     (() => {
       try {
-        return form?.getState().values[formName][index].phoneNumber;
+        return form?.getState().values[formName][index]?.phoneNumber || '';
       } catch (e) {
         console.error(e);
         return '';
@@ -126,7 +126,11 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
           <TextInput
             {...input}
             onBlur={(event) => {
-              if (currentphoneNumber.current.length === 0 || lastCheckedNumber.current !== currentphoneNumber.current) {
+              if (
+                !currentphoneNumber.current ||
+                currentphoneNumber.current.length === 0 ||
+                lastCheckedNumber.current !== currentphoneNumber.current
+              ) {
                 input.onBlur(event);
                 submitEnabledStatus.current = false;
                 validatePhoneNumberFn(input.value);
