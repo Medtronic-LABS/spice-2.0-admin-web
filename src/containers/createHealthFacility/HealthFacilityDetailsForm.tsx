@@ -193,9 +193,9 @@ const HealthFacilityDetailsForm = ({
 
   // Villages fetch
   useEffect(() => {
-    const selectedDistrictId = form.getState().values.healthFacility.district?.id;
-    const selectedChiefdomId = form.getState().values.healthFacility.chiefdom?.id;
-    if (selectedChiefdomId && selectedDistrictId) {
+    const districtId = form.getState().values.healthFacility?.district?.id;
+    const chiefdomId = form.getState().values.healthFacility?.chiefdom?.id;
+    if (chiefdomId && districtId) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
@@ -229,18 +229,8 @@ const HealthFacilityDetailsForm = ({
   ]);
 
   useEffect(() => {
-    const {
-      district: formDistrict,
-      chiefdom: formChiefdom,
-      city,
-      linkedVillages
-    } = form.getState().values?.healthFacility || {
-      district: {},
-      chiefdom: {},
-      city: {},
-      linkedVillages: []
-    };
-    if (!isEdit && !formDistrict?.id && (formChiefdom?.id || city?.id || (linkedVillages || []).length)) {
+    const { district, chiefdom, city, linkedVillages } = form.getState().values.healthFacility;
+    if (!isEdit && !district?.id && (chiefdom?.id || city?.id || (linkedVillages || []).length)) {
       form.batch(() => {
         form.change(`${formName}.chiefdom`, undefined);
         form.change(`${formName}.city`, undefined);
@@ -248,12 +238,6 @@ const HealthFacilityDetailsForm = ({
       });
     }
   }, [form, formName, isEdit]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearHFFormData());
-    };
-  }, []);
 
   return (
     <>
@@ -364,6 +348,7 @@ const HealthFacilityDetailsForm = ({
                     errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
                     valueKey='id'
+                    disabled={isEdit}
                     options={districtList || []}
                     loadingOptions={districtLoading}
                     error={(meta.touched && meta.error) || undefined}
@@ -385,6 +370,7 @@ const HealthFacilityDetailsForm = ({
             <Field
               required={true}
               name={`${formName}.chiefdom`}
+              type='text'
               validate={required}
               render={({ input, meta }) => (
                 <SelectInput
@@ -395,6 +381,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
+                  disabled={isEdit}
                   options={chiefdomList}
                   loadingOptions={chiefdomLoading}
                   error={(meta.touched && meta.error) || undefined}

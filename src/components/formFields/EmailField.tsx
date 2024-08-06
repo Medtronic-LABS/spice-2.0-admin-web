@@ -56,7 +56,7 @@ const EmailField = forwardRef(
     );
 
     const [loading, setLoading] = useState(false);
-    const errorValue = useRef<string>('');
+    const [error, setError] = useState('');
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
@@ -79,11 +79,11 @@ const EmailField = forwardRef(
 
     const validateIsEmailExist = useCallback(
       (email: string) =>
-        errorValue.current ||
+        error ||
         (!submitEnabledStatus.current && lastCheckedEmail.current !== email
           ? ' ' // blank space is given as error to block submition till the user already exist validation is completed
           : ''),
-      [errorValue]
+      [error]
     );
 
     const clearEmailFn = useCallback(() => {
@@ -153,7 +153,7 @@ const EmailField = forwardRef(
             return;
           }
           setLoading(true);
-          await fetchUserByEmail(email, parentOrgId, ignoreTenantId).then((res) => {
+          await fetchUserByEmail(email).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });
