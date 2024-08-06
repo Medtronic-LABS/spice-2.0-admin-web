@@ -2,10 +2,10 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import AccountDashboard from '../AccountDashboard';
+import CountyDashboard from '../CountyDashboard';
 import { BrowserRouter as Router } from 'react-router-dom';
 import styles from './Account.module.scss';
-import ACCOUNT_MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
+import ACCOUNT_MOCK_DATA_CONSTANTS from '../../../tests/mockData/countyDataConstants';
 import { act, waitFor } from '@testing-library/react';
 
 const mockStore = configureStore([]);
@@ -20,7 +20,7 @@ describe('AccountDashboard', () => {
   beforeEach(() => {
     store = mockStore({
       account: {
-        dashboardList: ACCOUNT_MOCK_DATA_CONSTANTS.DASHBOARD_ACCOUNTS_RESPONSE_PAYLOAD,
+        dashboardList: ACCOUNT_MOCK_DATA_CONSTANTS.DASHBOARD_COUNTY_RESPONSE_PAYLOAD,
         loading: false,
         loadingMore: false
       },
@@ -35,7 +35,7 @@ describe('AccountDashboard', () => {
     wrapper = mount(
       <Provider store={store}>
         <Router>
-          <AccountDashboard />
+          <CountyDashboard />
         </Router>
       </Provider>
     );
@@ -47,7 +47,7 @@ describe('AccountDashboard', () => {
   it('should display loader when loading is true', () => {
     store = mockStore({
       account: {
-        dashboardList: ACCOUNT_MOCK_DATA_CONSTANTS.DASHBOARD_ACCOUNTS_RESPONSE_PAYLOAD,
+        dashboardList: ACCOUNT_MOCK_DATA_CONSTANTS.DASHBOARD_COUNTY_RESPONSE_PAYLOAD,
         loading: true,
         loadingMore: true
       },
@@ -62,7 +62,7 @@ describe('AccountDashboard', () => {
     wrapper = mount(
       <Provider store={store}>
         <Router>
-          <AccountDashboard />
+          <CountyDashboard />
         </Router>
       </Provider>
     );
@@ -90,7 +90,7 @@ describe('AccountDashboard', () => {
     wrapper = mount(
       <Provider store={store}>
         <Router>
-          <AccountDashboard />
+          <CountyDashboard />
         </Router>
       </Provider>
     );
@@ -116,7 +116,7 @@ describe('AccountDashboard', () => {
     const wrapperAccount = mount(
       <Provider store={store}>
         <Router>
-          <AccountDashboard />
+          <CountyDashboard />
         </Router>
       </Provider>
     );

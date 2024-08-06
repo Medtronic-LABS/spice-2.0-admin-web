@@ -8,21 +8,13 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
-import {
-  fetchSubCountyDetail,
-  updateSubCountyAdminReq,
-  updateSubCountyReq
-} from '../../store/subCounty/actions';
+import { fetchSubCountyDetail, updateSubCountyAdminReq, updateSubCountyReq } from '../../store/subCounty/actions';
 import {
   getSubCountyDetailSelector,
   getOuAdminsSelector,
   subCountyLoadingSelector
 } from '../../store/subCounty/selectors';
-import {
-  ISubCountyAdminFormvalue,
-  ISubCountyAdmin,
-  ISubCountyDetail
-} from '../../store/subCounty/types';
+import { ISubCountyAdmin, ISubCountyDetail } from '../../store/subCounty/types';
 import SubCountyForm from '../../components/subCountyForm/SubCountyForm';
 import UserForm from '../../components/userForm/UserForm';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
@@ -59,7 +51,7 @@ const SubCountySummary = () => {
 
   const dispatch = useDispatch();
   const SubCountyDetail = useSelector(getSubCountyDetailSelector);
-  const OUAdmins = useSelector(getOuAdminsSelector);
+  const subCountyAdmins = useSelector(getOuAdminsSelector);
   const loading = useSelector(subCountyLoadingSelector);
   const currentRole = useSelector(roleSelector);
   const isReadOnly = currentRole === APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN;
@@ -67,24 +59,24 @@ const SubCountySummary = () => {
   const { county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
   const countryIdValue = useCountryId();
 
-  // Edit OU
-  const [showOUEditModal, setShowOUEditModal] = useState(false);
-  const openOUEditModal = useCallback(() => {
-    setShowOUEditModal(true);
+  // Edit Sub County
+  const [showSubCountyEditModal, setShowSubCountyEditModal] = useState(false);
+  const openSubCountyEditModal = useCallback(() => {
+    setShowSubCountyEditModal(true);
   }, []);
-  const handleOUEdit = ({ name, account, id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
+  const handleSubCountyEdit = ({ name, county, id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
     dispatch(
       updateSubCountyReq({
         payload: {
           name,
           countryId: countryIdValue,
-          countyId: Number(account?.id),
+          countyId: Number(county?.id),
           id,
           tenantId: tenantIdFromEdit
         },
         isSuccessPayloadNeeded: true,
         successCb: () => {
-          setShowOUEditModal(false);
+          setShowSubCountyEditModal(false);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
             formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_UPDATE_SUCCESS, subCountyModuleName)
@@ -102,19 +94,19 @@ const SubCountySummary = () => {
     );
   };
 
-  // OU Admin Form
-  const [showOUAdminModal, setShowOUAdminModal] = useState(false);
-  const [isOUAdminEdit, setIsOUAdminEdit] = useState(false);
-  const OUAdminForEdit = useRef<{ users: IAdminEditFormValues[] }>({ users: [] });
+  // Sub County Admin Form
+  const [showSubCountyAdminModal, setShowSubCountyAdminModal] = useState(false);
+  const [isSubCountyAdminEdit, setIsSubCountyAdminEdit] = useState(false);
+  const subCountyAdminForEdit = useRef<{ users: IAdminEditFormValues[] }>({ users: [] });
 
-  const handleEditOUAdminClick = useCallback(
+  const handleEditSubCountyAdminClick = useCallback(
     (subCountyAdmin: IAdminEditFormValues) => {
       subCountyAdmin.role = subCountyAdmin.roles;
-      setIsOUAdminEdit(true);
-      OUAdminForEdit.current = { users: [subCountyAdmin] };
-      setShowOUAdminModal(true);
+      setIsSubCountyAdminEdit(true);
+      subCountyAdminForEdit.current = { users: [subCountyAdmin] };
+      setShowSubCountyAdminModal(true);
     },
-    [OUAdminForEdit]
+    [subCountyAdminForEdit]
   );
 
   const getSubCountyDetails = useCallback(
@@ -138,13 +130,13 @@ const SubCountySummary = () => {
     [OUId, dispatch, searchTerm, tenantId]
   );
 
-  const handleAddOUAdminClick = useCallback(() => {
-    setIsOUAdminEdit(false);
-    OUAdminForEdit.current = { users: [] };
-    setShowOUAdminModal(true);
-  }, [OUAdminForEdit]);
+  const handleAddSubCountyAdminClick = useCallback(() => {
+    setIsSubCountyAdminEdit(false);
+    subCountyAdminForEdit.current = { users: [] };
+    setShowSubCountyAdminModal(true);
+  }, [subCountyAdminForEdit]);
 
-  const handleOUAdminEdit = ({ users }: { users: IAdminEditFormValues[] }) => {
+  const handleSubCountyAdminEdit = ({ users }: { users: IAdminEditFormValues[] }) => {
     const {
       firstName,
       lastName,
@@ -176,7 +168,7 @@ const SubCountySummary = () => {
         },
         successCb: () => {
           getSubCountyDetails(searchTerm);
-          setShowOUAdminModal(false);
+          setShowSubCountyAdminModal(false);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
             formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_ADMIN_UPDATE_SUCCESS, subCountyModuleName)
@@ -193,9 +185,9 @@ const SubCountySummary = () => {
       })
     );
   };
-  const handleOUAdminCreate = ({
+  const handleSubCountyAdminCreate = ({
     users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, country, username, role = [] }]
-  }: typeof OUAdminForEdit.current) => {
+  }: typeof subCountyAdminForEdit.current) => {
     const [roleId] = role;
     const payload: IHFUserPost = {
       firstName: firstName.trim(),
@@ -216,7 +208,7 @@ const SubCountySummary = () => {
       createAdminRequest({
         data: payload,
         successCb: () => {
-          setShowOUAdminModal(false);
+          setShowSubCountyAdminModal(false);
           getSubCountyDetails(searchTerm);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
@@ -235,7 +227,7 @@ const SubCountySummary = () => {
     );
   };
 
-  const handleOUAdminDelete = ({ data: { id } }: { data: ISubCountyAdmin }) => {
+  const handleSubCountyAdminDelete = ({ data: { id } }: { data: ISubCountyAdmin }) => {
     dispatch(
       deleteAdminRequest({
         data: { id: Number(id), tenantIds: [Number(tenantId)] },
@@ -286,19 +278,20 @@ const SubCountySummary = () => {
     { id: 5, name: 'phoneNumber', label: 'CONTACT NUMBER', cellFormatter: formatPhone }
   ];
 
-  const renderOUAdminForm = useCallback(
+  const renderSubCountyAdminForm = useCallback(
     (form: any) => (
       <UserForm
         form={form as FormApi<any>}
-        initialEditValue={OUAdminForEdit.current.users[0]}
+        initialEditValue={subCountyAdminForEdit.current.users[0]}
         disableOptions={true}
-        isEdit={isOUAdminEdit}
+        isEdit={isSubCountyAdminEdit}
         countryId={countryIdValue}
         isAdminForm={true}
         defaultSelectedRole={APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN}
+        enableAutoPopulate={true}
       />
     ),
-    [isOUAdminEdit]
+    [isSubCountyAdminEdit]
   );
 
   return (
@@ -310,7 +303,7 @@ const SubCountySummary = () => {
             buttonLabel={isReadOnly ? undefined : `Edit ${subCountyModuleName}`}
             isEdit={true}
             header={`${subCountyModuleName} Summary`}
-            onButtonClick={openOUEditModal}
+            onButtonClick={openSubCountyEditModal}
           >
             <div className='row gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
               {data.map(({ label, value }) => (
@@ -329,15 +322,15 @@ const SubCountySummary = () => {
             isSearch={true}
             onSearch={handleSearch}
             searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
-            onButtonClick={handleAddOUAdminClick}
+            onButtonClick={handleAddSubCountyAdminClick}
           >
             <CustomTable
               columnsDef={columnsDef}
-              rowData={OUAdmins || []}
+              rowData={subCountyAdmins || []}
               isEdit={!isReadOnly}
               isDelete={!isReadOnly}
-              onRowEdit={handleEditOUAdminClick}
-              onDeleteClick={handleOUAdminDelete}
+              onRowEdit={handleEditSubCountyAdminClick}
+              onDeleteClick={handleSubCountyAdminDelete}
               deleteTitle={formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_ADMIN_DELETE_TITLE, subCountyModuleName)}
               confirmationTitle={formatUserToastMsg(
                 APPCONSTANTS.SUB_COUNTY_ADMIN_DELETE_CONFIRMATION,
@@ -351,23 +344,23 @@ const SubCountySummary = () => {
         title={`Edit ${subCountyModuleName}`}
         cancelText='Cancel'
         submitText='Submit'
-        show={showOUEditModal}
-        handleCancel={() => setShowOUEditModal(false)}
-        handleFormSubmit={handleOUEdit}
+        show={showSubCountyEditModal}
+        handleCancel={() => setShowSubCountyEditModal(false)}
+        handleFormSubmit={handleSubCountyEdit}
         initialValues={SubCountyDetail}
       >
         <SubCountyForm isEdit={true} />
       </ModalForm>
       <ModalForm
-        title={`${isOUAdminEdit ? 'Edit' : 'Add'} ${subCountyModuleName} Admin`}
+        title={`${isSubCountyAdminEdit ? 'Edit' : 'Add'} ${subCountyModuleName} Admin`}
         cancelText='Cancel'
         submitText='Submit'
-        show={showOUAdminModal}
-        handleCancel={() => setShowOUAdminModal(false)}
-        handleFormSubmit={isOUAdminEdit ? handleOUAdminEdit : handleOUAdminCreate}
-        initialValues={OUAdminForEdit.current}
+        show={showSubCountyAdminModal}
+        handleCancel={() => setShowSubCountyAdminModal(false)}
+        handleFormSubmit={isSubCountyAdminEdit ? handleSubCountyAdminEdit : handleSubCountyAdminCreate}
+        initialValues={subCountyAdminForEdit.current}
         mutators={arrayMutators}
-        render={renderOUAdminForm}
+        render={renderSubCountyAdminForm}
       />
     </>
   );

@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import configureMockStore from 'redux-mock-store';
-import AccountList from '../AccountList';
+import CountyList from '../CountyList';
 
 const mockStore = configureMockStore([]);
 const store = mockStore({
@@ -45,8 +45,8 @@ describe('AccountList', () => {
     mount(
       <Provider store={store}>
         <MemoryRouter>
-          <AccountList
-            decactivateAccountReq={() => {
+          <CountyList
+            decactivateCountyReq={() => {
               //
             }}
             {...matchProps}
@@ -60,8 +60,8 @@ describe('AccountList', () => {
     mount(
       <Provider store={store}>
         <MemoryRouter>
-          <AccountList
-            decactivateAccountReq={() => {
+          <CountyList
+            decactivateCountyReq={() => {
               //
             }}
             {...matchProps}
@@ -77,8 +77,8 @@ describe('AccountList', () => {
     const wrapper = mount(
       <Provider store={store}>
         <MemoryRouter>
-          <AccountList
-            decactivateAccountReq={() => {
+          <CountyList
+            decactivateCountyReq={() => {
               //
             }}
             {...matchProps}

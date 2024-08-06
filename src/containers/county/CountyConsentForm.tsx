@@ -22,10 +22,10 @@ interface IProps {
 }
 
 /**
- * Shows the account list
+ * Shows the County list
  * @returns {React.ReactElement}
  */
-const AccountConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose }: IProps): React.ReactElement => {
+const CountyConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose }: IProps): React.ReactElement => {
   const dispatch = useDispatch();
   const { id: formId } = useSelector(consentFormSelector) || {};
   const [editorContent, setEditorContent] = useState('');
@@ -49,7 +49,7 @@ const AccountConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose 
       countryId: consentFormConfig.regionId || '',
       formType: selectedFormType.name as FormType,
       category: 'Consent_form',
-      accountId: consentFormConfig.id
+      countyId: consentFormConfig.id
     }),
     [formId, consentFormConfig, selectedFormType.name]
   );
@@ -174,4 +174,4 @@ const AccountConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose 
   );
 };
 
-export default AccountConsentForm;
+export default CountyConsentForm;

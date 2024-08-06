@@ -18,7 +18,7 @@ import {
 } from '../../store/subCounty/selectors';
 import { ISubCountySummary } from '../../store/subCounty/types';
 import {
-  fetchOUDashboardListRequest,
+  fetchSubCountyDashboardListRequest,
   fetchSubCountyDetail,
   clearSubCountyDetail,
   setSubCountyDetails
@@ -44,7 +44,7 @@ const SubCountyDashboard = () => {
     itemsPerPage: APPCONSTANTS.SUB_COUNTY_PER_PAGE,
     onLoadMore: ({ skip, limit, onFail }) => {
       dispatch(
-        fetchOUDashboardListRequest({
+        fetchSubCountyDashboardListRequest({
           skip,
           limit,
           isLoadMore: true,
@@ -54,7 +54,7 @@ const SubCountyDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.OU_FETCH_ERROR, subCountyModuleName)
+                formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_FETCH_ERROR, subCountyModuleName)
               )
             );
           }
@@ -65,7 +65,7 @@ const SubCountyDashboard = () => {
 
   useEffect(() => {
     dispatch(
-      fetchOUDashboardListRequest({
+      fetchSubCountyDashboardListRequest({
         skip: 0,
         limit: APPCONSTANTS.SUB_COUNTY_PER_PAGE,
         failureCb: (e) =>
@@ -73,7 +73,7 @@ const SubCountyDashboard = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.OU_FETCH_ERROR, subCountyModuleName)
+              formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_FETCH_ERROR, subCountyModuleName)
             )
           )
       })
@@ -97,7 +97,7 @@ const SubCountyDashboard = () => {
     (search: string) => {
       searchText.current = search;
       dispatch(
-        fetchOUDashboardListRequest({
+        fetchSubCountyDashboardListRequest({
           skip: 0,
           limit: APPCONSTANTS.SUB_COUNTY_PER_PAGE,
           search,
@@ -107,7 +107,7 @@ const SubCountyDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.OU_FETCH_ERROR, subCountyModuleName)
+                formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_FETCH_ERROR, subCountyModuleName)
               )
             )
         })
@@ -128,7 +128,7 @@ const SubCountyDashboard = () => {
             value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
             label: 'Site',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.siteByOU.replace(':OUId', id).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.hfBySubCounty.replace(':OUId', id).replace(':tenantId', tenantId),
             onClick: () => {
               if (!subCountyDetail.id || subCountyDetail.id !== id) {
                 onDashboardExit(id, tenantId, name);
@@ -151,7 +151,7 @@ const SubCountyDashboard = () => {
 
   const accountId = useSelector(formDataIdSelector);
   const accountTentantId = useSelector(tenantIdSelector);
-  const createOURoute = PROTECTED_ROUTES.createOUByAccount
+  const createSubCountyRoute = PROTECTED_ROUTES.createSubCountyByCounty
     .replace(':accountId', accountId)
     .replace(':tenantId', accountTentantId);
   const loaderWrapperClass = loadingMore
@@ -169,7 +169,7 @@ const SubCountyDashboard = () => {
               <span className='ms-sm-auto mb-sm-0 mb-1'>
                 <Searchbar placeholder={`Search ${subCountyModuleName}`} onSearch={onSearch} isOutlined={false} />
               </span>
-              <Link to={createOURoute} className='ms-sm-1dot5' tabIndex={-1}>
+              <Link to={createSubCountyRoute} className='ms-sm-1dot5' tabIndex={-1}>
                 <button className='btn primary-btn'>Create {subCountyModuleName}</button>
               </Link>
             </>
@@ -178,7 +178,7 @@ const SubCountyDashboard = () => {
         <div className='col-12'>
           <div className='row gx-1dot25 gy-1dot25'>
             {parsedData?.map((summaryProps: ISummaryCardProps, i: number) => (
-              <div key={`OU${i}`} className='col-lg-4 col-md-6 col-12 mx-md-0 mx-auto'>
+              <div key={`sub-county${i}`} className='col-lg-4 col-md-6 col-12 mx-md-0 mx-auto'>
                 <SummaryCard disableImg={true} titleClassName={styles.ouSummaryTitle} {...summaryProps} />
               </div>
             ))}
@@ -188,7 +188,7 @@ const SubCountyDashboard = () => {
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {subCountyModuleName.toLowerCase()}</div>
-            <Link to={createOURoute} className='mx-auto' tabIndex={-1}>
+            <Link to={createSubCountyRoute} className='mx-auto' tabIndex={-1}>
               <button className='btn primary-btn'>Create {subCountyModuleName}</button>
             </Link>
           </div>

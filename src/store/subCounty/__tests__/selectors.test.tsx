@@ -54,9 +54,11 @@ test('subCountyAdminListSelector should return OU admin list from state', () => 
 });
 
 test('subCountyDropdownSelector should return OU dropdown from state', () => {
-  return expect(subCountyDropdownSelector(initialState)).toEqual(initialState.subCounty.dropdownOUList);
+  return expect(subCountyDropdownSelector(initialState)).toEqual(initialState.subCounty.dropdownSubCountyList);
 });
 
 test('subCountyDropdownLoadingSelector should return OU dropdown loading from state', () => {
-  return expect(subCountyDropdownLoadingSelector(initialState)).toEqual(initialState.subCounty.dropdownOUListLoading);
+  return expect(subCountyDropdownLoadingSelector(initialState)).toEqual(
+    initialState.subCounty.dropdownSubCountyListLoading
+  );
 });

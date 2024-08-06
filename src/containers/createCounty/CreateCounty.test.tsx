@@ -1,5 +1,5 @@
 import { mount } from 'enzyme';
-import CreateAccount from './CreateAccount';
+import CreateAccount from './CreateCounty';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { BrowserRouter as Router } from 'react-router-dom';

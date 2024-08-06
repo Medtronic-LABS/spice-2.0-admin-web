@@ -16,7 +16,8 @@ export const SiteUserForm = ({
   isSiteUser,
   selectedAdmins,
   countyDetails,
-  subCountyDetails
+  subCountyDetails,
+  isAdminForm
 }: any) => {
   const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN, REGION_ADMIN, SUPER_ADMIN } = APPCONSTANTS.ROLES;
 
@@ -74,7 +75,7 @@ export const SiteUserForm = ({
             </div>
           )}
         </>
-      ) : (
+      ) : !isAdminForm ? (
         <>
           {[ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
@@ -121,6 +122,8 @@ export const SiteUserForm = ({
             </div>
           )}
         </>
+      ) : (
+        <div />
       )}
     </>
   );

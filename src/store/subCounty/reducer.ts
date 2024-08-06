@@ -10,7 +10,7 @@ export const initialState: ISubCountyState = {
     tenantId: '',
     countryId: '',
     countyName: '',
-    account: {
+    county: {
       id: '',
       name: '',
       tenantId: ''
@@ -27,10 +27,7 @@ export const initialState: ISubCountyState = {
   dropdownSubCountyListLoading: false
 };
 
-const subCountyReducer = (
-  state: ISubCountyState = initialState,
-  action = {} as SubCountyActions
-): ISubCountyState => {
+const subCountyReducer = (state: ISubCountyState = initialState, action = {} as SubCountyActions): ISubCountyState => {
   switch (action.type) {
     case ACTION_TYPES.FETCH_SUB_COUNTY_DASHBOARD_LIST_REQUEST:
       return {
@@ -61,7 +58,6 @@ const subCountyReducer = (
     case ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_REQUEST:
     case ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_REQUEST:
     case ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_REQUEST:
-    case ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST:
       return {
         ...state,
         loading: true
@@ -126,25 +122,11 @@ const subCountyReducer = (
         ...state,
         loading: false
       };
-    case ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        subCountyAdmins: action.payload.subCountyAdmins,
-        total: action.payload.total,
-        error: null
-      };
     case ACTION_TYPES.CLEAR_SUB_COUNTY_ADMIN_LIST:
       return {
         ...state,
         subCountyAdmins: [],
         total: 0
-      };
-    case ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        error: action.error
       };
     case ACTION_TYPES.CLEAR_SUB_COUNTY_DETAIL:
       return { ...state, subCountyDetail: initialState.subCountyDetail, admins: [] };

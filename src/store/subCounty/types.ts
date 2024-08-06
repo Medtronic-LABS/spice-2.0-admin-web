@@ -1,4 +1,4 @@
-import { IRoles, ITimezone } from '../user/types';
+import { ITimezone } from '../user/types';
 import * as ACTION_TYPES from './actionTypes';
 
 export interface ISubCounty {
@@ -63,7 +63,7 @@ export interface ISubCountyDetail {
   tenantId: string;
   countryId: string;
   countyName: string;
-  account: { id: string; name: string; tenantId?: string };
+  county: { id: string; name: string; tenantId?: string };
 }
 
 export interface IFetchSubCountyDashboardListSuccessPayload {
@@ -280,26 +280,9 @@ export interface IFetchSubCountyAdminsSuccessPayload {
 }
 
 export interface IFetchSubCountyAdminsRequest {
-  type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST;
-  payload: {
-    skip?: number;
-    userType?: string;
-    limit?: number | null;
-    searchTerm?: string;
-    tenantId: string;
-  };
-  successCb?: (payload: IFetchSubCountyAdminsSuccessPayload) => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IFetchSubCountyAdminsSuccess {
-  type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_SUCCESS;
-  payload: IFetchSubCountyAdminsSuccessPayload;
-}
-
-export interface IFetchSubCountyAdminsFailure {
-  type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_FAILURE;
-  error: Error;
+  searchTerm?: string;
+  roleNames: string[];
+  tenantId: string;
 }
 
 export interface IClearSubCountyDetail {
@@ -372,9 +355,6 @@ export type SubCountyActions =
   | IFetchSubCountyByIdRequest
   | IFetchSubCountyByIdSuccess
   | IFetchSubCountyByIdFailure
-  | IFetchSubCountyAdminsRequest
-  | IFetchSubCountyAdminsSuccess
-  | IFetchSubCountyAdminsFailure
   | IClearSubCountyDetail
   | ISetSubCountyDetails
   | IClearSubCountyList

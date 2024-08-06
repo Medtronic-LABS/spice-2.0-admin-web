@@ -1,7 +1,7 @@
 import { shallow } from 'enzyme';
 import { useDispatch, useSelector } from 'react-redux';
 
-import AccountConsentForm from '../AccountConsentForm';
+import CountyConsentForm from '../CountyConsentForm';
 import ConsentForm from '../../ConsentForm/ConsentForm';
 import ConfirmationModalPopup from '../../../components/customTable/ConfirmationModalPopup';
 
@@ -18,7 +18,7 @@ describe('AccountConsentForm', () => {
   beforeEach(() => {
     (useDispatch as any).mockReturnValue(dispatch);
     (useSelector as any).mockImplementation(mockSelector);
-    wrapper = shallow(<AccountConsentForm isOpen={true} consentFormConfig={{}} handleConsentFormClose={jest.fn()} />);
+    wrapper = shallow(<CountyConsentForm isOpen={true} consentFormConfig={{}} handleConsentFormClose={jest.fn()} />);
   });
 
   afterEach(() => {

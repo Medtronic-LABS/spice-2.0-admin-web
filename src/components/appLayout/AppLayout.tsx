@@ -15,57 +15,57 @@ interface IAppLayout {
 }
 
 const routesWithSideMenu = [
-  { route: PROTECTED_ROUTES.accountByRegion },
-  { route: PROTECTED_ROUTES.accountAdminByRegion },
+  { route: PROTECTED_ROUTES.countyByRegion },
+  { route: PROTECTED_ROUTES.countyAdminByRegion },
   { route: PROTECTED_ROUTES.healthFacilityByAdmin },
   { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin },
   { route: PROTECTED_ROUTES.usersByAdmin },
   { route: PROTECTED_ROUTES.usersBySuperAdmin },
   { route: PROTECTED_ROUTES.adminBySuperAdmin },
   { route: PROTECTED_ROUTES.subCountyByRegion },
-  { route: PROTECTED_ROUTES.subCountyByAccount },
+  { route: PROTECTED_ROUTES.subCountyByCounty },
 
   { route: PROTECTED_ROUTES.subCountyAdminByRegion },
-  { route: PROTECTED_ROUTES.subCountyAdminByAccount },
+  { route: PROTECTED_ROUTES.subCountyAdminByCounty },
 
-  { route: PROTECTED_ROUTES.siteByRegion },
-  { route: PROTECTED_ROUTES.siteByAccount },
-  { route: PROTECTED_ROUTES.siteByOU },
+  { route: PROTECTED_ROUTES.hfByRegion },
+  { route: PROTECTED_ROUTES.hfByCounty },
+  { route: PROTECTED_ROUTES.hfBySubCounty },
 
   { route: PROTECTED_ROUTES.siteAdminByRegion },
-  { route: PROTECTED_ROUTES.siteAdminByAccount },
+  { route: PROTECTED_ROUTES.siteAdminByCounty },
   { route: PROTECTED_ROUTES.siteAdminByOU },
 
   { route: PROTECTED_ROUTES.groupByRegion },
-  { route: PROTECTED_ROUTES.groupByAccount },
+  { route: PROTECTED_ROUTES.groupByCounty },
   { route: PROTECTED_ROUTES.groupByOU },
   { route: PROTECTED_ROUTES.groupBySite },
 
   { route: PROTECTED_ROUTES.programByRegion },
 
   { route: PROTECTED_ROUTES.userByRegion },
-  { route: PROTECTED_ROUTES.userByAccount },
+  { route: PROTECTED_ROUTES.userByCounty },
   { route: PROTECTED_ROUTES.userByOU },
 
   { route: PROTECTED_ROUTES.regionSummary },
-  { route: PROTECTED_ROUTES.accountSummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
+  { route: PROTECTED_ROUTES.countySummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
   { route: PROTECTED_ROUTES.SubCountySummary, disabledRoles: [APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN] },
   { route: PROTECTED_ROUTES.siteSummary },
 
   { route: PROTECTED_ROUTES.workflowByRegion },
-  { route: PROTECTED_ROUTES.workflowByAccount },
+  { route: PROTECTED_ROUTES.workflowByCounty },
 
   { route: PROTECTED_ROUTES.medicationByRegion },
   { route: PROTECTED_ROUTES.labtestList },
   { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] },
   { route: PROTECTED_ROUTES.labTestByRegion },
   { route: PROTECTED_ROUTES.customizationByRegion },
-  { route: PROTECTED_ROUTES.accountWorkflowCustomization }
+  { route: PROTECTED_ROUTES.countyWorkflowCustomization }
 ];
 
 const routesWithoutBreadcrumb = [
   PROTECTED_ROUTES.regionDashboard,
-  PROTECTED_ROUTES.accountDashboard,
+  PROTECTED_ROUTES.CountyDashboard,
   PROTECTED_ROUTES.SubCountyDashboard,
   PROTECTED_ROUTES.siteDashboard,
   PROTECTED_ROUTES.dashboard
