@@ -138,8 +138,8 @@ const HealthFacilityDetailsForm = ({
 
   // Villages fetch
   useEffect(() => {
-    const districtId = form.getState().values.healthFacility.district?.id;
-    const chiefdomId = form.getState().values.healthFacility.chiefdom?.id;
+    const districtId = form.getState().values.healthFacility?.district?.id;
+    const chiefdomId = form.getState().values.healthFacility?.chiefdom?.id;
     if (chiefdomId && districtId) {
       dispatch(
         fetchVillagesListRequest({
@@ -159,6 +159,17 @@ const HealthFacilityDetailsForm = ({
     form.getState().values.healthFacility?.chiefdom?.id,
     regionId
   ]);
+
+  useEffect(() => {
+    const { district, chiefdom, city, linkedVillages } = form.getState().values.healthFacility;
+    if (!isEdit && !district?.id && (chiefdom?.id || city?.id || (linkedVillages || []).length)) {
+      form.batch(() => {
+        form.change(`${formName}.chiefdom`, undefined);
+        form.change(`${formName}.city`, undefined);
+        form.change(`${formName}.linkedVillages`, undefined);
+      });
+    }
+  }, [form, formName, isEdit]);
 
   return (
     <>
@@ -268,6 +279,7 @@ const HealthFacilityDetailsForm = ({
                     errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
                     valueKey='id'
+                    disabled={isEdit}
                     options={districtList || []}
                     loadingOptions={districtLoading}
                     error={(meta.touched && meta.error) || undefined}
@@ -289,6 +301,7 @@ const HealthFacilityDetailsForm = ({
             <Field
               required={true}
               name={`${formName}.chiefdom`}
+              type='text'
               validate={required}
               render={({ input, meta }) => (
                 <SelectInput
@@ -298,6 +311,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
+                  disabled={isEdit}
                   options={chiefdomList}
                   loadingOptions={chiefdomLoading}
                   error={(meta.touched && meta.error) || undefined}
@@ -315,6 +329,7 @@ const HealthFacilityDetailsForm = ({
             <Field
               required={true}
               name={`${formName}.city`}
+              type='text'
               validate={required}
               render={({ input, meta }) => (
                 <SelectInput

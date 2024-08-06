@@ -366,6 +366,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA:
       return {
         ...state,
+        healthFacility: initialState.healthFacility as IHealthFacility,
         chiefdomList: [],
         villagesList: [],
         villagesFromHFList: { list: [], hfTenantIds: null }

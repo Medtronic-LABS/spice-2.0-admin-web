@@ -74,7 +74,7 @@ const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
           }
           // reset eq condition field on remove options list value
           if ('condition' in obj) {
-            obj.condition.forEach((item: any, index: number) => {
+            (obj.condition || []).forEach((item: any, index: number) => {
               if ('eq' in item && !value.includes(item.eq)) {
                 obj.condition[index].eq = '';
               }
