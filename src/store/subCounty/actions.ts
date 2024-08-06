@@ -74,9 +74,7 @@ export const fetchOUDashboardListFailure = (error: Error): IFetchSubCountyDashbo
   error
 });
 
-export const fetchSubCountyDetail = (
-  payload: IFetchSubCountyDetailReqPayload
-): IFetchSubCountyDetailReq => ({
+export const fetchSubCountyDetail = (payload: IFetchSubCountyDetailReqPayload): IFetchSubCountyDetailReq => ({
   type: ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_REQUEST,
   payload
 });
@@ -106,8 +104,8 @@ export const fetchSubCountyListRequest = ({
   failureCb
 }: {
   tenantId: string;
-  skip: number;
-  limit: number | null;
+  skip?: number;
+  limit?: number | null;
   search?: string;
   failureCb?: (error: Error) => void;
 }): IFetchSubCountyListRequest => ({
@@ -119,9 +117,7 @@ export const fetchSubCountyListRequest = ({
   failureCb
 });
 
-export const fetchSubCountyListSuccess = (
-  payload: IFetchSubCountyListSuccessPayload
-): IFetchSubCountyListSuccess => ({
+export const fetchSubCountyListSuccess = (payload: IFetchSubCountyListSuccessPayload): IFetchSubCountyListSuccess => ({
   type: ACTION_TYPES.FETCH_SUB_COUNTY_LIST_SUCCESS,
   payload
 });
@@ -292,11 +288,7 @@ export const clearSubCountyAdminList = (): IClearSubCountyAdminList => ({
   type: ACTION_TYPES.CLEAR_SUB_COUNTY_ADMIN_LIST
 });
 
-export const fetchSubCountyDropdownRequest = ({
-  tenantId
-}: {
-  tenantId: string;
-}): ISubCountyDropdownRequest => ({
+export const fetchSubCountyDropdownRequest = ({ tenantId }: { tenantId: string }): ISubCountyDropdownRequest => ({
   type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST,
   tenantId
 });

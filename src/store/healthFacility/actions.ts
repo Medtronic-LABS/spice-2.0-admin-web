@@ -29,7 +29,6 @@ import {
   ICreateHFRequestPayload,
   IHFUserPost,
   IFetchChiefdomListRequest,
-  IChiefdom,
   IFetchChiefdomListSuccess,
   IFetchChiefdomListFailure,
   IFetchDistrictListRequest,
@@ -46,7 +45,6 @@ import {
   IWorkflow,
   IFetchWorkflowListSuccess,
   IFetchWorkflowListFailure,
-  IDistrict,
   IHealthFacility,
   IFetchVillagespayload,
   IFetchHFTypesRequest,
@@ -77,7 +75,9 @@ import {
   IDeleteHFFailure,
   IClearDependentData,
   IClearVillagesList,
-  IPeerSupervisorValidation
+  IPeerSupervisorValidation,
+  ISubCounty,
+  ICounty
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -367,7 +367,7 @@ export const fetchDistrictListRequest = ({
   failureCb
 });
 
-export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
+export const fetchDistrictListSuccess = (payload: { list: ICounty[]; total: number }): IFetchDistrictListSuccess => ({
   type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
   payload
 });
@@ -391,7 +391,10 @@ export const fetchChiefdomListRequest = ({
   failureCb
 });
 
-export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
+export const fetchChiefdomListSuccess = (payload: {
+  list: ISubCounty[];
+  total: number;
+}): IFetchChiefdomListSuccess => ({
   type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
   payload
 });

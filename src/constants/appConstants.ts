@@ -1,4 +1,3 @@
-
 const APPCONSTANTS = {
   APP_TYPE: 'admin',
   HASH_ALGORITM: 'sha512',
@@ -140,6 +139,13 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
   CLINICAL_WORKFLOW_FETCH_SUCCESS: 'Unable to load the clinical workflows. Please try after sometime.',
+  WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select a clinical workflow',
+  CUSTOMIZED_WORKFLOW: 'Customized Workflow',
+  CLINICAL_WORKFLOW: 'Clinical Workflow',
+  WORKFLOW_MODULE: {
+    clinical: 'clinical',
+    customized: 'customized'
+  },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin user should not be added.',
@@ -339,6 +345,5 @@ export const ROLE_LABELS = {
   [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
   [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
 };
-
 
 export default APPCONSTANTS;

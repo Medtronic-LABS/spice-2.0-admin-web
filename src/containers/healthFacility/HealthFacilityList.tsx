@@ -27,9 +27,10 @@ import {
   healthFacilityListTotalSelector,
   healthFacilityLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { roleSelector, userDataSelector } from '../../store/user/selectors';
+import { countryIdSelector, roleSelector } from '../../store/user/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { formatHealthFacility } from './HealthFacilitySummary';
+import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IModalState {
   data?: any;
@@ -43,7 +44,8 @@ const HealthFacilityList = (): React.ReactElement => {
   const healthFacilityCount = useSelector(healthFacilityListTotalSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
-  const regionData = useSelector(userDataSelector).country;
+  const countryId = useSelector(countryIdSelector);
+  const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -60,7 +62,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const fetchList = useCallback(() => {
     dispatch(
       fetchHFListRequest({
-        countryId: regionData.id,
+        countryId: countryIdValue,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
@@ -68,7 +70,7 @@ const HealthFacilityList = (): React.ReactElement => {
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
 
   useEffect(() => {
     fetchList();
@@ -142,7 +144,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const fetchWorkflowList = (healthFacility: any) =>
     dispatch(
       fetchWorkflowListRequest({
-        countryId: Number(regionData.id),
+        countryId: Number(countryIdValue),
         successCb: (flows) => {
           setSubmittedData({
             data: {
@@ -188,7 +190,7 @@ const HealthFacilityList = (): React.ReactElement => {
       }
       validatePeerSupervisor(missingIds, healthFacility.tenantId, healthFacility);
     } else {
-      const postData = formatHealthFacility(healthFacility, regionData.id);
+      const postData = formatHealthFacility(healthFacility, countryIdValue);
       if (postData.clinicalWorkflowIds.length) {
         dispatch(
           updateHFDetailsRequest({
@@ -205,7 +207,7 @@ const HealthFacilityList = (): React.ReactElement => {
   };
   const openCreateHealthFacility = () => {
     const url = PROTECTED_ROUTES.createHealthFacility;
-    history.push(url.replace(':regionId', regionData.id as string));
+    history.push(url.replace(':regionId', countryIdValue as string));
   };
 
   const handleRowClick = (data: any) => {
@@ -261,20 +263,27 @@ const HealthFacilityList = (): React.ReactElement => {
                 id: 1,
                 name: 'name',
                 label: 'Name',
-                width: '40%'
+                width: '30%'
               },
               {
                 id: 2,
                 name: 'type',
                 label: 'Type',
-                width: '35%'
+                width: '30%'
               },
               {
                 id: 3,
-                name: 'chiefdom',
-                label: 'Chiefdom',
+                name: 'county',
+                label: 'County',
                 width: '30%',
-                cellFormatter: ({ chiefdom }) => chiefdom.name
+                cellFormatter: ({ county }) => county.name
+              },
+              {
+                id: 3,
+                name: 'subcounty',
+                label: 'Sub County',
+                width: '30%',
+                cellFormatter: ({ subCounty }) => subCounty.name
               }
             ]}
             isDelete={!adminPSRoles.includes(role)}

@@ -97,7 +97,6 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
    */
 
   const onSubmit = ({ subCounty: { account, ...subCounty }, users }: IOUFormValues) => {
-    console.log({account, subCounty, users});
     const payload = {
       ...subCounty,
       name: subCounty.name.trim(),

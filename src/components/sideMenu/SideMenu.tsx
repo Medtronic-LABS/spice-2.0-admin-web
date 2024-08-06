@@ -51,7 +51,7 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Health Facility',
     route: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
-    disabled: true,
+    disabled: false,
     childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
   },
   {

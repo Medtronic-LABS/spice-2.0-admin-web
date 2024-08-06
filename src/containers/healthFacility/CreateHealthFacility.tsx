@@ -156,7 +156,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
             <form onSubmit={handleSubmit} data-testid='create-site-form'>
               <div className='row g-1dot25'>
                 {submittedData.isNextClicked ? (
-                  <FormContainer label='Clinical Workflows Involved' required={true} icon={SiteDetailsIcon}>
+                  <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
                     <Workflows formName='healthFacility' form={form} />
                   </FormContainer>
                 ) : (
@@ -179,6 +179,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           isHF={true}
                           isHFCreate={true}
                           entityName='healthFacility'
+                          isAdminForm={true}
+                          defaultSelectedRole={APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN}
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
                         />

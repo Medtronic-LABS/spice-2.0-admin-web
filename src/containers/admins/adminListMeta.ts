@@ -1,7 +1,6 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
 
-
 const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN } = APPCONSTANTS.ROLES;
 /**
  * Formats the user's full name by concatenating the first name and last name.
@@ -20,7 +19,6 @@ const formatName = (user: IHFUserGet): string => `${user.firstName} ${user.lastN
 const formatRoles = (user: IHFUserGet): string =>
   `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(',')}`;
 
-
 /**
  * Formats the organization names for a given user and role.
  *
@@ -30,9 +28,7 @@ const formatRoles = (user: IHFUserGet): string =>
  */
 const formatOrganizations = (user: IHFUserGet, roleName: string): string => {
   const [currentAdmin] = user.roles;
-  return currentAdmin.name === roleName
-    ? (user.organizations || []).map((org) => org.name).join(', ')
-    : '';
+  return currentAdmin.name === roleName ? (user.organizations || []).map((org) => org.name).join(', ') : '';
 };
 
 /**
@@ -41,8 +37,7 @@ const formatOrganizations = (user: IHFUserGet, roleName: string): string => {
  * @param {IHFUserGet} user - The user object containing roles and organizations.
  * @returns {string} A comma-separated list of health facility names if the user has the HEALTH_FACILITY_ADMIN role.
  */
-const formatHealthFacility = (user: IHFUserGet): string =>
-  formatOrganizations(user, HEALTH_FACILITY_ADMIN);
+const formatHealthFacility = (user: IHFUserGet): string => formatOrganizations(user, HEALTH_FACILITY_ADMIN);
 
 /**
  * Formats county names for the user with the ACCOUNT_ADMIN role.
@@ -50,8 +45,7 @@ const formatHealthFacility = (user: IHFUserGet): string =>
  * @param {IHFUserGet} user - The user object containing roles and organizations.
  * @returns {string} A comma-separated list of county names if the user has the ACCOUNT_ADMIN role.
  */
-const formatCounty = (user: IHFUserGet): string =>
-  formatOrganizations(user, ACCOUNT_ADMIN);
+const formatCounty = (user: IHFUserGet): string => formatOrganizations(user, ACCOUNT_ADMIN);
 
 /**
  * Formats sub-county names for the user with the SUB_COUNTY_ADMIN role.
@@ -59,8 +53,7 @@ const formatCounty = (user: IHFUserGet): string =>
  * @param {IHFUserGet} user - The user object containing roles and organizations.
  * @returns {string} A comma-separated list of sub-county names if the user has the SUB_COUNTY_ADMIN role.
  */
-const formatSubCounty = (user: IHFUserGet): string =>
-  formatOrganizations(user, SUB_COUNTY_ADMIN);
+const formatSubCounty = (user: IHFUserGet): string => formatOrganizations(user, SUB_COUNTY_ADMIN);
 
 export const columnDef = [
   {
@@ -97,12 +90,6 @@ export const columnDef = [
     label: 'HEALTH FACILITY',
     width: '20%',
     cellFormatter: formatHealthFacility
-  },
-  {
-    id: 4,
-    name: 'gender',
-    label: 'GENDER',
-    width: '10%'
   },
   {
     id: 5,
