@@ -5,7 +5,7 @@ import configureMockStore from 'redux-mock-store';
 import { MemoryRouter, Route } from 'react-router-dom';
 import SubCountySummary from '../SubCountySummary';
 import OU_MOCK_DATA_CONSTANTS from '../../../tests/mockData/subCountyDataConstants';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/accountDataConstants';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/countyDataConstants';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/edit.svg', () => ({
@@ -45,8 +45,8 @@ describe('SubCounty Summary', () => {
 
   beforeEach(() => {
     store = mockStore({
-      operatingUnit: {
-        operatingUnitDetail: OU_MOCK_DATA_CONSTANTS.SUB_COUNTY_ADMIN_REQUEST_PAYLOAD,
+      subCounty: {
+        subCountyDetail: OU_MOCK_DATA_CONSTANTS.SUB_COUNTY_ADMIN_REQUEST_PAYLOAD,
         admins: OU_MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_ADMINS_RESPONSE_PAYLOAD,
         loading: false
       },
@@ -54,7 +54,7 @@ describe('SubCounty Summary', () => {
         account: {
           id: '1',
           clinicalWorkflow: [1],
-          users: MOCK_DATA_CONSTANTS.ACCOUNT_DETAIL_RESPONSE_PAYLOAD.users,
+          users: MOCK_DATA_CONSTANTS.COUNTY_DETAIL_RESPONSE_PAYLOAD.users,
           name: 'AccountOne',
           maxNoOfUsers: '22',
           tenantId: '1'

@@ -2,28 +2,28 @@ import { useCallback, useMemo, useEffect } from 'react';
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
 import APPCONSTANTS from '../../constants/appConstants';
-import { accountsCountSelector, accountsLoadingSelector, getAccountsSelector } from '../../store/account/selectors';
+import { countyCountSelector, countyLoadingSelector, getCountyListSelector } from '../../store/county/selectors';
 import { useDispatch, useSelector } from 'react-redux';
-import { activateAccountReq, fetchAccountsRequest, removeDeactivatedAccountList } from '../../store/account/actions';
+import { activateCountyReq, fetchCountyListRequest, removeDeactivatedCountyList } from '../../store/county/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { roleSelector, tenantIdSelector } from '../../store/user/selectors';
-import { IAccount } from '../../store/account/types';
+import { ICounty } from '../../store/county/types';
 import { formatDate } from '../../utils/validation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
 const DeactivatedRecords = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const dispatch = useDispatch();
-  const loading = useSelector(accountsLoadingSelector);
-  const deactivatedRecords = useSelector(getAccountsSelector);
-  const deactivatedRecordsCount = useSelector(accountsCountSelector);
+  const loading = useSelector(countyLoadingSelector);
+  const deactivatedRecords = useSelector(getCountyListSelector);
+  const deactivatedRecordsCount = useSelector(countyCountSelector);
   const tenantId = useSelector(tenantIdSelector);
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
 
   const fetchDetails = useCallback(() => {
     dispatch(
-      fetchAccountsRequest({
+      fetchCountyListRequest({
         tenantId: ROLES.REGION_ADMIN === role ? tenantId : '',
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
@@ -39,7 +39,7 @@ const DeactivatedRecords = (): React.ReactElement => {
   useEffect(() => {
     fetchDetails();
     return () => {
-      dispatch(removeDeactivatedAccountList());
+      dispatch(removeDeactivatedCountyList());
     };
   }, [dispatch, fetchDetails, listParams]);
 
@@ -47,9 +47,9 @@ const DeactivatedRecords = (): React.ReactElement => {
    * Handler to open activate modal
    * @param values
    */
-  const openActivateModal = (value: IAccount) => {
+  const openActivateModal = (value: ICounty) => {
     dispatch(
-      activateAccountReq({
+      activateCountyReq({
         data: { tenantId: Number(value?.tenantId) },
         successCb: () => {
           fetchDetails();
@@ -73,7 +73,7 @@ const DeactivatedRecords = (): React.ReactElement => {
         id: 2,
         name: 'updated_at',
         label: 'Deactivated Date',
-        cellFormatter: (data: IAccount) => {
+        cellFormatter: (data: ICounty) => {
           if (data?.updatedAt) {
             return formatDate(data.updatedAt, { month: 'short', format: 'DD MM, YYYY' });
           } else {

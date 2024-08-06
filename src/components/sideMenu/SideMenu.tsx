@@ -28,7 +28,7 @@ const superAdminRoutes: ISideMenuItem[] = [
   },
   {
     label: 'County',
-    route: PROTECTED_ROUTES.accountByRegion,
+    route: PROTECTED_ROUTES.countyByRegion,
     collapsible: true,
     disabled: false
   },

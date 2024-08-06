@@ -5,31 +5,21 @@ import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { useDispatch, useSelector } from 'react-redux';
 
-import AccountForm from './AccountForm';
+import CountyForm from './CountyForm';
 import FormContainer from '../../components/formContainer/FormContainer';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { AppState } from '../../store/rootReducer';
-import { createAccountRequest } from '../../store/account/actions';
-import { IAccountPayload } from '../../store/account/types';
+import { createCountyRequest } from '../../store/county/actions';
+import { ICountyPayload } from '../../store/county/types';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import CountyFormIcon from '../../assets/images/info-grey.svg';
 import CountyAdminFormIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
-import UserForm from '../../components/userForm/UserForm';
+import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import sessionStorageServices from '../../global/sessionStorageServices';
-
-export interface IUserFormValues {
-  email: string;
-  firstName: string;
-  lastName: string;
-  countryCode: string | { countryCode: string };
-  username: string;
-  phoneNumber: string;
-  timezone: { id: string; description: string };
-  gender: string;
-  country: { countryCode: string };
-}
+import { userDataSelector } from '../../store/user/selectors';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface ICountyFormValues {
   county: {
@@ -47,31 +37,29 @@ const CreateCounty: React.FC = () => {
   const dispatch = useDispatch();
   const formInstance = useRef<FormApi<ICountyFormValues> | undefined>(undefined);
 
-  const loading = useSelector((state: AppState) => state.account.loading);
-  const countryId = useSelector((state: AppState) => state.user.user.countryId);
-  const moduleName = NAME_CONSTANTS.county;
+  const loading = useSelector((state: AppState) => state.county.loading);
+  const userData = useSelector(userDataSelector);
+  const countryId = userData?.id;
+  const { county: countyModuleName } = NAME_CONSTANTS;
 
-  const resetFields = useCallback(
-    ([subStrOfKey]: [string], state: any, utils: Tools<ICountyFormValues>) => {
-      try {
-        Object.keys(state.fields).forEach((key: string) => {
-          if (key.includes(subStrOfKey)) {
-            utils.resetFieldState(key);
-          }
-        });
-      } catch (e) {
-        console.error('Error removing form', e);
-      }
-    },
-    []
-  );
+  const resetFields = useCallback(([subStrOfKey]: [string], state: any, utils: Tools<ICountyFormValues>) => {
+    try {
+      Object.keys(state.fields).forEach((key: string) => {
+        if (key.includes(subStrOfKey)) {
+          utils.resetFieldState(key);
+        }
+      });
+    } catch (e) {
+      console.error('Error removing form', e);
+    }
+  }, []);
 
   const handleNavigation = useCallback(() => {
     let redirectTo: string;
     if (countryId) {
-      redirectTo = PROTECTED_ROUTES.accountDashboard;
+      redirectTo = PROTECTED_ROUTES.CountyDashboard;
     } else {
-      redirectTo = PROTECTED_ROUTES.accountByRegion
+      redirectTo = PROTECTED_ROUTES.countyByRegion
         .replace(':regionId', sessionStorageServices.getItem(APPCONSTANTS.FORM_ID))
         .replace(':tenantId', sessionStorageServices.getItem(APPCONSTANTS.ID));
     }
@@ -83,33 +71,40 @@ const CreateCounty: React.FC = () => {
       const countyUsers = [...users] as any;
       const data = {
         name: county.name.trim(),
-        maxNoOfUsers: county.maxNoOfUsers ? Number(county.maxNoOfUsers) : undefined,
-        clinicalWorkflow: county.clinicalWorkflow,
-        customizedWorkflow: county.customizedWorkflow,
-        countryId: Number(regionId),
-        parentOrganizationId: Number(tenantId),
-        tenantId: Number(tenantId),
         users: countyUsers.map((user: any) => ({
           ...user,
           firstName: user.firstName.trim(),
           lastName: user.lastName.trim(),
+          gender: user.gender,
+          phoneNumber: user.phoneNumber,
           username: user.email,
-          timezone: { id: Number(user.timezone.id) },
-          countryCode: user.countryCode.countryCode,
-          country: regionId,
-          tenantId: user
-        }))
-      } as IAccountPayload;
-
+          countryCode: user.country.phoneNumberCode,
+          country: { id: regionId },
+          roleIds: [user.role[0].id],
+          timezone: { id: Number(user.timezone.id) }
+        })),
+        countryId: Number(regionId),
+        parentOrganizationId: Number(tenantId),
+        tenantId: Number(tenantId)
+      } as ICountyPayload;
       dispatch(
-        createAccountRequest({
+        createCountyRequest({
           data,
           successCb: () => {
             handleNavigation();
-            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_CREATION_SUCCESS);
+            toastCenter.success(
+              APPCONSTANTS.SUCCESS,
+              formatUserToastMsg(APPCONSTANTS.COUNTY_CREATION_SUCCESS, countyModuleName)
+            );
           },
           failureCb: (e: Error) =>
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ACCOUNT_CREATION_FAIL))
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.COUNTY_CREATION_FAIL, countyModuleName)
+              )
+            )
         })
       );
     },
@@ -130,13 +125,19 @@ const CreateCounty: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${moduleName} Details`} icon={CountyFormIcon}>
-                    <AccountForm form={formInstance.current} />
+                  <FormContainer label={`${countyModuleName} Details`} icon={CountyFormIcon}>
+                    <CountyForm form={formInstance.current} />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${moduleName} Admin`} icon={CountyAdminFormIcon}>
-                    <UserForm form={formInstance.current} countryId={Number(regionId)} />
+                  <FormContainer label={`${countyModuleName} Admin`} icon={CountyAdminFormIcon}>
+                    <UserForm
+                      form={formInstance.current}
+                      countryId={Number(regionId)}
+                      isAdminForm={true}
+                      defaultSelectedRole={APPCONSTANTS.ROLES.ACCOUNT_ADMIN}
+                      enableAutoPopulate={true}
+                    />
                   </FormContainer>
                 </div>
               </div>

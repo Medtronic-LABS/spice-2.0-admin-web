@@ -1,5 +1,7 @@
+import APPCONSTANTS from '../../constants/appConstants';
+
 const MOCK_DATA_CONSTANTS = {
-  FETCH_ACTIVE_ACCOUNTS_REQUEST_PAYLOAD: {
+  FETCH_ACTIVE_COUNTY_LIST_REQUEST_PAYLOAD: {
     isActive: true,
     tenantId: '5',
     skip: 0,
@@ -12,7 +14,7 @@ const MOCK_DATA_CONSTANTS = {
     limit: 10,
     search: 'Sample'
   },
-  FETCH_ACCOUNTS_RESPONSE_PAYLOAD: {
+  FETCH_COUNTY_LIST_RESPONSE_PAYLOAD: {
     id: '3',
     users: [
       {
@@ -31,7 +33,7 @@ const MOCK_DATA_CONSTANTS = {
         }
       }
     ],
-    name: 'Sample Account',
+    name: 'Sample County',
     maxNoOfUsers: '100',
     tenantId: '3',
     country: {
@@ -40,56 +42,56 @@ const MOCK_DATA_CONSTANTS = {
       id: '6'
     }
   },
-  FETCH_DASHBOARD_ACCOUNTS_PAYLOAD: {
+  FETCH_DASHBOARD_COUNTY_PAYLOAD: {
     skip: 0,
     limit: 10,
     searchTerm: 'Sample',
     tenantId: '4'
   },
-  DASHBOARD_ACCOUNTS_RESPONSE_PAYLOAD: [
+  DASHBOARD_COUNTY_RESPONSE_PAYLOAD: [
     {
       id: '1',
-      name: 'Account One',
+      name: 'County One',
       ouCount: 3,
       siteCount: 10,
       tenantId: '5'
     },
     {
       id: '2',
-      name: 'Account Two',
+      name: 'County Two',
       ouCount: 13,
       siteCount: 20,
       tenantId: '6'
     }
   ],
-  ACTIVATE_ACCOUNT_PAYLOAD: {
+  ACTIVATE_COUNTY_PAYLOAD: {
     tenantId: 4
   },
-  DEACTIVATE_ACCOUNT_PAYLOAD: {
+  DEACTIVATE_COUNTY_PAYLOAD: {
     tenantId: 3,
     status: 'Inactive',
     reason: 'Not active anymore'
   },
-  FETCH_ACCOUNT_OPTIONS_REQUEST_PAYLOAD: {
+  FETCH_COUNTY_OPTIONS_REQUEST_PAYLOAD: {
     tenantId: '2',
     skip: 0,
     limit: null,
     searchTerm: ''
   },
-  FETCH_ACCOUNT_OPTIONS_RESPONSE_PAYLOAD: [
+  FETCH_COUNTY_OPTIONS_RESPONSE_PAYLOAD: [
     {
-      name: 'Account option one',
+      name: 'County option one',
       id: '1',
       tenantId: '5'
     },
     {
-      name: 'Account option two',
+      name: 'County option two',
       id: '2',
       tenantId: '6'
     }
   ],
-  CREATE_ACCOUNT_PAYLOAD: {
-    name: 'Account Test',
+  CREATE_COUNTY_PAYLOAD: {
+    name: 'County Test',
     maxNoOfUsers: 100,
     clinicalWorkflow: [2, 4],
     customizedWorkflow: [],
@@ -98,12 +100,12 @@ const MOCK_DATA_CONSTANTS = {
     tenantId: 290,
     users: [
       {
-        email: 'testaccount@admin.com',
-        firstName: 'TestAccount',
+        email: 'testcounty@admin.com',
+        firstName: 'TestCounty',
         lastName: 'Admin',
         phoneNumber: '1234567890',
         gender: 'Male',
-        username: 'testaccount@admin.com',
+        username: 'testcounty@admin.com',
         country: '3',
         timezone: {
           id: 2
@@ -111,14 +113,14 @@ const MOCK_DATA_CONSTANTS = {
       }
     ]
   },
-  ACCOUNT_WORLFOW_PAYLOAD: {
-    name: 'Account Workflow sample',
+  COUNTY_WORLFOW_PAYLOAD: {
+    name: 'County Workflow sample',
     viewScreens: ['ViewScreen 1', 'ViewScreen 2'],
     countryId: '2',
     tenantId: '4',
     id: '2'
   },
-  DELETE_ACCOUNT_WORLFOW_PAYLOAD: {
+  DELETE_COUNTY_WORLFOW_PAYLOAD: {
     tenantId: '4',
     id: '2'
   },
@@ -156,9 +158,9 @@ const MOCK_DATA_CONSTANTS = {
       viewScreens: ['View Screen One', 'View Screen Two']
     }
   ],
-  UPDATE_ACCOUNT_PAYLOAD: {
+  UPDATE_COUNTY_PAYLOAD: {
     id: '1',
-    name: 'Account Dummy',
+    name: 'County Dummy',
     maxNoOfUsers: '100',
     tenantId: '4'
   },
@@ -166,19 +168,12 @@ const MOCK_DATA_CONSTANTS = {
     tenantId: 1,
     id: 1
   },
-  SEARCH_ACCOUNT_ADMIN_REQUEST_PAYLOAD: {
+  SEARCH_COUNTY_ADMIN_REQUEST_PAYLOAD: {
     tenantId: 80,
     searchTerm: 'of',
-    userType: 'account'
+    roleNames: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN]
   },
-  ACCOUNT_ADMIN_LIST_REQUEST_PAYLOAD: {
-    tenantId: '80',
-    searchTerm: 'of',
-    skip: 0,
-    limit: 10,
-    userType: 'account'
-  },
-  ACCOUNT_DETAIL_RESPONSE_PAYLOAD: {
+  COUNTY_DETAIL_RESPONSE_PAYLOAD: {
     id: '1',
     name: 'Novo Kenya',
     maxNoOfUsers: '100',
@@ -202,18 +197,19 @@ const MOCK_DATA_CONSTANTS = {
       }
     ]
   },
-  ACCOUNT_ADMIN: {
+  COUNTY_ADMIN: {
     id: '2',
-    firstName: 'Account',
+    firstName: 'County',
     lastName: 'Admin',
-    email: 'accountadmin@email.com',
+    email: 'countyadmin@email.com',
     phoneNumber: '1234567890',
-    username: 'accountadmin@email.com',
+    username: 'countyadmin@email.com',
     gender: 'male',
     countryCode: '231',
     timezone: '23',
     country: { countryCode: '231', id: '4' },
-    tenantId: '4'
+    tenantId: '4',
+    roles: []
   }
 };
 

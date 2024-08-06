@@ -5,7 +5,7 @@ import healthFacilityReducer from './healthFacility/reducer';
 import medicationReducer from './medication/reducer';
 import workflowReducer from './workflow/reducer';
 import labtestReducer from './labTest/reducer';
-import accountReducer from './account/reducer';
+import countyReducer from './county/reducer';
 import subCountyReducer from './subCounty/reducer';
 import healthFacilityDashboardReducer from './healthFacilityDashboard/reducer';
 
@@ -16,7 +16,7 @@ const appReducer = combineReducers({
   medication: medicationReducer,
   labtest: labtestReducer,
   workflow: workflowReducer,
-  account: accountReducer,
+  county: countyReducer,
   subCounty: subCountyReducer,
   healthFacilityDashboardReducer
 });

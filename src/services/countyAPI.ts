@@ -1,17 +1,17 @@
 import axios from 'axios';
 import {
-  IAccountPayload,
-  IAccountInfo,
-  IAccountAdmin,
-  IAccountDeactivate,
-  IFetchAccounts,
-  IAccountWorkflowModuleReqPayload,
-  IDeleteAccountWorkflowModuleReqPayload,
+  ICountyPayload,
+  ICountyInfo,
+  ICountyAdmin,
+  ICountyDeactivate,
+  IFetchCountyList,
+  ICountyWorkflowModuleReqPayload,
+  IDeleteCountyWorkflowModuleReqPayload,
   IFetchClinicalWorkflowReqPayload,
-  IFetchAccountOptionsPayload
-} from '../store/account/types';
+  IFetchCountyOptionsPayload
+} from '../store/county/types';
 
-export const fetchAccounts = (
+export const fetchCountyList = (
   tenantId: number,
   isActive: boolean,
   skip: number,
@@ -49,77 +49,77 @@ export const fetchDeactivatedAccounts = (
     }
   });
 
-export const createAccount = (data: IAccountPayload) =>
+export const createCounty = (data: ICountyPayload) =>
   axios({
     method: 'POST',
-    url: '/user-service/organization/create-account',
+    url: '/user-service/organization/create-county',
     data
   });
 
-export const fetchAccountDetails = (data: { tenantId: number; id: number }) =>
+export const fetchCountyDetails = (data: { tenantId: number; id: number }) =>
   axios({
     method: 'POST',
     url: '/admin-service/county/details',
     data
   });
 
-export const fetchDashboardAccounts = (data: { skip: number; limit: number; tenantId: string; searchTerm: string }) =>
+export const fetchDashboardCounty = (data: { skip: number; limit: number; tenantId: string; searchTerm: string }) =>
   axios({
     method: 'POST',
     url: '/admin-service/county/list',
     data
   });
 
-export const updateAccount = (data: IAccountInfo) =>
+export const updateCounty = (data: ICountyInfo) =>
   axios({
     method: 'POST',
     url: '/admin-service/county/update',
     data
   });
 
-export const createAccountAdmin = (data: IAccountAdmin) =>
+export const createCountyAdmin = (data: ICountyAdmin) =>
   axios({
-    url: '/admin-service/account/user-add',
+    url: '/admin-service/county/user-add',
     method: 'POST',
     data
   });
 
-export const updateAccountAdmin = (data: IAccountAdmin) =>
+export const updateCountyAdmin = (data: ICountyAdmin) =>
   axios({
-    url: '/admin-service/account/user-update',
+    url: '/admin-service/county/user-update',
     method: 'PUT',
     data
   });
 
-export const deleteAccountAdmin = (data: { tenantId: string | number; id: string | number }) =>
+export const deleteCountyAdmin = (data: { tenantId: string | number; id: string | number }) =>
   axios({
-    url: '/admin-service/account/user-remove',
+    url: '/admin-service/county/user-remove',
     method: 'DELETE',
     data
   });
 
-export const activateAccount = (data: { tenantId: number }) =>
+export const activateCounty = (data: { tenantId: number }) =>
   axios({
     url: '/admin-service/county/activate',
     method: 'PUT',
     data
   });
 
-export const deactivateAccount = (data: IAccountDeactivate) =>
+export const deactivateCounty = (data: ICountyDeactivate) =>
   axios({
     url: '/admin-service/county/deactivate',
     method: 'POST',
     data
   });
 
-export const fetchAccountOptions = (data: IFetchAccountOptionsPayload) =>
+export const fetchCountyOptions = (data: IFetchCountyOptionsPayload) =>
   axios({
     method: 'POST',
     url: '/admin-service/county/county-list',
     data
   });
 
-export const fetchAccountAdmins = (data: IFetchAccounts) =>
+export const fetchCountyAdmins = (data: IFetchCountyList) =>
   axios({
     method: 'POST',
     url: '/user-service/user/admin-users',
@@ -133,21 +133,21 @@ export const fetchClinicalWorkflows = (data: IFetchClinicalWorkflowReqPayload) =
     data
   });
 
-export const createAccountWorkflowModule = (data: IAccountWorkflowModuleReqPayload) =>
+export const createCountyWorkflowModule = (data: ICountyWorkflowModuleReqPayload) =>
   axios({
     method: 'POST',
     url: '/admin-service/clinical-workflow/create',
     data
   });
 
-export const updateAccountWorkflowModule = (data: IAccountWorkflowModuleReqPayload) =>
+export const updateCountyWorkflowModule = (data: ICountyWorkflowModuleReqPayload) =>
   axios({
     method: 'PUT',
     url: '/admin-service/clinical-workflow/update',
     data
   });
 
-export const deleteAccountWorkflowModule = (data: IDeleteAccountWorkflowModuleReqPayload) =>
+export const deleteCountyWorkflowModule = (data: IDeleteCountyWorkflowModuleReqPayload) =>
   axios({
     method: 'PUT',
     url: '/admin-service/clinical-workflow/remove',

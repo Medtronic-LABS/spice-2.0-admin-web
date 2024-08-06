@@ -4,7 +4,7 @@ const SITE_MOCK_DATA = {
       id: 261,
       name: 'Hostor',
       tenantId: 372,
-      operatingUnitName: 'Dar es Salaam- Sanofi',
+      subCountyName: 'Dar es Salaam- Sanofi',
       culture: 'English - India',
       siteLevel: 'Level 3',
       siteType: 'Clinic'
@@ -56,7 +56,7 @@ const SITE_MOCK_DATA = {
     accountId: 2,
     parentOrganizationId: 136,
     tenantId: 136,
-    operatingUnit: {
+    subCounty: {
       id: 14
     },
     countryId: 2,
@@ -144,17 +144,13 @@ const SITE_MOCK_DATA = {
       id: '68',
       name: 'Arusha'
     },
-    subCounty: {
-      id: '311',
-      name: 'Arusha'
-    },
     account: {
       id: '2',
       name: 'Christian Health Associates of Tanzania',
       tenantId: '80',
       email: ''
     },
-    operatingUnit: {
+    subCounty: {
       id: '11',
       name: 'Arusha- Sanofi',
       tenantId: '159'
@@ -248,7 +244,7 @@ const SITE_MOCK_DATA = {
       id: '1',
       name: 'KKKT Mtoni Dispensary',
       tenantId: '43',
-      operatingUnitName: 'Dar es Salaam- Sanofi',
+      subCountyName: 'Dar es Salaam- Sanofi',
       cultureName: 'English - India',
       siteLevel: 'Level 1',
       siteType: 'Clinic'
@@ -260,7 +256,7 @@ const SITE_MOCK_DATA = {
         id: 82,
         name: 'SDA Hospital Obuasi',
         tenantId: 180,
-        operatingUnitName: 'Ashanti Region-CHAG',
+        subCountyName: 'Ashanti Region-CHAG',
         cultureName: 'English - India',
         siteLevel: 'Level 3',
         siteType: 'Clinic',

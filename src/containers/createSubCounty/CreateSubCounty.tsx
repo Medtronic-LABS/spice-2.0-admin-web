@@ -11,19 +11,19 @@ import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import { createSubCountyRequest } from '../../store/subCounty/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import OUFormIcon from '../../assets/images/info-grey.svg';
-import OUAdminFormIcon from '../../assets/images/avatar-o.svg';
-import { IAccountOption } from '../../store/account/types';
+import SubCountyFormIcon from '../../assets/images/info-grey.svg';
+import SubCountyAdminFormIcon from '../../assets/images/avatar-o.svg';
+import { ICountyOption } from '../../store/county/types';
 import { Tools } from 'final-form';
 import { subCountyLoadingSelector } from '../../store/subCounty/selectors';
 import { roleSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
 
-export interface IOUFormValues {
+export interface ISubCountyFormValues {
   subCounty: {
     name: string;
-    account?: IAccountOption;
+    county?: ICountyOption;
   };
   users: IUserFormValues[];
 }
@@ -64,7 +64,7 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
         role === APPCONSTANTS.ROLES.SUPER_ADMIN ||
         role === APPCONSTANTS.ROLES.SUPER_USER)
     ) {
-      redirectTo = PROTECTED_ROUTES.subCountyByAccount.replace(':accountId', accountId).replace(':tenantId', tenantId);
+      redirectTo = PROTECTED_ROUTES.subCountyByCounty.replace(':accountId', accountId).replace(':tenantId', tenantId);
     } else {
       redirectTo = PROTECTED_ROUTES.SubCountyDashboard;
     }
@@ -76,9 +76,9 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
    *
    * @param {string} subStrOfKey - The substring to match in field keys.
    * @param {object} state - The current state of the form, containing field data.
-   * @param {Tools<IOUFormValues>} utils - Utility functions for managing form state.
+   * @param {Tools<ISubCountyFormValues>} utils - Utility functions for managing form state.
    */
-  const resetFields = ([subStrOfKey]: [string], state: any, utils: Tools<IOUFormValues>) => {
+  const resetFields = ([subStrOfKey]: [string], state: any, utils: Tools<ISubCountyFormValues>) => {
     try {
       Object.keys(state.fields).forEach((key: string) => {
         if (key.includes(subStrOfKey)) {
@@ -93,10 +93,10 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
   /**
    * Handles the form submission for creating or updating an operating unit.
    *
-   * @param {IOUFormValues} formValues - The form values containing the operating unit and user data.
+   * @param {ISubCountyFormValues} formValues - The form values containing the operating unit and user data.
    */
 
-  const onSubmit = ({ subCounty: { account, ...subCounty }, users }: IOUFormValues) => {
+  const onSubmit = ({ subCounty: { county, ...subCounty }, users }: ISubCountyFormValues) => {
     const payload = {
       ...subCounty,
       name: subCounty.name.trim(),
@@ -115,9 +115,9 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
         };
       }),
       countryId: countryIdValue,
-      countyId: Number(account?.id) || Number(accountId),
-      parentOrganizationId: accountId ? Number(tenantId) : Number(account?.tenantId),
-      tenantId: (accountId ? tenantId : account?.tenantId) as string
+      countyId: Number(county?.id) || Number(accountId),
+      parentOrganizationId: accountId ? Number(tenantId) : Number(county?.tenantId),
+      tenantId: (accountId ? tenantId : county?.tenantId) as string
     };
 
     dispatch(
@@ -150,22 +150,23 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
           ...arrayMutators,
           resetFields
         }}
-        render={({ handleSubmit, form }: FormRenderProps<IOUFormValues>) => {
+        render={({ handleSubmit, form }: FormRenderProps<ISubCountyFormValues>) => {
           return (
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${subCountyModuleName} Details`} icon={OUFormIcon}>
+                  <FormContainer label={`${subCountyModuleName} Details`} icon={SubCountyFormIcon}>
                     <SubCountyForm form={form} nestingKey='subCounty' />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${subCountyModuleName} Admin`} icon={OUAdminFormIcon}>
+                  <FormContainer label={`${subCountyModuleName} Admin`} icon={SubCountyAdminFormIcon}>
                     <UserForm
                       form={form}
                       countryId={countryIdValue}
                       isAdminForm={true}
                       defaultSelectedRole={APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN}
+                      enableAutoPopulate={true}
                     />
                   </FormContainer>
                 </div>

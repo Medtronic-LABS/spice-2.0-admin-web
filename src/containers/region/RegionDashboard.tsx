@@ -27,10 +27,10 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 import { fetchTimezoneListRequest } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
 import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
-import { clearAccountDetails, resetClinicalWorkflow } from '../../store/account/actions';
+import { clearCountyDetails, resetClinicalWorkflow } from '../../store/county/actions';
 import { clearSubCountyDetail } from '../../store/subCounty/actions';
 import { IRegionDetail } from '../../store/region/types';
-import { getClinicalWorkflowSelector } from '../../store/account/selectors';
+import { getClinicalWorkflowSelector } from '../../store/county/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 
 /**
@@ -105,7 +105,7 @@ const Region = (): React.ReactElement => {
    */
   useEffect(() => {
     dispatch(clearRegionDetail());
-    dispatch(clearAccountDetails());
+    dispatch(clearCountyDetails());
     dispatch(clearSubCountyDetail());
     dispatch(clearSiteSummary());
     dispatch(clearClientRegistryStatus());
@@ -157,7 +157,7 @@ const Region = (): React.ReactElement => {
             value: Number(countyCount) ? appendZeroBefore(countyCount, 2) : '-',
             label: countyModuleName,
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.accountByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.countyByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {
@@ -172,7 +172,7 @@ const Region = (): React.ReactElement => {
             value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
             label: healthFacility,
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.siteByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.hfByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           }
         ]

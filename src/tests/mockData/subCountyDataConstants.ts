@@ -4,7 +4,7 @@ const MOCK_DATA_CONSTANTS = {
   FETCH_SUB_COUNTY_DETAILS_REQUEST_PAYLOAD_WITH_SEARCH: {
     tenantId: '4',
     searchTerm: 'Admin',
-    userType: 'operatingunit'
+    userType: 'subcounty'
   },
 
   ID_AND_TENANT_ID_REQUEST_PAYLOAD: {
@@ -178,7 +178,7 @@ const MOCK_DATA_CONSTANTS = {
 
   FETCH_SUB_COUNTY_DROPDOWN_LIST_RESPONSE_PAYLOAD: {
     total: 10,
-    operatingUnitList: [
+    subCountyList: [
       {
         id: '1',
         tenantId: '2',

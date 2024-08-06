@@ -34,7 +34,7 @@ import { FormTypes } from '../../containers/region/RegionCustomization';
 export function* fetchCustomizationForm({
   tenantId,
   countryId,
-  districtId,
+  countyId,
   formType,
   category,
   cultureId,
@@ -48,7 +48,7 @@ export function* fetchCustomizationForm({
     } = yield call(workflowService.fetchCustomizationForm, {
       tenantId,
       countryId,
-      districtId,
+      countyId,
       formType,
       category,
       cultureId,
@@ -138,7 +138,7 @@ export function* customizeForm({
   payload,
   tenantId,
   countryId,
-  districtId,
+  countyId,
   cultureId,
   clinicalWorkflowId,
   workflowId,
@@ -154,7 +154,7 @@ export function* customizeForm({
       payload,
       tenantId,
       countryId,
-      districtId,
+      countyId,
       clinicalWorkflowId,
       workflowId,
       cultureId

@@ -6,13 +6,13 @@ import { useParams } from 'react-router';
 
 import SelectInput from '../formFields/SelectInput';
 import TextInput from '../formFields/TextInput';
-import { fetchAccountDetailReq, fetchAccountOptionsRequest } from '../../store/account/actions';
+import { fetchCountyListDetailReq, fetchCountyOptionsRequest } from '../../store/county/actions';
 import {
-  accountOptionsLoadingSelector,
-  accountOptionsSelector,
-  accountSelector,
-  accountsLoadingSelector
-} from '../../store/account/selectors';
+  countyOptionsLoadingSelector,
+  countyOptionsSelector,
+  countySelector,
+  countyLoadingSelector
+} from '../../store/county/selectors';
 import { composeValidators, required, validateEntityName } from '../../utils/validation';
 import { roleSelector } from '../../store/user/selectors';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
@@ -29,54 +29,54 @@ interface ISubCountyFormProps {
  */
 const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps): React.ReactElement => {
   const dispatch = useDispatch();
-  const accountOptions = useSelector(accountOptionsSelector);
-  const accountOptionsLoading = useSelector(accountOptionsLoadingSelector);
+  const countyOptions = useSelector(countyOptionsSelector);
+  const countyOptionsLoading = useSelector(countyOptionsLoadingSelector);
   const { regionId, accountId, tenantId } = useParams<{ regionId?: string; accountId?: string; tenantId: string }>();
 
   const { county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
 
   useEffect(() => {
     if (regionId && tenantId && !isEdit) {
-      dispatch(fetchAccountOptionsRequest(tenantId));
+      dispatch(fetchCountyOptionsRequest(tenantId));
     }
   }, [dispatch, regionId, tenantId, isEdit]);
 
-  // Logic for account autoselecting when the route is createOuByAccount
-  // route is createOuByAccount, if isEdit = false and the route contains accountId param
-  const account = useSelector(accountSelector);
-  const accountLoading = useSelector(accountsLoadingSelector);
+  // Logic for county autoselecting when the route is createSubCountyByCounty
+  // route is createSubCountyByCounty, if isEdit = false and the route contains countyId param
+  const county = useSelector(countySelector);
+  const countyLoading = useSelector(countyLoadingSelector);
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
-  const showAccountField = ROLES.SUPER_ADMIN === role || ROLES.SUPER_USER === role || ROLES.REGION_ADMIN === role;
+  const showCountyField = ROLES.SUPER_ADMIN === role || ROLES.SUPER_USER === role || ROLES.REGION_ADMIN === role;
   useEffect(() => {
-    if (showAccountField && !isEdit && accountId && account?.id !== accountId) {
+    if (showCountyField && !isEdit && accountId && county?.id !== accountId) {
       dispatch(
-        fetchAccountDetailReq({
+        fetchCountyListDetailReq({
           tenantId,
           id: accountId
         })
       );
     }
-  }, [account?.id, accountId, dispatch, isEdit, showAccountField, tenantId]);
+  }, [county?.id, accountId, dispatch, isEdit, showCountyField, tenantId]);
 
   useEffect(() => {
     if (!isEdit && accountId) {
       const { values: formValues = {} } = form?.getState?.() || {};
-      let accountsFormValue = '';
+      let countyFormValue = '';
       if (nestingKey) {
-        accountsFormValue = (nestingKey.split('.').reduce((a, b: string) => a[b], formValues) || {}).accounts;
+        countyFormValue = (nestingKey.split('.').reduce((a, b: string) => a[b], formValues) || {}).county;
       } else {
-        accountsFormValue = formValues.accounts;
+        countyFormValue = formValues.county;
       }
-      if (!accountsFormValue && account?.id.toString() === accountId) {
-        form?.change(`${nestingKey ? nestingKey + '.' : ''}account`, account);
+      if (!countyFormValue && county?.id.toString() === accountId) {
+        form?.change(`${nestingKey ? nestingKey + '.' : ''}county`, county);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, form, isEdit, nestingKey]);
 
   const nestingKeyName = `${nestingKey ? nestingKey + '.' : ''}name`;
-  const nestingKeyAccount = `${nestingKey ? nestingKey + '.' : ''}account`;
+  const nestingKeyCounty = `${nestingKey ? nestingKey + '.' : ''}county`;
 
   return (
     <div className='row gx-1dot25'>
@@ -96,10 +96,10 @@ const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps
           )}
         />
       </div>
-      {showAccountField && (
+      {showCountyField && (
         <div className='col-12 col-md-6'>
           <Field
-            name={nestingKeyAccount}
+            name={nestingKeyCounty}
             type='text'
             validate={required}
             render={({ input, meta }) => {
@@ -107,8 +107,8 @@ const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps
                 <SelectInput
                   {...(input as any)}
                   disabled={Boolean(accountId || isEdit)}
-                  options={accountId || isEdit ? [] : accountOptions || []}
-                  loadingOptions={accountOptionsLoading || accountLoading}
+                  options={accountId || isEdit ? [] : countyOptions || []}
+                  loadingOptions={countyOptionsLoading || countyLoading}
                   labelKey='name'
                   valueKey='id'
                   label={countyModuleName}

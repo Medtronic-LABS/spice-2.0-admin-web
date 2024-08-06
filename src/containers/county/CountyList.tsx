@@ -1,45 +1,38 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { RouteComponentProps, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
-import styles from './Account.module.scss';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import {
-  clearAccountDetails,
-  clearAccounts,
-  decactivateAccountReq,
-  fetchAccountDetailReq,
-  fetchAccountsRequest,
+  clearCountyDetails,
+  clearCountyList,
+  decactivateCountyReq,
+  fetchCountyListRequest,
   resetClinicalWorkflow,
-  setAccountDetails,
-  updateAccountDetail
-} from '../../store/account/actions';
+  setCountyDetails,
+  updateCountyDetail
+} from '../../store/county/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import {
-  accountsLoadingSelector,
-  getAccountsSelector,
-  accountsCountSelector,
+  countyLoadingSelector,
+  getCountyListSelector,
+  countyCountSelector,
   getClinicalWorkflowSelector
-} from '../../store/account/selectors';
+} from '../../store/county/selectors';
 import Loader from '../../components/loader/Loader';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import {
-  IAccount,
-  IAccountDeactivateFormValues,
-  IAccountDetail,
-  IDeactivateReqPayload
-} from '../../store/account/types';
+import { ICounty, ICountyDeactivateFormValues, ICountyDetail, IDeactivateReqPayload } from '../../store/county/types';
 import Modal from '../../components/modal/ModalForm';
-import AccountForm from '../createAccount/AccountForm';
+import CountyForm from '../createCounty/CountyForm';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import Deactivation from '../../components/deactivate/Deactivation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { ReactComponent as IconLegal } from '../../assets/images/icon-legal.svg';
 import { clearConsentForm } from '../../store/workflow/actions';
-import AccountConsentForm from './AccountConsentForm';
+import CountyConsentForm from './CountyConsentForm';
 import { loadingSelector } from '../../store/workflow/selectors';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 interface IMatchParams {
   regionId: string;
@@ -47,41 +40,47 @@ interface IMatchParams {
 }
 
 interface IDispatchProps {
-  decactivateAccountReq: (payload: IDeactivateReqPayload) => void;
+  decactivateCountyReq: (payload: IDeactivateReqPayload) => void;
 }
 
 interface IMatchProps extends RouteComponentProps<IMatchParams> {}
 
 /**
- * Shows the account list
+ * Shows the county list
  * @returns {React.ReactElement}
  */
-const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement => {
+const CountyList = (props: IMatchProps & IDispatchProps): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const dispatch = useDispatch();
-  const loading = useSelector(accountsLoadingSelector);
+  const loading = useSelector(countyLoadingSelector);
   const workflowLoading = useSelector(loadingSelector);
-  const accountList = useSelector(getAccountsSelector);
-  const accountsCount = useSelector(accountsCountSelector);
+  const countyList = useSelector(getCountyListSelector);
+  const countyCount = useSelector(countyCountSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
-  const [isOpenAccountModal, setOpenAccountModal] = useState(false);
+  const [isOpenCountyModal, setOpenCountyModal] = useState(false);
   const [isOpenDeactivateModal, setOpenDeactivateModal] = useState(false);
-  const accountToBeEdited = useRef<IAccountDetail>({} as IAccountDetail);
+  const countyToBeEdited = useRef<ICountyDetail>({} as ICountyDetail);
   const consentFormConfig = useRef({} as any);
   const [openConsentForm, setOpenConsentForm] = useState(false);
   const { regionId, tenantId } = useParams<IMatchParams>();
-  const moduleName = NAME_CONSTANTS.county;
+  const { county: countyModuleName } = NAME_CONSTANTS;
 
   const fetchDetails = useCallback(() => {
     dispatch(
-      fetchAccountsRequest({
+      fetchCountyListRequest({
         tenantId,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         search: listParams.searchTerm,
         isActive: true,
         failureCb: (e) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ACCOUNT_FETCH_ERROR))
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.OOPS,
+              formatUserToastMsg(APPCONSTANTS.COUNTY_FETCH_ERROR, countyModuleName)
+            )
+          )
       })
     );
   }, [dispatch, tenantId, listParams]);
@@ -91,14 +90,14 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
   }, [dispatch, fetchDetails, tenantId, listParams]);
 
   /**
-   * To remove Account List and Consent form cache in store
+   * To remove County List and Consent form cache in store
    */
   useEffect(() => {
     if (clinicalWorkflows.length) {
       dispatch(resetClinicalWorkflow());
     }
     return () => {
-      dispatch(clearAccounts());
+      dispatch(clearCountyList());
       dispatch(clearConsentForm());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -106,17 +105,15 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
 
   const openAddModal = () => {
     props.history.push(
-      PROTECTED_ROUTES.createAccountByRegion
-        .replace(':regionId', regionId)
-        .replace(':tenantId', tenantId)
+      PROTECTED_ROUTES.createCountyByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId)
     );
   };
 
-  const handleRowClick = (data: Partial<IAccount>) => {
-    dispatch(clearAccountDetails());
-    dispatch(setAccountDetails(data));
+  const handleRowClick = (data: Partial<ICounty>) => {
+    dispatch(clearCountyDetails());
+    dispatch(setCountyDetails(data));
     props.history.push(
-      PROTECTED_ROUTES.accountSummary
+      PROTECTED_ROUTES.countySummary
         .replace(':accountId', data.id as string)
         .replace(':tenantId', data.tenantId as string)
     );
@@ -126,52 +123,44 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
    * Handle for modal cancel
    */
   const handleCancelClick = () => {
-    setOpenAccountModal(false);
+    setOpenCountyModal(false);
     setOpenDeactivateModal(false);
   };
 
-  const openAccountEditModal = (value: IAccountDetail) => {
-    accountToBeEdited.current = value;
-    setOpenAccountModal(true);
-    // Use the details getting from row click
-    // dispatch(
-    //   fetchAccountDetailReq({
-    //     tenantId: value.tenantId,
-    //     id: value.id,
-    //     successCb: (accountData) => {
-    //       accountToBeEdited.current = accountData;
-    //       setOpenAccountModal(true);
-    //     },
-    //     failureCb: (e) =>
-    //       toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ACCOUNT_UPDATE_FAIL))
-    //   })
-    // );
+  const openCountyEditModal = (value: ICountyDetail) => {
+    countyToBeEdited.current = value;
+    setOpenCountyModal(true);
   };
 
   /**
-   * Handler for account edit form submit.
+   * Handler for county edit form submit.
    * @param values
    */
-  const handleAccountFormSubmit = (values?: IAccountDetail) => {
+  const handleCountyFormSubmit = (values?: ICountyDetail) => {
     const data = JSON.parse(JSON.stringify(values));
-    data.account.name = data.account.name.trim();
-    delete data.account.users;
-    delete data.account.country;
-    delete data.account.code;
-    delete data.account.countryId;
-    delete data.account.reason;
-    delete data.account.updatedAt;
-    delete data.account.index;
     dispatch(
-      updateAccountDetail({
-        data: data.account,
+      updateCountyDetail({
+        data: {
+          id: data.county.id,
+          name: data.county.name.trim(),
+          tenantId: data.county.tenantId
+        },
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_UPDATE_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.COUNTY_UPDATE_SUCCESS, countyModuleName)
+          );
           handlePage(APPCONSTANTS.INITIAL_PAGE);
           handleCancelClick();
         },
         failureCb: (e) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ACCOUNT_UPDATE_FAIL))
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.OOPS,
+              formatUserToastMsg(APPCONSTANTS.COUNTY_UPDATE_FAIL, countyModuleName)
+            )
+          )
       })
     );
   };
@@ -180,32 +169,41 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
     setOpenDeactivateModal(true);
   };
 
-  const handleDeactivate = (values: IAccountDeactivateFormValues) => {
+  const handleDeactivate = (values: ICountyDeactivateFormValues) => {
     const status = values.status.value;
     const { reason } = values;
     dispatch(
-      decactivateAccountReq({
-        data: { tenantId: Number(accountToBeEdited.current.tenantId), status, reason },
+      decactivateCountyReq({
+        data: { tenantId: Number(countyToBeEdited.current.tenantId), status, reason },
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_DEACTIVATE_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.COUNTY_DEACTIVATE_SUCCESS, countyModuleName)
+          );
           props.history.push(
-            PROTECTED_ROUTES.accountByRegion
+            PROTECTED_ROUTES.countyByRegion
               .replace(':regionId', sessionStorageServices.getItem(APPCONSTANTS.FORM_ID))
               .replace(':tenantId', sessionStorageServices.getItem(APPCONSTANTS.ID))
           );
         },
         failureCb: (e) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_DEACTIVATE_FAIL))
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.ERROR,
+              formatUserToastMsg(APPCONSTANTS.COUNTY_DEACTIVATE_FAIL, countyModuleName)
+            )
+          )
       })
     );
   };
 
-  const formatUsers = (accounts: IAccount) => {
-    return accounts.maxNoOfUsers || '--';
-  };
-
   const editModalRender = (form: any) => {
-    return isOpenDeactivateModal ? <Deactivation formName={moduleName.toLowerCase()} /> : <AccountForm form={form} />;
+    return isOpenDeactivateModal ? (
+      <Deactivation formName={countyModuleName.toLowerCase()} />
+    ) : (
+      <CountyForm form={form} />
+    );
   };
 
   const handleConsentFormOpen = (data: { name: string; index: number }) => {
@@ -221,17 +219,17 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
   return (
     <>
       {(loading || workflowLoading) && <Loader />}
-      <div className={`${styles.accountContainer} row g-0dot625`}>
+      <div className={`row g-0dot625`}>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={`Add ${moduleName}`}
-            header={moduleName}
+            buttonLabel={`Add ${countyModuleName}`}
+            header={countyModuleName}
             isSearch={true}
             onSearch={handleSearch}
             onButtonClick={openAddModal}
           >
             <CustomTable
-              rowData={accountList}
+              rowData={countyList}
               columnsDef={[
                 {
                   id: 1,
@@ -242,10 +240,10 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
               ]}
               isEdit={true}
               isDelete={false}
-              page={accountsCount > APPCONSTANTS.ROWS_PER_PAGE_OF_TABLE ? listParams.page : 0}
+              page={countyCount > APPCONSTANTS.ROWS_PER_PAGE_OF_TABLE ? listParams.page : 0}
               rowsPerPage={listParams.rowsPerPage}
-              count={accountsCount}
-              onRowEdit={openAccountEditModal}
+              count={countyCount}
+              onRowEdit={openCountyEditModal}
               handlePageChange={handlePage}
               onCustomConfirmed={handleConsentFormOpen}
               CustomIcon={IconLegal}
@@ -256,20 +254,20 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
             />
           </DetailCard>
         </div>
-        <AccountConsentForm
+        <CountyConsentForm
           isOpen={openConsentForm}
           consentFormConfig={consentFormConfig.current}
           handleConsentFormClose={handleConsentFormClose}
         />
         <Modal
-          show={isOpenAccountModal}
-          title={isOpenDeactivateModal ? `Deactivate ${moduleName}` : `Edit ${moduleName}`}
+          show={isOpenCountyModal}
+          title={isOpenDeactivateModal ? `Deactivate ${countyModuleName}` : `Edit ${countyModuleName}`}
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}
-          handleFormSubmit={!isOpenDeactivateModal ? handleAccountFormSubmit : handleDeactivate}
-          initialValues={!isOpenDeactivateModal ? { account: accountToBeEdited.current } : {}}
-          deactivateLabel={!isOpenDeactivateModal ? `Deactivate ${moduleName}` : ''}
+          handleFormSubmit={!isOpenDeactivateModal ? handleCountyFormSubmit : handleDeactivate}
+          initialValues={!isOpenDeactivateModal ? { county: countyToBeEdited.current } : {}}
+          deactivateLabel={!isOpenDeactivateModal ? `Deactivate ${countyModuleName}` : ''}
           handleDeactivate={showDeactivateModal}
           isDeactivateModal={isOpenDeactivateModal}
           render={editModalRender}
@@ -279,4 +277,4 @@ const AccountList = (props: IMatchProps & IDispatchProps): React.ReactElement =>
   );
 };
 
-export default AccountList;
+export default CountyList;

@@ -12,19 +12,14 @@ import {
   IUpdateSubCountyAdminRequest,
   IDeleteSubCountyAdminRequest,
   IFetchSubCountyByIdRequest,
-  IFetchSubCountyAdminsRequest,
   ICreateSubCountyAdminRequest,
   ISubCountyDropdownRequest
 } from './types';
 import * as ACTION_TYPES from './actionTypes';
 import { AppState } from '../rootReducer';
 import { fetchSubCountyAdmins } from '../../services/subCountyAPI';
-import {
-  fetchSubCountyAdminsFailure,
-  fetchSubCountyAdminsSuccess,
-  fetchSubCountyDropdownFailure,
-  fetchSubCountyDropdownSuccess
-} from './actions';
+import { fetchSubCountyDropdownFailure, fetchSubCountyDropdownSuccess } from './actions';
+import APPCONSTANTS from '../../constants/appConstants';
 
 /*
   Worker Saga: Fired on FETCH_REGIONS_REQUEST action
@@ -44,11 +39,11 @@ export function* fetchSubCountyDashboardList({
     } = yield call(subCountyAPI.fetchSubCountyDashboardList as any, tenantId, limit, skip, undefined, search);
     const payload = { subCountyDashboardList: subCountyDashboardList || [], total, isLoadMore };
     successCb?.(payload);
-    yield put(operatinUnitActions.fetchOUDashboardListSuccess(payload));
+    yield put(operatinUnitActions.fetchSubCountyDashboardListSuccess(payload));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(operatinUnitActions.fetchOUDashboardListFailure(e));
+      yield put(operatinUnitActions.fetchSubCountyDashboardListFailure(e));
     }
   }
 }
@@ -65,7 +60,7 @@ export function* fetchSubCountyDetail(action: IFetchSubCountyDetailReq): SagaIte
       } = yield call(fetchSubCountyAdmins, {
         tenantId,
         searchTerm,
-        userType: 'operatingunit'
+        roleNames: [APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN]
       });
       yield put(operatinUnitActions.searchUserSuccess(userResponse || []));
     } else {
@@ -78,10 +73,9 @@ export function* fetchSubCountyDetail(action: IFetchSubCountyDetailReq): SagaIte
         operatinUnitActions.fetchSubCountyDetailSuccess({
           subCountyDetail: {
             ...subCountyDetail,
-            account: {
-              id: subCountyDetail.account?.id || subCountyDetail.account,
-              name: subCountyDetail.countyName,
-              tenantId: subCountyDetail.account?.tenantId
+            county: {
+              id: subCountyDetail.countryId,
+              name: subCountyDetail.countyName
             }
           },
           subCountyAdmins
@@ -227,33 +221,6 @@ export function* fetchSubCountyById(action: IFetchSubCountyByIdRequest): SagaIte
 }
 
 /*
-  Worker Saga: Fired on FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST action
-*/
-export function* fetchSubCountyAdminList({
-  payload,
-  successCb,
-  failureCb
-}: IFetchSubCountyAdminsRequest): SagaIterator {
-  payload.userType = 'operatingunit';
-  try {
-    const {
-      data: { entityList: subCountyAdmins, totalCount: total }
-    } = yield call(subCountyAPI.fetchSubCountyAdmins as any, payload);
-    const successPayload = { subCountyAdmins, total };
-    (successPayload.subCountyAdmins || []).map(
-      (admin: any) => (admin.organizationName = admin.organizations[0].name)
-    );
-    successCb?.(successPayload);
-    yield put(fetchSubCountyAdminsSuccess(successPayload));
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(fetchSubCountyAdminsFailure(e));
-    }
-  }
-}
-
-/*
   Worker Saga: Fired on FETCH_SUB_COUNTY_DROPDOWN_REQUEST action
 */
 export function* getOUListForDropdown({ tenantId }: ISubCountyDropdownRequest): SagaIterator {
@@ -284,7 +251,6 @@ function* subCountySaga() {
   yield all([takeLatest(ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_REQUEST, createSubCountyAdmin)]);
   yield all([takeLatest(ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_REQUEST, deleteSubCountyAdmin)]);
   yield all([takeLatest(ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_REQUEST, fetchSubCountyById)]);
-  yield all([takeLatest(ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST, fetchSubCountyAdminList)]);
   yield all([takeLatest(ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST, getOUListForDropdown)]);
 }
 

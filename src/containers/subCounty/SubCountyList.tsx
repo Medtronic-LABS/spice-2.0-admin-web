@@ -24,7 +24,7 @@ import { ISubCountyDetail, ISubCountyList } from '../../store/subCounty/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import SubCountyForm from '../../components/subCountyForm/SubCountyForm';
 import ModalForm from '../../components/modal/ModalForm';
-import { IAccountOption } from '../../store/account/types';
+import { ICountyOption } from '../../store/county/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { countryIdSelector } from '../../store/user/selectors';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
@@ -35,7 +35,7 @@ interface ISubCountyFormValue {
   email: string;
   manager_name: string;
   manager_phone_number: string;
-  account?: IAccountOption;
+  account?: ICountyOption;
 }
 
 /**
@@ -89,7 +89,7 @@ const SubCountyList = (): React.ReactElement => {
   }, [dispatch, fetchList, listParams]);
 
   /**
-   * To remove OU List and OU Detail cache in store
+   * To remove sub county List and sub county Detail cache in store
    */
   useEffect(() => {
     return () => {
@@ -99,18 +99,18 @@ const SubCountyList = (): React.ReactElement => {
   }, []);
 
   /**
-   * Opens the page for adding a new operating unit, adjusting the route based on the presence of a region ID.
+   * Opens the page for adding a new sub county, adjusting the route based on the presence of a region ID.
    * @callback
    */
   const openAddSubCounty = useCallback(() => {
-    const pathname = regionId ? PROTECTED_ROUTES.createOUByRegion : PROTECTED_ROUTES.createOUByAccount;
+    const pathname = regionId ? PROTECTED_ROUTES.createOUByRegion : PROTECTED_ROUTES.createSubCountyByCounty;
     history.push(
       pathname.replace(':regionId', regionId).replace(':accountId', accountId).replace(':tenantId', tenantId)
     );
   }, [history, regionId, accountId, tenantId]);
 
-  const [showOUEditModal, setShowOUEditModal] = useState(false);
-  const OUToBeEdited = useRef<ISubCountyFormValue | {}>({});
+  const [showSubCountyEditModal, setShowSubCountyEditModal] = useState(false);
+  const subCountyToBeEdited = useRef<ISubCountyFormValue | {}>({});
 
   /**
    * Opens the modal for editing an operating unit by fetching its details.
@@ -120,7 +120,7 @@ const SubCountyList = (): React.ReactElement => {
    * @param {string} subCounty.id - The ID of the operating unit.
    * @param {string} subCounty.tenantIdFromEdit - The tenant ID of the operating unit.
    */
-  const openOUEditModal = useCallback(
+  const openSubCountyEditModal = useCallback(
     ({ id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
       dispatch(
         fetchSubCountyByIdReq({
@@ -128,13 +128,13 @@ const SubCountyList = (): React.ReactElement => {
           successCb: (payload: ISubCountyDetail) => {
             payload = {
               ...payload,
-              account: {
-                ...payload.account,
+              county: {
+                id: payload.countryId,
                 name: payload.countyName
               }
             };
-            OUToBeEdited.current = payload;
-            setShowOUEditModal(true);
+            subCountyToBeEdited.current = payload;
+            setShowSubCountyEditModal(true);
           },
           failureCb: (e) =>
             toastCenter.error(
@@ -159,18 +159,18 @@ const SubCountyList = (): React.ReactElement => {
    * @param {string} subCounty.id - The ID of the operating unit.
    * @param {string} subCounty.tenantIdFromEdit - The tenant ID of the operating unit.
    */
-  const handleOUEdit = ({ name, account, id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
+  const handleSubCountyEdit = ({ name, county, id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
     dispatch(
       updateSubCountyReq({
         payload: {
           name: name.trim(),
           countryId: Number(countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID)),
-          countyId: Number(account?.id),
+          countyId: Number(county?.id),
           id,
           tenantId: tenantIdFromEdit
         },
         successCb: () => {
-          setShowOUEditModal(false);
+          setShowSubCountyEditModal(false);
           handlePage(APPCONSTANTS.INITIAL_PAGE);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
@@ -233,7 +233,7 @@ const SubCountyList = (): React.ReactElement => {
               count={listCount}
               handlePageChange={handlePage}
               isRowEdit={true}
-              onRowEdit={openOUEditModal}
+              onRowEdit={openSubCountyEditModal}
               handleRowClick={handleRowClick as any}
               confirmationTitle={formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_DELETE_CONFIRMATION, subCountyModuleName)}
               deleteTitle={formatUserToastMsg(APPCONSTANTS.SUB_COUNTY_DELETE_TITLE, subCountyModuleName)}
@@ -245,10 +245,10 @@ const SubCountyList = (): React.ReactElement => {
         title={`Edit ${subCountyModuleName}`}
         cancelText='Cancel'
         submitText='Submit'
-        show={showOUEditModal}
-        handleCancel={() => setShowOUEditModal(false)}
-        handleFormSubmit={handleOUEdit}
-        initialValues={OUToBeEdited.current}
+        show={showSubCountyEditModal}
+        handleCancel={() => setShowSubCountyEditModal(false)}
+        handleFormSubmit={handleSubCountyEdit}
+        initialValues={subCountyToBeEdited.current}
       >
         <SubCountyForm isEdit={true} />
       </ModalForm>
