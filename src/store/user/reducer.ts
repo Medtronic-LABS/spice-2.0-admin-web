@@ -1,10 +1,8 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import MOCK_DATA_CONSTANTS from '../../tests/mockData/userDataConstants';
 import * as USERTYPES from './actionTypes';
-import { communityListSelector } from './selectors';
 
-import { UserActions, IUserState, IUser } from './types';
+import { IUserState, IUser } from './types';
 
 const userInitialStateGetter = (): IUser => ({
   email: '',

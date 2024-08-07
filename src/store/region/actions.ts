@@ -9,11 +9,7 @@ import {
   ICreateRegionSuccess,
   ICreateRegionRequestPayload,
   IRegionDetail,
-  IRegionInfo,
-  IDeleteRegionAdminPayload,
-  IDeactivateReqPayload,
   ISetRegionDetails,
-  IRegionAdminAddPayload,
   IClearRegionDetail,
   IFetchClientRegistryStatusReq,
   IFetchClientRegistryStatusReqPayload,
@@ -113,7 +109,7 @@ export const regionDetailsRequest = ({
   failureCb
 });
 
-export const regionDetailsSuccess = (payload: { list: IRegionDetailList[], total: number }): IRegionDetailsSuccess => ({
+export const regionDetailsSuccess = (payload: { list: IRegionDetailList[]; total: number }): IRegionDetailsSuccess => ({
   type: REGION_TYPES.FETCH_REGION_DETAIL_SUCCESS,
   payload
 });

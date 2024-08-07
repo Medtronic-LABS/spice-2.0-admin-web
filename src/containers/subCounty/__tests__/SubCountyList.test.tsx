@@ -44,9 +44,9 @@ describe('SubCounty List', () => {
   let store: any;
   const mockSubCountyDetail: ISubCountyDetail = {
     id: '1',
-    name: 'Operating Unit 1',
+    name: 'Sub County 1',
     tenantId: 'tenant-1',
-    account: {
+    county: {
       id: '1',
       name: 'Account 1',
       tenantId: 'tenant-1'
@@ -58,8 +58,8 @@ describe('SubCounty List', () => {
     store = mockStore({
       subCounty: {
         subCountyList: [
-          { id: 1, name: 'OU one' },
-          { id: 2, name: 'OU two' }
+          { id: 1, name: 'Sub County one' },
+          { id: 2, name: 'Sub County two' }
         ],
         loading: false,
         total: 0
@@ -116,7 +116,7 @@ describe('SubCounty List', () => {
     });
     failureCbSpy.mockRestore();
   });
-  it('should redirect create OU', () => {
+  it('should redirect create Sub County', () => {
     const componentWrapper = mount(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/tenant/1']}>
@@ -133,7 +133,7 @@ describe('SubCounty List', () => {
       expect(customtableMock.onButtonClick()).toHaveBeenCalled();
     });
   });
-  it('should open Operating unit edit modal', () => {
+  it('should open Sub County edit modal', () => {
     const componentWrapper = mount(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/tenant/1']}>
@@ -182,7 +182,7 @@ describe('SubCounty List', () => {
     });
     componentWrapper.update();
     const handlePage = jest.fn();
-    const modalMockProps: any = componentWrapper.find('Memo()[title="Edit Operating Unit"]').props();
+    const modalMockProps: any = componentWrapper.find('Memo()[title="Edit Sub County"]').props();
     modalMockProps.handleFormSubmit(mockSubCountyDetail);
     const actions = store.getActions();
     const OUModalAction = actions.find((action: { type: string }) => action.type === 'UPDATE_SUB_COUNTY_REQUEST');
@@ -197,17 +197,17 @@ describe('SubCounty List', () => {
       failureCbSpy.mockRestore();
     });
   });
-  it('should redirect operating unit summary', () => {
+  it('should redirect sub county summary', () => {
     const mockSubCountyList: ISubCountyList = {
       id: '1',
       tenantId: 'tenant-1',
-      name: 'Operating Unit 1',
+      name: 'Sub County 1',
       email: 'subcounty1@example.com',
       county: 'County 1',
       account: {
         name: 'Account 1'
       },
-      countyName: 'Operating Unit 1'
+      countyName: 'Sub County 1'
     };
 
     const componentWrapper = mount(

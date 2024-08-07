@@ -34,22 +34,22 @@ const routesWithSideMenu = [
 
   { route: PROTECTED_ROUTES.siteAdminByRegion },
   { route: PROTECTED_ROUTES.siteAdminByCounty },
-  { route: PROTECTED_ROUTES.siteAdminByOU },
+  { route: PROTECTED_ROUTES.siteAdminBySubCounty },
 
   { route: PROTECTED_ROUTES.groupByRegion },
   { route: PROTECTED_ROUTES.groupByCounty },
-  { route: PROTECTED_ROUTES.groupByOU },
+  { route: PROTECTED_ROUTES.groupBySubCounty },
   { route: PROTECTED_ROUTES.groupBySite },
 
   { route: PROTECTED_ROUTES.programByRegion },
 
   { route: PROTECTED_ROUTES.userByRegion },
   { route: PROTECTED_ROUTES.userByCounty },
-  { route: PROTECTED_ROUTES.userByOU },
+  { route: PROTECTED_ROUTES.userBySubCounty },
 
   { route: PROTECTED_ROUTES.regionSummary },
   { route: PROTECTED_ROUTES.countySummary, disabledRoles: [APPCONSTANTS.ROLES.ACCOUNT_ADMIN] },
-  { route: PROTECTED_ROUTES.SubCountySummary, disabledRoles: [APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN] },
+  { route: PROTECTED_ROUTES.subCountySummary, disabledRoles: [APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN] },
   { route: PROTECTED_ROUTES.siteSummary },
 
   { route: PROTECTED_ROUTES.workflowByRegion },

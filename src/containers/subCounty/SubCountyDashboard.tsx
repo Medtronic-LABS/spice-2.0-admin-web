@@ -120,7 +120,7 @@ const SubCountyDashboard = () => {
     () =>
       subCountyDashboardList?.map(({ siteCount, name, id, tenantId }: ISubCountySummary) => ({
         title: name,
-        detailRoute: PROTECTED_ROUTES.SubCountySummary.replace(':OUId', id).replace(':tenantId', tenantId),
+        detailRoute: PROTECTED_ROUTES.subCountySummary.replace(':subCountyId', id).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit(id, tenantId, name),
         data: [
           {
@@ -128,7 +128,7 @@ const SubCountyDashboard = () => {
             value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
             label: 'Site',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.hfBySubCounty.replace(':OUId', id).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.hfBySubCounty.replace(':subCountyId', id).replace(':tenantId', tenantId),
             onClick: () => {
               if (!subCountyDetail.id || subCountyDetail.id !== id) {
                 onDashboardExit(id, tenantId, name);
@@ -149,10 +149,10 @@ const SubCountyDashboard = () => {
   const noSubCountysAvailable = !(searchText.current || parsedData?.length);
   const noSearchResultAvailable = Boolean(searchText.current && !parsedData?.length);
 
-  const accountId = useSelector(formDataIdSelector);
+  const countyId = useSelector(formDataIdSelector);
   const accountTentantId = useSelector(tenantIdSelector);
   const createSubCountyRoute = PROTECTED_ROUTES.createSubCountyByCounty
-    .replace(':accountId', accountId)
+    .replace(':countyId', countyId)
     .replace(':tenantId', accountTentantId);
   const loaderWrapperClass = loadingMore
     ? `${styles.loaderWrapper} d-flex align-items-center justify-content-center mt-2dot5`

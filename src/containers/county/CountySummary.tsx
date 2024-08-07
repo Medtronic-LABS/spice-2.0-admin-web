@@ -33,14 +33,14 @@ import {
 import { formatUserToastMsg } from '../../utils/commonUtils';
 
 interface IMatchParams {
-  accountId: string;
+  countyId: string;
   tenantId: string;
 }
 
 const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { accountId, tenantId } = useParams<IMatchParams>();
+  const { countyId, tenantId } = useParams<IMatchParams>();
 
   const loading = useSelector(countyLoadingSelector);
   const workflowLoading = useSelector(workflowLoadingSelector);
@@ -71,7 +71,7 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       dispatch(
         fetchCountyListDetailReq({
           tenantId,
-          id: accountId,
+          id: countyId,
           searchTerm: search,
           failureCb: (e: Error) =>
             toastCenter.error(
@@ -94,7 +94,7 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, accountId, tenantId]
+    [dispatch, countyId, tenantId]
   );
 
   const editDeactivateModalRender = (form: any) => {

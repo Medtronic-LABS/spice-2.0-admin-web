@@ -119,7 +119,7 @@ const Breadcrumb = (): React.ReactElement => {
   }, []);
 
   const prevPathname = useRef(pathname);
-  // Clearing the region/account/ou/site data in reducer, to prevent showing wrong data in breadcrumb
+  // Clearing the region/account/subCounty/site data in reducer, to prevent showing wrong data in breadcrumb
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       const prevRoute = {
