@@ -24,6 +24,7 @@ import {
   updateHFDetailsRequest,
   updateHFUserRequest,
   validateLinkedRestrictionsRequest
+  validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
   IHFUserGet,
@@ -330,17 +331,17 @@ const HealthFacilitySummary = (): React.ReactElement => {
       })
     );
 
-  const validateLinkedRestrictions = (
+  const validatePeerSupervisor = (
     missingIds: number[],
-    hfTenantId: number,
+    tenantId: number,
     healthFacilityParams: any,
     linkedVillageIds: number[]
   ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId: hfTenantId,
-        healthFacilityId: healthFacility.id,
+        tenantId,
+        healthFacilityId: healthFacilityParams?.id,
         linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacilityParams);
@@ -366,7 +367,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           missingIds.push(supervisor.id);
         }
       }
-      validateLinkedRestrictions(missingIds, Number(healthFacilityData.tenantId), healthFacility, linkedVillagesIds);
+      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility, linkedVillagesIds);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(

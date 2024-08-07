@@ -39,8 +39,7 @@ import {
   fetchVillagesListRequest
 } from '../../store/healthFacility/actions';
 import { useParams } from 'react-router';
-import { countryIdSelector } from '../../store/user/selectors';
-import { IObjectData, IVillages } from '../../store/healthFacility/types';
+import { userDataSelector } from '../../store/user/selectors';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from '../healthFacility/Workflows';
@@ -92,10 +91,6 @@ const HealthFacilityDetailsForm = ({
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
   const unlinkedVillagesList = useSelector(unlinkedVillagesListSelector);
   const unlinkedVillagesLoading = useSelector(unlinkedVillagesLoadingSelector);
-  const districtList = useSelector(getDistrictListSelector);
-  const chiefdomList = useSelector(chiefdomListSelector);
-  const districtLoading = useSelector(districtLoadingSelector);
-  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
   const languages = useSelector(cultureListSelector);
@@ -216,6 +211,14 @@ const HealthFacilityDetailsForm = ({
           }
         })
       );
+      dispatch(
+        fetchUnlinkedVillagesRequest({
+          countryId,
+          districtId: Number(districtId),
+          chiefdomId: Number(chiefdomId),
+          healthFacilityId: data?.id ? data.id : undefined
+        })
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -276,7 +279,9 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='type'
                   labelKey='name'
                   valueKey='id'
-                  defaultValue={hfTypesList.find((type: IObjectData) => type.name === (data.type?.name || data.type))}
+                  defaultValue={hfTypesList.find(
+                    (type: { id: string; name: string }) => type.name === (data.type?.name || data.type)
+                  )}
                   options={hfTypesList}
                   loadingOptions={hfTypesLoading}
                   error={(meta.touched && meta.error) || undefined}
@@ -517,34 +522,32 @@ const HealthFacilityDetailsForm = ({
               name={`${formName}.linkedVillages`}
               type='text'
               validate={required}
-              render={({ input, meta }) => {
-                return (
-                  <MultiSelect
-                    {...(input as any)}
-                    label='Linked Villages'
-                    errorLabel='linked villages'
-                    labelKey='name'
-                    valueKey='id'
-                    required={true}
-                    isShowLabel={true}
-                    isSelectAll={true}
-                    placeholder=''
-                    isDefaultSelected={true}
-                    menuPlacement={'auto'}
-                    isModel={true}
-                    isMulti={true}
-                    options={unlinkedVillagesList}
-                    loading={unlinkedVillagesLoading}
-                    error={(meta.touched && meta.error) || undefined}
-                    controlStyles={{
-                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
-                      '&:focus-visible': {
-                        borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
-                      }
-                    }}
-                  />
-                );
-              }}
+              render={({ input, meta }) => (
+                <MultiSelect
+                  {...(input as any)}
+                  label='Linked Villages'
+                  errorLabel='linked villages'
+                  labelKey='name'
+                  valueKey='id'
+                  required={true}
+                  isShowLabel={true}
+                  isSelectAll={true}
+                  placeholder=''
+                  isDefaultSelected={true}
+                  menuPlacement={'auto'}
+                  isModel={true}
+                  isMulti={true}
+                  options={unlinkedVillagesList}
+                  loading={unlinkedVillagesLoading}
+                  error={(meta.touched && meta.error) || undefined}
+                  controlStyles={{
+                    borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
+                    '&:focus-visible': {
+                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
+                    }
+                  }}
+                />
+              )}
             />
           </div>
         </div>

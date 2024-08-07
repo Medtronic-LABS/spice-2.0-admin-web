@@ -21,6 +21,7 @@ import {
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   validateLinkedRestrictionsRequest
+  validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
   healthFacilityListSelector,
@@ -180,14 +181,15 @@ const HealthFacilityList = (): React.ReactElement => {
 
   const validateLinkedRestrictions = (
     missingIds: number[],
-    hfTenantId: number,
+    tenantId: number,
     healthFacility: any,
     linkedVillageIds: number[]
   ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
+      validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId: hfTenantId,
+        tenantId,
         healthFacilityId: healthFacility.id,
         linkedVillageIds,
         successCb: () => {
@@ -195,6 +197,7 @@ const HealthFacilityList = (): React.ReactElement => {
         },
         failureCb: (error) =>
           toastCenter.error(
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
             ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
           )
       })

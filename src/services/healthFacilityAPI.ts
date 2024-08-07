@@ -168,9 +168,9 @@ export const fetchWorkflowList = (data: any) =>
     data
   });
 
-export const peerSupervisorValidation = (data: any) =>
+export const validateLinkedRestrictionsAPI = (data: any) =>
   axios({
-    url: '/user-service/user/validate-peer-supervisors',
+    url: '/admin-service/healthfacility/validate',
     method: 'POST',
     data
   });

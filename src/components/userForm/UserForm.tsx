@@ -245,7 +245,7 @@ const UserForm = ({
         }, 0);
       }
       if (roleOptionsState) {
-        roleOptionsState.current = roleOptions.current;
+        roleOptionsState.current = roleOptions.current || [];
       }
     };
   }, [
@@ -419,9 +419,8 @@ const UserForm = ({
       fetchedData.current = newFetchedData;
       isCHUserSelectedFn(userData.role, index);
       updateRoleOptionsAndDisableRoles(index, userData.roles);
-      if (isCHPSelected(userData.roles)) {
-        const tenantIds = [...userData.organizations.map((v: any) => v.id)].filter((v: any) => v);
-
+      if (isCHWSelected(userData.roles)) {
+        const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
         fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'village', index);
         fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'supervisor', index);
       }
@@ -528,7 +527,20 @@ const UserForm = ({
   const updateRoleOptionsAndDisableRoles = useCallback(
     (index: number, mandatoryRoleOptions?: IRoles[]) => {
       // role options
-      const newRoleOptions = [...roleOptions.current];
+      const newRoleOptions = [...(roleOptions.current || [])];
+      if (isHFCreate && (mandatoryRoleOptions ? !isCHWSelected(mandatoryRoleOptions) : true)) {
+        newRoleOptions[index] = (rolesGrouped?.SPICE || [])
+          .filter((r: IRoles) => hfCreateRoles.includes(r.name))
+          .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
+      } else if (isHF) {
+        newRoleOptions[index] = (rolesGrouped?.SPICE || [])
+          .filter((r: IRoles) => r.name !== 'SUPER_ADMIN')
+          .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
+      } else {
+        newRoleOptions[index] = (rolesGrouped?.SPICE || []).sort((a: any, b: any) =>
+          a.displayName > b.displayName ? 1 : -1
+        );
+      }
       roleOptions.current = newRoleOptions;
 
       // role disable
@@ -595,25 +607,24 @@ const UserForm = ({
     },
     [dispatch, peerSupervisors]
   );
+
   // Villages fetch
   const fetchVillagesList = useCallback(
-    (tenantIds: number[], userId: string, index: number) => {
-      if (tenantIds.length && countryId) {
-        dispatch(
-          fetchVillagesListUserLinked({
-            tenantIds,
-            userId: Number(userId),
-            successCb: ({ list }: { list: IVillages[] }) => {
-              if (!list.length) {
-                toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
-              }
-              const newVillages = [...villages];
-              newVillages[index] = list;
-              setVillages(newVillages);
+    (tenantIds: number[], userId: number | string | undefined = undefined, index: number) => {
+      dispatch(
+        fetchVillagesListFromHFRequest({
+          tenantIds,
+          userId: Number(userId),
+          successCb: ({ list }: { list: IVillages[] }) => {
+            if (!list.length) {
+              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
             }
-          })
-        );
-      }
+            const newVillages = [...villages];
+            newVillages[index] = list;
+            setVillages(newVillages);
+          }
+        })
+      );
     },
     [countryId, dispatch, healthFacilityList, villages]
   );
@@ -622,11 +633,11 @@ const UserForm = ({
   const fetchListWithConditions = (
     roles: IRoles[],
     tenantIds: number[] = [],
-    userId: string,
+    userId: number | string | undefined = undefined,
     name: string,
     index: number
   ) => {
-    if (isCHPSelected(roles) && tenantIds.length) {
+    if (isCHWSelected(roles) && tenantIds.length) {
       if (name === 'village') {
         return fetchVillagesList(tenantIds, userId, index);
       } else {
@@ -654,7 +665,7 @@ const UserForm = ({
 
   useEffect(() => {
     if (isEdit && !isProfile) {
-      const tenantIds = [...initialEditData[0].hfTenantIds].filter((v: number) => v);
+      const tenantIds = [...initialEditData[0].hfTenantIds, hfTenantId].filter((v: number) => v);
       fetchListWithConditions(selectedRoles(0), tenantIds, initialEditData[0]?.id, 'village', 0);
       fetchListWithConditions(selectedRoles(0), tenantIds, initialEditData[0]?.id, 'supervisor', 0);
     }
@@ -1009,18 +1020,17 @@ const UserForm = ({
                                   ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
                                   isHF ? hfTenantId : []
                                 ].filter((v: number) => v);
-
                                 fetchListWithConditions(
                                   selectedRoles(index),
                                   tenantIds,
-                                  initialEditData[0]?.id,
+                                  initialEditData[index]?.id,
                                   'village',
                                   index
                                 );
                                 fetchListWithConditions(
                                   selectedRoles(index),
                                   tenantIds,
-                                  initialEditData[0]?.id,
+                                  initialEditData[index]?.id,
                                   'supervisor',
                                   index
                                 );
@@ -1089,7 +1099,7 @@ const UserForm = ({
                                 : null;
                             }}
                             required={true}
-                            options={insightsRole}
+                            options={rolesGrouped?.['SPICE INSIGHTS'] || []}
                             mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceInsightsRole?.length}
@@ -1247,27 +1257,15 @@ const UserForm = ({
                               } else {
                                 form.change(`${formName}?.[${index}]?.villages`, []);
                               }
-
-                              if (isCHPUser[index]) {
-                                fetchSupervisorList(
-                                  formData?.organizations
-                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                        (v: any) => v
-                                      )
-                                    : [hf.tenantId],
-                                  index
-                                );
-                                fetchVillagesList(
-                                  formData?.organizations
-                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                        (v: any) => v
-                                      )
-                                    : [hf.tenantId],
-                                  formData?.id,
-                                  index
-                                );
-                              }
-
+                              fetchSupervisorList(
+                                [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
+                                index
+                              );
+                              fetchVillagesList(
+                                [...formData?.organizations.map((v: any) => v.id), hf.tenantId].filter((v: any) => v),
+                                formData?.id,
+                                index
+                              );
                               input.onChange(hf);
                             }}
                           />

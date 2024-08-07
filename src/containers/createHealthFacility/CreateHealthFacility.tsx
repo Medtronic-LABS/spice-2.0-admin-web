@@ -78,6 +78,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
 
   useEffect(() => {
     dispatch(clearAllDependentData());
+    dispatch(clearAllDependentData());
   }, [dispatch]);
 
   /**

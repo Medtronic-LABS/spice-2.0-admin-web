@@ -142,17 +142,6 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
-  WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select a clinical workflow',
-  CUSTOMIZED_WORKFLOW: 'Customized Workflow',
-  CLINICAL_WORKFLOW: 'Clinical Workflow',
-  WORKFLOW_MODULE: {
-    clinical: 'clinical',
-    customized: 'customized'
-  },
-  spiceRole: {
-    spice: 'spice web',
-    spiceInsights: 'SPICE INSIGHTS'
-  },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
@@ -171,19 +160,6 @@ const APPCONSTANTS = {
   USER_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
   USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
   NO_VILLAGE_FOUND: 'No village available. Villages are already linked to other users.',
-  ADD_ANOTHER_USER: 'Add Another User',
-  // Admin
-  ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
-  ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',
-  ADMIN_DETAILS_UPDATE_ERROR: 'Unable to update admin. Please try after sometime.',
-  ADMIN_DETAILS_CREATE_ERROR: 'Unable to create admin. Please try after sometime.',
-  ADMIN_DELETE_TITLE: 'Delete Admin',
-  ADMIN_DELETE_SUCCESS: 'Admin deleted successfully.',
-  ADMIN_DELETE_FAIL: 'Unable to delete the user. Please try after sometime.',
-  ADMIN_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
-  ADMIN_LIST_FETCH_ERROR: 'Unable to load Admins. Please try after sometime.',
-  ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
-  ADD_ANOTHER_ADMIN: 'Add Another Admin',
   // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
