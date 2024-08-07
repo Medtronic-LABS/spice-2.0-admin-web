@@ -540,8 +540,7 @@ export interface IFetchChiefdomListFailure {
   error: Error;
 }
 
-export interface IFetchVillagesListRequest {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF;
+interface IVillagesRequestPayload {
   countryId: number;
   districtId: number;
   chiefdomId: number;
@@ -583,9 +582,8 @@ export interface IFetchUnlinkedVillagesFailure {
 }
 export interface IFetchVillagesListFromHFRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
-  countryId: number;
-  districtId: number;
-  chiefdomId: number;
+  tenantIds: number[];
+  userId?: number;
   successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
   failureCb?: (error: Error) => void;
 }
@@ -783,9 +781,6 @@ export type HealthFacilityActions =
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
   | IFetchCountryListFailure
-  | IFetchHFDashboardListRequest
-  | IFetchHFDashboardListSuccess
-  | IFetchHFDashboardListFailure
-  | ISetHFSummary
-  | IClearHFSummary
-  | IClearHFDropdown;
+  | IValidateLinkedRestrictions
+  | IValidateLinkedRestrictionsSuccess
+  | IValidateLinkedRestrictionsFailure;

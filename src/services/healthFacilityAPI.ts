@@ -147,11 +147,11 @@ export const listCities = (countryId: number, searchTerm: string) =>
     data: { countryId, searchTerm }
   });
 
-export const fetchVillagesListfromHF = (countryId: number, districtId: number, chiefdomId: number) =>
+export const fetchVillagesListfromHF = (tenantIds: number[], userId: number) =>
   axios({
     url: '/admin-service/healthfacility/unlinked-villages-list',
     method: 'POST',
-    data: { countryId, districtId, chiefdomId }
+    data: { tenantIds, userId }
   });
 
 export const fetchPeerSupervisorList = (tenantIds: number[]) =>

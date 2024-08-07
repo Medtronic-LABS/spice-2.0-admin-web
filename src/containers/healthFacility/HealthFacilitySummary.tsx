@@ -326,11 +326,18 @@ const HealthFacilitySummary = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacilityParams: any) => {
+  const validatePeerSupervisor = (
+    missingIds: number[],
+    tenantId: number,
+    healthFacilityParams: any,
+    linkedVillageIds: number[]
+  ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId: hfTenantId,
+        tenantId,
+        healthFacilityId: healthFacilityParams?.id,
+        linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacilityParams);
         },
@@ -355,7 +362,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, Number(healthFacilityData.tenantId), healthFacility);
+      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility, linkedVillagesIds);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(

@@ -36,7 +36,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
   const lastCheckedNumber = useRef<string>(currentphoneNumber.current);
   const errorRef = useRef<string>('');
   const [loading, setLoading] = useState(false);
-  const [validating, setValidating] = useState(false);
+  const error = useRef('');
   const [isNetworkError, setNetworkError] = useState(false);
   const alreadyExistError = APPCONSTANTS.PHONE_NUMBER_ALREADY_EXISTS_ERR_MSG;
   const duplicationError = APPCONSTANTS.PHONE_NUMBER_DUPLICATION_ERR_MSG;
@@ -48,15 +48,12 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
   };
 
   const validateIfNumberExist = useCallback(
-    (phoneNumber: string) => {
-      return (
-        errorRef.current ||
-        ((validating || !submitEnabledStatus.current) && lastCheckedNumber.current !== phoneNumber
-          ? ' ' // blank space is given as error to block submition till number already exist validation is completed
-          : '')
-      );
-    },
-    [errorRef.current, submitEnabledStatus, validating]
+    (phoneNumber: string) =>
+      error.current ||
+      (!submitEnabledStatus.current && lastCheckedNumber.current !== phoneNumber
+        ? ' ' // blank space is given as error to block submition till number already exist validation is completed
+        : ''),
+    [error, submitEnabledStatus]
   );
 
   const validateDuplication = useCallback(
@@ -93,8 +90,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
         setLoading(true);
         await validatePhoneNumber(phoneNumber, id, countryCode || '').then((res) => {
           submitEnabledStatus.current = true;
-          errorRef.current = '';
-          setValidating(false);
+          error.current = '';
           setLoading(false);
           lastCheckedNumber.current = phoneNumber;
           form.change?.(`${name}.phoneNumber`, phoneNumber + ' '); // to trigger onchange space added
@@ -104,7 +100,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
       } catch (e: any) {
         setLoading(false);
         if (e instanceof ApiError && e.statusCode === 409) {
-          errorRef.current = alreadyExistError;
+          error.current = alreadyExistError;
           form.change?.(`${name}.phoneNumber`, phoneNumber + ' '); // to trigger onchange space added
           form.change?.(`${name}.phoneNumber`, phoneNumber);
           lastCheckedNumber.current = phoneNumber;

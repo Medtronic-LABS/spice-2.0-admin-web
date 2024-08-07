@@ -182,12 +182,19 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacility: any) => {
+  const validateLinkedRestrictions = (
+    missingIds: number[],
+    tenantId: number,
+    healthFacility: any,
+    linkedVillageIds: number[]
+  ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
       validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId: hfTenantId,
+        tenantId,
+        healthFacilityId: healthFacility.id,
+        linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacility);
         },
