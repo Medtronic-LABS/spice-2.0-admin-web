@@ -23,7 +23,7 @@ import {
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   updateHFUserRequest,
-  validationPeerSupervisor
+  validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
   IHFUserGet,
@@ -317,22 +317,29 @@ const HealthFacilitySummary = (): React.ReactElement => {
         },
         failureCb: (error) =>
           toastCenter.error(
-            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
           )
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacilityParams: any) => {
+  const validatePeerSupervisor = (
+    missingIds: number[],
+    tenantId: number,
+    healthFacilityParams: any,
+    linkedVillageIds: number[]
+  ) => {
     dispatch(
-      validationPeerSupervisor({
+      validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId: hfTenantId,
+        tenantId,
+        healthFacilityId: healthFacilityParams?.id,
+        linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacilityParams);
         },
         failureCb: (error) =>
           toastCenter.error(
-            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
           )
       })
     );
@@ -342,14 +349,16 @@ const HealthFacilitySummary = (): React.ReactElement => {
     const postData = formatHealthFacility(healthFacilityData, countryIdValue);
     if (!submittedData.isNextClicked) {
       const peerSupervisors = healthFacilityData?.peerSupervisors ?? [];
+      const linkedVillages = healthFacilityData?.linkedVillages ?? [];
       const peerIdsSet = peerSupervisors?.map((obj: any) => obj.id);
+      const linkedVillagesIds = linkedVillages?.map((obj: any) => Number(obj.id));
       const missingIds: number[] = [];
       for (const supervisor of editHFDetailsModal?.data?.peerSupervisors) {
         if (!peerIdsSet.includes(supervisor.id)) {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, Number(healthFacilityData.tenantId), healthFacility);
+      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility, linkedVillagesIds);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(

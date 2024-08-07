@@ -45,6 +45,9 @@ export const initialState: IHealthFacilityState = {
   chiefdomList: [],
   chiefdomTotal: 0,
   chiefdomLoading: false,
+  unlinkedVillagesList: [],
+  unlinkedVillagesTotal: 0,
+  unlinkedVillagesLoading: false,
   villagesList: [],
   villagesTotal: 0,
   villagesLoading: false,
@@ -124,6 +127,8 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_FAILURE:
       return {
         ...state,
         loading: false
@@ -158,6 +163,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST:
       return {
         ...state,
         loading: true
@@ -259,6 +265,23 @@ const healthFacilityReducer = (
       return {
         ...state,
         villagesLoading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST:
+      return {
+        ...state,
+        unlinkedVillagesLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_UNLINKED_VILLAGES_SUCCESS:
+      return {
+        ...state,
+        unlinkedVillagesLoading: false,
+        unlinkedVillagesList: action.payload.list,
+        unlinkedVillagesTotal: action.payload.total
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE:
+      return {
+        ...state,
+        unlinkedVillagesLoading: false
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST:
       return {
@@ -366,9 +389,10 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA:
       return {
         ...state,
-        healthFacility: initialState.healthFacility as IHealthFacility,
+        healthFacility: {} as IHealthFacility,
         chiefdomList: [],
         villagesList: [],
+        unlinkedVillagesList: [],
         villagesFromHFList: { list: [], hfTenantIds: null }
       };
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HF_DROPDOWN_OPTIONS:

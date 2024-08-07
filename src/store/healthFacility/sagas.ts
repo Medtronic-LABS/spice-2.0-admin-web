@@ -16,13 +16,13 @@ import {
   IFetchVillagesListRequest,
   IFetchPeerSupervisorListRequest,
   IFetchWorkflowListRequest,
-  IPeerSupervisorValidation,
+  IValidateLinkedRestrictions,
   IPeerSupervisor,
   IFetchHFTypesRequest,
   IFetchVillagesListFromHFRequest,
   IFetchUserDetailRequest,
   IDeleteHFRequest,
-  IFetchHFDashboardListRequest
+  IFetchUnlinkedVillagesRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -63,9 +63,10 @@ import {
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
   deleteHealthFacilityFailure,
-  fetchPeerSupervisorValidationsFailure,
-  fetchHFDashboardListFailure,
-  fetchHFDashboardListSuccess
+  validateLinkedRestrictionsFailure,
+  fetchUnlinkedVillagesListSuccess,
+  fetchUnlinkedVillagesListFailure,
+  validateLinkedRestrictionsSuccess
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -87,8 +88,8 @@ import {
   FETCH_CULTURE_LIST_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
   DELETE_HEALTH_FACILITY_REQUEST,
-  FETCH_PEER_SUPERVISOR_VALIDATION,
-  FETCH_HF_DASHBOARD_LIST_REQUEST
+  LINKED_RESTRICTIONS_VALIDATION_REQUEST,
+  FETCH_UNLINKED_VILLAGES_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
@@ -229,8 +230,9 @@ export function* fetchHFTypesSaga({ successCb, failureCb }: IFetchHFTypesRequest
     const {
       data: { entity: list }
     } = yield call(hfService.fetchHealthFacilityTypes as any);
-    successCb?.(list);
-    yield put(fetchHFTypesSuccess(list));
+    const payload = list.map((type: any) => ({ ...type, id: type.name }));
+    successCb?.(payload);
+    yield put(fetchHFTypesSuccess(payload));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -399,21 +401,46 @@ export function* fetchVillagesListSagaRequest({
 }
 
 /*
-  Worker Saga: Fired on FETCH_VILLAGES_LIST_FOR_HF_REQUEST action
+  Worker Saga: Fired on FETCH_UNLINKED_VILLAGES_REQUEST action
 */
-export function* fetchVillagesListFromHFSagaRequest({
+export function* fetchUnlinkedVillagesSagaRequest({
   countryId,
   districtId,
   chiefdomId,
+  healthFacilityId,
+  successCb,
+  failureCb
+}: IFetchUnlinkedVillagesRequest): SagaIterator {
+  try {
+    const {
+      data: { entity: list },
+      totalCount: total
+    } = yield call(hfService.fetchUnlinkedVillagesAPI as any, countryId, districtId, chiefdomId, healthFacilityId);
+    successCb?.(list, total);
+    yield put(fetchUnlinkedVillagesListSuccess({ list, total }));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchUnlinkedVillagesListFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_VILLAGES_LIST_FOR_HF_REQUEST action
+*/
+export function* fetchVillagesListFromHFSagaRequest({
+  tenantIds,
+  userId,
   successCb,
   failureCb
 }: IFetchVillagesListFromHFRequest): SagaIterator {
   try {
     const {
       data: { entity: list }
-    } = yield call(hfService.fetchVillagesList as any, countryId, districtId, chiefdomId);
-    successCb?.({ list, hfTenantIds: [countryId] });
-    yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: [countryId] } }));
+    } = yield call(hfService.fetchVillagesListfromHF as any, tenantIds, userId);
+    successCb?.({ list, hfTenantIds: tenantIds });
+    yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: tenantIds } }));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -472,21 +499,29 @@ export function* fetchWorkflowListSagaRequest({
 }
 
 /*
-  Worker Saga: Fired on FETCH_WORKFLOW_LIST_REQUEST action
+  Worker Saga: Fired on LINKED_RESTRICTIONS_VALIDATION_REQUEST action
 */
-export function* peerSupervisorValidationSagaRequest({
+export function* validateLinkedRestrictionsSagaRequest({
   ids,
   tenantId,
+  healthFacilityId,
+  linkedVillageIds,
   successCb,
   failureCb
-}: IPeerSupervisorValidation): SagaIterator {
+}: IValidateLinkedRestrictions): SagaIterator {
   try {
-    const { data } = yield call(hfService.peerSupervisorValidation as any, { ids, tenantId });
+    const { data } = yield call(hfService.validateLinkedRestrictionsAPI as any, {
+      ids,
+      tenantId,
+      healthFacilityId,
+      linkedVillageIds
+    });
     successCb?.(data);
+    yield put(validateLinkedRestrictionsSuccess());
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(fetchPeerSupervisorValidationsFailure(e));
+      yield put(validateLinkedRestrictionsFailure(e));
     }
   }
 }
@@ -572,12 +607,13 @@ function* healthFacilitySaga() {
   yield all([takeLatest(DELETE_HEALTH_FACILITY_USER_REQUEST, deleteHFUserRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_USER_REQUEST, updateHFUserSagaRequest)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_USER_REQUEST, createHFUserSagaRequest)]);
-  yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST_FOR_HF, fetchDistrictListSagaRequest)]);
-  yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF, fetchChiefdomListSagaRequest)]);
-  yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST_FOR_HF, fetchVillagesListSagaRequest)]);
+  yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST, fetchDistrictListSagaRequest)]);
+  yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST, fetchChiefdomListSagaRequest)]);
+  yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST, fetchVillagesListSagaRequest)]);
+  yield all([takeLatest(FETCH_UNLINKED_VILLAGES_REQUEST, fetchUnlinkedVillagesSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_LIST_REQUEST, fetchPeerSupervisorListSagaRequest)]);
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
-  yield all([takeLatest(FETCH_PEER_SUPERVISOR_VALIDATION, peerSupervisorValidationSagaRequest)]);
+  yield all([takeLatest(LINKED_RESTRICTIONS_VALIDATION_REQUEST, validateLinkedRestrictionsSagaRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_TYPES_REQUEST, fetchHFTypesSaga)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);

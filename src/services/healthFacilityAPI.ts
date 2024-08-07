@@ -128,6 +128,18 @@ export const fetchVillagesList = (countryId: number, districtId: number, chiefdo
     method: 'POST',
     data: { countryId, districtId, chiefdomId }
   });
+
+export const fetchUnlinkedVillagesAPI = (
+  countryId: number,
+  districtId: number,
+  chiefdomId: number,
+  healthFacilityId?: number
+) =>
+  axios({
+    url: 'admin-service/unlinked-villages-list',
+    method: 'POST',
+    data: { countryId, districtId, chiefdomId, healthFacilityId }
+  });
 export const listCities = (countryId: number, searchTerm: string) =>
   axios({
     url: '/admin-service/villages-list',
@@ -135,11 +147,11 @@ export const listCities = (countryId: number, searchTerm: string) =>
     data: { countryId, searchTerm }
   });
 
-export const fetchVillagesListfromHF = (countryId: number, districtId: number, chiefdomId: number) =>
+export const fetchVillagesListfromHF = (tenantIds: number[], userId: number) =>
   axios({
-    url: '/admin-service/healthfacility/villages-list',
+    url: '/admin-service/healthfacility/unlinked-villages-list',
     method: 'POST',
-    data: { countryId, districtId, chiefdomId }
+    data: { tenantIds, userId }
   });
 
 export const fetchPeerSupervisorList = (tenantIds: number[]) =>
@@ -156,9 +168,9 @@ export const fetchWorkflowList = (data: any) =>
     data
   });
 
-export const peerSupervisorValidation = (data: any) =>
+export const validateLinkedRestrictionsAPI = (data: any) =>
   axios({
-    url: '/user-service/user/validate-peer-supervisors',
+    url: '/admin-service/healthfacility/validate',
     method: 'POST',
     data
   });

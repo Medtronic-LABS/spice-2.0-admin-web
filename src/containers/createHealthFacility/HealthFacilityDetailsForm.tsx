@@ -22,6 +22,8 @@ import {
   hfTypesSelector,
   peerSupervisorListSelector,
   peerSupervisorLoadingSelector,
+  unlinkedVillagesListSelector,
+  unlinkedVillagesLoadingSelector,
   villagesListSelector,
   villagesLoadingSelector
 } from '../../store/healthFacility/selectors';
@@ -32,11 +34,11 @@ import {
   fetchCultureListRequest,
   fetchHFTypesRequest,
   fetchPeerSupervisorListRequest,
+  fetchUnlinkedVillagesRequest,
   fetchVillagesListRequest
 } from '../../store/healthFacility/actions';
 import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
-import { IObjectData } from '../../store/healthFacility/types';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from '../healthFacility/Workflows';
@@ -81,10 +83,8 @@ const HealthFacilityDetailsForm = ({
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
-  const districtList = useSelector(getDistrictListSelector);
-  const chiefdomList = useSelector(chiefdomListSelector);
-  const districtLoading = useSelector(districtLoadingSelector);
-  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const unlinkedVillagesList = useSelector(unlinkedVillagesListSelector);
+  const unlinkedVillagesLoading = useSelector(unlinkedVillagesLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
   const languages = useSelector(cultureListSelector);
@@ -148,6 +148,14 @@ const HealthFacilityDetailsForm = ({
           chiefdomId: Number(chiefdomId)
         })
       );
+      dispatch(
+        fetchUnlinkedVillagesRequest({
+          countryId,
+          districtId: Number(districtId),
+          chiefdomId: Number(chiefdomId),
+          healthFacilityId: data?.id ? data.id : undefined
+        })
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -208,7 +216,9 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='type'
                   labelKey='name'
                   valueKey='id'
-                  defaultValue={hfTypesList.find((type: IObjectData) => type.name === (data.type?.name || data.type))}
+                  defaultValue={hfTypesList.find(
+                    (type: { id: string; name: string }) => type.name === (data.type?.name || data.type)
+                  )}
                   options={hfTypesList}
                   loadingOptions={hfTypesLoading}
                   error={(meta.touched && meta.error) || undefined}
@@ -462,8 +472,8 @@ const HealthFacilityDetailsForm = ({
                   menuPlacement={'auto'}
                   isModel={true}
                   isMulti={true}
-                  options={villagesList}
-                  loading={villagesLoading}
+                  options={unlinkedVillagesList}
+                  loading={unlinkedVillagesLoading}
                   error={(meta.touched && meta.error) || undefined}
                   controlStyles={{
                     borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',

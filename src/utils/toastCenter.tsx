@@ -31,6 +31,7 @@ export const error = async (
       icon: <WarningIcon />,
       closeButton: true,
       hideProgressBar: true,
+      closeOnClick: true,
       position: 'bottom-right',
       autoClose: 10000,
       toastId: preventDuplicate ? toastId : undefined
@@ -49,6 +50,7 @@ export const success = (brief: string, body?: string) => {
   toast.success(messageFormatter(brief, body), {
     icon: <SuccessIcon />,
     closeButton: false,
+    closeOnClick: true,
     hideProgressBar: true,
     position: 'bottom-right'
   });
@@ -64,6 +66,7 @@ export const info = (brief: string, body?: string) => {
   toast.info(messageFormatter(brief, body), {
     icon: <InfoIcon />,
     closeButton: false,
+    closeOnClick: true,
     hideProgressBar: true,
     position: 'bottom-right'
   });

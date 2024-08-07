@@ -22,8 +22,47 @@ interface ISideMenuProps {
   className?: string;
 }
 
-const SideMenu = memo(({ className }: ISideMenuProps) => {
-  const dispatch = useDispatch();
+const superAdminRoutes: ISideMenuItem[] = [
+  {
+    label: 'Region',
+    route: PROTECTED_ROUTES.region,
+    disabled: false
+  },
+  {
+    label: 'Medication Database',
+    route: PROTECTED_ROUTES.medicationByRegion,
+    disabled: false
+  },
+  {
+    label: 'Lab Test Database',
+    route: PROTECTED_ROUTES.labtestList,
+    disabled: true
+  },
+  {
+    label: 'Health Facility',
+    route: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
+    disabled: false,
+    childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
+  },
+  {
+    label: 'Users',
+    route: PROTECTED_ROUTES.usersBySuperAdmin,
+    disabled: false
+  }
+];
+const adminRoutes: ISideMenuItem[] = [
+  {
+    label: 'Health Facility',
+    route: PROTECTED_ROUTES.healthFacilityByAdmin,
+    childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
+  },
+  {
+    label: 'Users',
+    route: PROTECTED_ROUTES.usersByAdmin
+  }
+];
+
+const SideMenu = ({ className }: ISideMenuProps) => {
   const { pathname } = useLocation();
 
   const sideMenuLoading = useSelector(getLoadingSelector);

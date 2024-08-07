@@ -15,7 +15,7 @@ import {
   fetchVillagesListSagaRequest,
   fetchPeerSupervisorListSagaRequest,
   fetchWorkflowListSagaRequest,
-  peerSupervisorValidationSagaRequest,
+  validateLinkedRestrictionsSagaRequest,
   fetchHFTypesSaga,
   fetchVillagesListFromHFSagaRequest,
   fetchCultureList,
@@ -712,7 +712,7 @@ describe('Fetch Workflow List for Health Facility in Region', () => {
 
 describe('Fetch Peer Supervisor Validation for Health Facility in Region', () => {
   it('Fetch peer supervisor validation and dispatch success', async () => {
-    const validationSpy = jest.spyOn(hfService, 'peerSupervisorValidation').mockImplementation(
+    const validationSpy = jest.spyOn(hfService, 'validateLinkedRestrictionsAPI').mockImplementation(
       () =>
         Promise.resolve({
           ...hfIdsTiRequestPayload
@@ -723,9 +723,9 @@ describe('Fetch Peer Supervisor Validation for Health Facility in Region', () =>
       {
         dispatch: (action) => dispatched.push(action)
       },
-      peerSupervisorValidationSagaRequest,
+      validateLinkedRestrictionsSagaRequest,
       {
-        type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+        type: ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST,
         ...hfIdsTiRequestPayload
       }
     ).toPromise();
@@ -735,21 +735,21 @@ describe('Fetch Peer Supervisor Validation for Health Facility in Region', () =>
   it('Fetch peer supervisor validation and dispatch failure', async () => {
     const error = new Error('Failed to validate peer supervisor');
     const validationSpy = jest
-      .spyOn(hfService, 'peerSupervisorValidation')
+      .spyOn(hfService, 'validateLinkedRestrictionsAPI')
       .mockImplementation(() => Promise.reject(error));
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
-      peerSupervisorValidationSagaRequest,
+      validateLinkedRestrictionsSagaRequest,
       {
-        type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+        type: ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST,
         ...hfIdsTiRequestPayload
       }
     ).toPromise();
     expect(validationSpy).toHaveBeenCalledWith({ ...hfIdsTiRequestPayload });
-    expect(dispatched).toEqual([hfActions.fetchPeerSupervisorValidationsFailure(error)]);
+    expect(dispatched).toEqual([hfActions.validateLinkedRestrictionsFailure(error)]);
   });
 });
 
@@ -798,6 +798,7 @@ describe('Fetch Health Facility Types in Region', () => {
 describe('Fetch Villages List from Health Facility in Region', () => {
   it('Fetch villages list and dispatch success', async () => {
     const tenantIds = [2];
+    const userId = 1;
     const villageListHF = jest
       .spyOn(hfService, 'fetchVillagesListfromHF')
       .mockImplementation(
@@ -811,10 +812,11 @@ describe('Fetch Villages List from Health Facility in Region', () => {
       fetchVillagesListFromHFSagaRequest,
       {
         type: ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
-        tenantIds
+        tenantIds,
+        userId
       }
     ).toPromise();
-    expect(villageListHF).toHaveBeenCalledWith(tenantIds);
+    expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
     expect(dispatched).toEqual([
       hfActions.fetchVillagesListFromHFSuccess({ data: { list: villagesListFromHF as any, hfTenantIds: tenantIds } })
     ]);
@@ -823,6 +825,7 @@ describe('Fetch Villages List from Health Facility in Region', () => {
   it('Fetch villages list and dispatch failure', async () => {
     const error = new Error('Failed to fetch villages list');
     const tenantIds = [2];
+    const userId = 1;
     const villageListHF = jest
       .spyOn(hfService, 'fetchVillagesListfromHF')
       .mockImplementation(() => Promise.reject(error));
@@ -834,10 +837,11 @@ describe('Fetch Villages List from Health Facility in Region', () => {
       fetchVillagesListFromHFSagaRequest,
       {
         type: ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
-        tenantIds
+        tenantIds,
+        userId
       }
     ).toPromise();
-    expect(villageListHF).toHaveBeenCalledWith(tenantIds);
+    expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
     expect(dispatched).toEqual([hfActions.fetchVillagesListFromHFFailure(error)]);
   });
 });

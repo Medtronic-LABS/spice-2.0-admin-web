@@ -3,7 +3,7 @@ import * as ACTION_TYPES from './actionTypes';
 
 export interface IHealthFacilityState {
   healthFacility: IHealthFacility;
-  hfTypes: IObjectData[];
+  hfTypes: Array<{ id: string; name: string }>;
   hfTypesLoading: boolean;
   loading: boolean;
   healthFacilityList: IHealthFacility[];
@@ -23,6 +23,9 @@ export interface IHealthFacilityState {
   cultureList: ICulture[];
   countryList: ICountryCode[];
   countryListLoading: boolean;
+  unlinkedVillagesList: IVillages[];
+  unlinkedVillagesTotal: number;
+  unlinkedVillagesLoading: boolean;
   villagesList: IVillages[];
   villagesTotal: number;
   villagesLoading: boolean;
@@ -398,13 +401,13 @@ export interface IUpdateHFDetailsFailure {
 
 export interface IFetchHFTypesRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST;
-  successCb?: (data: IObjectData[]) => void;
+  successCb?: (data: Array<{ id: string; name: string }>) => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IFetchHFTypesSuccess {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS;
-  payload: IObjectData[];
+  payload: Array<{ id: string; name: string }>;
 }
 
 export interface IFetchHFTypesFailure {
@@ -528,13 +531,16 @@ export interface IFetchChiefdomListFailure {
   error: Error;
 }
 
-export interface IFetchVillagesListRequest {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF;
+interface IVillagesRequestPayload {
   countryId: number;
   districtId: number;
   chiefdomId: number;
   successCb?: (data: IVillages[], total: number) => void;
   failureCb?: (error: Error) => void;
+}
+
+export interface IFetchVillagesListRequest extends IVillagesRequestPayload {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST;
 }
 
 export interface IFetchVillagespayload {
@@ -551,11 +557,24 @@ export interface IFetchVillagesListFailure {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF;
   error: Error;
 }
+export interface IFetchUnlinkedVillagesRequest extends IVillagesRequestPayload {
+  type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST;
+  healthFacilityId?: number;
+}
+
+export interface IFetchUnlinkedVillagesSuccess {
+  type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_SUCCESS;
+  payload: IFetchVillagespayload;
+}
+
+export interface IFetchUnlinkedVillagesFailure {
+  type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE;
+  error: Error;
+}
 export interface IFetchVillagesListFromHFRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
-  countryId: number;
-  districtId: number;
-  chiefdomId: number;
+  tenantIds: number[];
+  userId?: number;
   successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
   failureCb?: (error: Error) => void;
 }
@@ -609,12 +628,21 @@ export interface IFetchWorkflowListRequest {
   failureCb?: (error: Error) => void;
 }
 
-export interface IPeerSupervisorValidation {
-  type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION;
+export interface IValidateLinkedRestrictions {
+  type: typeof ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST;
   ids: number[];
   tenantId: number;
+  healthFacilityId: number;
+  linkedVillageIds: number[];
   successCb?: (data: IWorkflow[]) => void;
   failureCb?: (error: Error) => void;
+}
+export interface IValidateLinkedRestrictionsSuccess {
+  type: typeof ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_SUCCESS;
+}
+export interface IValidateLinkedRestrictionsFailure {
+  type: typeof ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_FAILURE;
+  error: Error;
 }
 export interface IFetchWorkflowListSuccess {
   type: typeof ACTION_TYPES.FETCH_WORKFLOW_LIST_SUCCESS;
@@ -725,6 +753,9 @@ export type HealthFacilityActions =
   | IFetchVillagesListRequest
   | IFetchVillagesListSuccess
   | IFetchVillagesListFailure
+  | IFetchUnlinkedVillagesRequest
+  | IFetchUnlinkedVillagesSuccess
+  | IFetchUnlinkedVillagesFailure
   | IFetchVillagesListFromHFRequest
   | IFetchVillagesListFromHFSuccess
   | IFetchVillagesListFromHFFailure
@@ -741,9 +772,6 @@ export type HealthFacilityActions =
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
   | IFetchCountryListFailure
-  | IFetchHFDashboardListRequest
-  | IFetchHFDashboardListSuccess
-  | IFetchHFDashboardListFailure
-  | ISetHFSummary
-  | IClearHFSummary
-  | IClearHFDropdown;
+  | IValidateLinkedRestrictions
+  | IValidateLinkedRestrictionsSuccess
+  | IValidateLinkedRestrictionsFailure;

@@ -62,9 +62,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   } = NAME_CONSTANTS;
 
   useEffect(() => {
-    return () => {
-      dispatch(clearAllDependentData());
-    };
+    dispatch(clearAllDependentData());
   }, [dispatch]);
 
   /**
@@ -144,7 +142,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
             },
             failureCb: (error) =>
               toastCenter.error(
-                ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+                ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
               )
           })
         );

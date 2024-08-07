@@ -49,7 +49,6 @@ import {
   IFetchVillagespayload,
   IFetchHFTypesRequest,
   IFetchHFTypesSuccess,
-  IObjectData,
   IFetchHFTypesFailure,
   IFetchVillagesListFromHFRequest,
   IFetchVillagesListFromHFSuccess,
@@ -75,16 +74,12 @@ import {
   IDeleteHFFailure,
   IClearDependentData,
   IClearVillagesList,
-  IPeerSupervisorValidation,
-  IChiefdom,
-  IDistrict,
-  IClearHFSummary,
-  IFetchHFDashboardListRequest,
-  IFetchHFDashboardListSuccessPayload,
-  IFetchHFDashboardListSuccess,
-  IFetchHFDashboardListFailure,
-  IHealthFacilitySummary,
-  ISetHFSummary
+  IValidateLinkedRestrictions,
+  IFetchUnlinkedVillagesRequest,
+  IFetchUnlinkedVillagesFailure,
+  IFetchUnlinkedVillagesSuccess,
+  IValidateLinkedRestrictionsFailure,
+  IValidateLinkedRestrictionsSuccess
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -279,7 +274,7 @@ export const fetchHFTypesRequest = ({
   successCb
 });
 
-export const fetchHFTypesSuccess = (payload: IObjectData[]): IFetchHFTypesSuccess => ({
+export const fetchHFTypesSuccess = (payload: Array<{ id: string; name: string }>): IFetchHFTypesSuccess => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS,
   payload
 });
@@ -483,18 +478,44 @@ export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailur
   error
 });
 
-// VILLAGES LIST FROM HF
-export const fetchVillagesListFromHFRequest = ({
+// UNLINKED VILLAGES LIST
+export const fetchUnlinkedVillagesRequest = ({
   countryId,
   districtId,
   chiefdomId,
+  healthFacilityId,
+  successCb,
+  failureCb
+}: Omit<IFetchUnlinkedVillagesRequest, 'type'>): IFetchUnlinkedVillagesRequest => ({
+  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST,
+  countryId,
+  districtId,
+  chiefdomId,
+  healthFacilityId,
+  successCb,
+  failureCb
+});
+
+export const fetchUnlinkedVillagesListSuccess = (payload: IFetchVillagespayload): IFetchUnlinkedVillagesSuccess => ({
+  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_SUCCESS,
+  payload
+});
+
+export const fetchUnlinkedVillagesListFailure = (error: Error): IFetchUnlinkedVillagesFailure => ({
+  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE,
+  error
+});
+
+// VILLAGES LIST FROM HF
+export const fetchVillagesListFromHFRequest = ({
+  tenantIds,
+  userId,
   successCb,
   failureCb
 }: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
-  countryId,
-  districtId,
-  chiefdomId,
+  tenantIds,
+  userId,
   successCb,
   failureCb
 });
@@ -550,19 +571,6 @@ export const fetchWorkflowListRequest = ({
   failureCb
 });
 
-export const validationPeerSupervisor = ({
-  ids,
-  tenantId,
-  successCb,
-  failureCb
-}: Omit<IPeerSupervisorValidation, 'type'>): IPeerSupervisorValidation => ({
-  type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
-  ids,
-  tenantId,
-  successCb,
-  failureCb
-});
-
 export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetchWorkflowListSuccess => ({
   type: HF_TYPES.FETCH_WORKFLOW_LIST_SUCCESS,
   payload
@@ -573,8 +581,27 @@ export const fetchWorkflowListFailure = (error: Error): IFetchWorkflowListFailur
   error
 });
 
-export const fetchPeerSupervisorValidationsFailure = (error: Error): any => ({
-  type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+export const validateLinkedRestrictionsRequest = ({
+  ids,
+  tenantId,
+  healthFacilityId,
+  linkedVillageIds,
+  successCb,
+  failureCb
+}: Omit<IValidateLinkedRestrictions, 'type'>): IValidateLinkedRestrictions => ({
+  type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST,
+  ids,
+  tenantId,
+  healthFacilityId,
+  linkedVillageIds,
+  successCb,
+  failureCb
+});
+export const validateLinkedRestrictionsSuccess = (): IValidateLinkedRestrictionsSuccess => ({
+  type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_SUCCESS
+});
+export const validateLinkedRestrictionsFailure = (error: Error): IValidateLinkedRestrictionsFailure => ({
+  type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_FAILURE,
   error
 });
 

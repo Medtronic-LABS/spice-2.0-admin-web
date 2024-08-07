@@ -20,7 +20,7 @@ import {
   fetchHFSummaryRequest,
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
-  validationPeerSupervisor
+  validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
   healthFacilityListSelector,
@@ -173,22 +173,29 @@ const HealthFacilityList = (): React.ReactElement => {
         },
         failureCb: (error) =>
           toastCenter.error(
-            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
           )
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacility: any) => {
+  const validateLinkedRestrictions = (
+    missingIds: number[],
+    tenantId: number,
+    healthFacility: any,
+    linkedVillageIds: number[]
+  ) => {
     dispatch(
-      validationPeerSupervisor({
+      validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId: hfTenantId,
+        tenantId,
+        healthFacilityId: healthFacility.id,
+        linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacility);
         },
         failureCb: (error) =>
           toastCenter.error(
-            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_SUCCESS)
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
           )
       })
     );
@@ -197,13 +204,16 @@ const HealthFacilityList = (): React.ReactElement => {
   const handleHealthFacilityDetailsSubmit = ({ healthFacility }: any) => {
     if (!submittedData.isNextClicked) {
       const peerIdsSet = new Set((healthFacility.peerSupervisors || []).map((obj: any) => obj.id));
+      const linkedVillagesIds = [
+        ...new Set((healthFacility.linkedVillages || []).map((obj: any) => Number(obj?.id)))
+      ] as number[];
       const missingIds = [];
       for (const supervisor of editHealthFacilityModal.data.peerSupervisors) {
         if (!peerIdsSet.has(supervisor.id)) {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, healthFacility.tenantId, healthFacility);
+      validateLinkedRestrictions(missingIds, healthFacility.tenantId, healthFacility, linkedVillagesIds);
     } else {
       const postData = formatHealthFacility(healthFacility, countryIdValue);
       if (postData.clinicalWorkflowIds.length) {

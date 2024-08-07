@@ -20,9 +20,12 @@ const getChiefdomTotal = (state: AppState) => state.healthFacility.chiefdomTotal
 const getChiefdomLoading = (state: AppState) => state.healthFacility.chiefdomLoading;
 const getVillagesList = (state: AppState) => state.healthFacility.villagesList;
 const getVillagesLoading = (state: AppState) => state.healthFacility.villagesLoading;
+const getVillagesTotal = (state: AppState) => state.healthFacility.villagesTotal;
+const getUnlinkedVillagesList = (state: AppState) => state.healthFacility.unlinkedVillagesList;
+const getUnlinkedVillagesLoading = (state: AppState) => state.healthFacility.unlinkedVillagesLoading;
+const getUnlinkedVillagesTotal = (state: AppState) => state.healthFacility.unlinkedVillagesTotal;
 const getVillagesFromHFList = (state: AppState) => state.healthFacility.villagesFromHFList;
 const getVillagesFromHFLoading = (state: AppState) => state.healthFacility.villagesFromHFLoading;
-const getVillagesTotal = (state: AppState) => state.healthFacility.villagesTotal;
 const getPeerSupervisorList = (state: AppState) => state.healthFacility.peerSupervisorList;
 const getPeerSupervisorTotal = (state: AppState) => state.healthFacility.peerSupervisorTotal;
 const getPeerSupervisorLoading = (state: AppState) => state.healthFacility.peerSupervisorLoading;
@@ -56,12 +59,18 @@ export const chiefdomTotalSelector = createSelector(getChiefdomTotal, (chiefdomT
 export const chiefdomLoadingSelector = createSelector(getChiefdomLoading, (chiefdomLoading) => chiefdomLoading);
 export const villagesListSelector = createSelector(getVillagesList, (villagesList) => villagesList);
 export const villagesLoadingSelector = createSelector(getVillagesLoading, (villagesLoading) => villagesLoading);
+export const villagesTotalSelector = createSelector(getVillagesTotal, (villagesTotal) => villagesTotal);
+export const unlinkedVillagesListSelector = createSelector(getUnlinkedVillagesList, (villagesList) => villagesList);
+export const unlinkedVillagesLoadingSelector = createSelector(
+  getUnlinkedVillagesLoading,
+  (villagesLoading) => villagesLoading
+);
+export const unlinkedVillagesTotalSelector = createSelector(getUnlinkedVillagesTotal, (villagesTotal) => villagesTotal);
 export const villagesFromHFListSelector = createSelector(getVillagesFromHFList, (villagesList) => villagesList);
 export const villagesFromHFLoadingSelector = createSelector(
   getVillagesFromHFLoading,
   (villagesLoading) => villagesLoading
 );
-export const villagesTotalSelector = createSelector(getVillagesTotal, (villagesTotal) => villagesTotal);
 export const peerSupervisorListSelector = createSelector(
   getPeerSupervisorList,
   (peerSupervisorList) => peerSupervisorList
