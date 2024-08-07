@@ -31,18 +31,18 @@ export interface ISubCountyFormValues {
 export interface IParams {
   regionId: string;
   tenantId: string;
-  accountId: string;
+  countyId: string;
 }
 
 /**
- * Provides a form for creating the operating unit with admin
+ * Provides a form for creating the sub county with admin
  * @returns {React.ReactElement}
  */
 
 const CreateSubCounty: React.FC = (): React.ReactElement => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { regionId, tenantId, accountId } = useParams<IParams>();
+  const { regionId, tenantId, countyId } = useParams<IParams>();
 
   const loading = useSelector(subCountyLoadingSelector);
   const role = useSelector(roleSelector);
@@ -58,13 +58,13 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
     if (regionId && tenantId) {
       redirectTo = PROTECTED_ROUTES.subCountyByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId);
     } else if (
-      accountId &&
+      countyId &&
       tenantId &&
       (role === APPCONSTANTS.ROLES.REGION_ADMIN ||
         role === APPCONSTANTS.ROLES.SUPER_ADMIN ||
         role === APPCONSTANTS.ROLES.SUPER_USER)
     ) {
-      redirectTo = PROTECTED_ROUTES.subCountyByCounty.replace(':accountId', accountId).replace(':tenantId', tenantId);
+      redirectTo = PROTECTED_ROUTES.subCountyByCounty.replace(':countyId', countyId).replace(':tenantId', tenantId);
     } else {
       redirectTo = PROTECTED_ROUTES.SubCountyDashboard;
     }
@@ -91,9 +91,9 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
   };
 
   /**
-   * Handles the form submission for creating or updating an operating unit.
+   * Handles the form submission for creating or updating an sub county.
    *
-   * @param {ISubCountyFormValues} formValues - The form values containing the operating unit and user data.
+   * @param {ISubCountyFormValues} formValues - The form values containing the sub county and user data.
    */
 
   const onSubmit = ({ subCounty: { county, ...subCounty }, users }: ISubCountyFormValues) => {
@@ -115,9 +115,9 @@ const CreateSubCounty: React.FC = (): React.ReactElement => {
         };
       }),
       countryId: countryIdValue,
-      countyId: Number(county?.id) || Number(accountId),
-      parentOrganizationId: accountId ? Number(tenantId) : Number(county?.tenantId),
-      tenantId: (accountId ? tenantId : county?.tenantId) as string
+      countyId: Number(county?.id) || Number(countyId),
+      parentOrganizationId: countyId ? Number(tenantId) : Number(county?.tenantId),
+      tenantId: (countyId ? tenantId : county?.tenantId) as string
     };
 
     dispatch(

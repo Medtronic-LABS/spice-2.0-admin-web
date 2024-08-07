@@ -12,7 +12,6 @@ describe('siteReducer', () => {
         email: '',
         account: { id: '', name: '', email: '', tenantId: '' },
         mflCode: '',
-        operatingUnit: { id: '', name: '', email: '', tenantId: '' },
         address1: '',
         address2: '',
         county: {
@@ -51,7 +50,7 @@ describe('siteReducer', () => {
           tenantId: 0,
           cultureName: '',
           siteLevel: '',
-          operatingUnitName: ''
+          subCountyName: ''
         }
       ],
       siteDashboardList: [
@@ -648,7 +647,7 @@ describe('siteReducer', () => {
         email: '',
         account: { id: '', name: '', email: '', tenantId: '' },
         mflCode: '',
-        operatingUnit: { id: '', name: '', email: '', tenantId: '' },
+        subCounty: { id: '', name: '', email: '', tenantId: '' },
         address1: '',
         address2: '',
         county: {
@@ -671,7 +670,7 @@ describe('siteReducer', () => {
         siteType: '',
         email: '',
         account: { id: '', name: '', email: '', tenantId: '' },
-        operatingUnit: { id: '', name: '', email: '', tenantId: '' },
+        subCounty: { id: '', name: '', email: '', tenantId: '' },
         address1: '',
         address2: '',
         county: {
@@ -689,7 +688,7 @@ describe('siteReducer', () => {
           siteType: '',
           email: '',
           account: { id: '', name: '', email: '', tenantId: '' },
-          operatingUnit: { id: '', name: '', email: '', tenantId: '' },
+          subCounty: { id: '', name: '', email: '', tenantId: '' },
           address1: '',
           address2: '',
           county: {

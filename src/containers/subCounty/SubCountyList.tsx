@@ -35,11 +35,11 @@ interface ISubCountyFormValue {
   email: string;
   manager_name: string;
   manager_phone_number: string;
-  account?: ICountyOption;
+  county?: ICountyOption;
 }
 
 /**
- * Lists all the operating units
+ * Lists all the sub county
  * Provides search feature
  * @returns {React.ReactElement}
  */
@@ -52,18 +52,18 @@ const SubCountyList = (): React.ReactElement => {
   const loading = useSelector(subCountyLoadingSelector);
   const listCount = useSelector(subCountyListCountSelector);
   // Considering this component can be rendered under ouByRegion and ouByAccount routes
-  // taking all the possible params(ie: accountId & regionId) to determine current route
+  // taking all the possible params(ie: countyId & regionId) to determine current route
   const {
     regionId = '',
-    accountId = '',
+    countyId = '',
     tenantId = ''
-  } = useParams<{ regionId?: string; accountId?: string; tenantId?: string }>();
+  } = useParams<{ regionId?: string; countyId?: string; tenantId?: string }>();
 
   const { county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
 
   /**
-   * to load Operating Unit List data.
-   * @param Operating Unit List
+   * to load Sub County List data.
+   * @param Sub County List
    */
   const fetchList = useCallback(() => {
     dispatch(
@@ -103,22 +103,20 @@ const SubCountyList = (): React.ReactElement => {
    * @callback
    */
   const openAddSubCounty = useCallback(() => {
-    const pathname = regionId ? PROTECTED_ROUTES.createOUByRegion : PROTECTED_ROUTES.createSubCountyByCounty;
-    history.push(
-      pathname.replace(':regionId', regionId).replace(':accountId', accountId).replace(':tenantId', tenantId)
-    );
-  }, [history, regionId, accountId, tenantId]);
+    const pathname = regionId ? PROTECTED_ROUTES.createSubCountyByRegion : PROTECTED_ROUTES.createSubCountyByCounty;
+    history.push(pathname.replace(':regionId', regionId).replace(':countyId', countyId).replace(':tenantId', tenantId));
+  }, [history, regionId, countyId, tenantId]);
 
   const [showSubCountyEditModal, setShowSubCountyEditModal] = useState(false);
   const subCountyToBeEdited = useRef<ISubCountyFormValue | {}>({});
 
   /**
-   * Opens the modal for editing an operating unit by fetching its details.
+   * Opens the modal for editing an sub County by fetching its details.
    *
    * @callback
-   * @param {ISubCountyDetail} subCounty - The details of the operating unit to be edited.
-   * @param {string} subCounty.id - The ID of the operating unit.
-   * @param {string} subCounty.tenantIdFromEdit - The tenant ID of the operating unit.
+   * @param {ISubCountyDetail} subCounty - The details of the sub County to be edited.
+   * @param {string} subCounty.id - The ID of the sub County.
+   * @param {string} subCounty.tenantIdFromEdit - The tenant ID of the sub County.
    */
   const openSubCountyEditModal = useCallback(
     ({ id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
@@ -151,13 +149,13 @@ const SubCountyList = (): React.ReactElement => {
   );
 
   /**
-   * Handles the update of an operating unit with the provided details.
+   * Handles the update of an sub County with the provided details.
    *
-   * @param {ISubCountyDetail} subCounty - The details of the operating unit to be updated.
-   * @param {string} subCounty.name - The name of the operating unit.
-   * @param {object} subCounty.account - The account information of the operating unit.
-   * @param {string} subCounty.id - The ID of the operating unit.
-   * @param {string} subCounty.tenantIdFromEdit - The tenant ID of the operating unit.
+   * @param {ISubCountyDetail} subCounty - The details of the sub County to be updated.
+   * @param {string} subCounty.name - The name of the sub County.
+   * @param {object} subCounty.account - The account information of the sub County.
+   * @param {string} subCounty.id - The ID of the sub County.
+   * @param {string} subCounty.tenantIdFromEdit - The tenant ID of the sub County.
    */
   const handleSubCountyEdit = ({ name, county, id, tenantId: tenantIdFromEdit }: ISubCountyDetail) => {
     dispatch(
@@ -190,17 +188,17 @@ const SubCountyList = (): React.ReactElement => {
   };
 
   /**
-   * Handles the row click event by setting the operating unit details and navigating to the summary page.
+   * Handles the row click event by setting the sub County details and navigating to the summary page.
    *
-   * @param {ISubCountyList} subCounty - The details of the operating unit from the clicked row.
-   * @param {string} subCounty.id - The ID of the operating unit.
-   * @param {string} subCounty.tenantIdFromClick - The tenant ID of the operating unit.
-   * @param {string} subCounty.name - The name of the operating unit.
+   * @param {ISubCountyList} subCounty - The details of the sub County from the clicked row.
+   * @param {string} subCounty.id - The ID of the sub County.
+   * @param {string} subCounty.tenantIdFromClick - The tenant ID of the sub County.
+   * @param {string} subCounty.name - The name of the sub County.
    */
   const handleRowClick = ({ id, tenantId: tenantIdFromClick, name }: ISubCountyList) => {
     dispatch(clearSubCountyDetail());
     dispatch(setSubCountyDetails({ id, tenantId, name }));
-    history.push(PROTECTED_ROUTES.SubCountySummary.replace(':OUId', id).replace(':tenantId', tenantIdFromClick));
+    history.push(PROTECTED_ROUTES.subCountySummary.replace(':subCountyId', id).replace(':tenantId', tenantIdFromClick));
   };
   return (
     <>

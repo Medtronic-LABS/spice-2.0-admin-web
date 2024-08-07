@@ -115,9 +115,15 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA_RA_AA
     },
     {
-      path: PROTECTED_ROUTES.createOUByRegion,
+      path: PROTECTED_ROUTES.createSubCountyByRegion,
       exact: true,
       component: CreateSubCounty,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.hfByRegion,
+      exact: true,
+      component: HealthFacilityList,
       authorisedRoles: SU_SA
     },
     {
@@ -139,7 +145,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA_RA_AA
     },
     {
-      path: PROTECTED_ROUTES.SubCountySummary,
+      path: PROTECTED_ROUTES.subCountySummary,
       exact: true,
       component: SubCountySummary,
       authorisedRoles: SU_SA_RA_AA_OUA

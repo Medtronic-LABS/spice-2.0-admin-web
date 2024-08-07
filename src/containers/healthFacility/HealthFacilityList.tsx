@@ -297,14 +297,14 @@ const HealthFacilityList = (): React.ReactElement => {
                 name: 'county',
                 label: 'County',
                 width: '30%',
-                cellFormatter: ({ county }) => county.name
+                cellFormatter: ({ county }) => county?.name
               },
               {
                 id: 3,
                 name: 'subcounty',
                 label: 'Sub County',
                 width: '30%',
-                cellFormatter: ({ subCounty }) => subCounty.name
+                cellFormatter: ({ subCounty }) => subCounty?.name
               }
             ]}
             isDelete={false}

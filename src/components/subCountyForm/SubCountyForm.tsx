@@ -31,7 +31,7 @@ const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps
   const dispatch = useDispatch();
   const countyOptions = useSelector(countyOptionsSelector);
   const countyOptionsLoading = useSelector(countyOptionsLoadingSelector);
-  const { regionId, accountId, tenantId } = useParams<{ regionId?: string; accountId?: string; tenantId: string }>();
+  const { regionId, countyId, tenantId } = useParams<{ regionId?: string; countyId?: string; tenantId: string }>();
 
   const { county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
 
@@ -49,18 +49,18 @@ const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps
   const { ROLES } = APPCONSTANTS;
   const showCountyField = ROLES.SUPER_ADMIN === role || ROLES.SUPER_USER === role || ROLES.REGION_ADMIN === role;
   useEffect(() => {
-    if (showCountyField && !isEdit && accountId && county?.id !== accountId) {
+    if (showCountyField && !isEdit && countyId && county?.id !== countyId) {
       dispatch(
         fetchCountyListDetailReq({
           tenantId,
-          id: accountId
+          id: countyId
         })
       );
     }
-  }, [county?.id, accountId, dispatch, isEdit, showCountyField, tenantId]);
+  }, [county?.id, countyId, dispatch, isEdit, showCountyField, tenantId]);
 
   useEffect(() => {
-    if (!isEdit && accountId) {
+    if (!isEdit && countyId) {
       const { values: formValues = {} } = form?.getState?.() || {};
       let countyFormValue = '';
       if (nestingKey) {
@@ -68,12 +68,12 @@ const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps
       } else {
         countyFormValue = formValues.county;
       }
-      if (!countyFormValue && county?.id.toString() === accountId) {
+      if (!countyFormValue && county?.id.toString() === countyId) {
         form?.change(`${nestingKey ? nestingKey + '.' : ''}county`, county);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, form, isEdit, nestingKey]);
+  }, [countyId, form, isEdit, nestingKey]);
 
   const nestingKeyName = `${nestingKey ? nestingKey + '.' : ''}name`;
   const nestingKeyCounty = `${nestingKey ? nestingKey + '.' : ''}county`;
@@ -106,8 +106,8 @@ const SubCountyForm = ({ nestingKey, isEdit = false, form }: ISubCountyFormProps
               return (
                 <SelectInput
                   {...(input as any)}
-                  disabled={Boolean(accountId || isEdit)}
-                  options={accountId || isEdit ? [] : countyOptions || []}
+                  disabled={Boolean(countyId || isEdit)}
+                  options={countyId || isEdit ? [] : countyOptions || []}
                   loadingOptions={countyOptionsLoading || countyLoading}
                   labelKey='name'
                   valueKey='id'

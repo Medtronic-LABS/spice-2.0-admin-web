@@ -21,7 +21,7 @@ export interface IUserFormProps {
   entityName?: string;
   enableAutoPopulate?: boolean;
   data?: any[];
-  countryId: number;
+  countryId?: number;
   hfTenantId?: number;
   autoFetchedDataState?: { autoFetchData: any[]; setAutoFetchData: React.Dispatch<React.SetStateAction<any[]>> };
   autoFetchedState?: { autoFetch: any[]; setAutoFetchState: React.Dispatch<React.SetStateAction<boolean[]>> };
@@ -39,6 +39,7 @@ export interface IUserFormProps {
   isSiteUser?: boolean;
   isAdminForm?: boolean;
   defaultSelectedRole?: string;
+  isRegionCreate?: boolean;
 }
 
 export interface IUser {

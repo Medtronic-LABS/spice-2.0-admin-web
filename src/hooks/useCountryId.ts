@@ -5,11 +5,11 @@ import sessionStorageServices from '../global/sessionStorageServices';
 import APPCONSTANTS from '../constants/appConstants';
 
 const useCountryId = () => {
-  const countryId = useSelector(countryIdSelector);
+  const country = useSelector(countryIdSelector);
 
   return useMemo(
-    () => Number(countryId?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID)),
-    [countryId]
+    () => Number(country?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID)),
+    [country]
   );
 };
 

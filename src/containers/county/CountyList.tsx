@@ -114,7 +114,7 @@ const CountyList = (props: IMatchProps & IDispatchProps): React.ReactElement => 
     dispatch(setCountyDetails(data));
     props.history.push(
       PROTECTED_ROUTES.countySummary
-        .replace(':accountId', data.id as string)
+        .replace(':countyId', data.id as string)
         .replace(':tenantId', data.tenantId as string)
     );
   };

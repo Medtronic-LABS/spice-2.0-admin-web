@@ -51,7 +51,7 @@ describe('Account Summary', () => {
   const props: any = {
     match: {
       params: {
-        accountId: '1',
+        countyId: '1',
         tenantId: '2'
       }
     }
