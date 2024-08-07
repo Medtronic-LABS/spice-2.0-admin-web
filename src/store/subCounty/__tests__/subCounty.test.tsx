@@ -5,7 +5,6 @@ import {
   createSubCounty,
   createSubCountyAdmin,
   deleteSubCountyAdmin,
-  fetchSubCountyAdminList,
   fetchSubCountyById,
   fetchSubCountyDashboardList,
   fetchSubCountyDetail,
@@ -23,7 +22,7 @@ const fetchSubCountyDetailWithSearchRequestMockData =
 const fetchSubCountyDetailRequestMockData = MOCK_DATA_CONSTANTS.ID_AND_TENANT_ID_REQUEST_PAYLOAD;
 const fetchSubCountyDetailResponseMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_DETAIL_RESPONSE_PAYLOAD;
 const fetchSubCountyAdminsResponseMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_ADMINS_RESPONSE_PAYLOAD;
-const updateOperatingtRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_SUB_COUNTY_REQUEST_PAYLOAD;
+const updateSubCountyRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_SUB_COUNTY_REQUEST_PAYLOAD;
 const fetchDashboardSubCountysRequestMockData = MOCK_DATA_CONSTANTS.FETCH_DASHBOARD_SUB_COUNTYS_REQUEST_PAYLOAD;
 const fetchDashboardSubCountysResponseMockData = MOCK_DATA_CONSTANTS.FETCH_DASHBOARD_SUB_COUNTYS_RESPONSE_PAYLOAD;
 const fetchSubCountysRequestMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COUNTY_LIST_REQUEST_PAYLOAD;
@@ -35,8 +34,8 @@ const fetchDropdownSubCountysRequestMockData = MOCK_DATA_CONSTANTS.FETCH_SUB_COU
 const subCountyAdminRequestMockData = MOCK_DATA_CONSTANTS.SUB_COUNTY_ADMIN_REQUEST_PAYLOAD;
 const deleteSubCountyAdminRequestMockData = MOCK_DATA_CONSTANTS.ID_AND_TENANT_ID_REQUEST_PAYLOAD;
 
-describe('Fetch Operating Unit Detail', () => {
-  it('Fetches a list of Operating Unit Admins and dispatches success', async () => {
+describe('Fetch Sub County Detail', () => {
+  it('Fetches a list of Sub County Admins and dispatches success', async () => {
     const fetchSubCountyDetailSpy = jest.spyOn(subCountyService, 'fetchSubCountyAdmins').mockImplementation(() => {
       return Promise.resolve({ data: { entityList: fetchSubCountyAdminsResponseMockData } } as AxiosResponse);
     });
@@ -55,7 +54,7 @@ describe('Fetch Operating Unit Detail', () => {
     expect(dispatched).toEqual([subCountyActions.searchUserSuccess(fetchSubCountyAdminsResponseMockData)]);
   });
 
-  it('Fetches operating unit details and dispatches success', async () => {
+  it('Fetches sub county details and dispatches success', async () => {
     const fetchSubCountyDetailSpy = jest.spyOn(subCountyService, 'getSubCountyDetails').mockImplementation(() => {
       return Promise.resolve({
         data: {
@@ -81,8 +80,8 @@ describe('Fetch Operating Unit Detail', () => {
     const { users: subCountyAdmins, ...subCountyDetail } = fetchSubCountyDetailResponseMockData;
     expect(dispatched).toEqual([subCountyActions.fetchSubCountyDetailSuccess({ subCountyAdmins, subCountyDetail })]);
   });
-  it('Fails to fetch operating unit and dispatches failure', async () => {
-    const error = new Error('Failed to operating unit');
+  it('Fails to fetch sub county and dispatches failure', async () => {
+    const error = new Error('Failed fetch to sub county');
     const fetchSubCountyDetailSpy = jest
       .spyOn(subCountyService, 'getSubCountyDetails')
       .mockImplementation(() => Promise.reject(error));
@@ -99,56 +98,8 @@ describe('Fetch Operating Unit Detail', () => {
   });
 });
 
-describe('Fetch Operating Unit Admin List', () => {
-  it('Fetches a list of Operating Unit Admins and dispatches success', async () => {
-    const fetchSubCountyAdminListSpy = jest.spyOn(subCountyService, 'fetchSubCountyAdmins').mockImplementation(() => {
-      return Promise.resolve({
-        data: { entityList: fetchSubCountyAdminsResponseMockData, totalCount: 10 }
-      } as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchSubCountyAdminList,
-      {
-        payload: fetchSubCountyDetailWithSearchRequestMockData as any,
-        type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST
-      }
-    ).toPromise();
-    expect(fetchSubCountyAdminListSpy).toHaveBeenCalledWith(fetchSubCountyDetailWithSearchRequestMockData);
-    expect(dispatched).toEqual([
-      subCountyActions.fetchSubCountyAdminsSuccess({
-        subCountyAdmins: fetchSubCountyAdminsResponseMockData,
-        total: 10
-      })
-    ]);
-  });
-
-  it('Fails to fetch Operating Admin list and dispatches failure', async () => {
-    const error = new Error('Failed to fetch Operating Admin list');
-    const fetchSubCountyAdminListSpy = jest
-      .spyOn(subCountyService, 'fetchSubCountyAdmins')
-      .mockImplementation(() => Promise.reject(error));
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchSubCountyAdminList,
-      {
-        payload: fetchSubCountyDetailWithSearchRequestMockData,
-        type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST
-      }
-    ).toPromise();
-    expect(fetchSubCountyAdminListSpy).toHaveBeenCalledWith(fetchSubCountyDetailWithSearchRequestMockData);
-    expect(dispatched).toEqual([subCountyActions.fetchSubCountyAdminsFailure(error)]);
-  });
-});
-
-describe('Updates an Operating Unit', () => {
-  it('Updates Operating Unit and dispatches success', async () => {
+describe('Updates an Sub County', () => {
+  it('Updates Sub County and dispatches success', async () => {
     const updateSubCountySpy = jest.spyOn(subCountyService, 'updateSubCounty').mockImplementation(() => {
       return Promise.resolve({} as AxiosResponse);
     });
@@ -159,15 +110,15 @@ describe('Updates an Operating Unit', () => {
       },
       updateSubCounty,
       {
-        payload: updateOperatingtRequestMockData,
+        payload: updateSubCountyRequestMockData,
         type: ACTION_TYPES.UPDATE_SUB_COUNTY_REQUEST
       }
     ).toPromise();
-    expect(updateSubCountySpy).toHaveBeenCalledWith(updateOperatingtRequestMockData);
+    expect(updateSubCountySpy).toHaveBeenCalledWith(updateSubCountyRequestMockData);
     expect(dispatched).toEqual([subCountyActions.updateSubCountySuccess()]);
   });
 
-  it('Updates Operating Unit with successPayload flag and dispatches success', async () => {
+  it('Updates Sub County with successPayload flag and dispatches success', async () => {
     const updateSubCountySpy = jest.spyOn(subCountyService, 'updateSubCounty').mockImplementation(() => {
       return Promise.resolve({} as AxiosResponse);
     });
@@ -178,17 +129,17 @@ describe('Updates an Operating Unit', () => {
       },
       updateSubCounty,
       {
-        payload: updateOperatingtRequestMockData,
+        payload: updateSubCountyRequestMockData,
         isSuccessPayloadNeeded: true,
         type: ACTION_TYPES.UPDATE_SUB_COUNTY_REQUEST
       }
     ).toPromise();
-    expect(updateSubCountySpy).toHaveBeenCalledWith(updateOperatingtRequestMockData);
-    expect(dispatched).toEqual([subCountyActions.updateSubCountySuccess({ name: 'Operating Unit Two' })]);
+    expect(updateSubCountySpy).toHaveBeenCalledWith(updateSubCountyRequestMockData);
+    expect(dispatched).toEqual([subCountyActions.updateSubCountySuccess({ name: 'Sub County Two' })]);
   });
 
-  it('Fails to update Operating unit and dispatches failure', async () => {
-    const error = new Error('Failed to update Operating Unit');
+  it('Fails to update Sub county and dispatches failure', async () => {
+    const error = new Error('Failed to update Sub County');
     const updateSubCountySpy = jest
       .spyOn(subCountyService, 'updateSubCounty')
       .mockImplementation(() => Promise.reject(error));
@@ -199,17 +150,17 @@ describe('Updates an Operating Unit', () => {
       },
       updateSubCounty,
       {
-        payload: updateOperatingtRequestMockData,
+        payload: updateSubCountyRequestMockData,
         type: ACTION_TYPES.UPDATE_SUB_COUNTY_REQUEST
       }
     ).toPromise();
-    expect(updateSubCountySpy).toHaveBeenCalledWith(updateOperatingtRequestMockData);
+    expect(updateSubCountySpy).toHaveBeenCalledWith(updateSubCountyRequestMockData);
     expect(dispatched).toEqual([subCountyActions.updateSubCountyFailure()]);
   });
 });
 
-describe('Fetch Operating Unit List in Dashboard', () => {
-  it('Fetches a list of Operating Units for Dashboard and dispatches success', async () => {
+describe('Fetch Sub County List in Dashboard', () => {
+  it('Fetches a list of Sub County for Dashboard and dispatches success', async () => {
     const fetchSubCountyDashboardListSpy = jest
       .spyOn(subCountyService, 'fetchSubCountyDashboardList')
       .mockImplementation(() => {
@@ -238,8 +189,8 @@ describe('Fetch Operating Unit List in Dashboard', () => {
     expect(dispatched).toEqual([subCountyActions.fetchSubCountyDashboardListSuccess(payload)]);
   });
 
-  it('Fails to fetch list of Operating Units for Dashboard and dispatches failure', async () => {
-    const error = new Error('Failed to fetch Operating unit dashboard list');
+  it('Fails to fetch list of Sub County for Dashboard and dispatches failure', async () => {
+    const error = new Error('Failed to fetch Sub county dashboard list');
     const fetchSubCountyDashboardListSpy = jest
       .spyOn(subCountyService, 'fetchSubCountyDashboardList')
       .mockImplementation(() => Promise.reject(error));
@@ -260,8 +211,8 @@ describe('Fetch Operating Unit List in Dashboard', () => {
   });
 });
 
-describe('Fetch Operating Unit List', () => {
-  it('Fetches a list of Operating Units and dispatches success', async () => {
+describe('Fetch Sub County List', () => {
+  it('Fetches a list of Sub County and dispatches success', async () => {
     const fetchSubCountyListSpy = jest.spyOn(subCountyService, 'fetchSubCountyList').mockImplementation(() => {
       return Promise.resolve({
         data: { entityList: fetchSubCountysResponseMockData, totalCount: 10 }
@@ -286,8 +237,8 @@ describe('Fetch Operating Unit List', () => {
     expect(dispatched).toEqual([subCountyActions.fetchSubCountyListSuccess(payload)]);
   });
 
-  it('Fails to fetch list of Operating Units and dispatches failure', async () => {
-    const error = new Error('Failed to fetch operating unit list');
+  it('Fails to fetch list of Sub County and dispatches failure', async () => {
+    const error = new Error('Failed to fetch sub county list');
     const fetchSubCountyListSpy = jest
       .spyOn(subCountyService, 'fetchSubCountyList')
       .mockImplementation(() => Promise.reject(error));
@@ -307,8 +258,8 @@ describe('Fetch Operating Unit List', () => {
   });
 });
 
-describe('Creates an Operating Unit', () => {
-  it('Creates Operating Unit and dispatches success', async () => {
+describe('Creates an Sub County', () => {
+  it('Creates Sub County and dispatches success', async () => {
     const createSubCountySpy = jest.spyOn(subCountyService, 'createSubCounty').mockImplementation(() => {
       return Promise.resolve({} as AxiosResponse);
     });
@@ -327,8 +278,8 @@ describe('Creates an Operating Unit', () => {
     expect(dispatched).toEqual([subCountyActions.createSubCountySuccess()]);
   });
 
-  it('Fails to create Operating Unit and dispatches failure', async () => {
-    const error = new Error('Failed to create operating unit');
+  it('Fails to create Sub County and dispatches failure', async () => {
+    const error = new Error('Failed to create sub county');
     const createSubCountySpy = jest.spyOn(subCountyService, 'createSubCounty').mockImplementation(() => {
       return Promise.reject(error);
     });
@@ -348,8 +299,8 @@ describe('Creates an Operating Unit', () => {
   });
 });
 
-describe('Fetches an Operating Unit', () => {
-  it('Fetches Operating Unit and dispatches success', async () => {
+describe('Fetches an Sub County', () => {
+  it('Fetches Sub County and dispatches success', async () => {
     const fetchSubCountySpy = jest.spyOn(subCountyService, 'fetchSubCountyById').mockImplementation(() => {
       return Promise.resolve({
         data: { entity: fetchSubCountyByIdResponseMockData }
@@ -370,8 +321,8 @@ describe('Fetches an Operating Unit', () => {
     expect(dispatched).toEqual([subCountyActions.fetchSubCountyByIdSuccess()]);
   });
 
-  it('Fails to fetch Operating Unit and dispatches failure', async () => {
-    const error = new Error('Failed to fetch operating unit');
+  it('Fails to fetch Sub County and dispatches failure', async () => {
+    const error = new Error('Failed to fetch sub county');
     const fetchSubCountySpy = jest.spyOn(subCountyService, 'fetchSubCountyById').mockImplementation(() => {
       return Promise.reject(error);
     });
@@ -391,8 +342,8 @@ describe('Fetches an Operating Unit', () => {
   });
 });
 
-describe('Fetch Operating Unit Drpodown List', () => {
-  it('Fetches Operating Unit Dropdown list and dispatches success', async () => {
+describe('Fetch Sub County Drpodown List', () => {
+  it('Fetches Sub County Dropdown list and dispatches success', async () => {
     const fetchSubCountyDropdownListSpy = jest
       .spyOn(subCountyService, 'fetchSubCountyForDropdown')
       .mockImplementation(() => {
@@ -420,8 +371,8 @@ describe('Fetch Operating Unit Drpodown List', () => {
     expect(dispatched).toEqual([subCountyActions.fetchSubCountyDropdownSuccess(payload)]);
   });
 
-  it('Fails to fetch Operating Unit Dropdown list and dispatches failure', async () => {
-    const error = new Error('Failed to fetch Operating Unit Dropdown list');
+  it('Fails to fetch Sub County Dropdown list and dispatches failure', async () => {
+    const error = new Error('Failed to fetch Sub County Dropdown list');
     const fetchSubCountyDropdownListSpy = jest
       .spyOn(subCountyService, 'fetchSubCountyForDropdown')
       .mockImplementation(() => Promise.reject(error));
@@ -441,8 +392,8 @@ describe('Fetch Operating Unit Drpodown List', () => {
   });
 });
 
-describe('Creates an Operating Unit Admin', () => {
-  it('Creates Operating Unit admin and dispatches success', async () => {
+describe('Creates an Sub County Admin', () => {
+  it('Creates Sub County admin and dispatches success', async () => {
     const createSubCountyAdminSpy = jest.spyOn(subCountyService, 'createSubCountyAdmin').mockImplementation(() => {
       return Promise.resolve({} as AxiosResponse);
     });
@@ -461,8 +412,8 @@ describe('Creates an Operating Unit Admin', () => {
     expect(dispatched).toEqual([subCountyActions.createSubCountyAdminSuccess()]);
   });
 
-  it('Fails to create Operating Unit admin and dispatches failure', async () => {
-    const error = new Error('Failed to create Operating Unit admin');
+  it('Fails to create Sub County admin and dispatches failure', async () => {
+    const error = new Error('Failed to create Sub County admin');
     const createSubCountyAdminSpy = jest
       .spyOn(subCountyService, 'createSubCountyAdmin')
       .mockImplementation(() => Promise.reject(error));
@@ -482,8 +433,8 @@ describe('Creates an Operating Unit Admin', () => {
   });
 });
 
-describe('Updates an Operating Unit Admin', () => {
-  it('Updates Operating Unit admin and dispatches success', async () => {
+describe('Updates an Sub County Admin', () => {
+  it('Updates Sub County admin and dispatches success', async () => {
     const updateSubCountyAdminSpy = jest.spyOn(subCountyService, 'updateSubCountyAdmin').mockImplementation(() => {
       return Promise.resolve({} as AxiosResponse);
     });
@@ -502,8 +453,8 @@ describe('Updates an Operating Unit Admin', () => {
     expect(dispatched).toEqual([subCountyActions.updateSubCountyAdminSuccess()]);
   });
 
-  it('Fails to update Operating Unit admin and dispatches failure', async () => {
-    const error = new Error('Failed to update Operating Unit admin');
+  it('Fails to update Sub County admin and dispatches failure', async () => {
+    const error = new Error('Failed to update Sub County admin');
     const updateSubCountyAdminSpy = jest
       .spyOn(subCountyService, 'updateSubCountyAdmin')
       .mockImplementation(() => Promise.reject(error));
@@ -523,8 +474,8 @@ describe('Updates an Operating Unit Admin', () => {
   });
 });
 
-describe('Deletes an Operating Unit Admin', () => {
-  it('Deletes Operating Unit admin and dispatches success', async () => {
+describe('Deletes an Sub County Admin', () => {
+  it('Deletes Sub County admin and dispatches success', async () => {
     const deleteSubCountyAdminSpy = jest.spyOn(subCountyService, 'deleteSubCountyAdmin').mockImplementation(() => {
       return Promise.resolve({} as AxiosResponse);
     });
@@ -543,8 +494,8 @@ describe('Deletes an Operating Unit Admin', () => {
     expect(dispatched).toEqual([subCountyActions.deleteSubCountyAdminSuccess()]);
   });
 
-  it('Fails to delete Operating Unit admin and dispatches failure', async () => {
-    const error = new Error('Failed to delete Operating Unit admin');
+  it('Fails to delete Sub County admin and dispatches failure', async () => {
+    const error = new Error('Failed to delete Sub County admin');
     const deleteSubCountyAdminSpy = jest
       .spyOn(subCountyService, 'deleteSubCountyAdmin')
       .mockImplementation(() => Promise.reject(error));

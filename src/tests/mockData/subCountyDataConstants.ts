@@ -4,7 +4,7 @@ const MOCK_DATA_CONSTANTS = {
   FETCH_SUB_COUNTY_DETAILS_REQUEST_PAYLOAD_WITH_SEARCH: {
     tenantId: '4',
     searchTerm: 'Admin',
-    userType: 'subcounty'
+    roleNames: ['SUB_COUNTY_ADMIN']
   },
 
   ID_AND_TENANT_ID_REQUEST_PAYLOAD: {
@@ -41,10 +41,10 @@ const MOCK_DATA_CONSTANTS = {
 
   FETCH_SUB_COUNTY_DETAIL_RESPONSE_PAYLOAD: {
     id: '2',
-    name: 'Operating Unit Two',
+    name: 'Sub County Two',
     tenantId: '4',
     account: { id: '1', name: 'Account One', tenantId: '7' },
-    county: { id: '5', name: 'County Five' },
+    county: { id: '1', name: 'Account One' },
     countryId: '1',
     countyName: 'Account One',
     users: [
@@ -71,7 +71,7 @@ const MOCK_DATA_CONSTANTS = {
 
   UPDATE_SUB_COUNTY_REQUEST_PAYLOAD: {
     id: '2',
-    name: 'Operating Unit Two',
+    name: 'Sub County Two',
     account: { id: 2 },
     countryId: 5,
     tenantId: '7',
@@ -88,7 +88,7 @@ const MOCK_DATA_CONSTANTS = {
   FETCH_DASHBOARD_SUB_COUNTYS_RESPONSE_PAYLOAD: [
     {
       id: '1',
-      name: 'Operating Unit One',
+      name: 'Sub County One',
       siteCount: 45,
       groupCount: 3,
       tenantId: '7'
@@ -106,8 +106,8 @@ const MOCK_DATA_CONSTANTS = {
     {
       id: '1',
       tenantId: '2',
-      name: 'Operating Unit One',
-      email: 'ou@email.com',
+      name: 'Sub County One',
+      email: 'subcounty@email.com',
       county: '5',
       account: { name: 'Account One' },
       countyName: 'Account One'
@@ -116,7 +116,7 @@ const MOCK_DATA_CONSTANTS = {
 
   CREATE_SUB_COUNTY_REQUEST_PAYLOAD: {
     id: '2',
-    name: 'Operating Unit Two',
+    name: 'Sub County Two',
     account: { id: 2 },
     countryId: 6,
     countyId: 2,
@@ -182,8 +182,8 @@ const MOCK_DATA_CONSTANTS = {
       {
         id: '1',
         tenantId: '2',
-        name: 'Operating Unit One',
-        email: 'ou@email.com',
+        name: 'Sub County One',
+        email: 'subcounty@email.com',
         county: '5',
         account: { name: 'Account One' }
       }

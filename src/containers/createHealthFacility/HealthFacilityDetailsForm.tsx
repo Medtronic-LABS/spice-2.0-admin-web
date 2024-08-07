@@ -42,8 +42,8 @@ import { userDataSelector } from '../../store/user/selectors';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from './Workflows';
-import { fetchAccountsRequest } from '../../store/account/actions';
-import { accountsLoadingSelector, getAccountsSelector } from '../../store/account/selectors';
+import { fetchCountyListRequest } from '../../store/county/actions';
+import { countyLoadingSelector, getCountyListSelector } from '../../store/county/selectors';
 import { fetchSubCountyListRequest } from '../../store/subCounty/actions';
 import { subCountyListSelector, subCountyLoadingSelector } from '../../store/subCounty/selectors';
 
@@ -58,8 +58,8 @@ interface IAddUserFormProps {
 
 interface IMatchParams {
   regionId?: string;
-  chiefdomId?: string;
-  districtId?: string;
+  subCountyId?: string;
+  countyId?: string;
 }
 
 /**
@@ -82,9 +82,9 @@ const HealthFacilityDetailsForm = ({
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
-  const countyList = useSelector(getAccountsSelector);
+  const countyList = useSelector(getCountyListSelector);
   const subCountyList = useSelector(subCountyListSelector);
-  const countyLoading = useSelector(accountsLoadingSelector);
+  const countyLoading = useSelector(countyLoadingSelector);
   const subCountyLoading = useSelector(subCountyLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
@@ -110,7 +110,7 @@ const HealthFacilityDetailsForm = ({
   // County fetch
   useEffect(() => {
     if (!countyList.length) {
-      dispatch(fetchAccountsRequest({ tenantId: String(countryId), isActive: true }));
+      dispatch(fetchCountyListRequest({ tenantId: String(countryId), isActive: true }));
     }
   }, [dispatch, countyList.length, countryId]);
 

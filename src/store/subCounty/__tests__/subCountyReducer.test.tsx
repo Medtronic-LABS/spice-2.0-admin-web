@@ -200,21 +200,10 @@ describe('subCountyReducer', () => {
     expect(subCountyReducer(mainInitialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST', () => {
-    const action: any = {
-      type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_REQUEST
-    };
-    const expectedState = {
-      ...mainInitialState,
-      loading: true
-    };
-    expect(subCountyReducer(mainInitialState, action)).toEqual(expectedState);
-  });
-
   it('should handle FETCH_SUB_COUNTY_DETAIL_FAILURE', () => {
     const action: any = {
       type: ACTION_TYPES.FETCH_SUB_COUNTY_DETAIL_FAILURE,
-      error: 'Failed to fetch operating unit detail'
+      error: 'Failed to fetch sub county detail'
     };
     const expectedState = {
       ...mainInitialState,
@@ -255,16 +244,16 @@ describe('subCountyReducer', () => {
     expect(subCountyReducer(mainInitialState, action)).toEqual(expectedState);
   });
 
-  it('should clear operating unit list', () => {
+  it('should clear sub county list', () => {
     const action: any = { type: ACTION_TYPES.CLEAR_SUB_COUNTY_LIST };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should update operating unit detail', () => {
+  it('should update sub county detail', () => {
     const payload = {
       id: '123',
-      name: 'Updated Operating Unit'
+      name: 'Updated Sub County'
     };
     const action: any = {
       type: ACTION_TYPES.UPDATE_SUB_COUNTY_SUCCESS,
@@ -276,14 +265,14 @@ describe('subCountyReducer', () => {
       subCountyDetail: {
         ...mainExpectedState.subCountyDetail,
         id: '123',
-        name: 'Updated Operating Unit'
+        name: 'Updated Sub County'
       }
     };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(expectedState);
   });
 
-  it('should handle update operating unit admin success', () => {
+  it('should handle update sub county admin success', () => {
     const action: any = { type: ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_SUCCESS };
     const expectedState = {
       loading: false,
@@ -293,118 +282,86 @@ describe('subCountyReducer', () => {
     expect(newState).toEqual(expectedState);
   });
 
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.FETCH_SUB_COUNTY_LIST_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit list success', () => {
+  it('should handle fetch sub county list success', () => {
     const action: any = { type: ACTION_TYPES.CREATE_SUB_COUNTY_SUCCESS };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.CREATE_SUB_COUNTY_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.UPDATE_SUB_COUNTY_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.UPDATE_SUB_COUNTY_ADMIN_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
-  it('should handle fetch operating unit list success', () => {
+  it('should handle fetch sub county list success', () => {
     const action: any = { type: ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_SUCCESS };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.CREATE_SUB_COUNTY_ADMIN_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
-  it('should handle fetch operating unit list success', () => {
+  it('should handle fetch sub county list success', () => {
     const action: any = { type: ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_SUCCESS };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.DELETE_SUB_COUNTY_ADMIN_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
-  it('should handle fetch operating unit list success', () => {
+  it('should handle fetch sub county list success', () => {
     const action: any = { type: ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_SUCCESS };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit list failure', () => {
+  it('should handle fetch sub county list failure', () => {
     const action: any = { type: ACTION_TYPES.FETCH_SUB_COUNTY_BY_ID_FAILURE };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit admin list success', () => {
-    const payload = {
-      subCountyAdmins: [],
-      total: 0
-    };
-    const action: any = {
-      type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_SUCCESS,
-      payload
-    };
-    mainExpectedState = {
-      ...mainExpectedState,
-      subCountyAdmins: [],
-      total: 0
-    };
-    const newState = subCountyReducer(mainInitialState, action);
-    expect(newState).toEqual(mainExpectedState);
-  });
-
-  it('should handle clear operating unit admin list', () => {
+  it('should handle clear sub county admin list', () => {
     const action: any = { type: ACTION_TYPES.CLEAR_SUB_COUNTY_ADMIN_LIST };
     const newState = subCountyReducer(mainInitialState, action);
     expect(newState).toEqual(mainExpectedState);
   });
 
-  it('should handle fetch operating unit admin list failure', () => {
-    const error = 'Failed to fetch operating unit admin list';
-    const action: any = {
-      type: ACTION_TYPES.FETCH_SUB_COUNTY_ADMIN_LIST_FAILURE,
-      error
-    };
-    mainExpectedState = {
-      ...mainExpectedState,
-      error: 'Failed to fetch operating unit admin list'
-    };
-    const newState = subCountyReducer(mainInitialState, action);
-    expect(newState).toEqual(mainExpectedState);
-  });
-
-  it('should handle clear operating unit detail', () => {
+  it('should handle clear sub county detail', () => {
     const localInitialState: any = {
       subCountyDetail: {
         id: '1',
-        name: 'Operating Unit 1',
+        name: 'Sub County 1',
         tenantId: 'tenant1',
-        account: {
+        countryId: 'county1',
+        countyName: 'County 1',
+        county: {
           id: 'account1',
           name: 'Account 1',
           tenantId: '123'
-        },
-        countryId: 'county1',
-        countyName: 'County 1'
+        }
       },
       admins: ['admin1', 'admin2']
     };
@@ -414,13 +371,13 @@ describe('subCountyReducer', () => {
         id: '',
         name: '',
         tenantId: '',
-        account: {
+        countryId: '',
+        countyName: '',
+        county: {
           id: '',
           name: '',
           tenantId: ''
-        },
-        countryId: '',
-        countyName: ''
+        }
       },
       admins: []
     };
@@ -428,11 +385,11 @@ describe('subCountyReducer', () => {
     expect(newState).toEqual(expectedState);
   });
 
-  it('should handle set operating unit details', () => {
+  it('should handle set sub county details', () => {
     const localInitialState: any = {
       subCountyDetail: {
         id: '1',
-        name: 'Operating Unit 1',
+        name: 'Sub County 1',
         tenantId: 'tenant1',
         account: {
           id: 'account1',
@@ -447,7 +404,7 @@ describe('subCountyReducer', () => {
     const action: any = {
       type: ACTION_TYPES.SET_SUB_COUNTY_DETAILS,
       data: {
-        name: 'Updated Operating Unit',
+        name: 'Updated Sub County',
         account: {
           id: 'account1',
           name: 'Updated Account'
@@ -458,7 +415,7 @@ describe('subCountyReducer', () => {
     const expectedState = {
       subCountyDetail: {
         id: '1',
-        name: 'Updated Operating Unit',
+        name: 'Updated Sub County',
         tenantId: 'tenant1',
         account: {
           id: 'account1',
@@ -474,7 +431,7 @@ describe('subCountyReducer', () => {
     expect(newState).toEqual(expectedState);
   });
 
-  it('should handle fetch operating unit dropdown request', () => {
+  it('should handle fetch sub county dropdown request', () => {
     const localInitialState: any = {
       dropdownSubCountyList: ['option1', 'option2'],
       dropdownSubCountyListLoading: false
@@ -488,7 +445,7 @@ describe('subCountyReducer', () => {
     expect(newState).toEqual(expectedState);
   });
 
-  it('should handle fetch operating unit dropdown success', () => {
+  it('should handle fetch sub county dropdown success', () => {
     const localInitialState: any = {
       dropdownSubCountyList: [],
       dropdownSubCountyListLoading: true
@@ -508,12 +465,12 @@ describe('subCountyReducer', () => {
     expect(newState).toEqual(expectedState);
   });
 
-  it('should handle fetch operating unit dropdown fail', () => {
+  it('should handle fetch sub county dropdown fail', () => {
     const localInitialState: any = {
       dropdownSubCountyList: [],
       dropdownSubCountyListLoading: true
     };
-    const error = 'Failed to fetch operating unit dropdown';
+    const error = 'Failed to fetch sub county dropdown';
     const action: any = {
       type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAIL,
       error

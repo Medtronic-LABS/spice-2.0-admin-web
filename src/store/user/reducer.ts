@@ -1,8 +1,6 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import MOCK_DATA_CONSTANTS from '../../tests/mockData/userDataConstants';
 import * as USERTYPES from './actionTypes';
-import { communityListSelector } from './selectors';
 
 import { IUserState, IUser } from './types';
 

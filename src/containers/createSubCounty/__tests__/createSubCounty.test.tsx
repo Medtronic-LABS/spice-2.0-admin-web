@@ -41,7 +41,7 @@ describe('CreateSubCounty', () => {
       params: {
         regionId: '1',
         tenantId: '1',
-        accountId: '1'
+        countyId: '1'
       }
     },
     history: {
@@ -148,7 +148,7 @@ describe('CreateSubCounty', () => {
     const form = wrapper.find(Form);
     const values: ISubCountyFormValues = {
       subCounty: {
-        name: 'Test Operating Unit'
+        name: 'Test Sub County'
       },
       users: []
     };
@@ -205,20 +205,20 @@ describe('CreateSubCounty', () => {
     expect(history.location.pathname).toEqual('/');
   });
 
-  it('should navigate to OUByAccount if accountId, tenantId, and user has appropriate role', () => {
-    wrapper.setProps({ match: { params: { accountId: '3', tenantId: '4' } }, role: 'super_admin' });
+  it('should navigate to OUByAccount if countyId, tenantId, and user has appropriate role', () => {
+    wrapper.setProps({ match: { params: { countyId: '3', tenantId: '4' } }, role: 'super_admin' });
     wrapper.find('button').first().simulate('click');
     expect(history.location.pathname).toEqual('/');
   });
 
-  it('should navigate to OUByAccount if accountId, tenantId, and user has appropriate role', () => {
-    wrapper.setProps({ match: { params: { accountId: '3', tenantId: '4' } }, role: 'super_admin' });
+  it('should navigate to OUByAccount if countyId, tenantId, and user has appropriate role', () => {
+    wrapper.setProps({ match: { params: { countyId: '3', tenantId: '4' } }, role: 'super_admin' });
     wrapper.find('button').at(1).simulate('click');
     expect(history.location.pathname).toEqual('/');
   });
 
-  it('should navigate to OUByAccount if accountId, tenantId, and user has appropriate role', () => {
-    wrapper.setProps({ match: { params: { accountId: '3', tenantId: '4' } }, role: 'super_admin' });
+  it('should navigate to OUByAccount if countyId, tenantId, and user has appropriate role', () => {
+    wrapper.setProps({ match: { params: { countyId: '3', tenantId: '4' } }, role: 'super_admin' });
     wrapper.find('button').last().simulate('click');
     expect(history.location.pathname).toEqual('/');
   });
@@ -227,7 +227,7 @@ describe('CreateSubCounty', () => {
     const createSubCountyMock = jest.fn();
     wrapper.setProps({ createSubCounty: createSubCountyMock });
 
-    const subCountyData = { name: 'Test OU', users: [{ firstName: 'John', lastName: 'Doe' }] };
+    const subCountyData = { name: 'Test Sub County', users: [{ firstName: 'John', lastName: 'Doe' }] };
     const eventData = { subCounty: subCountyData, users: [] };
 
     wrapper.find('form').first().simulate('submit', { preventDefault: jest.fn(), stopPropagation: jest.fn() });
@@ -239,7 +239,7 @@ describe('CreateSubCounty', () => {
     const createSubCountyMock = jest.fn();
     wrapper.setProps({ createSubCounty: createSubCountyMock });
 
-    const subCountyData = { name: 'Test OU', users: [{ firstName: 'John', lastName: 'Doe' }] };
+    const subCountyData = { name: 'Test Sub County', users: [{ firstName: 'John', lastName: 'Doe' }] };
     const eventData = { subCounty: subCountyData, users: [] };
 
     wrapper.find('form').last().simulate('submit', { preventDefault: jest.fn(), stopPropagation: jest.fn() });

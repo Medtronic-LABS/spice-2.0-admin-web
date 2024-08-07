@@ -47,24 +47,24 @@ describe('SubCountyDashboard', () => {
     jest.resetAllMocks();
   });
 
-  it('should render operating unit cards', () => {
+  it('should render sub county cards', () => {
     expect(wrapper.find(`.${styles.summaryCard}`).length).toEqual(15);
   });
   it('renders the header correctly', () => {
     const header = wrapper.find('.page-title');
     expect(header).toHaveLength(1);
-    expect(header.text()).toEqual('Operating Units');
+    expect(header.text()).toEqual('Sub County');
   });
 
-  it('renders the create operating unit button when there are operating units available', () => {
+  it('renders the create sub county button when there are sub county available', () => {
     expect(wrapper.find('.primary-btn')).toHaveLength(1);
   });
 
   it('should render the search bar', () => {
-    expect(wrapper.find('[placeholder="Search Operating Unit"]').length).toEqual(2);
+    expect(wrapper.find('[placeholder="Search Sub County"]').length).toEqual(2);
   });
 
-  it('renders the no data message when there are no operating units available', () => {
+  it('renders the no data message when there are no sub county available', () => {
     const state = {
       subCounty: {
         subCountyDashboardList: [],
@@ -90,7 +90,7 @@ describe('SubCountyDashboard', () => {
 
     wrapper.setProps({ noSubCountysAvailable: true, loading: false });
     expect(wrapper.find('.fw-bold').text()).toEqual('Let’s Get Started!');
-    expect(wrapper.find('.subtle-color').text()).toEqual('Create an operating unit');
+    expect(wrapper.find('.subtle-color').text()).toEqual('Create an sub county');
     expect(wrapper.find('.primary-btn')).toHaveLength(1);
   });
 });

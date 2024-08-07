@@ -119,7 +119,7 @@ const CountyDashboard = () => {
         title: name,
         _id,
         formId: formDataId,
-        detailRoute: PROTECTED_ROUTES.countySummary.replace(':accountId', formDataId).replace(':tenantId', _id),
+        detailRoute: PROTECTED_ROUTES.countySummary.replace(':countyId', formDataId).replace(':tenantId', _id),
         setBreadcrumbDetails: () => onDashboardExit({ id: formDataId, name, tenantId: _id }),
         data: [
           {
@@ -127,14 +127,14 @@ const CountyDashboard = () => {
             value: Number(ouCount) ? appendZeroBefore(ouCount, 2) : '-',
             label: subCountyModuleName,
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.subCountyByCounty.replace(':accountId', formDataId).replace(':tenantId', _id),
+            route: PROTECTED_ROUTES.subCountyByCounty.replace(':countyId', formDataId).replace(':tenantId', _id),
             onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
           },
           {
             type: 'number',
             value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
             label: 'Health Facility',
-            route: PROTECTED_ROUTES.hfByCounty.replace(':accountId', formDataId).replace(':tenantId', _id),
+            route: PROTECTED_ROUTES.hfByCounty.replace(':countyId', formDataId).replace(':tenantId', _id),
             onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
           }
         ]

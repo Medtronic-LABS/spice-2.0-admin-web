@@ -55,7 +55,7 @@ const SubCountySummary = () => {
   const loading = useSelector(subCountyLoadingSelector);
   const currentRole = useSelector(roleSelector);
   const isReadOnly = currentRole === APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN;
-  const { OUId, tenantId }: { OUId: string; tenantId: string } = useParams();
+  const { subCountyId, tenantId }: { subCountyId: string; tenantId: string } = useParams();
   const { county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
   const countryIdValue = useCountryId();
 
@@ -114,7 +114,7 @@ const SubCountySummary = () => {
       dispatch(
         fetchSubCountyDetail({
           tenantId,
-          id: OUId,
+          id: subCountyId,
           searchTerm: search,
           failureCb: (e) =>
             toastCenter.error(
@@ -127,7 +127,7 @@ const SubCountySummary = () => {
         })
       );
     },
-    [OUId, dispatch, searchTerm, tenantId]
+    [subCountyId, dispatch, searchTerm, tenantId]
   );
 
   const handleAddSubCountyAdminClick = useCallback(() => {

@@ -102,7 +102,8 @@ const UserForm = ({
   roleOptionsState,
   isSiteUser = false,
   isAdminForm = false,
-  defaultSelectedRole
+  defaultSelectedRole,
+  isRegionCreate = false
 }: IUserFormProps): React.ReactElement => {
   const idRefs = useRef([new Date().getTime()]);
   const formName = 'users';
@@ -175,7 +176,7 @@ const UserForm = ({
       dispatch(fetchCultureListRequest());
     }
 
-    if (isSiteUser && communityList && !communityList.length) {
+    if (isSiteUser && countryId && communityList && !communityList.length) {
       const payload = {
         countryId,
         search: ''
@@ -264,7 +265,7 @@ const UserForm = ({
   const SuperAdminToPeerSuperviserFn = useCallback(
     (roles: IRoles[]) => {
       if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
-        if (healthFacilityList?.length === 0) {
+        if (healthFacilityList?.length === 0 && countryId) {
           dispatch(
             fetchHFListRequest({
               countryId,
@@ -372,7 +373,7 @@ const UserForm = ({
     }
   }, [countryList.length, dispatch]);
   useEffect(() => {
-    if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile && (countryId || isRegionCreate)) {
+    if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile && countryId) {
       dispatch(
         fetchUserRolesAction({
           countryId: countryId || null,
@@ -551,7 +552,7 @@ const UserForm = ({
   // Villages fetch
   const fetchVillagesList = useCallback(
     (tenantIds: number[], index: number) => {
-      if (tenantIds.length) {
+      if (tenantIds.length && countryId) {
         const getSelectedHFDetails: any = healthFacilityList.filter((HFData: any) => {
           return HFData.tenantId === tenantIds[index];
         });
@@ -783,7 +784,7 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {(isSPICE || isAdminForm) && (
+                {(isSPICE || isAdminForm) && !isRegionCreate && (
                   <div className={`${!isAdminForm ? 'col-sm-6' : 'col-12'} `}>
                     <Field
                       name={`${name}.role`}
