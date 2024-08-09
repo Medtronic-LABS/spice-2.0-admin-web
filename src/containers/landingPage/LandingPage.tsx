@@ -72,19 +72,20 @@ const LandingPage = (): React.ReactElement => {
       userSuiteAccess.includes(suite.suiteAccessName)
     );
     if (authorisedSuites.length === 1) {
-      history.push(spiceHomeUrl);
+      const { hasDomain, domainUrl } = authorisedSuites[0];
+      hasDomain ? goToUrl(domainUrl) : history.push(domainUrl);
     }
     setSuites(authorisedSuites);
-  }, [history, spiceHomeUrl, userSuiteAccess]);
+  }, [history, userSuiteAccess, spiceSuites]);
 
   const renderCardContent = (data: ISpiceSuite) => {
     const { name, icon: IconComponent } = data;
     return (
       <>
         <div className='row p-2'>
-          <IconComponent className='card-icon' aria-labelledby={`${name} logo`} />
+          <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
         </div>
-        <div className={`row ${styles.report_card_text} py-1`}>
+        <div className={`row ${styles.reportCardText} py-1`}>
           <p>{name}</p>
         </div>
       </>
@@ -97,7 +98,7 @@ const LandingPage = (): React.ReactElement => {
         {suites.map((data) => (
           <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
             {!data.hasDomain ? (
-              <Link to={spiceHomeUrl} children={renderCardContent(data)} />
+              <Link to={data.domainUrl} children={renderCardContent(data)} />
             ) : (
               <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
             )}
