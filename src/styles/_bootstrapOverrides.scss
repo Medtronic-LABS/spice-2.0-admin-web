@@ -118,16 +118,13 @@ $gutters: (
       border-bottom-left-radius: 12px;
     }
     &:first-of-type {
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-      // overflow: auto;
+      border-top-left-radius: 12px !important;
+      border-top-right-radius: 12px !important;
       .accordion-button {
-        border-radius: inherit !important;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        // overflow: hidden;
-        border-bottom-right-radius: 12px;
-        border-bottom-left-radius: 12px;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        border-bottom-right-radius: 12px !important;
+        border-bottom-left-radius: 12px !important;
       }
     }
   }

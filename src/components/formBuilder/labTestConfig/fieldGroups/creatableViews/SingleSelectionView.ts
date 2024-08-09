@@ -3,57 +3,57 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IDropdownFields extends IBaseFields {
-  hint?: string;
+export interface ISingleSelectionFields extends IBaseFields {
+  orientation: number;
   visibility: string;
-  isNew?: boolean;
-  optionsList?: Array<{ name: string; id: string }>;
+  defaultValue?: string;
+  optionsList: Array<{ name: string; id: string }>;
   errorMessage?: string;
-  isDefault?: boolean;
-  isResult?: boolean;
+  isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IDropdownFields => ({
-  id: new Date().getTime().toString() + 'Spinner',
-  viewType: 'Spinner',
+const getEmptyData = (): ISingleSelectionFields => ({
+  id: new Date().getTime().toString() + 'SingleSelectionView',
+  viewType: 'SingleSelectionView',
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  hint: '',
+  condition: [],
   optionsList: [],
+  orientation: 0,
   errorMessage: '',
-  isDefault: false,
-  isResult: true
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
+  orientation: {},
   visibility: {},
-  isEnabled: {},
-  isEnrollment: {},
-  isMandatory: {},
   title: {},
   fieldName: {},
+  isMandatory: {},
   optionsList: {},
+  condition: {},
+  errorMessage: {},
+  isEnabled: {},
   isEditable: {},
-  isResult: {},
-  code: {},
-  url: {},
-  resource: {}
+  isEnrollment: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
+  json.condition = json.condition?.filter((val: any) => !!val);
   return json;
 };
 
-const DROPDOWN_CONFIG: IComponentConfig = {
+const SINGLE_SELECTION_VIEW_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default DROPDOWN_CONFIG;
+export default SINGLE_SELECTION_VIEW_CONFIG;

@@ -20,6 +20,7 @@ const getEmptyData = (): IRadioGroupFields => ({
   family: '',
   isMandatory: false,
   isEnabled: true,
+  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   optionsList: [],
   orientation: 0,
@@ -36,7 +37,9 @@ const customizableFieldMeta: IBaseFieldMeta = {
   optionsList: {},
   errorMessage: {},
   isEnabled: {},
-  isEditable: {}
+  isEditable: {},
+  isEnrollment: {},
+  unitMeasurement: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {

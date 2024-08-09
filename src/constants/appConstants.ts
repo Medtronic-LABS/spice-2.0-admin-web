@@ -303,6 +303,7 @@ const APPCONSTANTS = {
   DEACTIVATE_CONSENT_NO_DATA: 'consent data not found. Please try after sometime.',
   DELETE_CONSENT_TITLE: 'Delete confirmation',
   DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the county consent form?',
+  FETCH_FORM_META_ERROR: 'Unable to fetch the form meta data. Please try after sometime.',
 
   REGION_CUSTOMIZATION_SCREENS: [
     { name: 'Screening Form' },
@@ -347,29 +348,7 @@ const APPCONSTANTS = {
     'November',
     'December'
   ],
-  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType'],
-  CUSTOMIZATION_FORM_CATEGORY: 'Input_form'
-};
-
-export const NAME_CONSTANTS = {
-  // s for singular name
-  // p for plural name
-  region: {
-    s: 'Region',
-    p: 'Regions'
-  },
-  district: {
-    s: 'County',
-    p: 'Counties'
-  },
-  chiefdom: {
-    s: 'Sub County',
-    p: 'Sub Counties'
-  },
-  healthFacility: {
-    s: 'Health Facility',
-    p: 'Health Facilities'
-  }
+  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType']
 };
 
 export const NAME_CONSTANTS = {

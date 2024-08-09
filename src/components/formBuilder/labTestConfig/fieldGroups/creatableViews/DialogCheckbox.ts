@@ -3,7 +3,7 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IEditTextFields extends IBaseFields {
+export interface IDialogCheckboxFields extends IBaseFields {
   hint?: string;
   maxLength?: number;
   minLength?: number;
@@ -14,32 +14,26 @@ export interface IEditTextFields extends IBaseFields {
   minValue?: number;
   maxValue?: number;
   isNeedAction?: boolean;
-  isDefault?: boolean;
-  isResult?: boolean;
-  unitList?: Array<{ name: string; id: string }>;
-  code?: string;
-  url?: string;
-  resource?: string;
-  ranges?: any[];
+  isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IEditTextFields => ({
-  id: new Date().getTime().toString() + 'EditText',
-  viewType: 'EditText',
+const getEmptyData = (): IDialogCheckboxFields => ({
+  id: new Date().getTime().toString() + 'DialogCheckbox',
+  viewType: 'DialogCheckbox',
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
+  condition: [],
   hint: '',
   errorMessage: '',
-  inputType: -1,
-  isDefault: false,
+  isNotDefault: true,
   minLength: undefined,
-  maxLength: undefined,
-  ranges: []
+  maxLength: undefined
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -47,33 +41,17 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEnabled: {},
   isEnrollment: {},
   isMandatory: {},
-  isNeedAction: { disabled: true },
   maxLength: {},
   minLength: {},
-  contentLength: {},
-  startsWith: {},
-  defaultValue: { disabled: true },
-  hint: {},
-  isResult: {},
-  unitList: {},
-  code: {},
-  url: {},
-  resource: {},
-  minValue: {},
-  maxValue: {},
-  inputType: {},
+  errorMessage: {},
   title: {},
-  ranges: {},
-  fieldName: {},
-  isEditable: {}
+  condition: {},
+  fieldName: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
-  if (json.inputType === 0) {
-    delete json.inputType;
-  }
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  json.ranges = json.ranges?.filter((val: any) => !!val);
+  json.condition = json.condition?.filter((val: any) => !!val);
   if (json.minValue) {
     json.minValue = Number(json.minValue);
   }
@@ -83,10 +61,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const EDIT_TEXT_CONFIG: IComponentConfig = {
+const DIALOG_CHECKBOX_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default EDIT_TEXT_CONFIG;
+export default DIALOG_CHECKBOX_CONFIG;

@@ -9,7 +9,7 @@ import Accordian from '../../../../components/accordian/Accordian';
 import APPCONSTANTS from '../../../../constants/appConstants';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
-import { creatableViews, getConfigByViewType } from '../../utils/FieldUtils';
+import { creatableViews, getConfigByViewType, isEditableFields, unitMeasurementFields } from '../../utils/FieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
 import { containsOnlyLettersAndNumbers } from '../../../../utils/validation';
 
@@ -35,8 +35,7 @@ interface IAccordinaViewProps {
   isShow?: boolean;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
-  isCustomizationForm?: boolean;
-  isWorkFlowCustomization?: boolean;
+  isRegionCustomizeForm?: boolean;
 }
 
 export interface IFormValues {
@@ -181,8 +180,7 @@ const AccordianBody = ({
   hashFieldIdsWithFieldName,
   addNewFieldDisabled,
   isFieldNameChangable,
-  isCustomizationForm,
-  isWorkFlowCustomization
+  isRegionCustomizeForm
 }: any) => {
   const getDeleteIconCondition = (fieldGroupName: any, isNew: any) => {
     if (!isCustomizationForm || isWorkFlowCustomization) {
@@ -225,12 +223,12 @@ const AccordianBody = ({
                     newlyAddedIds={newlyAddedIds}
                     isNew={isNew}
                     handleUpdateFieldName={handleUpdateFieldName}
-                    isFieldNameChangable={true}
-                    addNewFieldDisabled={false}
+                    // isAccountCustomization={isAccountCustomization}
+                    isFieldNameChangable={isFieldNameChangable}
+                    addNewFieldDisabled={addNewFieldDisabled}
                     hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                     hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-                    isCustomizationForm={isCustomizationForm}
-                    isWorkFlowCustomization={isWorkFlowCustomization}
+                    isRegionCustomizeForm={isRegionCustomizeForm}
                   />
                 </div>
                 {currentFamilyGroup[fieldGroupName]?.isDeletable !== undefined
@@ -276,11 +274,11 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
         )}
       </div>
       {/* ------- JSON viewer ----------- */}
-      {/* <div className='mt-1 bg-black p-2'>
+      <div className='mt-1 bg-black p-2'>
         <code>
           <pre style={{ fontSize: '1rem' }}>{JSON.stringify(_presentableJson(cloneDeep(values)), null, 2)}</pre>
         </code>
-      </div> */}
+      </div>
       {/* ------------------------------- */}
     </>
   );
@@ -308,8 +306,7 @@ const AccordianView = ({
   isShow,
   addNewFieldDisabled,
   isFieldNameChangable,
-  isCustomizationForm = false,
-  isWorkFlowCustomization = false
+  isRegionCustomizeForm = false
 }: IAccordinaViewProps) => {
   const fieldGroupRef = useRef<any>([]);
   const newlyAddedIds = newlyAddedIdsRef;
@@ -410,7 +407,7 @@ const AccordianView = ({
             }
           });
         }
-        if (v?.targetViews?.length) {
+        if (v?.targetViews?.length && !isRegionCustomizeForm) {
           const fieldToRemove = v.targetViews.findIndex(
             (selectedField: any) => selectedField.value === formValues[familyName][fieldGroupName].id
           );
@@ -454,6 +451,17 @@ const AccordianView = ({
       formValues[familyName][newFieldName].id = newFieldName;
       formValues[familyName][newFieldName].fieldName = newFieldLabel;
 
+      // toggle fields based on fieldname
+      if (isEditableFields.includes(newFieldName) && isRegionCustomizeForm) {
+        formValues[familyName][newFieldName].isEditable = true;
+      } else if ('isEditable' in formValues[familyName][newFieldName]) {
+        delete formValues[familyName][newFieldName].isEditable;
+      }
+      if (unitMeasurementFields.includes(newFieldName)) {
+        formValues[familyName][newFieldName].unitMeasurement = undefined;
+      } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
+        delete formValues[familyName][newFieldName].unitMeasurement;
+      }
       delete formValues[familyName][currentFieldID];
 
       // update newly added ids
@@ -585,8 +593,7 @@ const AccordianView = ({
                               isFieldNameChangable={isFieldNameChangable}
                               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-                              isCustomizationForm={isCustomizationForm}
-                              isWorkFlowCustomization={isWorkFlowCustomization}
+                              isRegionCustomizeForm={isRegionCustomizeForm}
                             />
                           }
                         />

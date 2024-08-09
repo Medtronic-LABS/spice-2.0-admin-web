@@ -14,6 +14,7 @@ interface ISideMenuItem {
   disabled?: boolean;
   childRoutes?: string[];
   collapsible?: boolean;
+  type?: string;
 }
 
 interface ISideMenuProps {
@@ -46,7 +47,7 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Lab Test Database',
     route: PROTECTED_ROUTES.labtestList,
-    disabled: true
+    disabled: false
   },
   {
     label: 'Health Facility',
@@ -63,6 +64,12 @@ const superAdminRoutes: ISideMenuItem[] = [
     label: 'Admins',
     route: PROTECTED_ROUTES.adminBySuperAdmin,
     disabled: false
+  },
+  {
+    label: 'Region Customization',
+    route: PROTECTED_ROUTES.customizationByRegion,
+    collapsible: false,
+    type: 'regionAdmin'
   }
 ];
 const adminRoutes: ISideMenuItem[] = [

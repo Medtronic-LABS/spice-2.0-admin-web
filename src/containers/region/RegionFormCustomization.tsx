@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
@@ -10,7 +10,7 @@ import {
   fetchFormMetaRequest,
   fetchCustomizationFormRequest
 } from '../../store/workflow/actions';
-import { formJSONSelector, getFormMetaSelector, loadingSelector } from '../../store/workflow/selectors';
+import { formJSONSelector, formMetaSelector, loadingSelector } from '../../store/workflow/selectors';
 import { FormType } from '../../store/workflow/types';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -36,7 +36,7 @@ const RegionFormCustomization = () => {
 
   const history = useHistory();
   const { tenantId, regionId, form } = useParams<IMatchParams>();
-  const formGetMeta = useSelector(getFormMetaSelector) || [];
+  const formGetMeta = useSelector(formMetaSelector) || [];
   const { id: formId } = useSelector(formJSONSelector) || {};
   const loading = useSelector(loadingSelector);
   const cultureList = useSelector(cultureListSelector);
@@ -46,8 +46,6 @@ const RegionFormCustomization = () => {
     [cultureList]
   );
   const [currentCulture, setCulture] = useState(defaultCulture);
-  const accordianRef = useRef<any>([]);
-  const newlyAddedIdsRef = useRef<any>([]);
 
   const {
     formRef,
@@ -63,7 +61,6 @@ const RegionFormCustomization = () => {
     resetCollapsedCalculation,
     getSortedData,
     presentableJson,
-    sethashFieldIdsWithFieldName,
 
     // reorder props
     isFamilyOrderModelOpen,
@@ -78,8 +75,8 @@ const RegionFormCustomization = () => {
         fetchCustomizationFormRequest({
           tenantId,
           countryId: regionId,
-          formType: (form.charAt(0).toUpperCase() + form.slice(1)) as FormType,
-          category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
+          formType: form as FormType,
+          category: 'input_form',
           cultureId,
           successCb: ({ formInput, cultureId: existingCulture }) => {
             if (!currentCulture?.id && cultureList?.length) {
@@ -144,7 +141,7 @@ const RegionFormCustomization = () => {
       customizeFormRequest({
         formType: form as FormType,
         formId,
-        category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
+        category: 'input_form',
         tenantId,
         countryId: regionId ? regionId : '',
         cultureId: currentCulture?.id,
@@ -205,7 +202,7 @@ const RegionFormCustomization = () => {
             formMeta={formData}
             setFormMeta={setFormData}
             addedFields={addedFields}
-            allowedFields={[...formGetMeta]}
+            allowedFields={formGetMeta}
             targetIds={targetIds}
             culture={currentCulture}
             onSubmit={onSubmit}
@@ -215,12 +212,9 @@ const RegionFormCustomization = () => {
             collapsedGroup={collapsedGroup}
             setCollapsedGroup={setCollapsedGroup}
             isShow={false}
-            sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             addNewFieldDisabled={true}
             isFieldNameChangable={false}
-            isCustomizationForm={true}
-            newlyAddedIdsRef={newlyAddedIdsRef.current}
-            accordianRef={accordianRef}
+            isRegionCustomizeForm={true}
           />
           <ReorderView
             formRef={formRef}

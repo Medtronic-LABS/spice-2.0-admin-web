@@ -7,6 +7,7 @@ export interface IBaseFields {
   fieldName: string;
   family: string;
   isEnabled?: boolean;
+  isEnrollment?: boolean;
   visibility: string;
   isMandatory?: boolean;
   condition?: ICondition[];
