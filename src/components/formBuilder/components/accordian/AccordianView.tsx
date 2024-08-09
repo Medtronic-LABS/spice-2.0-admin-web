@@ -9,7 +9,7 @@ import Accordian from '../../../../components/accordian/Accordian';
 import APPCONSTANTS from '../../../../constants/appConstants';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
-import { creatableViews, getConfigByViewType, unitMeasurementFields } from '../../utils/FieldUtils';
+import { creatableViews, getConfigByViewType, isEditableFields, unitMeasurementFields } from '../../utils/FieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
 
 interface IAccordinaViewProps {
@@ -31,6 +31,7 @@ interface IAccordinaViewProps {
   isShow?: boolean;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
+  isRegionCustomizeForm?: boolean;
 }
 
 export interface IFormValues {
@@ -118,7 +119,10 @@ const AccordianBody = ({
   handleUpdateFieldName,
   isAccountCustomization,
   hashFieldIdsWithTitle,
-  hashFieldIdsWithFieldName
+  hashFieldIdsWithFieldName,
+  addNewFieldDisabled,
+  isFieldNameChangable,
+  isRegionCustomizeForm
 }: any) => {
   return (
     <div className='row'>
@@ -150,10 +154,11 @@ const AccordianBody = ({
                     isNew={isNew}
                     handleUpdateFieldName={handleUpdateFieldName}
                     // isAccountCustomization={isAccountCustomization}
-                    isFieldNameChangable={true}
-                    addNewFieldDisabled={false}
+                    isFieldNameChangable={isFieldNameChangable}
+                    addNewFieldDisabled={addNewFieldDisabled}
                     hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                     hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+                    isRegionCustomizeForm={isRegionCustomizeForm}
                   />
                 </div>
                 {(isNew || currentFamilyGroup[fieldGroupName]?.isNotDefault) && (
@@ -197,11 +202,11 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
         )}
       </div>
       {/* ------- JSON viewer ----------- */}
-      {/* <div className='mt-1 bg-black p-2'>
+      <div className='mt-1 bg-black p-2'>
         <code>
           <pre style={{ fontSize: '1rem' }}>{JSON.stringify(_presentableJson(cloneDeep(values)), null, 2)}</pre>
         </code>
-      </div> */}
+      </div>
       {/* ------------------------------- */}
     </>
   );
@@ -225,7 +230,8 @@ const AccordianView = ({
   culture,
   isShow,
   addNewFieldDisabled,
-  isFieldNameChangable
+  isFieldNameChangable,
+  isRegionCustomizeForm = false
 }: IAccordinaViewProps) => {
   const accordianRef = useRef<any>([]);
   const fieldGroupRef = useRef<any>([]);
@@ -310,7 +316,7 @@ const AccordianView = ({
             }
           });
         }
-        if (v?.targetViews?.length) {
+        if (v?.targetViews?.length && !isRegionCustomizeForm) {
           const fieldToRemove = v.targetViews.findIndex(
             (selectedField: any) => selectedField.value === formValues[familyName][fieldGroupName].id
           );
@@ -366,11 +372,11 @@ const AccordianView = ({
       formValues[familyName][newFieldName].fieldName = newFieldLabel;
 
       // toggle fields based on fieldname
-      // if (isEditableFields.includes(newFieldName)) {
-      //   formValues[familyName][newFieldName].isEditable = true;
-      // } else if ('isEditable' in formValues[familyName][newFieldName]) {
-      //   delete formValues[familyName][newFieldName].isEditable;
-      // }
+      if (isEditableFields.includes(newFieldName) && isRegionCustomizeForm) {
+        formValues[familyName][newFieldName].isEditable = true;
+      } else if ('isEditable' in formValues[familyName][newFieldName]) {
+        delete formValues[familyName][newFieldName].isEditable;
+      }
       if (unitMeasurementFields.includes(newFieldName)) {
         formValues[familyName][newFieldName].unitMeasurement = undefined;
       } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
@@ -509,6 +515,7 @@ const AccordianView = ({
                               isFieldNameChangable={isFieldNameChangable}
                               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+                              isRegionCustomizeForm={isRegionCustomizeForm}
                             />
                           }
                         />

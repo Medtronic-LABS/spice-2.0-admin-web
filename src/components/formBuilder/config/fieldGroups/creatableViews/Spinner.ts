@@ -22,6 +22,7 @@ const getEmptyData = (): ISpinnerFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
+  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   condition: [],
   hint: '',
@@ -34,6 +35,7 @@ const getEmptyData = (): ISpinnerFields => ({
 const customizableFieldMeta: IBaseFieldMeta = {
   visibility: {},
   isEnabled: {},
+  isEnrollment: {},
   isMandatory: {},
   defaultValue: {},
   title: {},

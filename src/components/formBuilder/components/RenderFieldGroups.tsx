@@ -17,7 +17,8 @@ const RenderFieldGroups = ({
   isFieldNameChangable,
   addNewFieldDisabled,
   hashFieldIdsWithTitle,
-  hashFieldIdsWithFieldName
+  hashFieldIdsWithFieldName,
+  isRegionCustomizeForm = false
 }: any) => {
   const componentConfig: IComponentConfig = getConfigByViewType(obj?.viewType);
   return (
@@ -32,7 +33,8 @@ const RenderFieldGroups = ({
           if (componentConfig.customizableFieldMeta.hasOwnProperty(field)) {
             const inputProps = {
               ...baseFieldMeta[field as keyof IBaseFieldMeta],
-              ...componentConfig.customizableFieldMeta[field as keyof IBaseFieldMeta]
+              ...componentConfig.customizableFieldMeta[field as keyof IBaseFieldMeta],
+              ...(isRegionCustomizeForm ? { disabled: obj.readOnly === true } : {})
             };
             return (
               <RenderFields
@@ -48,10 +50,11 @@ const RenderFieldGroups = ({
                 newlyAddedIds={newlyAddedIds}
                 handleUpdateFieldName={handleUpdateFieldName}
                 // isAccountCustomization={isAccountCustomization}
-                isFieldNameChangable={true}
-                addNewFieldDisabled={false}
+                isFieldNameChangable={isFieldNameChangable}
+                addNewFieldDisabled={addNewFieldDisabled}
                 hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                 hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+                isRegionCustomizeForm={isRegionCustomizeForm}
               />
             );
           } else {

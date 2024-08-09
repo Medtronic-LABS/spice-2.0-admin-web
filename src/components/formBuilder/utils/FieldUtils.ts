@@ -14,7 +14,10 @@ import TIME_VIEW_CONFIG from '../config/fieldGroups/creatableViews/TimeView';
 import TEXT_LABEL_CONFIG from '../config/fieldGroups/TextLabel';
 import INFORMATION_LABEL_CONFIG from '../config/fieldGroups/creatableViews/InformationLabel';
 import { IComponentConfig } from '../types/ComponentConfig';
+import SINGLE_SELECTION_VIEW_CONFIG from '../config/fieldGroups/creatableViews/SingleSelectionView';
 import DATE_PICKER_CONFIG from '../config/fieldGroups/creatableViews/DatePickerView';
+import DIALOG_CHECKBOX_CONFIG from '../config/fieldGroups/creatableViews/DialogCheckbox';
+import MENTAL_HEALTH_CONFIG from '../config/fieldGroups/MentalHealthView';
 
 export const creatableViews = [
   { label: 'BP Input', value: 'BP', isAccountCustomizable: false },
@@ -26,6 +29,8 @@ export const creatableViews = [
   { label: 'Select Input', value: 'Spinner', isAccountCustomizable: true },
   { label: 'Slider', value: 'ScaleIndicator', isAccountCustomizable: true },
   { label: 'Multi Select Input', value: 'CheckBox', isAccountCustomizable: true },
+  { label: 'Single Selection', value: 'SingleSelectionView', isAccountCustomizable: true },
+  { label: 'Dialog Checkbox', value: 'DialogCheckbox', isAccountCustomizable: false },
   { label: 'Instructions', value: 'Instruction', isAccountCustomizable: true },
   { label: 'Information Label', value: 'InformationLabel', isAccountCustomizable: false },
   { label: 'Date Input', value: 'DatePicker', isAccountCustomizable: true }
@@ -33,19 +38,19 @@ export const creatableViews = [
 
 export const unitMeasurementFields = ['glucose', 'hba1c'];
 
-// export const isEditableFields = [
-//   'firstName',
-//   'middleName',
-//   'lastName',
-//   'phoneNumber',
-//   'phoneNumberCategory',
-//   'landmark',
-//   'occupation',
-//   'insuranceStatus',
-//   'insuranceType',
-//   'insuranceId',
-//   'otherInsurance'
-// ];
+export const isEditableFields = [
+  'firstName',
+  'middleName',
+  'lastName',
+  'phoneNumber',
+  'phoneNumberCategory',
+  'landmark',
+  'occupation',
+  'insuranceStatus',
+  'insuranceType',
+  'insuranceId',
+  'otherInsurance'
+];
 
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
   switch (viewType) {
@@ -53,6 +58,8 @@ export const getConfigByViewType = (viewType: string): IComponentConfig => {
       return BP_CONFIG;
     case 'RadioGroup':
       return RADIO_GROUP_CONFIG;
+    case 'SingleSelectionView':
+      return SINGLE_SELECTION_VIEW_CONFIG;
     case 'Age':
       return AGE_CONFIG;
     case 'Height':
@@ -67,10 +74,14 @@ export const getConfigByViewType = (viewType: string): IComponentConfig => {
       return COLLAPSIBLE_VIEW_CONFIG;
     case 'CheckBox':
       return CHECKBOX_CONFIG;
+    case 'DialogCheckbox':
+      return DIALOG_CHECKBOX_CONFIG;
     case 'ScaleIndicator':
       return SCALE_INDICATOR_CONFIG;
     case 'Instruction':
       return INSTRUCTION_CONFIG;
+    case 'MentalHealthView':
+      return MENTAL_HEALTH_CONFIG;
     case 'TextLabel':
       return TEXT_LABEL_CONFIG;
     case 'InformationLabel':

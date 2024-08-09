@@ -17,6 +17,7 @@ const getEmptyData = (): IHeightFields => ({
   isSummary: false,
   isMandatory: false,
   isEnabled: true,
+  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   condition: [],
   errorMessage: '',
@@ -32,6 +33,7 @@ const customizableFieldMeta: IBaseFieldMeta = {
   condition: {},
   fieldName: {},
   isEditable: {},
+  isEnrollment: {},
   unitMeasurement: {}
 };
 

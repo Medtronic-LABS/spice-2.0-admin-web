@@ -9,9 +9,11 @@ import { IRadioGroupFields } from '../config/fieldGroups/creatableViews/RadioGro
 import { ISpinnerFields } from '../config/fieldGroups/creatableViews/Spinner';
 import { IInformationLabelFields } from '../config/fieldGroups/creatableViews/InformationLabel';
 import { ITimeViewFields } from '../config/fieldGroups/creatableViews/TimeView';
+import { IMentalHealthViewFields } from '../config/fieldGroups/MentalHealthView';
 import { ITextLabelFields } from '../config/fieldGroups/TextLabel';
 
 import { IBaseFieldMeta } from './BaseFieldMeta';
+import { IDialogCheckboxFields } from '../config/fieldGroups/creatableViews/DialogCheckbox';
 import { IDatePickerFields } from '../config/fieldGroups/creatableViews/DatePickerView';
 
 export type IFieldViewType =
@@ -25,9 +27,11 @@ export type IFieldViewType =
   | ITimeViewFields
   | IInstructionFields
   | ICardViewFields
+  | IMentalHealthViewFields
   | ITextLabelFields
-  | IDatePickerFields
-  | IInformationLabelFields;
+  | IInformationLabelFields
+  | IDialogCheckboxFields
+  | IDatePickerFields;
 
 export interface IComponentConfig {
   getEmptyData: () => IFieldViewType;

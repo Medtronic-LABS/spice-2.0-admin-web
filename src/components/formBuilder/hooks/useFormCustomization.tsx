@@ -1,13 +1,21 @@
 import { useRef, useState } from 'react';
 import { IComponentConfig } from '../types/ComponentConfig';
 import { FormApi } from 'final-form';
-import { getConfigByViewType, unitMeasurementFields } from '../utils/FieldUtils';
+import { getConfigByViewType, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
 import { ISelectFormOptions } from '../../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../../constants/appConstants';
+import { useParams } from 'react-router-dom';
 import { camel2Title } from '../../../utils/validation';
+import { matchPath, useLocation } from 'react-router-dom';
+import { PROTECTED_ROUTES } from '../../../constants/route';
+
+interface IMatchParams {
+  form: string;
+}
 
 const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   const [formData, setFormData] = useState<any>({});
+  const { form: formType } = useParams<IMatchParams>();
   const [isFamilyOrderModelOpen, setFamilyOrderModelOpen] = useState<boolean>(false);
   const [editGroupedFieldsOrder, setEditGroupedFieldsOrder] = useState<any>({
     isOpen: false,
@@ -29,10 +37,15 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   const hashFieldIdsWithFieldNameRef = useRef<any>({});
   const hashFieldIdsWithFieldName = hashFieldIdsWithFieldNameRef.current;
 
+  const { pathname } = useLocation();
+  const isRegionCustomizeForm = Boolean(
+    matchPath(pathname, { path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm, exact: true })
+  );
+
   const resetCollapsedCalculation = (keys: string[]) => {
     const res: { [k: string]: boolean } = {};
     keys.forEach((key: string, index: number) => {
-      res[key] = index === 0 ? true : false;
+      res[key] = index === 0 && !isRegionCustomizeForm ? true : false;
     });
     return res as { [key: string]: boolean };
   };
@@ -90,6 +103,9 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
 
       if (!isRegionFormCustomization) {
         return;
+      }
+      if (formType === 'enrollment' && isEditableFields.includes(view.id) && !('isEditable' in view)) {
+        view.isEditable = true;
       }
       if (unitMeasurementFields.includes(view.id) && !('unitMeasurement' in view)) {
         view.unitMeasurement = undefined;

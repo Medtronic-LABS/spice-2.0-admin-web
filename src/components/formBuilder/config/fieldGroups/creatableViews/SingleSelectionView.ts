@@ -3,7 +3,7 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IRadioGroupFields extends IBaseFields {
+export interface ISingleSelectionFields extends IBaseFields {
   orientation: number;
   visibility: string;
   defaultValue?: string;
@@ -12,9 +12,9 @@ export interface IRadioGroupFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IRadioGroupFields => ({
-  id: new Date().getTime().toString() + 'RadioGroup',
-  viewType: 'RadioGroup',
+const getEmptyData = (): ISingleSelectionFields => ({
+  id: new Date().getTime().toString() + 'SingleSelectionView',
+  viewType: 'SingleSelectionView',
   title: '',
   fieldName: '',
   family: '',
@@ -41,8 +41,7 @@ const customizableFieldMeta: IBaseFieldMeta = {
   errorMessage: {},
   isEnabled: {},
   isEditable: {},
-  isEnrollment: {},
-  unitMeasurement: {}
+  isEnrollment: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
@@ -51,10 +50,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const RADIO_GROUP_CONFIG: IComponentConfig = {
+const SINGLE_SELECTION_VIEW_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default RADIO_GROUP_CONFIG;
+export default SINGLE_SELECTION_VIEW_CONFIG;

@@ -1,9 +1,10 @@
 import { useRef } from 'react';
 import { Field } from 'react-final-form';
+import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
-import { inputTypesSwitch, unitMeasurementFields } from '../utils/FieldUtils';
+import { inputTypesSwitch, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
 import ConditionConfig from './fieldUI/ConditionConfig';
 import OptionList from './fieldUI/OptionList';
 import Questionnaire from './fieldUI/Questionnaire';
@@ -12,12 +13,23 @@ import TextFieldWrapper from './fieldUI/TextFieldWrapper';
 import TextInputArray from './fieldUI/TextInputArray';
 import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
 import DatePickerWrapper from './fieldUI/DatePickerWrapper';
+import APPCONSTANTS from '../../../constants/appConstants';
+
+interface IMatchParams {
+  form: string;
+}
 
 const filterByGetMetaViewTypes: { [K: string]: string[] } = {
   RadioGroup: ['checkbox', 'radio']
 };
 
-const getComponentsByFieldName = (fieldName: string, obj: any, isNew?: boolean, isFieldNameChangable?: boolean) => {
+const getComponentsByFieldName = (
+  fieldName: string,
+  obj: any,
+  isNew?: boolean,
+  isFieldNameChangable?: boolean,
+  isRegionCustomizeForm?: boolean
+) => {
   let inputProps = {};
   if (fieldName === 'fieldName') {
     inputProps = { ...inputProps, ...{ component: !isNew || isFieldNameChangable ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
@@ -34,6 +46,10 @@ const getComponentsByFieldName = (fieldName: string, obj: any, isNew?: boolean, 
     obj?.isNeededDefault &&
     (fieldName === 'isMandatory' || fieldName === 'visibility' || fieldName === 'isEnabled')
   ) {
+    inputProps = { ...inputProps, ...{ disabled: true } };
+  }
+  // disable fields for region customization
+  if (isRegionCustomizeForm && APPCONSTANTS.DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION?.includes(fieldName)) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
   return inputProps;
@@ -61,6 +77,7 @@ interface IComponentProps {
   hashFieldIdsWithFieldName?: any;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
+  isRegionCustomizeForm?: boolean;
 }
 
 export const CheckboxComponent = ({ name, fieldName, inputProps = {} }: IComponentProps) => {
@@ -205,7 +222,8 @@ export const TextFieldComponent = ({
   handleUpdateFieldName,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isFieldNameChangable
+  isFieldNameChangable,
+  isRegionCustomizeForm
 }: IComponentProps) => {
   let parseFn = (value: any) => value;
   let capitalize = false;
@@ -219,11 +237,22 @@ export const TextFieldComponent = ({
     });
     return otherFieldNames;
   };
+  const filterTitleDuplicates = () => {
+    const otherTitles: any = [];
+    Object.entries(hashFieldIdsWithTitle).forEach(([key, value]) => {
+      if (key !== obj.id) {
+        otherTitles.push(value);
+      }
+    });
+    return otherTitles;
+  };
+
   const errorRef = useRef('');
   if (fieldName === 'fieldName' || fieldName === 'title') {
     if (isFieldNameChangable) {
       inputProps.customValidator = (propsValue: any = []) => {
         const otherFieldNames = filterDuplicates();
+        const otherTitleNames = filterTitleDuplicates();
         errorRef.current = '';
         if (fieldName === 'fieldName') {
           if (propsValue?.includes('.')) {
@@ -242,6 +271,9 @@ export const TextFieldComponent = ({
         if (!isNaN(propsValue)) {
           errorRef.current = 'Invalid ';
         }
+        if (isRegionCustomizeForm && otherTitleNames.includes(propsValue) && fieldName === 'title') {
+          errorRef.current = 'Cannot enter duplicate ';
+        }
         return errorRef.current;
       };
       if (fieldName === 'fieldName' || fieldName === 'title') {
@@ -249,7 +281,8 @@ export const TextFieldComponent = ({
           if (!!errorRef.current) {
             fieldNameValue = '';
           }
-          const otherFieldNames = fieldName === 'fieldName' ? filterDuplicates() : [];
+          const otherFieldNames =
+            fieldName === 'fieldName' ? filterDuplicates() : isRegionCustomizeForm ? filterTitleDuplicates() : [];
           let newFieldName = fieldNameValue;
           let newFieldLabel = fieldNameValue;
           if (otherFieldNames.includes(fieldNameValue) || !fieldNameValue) {
@@ -339,18 +372,39 @@ const RenderFields = ({
   addNewFieldDisabled,
   isFieldNameChangable,
   hashFieldIdsWithTitle,
-  hashFieldIdsWithFieldName
+  hashFieldIdsWithFieldName,
+  isRegionCustomizeForm = false
 }: any) => {
   // Toggle text field component to select component on disable mode
+  const { form: formType } = useParams<IMatchParams>();
+
   inputProps = {
     ...inputProps,
-    ...getComponentsByFieldName(fieldName, obj, isNew, isFieldNameChangable)
+    ...getComponentsByFieldName(fieldName, obj, isNew, isFieldNameChangable, isRegionCustomizeForm)
   };
 
-  if (fieldName === 'isEditable') {
+  if (
+    fieldName === 'isEditable' &&
+    (!isRegionCustomizeForm || (isEditableFields.includes(obj.id) && formType === 'enrollment'))
+  ) {
+    return null;
+  }
+  if (fieldName === 'readOnly' && isRegionCustomizeForm) {
     return null;
   }
   if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
+    return null;
+  }
+
+  if (fieldName === 'isEnrollment' && isRegionCustomizeForm && formType !== 'assessment') {
+    obj.isEnrollment = undefined;
+    return null;
+  }
+
+  if (
+    fieldName === 'condition' &&
+    !['Spinner', 'RadioGroup', 'EditText', 'SingleSelectionView'].includes(obj.viewType)
+  ) {
     return null;
   }
 
@@ -384,6 +438,7 @@ const RenderFields = ({
                   label={inputProps?.label || ''}
                   defaultValue={fieldVal as unknown as string[]}
                   required={false}
+                  obj={obj}
                   onChange={(value: string[]) => {
                     form.mutators.setValue(`${name}.${fieldName}`, value);
                   }}
@@ -478,6 +533,7 @@ const RenderFields = ({
           hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
           // isAccountCustomization={isAccountCustomization}
           isFieldNameChangable={isFieldNameChangable}
+          isRegionCustomizeForm={isRegionCustomizeForm}
         />
       );
     }

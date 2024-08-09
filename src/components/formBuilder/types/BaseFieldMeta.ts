@@ -52,6 +52,7 @@ export interface IBaseFieldMeta {
   unitMeasurement?: ISelectAttributeProps;
   isMandatory?: IAttributeProps;
   isEnabled?: IAttributeProps;
+  isEnrollment?: IAttributeProps;
   isAboveUpperLimit?: IAttributeProps;
   disableFutureDate?: IAttributeProps;
   isNeedAction?: IAttributeProps;
@@ -63,6 +64,7 @@ export interface IBaseFieldMeta {
   startsWith?: IAttributeProps;
   isSummary?: IAttributeProps;
   condition?: IAttributeProps;
+  readOnly?: IAttributeProps;
   startDate?: IAttributeProps;
   endDate?: IAttributeProps;
 }

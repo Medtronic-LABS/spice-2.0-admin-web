@@ -3,18 +3,23 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IScaleIndicatorFields extends IBaseFields {
+export interface IDialogCheckboxFields extends IBaseFields {
+  hint?: string;
+  maxLength?: number;
+  minLength?: number;
+  contentLength?: number;
   errorMessage?: string;
-  startValue?: number;
-  endValue?: number;
-  interval?: number;
-  isAboveUpperLimit?: boolean;
+  inputType?: number;
+  defaultValue?: string;
+  minValue?: number;
+  maxValue?: number;
+  isNeedAction?: boolean;
   isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IScaleIndicatorFields => ({
-  id: new Date().getTime().toString() + 'ScaleIndicator',
-  viewType: 'ScaleIndicator',
+const getEmptyData = (): IDialogCheckboxFields => ({
+  id: new Date().getTime().toString() + 'DialogCheckbox',
+  viewType: 'DialogCheckbox',
   title: '',
   fieldName: '',
   family: '',
@@ -22,13 +27,13 @@ const getEmptyData = (): IScaleIndicatorFields => ({
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
-  isAboveUpperLimit: false,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
+  condition: [],
+  hint: '',
+  errorMessage: '',
   isNotDefault: true,
-  errorMessage: undefined,
-  startValue: undefined,
-  endValue: undefined,
-  interval: undefined
+  minLength: undefined,
+  maxLength: undefined
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -36,37 +41,30 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEnabled: {},
   isEnrollment: {},
   isMandatory: {},
-  isAboveUpperLimit: {},
-  startValue: {},
-  endValue: {},
-  interval: {},
+  maxLength: {},
+  minLength: {},
   errorMessage: {},
   title: {},
-  fieldName: {},
-  isEditable: {}
+  condition: {},
+  fieldName: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
-  if (json.inputType === 0) {
-    delete json.inputType;
+  json.condition = json.condition?.filter((val: any) => !!val);
+  if (json.minValue) {
+    json.minValue = Number(json.minValue);
   }
-  if (json.startValue) {
-    json.startValue = Number(json.startValue);
-  }
-  if (json.endValue) {
-    json.endValue = Number(json.endValue);
-  }
-  if (json.interval) {
-    json.interval = Number(json.interval);
+  if (json.maxValue) {
+    json.maxValue = Number(json.maxValue);
   }
   return json;
 };
 
-const SCALE_INDICATOR_CONFIG: IComponentConfig = {
+const DIALOG_CHECKBOX_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default SCALE_INDICATOR_CONFIG;
+export default DIALOG_CHECKBOX_CONFIG;

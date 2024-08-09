@@ -3,40 +3,33 @@ import { IBaseFieldMeta } from '../../types/BaseFieldMeta';
 import { IBaseFields } from '../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../types/ComponentConfig';
 
-export interface ITextLabelFields extends IBaseFields {
-  viewType: string;
-  id: string;
-  title: string;
-  family: string;
-  fieldName: string;
+export interface IMentalHealthViewFields extends IBaseFields {
+  localDataCache?: string;
   isNew?: boolean;
-  isMandatory?: boolean;
-  isEnabled?: boolean;
-  isEnrollment?: boolean;
   isNotDefault?: boolean;
 }
 
-const getEmptyData = (): ITextLabelFields => ({
-  id: new Date().getTime().toString() + 'TextLabel',
-  viewType: 'TextLabel',
-  title: '',
-  fieldName: '',
-  family: '',
-  isSummary: false,
-  isMandatory: false,
-  isEnabled: true,
-  isEnrollment: true,
+const getEmptyData = (): IMentalHealthViewFields => ({
+  id: new Date().getTime().toString() + 'MentalHealthView',
+  viewType: 'MentalHealthView',
+  title: 'Title',
+  fieldName: 'Field name',
+  family: 'phq4',
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  isNotDefault: true
+  isMandatory: undefined,
+  isEnabled: undefined,
+  isEnrollment: true,
+  localDataCache: 'PHQ4',
+  isNotDefault: false
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
-  title: {},
   isMandatory: {},
+  title: {},
+  fieldName: {},
+  visibility: {},
   isEnabled: {},
   isEnrollment: {},
-  visibility: {},
-  fieldName: {},
   isEditable: {},
   unitMeasurement: {}
 };
@@ -46,10 +39,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const TEXT_LABEL_CONFIG: IComponentConfig = {
+const MENTAL_HEALTH_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default TEXT_LABEL_CONFIG;
+export default MENTAL_HEALTH_CONFIG;

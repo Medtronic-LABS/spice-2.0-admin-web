@@ -118,13 +118,13 @@ $gutters: (
       border-bottom-left-radius: 12px;
     }
     &:first-of-type {
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
+      border-top-left-radius: 12px !important;
+      border-top-right-radius: 12px !important;
       .accordion-button {
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        border-bottom-right-radius: 12px;
-        border-bottom-left-radius: 12px;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        border-bottom-right-radius: 12px !important;
+        border-bottom-left-radius: 12px !important;
       }
     }
   }

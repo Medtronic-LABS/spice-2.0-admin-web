@@ -98,10 +98,12 @@ const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
           <TagInput
             {...input}
             defaultValue={
-              Array.isArray(obj[field]) ? obj[field]?.map((value: { name: string }) => value.name) || [] : obj[field]
+              Array.isArray(obj[field])
+                ? obj[field]?.map((value: any) => (value?.name ? value.name : value)) || []
+                : obj[field]
             }
             label={inputProps?.label}
-            disabled={false}
+            disabled={!!inputProps.disabled}
             error={!(obj[field] || []).length ? 'Please add the ' + inputProps?.label.toLowerCase() : ''}
             classChange={'optionsList'}
             allowOnlyNumbers={field === 'startsWith'}

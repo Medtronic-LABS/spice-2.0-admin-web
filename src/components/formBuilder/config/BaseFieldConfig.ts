@@ -186,11 +186,13 @@ export const baseFieldMeta: IBaseFieldMeta = {
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },
   isEnabled: { order: 15, label: 'Is Enabled', component: 'CHECKBOX' },
+  isEnrollment: { order: 15.1, label: 'Is Enrollment', component: 'CHECKBOX' },
   disableFutureDate: { order: 15.2, label: 'Disable Future Dates', component: 'CHECKBOX' },
   isNeedAction: { order: 15.3, label: 'Action Needed', component: 'CHECKBOX' },
   isNew: { order: 0, label: 'isNew', component: 'CHECKBOX' },
   isEditable: { order: 15.4, label: 'Is Editable', component: 'CHECKBOX' },
   instructions: { order: 15.5, label: 'Instructions', component: 'INSTRUCTIONS' },
+  readOnly: { order: 15.6, label: 'readOnly', component: 'CHECKBOX' },
   condition: { order: 16.0, label: 'Condition', component: 'CONDITION_CONFIG' },
   familyOrder: {
     order: 0,

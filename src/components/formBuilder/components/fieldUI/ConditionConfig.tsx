@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 import BinIcon from '../../../../assets/images/bin.svg';
 import PlusIcon from '../../../../assets/images/plus_blue.svg';
@@ -165,7 +165,7 @@ const ConditionFieldsComponent = ({
               case 'MULTI_SELECT_INPUT':
               case 'SELECT_INPUT': {
                 return (
-                  <>
+                  <Fragment key={fieldName}>
                     <SelectInputComponent
                       form={form}
                       name={name}
@@ -181,20 +181,22 @@ const ConditionFieldsComponent = ({
                       selectedCondition={selectedCondition}
                       handleSelectedCondition={handleSelectedCondition}
                     />
-                  </>
+                  </Fragment>
                 );
               }
               case 'TEXT_INPUT':
               default: {
                 return (
-                  <TextInputComponent
-                    name={name}
-                    key={fieldName}
-                    fieldName={fieldName}
-                    item={item}
-                    config={config}
-                    index={index}
-                  />
+                  <Fragment key={fieldName}>
+                    <TextInputComponent
+                      name={name}
+                      key={fieldName}
+                      fieldName={fieldName}
+                      item={item}
+                      config={config}
+                      index={index}
+                    />
+                  </Fragment>
                 );
               }
             }
@@ -322,8 +324,10 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
     <div className='col-4 col-12'>
       <div className='d-flex align-items-center '>
         <div
-          className={`d-flex mt-1 mb-0dot5 theme-text lh-1dot25 ${!!obj.fieldName ? 'pointer' : 'not-allowed'}`}
-          onClick={!!obj.fieldName && !obj[field].length ? onAddNewCondition : () => null}
+          className={`d-flex mt-1 mb-0dot5 theme-text lh-1dot25 ${
+            !!obj.fieldName && !obj.readOnly ? 'pointer' : 'not-allowed'
+          }`}
+          onClick={!!obj.fieldName && !obj[field].length && !obj.readOnly ? onAddNewCondition : () => null}
         >
           <CustomTooltip title={`${!!obj.fieldName ? 'Add' : 'Please select a field name'}`}>
             <span className={`${styles.label} m-0 `}>Conditions</span>
@@ -387,12 +391,11 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
                           <div
                             className='danger-text lh-1dot25 pointer m-0dot5'
                             onClick={() => {
-                              fields?.value?.length > 1
-                                ? fields.remove(index)
-                                : form.mutators.setValue(`${obj.family}.${obj.id}`, {
-                                    ...obj,
-                                    condition: []
-                                  });
+                              if (fields.length === 1) {
+                                form.change(name, []);
+                              } else {
+                                fields.remove(index);
+                              }
                             }}
                           >
                             <CustomTooltip title='Delete'>
