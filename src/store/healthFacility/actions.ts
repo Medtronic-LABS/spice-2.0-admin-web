@@ -238,6 +238,7 @@ export const fetchHFTypesFailure = (error: Error): IFetchHFTypesFailure => ({
   error
 });
 
+// this same action is being used to create admin
 export const createHFUserRequest = ({
   data,
   successCb,
@@ -282,6 +283,7 @@ export const updateHFDetailsFailure = (error: Error): IUpdateHFDetailsFailure =>
   error
 });
 
+// this same action is being used to update admin
 export const updateHFUserRequest = ({
   data,
   successCb,
@@ -335,6 +337,7 @@ export const fetchHFUserListFailure = (error: Error): IFetchHFUserListFailure =>
   error
 });
 
+// this same action is being used to delete admin
 export const deleteHFUserRequest = ({
   data,
   successCb,

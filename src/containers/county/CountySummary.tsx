@@ -3,12 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useHistory, RouteComponentProps } from 'react-router-dom';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
-import {
-  fetchCountyListDetailReq,
-  updateCountyDetail,
-  updateCountyAdmin,
-  decactivateCountyReq
-} from '../../store/county/actions';
+import { fetchCountyListDetailReq, updateCountyDetail, decactivateCountyReq } from '../../store/county/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import Loader from '../../components/loader/Loader';
@@ -24,13 +19,14 @@ import arrayMutators from 'final-form-arrays';
 import IconLegal from '../../assets/images/icon-legal.svg';
 import { countyLoadingSelector, countySelector } from '../../store/county/selectors';
 import { roleSelector } from '../../store/user/selectors';
-import { workflowLoadingSelector } from '../../store/healthFacility/selectors';
-import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import {
   createHFUserRequest as createAdminRequest,
-  deleteHFUserRequest as deleteAdminRequest
+  deleteHFUserRequest as deleteAdminRequest,
+  updateHFUserRequest as updateAdminRequest
 } from '../../store/healthFacility/actions';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import useCountryId from '../../hooks/useCountryId';
 
 interface IMatchParams {
   countyId: string;
@@ -43,11 +39,11 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const { countyId, tenantId } = useParams<IMatchParams>();
 
   const loading = useSelector(countyLoadingSelector);
+  const adminLoading = useSelector(healthFacilityLoadingSelector);
   const workflowLoading = useSelector(workflowLoadingSelector);
   const county = useSelector(countySelector);
   const role = useSelector(roleSelector);
-  const regionDetails = useSelector(getRegionDetailsSelector);
-  const countryId = Number(regionDetails.id);
+  const countryId = useCountryId();
 
   const [isOpenAdminModal, setIsOpenAdminModal] = useState(false);
   const [isOpenCountyModal, setIsOpenCountyModal] = useState(false);
@@ -128,8 +124,9 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   };
 
   const openEditModal = (values: ICountyAdmin) => {
+    const valuesWithRole = { ...values, country: { phoneNumberCode: values.countryCode }, role: values.roles };
     setIsOpenAdminModal(true);
-    setAdminInitialValues(values);
+    setAdminInitialValues(valuesWithRole);
     setIsAdd(false);
   };
 
@@ -171,21 +168,24 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
 
   const handleAdminSubmit = ({ users }: { users: IUserFormValues[] }) => {
     const admin: any = users[0];
+    const [roleId] = admin.role;
+    const payload = {
+      firstName: admin.firstName.trim(),
+      lastName: admin.lastName.trim(),
+      gender: admin.gender,
+      phoneNumber: admin.phoneNumber,
+      username: admin.email,
+      countryCode: admin.country.phoneNumberCode,
+      country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
+      roleIds: [roleId?.id],
+      timezone: { id: Number(admin.timezone.id) },
+      tenantId: Number(tenantId)
+    };
     if (isAdd) {
-      const [roleId] = admin.role;
       dispatch(
         createAdminRequest({
           data: {
-            firstName: admin.firstName.trim(),
-            lastName: admin.lastName.trim(),
-            gender: admin.gender,
-            phoneNumber: admin.phoneNumber,
-            username: admin.email,
-            countryCode: admin.country.phoneNumberCode,
-            country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
-            roleIds: [roleId?.id],
-            timezone: { id: Number(admin.timezone.id) },
-            tenantId: Number(tenantId)
+            ...payload
           },
           successCb: () => {
             toastCenter.success(
@@ -206,14 +206,12 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         })
       );
     } else {
-      admin.tenantId = tenantId;
       dispatch(
-        updateCountyAdmin({
+        updateAdminRequest({
           data: {
             ...(admin as ICountyAdmin),
-            firstName: admin.firstName.trim(),
-            lastName: admin.lastName.trim(),
-            country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) }
+            id: admin.id,
+            ...payload
           },
           successCb: () => {
             toastCenter.success(
@@ -250,7 +248,6 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   };
 
   const editModalRender = (form: any) => {
-    adminInitialValues.role = adminInitialValues.roles;
     return (
       <UserForm
         form={form}
@@ -338,7 +335,7 @@ const CountySummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
 
   return (
     <>
-      {(loading || workflowLoading) && <Loader />}
+      {(loading || workflowLoading || adminLoading) && <Loader />}
       <div className='row g-0dot625'>
         <div className='col-12'>
           <DetailCard

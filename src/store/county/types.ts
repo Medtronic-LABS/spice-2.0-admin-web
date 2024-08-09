@@ -156,7 +156,7 @@ export interface IAdminEditFormValues {
   gender: string;
   countryCode: string;
   timezone: ITimezone;
-  country: { countryCode?: string; id?: string };
+  country: { countryCode?: string; id?: string; phoneNumberCode?: string };
   tenantId?: string;
   roles: IRoles[];
   role?: IRoles[];

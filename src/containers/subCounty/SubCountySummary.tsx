@@ -8,7 +8,7 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
-import { fetchSubCountyDetail, updateSubCountyAdminReq, updateSubCountyReq } from '../../store/subCounty/actions';
+import { fetchSubCountyDetail, updateSubCountyReq } from '../../store/subCounty/actions';
 import {
   getSubCountyDetailSelector,
   getOuAdminsSelector,
@@ -26,9 +26,11 @@ import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
 import {
   createHFUserRequest as createAdminRequest,
-  deleteHFUserRequest as deleteAdminRequest
+  deleteHFUserRequest as deleteAdminRequest,
+  updateHFUserRequest as updateAdminRequest
 } from '../../store/healthFacility/actions';
 import { IHFUserPost } from '../../store/healthFacility/types';
+import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
 export interface IAdminEditFormValues {
   id: string;
@@ -38,9 +40,9 @@ export interface IAdminEditFormValues {
   phoneNumber: string;
   username: string;
   gender: string;
-  countryCode: { countryCode: string };
+  countryCode: string;
   timezone: ITimezone;
-  country: { countryCode: string; phoneNumberCode: string };
+  country: { countryCode?: string; phoneNumberCode: string };
   tenantId?: string;
   roles: IRoles[];
   role?: IRoles[];
@@ -54,6 +56,7 @@ const SubCountySummary = () => {
   const subCountyAdmins = useSelector(getOuAdminsSelector);
   const loading = useSelector(subCountyLoadingSelector);
   const currentRole = useSelector(roleSelector);
+  const adminLoading = useSelector(healthFacilityLoadingSelector);
   const isReadOnly = currentRole === APPCONSTANTS.ROLES.SUB_COUNTY_ADMIN;
   const { subCountyId, tenantId }: { subCountyId: string; tenantId: string } = useParams();
   const { county: countyModuleName, subCounty: subCountyModuleName } = NAME_CONSTANTS;
@@ -102,6 +105,7 @@ const SubCountySummary = () => {
   const handleEditSubCountyAdminClick = useCallback(
     (subCountyAdmin: IAdminEditFormValues) => {
       subCountyAdmin.role = subCountyAdmin.roles;
+      subCountyAdmin.country = { phoneNumberCode: subCountyAdmin.countryCode };
       setIsSubCountyAdminEdit(true);
       subCountyAdminForEdit.current = { users: [subCountyAdmin] };
       setShowSubCountyAdminModal(true);
@@ -151,20 +155,19 @@ const SubCountySummary = () => {
     } = users[0];
     const [roleId] = role;
     dispatch(
-      updateSubCountyAdminReq({
-        payload: {
-          id,
+      updateAdminRequest({
+        data: {
+          id: Number(id),
           firstName: firstName.trim(),
           lastName: lastName.trim(),
           gender,
           username: email || username,
           timezone: { id: Number(timezone?.id) },
-          email,
           phoneNumber,
           roleIds: [roleId?.id],
           countryCode: country.phoneNumberCode,
           country: { id: countryIdValue },
-          tenantId
+          tenantId: Number(tenantId)
         },
         successCb: () => {
           getSubCountyDetails(searchTerm);
@@ -296,7 +299,7 @@ const SubCountySummary = () => {
 
   return (
     <>
-      {loading && <Loader />}
+      {(loading || adminLoading) && <Loader />}
       <div className='row g-0dot625'>
         <div className='col-12'>
           <DetailCard
