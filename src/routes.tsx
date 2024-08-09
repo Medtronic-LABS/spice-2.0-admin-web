@@ -333,8 +333,8 @@ export const AppRoutes = () => {
     }
   }, [data, isLoggedIn, url]);
 
-  const params = new URLSearchParams(document.location.search)
-  const url = useRef(params.get('next') || '')
+  const params = new URLSearchParams(document.location.search);
+  const url = useRef(params.get('next') || '');
 
   useEffect(() => {
     if (isLoggedIn && url.current) {
@@ -342,10 +342,10 @@ export const AppRoutes = () => {
       goToUrl(data.redirectUrl);
       url.current = '';
     }
-  }, [data, isLoggedIn, url])
+  }, [data, isLoggedIn, url]);
 
   if (isLoggedIn && url.current) {
-    return <Loader />
+    return <Loader />;
   }
 
   return isLoggedIn && regionId && tenantId ? (
@@ -363,10 +363,7 @@ export const AppRoutes = () => {
             />
           ) : null
         )}
-        <Redirect
-          exact={true}
-          to={PROTECTED_ROUTES.landingPage}
-        />
+        <Redirect exact={true} to={PROTECTED_ROUTES.landingPage} />
       </Switch>
     </AppLayout>
   ) : !isLoggedIn ? (
