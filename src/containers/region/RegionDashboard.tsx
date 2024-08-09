@@ -101,7 +101,7 @@ const Region = (): React.ReactElement => {
   }, [dispatch, timezoneList?.length]);
 
   /**
-   * To remove Region, Account, Sb County, Site Details cache in store
+   * To remove Region, Account, Sub County, Site Details cache in store
    */
   useEffect(() => {
     dispatch(clearRegionDetail());

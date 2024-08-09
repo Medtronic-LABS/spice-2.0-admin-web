@@ -46,7 +46,8 @@ import SubCountyDashboard from './containers/subCounty/SubCountyDashboard';
 import CreateSubCounty from './containers/createSubCounty/CreateSubCounty';
 import SubCountyList from './containers/subCounty/SubCountyList';
 import SubCountySummary from './containers/subCounty/SubCountySummary';
-
+import RegionCustomization from './containers/region/RegionCustomization';
+import RegionFormCustomization from './containers/region/RegionFormCustomization';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -338,6 +339,18 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.deactivatedRecords,
       exact: true,
       component: DeactivatedRecords,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
+      exact: true,
+      component: RegionFormCustomization,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.customizationByRegion,
+      exact: true,
+      component: RegionCustomization,
       authorisedRoles: SU_SA_RA
     },
     {

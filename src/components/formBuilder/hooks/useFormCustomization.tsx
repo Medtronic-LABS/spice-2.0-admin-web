@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { IComponentConfig } from '../types/ComponentConfig';
 import { FormApi } from 'final-form';
-import { getConfigByViewType } from '../utils/FieldUtils';
+import { getConfigByViewType, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
 import { ISelectFormOptions } from '../../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { useParams } from 'react-router-dom';
@@ -103,6 +103,12 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
 
       if (!isRegionFormCustomization) {
         return;
+      }
+      if (formType === 'enrollment' && isEditableFields.includes(view.id) && !('isEditable' in view)) {
+        view.isEditable = true;
+      }
+      if (unitMeasurementFields.includes(view.id) && !('unitMeasurement' in view)) {
+        view.unitMeasurement = undefined;
       }
     });
     sethashFieldIdsWithFieldName(newhashFieldIdsWithFieldName);

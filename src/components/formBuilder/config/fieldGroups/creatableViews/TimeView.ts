@@ -3,46 +3,34 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IDropdownFields extends IBaseFields {
-  hint?: string;
-  visibility: string;
+export interface ITimeViewFields extends IBaseFields {
   isNew?: boolean;
-  optionsList?: Array<{ name: string; id: string }>;
-  errorMessage?: string;
-  isDefault?: boolean;
-  isResult?: boolean;
+  isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IDropdownFields => ({
-  id: new Date().getTime().toString() + 'Spinner',
-  viewType: 'Spinner',
+const getEmptyData = (): ITimeViewFields => ({
+  id: new Date().getTime().toString() + 'TimeView',
+  viewType: 'TimeView',
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  hint: '',
-  optionsList: [],
-  errorMessage: '',
-  isDefault: false,
-  isResult: true
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
+  title: {},
+  fieldName: {},
+  isMandatory: {},
   visibility: {},
   isEnabled: {},
   isEnrollment: {},
-  isMandatory: {},
-  title: {},
-  fieldName: {},
-  optionsList: {},
   isEditable: {},
-  isResult: {},
-  code: {},
-  url: {},
-  resource: {}
+  unitMeasurement: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
@@ -50,10 +38,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const DROPDOWN_CONFIG: IComponentConfig = {
+const TIME_VIEW_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default DROPDOWN_CONFIG;
+export default TIME_VIEW_CONFIG;
