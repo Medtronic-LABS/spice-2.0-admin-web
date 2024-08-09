@@ -8,41 +8,43 @@ import { ReactComponent as ReportingPortalLogo } from '../../assets/images/repor
 import { ReactComponent as InsightsLogo } from '../../assets/images/insights.svg';
 
 import APPCONSTANTS from '../../constants/appConstants';
-import styles from './LandingPage.module.scss'
+import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
 import { goToUrl } from '../../utils/routeUtil';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
 export interface ISpiceSuite {
-  id: number,
-  name: string,
-  icon: any,
-  hasDomain: boolean,
-  domainUrl?: string,
+  id: number;
+  name: string;
+  icon: any;
+  hasDomain: boolean;
+  domainUrl?: string;
   suiteAccessName: string;
   disabled?: boolean;
 }
 
 const LandingPage = (): React.ReactElement => {
-
   const history = useHistory();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
   const userData = useSelector(userDataSelector);
-  const { country: { id: regionId, tenantId } } = userData;
+  const {
+    country: { id: regionId, tenantId }
+  } = userData;
 
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
-  const spiceSuites: ISpiceSuite[] = useMemo(() =>
-    [
+  const spiceSuites: ISpiceSuite[] = useMemo(
+    () => [
       {
         id: 1,
         name: 'Admin',
         icon: AdminPortalLogo,
         hasDomain: false,
         suiteAccessName: ADMIN,
-        domainUrl: HOME_PAGE_BY_ROLE[role].replace(':regionId', regionId?.toString())
+        domainUrl: HOME_PAGE_BY_ROLE[role]
+          .replace(':regionId', regionId?.toString())
           .replace(':tenantId', tenantId?.toString()),
         disabled: false
       },
@@ -67,43 +69,41 @@ const LandingPage = (): React.ReactElement => {
     [regionId, tenantId, role]
   );
 
-  useEffect(
-    () => {
-      const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite: ISpiceSuite) =>
-        userSuiteAccess.includes(suite.suiteAccessName)
-      );
-      if (authorisedSuites.length === 1) {
-        const { hasDomain, domainUrl } = authorisedSuites[0];
-        hasDomain ? goToUrl(domainUrl) : history.push(domainUrl);
-      }
-      setSuites(authorisedSuites);
-    },
-    [history, userSuiteAccess, spiceSuites]
-  );
+  useEffect(() => {
+    const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite: ISpiceSuite) =>
+      userSuiteAccess.includes(suite.suiteAccessName)
+    );
+    if (authorisedSuites.length === 1) {
+      const { hasDomain, domainUrl } = authorisedSuites[0];
+      hasDomain ? goToUrl(domainUrl) : history.push(domainUrl);
+    }
+    setSuites(authorisedSuites);
+  }, [history, userSuiteAccess, spiceSuites]);
 
   const renderCardContent = (data: ISpiceSuite) => {
     const { name, icon: IconComponent } = data;
-    return <>
-      <div className='row p-2'>
-        <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
-      </div>
-      <div className={`row ${styles.reportCardText} py-1`}>
-        <p>{name}</p>
-      </div>
-    </>
-  }
+    return (
+      <>
+        <div className='row p-2'>
+          <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
+        </div>
+        <div className={`row ${styles.reportCardText} py-1`}>
+          <p>{name}</p>
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className={`position-relative ${styles.landingPageContainer}`}>
       <div className='row'>
         {suites.map((data) => (
           <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
-            {!data.hasDomain
-              ?
+            {!data.hasDomain ? (
               <Link to={data.domainUrl} children={renderCardContent(data)} />
-              :
-              <a href={data.domainUrl} target='_blank' rel="noreferrer" children={renderCardContent(data)} />
-            }
+            ) : (
+              <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
+            )}
           </div>
         ))}
       </div>

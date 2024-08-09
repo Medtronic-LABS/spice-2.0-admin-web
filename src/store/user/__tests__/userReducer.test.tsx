@@ -167,7 +167,7 @@ describe('userReducer', () => {
     };
     const expectedState = {
       initializing: false,
-      isLoggedIn: false,
+      isLoggedIn: false
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });

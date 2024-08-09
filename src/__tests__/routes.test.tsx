@@ -9,102 +9,98 @@ import { PROTECTED_ROUTES, PUBLIC_ROUTES } from '../constants/route';
 
 // Mocking the utility functions
 jest.mock('../utils/routeUtil', () => ({
-    goToUrl: jest.fn(),
-    decryptData: jest.fn(),
+  goToUrl: jest.fn(),
+  decryptData: jest.fn()
 }));
 
 jest.mock('../../../assets/images/app-logo.svg', () => ({
-    ReactComponent: 'Logo'
+  ReactComponent: 'Logo'
 }));
 
 jest.mock('../../../assets/images/admin.svg', () => ({
-    ReactComponent: () => <div>AdminPortalLogo</div>
+  ReactComponent: () => <div>AdminPortalLogo</div>
 }));
 
 jest.mock('../../../assets/images/reports.svg', () => ({
-    ReactComponent: () => <div>ReportingPortalLogo</div>
+  ReactComponent: () => <div>ReportingPortalLogo</div>
 }));
 
 jest.mock('../../../assets/images/insights.svg', () => ({
-    ReactComponent: () => <div>InsightsLogo</div>
+  ReactComponent: () => <div>InsightsLogo</div>
 }));
 
 const mockStore = configureStore([thunk]);
 
 describe('AppRoutes', () => {
-    let store: any;
+  let store: any;
 
-    beforeEach(() => {
-        store = mockStore({
-            user: {
-                isLoggedIn: false,
-                role: APPCONSTANTS.ROLES.SUPER_ADMIN,
-                user: {
-                    country: {
-                        id: 1,
-                        tenantId: 123,
-                    },
-                },
-            }
-        });
+  beforeEach(() => {
+    store = mockStore({
+      user: {
+        isLoggedIn: false,
+        role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+        user: {
+          country: {
+            id: 1,
+            tenantId: 123
+          }
+        }
+      }
+    });
+  });
+
+  it('should render public routes when not logged in', () => {
+    const { container } = render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[PUBLIC_ROUTES.login]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.queryByText('Admin')).not.toBeInTheDocument(); // Ensure protected routes are not rendered
+  });
+
+  it('should render protected routes when logged in', () => {
+    const store1 = mockStore({
+      user: {
+        isLoggedIn: true,
+        role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+        user: {
+          country: {
+            id: 1,
+            tenantId: 1
+          }
+        },
+        suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR]
+      }
     });
 
-    it('should render public routes when not logged in', () => {
-        const { container } = render(
-            <Provider store={store}>
-                <MemoryRouter initialEntries={[PUBLIC_ROUTES.login]}>
-                    <AppRoutes />
-                </MemoryRouter>
-            </Provider>
-        );
+    const { container } = render(
+      <Provider store={store1}>
+        <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </Provider>
+    );
 
-        expect(screen.getByText('Login')).toBeInTheDocument();
-        expect(screen.queryByText('Admin')).not.toBeInTheDocument(); // Ensure protected routes are not rendered
+    // Ensure LandingPage component is rendered
+    waitFor(() => {
+      expect(screen.getByText('ADMIN')).toBeInTheDocument();
+      expect(screen.queryByText('Login')).not.toBeInTheDocument();
     });
+  });
 
-    it('should render protected routes when logged in', () => {
-        const store1 = mockStore({
-            user: {
-                isLoggedIn: true,
-                role: APPCONSTANTS.ROLES.SUPER_ADMIN,
-                user: {
-                    country: {
-                        id: 1,
-                        tenantId: 1,
-                    },
-                },
-                suiteAccess: [
-                    APPCONSTANTS.SUITE_ACCESS.ADMIN,
-                    APPCONSTANTS.SUITE_ACCESS.CFR
-                ],
-            },
-        });
+  it('should redirect to the login page when not logged in and navigating to a protected route', () => {
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </Provider>
+    );
 
-        const { container } = render(
-            <Provider store={store1}>
-                <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
-                    <AppRoutes />
-                </MemoryRouter>
-            </Provider>
-        );
-
-        // Ensure LandingPage component is rendered
-        waitFor(() => {
-            expect(screen.getByText('ADMIN')).toBeInTheDocument();
-            expect(screen.queryByText('Login')).not.toBeInTheDocument();
-        });
-    });
-
-    it('should redirect to the login page when not logged in and navigating to a protected route', () => {
-        render(
-            <Provider store={store}>
-                <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
-                    <AppRoutes />
-                </MemoryRouter>
-            </Provider>
-        );
-
-        expect(screen.getByText('Login')).toBeInTheDocument();
-    });
-
+    expect(screen.getByText('Login')).toBeInTheDocument();
+  });
 });
