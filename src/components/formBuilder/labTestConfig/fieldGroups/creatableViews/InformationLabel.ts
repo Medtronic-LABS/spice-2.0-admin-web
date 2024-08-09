@@ -3,43 +3,31 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IRadioGroupFields extends IBaseFields {
-  orientation: number;
-  visibility: string;
-  defaultValue?: string;
-  optionsList: Array<{ name: string; id: string }>;
-  errorMessage?: string;
-  isDefault?: boolean;
+export interface IInformationLabelFields extends IBaseFields {
+  isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IRadioGroupFields => ({
-  id: new Date().getTime().toString() + 'RadioGroup',
-  viewType: 'RadioGroup',
+const getEmptyData = (): IInformationLabelFields => ({
+  id: new Date().getTime().toString() + 'InformationLabel',
+  viewType: 'InformationLabel',
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  optionsList: [],
-  orientation: 0,
-  errorMessage: '',
-  isDefault: false
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
-  orientation: {},
-  visibility: {},
   title: {},
   fieldName: {},
   isMandatory: {},
-  optionsList: {},
-  errorMessage: {},
   isEnabled: {},
-  isEditable: {},
   isEnrollment: {},
-  unitMeasurement: {}
+  visibility: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
@@ -47,10 +35,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const RADIO_GROUP_CONFIG: IComponentConfig = {
+const INFORMATION_LABEL_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default RADIO_GROUP_CONFIG;
+export default INFORMATION_LABEL_CONFIG;

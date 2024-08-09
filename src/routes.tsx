@@ -36,11 +36,19 @@ import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
 import { goToUrl } from './utils/routeUtil';
 import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
-import AccountList from './containers/account/AccountList';
-import CreateAccount from './containers/createAccount/CreateAccount';
-import AccountSummary from './containers/account/AccountSummary';
-import AccountDashboard from './containers/account/AccountDashboard';
-
+import CountyList from './containers/county/CountyList';
+import CreateAccount from './containers/createCounty/CreateCounty';
+import CountySummary from './containers/county/CountySummary';
+import CountyDashboard from './containers/county/CountyDashboard';
+import LockedUsers from './containers/lockedUsers/LockedUsers';
+import UserList from './containers/user/UserList';
+import Admins from './containers/admins/AdminList';
+import SubCountyDashboard from './containers/subCounty/SubCountyDashboard';
+import CreateSubCounty from './containers/createSubCounty/CreateSubCounty';
+import SubCountyList from './containers/subCounty/SubCountyList';
+import SubCountySummary from './containers/subCounty/SubCountySummary';
+import RegionCustomization from './containers/region/RegionCustomization';
+import RegionFormCustomization from './containers/region/RegionFormCustomization';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -345,6 +353,30 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: DeactivatedRecords,
       authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
+      exact: true,
+      component: RegionFormCustomization,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.customizationByRegion,
+      exact: true,
+      component: RegionCustomization,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.lockedUsers,
+      exact: true,
+      component: LockedUsers,
+      authorisedRoles: SU_SA_RA_AA_OUA_HFA
+    },
+    {
+      path: PROTECTED_ROUTES.adminBySuperAdmin,
+      exact: true,
+      component: Admins,
+      authorisedRoles: SU_SA_RA_AA_OUA_HFA
     }
   ];
 })();

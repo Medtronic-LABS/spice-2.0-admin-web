@@ -31,7 +31,7 @@ const getEmptyData = (): IEditTextFields => ({
   family: '',
   isMandatory: false,
   isEnabled: true,
-  isResult: true,
+  isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   hint: '',
   errorMessage: '',
@@ -44,6 +44,9 @@ const getEmptyData = (): IEditTextFields => ({
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
+  visibility: {},
+  isEnabled: {},
+  isEnrollment: {},
   isMandatory: {},
   isNeedAction: { disabled: true },
   maxLength: {},

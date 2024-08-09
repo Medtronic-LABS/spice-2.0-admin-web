@@ -3,42 +3,36 @@ import { IBaseFieldMeta } from '../../../types/BaseFieldMeta';
 import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig';
 
-export interface IRadioGroupFields extends IBaseFields {
-  orientation: number;
-  visibility: string;
-  defaultValue?: string;
-  optionsList: Array<{ name: string; id: string }>;
-  errorMessage?: string;
-  isDefault?: boolean;
+export interface IAgeFields extends IBaseFields {
+  hint?: string;
+  disableFutureDate?: boolean;
+  isNotDefault?: boolean;
 }
 
-const getEmptyData = (): IRadioGroupFields => ({
-  id: new Date().getTime().toString() + 'RadioGroup',
-  viewType: 'RadioGroup',
+const getEmptyData = (): IAgeFields => ({
+  id: new Date().getTime().toString() + 'Age',
+  viewType: 'Age',
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  optionsList: [],
-  orientation: 0,
-  errorMessage: '',
-  isDefault: false
+  disableFutureDate: true,
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
-  orientation: {},
-  visibility: {},
   title: {},
   fieldName: {},
   isMandatory: {},
-  optionsList: {},
-  errorMessage: {},
+  disableFutureDate: {},
   isEnabled: {},
-  isEditable: {},
   isEnrollment: {},
+  visibility: {},
+  isEditable: {},
   unitMeasurement: {}
 };
 
@@ -47,10 +41,10 @@ const getJSON = (json: any): IFieldViewType => {
   return json;
 };
 
-const RADIO_GROUP_CONFIG: IComponentConfig = {
+const AGE_CONFIG: IComponentConfig = {
   getEmptyData,
   customizableFieldMeta,
   getJSON
 };
 
-export default RADIO_GROUP_CONFIG;
+export default AGE_CONFIG;
