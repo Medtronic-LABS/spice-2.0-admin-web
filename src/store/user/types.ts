@@ -798,9 +798,7 @@ export type UserActions =
   | IFetchLoggedInUserFailure
   | ISessionTimeout
   | IResetStore
-  | IAddToken
   | IAddUserTenantId
-  | IRemoveToken
   | IFetchUserRolesRequest
   | IFetchUserRolesSuccess
   | IFetchUserRolesFailure

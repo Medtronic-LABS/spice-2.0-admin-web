@@ -9,7 +9,15 @@ import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
+import {
+  getIsLoggedInSelector,
+  roleSelector,
+  userDataSelector,
+  initializingSelector,
+  getIsLoggingInSelector,
+  getIsLoggingOutSelector,
+  loadingSelector
+} from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
 import Dashboard from './containers/dashboard/Dashboard';
@@ -351,7 +359,7 @@ export const AppRoutes = () => {
     }
   }, [data, isLoggedIn, url]);
 
-  if (isLoggedIn && url.current) {
+  if ((isLoggedIn && url.current) || loggingIn || loggingOut || loading || intializaing) {
     return <Loader />;
   }
 
