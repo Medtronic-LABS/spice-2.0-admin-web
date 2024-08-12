@@ -231,33 +231,6 @@ describe('userReducer', () => {
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle AUTH_TOKEN', () => {
-    const initialState: any = {
-      token: ''
-    };
-    const action: any = {
-      type: USERTYPES.AUTH_TOKEN,
-      payload: 'abcd1234'
-    };
-    const expectedState = {
-      token: 'abcd1234'
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle REMOVE_TOKEN', () => {
-    const initialState: any = {
-      token: 'abcd1234'
-    };
-    const action: any = {
-      type: USERTYPES.REMOVE_TOKEN
-    };
-    const expectedState = {
-      token: ''
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
-
   it('should handle ADD_USER_TENANT_ID', () => {
     const initialState: any = {
       userTenantId: 'tenant1'

@@ -1,28 +1,32 @@
-import { goToUrl } from '../routeUtil'; // replace './yourFile' with the actual file path
+import { goToUrl } from '../routeUtil';
 
-jest.mock('../commonUtils', () => ({
-  encryptData: jest.fn()
-}));
+describe('goToUrl', () => {
+  const originalLocation = window.location;
 
-jest.mock('../commonUtils', () => ({
-  goToUrl: jest.fn()
-}));
-
-describe('Route Utils', () => {
-  beforeAll(() => {
-    document.body.innerHTML = '';
+  beforeEach(() => {
+    // Mock the location object with only the replace function
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: {
+        ...window.location,
+        replace: jest.fn()
+      }
+    });
   });
 
-  it('should create a link and navigate to the URL', () => {
-    const url = 'http://example.com/';
-    goToUrl(url);
+  afterEach(() => {
+    // Restore the original location object after each test
+    window.location = originalLocation;
+  });
 
-    const link = document.querySelector('a');
-    if (link) {
-      expect(link.href).toBe(url);
-      expect(document.body.contains(link)).toBe(true);
-    } else {
-      fail('Link element not found');
-    }
+  it('should call window.location.replace with the provided URL', () => {
+    const url = 'https://example.com';
+    goToUrl(url);
+    expect(window.location.replace).toHaveBeenCalledWith(url);
+  });
+
+  it('should default to "/" if no URL is provided', () => {
+    goToUrl();
+    expect(window.location.replace).toHaveBeenCalledWith('/');
   });
 });

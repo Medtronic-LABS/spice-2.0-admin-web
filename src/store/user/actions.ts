@@ -6,7 +6,8 @@ import {
   ILogoutRequest,
   ILogoutSuccess,
   ILogoutFailure,
-  IAddToken,
+  ILoginRequestPayload,
+  IUser,
   IAddUserTenantId,
   IRemoveToken,
   IFetchUserRolesRequest,
@@ -85,14 +86,6 @@ export const loginSuccess = (payload: ILoginSuccessPayload): ILoginSuccess => ({
 export const loginFailure = (payload: ILoginFailurePayload): ILoginFailure => ({
   type: USER_TYPES.LOGIN_FAILURE,
   payload
-});
-
-export const addToken = (payload: string): IAddToken => ({
-  type: USER_TYPES.AUTH_TOKEN,
-  payload
-});
-export const removeToken = (): IRemoveToken => ({
-  type: USER_TYPES.REMOVE_TOKEN
 });
 
 export const logoutRequest = (): ILogoutRequest => ({

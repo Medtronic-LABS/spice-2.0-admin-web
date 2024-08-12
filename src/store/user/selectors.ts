@@ -17,7 +17,6 @@ const getUserId = (state: AppState) => state.user.user?.userId;
 const getLoading = (state: AppState) => state.user.loading;
 const getInitializing = (state: AppState) => state.user.initializing;
 const getShowLoader = (state: AppState) => state.user.showLoader;
-const getAuthToken = (state: AppState) => state.user.token;
 const getUserRoles = (state: AppState) => state.user.userRoles;
 const getIsUserRolesLoading = (state: AppState) => state.user.isRolesLoading;
 const getIsPasswordSet = (state: AppState) => state.user.isPasswordSet;
@@ -45,7 +44,6 @@ export const initializingSelector = createSelector(getInitializing, (initializin
 export const roleSelector = createSelector(getRole, (role) => role);
 export const getUserSuiteAccessSelector = createSelector(getUserSuiteAccess, (suites) => suites);
 export const showLoaderSelector = createSelector(getShowLoader, (loading) => loading);
-export const authTokenSelector = createSelector(getAuthToken, (token) => token);
 export const userDataSelector = createSelector(getUserData, (user) => user);
 export const userRolesSelector = createSelector(getUserRoles, (roles) => roles);
 export const isUserRolesLoading = createSelector(getIsUserRolesLoading, (loading) => loading);

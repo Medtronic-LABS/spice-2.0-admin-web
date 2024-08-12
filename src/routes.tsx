@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
@@ -8,7 +8,15 @@ import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
+import {
+  getIsLoggedInSelector,
+  roleSelector,
+  userDataSelector,
+  initializingSelector,
+  getIsLoggingInSelector,
+  getIsLoggingOutSelector,
+  loadingSelector
+} from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
 import Dashboard from './containers/dashboard/Dashboard';
@@ -304,6 +312,10 @@ const publicRoutes = [
   }
 ];
 export const AppRoutes = () => {
+  const intializaing = useSelector(initializingSelector);
+  const loggingIn = useSelector(getIsLoggingInSelector);
+  const loggingOut = useSelector(getIsLoggingOutSelector);
+  const loading = useSelector(loadingSelector);
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const role = useSelector(roleSelector);
 
@@ -316,7 +328,7 @@ export const AppRoutes = () => {
     }
   }, [data, isLoggedIn, url]);
 
-  if (isLoggedIn && url.current) {
+  if ((isLoggedIn && url.current) || loggingIn || loggingOut || loading || intializaing) {
     return <Loader />;
   }
 

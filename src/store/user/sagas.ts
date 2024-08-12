@@ -39,7 +39,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     yield put(userActions.addUserTenantID(headers?.Tenantid));
     const encryptedToken = encryptData(headers?.authorization);
     sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, encryptedToken);
-    yield put(userActions.addToken(encryptedToken));
     const {
       data: {
         entity: {
@@ -81,7 +80,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
       sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
       yield put(userActions.resetStore());
-      yield put(userActions.removeToken());
       failureCb?.(e);
       yield put(userActions.loginFailure({ error: e?.message }));
     }
@@ -97,12 +95,10 @@ export function* logout(): SagaIterator {
     yield call(userService.logout, token);
     sessionStorageServices.clearAllItem();
     yield put(userActions.resetStore());
-    yield put(userActions.removeToken());
     yield put(userActions.logoutSuccess());
   } catch (e) {
     sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
     sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-    yield put(userActions.removeToken());
     yield put(userActions.removeUserTenantID());
     yield put(userActions.logoutFailure());
   }
@@ -163,7 +159,6 @@ export function* fetchLoggedInUser(): SagaIterator {
     sessionStorageServices.clearAllItem();
     sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
     sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-    yield put(userActions.removeToken());
     yield put(userActions.resetStore());
     yield put(userActions.fetchLoggedInUserFail());
   }

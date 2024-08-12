@@ -121,20 +121,10 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         isLoggedIn: false,
         errorMessage: action.message
       };
-    case USERTYPES.AUTH_TOKEN:
-      return {
-        ...state,
-        token: action.payload
-      };
     case USERTYPES.ADD_USER_TENANT_ID:
       return {
         ...state,
         userTenantId: action.payload
-      };
-    case USERTYPES.REMOVE_TOKEN:
-      return {
-        ...state,
-        token: ''
       };
     case USERTYPES.CHANGE_PASSWORD_REQUEST:
     case USERTYPES.CHANGE_OWN_PASSWORD_REQUEST:

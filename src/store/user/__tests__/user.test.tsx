@@ -58,7 +58,6 @@ describe('User Login', () => {
     expect(fetchLoggedInUserSpy).toHaveBeenCalled();
     expect(dispatched).toEqual([
       loginActions.addUserTenantID(userTenantID),
-      loginActions.addToken(encryptedToken),
       loginActions.loginSuccess(loginSuccessResponseMockData as any)
     ]);
   });
@@ -85,7 +84,6 @@ describe('User Login', () => {
     expect(loginUserSpy).toHaveBeenCalledWith(username, hashedPassword);
     expect(dispatched).toEqual([
       loginActions.resetStore(),
-      loginActions.removeToken(),
       loginActions.loginFailure({ error })
     ]);
     expect(loginUserSpy).toHaveBeenCalledTimes(2);
@@ -162,7 +160,7 @@ describe('User Logout', () => {
       logout
     ).toPromise();
     expect(logoutSpy).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.resetStore(), loginActions.removeToken(), loginActions.logoutSuccess()]);
+    expect(dispatched).toEqual([loginActions.resetStore(), loginActions.logoutSuccess()]);
   });
 
   it('Fails to logout user', async () => {
@@ -178,7 +176,6 @@ describe('User Logout', () => {
     ).toPromise();
     expect(logoutSpy).toHaveBeenCalled();
     expect(dispatched).toEqual([
-      loginActions.removeToken(),
       loginActions.removeUserTenantID(),
       loginActions.logoutFailure()
     ]);
@@ -240,7 +237,6 @@ describe('Fetch Logged in user', () => {
     ).toPromise();
     expect(fetchLoggedInUserSpy).toHaveBeenCalledWith();
     expect(dispatched).toEqual([
-      loginActions.removeToken(),
       loginActions.resetStore(),
       loginActions.fetchLoggedInUserFail()
     ]);

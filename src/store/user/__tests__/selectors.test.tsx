@@ -1,6 +1,5 @@
 import USER_MOCK_DATA from '../../../tests/mockData/userDataConstants';
 import {
-  authTokenSelector,
   emailSelector,
   firstNameSelector,
   formDataIdSelector,
@@ -86,10 +85,6 @@ test('userRolesSelector should return userRoles from state', () => {
 // Test showLoaderSelector
 test('showLoaderSelector should return showLoader from state', () => {
   expect(showLoaderSelector(initialState)).toEqual(initialState.user.showLoader);
-});
-// Test authTokenSelector
-test('authTokenSelector should return token from state', () => {
-  expect(authTokenSelector(initialState)).toEqual(initialState.user.token);
 });
 // Test userDataSelector
 test('userDataSelector should return userData from state', () => {

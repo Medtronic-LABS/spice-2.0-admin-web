@@ -151,13 +151,6 @@ export interface ILoginFailure {
   payload: ILoginFailurePayload;
 }
 
-export interface IAddToken {
-  type: typeof USER_TYPES.AUTH_TOKEN;
-  payload: string;
-}
-export interface IRemoveToken {
-  type: typeof USER_TYPES.REMOVE_TOKEN;
-}
 export interface ILogoutRequest {
   type: typeof USER_TYPES.LOGOUT_REQUEST;
 }
@@ -797,9 +790,7 @@ export type UserActions =
   | IFetchLoggedInUserFailure
   | ISessionTimeout
   | IResetStore
-  | IAddToken
   | IAddUserTenantId
-  | IRemoveToken
   | IFetchUserRolesRequest
   | IFetchUserRolesSuccess
   | IFetchUserRolesFailure
