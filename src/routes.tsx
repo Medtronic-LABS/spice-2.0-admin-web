@@ -1,5 +1,4 @@
-import { useEffect, useRef } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
@@ -10,7 +9,15 @@ import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import { getIsLoggedInSelector, roleSelector, userDataSelector } from './store/user/selectors';
+import {
+  getIsLoggedInSelector,
+  roleSelector,
+  userDataSelector,
+  initializingSelector,
+  getIsLoggingInSelector,
+  getIsLoggingOutSelector,
+  loadingSelector
+} from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
 import CreateRegion from './containers/createRegion/CreateRegion';
@@ -344,7 +351,7 @@ export const AppRoutes = () => {
     }
   }, [data, isLoggedIn, url]);
 
-  if (isLoggedIn && url.current) {
+  if ((isLoggedIn && url.current) || loggingIn || loggingOut || loading || intializaing) {
     return <Loader />;
   }
 

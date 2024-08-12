@@ -7,24 +7,11 @@ import Header from './components/header/Header';
 import { AppRoutes } from './routes';
 import './App.scss';
 import ErrorBoundary from './components/errorBoundary/ErrorBoundary';
-// import sessionStorageServices from './global/sessionStorageServices';
-// import APPCONSTANTS from './constants/appConstants';
 import { useSelector } from 'react-redux';
-import {
-  // authTokenSelector,
-  getIsLoggedInSelector,
-  getIsLoggingInSelector,
-  getIsLoggingOutSelector,
-  initializingSelector,
-  loadingSelector
-} from './store/user/selectors';
+import { getIsLoggedInSelector } from './store/user/selectors';
 
 const App = () => {
   const loggedIn = useSelector(getIsLoggedInSelector);
-  const loggingOut = useSelector(getIsLoggingOutSelector);
-  const loading = useSelector(loadingSelector);
-  const initializingApp = useSelector(initializingSelector);
-  // const token = useSelector(authTokenSelector);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -36,15 +23,6 @@ const App = () => {
      */
     ReactGa.send({ hitType: 'pageview', page: pathname });
   }, [pathname]);
-
-  // useEffect(() => {
-  //   window.addEventListener('beforeunload', () => {
-  //     if (token && Boolean(sessionStorageServices.getItem('iLi'))) {
-  //       sessionStorageServices.setItem(APPCONSTANTS.SECRET_TOKEN, token);
-  //     }
-  //     return null;
-  //   });
-  // }, [token]);
 
   return (
     <div className='app-container'>
