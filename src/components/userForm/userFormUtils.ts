@@ -13,7 +13,7 @@ const useUserFormUtils = () => {
     (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
     [isCHPRole]
   );
-  const isCountySelected = useCallback(
+  const isDistrictSelected = useCallback(
     (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
     [isCHPRole]
   );

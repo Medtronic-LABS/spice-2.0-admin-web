@@ -6,7 +6,7 @@ import { FormApi } from 'final-form';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
@@ -67,6 +67,7 @@ const UserList = (): React.ReactElement => {
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
+  const { chiefdom: chiefdomModuleName, district: districtModuleName } = NAME_CONSTANTS;
 
   const refreshHFUserList = useCallback(
     (selectedIds?: { roleNameList: string[]; facilityTenantIds: string[] }) =>
@@ -206,7 +207,7 @@ const UserList = (): React.ReactElement => {
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
       const [selectedUser] = users;
-      const userObj = formatHFUserData(users, countryIdValue, tenantId || selectedUser.county?.tenantId);
+      const userObj = formatHFUserData(users, countryIdValue, tenantId || selectedUser.district?.tenantId);
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
         data,
@@ -315,7 +316,7 @@ const UserList = (): React.ReactElement => {
         >
           <CustomTable
             rowData={hfUserList}
-            columnsDef={columnDef}
+            columnsDef={columnDef({ chiefdomModuleName, districtModuleName })}
             isDelete={true}
             isEdit={true}
             onRowEdit={openEditModal}

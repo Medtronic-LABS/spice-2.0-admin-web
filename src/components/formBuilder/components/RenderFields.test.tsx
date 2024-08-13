@@ -529,8 +529,7 @@ describe('RenderFields Test Cases', () => {
       newlyAddedIds: [],
       handleUpdateFieldName: jest.fn(),
       hashFieldIdsWithTitle: {},
-      hashFieldIdsWithFieldName: {},
-      isAccountCustomization: false
+      hashFieldIdsWithFieldName: {}
     };
     const wrapper = mount(
       // tslint:disable-next-line:no-empty
@@ -556,8 +555,7 @@ describe('RenderFields Test Cases', () => {
       newlyAddedIds: [],
       handleUpdateFieldName: jest.fn(),
       hashFieldIdsWithTitle: {},
-      hashFieldIdsWithFieldName: {},
-      isAccountCustomization: false
+      hashFieldIdsWithFieldName: {}
     };
     const wrapper = mount(
       // tslint:disable-next-line:no-empty

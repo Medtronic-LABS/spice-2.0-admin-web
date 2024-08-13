@@ -29,13 +29,13 @@ const superAdminRoutes: ISideMenuItem[] = [
   },
   {
     label: 'County',
-    route: PROTECTED_ROUTES.countyByRegion,
+    route: PROTECTED_ROUTES.districtByRegion,
     collapsible: true,
     disabled: false
   },
   {
     label: 'Sub County',
-    route: PROTECTED_ROUTES.subCountyByRegion,
+    route: PROTECTED_ROUTES.chiefdomByRegion,
     collapsible: true,
     disabled: false
   },

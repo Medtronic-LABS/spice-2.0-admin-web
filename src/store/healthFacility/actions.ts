@@ -76,8 +76,8 @@ import {
   IClearDependentData,
   IClearVillagesList,
   IPeerSupervisorValidation,
-  ISubCounty,
-  ICounty
+  IChiefdom,
+  IDistrict
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -370,7 +370,7 @@ export const fetchDistrictListRequest = ({
   failureCb
 });
 
-export const fetchDistrictListSuccess = (payload: { list: ICounty[]; total: number }): IFetchDistrictListSuccess => ({
+export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
   type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
   payload
 });
@@ -394,10 +394,7 @@ export const fetchChiefdomListRequest = ({
   failureCb
 });
 
-export const fetchChiefdomListSuccess = (payload: {
-  list: ISubCounty[];
-  total: number;
-}): IFetchChiefdomListSuccess => ({
+export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
   type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
   payload
 });
@@ -436,15 +433,15 @@ export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailur
 // VILLAGES LIST FROM HF
 export const fetchVillagesListFromHFRequest = ({
   countryId,
-  countyId,
-  subCountyId,
+  districtId,
+  chiefdomId,
   successCb,
   failureCb
 }: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
   countryId,
-  countyId,
-  subCountyId,
+  districtId,
+  chiefdomId,
   successCb,
   failureCb
 });

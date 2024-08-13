@@ -396,15 +396,15 @@ export function* fetchVillagesListSagaRequest({
 */
 export function* fetchVillagesListFromHFSagaRequest({
   countryId,
-  countyId,
-  subCountyId,
+  districtId,
+  chiefdomId,
   successCb,
   failureCb
 }: IFetchVillagesListFromHFRequest): SagaIterator {
   try {
     const {
       data: { entity: list }
-    } = yield call(hfService.fetchVillagesList as any, countryId, countyId, subCountyId);
+    } = yield call(hfService.fetchVillagesList as any, countryId, districtId, chiefdomId);
     successCb?.({ list, hfTenantIds: [countryId] });
     yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: [countryId] } }));
   } catch (e) {

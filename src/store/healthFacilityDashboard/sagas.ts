@@ -15,14 +15,14 @@ import {
   IFetchSiteUserListRequest,
   IFetchSiteDashboardListRequest,
   IFetchSiteDropdownRequest,
-  IFetchCountyDropdownRequest,
-  IFetchSubCountyDropdownRequest
+  IFetchDistrictDropdownRequest,
+  IFetchChiefdomDropdownRequest
 } from '../healthFacilityDashboard/types';
 import {
   fetchSiteListSuccess,
   fetchSiteListFailure,
-  fetchSiteCountyDropdownSuccess,
-  fetchSiteCountyDropdownFailure,
+  fetchSiteDistrictDropdownSuccess,
+  fetchSiteDistrictDropdownFailure,
   createSiteSuccess,
   createSiteFailure,
   fetchSiteSummarySuccess,
@@ -41,8 +41,8 @@ import {
   deleteSiteUserFailure,
   fetchSiteUserListSuccess,
   fetchSiteUserListFailure,
-  fetchSubCountyDropdownSuccess,
-  fetchSubCountyDropdownFailure,
+  fetchChiefdomDropdownSuccess,
+  fetchChiefdomDropdownFailure,
   fetchSiteDashboardListSuccess,
   fetchSiteDashboardListFailure,
   fetchSiteDropdownFailure,
@@ -51,7 +51,7 @@ import {
 import * as siteActions from '../healthFacilityDashboard/actions';
 import {
   FETCH_SITE_LIST_REQUEST,
-  FETCH_COUNTY_DROPDOWN_REQUEST,
+  FETCH_DISTRICT_DROPDOWN_REQUEST,
   CREATE_SITE_REQUEST,
   FETCH_SITE_SUMMARY_REQUEST,
   FETCH_SITE_USERS_REQUEST,
@@ -61,7 +61,7 @@ import {
   FETCH_CULTURE_DROPDOWN_REQUEST,
   FETCH_SITE_USER_LIST_REQUEST,
   DELETE_SITE_USER_REQUEST,
-  FETCH_SUB_COUNTY_DROPDOWN_REQUEST,
+  FETCH_CHIEFDOM_DROPDOWN_REQUEST,
   FETCH_SITE_DASHBOARD_LIST_REQUEST,
   FETCH_SITE_DROPDOWN_REQUEST
 } from './actionTypes';
@@ -87,31 +87,31 @@ export function* fetchSiteList({ tenantId, skip, limit, search, failureCb }: IFe
 /*
   Worker Saga: Fired on FETCH_STATE_DROPDOWN_REQUEST action
 */
-export function* fetchSiteCountyList({ countryId }: IFetchCountyDropdownRequest): SagaIterator {
+export function* fetchSiteDistrictList({ countryId }: IFetchDistrictDropdownRequest): SagaIterator {
   try {
-    const { data: countyList } = yield call(siteListService.fetchSiteCounty as any, countryId);
-    const payload = { countyList };
-    yield put(fetchSiteCountyDropdownSuccess(payload));
+    const { data: districtList } = yield call(siteListService.fetchSiteDistrict as any, countryId);
+    const payload = { districtList };
+    yield put(fetchSiteDistrictDropdownSuccess(payload));
   } catch (e) {
     if (e instanceof Error) {
-      yield put(fetchSiteCountyDropdownFailure(e));
+      yield put(fetchSiteDistrictDropdownFailure(e));
     }
   }
 }
 
 /*
-  Worker Saga: Fired on FETCH_DISTRICT_DROPDOWN_REQUEST action
+  Worker Saga: Fired on FETCH_CHIEFDOM_DROPDOWN_REQUEST action
 */
-export function* fetchSubCountyList(countyId: IFetchSubCountyDropdownRequest): SagaIterator {
+export function* fetchChiefdomList(districtId: IFetchChiefdomDropdownRequest): SagaIterator {
   try {
     const {
-      data: { entityList: subCountyList }
-    } = yield call(siteListService.fetchSubCounty as any, countyId.countyId);
-    const payload = { subCountyList: subCountyList || [] };
-    yield put(fetchSubCountyDropdownSuccess(payload));
+      data: { entityList: chiefdomList }
+    } = yield call(siteListService.fetchChiefdom as any, districtId.districtId);
+    const payload = { chiefdomList: chiefdomList || [] };
+    yield put(fetchChiefdomDropdownSuccess(payload));
   } catch (e) {
     if (e instanceof Error) {
-      yield put(fetchSubCountyDropdownFailure(e));
+      yield put(fetchChiefdomDropdownFailure(e));
     }
   }
 }
@@ -362,8 +362,8 @@ export function* fetchSitesForDropdown({ tenantId, regionTenantId = '' }: IFetch
 */
 function* siteSaga() {
   yield all([takeLatest(FETCH_SITE_LIST_REQUEST, fetchSiteList)]);
-  yield all([takeLatest(FETCH_COUNTY_DROPDOWN_REQUEST, fetchSiteCountyList)]);
-  yield all([takeLatest(FETCH_SUB_COUNTY_DROPDOWN_REQUEST, fetchSubCountyList)]);
+  yield all([takeLatest(FETCH_DISTRICT_DROPDOWN_REQUEST, fetchSiteDistrictList)]);
+  yield all([takeLatest(FETCH_CHIEFDOM_DROPDOWN_REQUEST, fetchChiefdomList)]);
   yield all([takeLatest(CREATE_SITE_REQUEST, createSiteRequest)]);
   yield all([takeLatest(FETCH_SITE_SUMMARY_REQUEST, fetchSiteSummaryRequest)]);
   yield all([takeLatest(FETCH_SITE_USERS_REQUEST, fetchSiteSummaryusersRequest)]);

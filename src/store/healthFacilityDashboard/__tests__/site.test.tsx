@@ -3,7 +3,7 @@ import {
   createSiteRequest,
   createSiteUserRequest,
   deleteSiteUserRequest,
-  fetchSiteCountyList,
+  fetchSiteDistrictList,
   fetchSiteCultureList,
   fetchSiteDashboardList,
   fetchSiteList,
@@ -11,7 +11,7 @@ import {
   fetchSiteSummaryRequest,
   fetchSiteSummaryusersRequest,
   fetchSiteUserList,
-  fetchSubCountyList,
+  fetchChiefdomList,
   updateSiteDetailsRequest,
   updateSiteUserRequest
 } from '../sagas';
@@ -21,11 +21,11 @@ import * as ACTION_TYPES from '../actionTypes';
 import { AxiosPromise } from 'axios';
 import { SITE_MOCK_DATA, SITE_USER_MOCK_DATA } from '../siteMockDataConstants';
 import { ISiteUserList } from '../types';
-import { clearDropdownValues, fetchSubCountyDropdownRequest } from '../actions';
+import { clearDropdownValues, fetchChiefdomDropdownRequest } from '../actions';
 
 const siteListResponsePayload = SITE_MOCK_DATA.SITE_LIST_RESPONSE_PAYLOAD;
-const siteCountyListResponsePayload = SITE_MOCK_DATA.SITE_COUNTY_LIST_RESPONSE;
-const siteSubCountyResponsePayload = SITE_MOCK_DATA.SITE_SUB_COUNTY_RESPONSE;
+const siteDistrictListResponsePayload = SITE_MOCK_DATA.SITE_DISTRICT_LIST_RESPONSE;
+const siteChiefdomResponsePayload = SITE_MOCK_DATA.SITE_CHIEFDOM_RESPONSE;
 const siteCultureListResponsePayload = SITE_MOCK_DATA.SITE_CULTURE_LIST;
 const siteDataRequestPayload = SITE_MOCK_DATA.SITE_DATA_REQUEST_PAYLOAD;
 const siteDetailRequestPayload = SITE_MOCK_DATA.SITE_DETAIL_REQUEST_PAYLOAD;
@@ -79,91 +79,89 @@ describe('Fetch Site List', () => {
   });
 });
 
-describe('Fetch county list', () => {
-  it('Fetch the county list and dispatches success', async () => {
-    const siteCountyListSpy = jest
-      .spyOn(siteService, 'fetchSiteCounty')
-      .mockImplementation(() => Promise.resolve({ data: siteCountyListResponsePayload }) as AxiosPromise);
+describe('Fetch district list', () => {
+  it('Fetch the district list and dispatches success', async () => {
+    const siteDistrictListSpy = jest
+      .spyOn(siteService, 'fetchSiteDistrict')
+      .mockImplementation(() => Promise.resolve({ data: siteDistrictListResponsePayload }) as AxiosPromise);
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
-      fetchSiteCountyList,
+      fetchSiteDistrictList,
       {
         countryId: '1',
-        type: ACTION_TYPES.FETCH_COUNTY_DROPDOWN_REQUEST
+        type: ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_REQUEST
       }
     ).toPromise();
-    expect(siteCountyListSpy).toHaveBeenCalledWith('1');
+    expect(siteDistrictListSpy).toHaveBeenCalledWith('1');
     expect(dispatched).toEqual([
-      siteActions.fetchSiteCountyDropdownSuccess({ countyList: siteCountyListResponsePayload })
+      siteActions.fetchSiteDistrictDropdownSuccess({ districtList: siteDistrictListResponsePayload })
     ]);
   });
 
-  it('Fetch the county list and dispatches failure', async () => {
-    const error = new Error('Failed to fetch county list');
-    const siteCountyListSpy = jest
-      .spyOn(siteService, 'fetchSiteCounty')
+  it('Fetch the district list and dispatches failure', async () => {
+    const error = new Error('Failed to fetch district list');
+    const siteDistrictListSpy = jest
+      .spyOn(siteService, 'fetchSiteDistrict')
       .mockImplementation(() => Promise.reject(error));
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
-      fetchSiteCountyList,
+      fetchSiteDistrictList,
       {
         countryId: '1',
-        type: ACTION_TYPES.FETCH_COUNTY_DROPDOWN_REQUEST
+        type: ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_REQUEST
       }
     ).toPromise();
-    expect(siteCountyListSpy).toHaveBeenCalledWith('1');
-    expect(dispatched).toEqual([siteActions.fetchSiteCountyDropdownFailure(error)]);
+    expect(siteDistrictListSpy).toHaveBeenCalledWith('1');
+    expect(dispatched).toEqual([siteActions.fetchSiteDistrictDropdownFailure(error)]);
   });
 });
 
-describe('Fetch sub county list', () => {
-  it('Fetch the sub county list and dispatches success', async () => {
-    const siteSubCountyListSpy = jest
-      .spyOn(siteService, 'fetchSubCounty')
-      .mockImplementation(
-        () => Promise.resolve({ data: { entityList: siteSubCountyResponsePayload } }) as AxiosPromise
-      );
+describe('Fetch chiefdom list', () => {
+  it('Fetch the chiefdom list and dispatches success', async () => {
+    const siteChiefdomListSpy = jest
+      .spyOn(siteService, 'fetchChiefdom')
+      .mockImplementation(() => Promise.resolve({ data: { entityList: siteChiefdomResponsePayload } }) as AxiosPromise);
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
-      fetchSubCountyList,
+      fetchChiefdomList,
       {
-        countyId: '1',
-        type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST
+        districtId: '1',
+        type: ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST
       }
     ).toPromise();
-    expect(siteSubCountyListSpy).toHaveBeenCalledWith('1');
+    expect(siteChiefdomListSpy).toHaveBeenCalledWith('1');
     expect(dispatched).toEqual([
-      siteActions.fetchSubCountyDropdownSuccess({ subCountyList: siteSubCountyResponsePayload })
+      siteActions.fetchChiefdomDropdownSuccess({ chiefdomList: siteChiefdomResponsePayload })
     ]);
   });
 
-  it('Fetch the sub county list and dispatches failure', async () => {
-    const error = new Error('Failed to fetch sub county list');
-    const siteSubCountyListSpy = jest
-      .spyOn(siteService, 'fetchSubCounty')
+  it('Fetch the chiefdom list and dispatches failure', async () => {
+    const error = new Error('Failed to fetch chiefdom list');
+    const siteChiefdomListSpy = jest
+      .spyOn(siteService, 'fetchChiefdom')
       .mockImplementation(() => Promise.reject(error));
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
-      fetchSubCountyList,
+      fetchChiefdomList,
       {
-        countyId: '1',
-        type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST
+        districtId: '1',
+        type: ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST
       }
     ).toPromise();
-    expect(siteSubCountyListSpy).toHaveBeenCalledWith('1');
-    expect(dispatched).toEqual([siteActions.fetchSubCountyDropdownFailure(error)]);
+    expect(siteChiefdomListSpy).toHaveBeenCalledWith('1');
+    expect(dispatched).toEqual([siteActions.fetchChiefdomDropdownFailure(error)]);
   });
 });
 
@@ -620,13 +618,13 @@ describe('Fetch sites list for dropdown in Program', () => {
   });
 });
 
-describe('fetchSubCountyDropdownRequest', () => {
-  it('should return a valid action object with provided countyId', () => {
-    const countyId = '123';
-    const action = fetchSubCountyDropdownRequest({ countyId });
+describe('fetchChiefdomDropdownRequest', () => {
+  it('should return a valid action object with provided districtId', () => {
+    const districtId = '123';
+    const action = fetchChiefdomDropdownRequest({ districtId });
     const expectedAction = {
-      type: ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST,
-      countyId
+      type: ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST,
+      districtId
     };
     expect(action).toEqual(expectedAction);
   });

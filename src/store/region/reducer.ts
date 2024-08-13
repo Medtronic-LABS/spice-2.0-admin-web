@@ -24,6 +24,7 @@ export const initialState: IRegionState = {
 const regionReducer = (state = initialState, action = {} as RegionActions): IRegionState => {
   switch (action.type) {
     case REGION_TYPES.FETCH_REGION_DETAIL_REQUEST:
+    case REGION_TYPES.FETCH_COUNTRY_DETAILS_REQUEST:
     case REGION_TYPES.CREATE_REGION_REQUEST:
     case REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_REQUEST:
       return {
@@ -45,6 +46,7 @@ const regionReducer = (state = initialState, action = {} as RegionActions): IReg
       };
     case REGION_TYPES.FETCH_REGIONS_FAILURE:
     case REGION_TYPES.FETCH_REGION_DETAIL_FAILURE:
+    case REGION_TYPES.FETCH_COUNTRY_DETAILS_FAILURE:
       return {
         ...state,
         loading: false,
@@ -74,6 +76,7 @@ const regionReducer = (state = initialState, action = {} as RegionActions): IReg
         error: null
       };
     case REGION_TYPES.FETCH_REGION_DETAIL_SUCCESS:
+    case REGION_TYPES.FETCH_COUNTRY_DETAILS_SUCCESS:
       return {
         ...state,
         detail: { ...state.detail, ...action.payload },

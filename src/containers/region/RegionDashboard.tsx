@@ -27,10 +27,10 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 import { fetchTimezoneListRequest } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
 import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
-import { clearCountyDetails, resetClinicalWorkflow } from '../../store/county/actions';
-import { clearSubCountyDetail } from '../../store/subCounty/actions';
+import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
+import { clearChiefdomDetail } from '../../store/chiefdom/actions';
 import { IRegionDetail } from '../../store/region/types';
-import { getClinicalWorkflowSelector } from '../../store/county/selectors';
+import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 
 /**
@@ -50,8 +50,8 @@ const Region = (): React.ReactElement => {
 
   const {
     region: regionModuleName,
-    county: countyModuleName,
-    subCounty: subCountyModuleName,
+    district: districtModuleName,
+    chiefdom: chiefdomModuleName,
     healthFacility
   } = NAME_CONSTANTS;
 
@@ -101,12 +101,12 @@ const Region = (): React.ReactElement => {
   }, [dispatch, timezoneList?.length]);
 
   /**
-   * To remove Region, Account, Sub County, Site Details cache in store
+   * To remove Region, District, Chiefdom, Site Details cache in store
    */
   useEffect(() => {
     dispatch(clearRegionDetail());
-    dispatch(clearCountyDetails());
-    dispatch(clearSubCountyDetail());
+    dispatch(clearDistrictDetails());
+    dispatch(clearChiefdomDetail());
     dispatch(clearSiteSummary());
     dispatch(clearClientRegistryStatus());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,7 +145,7 @@ const Region = (): React.ReactElement => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      regions.map(({ subCountyCount, healthFacilityCount, countyCount, name, tenantId, id: regionId }: any) => ({
+      regions.map(({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId }: any) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId }),
@@ -154,17 +154,17 @@ const Region = (): React.ReactElement => {
         data: [
           {
             type: 'number',
-            value: Number(countyCount) ? appendZeroBefore(countyCount, 2) : '-',
-            label: countyModuleName,
+            value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
+            label: districtModuleName,
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.countyByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {
             type: 'number',
-            value: Number(subCountyCount) ? appendZeroBefore(subCountyCount, 2) : '-',
-            label: subCountyModuleName,
-            route: PROTECTED_ROUTES.subCountyByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
+            label: chiefdomModuleName,
+            route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {

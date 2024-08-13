@@ -18,7 +18,7 @@ export interface IFetchCustomizationFormRequest {
   category: string;
   cultureId?: number;
   countryId: string;
-  countyId?: string;
+  districtId?: string;
   clinicalWorkflowId?: string;
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
@@ -69,7 +69,7 @@ export interface ICustomizeFormRequest {
   countryId: string;
   cultureId?: number;
   payload: any;
-  countyId?: string;
+  districtId?: string;
   clinicalWorkflowId?: string;
   workflowId?: string;
   successCb?: () => void;

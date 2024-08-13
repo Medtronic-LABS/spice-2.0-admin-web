@@ -119,11 +119,11 @@ export const fetchChiefdomList = (countryId: number, districtId: number) =>
     }
   });
 
-export const fetchVillagesList = (countryId: number, countyId: number, subCountyId: number) =>
+export const fetchVillagesList = (countryId: number, districtId: number, chiefdomId: number) =>
   axios({
     url: '/admin-service/villages-list',
     method: 'POST',
-    data: { countryId, countyId, subCountyId }
+    data: { countryId, districtId, chiefdomId }
   });
 export const listCities = (countryId: number, searchTerm: string) =>
   axios({
@@ -132,11 +132,11 @@ export const listCities = (countryId: number, searchTerm: string) =>
     data: { countryId, searchTerm }
   });
 
-export const fetchVillagesListfromHF = (countryId: number, countyId: number, subCountyId: number) =>
+export const fetchVillagesListfromHF = (countryId: number, districtId: number, chiefdomId: number) =>
   axios({
     url: '/admin-service/healthfacility/villages-list',
     method: 'POST',
-    data: { countryId, countyId, subCountyId }
+    data: { countryId, districtId, chiefdomId }
   });
 
 export const fetchPeerSupervisorList = (tenantIds: number[]) =>

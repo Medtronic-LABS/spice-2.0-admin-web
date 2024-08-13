@@ -39,7 +39,7 @@ const props = {
   isFieldNameChangable: true
 };
 
-describe('SubCountyForm', () => {
+describe('ChiefdomForm', () => {
   let wrapper: any;
   beforeEach(() => {
     wrapper = mount(<AccordianView {...props} />);

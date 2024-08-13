@@ -31,7 +31,7 @@ import {
   fetchPeerSupervisorListRequest,
   fetchVillagesListFromHFRequest
 } from '../../store/healthFacility/actions';
-import { countyLoadingSelector, getCountyListSelector } from '../../store/county/selectors';
+import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   countryListSelector,
   countryLoadingSelector,
@@ -54,9 +54,9 @@ import PhoneNumberField from '../formFields/PhoneNumber';
 import useUserFormUtils from './userFormUtils';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import { SiteUserForm } from './userConditionalFields/SiteUserForm';
-import { fetchSubCountyListRequest } from '../../store/subCounty/actions';
-import { subCountyListSelector, subCountyLoadingSelector } from '../../store/subCounty/selectors';
-import { fetchCountyListRequest } from '../../store/county/actions';
+import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { fetchDistrictListRequest } from '../../store/district/actions';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface IUserFormValues {
@@ -104,7 +104,7 @@ const UserForm = ({
   const dispatch = useDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
   const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange } = useUserFormUtils();
-  const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN } = APPCONSTANTS.ROLES;
+  const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const hfLoading = useSelector(healthFacilityLoadingSelector);
@@ -115,9 +115,9 @@ const UserForm = ({
   const cultureList = useSelector(cultureListSelector);
   const communityList = useSelector(communityListSelector);
   const isCultureListLoading = useSelector(cultureListLoadingSelector);
-  const subCountyList = useSelector(subCountyListSelector);
-  const subCountyLoading = useSelector(subCountyLoadingSelector);
-  const countyLoading = useSelector(countyLoadingSelector);
+  const chiefdomList = useSelector(chiefdomListSelector);
+  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const districtLoading = useSelector(districtLoadingSelector);
   const role = useSelector(roleSelector);
   const countryList = useSelector(countryListSelector);
   const isCountryListLoading = useSelector(countryLoadingSelector);
@@ -135,8 +135,8 @@ const UserForm = ({
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
   const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles } = userMeta();
-  const countyList = useSelector(getCountyListSelector);
-  const { county: countyModuleName } = NAME_CONSTANTS;
+  const districtList = useSelector(getDistrictListSelector);
+  const { district: districtModuleName } = NAME_CONSTANTS;
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
     () => [
@@ -543,8 +543,8 @@ const UserForm = ({
         dispatch(
           fetchVillagesListFromHFRequest({
             countryId,
-            countyId: HFDetails?.county?.id,
-            subCountyId: HFDetails?.subCounty?.id,
+            districtId: HFDetails?.district?.id,
+            chiefdomId: HFDetails?.chiefdom?.id,
             successCb: ({ list }: { list: IVillages[] }) => {
               const newVillages = [...villages];
               newVillages[index] = list;
@@ -651,7 +651,7 @@ const UserForm = ({
 
   const fetchDetails = useCallback(() => {
     dispatch(
-      fetchCountyListRequest({
+      fetchDistrictListRequest({
         tenantId: String(countryId),
         isActive: true,
         failureCb: (e) =>
@@ -659,7 +659,7 @@ const UserForm = ({
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.COUNTY_FETCH_ERROR, countyModuleName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
             )
           )
       })
@@ -667,7 +667,7 @@ const UserForm = ({
   }, [countryId, dispatch]);
 
   useEffect(() => {
-    if ([ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN].includes(selectedAdmins)) {
+    if ([DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins)) {
       fetchDetails();
     }
 
@@ -675,12 +675,12 @@ const UserForm = ({
   }, [dispatch, fetchDetails, selectedAdmins]);
 
   useEffect(() => {
-    const countyId = form.getState().values.users?.[0]?.county?.tenantId;
-    if (countyId) {
-      dispatch(fetchSubCountyListRequest({ tenantId: countyId }));
+    const districtId = form.getState().values.users?.[0]?.district?.tenantId;
+    if (districtId) {
+      dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.users?.[0]?.county?.tenantId]);
+  }, [dispatch, countryId, form.getState().values.users?.[0]?.district?.tenantId]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -1049,8 +1049,8 @@ const UserForm = ({
                   isTmezoneListLoading={isTmezoneListLoading}
                   timezoneList={timezoneList}
                   communityList={communityList}
-                  countyDetails={{ list: countyList || [], loading: countyLoading }}
-                  subCountyDetails={{ list: subCountyList || [], loading: subCountyLoading }}
+                  districtDetails={{ list: districtList || [], loading: districtLoading }}
+                  chiefdomDetails={{ list: chiefdomList || [], loading: chiefdomLoading }}
                   siteRolesChange={siteRolesChange}
                   selectedAdmins={selectedAdmins}
                   fields={fields}

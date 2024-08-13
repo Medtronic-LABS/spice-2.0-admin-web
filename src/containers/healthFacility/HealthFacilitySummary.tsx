@@ -5,7 +5,7 @@ import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
@@ -67,15 +67,15 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     phuFocalPersonName: hf.phuFocalPersonName,
     phuFocalPersonNumber: hf.phuFocalPersonNumber,
     address: hf.address,
-    county: hf.county,
-    subCounty: hf.subCounty,
+    district: hf.district,
+    chiefdom: hf.chiefdom,
     cityName: hf.city.name,
     latitude: hf.latitude,
     longitude: hf.longitude,
     postalCode: hf.postalCode,
     country: { id: countryId },
     language: hf.language.name,
-    parentTenantId: hf.subCounty?.tenantId,
+    parentTenantId: hf.chiefdom?.tenantId,
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
@@ -101,7 +101,7 @@ export const formatHFUserData = (userData: any[], countryId: number | string, te
     villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
     village: user?.village,
     timezone: user?.timezone,
-    county: user?.county
+    district: user?.district
   }));
 };
 const HealthFacilitySummary = (): React.ReactElement => {
@@ -127,6 +127,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   const lableData = useMemo(
     () => [
@@ -134,8 +135,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: 'Health Facility Type', value: healthFacility?.type },
       { label: 'PHU Focal Person Name', value: healthFacility?.phuFocalPersonName },
       { label: 'PHU Focal Person No', value: healthFacility?.phuFocalPersonNumber },
-      { label: 'County', value: healthFacility?.county?.name },
-      { label: 'Sub County', value: healthFacility?.subCounty?.name },
+      { label: districtModuleName, value: healthFacility?.district?.name },
+      { label: chiefdomModuleName, value: healthFacility?.chiefdom?.name },
       { label: 'Address', value: healthFacility?.address },
       { label: 'City/Village', value: healthFacility?.cityName },
       { label: 'Latitude', value: healthFacility?.latitude },
