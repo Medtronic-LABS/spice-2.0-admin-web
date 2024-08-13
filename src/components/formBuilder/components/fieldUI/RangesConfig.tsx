@@ -154,7 +154,8 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
       valueKey: 'id',
       options: [
         { name: 'Male', id: 'Male' },
-        { name: 'Female', id: 'Female' }
+        { name: 'Female', id: 'Female' },
+        { name: 'Both', id: 'Both' }
       ],
       required: true,
       disabledValidation: true,

@@ -39,9 +39,8 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  // disable fields for region customization
-  if (isRegionCustomizeForm && APPCONSTANTS.DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION?.includes(fieldName)) {
-    inputProps = { ...inputProps, ...{ disabled: true } };
+  if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
+    inputProps = { ...inputProps, required: true };
   }
   return inputProps;
 };

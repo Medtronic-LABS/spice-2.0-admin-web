@@ -36,7 +36,7 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
         </div>
         <div className='col-12 col-lg-6'>
           <Field
-            name='url'
+            name='codeDetails.url'
             type='text'
             validate={composeValidators(required)}
             render={({ input, meta }) => (

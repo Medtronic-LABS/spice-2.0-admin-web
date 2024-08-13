@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { matchPath, useLocation } from 'react-router';
 
 import { ReactComponent as HomeIcon } from '../../assets/images/home.svg';
-import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES } from '../../constants/route';
+import { PROTECTED_ROUTES } from '../../constants/route';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { districtSelector } from '../../store/district/selectors';
@@ -371,8 +371,7 @@ const Breadcrumb = (): React.ReactElement => {
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
-        onClick={clearData}
-        to={HOME_PAGE_BY_ROLE[role]}
+        to={PROTECTED_ROUTES.landingPage}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

@@ -36,7 +36,7 @@ const superAdminRoutes: ISideMenuItem[] = [
   {
     label: 'Lab Test Database',
     route: PROTECTED_ROUTES.labtestList,
-    disabled: true
+    disabled: false
   },
   {
     label: 'Health Facility',

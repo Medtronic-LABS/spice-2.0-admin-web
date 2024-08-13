@@ -74,10 +74,11 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     }
   }
   if (isResult) {
-    finalFields = { ...finalFields, ...{ ...resultFields, ranges: obj.viewType === 'EditText' } };
-    Object.keys(fieldValue ? inputTypeRelatedFields : {}).forEach((key: any) => {
-      finalFields[key] = false;
-    });
+    finalFields = {
+      ...finalFields,
+      ...inputTypeRelatedFields,
+      ...{ ...resultFields, ranges: obj.viewType === 'EditText', unitList: obj.viewType === 'EditText' }
+    };
   } else {
     Object.keys(resultFields).forEach((key: any) => {
       finalFields[key] = false;
@@ -117,7 +118,8 @@ interface IGender {
 
 const genderList: IGender[] = [
   { name: 'Male', id: 'Male' },
-  { name: 'Female', id: 'Female' }
+  { name: 'Female', id: 'Female' },
+  { name: 'Both', id: 'Both' }
 ];
 
 interface IRemovedUnits {
@@ -140,7 +142,8 @@ export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
   });
 
   // Function to check if a unitType has both genders
-  const hasBothGenders = (unitType: string) => unitGenderMap[unitType] && unitGenderMap[unitType].size === 2;
+  const hasBothGenders = (unitType: string) =>
+    unitGenderMap[unitType] && unitGenderMap[unitType].size === genderList.length;
 
   // Filter the unitList based on the genders associated with each unitType
   const filteredUnitList: IUnit[] = [];

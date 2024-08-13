@@ -44,7 +44,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   errorMessage: {},
   isEditable: {},
   isResult: {},
-  unitList: {},
   code: {},
   url: {},
   resource: {}
