@@ -19,7 +19,6 @@ import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { roleSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
-import { IRoles } from '../../store/user/types';
 
 export interface IChiefdomFormValues {
   chiefdom: {
@@ -27,7 +26,6 @@ export interface IChiefdomFormValues {
     district?: IDistrictOption;
   };
   users: IUserFormValues[];
-  village: string[];
 }
 
 export interface IParams {
@@ -50,9 +48,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
   const role = useSelector(roleSelector);
   const countryIdValue = useCountryId();
 
-  const {
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  const { chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   /**
    * Navigates back to the appropriate route based on available IDs and user role.
@@ -72,7 +68,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
         .replace(':districtId', districtId)
         .replace(':tenantId', tenantId);
     } else {
-      redirectTo = PROTECTED_ROUTES.chiefdomDashboard;
+      redirectTo = PROTECTED_ROUTES.ChiefdomDashboard;
     }
     history.push(redirectTo);
   };
@@ -102,18 +98,11 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
    * @param {IChiefdomFormValues} formValues - The form values containing the chiefdom and user data.
    */
 
-  const onSubmit = ({ chiefdom: { district, ...chiefdom }, users, village }: IChiefdomFormValues) => {
+  const onSubmit = ({ chiefdom: { district, ...chiefdom }, users }: IChiefdomFormValues) => {
     const payload = {
       ...chiefdom,
       name: chiefdom.name.trim(),
-      villages: village.map((e: string) => ({ name: e })),
       users: users.map((user: any) => {
-        let insightIds: number[] = [];
-        if (user.roles) {
-          insightIds = user.roles
-            ?.filter((userRole: IRoles) => userRole.groupName === APPCONSTANTS.spiceRole.spiceInsights)
-            ?.map((insightRole: IRoles) => insightRole.id);
-        }
         return {
           ...user,
           firstName: user.firstName.trim(),
@@ -121,9 +110,9 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
           gender: user.gender,
           username: user.email,
           phoneNumber: user.phoneNumber,
-          countryCode: user?.countryCode?.phoneNumberCode || user.country.phoneNumberCode,
+          countryCode: user.country.phoneNumberCode,
           country: { id: countryIdValue },
-          roleIds: [user.role[0].id, ...insightIds],
+          roleIds: [user.role[0].id],
           timezone: { id: Number(user.timezone?.id) }
         };
       }),
@@ -140,7 +129,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
           navigateBack();
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_SUCCESS, chiefdomSName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_SUCCESS, chiefdomModuleName)
           );
         },
         failureCb: (e: Error) =>
@@ -148,7 +137,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_FAIL, chiefdomSName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_FAIL, chiefdomModuleName)
             )
           )
       })
@@ -168,12 +157,12 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${chiefdomSName} Details`} icon={ChiefdomFormIcon}>
+                  <FormContainer label={`${chiefdomModuleName} Details`} icon={ChiefdomFormIcon}>
                     <ChiefdomForm form={form} nestingKey='chiefdom' />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${chiefdomSName} Admin`} icon={ChiefdomAdminFormIcon}>
+                  <FormContainer label={`${chiefdomModuleName} Admin`} icon={ChiefdomAdminFormIcon}>
                     <UserForm
                       form={form}
                       countryId={countryIdValue}

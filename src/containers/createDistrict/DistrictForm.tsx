@@ -11,9 +11,7 @@ import { NAME_CONSTANTS } from '../../constants/appConstants';
  * @returns {React.ReactElement}
  */
 const DistrictForm = ({ form }: { form: FormApi<any> }): React.ReactElement => {
-  const {
-    district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  const moduleName = NAME_CONSTANTS.district;
   return (
     <div className='row gx-1dot25'>
       <div className='col-12'>
@@ -24,8 +22,8 @@ const DistrictForm = ({ form }: { form: FormApi<any> }): React.ReactElement => {
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label={`${districtSName} Name`}
-              errorLabel={`${districtSName.toLowerCase()} name`}
+              label={`${moduleName} Name`}
+              errorLabel={`${moduleName.toLowerCase()} name`}
               placeholder='Name'
               capitalize={true}
               error={(meta.touched && meta.error) || undefined}

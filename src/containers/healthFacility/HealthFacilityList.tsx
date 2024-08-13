@@ -13,6 +13,7 @@ import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDet
 import { FormApi } from 'final-form';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteHealthFacilityRequest,
@@ -56,13 +57,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
-  const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
-
-  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
@@ -294,17 +289,17 @@ const HealthFacilityList = (): React.ReactElement => {
               },
               {
                 id: 3,
-                name: 'county',
-                label: 'County',
+                name: 'district',
+                label: districtModuleName,
                 width: '30%',
-                cellFormatter: ({ county }) => county?.name
+                cellFormatter: ({ district }) => district?.name
               },
               {
                 id: 3,
-                name: 'subcounty',
-                label: 'Sub County',
+                name: 'chiefdom',
+                label: chiefdomModuleName,
                 width: '30%',
-                cellFormatter: ({ subCounty }) => subCounty?.name
+                cellFormatter: ({ chiefdom }) => chiefdom?.name
               }
             ]}
             isDelete={false}

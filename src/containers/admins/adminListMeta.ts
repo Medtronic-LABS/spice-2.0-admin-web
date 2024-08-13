@@ -1,7 +1,7 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
 
-const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN } = APPCONSTANTS.ROLES;
+const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
 /**
  * Formats the user's full name by concatenating the first name and last name.
  *
@@ -40,62 +40,70 @@ const formatOrganizations = (user: IHFUserGet, roleName: string): string => {
 const formatHealthFacility = (user: IHFUserGet): string => formatOrganizations(user, HEALTH_FACILITY_ADMIN);
 
 /**
- * Formats county names for the user with the ACCOUNT_ADMIN role.
+ * Formats district names for the user with the DISTRICT_ADMIN role.
  *
  * @param {IHFUserGet} user - The user object containing roles and organizations.
- * @returns {string} A comma-separated list of county names if the user has the ACCOUNT_ADMIN role.
+ * @returns {string} A comma-separated list of district names if the user has the DISTRICT_ADMIN role.
  */
-const formatCounty = (user: IHFUserGet): string => formatOrganizations(user, ACCOUNT_ADMIN);
+const formatDistrict = (user: IHFUserGet): string => formatOrganizations(user, DISTRICT_ADMIN);
 
 /**
- * Formats sub-county names for the user with the SUB_COUNTY_ADMIN role.
+ * Formats chiefdom names for the user with the CHIEFDOM_ADMIN role.
  *
  * @param {IHFUserGet} user - The user object containing roles and organizations.
- * @returns {string} A comma-separated list of sub-county names if the user has the SUB_COUNTY_ADMIN role.
+ * @returns {string} A comma-separated list of chiefdom names if the user has the CHIEFDOM_ADMIN role.
  */
-const formatSubCounty = (user: IHFUserGet): string => formatOrganizations(user, SUB_COUNTY_ADMIN);
+const formatChiefdom = (user: IHFUserGet): string => formatOrganizations(user, CHIEFDOM_ADMIN);
 
-export const columnDef = [
-  {
-    id: 1,
-    name: 'name',
-    label: 'Name',
-    width: '20%',
-    cellFormatter: formatName
-  },
-  {
-    id: 2,
-    name: 'role',
-    label: 'ROLE',
-    width: '20%',
-    cellFormatter: formatRoles
-  },
-  {
-    id: 3,
-    name: 'county',
-    label: 'County',
-    width: '20%',
-    cellFormatter: formatCounty
-  },
-  {
-    id: 3,
-    name: 'subCounty',
-    label: 'Sub County',
-    width: '20%',
-    cellFormatter: formatSubCounty
-  },
-  {
-    id: 3,
-    name: 'healthFacility',
-    label: 'HEALTH FACILITY',
-    width: '20%',
-    cellFormatter: formatHealthFacility
-  },
-  {
-    id: 5,
-    name: 'phoneNumber',
-    label: 'CONTACT NUMBER',
-    width: '18%',
-    cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
-  }
-];
+export const columnDef = ({
+  chiefdomModuleName,
+  districtModuleName
+}: {
+  chiefdomModuleName: string;
+  districtModuleName: string;
+}) => {
+  return [
+    {
+      id: 1,
+      name: 'name',
+      label: 'Name',
+      width: '20%',
+      cellFormatter: formatName
+    },
+    {
+      id: 2,
+      name: 'role',
+      label: 'ROLE',
+      width: '20%',
+      cellFormatter: formatRoles
+    },
+    {
+      id: 3,
+      name: 'district',
+      label: districtModuleName,
+      width: '20%',
+      cellFormatter: formatDistrict
+    },
+    {
+      id: 3,
+      name: 'chiefdom',
+      label: chiefdomModuleName,
+      width: '20%',
+      cellFormatter: formatChiefdom
+    },
+    {
+      id: 3,
+      name: 'healthFacility',
+      label: 'HEALTH FACILITY',
+      width: '20%',
+      cellFormatter: formatHealthFacility
+    },
+    {
+      id: 5,
+      name: 'phoneNumber',
+      label: 'CONTACT NUMBER',
+      width: '18%',
+      cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
+    }
+  ];
+};

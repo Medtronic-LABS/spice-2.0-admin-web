@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useHistory, RouteComponentProps } from 'react-router-dom';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
-import { fetchDistrictDetailReq, updateDistrictDetail, decactivateDistrictReq } from '../../store/district/actions';
+import { fetchDistrictListDetailReq, updateDistrictDetail, decactivateDistrictReq } from '../../store/district/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import Loader from '../../components/loader/Loader';
@@ -27,7 +27,6 @@ import {
 } from '../../store/healthFacility/actions';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
-import { IRoles } from '../../store/user/types';
 
 interface IMatchParams {
   districtId: string;
@@ -56,9 +55,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
 
   const isReadOnly = role === APPCONSTANTS.ROLES.DISTRICT_ADMIN;
 
-  const {
-    district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  const { district: districtModuleName } = NAME_CONSTANTS;
 
   useEffect(() => {
     getDistrictDetail();
@@ -68,7 +65,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const getDistrictDetail = useCallback(
     (search?: string) => {
       dispatch(
-        fetchDistrictDetailReq({
+        fetchDistrictListDetailReq({
           tenantId,
           id: districtId,
           searchTerm: search,
@@ -77,14 +74,14 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_DETAIL_FETCH_ERROR, districtSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_DETAIL_FETCH_ERROR, districtModuleName)
               )
             ),
           successCb: (res: any) => {
             if (!res?.id) {
               toastCenter.error(
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_DETAIL_FETCH_ERROR, districtSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_DETAIL_FETCH_ERROR, districtModuleName)
               );
               handleNavigation();
             }
@@ -98,7 +95,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
 
   const editDeactivateModalRender = (form: any) => {
     return isOpenDeactivateModal ? (
-      <Deactivation formName={districtSName.toLowerCase()} />
+      <Deactivation formName={districtModuleName.toLowerCase()} />
     ) : (
       <DistrictForm form={form} />
     );
@@ -127,18 +124,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   };
 
   const openEditModal = (values: IDistrictAdmin) => {
-    const allSuiteAccess = values.roles.map((r: IRoles) => ({
-      groupName: r.groupName,
-      id: r.groupName
-    }));
-
-    const valuesWithRole = {
-      ...values,
-      suiteAccess: [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()],
-      country: { phoneNumberCode: values.countryCode },
-      role: values.roles
-    };
-
+    const valuesWithRole = { ...values, country: { phoneNumberCode: values.countryCode }, role: values.roles };
     setIsOpenAdminModal(true);
     setAdminInitialValues(valuesWithRole);
     setIsAdd(false);
@@ -163,7 +149,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_SUCCESS, districtSName)
+            formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_SUCCESS, districtModuleName)
           );
           getDistrictDetail();
           handleCancelClick();
@@ -173,7 +159,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_FAIL, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_FAIL, districtModuleName)
             )
           )
       })
@@ -189,7 +175,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       gender: admin.gender,
       phoneNumber: admin.phoneNumber,
       username: admin.email,
-      countryCode: admin.countryCode.phoneNumberCode,
+      countryCode: admin.country.phoneNumberCode,
       country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
       roleIds: [roleId?.id],
       timezone: { id: Number(admin.timezone.id) },
@@ -204,7 +190,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
           successCb: () => {
             toastCenter.success(
               APPCONSTANTS.SUCCESS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_CREATE_SUCCESS, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_CREATE_SUCCESS, districtModuleName)
             );
             handleCancelClick();
             getDistrictDetail();
@@ -214,7 +200,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.ERROR,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_CREATE_FAIL, districtSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_CREATE_FAIL, districtModuleName)
               )
             )
         })
@@ -230,7 +216,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
           successCb: () => {
             toastCenter.success(
               APPCONSTANTS.SUCCESS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_UPDATE_SUCCESS, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_UPDATE_SUCCESS, districtModuleName)
             );
             handleCancelClick();
             getDistrictDetail();
@@ -240,7 +226,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.ERROR,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_UPDATE_FAIL, districtSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_UPDATE_FAIL, districtModuleName)
               )
             )
         })
@@ -283,7 +269,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_SUCCESS, districtSName)
+            formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_SUCCESS, districtModuleName)
           );
           getDistrictDetail();
         },
@@ -292,7 +278,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.ERROR,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_FAIL, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_FAIL, districtModuleName)
             )
           )
       })
@@ -306,13 +292,14 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const handleNavigation = () => {
     let redirectTo: string;
     if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-      redirectTo = PROTECTED_ROUTES.districtDashboard;
+      redirectTo = PROTECTED_ROUTES.DistrictDashboard;
     } else {
       redirectTo = PROTECTED_ROUTES.districtByRegion
         .replace(':regionId', sessionStorageServices.getItem(APPCONSTANTS.FORM_ID))
         .replace(':tenantId', sessionStorageServices.getItem(APPCONSTANTS.ID));
     }
     history.push(redirectTo);
+    history.push(PROTECTED_ROUTES.dashboard);
   };
 
   const handleDeactivate = (values: IDistrictDeactivateFormValues) => {
@@ -325,7 +312,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_SUCCESS, districtSName)
+            formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_SUCCESS, districtModuleName)
           );
           handleNavigation();
         },
@@ -334,7 +321,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.ERROR,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_FAIL, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_FAIL, districtModuleName)
             )
           )
       })
@@ -343,7 +330,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
 
   const getSummaryDetails = () => {
     const { name } = district;
-    return [{ label: `${districtSName} Name`, value: name }];
+    return [{ label: `${districtModuleName} Name`, value: name }];
   };
 
   return (
@@ -352,12 +339,12 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       <div className='row g-0dot625'>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={isReadOnly ? undefined : `Edit ${districtSName}`}
+            buttonLabel={isReadOnly ? undefined : `Edit ${districtModuleName}`}
             customLabel={isReadOnly ? '' : 'Consent form'}
             onCustomClick={() => (isReadOnly ? null : handleConsentFormOpen(district))}
             customButtonIcon={isReadOnly ? '' : IconLegal}
             isEdit={true}
-            header={`${districtSName} Summary`}
+            header={`${districtModuleName} Summary`}
             onButtonClick={openDistrictEditModal}
           >
             <div className='row  gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
@@ -372,8 +359,8 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         </div>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={isReadOnly ? undefined : `Add ${districtSName} Admin`}
-            header={`${districtSName} Admin`}
+            buttonLabel={isReadOnly ? undefined : `Add ${districtModuleName} Admin`}
+            header={`${districtModuleName} Admin`}
             searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
             isSearch={true}
             onSearch={handleSearch}
@@ -408,8 +395,11 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
               isDelete={!isReadOnly}
               onRowEdit={openEditModal}
               onDeleteClick={handleAdminDeleteClick}
-              confirmationTitle={formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_CONFIRMATION, districtSName)}
-              deleteTitle={formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_TITLE, districtSName)}
+              confirmationTitle={formatUserToastMsg(
+                APPCONSTANTS.DISTRICT_ADMIN_DELETE_CONFIRMATION,
+                districtModuleName
+              )}
+              deleteTitle={formatUserToastMsg(APPCONSTANTS.DISTRICT_ADMIN_DELETE_TITLE, districtModuleName)}
             />
           </DetailCard>
         </div>
@@ -420,7 +410,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         />
         <Modal
           show={isOpenAdminModal}
-          title={`${isAdd ? 'Add' : 'Edit'} ${districtSName} Admin`}
+          title={`${isAdd ? 'Add' : 'Edit'} ${districtModuleName} Admin`}
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}
@@ -431,13 +421,13 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         />
         <Modal
           show={isOpenDistrictModal}
-          title={isOpenDeactivateModal ? `Deactivate ${districtSName}` : `Edit ${districtSName}`}
+          title={isOpenDeactivateModal ? `Deactivate ${districtModuleName}` : `Edit ${districtModuleName}`}
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}
           handleFormSubmit={!isOpenDeactivateModal ? handleDistrictFormSubmit : handleDeactivate}
           initialValues={!isOpenDeactivateModal ? { district } : {}}
-          deactivateLabel={!isOpenDeactivateModal ? `Deactivate ${districtSName}` : ''}
+          deactivateLabel={!isOpenDeactivateModal ? `Deactivate ${districtModuleName}` : ''}
           handleDeactivate={showDeactivateModal}
           isDeactivateModal={isOpenDeactivateModal}
           render={editDeactivateModalRender}

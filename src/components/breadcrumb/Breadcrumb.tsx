@@ -44,7 +44,7 @@ const customBreadcrumbs = [
   { route: PROTECTED_ROUTES.createHealthFacility, label: 'Add Health Facility', appendParent: true },
   { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true },
   { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
-  { route: PROTECTED_ROUTES.createCountyByRegion, label: 'Create County', appendParent: true },
+  { route: PROTECTED_ROUTES.createDistrictByRegion, label: 'Create District', appendParent: true },
   { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' }
 ];
 
@@ -272,7 +272,7 @@ const Breadcrumb = (): React.ReactElement => {
   }, [urlRouteIdDispatch]);
 
   const prevPathname = useRef(pathname);
-  // Clearing the region/account/subCounty/site data in reducer, to prevent showing wrong data in breadcrumb
+  // Clearing the region/district/chiefdom/site data in reducer, to prevent showing wrong data in breadcrumb
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       const prevRoute = {
@@ -340,7 +340,7 @@ const Breadcrumb = (): React.ReactElement => {
 
   const clearData = useCallback(() => {
     dispatch(clearRegionDetail());
-    // clear county, sub county and facility details
+    // clear district, chiefdom and facility details
   }, []);
 
   return (

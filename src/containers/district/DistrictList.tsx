@@ -68,9 +68,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
   const consentFormConfig = useRef({} as any);
   const [openConsentForm, setOpenConsentForm] = useState(false);
   const { regionId, tenantId } = useParams<IMatchParams>();
-  const {
-    district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  const { district: districtModuleName } = NAME_CONSTANTS;
 
   const fetchDetails = useCallback(() => {
     dispatch(
@@ -85,7 +83,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
             )
           )
       })
@@ -155,7 +153,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_SUCCESS, districtSName)
+            formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_SUCCESS, districtModuleName)
           );
           handlePage(APPCONSTANTS.INITIAL_PAGE);
           handleCancelClick();
@@ -165,7 +163,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_FAIL, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_UPDATE_FAIL, districtModuleName)
             )
           )
       })
@@ -185,7 +183,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_SUCCESS, districtSName)
+            formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_SUCCESS, districtModuleName)
           );
           props.history.push(
             PROTECTED_ROUTES.districtByRegion
@@ -198,7 +196,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.ERROR,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_FAIL, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_DEACTIVATE_FAIL, districtModuleName)
             )
           )
       })
@@ -207,7 +205,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
 
   const editModalRender = (form: any) => {
     return isOpenDeactivateModal ? (
-      <Deactivation formName={districtSName.toLowerCase()} />
+      <Deactivation formName={districtModuleName.toLowerCase()} />
     ) : (
       <DistrictForm form={form} />
     );
@@ -229,8 +227,8 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
       <div className={`row g-0dot625`}>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={`Add ${districtSName}`}
-            header={districtSName}
+            buttonLabel={`Add ${districtModuleName}`}
+            header={districtModuleName}
             isSearch={true}
             onSearch={handleSearch}
             onButtonClick={openAddModal}
@@ -268,13 +266,13 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
         />
         <Modal
           show={isOpenDistrictModal}
-          title={isOpenDeactivateModal ? `Deactivate ${districtSName}` : `Edit ${districtSName}`}
+          title={isOpenDeactivateModal ? `Deactivate ${districtModuleName}` : `Edit ${districtModuleName}`}
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}
           handleFormSubmit={!isOpenDeactivateModal ? handleDistrictFormSubmit : handleDeactivate}
           initialValues={!isOpenDeactivateModal ? { district: districtToBeEdited.current } : {}}
-          deactivateLabel={!isOpenDeactivateModal ? `Deactivate ${districtSName}` : ''}
+          deactivateLabel={!isOpenDeactivateModal ? `Deactivate ${districtModuleName}` : ''}
           handleDeactivate={showDeactivateModal}
           isDeactivateModal={isOpenDeactivateModal}
           render={editModalRender}

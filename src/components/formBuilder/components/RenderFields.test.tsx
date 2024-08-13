@@ -533,8 +533,7 @@ describe('RenderFields Test Cases', () => {
       newlyAddedIds: [],
       handleUpdateFieldName: jest.fn(),
       hashFieldIdsWithTitle: {},
-      hashFieldIdsWithFieldName: {},
-      isAccountCustomization: false
+      hashFieldIdsWithFieldName: {}
     };
     const wrapper = mount(
       <Provider store={store}>
@@ -562,8 +561,7 @@ describe('RenderFields Test Cases', () => {
       newlyAddedIds: [],
       handleUpdateFieldName: jest.fn(),
       hashFieldIdsWithTitle: {},
-      hashFieldIdsWithFieldName: {},
-      isAccountCustomization: false
+      hashFieldIdsWithFieldName: {}
     };
     const wrapper = mount(
       <Provider store={store}>

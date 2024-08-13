@@ -4,19 +4,19 @@ import { Provider, useDispatch, useSelector } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import Router, { MemoryRouter, useParams } from 'react-router';
 import userEvent from '@testing-library/user-event';
-import SubCountyForm from '../SubCountyForm';
-import { fetchCountyListDetailReq, fetchCountyOptionsRequest } from '../../../store/county/actions';
+import ChiefdomForm from '../ChiefdomForm';
+import { fetchDistrictListDetailReq, fetchDistrictOptionsRequest } from '../../../store/district/actions';
 import {
-  countyOptionsLoadingSelector,
-  countyOptionsSelector,
-  countySelector,
-  countyLoadingSelector
-} from '../../../store/county/selectors';
+  districtOptionsLoadingSelector,
+  districtOptionsSelector,
+  districtSelector,
+  districtLoadingSelector
+} from '../../../store/district/selectors';
 import { roleSelector } from '../../../store/user/selectors';
 import '@testing-library/jest-dom/extend-expect';
 import { Form } from 'react-final-form';
 import '@testing-library/jest-dom/extend-expect';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/subCountyDataConstants';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/chiefdomDataConstants';
 
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
@@ -33,7 +33,7 @@ const mockStore = configureMockStore();
 const initialValues = MOCK_DATA_CONSTANTS.TEST_FORM_INITIAL_VALUES;
 const store = mockStore(MOCK_DATA_CONSTANTS.TEST_STORE_INITIAL_VALUES);
 
-describe('SubCountyForm', () => {
+describe('ChiefdomForm', () => {
   const dispatchMock = jest.fn();
   const useSelectorMock = jest.fn();
   let useParamsMock = jest.fn();
@@ -42,18 +42,18 @@ describe('SubCountyForm', () => {
     (useDispatch as any).mockReturnValue(dispatchMock);
     (useSelector as any).mockImplementation(useSelectorMock);
     useParamsMock = useParams as jest.Mock;
-    useParamsMock.mockReturnValue({ regionId: '1', countyId: '1', tenantId: '1' });
+    useParamsMock.mockReturnValue({ regionId: '1', districtId: '1', tenantId: '1' });
     useSelectorMock.mockImplementation((selector: any) => {
-      if (selector === countyOptionsSelector) {
-        return [{ id: 1, name: 'Account 1' }];
+      if (selector === districtOptionsSelector) {
+        return [{ id: 1, name: 'District 1' }];
       }
-      if (selector === countyOptionsLoadingSelector) {
+      if (selector === districtOptionsLoadingSelector) {
         return false;
       }
-      if (selector === countySelector) {
-        return { id: 1, name: 'Account 1' };
+      if (selector === districtSelector) {
+        return { id: 1, name: 'District 1' };
       }
-      if (selector === countyLoadingSelector) {
+      if (selector === districtLoadingSelector) {
         return false;
       }
       if (selector === roleSelector) {
@@ -69,7 +69,7 @@ describe('SubCountyForm', () => {
               // form submission logic
             }}
             initialValues={initialValues}
-            render={() => <SubCountyForm nestingKey='subCounty' />}
+            render={() => <ChiefdomForm nestingKey='chiefdom' />}
           />
         </MemoryRouter>
       </Provider>
@@ -80,27 +80,27 @@ describe('SubCountyForm', () => {
     jest.clearAllMocks();
   });
 
-  it('renders SubCountyForm without errors and dispatches fetchAccountOptionsRequest', async () => {
-    const input = screen.getByRole('textbox', { name: 'subCounty.name' });
+  it('renders ChiefdomForm without errors and dispatches fetchDistrictOptionsRequest', async () => {
+    const input = screen.getByRole('textbox', { name: 'chiefdom.name' });
     expect(input).toBeInTheDocument();
-    dispatchMock(fetchCountyOptionsRequest('3'));
-    jest.spyOn(Router, 'useParams').mockReturnValue({ regionId: '1', countyId: '1', tenantId: '1' });
+    dispatchMock(fetchDistrictOptionsRequest('3'));
+    jest.spyOn(Router, 'useParams').mockReturnValue({ regionId: '1', districtId: '1', tenantId: '1' });
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(fetchCountyOptionsRequest('3'));
+      expect(dispatchMock).toHaveBeenCalledWith(fetchDistrictOptionsRequest('3'));
     });
   });
 
   it('user event for input', () => {
-    const input = screen.getByRole('textbox', { name: 'subCounty.name' });
+    const input = screen.getByRole('textbox', { name: 'chiefdom.name' });
     userEvent.type(input, 'Sample Text');
     expect(input).toHaveValue('Sample Text');
   });
 
-  it('dispatch fetchAccountDetailReq', async () => {
-    dispatchMock(fetchCountyListDetailReq({ tenantId: '1', id: '2' }));
-    jest.spyOn(Router, 'useParams').mockReturnValue({ regionId: '1', countyId: '1', tenantId: '1' });
+  it('dispatch fetchDistrictDetailReq', async () => {
+    dispatchMock(fetchDistrictListDetailReq({ tenantId: '1', id: '2' }));
+    jest.spyOn(Router, 'useParams').mockReturnValue({ regionId: '1', districtId: '1', tenantId: '1' });
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(fetchCountyListDetailReq({ tenantId: '1', id: '2' }));
+      expect(dispatchMock).toHaveBeenCalledWith(fetchDistrictListDetailReq({ tenantId: '1', id: '2' }));
     });
   });
 });

@@ -48,7 +48,7 @@ export const fetchChiefdomList = (tenantId: string, limit?: number | null, skip?
 export const createChiefdom = (data: IChiefdomFormData) => {
   return axios({
     method: 'POST',
-    url: '/user-service/organization/create-chiefdom',
+    url: '/user-service/organization/create-sub-district',
     data
   });
 };

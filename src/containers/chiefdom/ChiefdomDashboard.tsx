@@ -28,7 +28,6 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
 import styles from './Chiefdom.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { clearSideMenu } from '../../store/common/actions';
 
 const ChiefdomDashboard = () => {
   const dispatch = useDispatch();
@@ -38,10 +37,7 @@ const ChiefdomDashboard = () => {
   const loadingMore = useSelector(chiefdomLoadingMoreSelector);
   const chiefdomDetail = useSelector(getChiefdomDetailSelector);
   const countryId = useSelector(countryIdSelector);
-  const {
-    chiefdom: { s: chiefdomSName, p: chiefdomPName },
-    healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
-  } = NAME_CONSTANTS;
+  const { chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: chiefdomCount,
@@ -58,7 +54,7 @@ const ChiefdomDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomModuleName)
               )
             );
           }
@@ -77,20 +73,12 @@ const ChiefdomDashboard = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomModuleName)
             )
           )
       })
     );
   }, [dispatch]);
-
-  /**
-   * To clear sidemenu
-   */
-  useEffect(() => {
-    dispatch(clearSideMenu());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   /**
    * To clear cache and set current Chiefdom details
@@ -119,7 +107,7 @@ const ChiefdomDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomModuleName)
               )
             )
         })
@@ -130,17 +118,17 @@ const ChiefdomDashboard = () => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      chiefdomDashboardList?.map(({ healthFacilityCount, name, id, tenantId }: IChiefdomSummary) => ({
+      chiefdomDashboardList?.map(({ siteCount, name, id, tenantId }: IChiefdomSummary) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.chiefdomSummary.replace(':chiefdomId', id).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit(id, tenantId, name),
         data: [
           {
             type: 'number',
-            value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-            label: healthFacilitySName,
+            value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
+            label: 'Site',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.healthFacilityByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.hfByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
             onClick: () => {
               if (!chiefdomDetail.id || chiefdomDetail.id !== id) {
                 onDashboardExit(id, tenantId, name);
@@ -175,14 +163,14 @@ const ChiefdomDashboard = () => {
         <div
           className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column ${styles.header}`}
         >
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{chiefdomPName}</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{chiefdomModuleName}s</h4>
           {!noChiefdomsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${chiefdomSName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${chiefdomModuleName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <Link to={createChiefdomRoute} className='ms-sm-1dot5' tabIndex={-1}>
-                <button className='btn primary-btn'>Create {chiefdomSName}</button>
+                <button className='btn primary-btn'>Create {chiefdomModuleName}</button>
               </Link>
             </>
           )}
@@ -198,16 +186,16 @@ const ChiefdomDashboard = () => {
         </div>
         {noChiefdomsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>Letâ€™s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {chiefdomSName.toLowerCase()}</div>
+            <div className='fw-bold highlight-text'>Let’s Get Started!</div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {chiefdomModuleName.toLowerCase()}</div>
             <Link to={createChiefdomRoute} className='mx-auto' tabIndex={-1}>
-              <button className='btn primary-btn'>Create {chiefdomSName}</button>
+              <button className='btn primary-btn'>Create {chiefdomModuleName}</button>
             </Link>
           </div>
         )}
         {noSearchResultAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {chiefdomPName.toLowerCase()} available</div>
+            <div className='fw-bold highlight-text'>No {chiefdomModuleName.toLowerCase()}s available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

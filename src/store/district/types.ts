@@ -111,7 +111,7 @@ export interface IFetchDistrictListRequest {
   isActive: boolean;
   skip?: number;
   limit?: number | null;
-  tenantId?: string | number;
+  tenantId?: string;
   search?: string;
   successCb?: (payload: IFetchDistrictListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
@@ -160,7 +160,6 @@ export interface IAdminEditFormValues {
   tenantId?: string;
   roles: IRoles[];
   role?: IRoles[];
-  suiteAccess?: Array<{ groupName: string; id: string }>;
 }
 
 export interface IDistrictAdmin extends Omit<IAdminEditFormValues, 'timezone'> {
@@ -201,8 +200,8 @@ export interface IFetchDashboardDistrict {
 export interface IDashboardDistrict {
   id: string;
   name: string;
-  chiefdomCount: number;
-  healthFacilityCount: number;
+  ouCount: number;
+  siteCount: number;
   tenantId: string;
 }
 
@@ -293,19 +292,19 @@ export interface IActivateReqPayload {
   successCb: () => void;
   failureCb: () => void;
 }
-export interface IActivateAccountReq {
-  type: typeof ACTION_TYPES.ACTIVATE_ACCOUNT_REQUEST;
+export interface IActivateDistrictReq {
+  type: typeof ACTION_TYPES.ACTIVATE_DISTRICT_REQUEST;
   data: { tenantId: number };
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IActivateDistrictSuccess {
-  type: typeof ACTION_TYPES.ACTIVATE_ACCOUNT_SUCCESS;
+  type: typeof ACTION_TYPES.ACTIVATE_DISTRICT_SUCCESS;
 }
 
 export interface IActivateDistrictFail {
-  type: typeof ACTION_TYPES.ACTIVATE_ACCOUNT_FAIL;
+  type: typeof ACTION_TYPES.ACTIVATE_DISTRICT_FAIL;
   error: Error;
 }
 
@@ -418,12 +417,65 @@ export interface IFetchClinicalWorkflowFailure {
   type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE;
 }
 
-export interface IWorkflowModuleReqPayload {
+export interface ICountyWorkflowModuleReqPayload {
   name?: string;
   viewScreens?: string[];
   countryId?: string;
   tenantId: string;
   id?: string;
+}
+export interface IDeleteCountyWorkflowModuleReqPayload {
+  id: string;
+  tenantId: string;
+}
+export interface ICreateCountyWorkflowModule {
+  type: typeof ACTION_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_REQUEST;
+  data: ICountyWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface ICreateCountyWorkflowModuleSuccess {
+  type: typeof ACTION_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_SUCCESS;
+}
+
+export interface ICreateCountyWorkflowModuleFail {
+  type: typeof ACTION_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_FAILURE;
+  error: Error;
+}
+
+export interface IUpdateCountyWorkflowModule {
+  type: typeof ACTION_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST;
+  data: ICountyWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IDeleteCountyWorkflowModule {
+  type: typeof ACTION_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_REQUEST;
+  data: IDeleteCountyWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IUpdateCountyWorkflowModuleSuccess {
+  type: typeof ACTION_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_SUCCESS;
+}
+
+export interface IUpdateCountyWorkflowModuleFail {
+  type: typeof ACTION_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_FAILURE;
+  error: Error;
+}
+export interface IDeleteCountyWorkflowModuleSuccess {
+  type: typeof ACTION_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_SUCCESS;
+}
+
+export interface IDeleteCountyWorkflowModuleFail {
+  type: typeof ACTION_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_FAILURE;
+  error: Error;
+}
+
+export interface IResetCountyWorkFlowModule {
+  type: typeof ACTION_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST;
 }
 
 export type DistrictActions =
@@ -452,7 +504,7 @@ export type DistrictActions =
   | IDeleteDistrictAdminReq
   | IDeleteDistrictAdminSuccess
   | IDeleteDistrictAdminFail
-  | IActivateAccountReq
+  | IActivateDistrictReq
   | IActivateDistrictSuccess
   | IActivateDistrictFail
   | IRemoveDeactivatedAccountList
@@ -468,4 +520,14 @@ export type DistrictActions =
   | IClearDistrictAdmin
   | IFetchClinicalWorkflowReq
   | IFetchClinicalWorkflowSuccess
-  | IFetchClinicalWorkflowFailure;
+  | IFetchClinicalWorkflowFailure
+  | ICreateCountyWorkflowModule
+  | ICreateCountyWorkflowModuleSuccess
+  | ICreateCountyWorkflowModuleFail
+  | IUpdateCountyWorkflowModule
+  | IUpdateCountyWorkflowModuleSuccess
+  | IUpdateCountyWorkflowModuleFail
+  | IDeleteCountyWorkflowModule
+  | IDeleteCountyWorkflowModuleSuccess
+  | IDeleteCountyWorkflowModuleFail
+  | IResetCountyWorkFlowModule;

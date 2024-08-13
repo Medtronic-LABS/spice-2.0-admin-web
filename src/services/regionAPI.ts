@@ -51,9 +51,9 @@ export const createRegion = (data: IRegionPayload) =>
     data
   });
 
-export const getRegionDetail = (data: IFetchRegionDetailReqPayload) =>
+export const getCountryDetail = (data: IFetchRegionDetailReqPayload) =>
   axios({
-    url: '/admin-service/data/country/details',
+    url: '/admin-service/country/details',
     method: 'POST',
     data
   });

@@ -89,7 +89,7 @@ const MOCK_DATA_CONSTANTS = {
     {
       id: '1',
       name: 'Chiefdom One',
-      healthFacilityCount: 45,
+      siteCount: 45,
       groupCount: 3,
       tenantId: '7'
     }

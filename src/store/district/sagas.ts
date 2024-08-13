@@ -14,15 +14,18 @@ import {
   IDeleteDistrictAdminReq,
   IDeactivateDistrictReq,
   IFetchDistrictOptionsRequest,
-  IActivateAccountReq,
+  IActivateDistrictReq,
   IDistrict,
+  ICreateCountyWorkflowModule,
   IFetchClinicalWorkflowReq,
   IClinicalWorkflow,
+  IUpdateCountyWorkflowModule,
   IFetchClinicalWorkflowSuccessPayload,
+  IDeleteCountyWorkflowModule,
   IFetchDistrictOptionsPayload
 } from './types';
 import * as districtActions from './actions';
-import * as hfActions from '../healthFacility/actions';
+import * as siteActions from '../healthFacilityDashboard/actions';
 import {
   FETCH_DISTRICT_LIST_REQUEST,
   CREATE_DISTRICT_REQUEST,
@@ -34,8 +37,11 @@ import {
   DELETE_DISTRICT_ADMIN_REQUEST,
   DEACTIVATE_DISTRICT_REQUEST,
   FETCH_DISTRICT_OPTIONS_REQUEST,
-  ACTIVATE_ACCOUNT_REQUEST,
-  FETCH_CLINICAL_WORKFLOW_REQUEST
+  ACTIVATE_DISTRICT_REQUEST,
+  FETCH_CLINICAL_WORKFLOW_REQUEST,
+  CREATE_COUNTY_WORKFLOW_MODULE_REQUEST,
+  UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST,
+  DELETE_COUNTY_WORKFLOW_MODULE_REQUEST
 } from './actionTypes';
 import { AppState } from '../rootReducer';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -223,7 +229,7 @@ export function* deactivateDistrict({ data, successCb, failureCb }: IDeactivateD
   try {
     yield call(districtService.deactivateDistrict, data);
     yield put(districtActions.deactivateDistrictSuccess());
-    yield put(hfActions.clearHFDropdown());
+    yield put(siteActions.clearSiteDropdown());
     successCb?.();
   } catch (e) {
     if (e instanceof Error) {
@@ -234,17 +240,17 @@ export function* deactivateDistrict({ data, successCb, failureCb }: IDeactivateD
 }
 
 /*
-  Worker Saga: Fired on ACTIVATE_ACCOUNT_REQUEST action
+  Worker Saga: Fired on ACTIVATE_DISTRICT_REQUEST action
 */
-export function* activateAccount({ data, successCb, failureCb }: IActivateAccountReq) {
+export function* activateDistrict({ data, successCb, failureCb }: IActivateDistrictReq) {
   try {
-    yield call(districtService.activateAccount, data);
-    yield put(districtActions.activateAccountSuccess());
+    yield call(districtService.activateDistrict, data);
+    yield put(districtActions.activateDistrictSuccess());
     successCb?.();
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(districtActions.activateAccountFail(e));
+      yield put(districtActions.activateDistrictFail(e));
     }
   }
 }
@@ -292,6 +298,66 @@ export function* fetchClinicalWorkflows({ data }: IFetchClinicalWorkflowReq): Sa
 }
 
 /*
+  Worker Saga: Fired on CREATE_COUNTY_WORKFLOW_MODULE_REQUEST action
+*/
+export function* createCountyWorkflowRequest({
+  data,
+  successCb,
+  failureCb
+}: ICreateCountyWorkflowModule): SagaIterator {
+  try {
+    yield call(districtService.createCountyWorkflowModule, data);
+    successCb?.();
+    yield put(districtActions.createCountyWorkflowModuleSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(districtActions.createCountyWorkflowModuleFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST action
+*/
+export function* updateCountyWorkflowRequest({
+  data,
+  successCb,
+  failureCb
+}: IUpdateCountyWorkflowModule): SagaIterator {
+  try {
+    yield call(districtService.updateCountyWorkflowModule, data);
+    successCb?.();
+    yield put(districtActions.updateCountyWorkflowModuleSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(districtActions.updateCountyWorkflowModuleFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on DELETE_COUNTY_WORKFLOW_MODULE_REQUEST action
+*/
+export function* deleteCountyWorkflowRequest({
+  data,
+  successCb,
+  failureCb
+}: IDeleteCountyWorkflowModule): SagaIterator {
+  try {
+    yield call(districtService.deleteCountyWorkflowModule, data);
+    successCb?.();
+    yield put(districtActions.deleteCountyWorkflowModuleSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(districtActions.deleteCountyWorkflowModuleFailure(e));
+    }
+  }
+}
+
+/*
   Starts worker saga on latest dispatched specific action.
 */
 function* districtSaga() {
@@ -303,10 +369,13 @@ function* districtSaga() {
   yield all([takeLatest(UPDATE_DISTRICT_ADMIN_REQUEST, updateDistrictAdminInfo)]);
   yield all([takeLatest(CREATE_DISTRICT_ADMIN_REQUEST, createDistrictAdminInfo)]);
   yield all([takeLatest(DELETE_DISTRICT_ADMIN_REQUEST, removeDistrictAdmin)]);
-  yield all([takeLatest(ACTIVATE_ACCOUNT_REQUEST, activateAccount)]);
+  yield all([takeLatest(ACTIVATE_DISTRICT_REQUEST, activateDistrict)]);
   yield all([takeLatest(DEACTIVATE_DISTRICT_REQUEST, deactivateDistrict)]);
   yield all([takeLatest(FETCH_DISTRICT_OPTIONS_REQUEST, fetchDistrictOptions)]);
   yield all([takeLatest(FETCH_CLINICAL_WORKFLOW_REQUEST, fetchClinicalWorkflows)]);
+  yield all([takeLatest(CREATE_COUNTY_WORKFLOW_MODULE_REQUEST, createCountyWorkflowRequest)]);
+  yield all([takeLatest(UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST, updateCountyWorkflowRequest)]);
+  yield all([takeLatest(DELETE_COUNTY_WORKFLOW_MODULE_REQUEST, deleteCountyWorkflowRequest)]);
 }
 
 export default districtSaga;

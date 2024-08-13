@@ -22,7 +22,6 @@ import { countryIdSelector, formDataIdSelector, tenantIdSelector } from '../../s
 
 import styles from './District.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { clearSideMenu } from '../../store/common/actions';
 
 const DistrictDashboard = () => {
   const dispatch = useDispatch();
@@ -34,10 +33,7 @@ const DistrictDashboard = () => {
   const loadingMore = useSelector(districtDashboardLoadingMoreSelector);
   const countryId = useSelector(countryIdSelector);
   const { push } = useHistory();
-  const {
-    district: { s: districtSName, p: districtPName },
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: count,
@@ -54,7 +50,7 @@ const DistrictDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
               )
             );
           }
@@ -76,14 +72,6 @@ const DistrictDashboard = () => {
     [countryId, dispatch]
   );
 
-  /**
-   * To clear sidemenu
-   */
-  useEffect(() => {
-    dispatch(clearSideMenu());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   useEffect(() => {
     dispatch(
       fetchDistrictDashboardList({
@@ -94,7 +82,7 @@ const DistrictDashboard = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
             )
           )
       })
@@ -116,7 +104,7 @@ const DistrictDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
               )
             )
         })
@@ -127,34 +115,30 @@ const DistrictDashboard = () => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      districtList?.map(
-        ({ healthFacilityCount, chiefdomCount, name, tenantId: _id, id: formDataId }: IDashboardDistrict) => ({
-          title: name,
-          _id,
-          formId: formDataId,
-          detailRoute: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', _id),
-          setBreadcrumbDetails: () => onDashboardExit({ id: formDataId, name, tenantId: _id }),
-          data: [
-            {
-              type: 'number',
-              value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-              label: chiefdomSName,
-              disableEllipsis: true,
-              route: PROTECTED_ROUTES.chiefdomByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
-              onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
-            },
-            {
-              type: 'number',
-              value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-              label: 'Health Facility',
-              route: PROTECTED_ROUTES.healthFacilityByDistrict
-                .replace(':districtId', formDataId)
-                .replace(':tenantId', _id),
-              onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
-            }
-          ]
-        })
-      ),
+      districtList?.map(({ siteCount, ouCount, name, tenantId: _id, id: formDataId }: IDashboardDistrict) => ({
+        title: name,
+        _id,
+        formId: formDataId,
+        detailRoute: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', _id),
+        setBreadcrumbDetails: () => onDashboardExit({ id: formDataId, name, tenantId: _id }),
+        data: [
+          {
+            type: 'number',
+            value: Number(ouCount) ? appendZeroBefore(ouCount, 2) : '-',
+            label: chiefdomModuleName,
+            disableEllipsis: true,
+            route: PROTECTED_ROUTES.chiefdomByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
+            onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
+          },
+          {
+            type: 'number',
+            value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
+            label: 'Health Facility',
+            route: PROTECTED_ROUTES.hfByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
+            onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
+          }
+        ]
+      })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [districtList, onDashboardExit]
   );
@@ -162,7 +146,7 @@ const DistrictDashboard = () => {
   const noDistrictAvailable = !(searchText.current || parsedData.length);
   const noSearchRecordsAvailable = Boolean(searchText.current && !parsedData.length);
 
-  const navigateToCreateDistrict = () => {
+  const navigateToCreateAcc = () => {
     push(PROTECTED_ROUTES.createDistrictByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId));
   };
 
@@ -170,14 +154,14 @@ const DistrictDashboard = () => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className='col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column'>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{districtPName}</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{districtModuleName}s</h4>
           {!noDistrictAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${districtSName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${districtModuleName}`} onSearch={onSearch} isOutlined={false} />
               </span>
-              <button className='ms-sm-1dot5 btn primary-btn' onClick={navigateToCreateDistrict}>
-                Create {districtSName}
+              <button className='ms-sm-1dot5 btn primary-btn' onClick={navigateToCreateAcc}>
+                Create {districtModuleName}
               </button>
             </>
           )}
@@ -194,15 +178,15 @@ const DistrictDashboard = () => {
         {noDistrictAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {districtSName.toLowerCase()}</div>
-            <button className='btn primary-btn mx-auto' onClick={navigateToCreateDistrict}>
-              Create {districtSName}
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {districtModuleName.toLowerCase()}</div>
+            <button className='btn primary-btn mx-auto' onClick={navigateToCreateAcc}>
+              Create {districtModuleName}
             </button>
           </div>
         )}
         {noSearchRecordsAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {districtSName} available</div>
+            <div className='fw-bold highlight-text'>No {districtModuleName} available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

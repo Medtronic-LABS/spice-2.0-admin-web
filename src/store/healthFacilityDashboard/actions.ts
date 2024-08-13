@@ -4,10 +4,10 @@ import {
   IFetchSiteListRequest,
   IFetchSiteListSuccess,
   IFetchSiteListSuccessPayload,
-  IFetchCountyDropdownRequest,
-  IFetchCountyDropdownSuccess,
-  IFetchCountyDropdownSuccessPayload,
-  IFetchCountyDropdownFailure,
+  IFetchDistrictDropdownRequest,
+  IFetchDistrictDropdownSuccess,
+  IFetchDistrictDropdownSuccessPayload,
+  IFetchDistrictDropdownFailure,
   ICreateSiteRequest,
   ICreateSiteSuccess,
   ICreateSiteFailure,
@@ -40,9 +40,9 @@ import {
   IDeleteSiteUserRequest,
   IDeleteSiteUserSuccess,
   IDeleteSiteUserFailure,
-  IFetchSubCountyDropdownSuccessPayload,
-  IFetchSubCountyDropdownSuccess,
-  IFetchSubCountyDropdownFailure,
+  IFetchChiefdomDropdownSuccessPayload,
+  IFetchChiefdomDropdownSuccess,
+  IFetchChiefdomDropdownFailure,
   ICreateSiteRequestPayload,
   ISiteSummary,
   ISiteUpdateReqPayload,
@@ -59,7 +59,7 @@ import {
   IFetchSiteDropdownRequest,
   IFetchSiteDropdownSuccess,
   IFetchSiteDropdownSuccessPayload,
-  IFetchSubCountyDropdownRequest
+  IFetchChiefdomDropdownRequest
 } from '../healthFacilityDashboard/types';
 
 export const fetchSiteListRequest = ({
@@ -93,37 +93,45 @@ export const fetchSiteListFailure = (error: Error): IFetchSiteListFailure => ({
   error
 });
 
-export const fetchSiteCountyDropdownRequest = ({ countryId }: { countryId: string }): IFetchCountyDropdownRequest => ({
-  type: SITE_TYPES.FETCH_COUNTY_DROPDOWN_REQUEST,
+export const fetchSiteDistrictDropdownRequest = ({
+  countryId
+}: {
+  countryId: string;
+}): IFetchDistrictDropdownRequest => ({
+  type: SITE_TYPES.FETCH_DISTRICT_DROPDOWN_REQUEST,
   countryId
 });
 
-export const fetchSiteCountyDropdownSuccess = (
-  payload: IFetchCountyDropdownSuccessPayload
-): IFetchCountyDropdownSuccess => ({
-  type: SITE_TYPES.FETCH_COUNTY_DROPDOWN_SUCCESS,
+export const fetchSiteDistrictDropdownSuccess = (
+  payload: IFetchDistrictDropdownSuccessPayload
+): IFetchDistrictDropdownSuccess => ({
+  type: SITE_TYPES.FETCH_DISTRICT_DROPDOWN_SUCCESS,
   payload
 });
 
-export const fetchSiteCountyDropdownFailure = (error: Error): IFetchCountyDropdownFailure => ({
-  type: SITE_TYPES.FETCH_COUNTY_DROPDOWN_FAILURE,
+export const fetchSiteDistrictDropdownFailure = (error: Error): IFetchDistrictDropdownFailure => ({
+  type: SITE_TYPES.FETCH_DISTRICT_DROPDOWN_FAILURE,
   error
 });
 
-export const fetchSubCountyDropdownRequest = ({ countyId }: { countyId: string }): IFetchSubCountyDropdownRequest => ({
-  type: SITE_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST,
-  countyId
+export const fetchChiefdomDropdownRequest = ({
+  districtId
+}: {
+  districtId: string;
+}): IFetchChiefdomDropdownRequest => ({
+  type: SITE_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST,
+  districtId
 });
 
-export const fetchSubCountyDropdownSuccess = (
-  payload: IFetchSubCountyDropdownSuccessPayload
-): IFetchSubCountyDropdownSuccess => ({
-  type: SITE_TYPES.FETCH_SUB_COUNTY_DROPDOWN_SUCCESS,
+export const fetchChiefdomDropdownSuccess = (
+  payload: IFetchChiefdomDropdownSuccessPayload
+): IFetchChiefdomDropdownSuccess => ({
+  type: SITE_TYPES.FETCH_CHIEFDOM_DROPDOWN_SUCCESS,
   payload
 });
 
-export const fetchSubCountyDropdownFailure = (error: Error): IFetchSubCountyDropdownFailure => ({
-  type: SITE_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAILURE,
+export const fetchChiefdomDropdownFailure = (error: Error): IFetchChiefdomDropdownFailure => ({
+  type: SITE_TYPES.FETCH_CHIEFDOM_DROPDOWN_FAILURE,
   error
 });
 

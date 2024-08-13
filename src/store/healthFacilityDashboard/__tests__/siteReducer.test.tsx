@@ -14,7 +14,7 @@ describe('siteReducer', () => {
         mflCode: '',
         address1: '',
         address2: '',
-        county: {
+        district: {
           id: '',
           name: ''
         },
@@ -29,7 +29,7 @@ describe('siteReducer', () => {
         },
         addressUse: '',
         addressType: '',
-        subCounty: {
+        chiefdom: {
           id: '',
           name: ''
         },
@@ -50,7 +50,7 @@ describe('siteReducer', () => {
           tenantId: 0,
           cultureName: '',
           siteLevel: '',
-          subCountyName: ''
+          chiefdomName: ''
         }
       ],
       siteDashboardList: [
@@ -59,16 +59,16 @@ describe('siteReducer', () => {
           name: '',
           siteType: '',
           tenantId: 0,
-          subCounty: ''
+          chiefdom: ''
         }
       ],
       siteUserList: [],
       loading: false,
       error: null,
-      countyList: [],
-      countyDropdownLoading: false,
-      subCountyList: [],
-      subCountyDropdownLoading: false,
+      districtList: [],
+      districtDropdownLoading: false,
+      chiefdomList: [],
+      chiefdomDropdownLoading: false,
       cultureList: [],
       cultureListLoading: false,
       loadingMore: false,
@@ -192,51 +192,51 @@ describe('siteReducer', () => {
     expect(newState.total).toBe(0);
     expect(newState.siteUserList).toEqual([]);
   });
-  it('should handle FETCH_COUNTY_DROPDOWN_SUCCESS', () => {
-    const countyList = [
-      { id: 1, name: 'County 1' },
-      { id: 2, name: 'County 2' }
+  it('should handle FETCH_DISTRICT_DROPDOWN_SUCCESS', () => {
+    const districtList = [
+      { id: 1, name: 'District 1' },
+      { id: 2, name: 'District 2' }
     ];
     const action: any = {
-      type: SITE_ACTION_TYPES.FETCH_COUNTY_DROPDOWN_SUCCESS,
+      type: SITE_ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_SUCCESS,
       payload: {
-        countyList
+        districtList
       }
     };
     const actionWithNull: any = {
       type: SITE_ACTION_TYPES.FETCH_SITE_USER_LIST_SUCCESS,
       payload: {
-        countyList: null
+        districtList: null
       }
     };
     const newState = siteReducer(initialState, action);
     const newStateWithNull = siteReducer(initialState, actionWithNull);
-    expect(newState.countyDropdownLoading).toBe(false);
-    expect(newState.countyList).toEqual(countyList);
-    expect(newStateWithNull.countyList).toEqual([]);
+    expect(newState.districtDropdownLoading).toBe(false);
+    expect(newState.districtList).toEqual(districtList);
+    expect(newStateWithNull.districtList).toEqual([]);
   });
-  it('should handle FETCH_SUB_COUNTY_DROPDOWN_SUCCESS', () => {
-    const subCountyList = [
-      { id: 1, name: 'SubCounty 1' },
-      { id: 2, name: 'SubCounty 2' }
+  it('should handle FETCH_CHIEFDOM_DROPDOWN_SUCCESS', () => {
+    const chiefdomList = [
+      { id: 1, name: 'Chiefdom 1' },
+      { id: 2, name: 'Chiefdom 2' }
     ];
     const action: any = {
-      type: SITE_ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_SUCCESS,
+      type: SITE_ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_SUCCESS,
       payload: {
-        subCountyList
+        chiefdomList
       }
     };
     const actionWithNull: any = {
       type: SITE_ACTION_TYPES.FETCH_SITE_USER_LIST_SUCCESS,
       payload: {
-        subCountyList: null
+        chiefdomList: null
       }
     };
     const newState = siteReducer(initialState, action);
     const newStateWithNull = siteReducer(initialState, actionWithNull);
-    expect(newState.subCountyDropdownLoading).toBe(false);
-    expect(newState.subCountyList).toEqual(subCountyList);
-    expect(newStateWithNull.subCountyList).toEqual([]);
+    expect(newState.chiefdomDropdownLoading).toBe(false);
+    expect(newState.chiefdomList).toEqual(chiefdomList);
+    expect(newStateWithNull.chiefdomList).toEqual([]);
   });
   it('should handle FETCH_CULTURE_DROPDOWN_SUCCESS', () => {
     const cultureList = [
@@ -366,21 +366,21 @@ describe('siteReducer', () => {
     expect(newState.site).toEqual(siteData);
     expect(newState.loading).toBe(false);
   });
-  it('should handle FETCH_COUNTY_DROPDOWN_REQUEST', () => {
+  it('should handle FETCH_DISTRICT_DROPDOWN_REQUEST', () => {
     const action: any = {
-      type: SITE_ACTION_TYPES.FETCH_COUNTY_DROPDOWN_REQUEST
+      type: SITE_ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_REQUEST
     };
     const newState = siteReducer(initialState, action);
-    expect(newState.countyList).toEqual([]);
-    expect(newState.countyDropdownLoading).toBe(true);
+    expect(newState.districtList).toEqual([]);
+    expect(newState.districtDropdownLoading).toBe(true);
   });
-  it('should handle FETCH_SUB_COUNTY_DROPDOWN_REQUEST', () => {
+  it('should handle FETCH_CHIEFDOM_DROPDOWN_REQUEST', () => {
     const action: any = {
-      type: SITE_ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST
+      type: SITE_ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST
     };
     const newState = siteReducer(initialState, action);
-    expect(newState.subCountyList).toEqual([]);
-    expect(newState.subCountyDropdownLoading).toBe(true);
+    expect(newState.chiefdomList).toEqual([]);
+    expect(newState.chiefdomDropdownLoading).toBe(true);
   });
   it('should handle FETCH_CULTURE_DROPDOWN_REQUEST', () => {
     const action: any = {
@@ -483,33 +483,33 @@ describe('siteReducer', () => {
     };
     expect(siteReducer(initialStateVar, action)).toEqual(expectedState);
   });
-  it('should handle FETCH_COUNTY_DROPDOWN_FAILURE', () => {
+  it('should handle FETCH_DISTRICT_DROPDOWN_FAILURE', () => {
     const initialStateVar: any = {
-      countyDropdownLoading: true,
+      districtDropdownLoading: true,
       error: null
     };
     const action: any = {
-      type: SITE_ACTION_TYPES.FETCH_COUNTY_DROPDOWN_FAILURE,
-      error: 'Failed to fetch county dropdown'
+      type: SITE_ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_FAILURE,
+      error: 'Failed to fetch district dropdown'
     };
     const expectedState = {
-      countyDropdownLoading: false,
-      error: 'Failed to fetch county dropdown'
+      districtDropdownLoading: false,
+      error: 'Failed to fetch district dropdown'
     };
     expect(siteReducer(initialStateVar, action)).toEqual(expectedState);
   });
-  it('should handle FETCH_SUB_COUNTY_DROPDOWN_FAILURE', () => {
+  it('should handle FETCH_CHIEFDOM_DROPDOWN_FAILURE', () => {
     const initialStateVar: any = {
-      subCountyDropdownLoading: true,
+      chiefdomDropdownLoading: true,
       error: null
     };
     const action: any = {
-      type: SITE_ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAILURE,
-      error: 'Failed to fetch sub county dropdown'
+      type: SITE_ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_FAILURE,
+      error: 'Failed to fetch chiefdom dropdown'
     };
     const expectedState = {
-      subCountyDropdownLoading: false,
-      error: 'Failed to fetch sub county dropdown'
+      chiefdomDropdownLoading: false,
+      error: 'Failed to fetch chiefdom dropdown'
     };
     expect(siteReducer(initialStateVar, action)).toEqual(expectedState);
   });
@@ -530,16 +530,16 @@ describe('siteReducer', () => {
   });
   it('should handle CLEAR_DROPDOWN_VALUES', () => {
     const initialStateVar: any = {
-      countyList: ['County 1', 'County 2'],
-      subCountyList: ['Sub County 1', 'Sub County 2'],
+      districtList: ['District 1', 'District 2'],
+      chiefdomList: ['Chiefdom 1', 'Chiefdom 2'],
       cultureList: ['Culture 1', 'Culture 2']
     };
     const action: any = {
       type: SITE_ACTION_TYPES.CLEAR_DROPDOWN_VALUES
     };
     const expectedState = {
-      countyList: [],
-      subCountyList: [],
+      districtList: [],
+      chiefdomList: [],
       cultureList: []
     };
     expect(siteReducer(initialStateVar, action)).toEqual(expectedState);
@@ -647,10 +647,10 @@ describe('siteReducer', () => {
         email: '',
         account: { id: '', name: '', email: '', tenantId: '' },
         mflCode: '',
-        subCounty: { id: '', name: '', email: '', tenantId: '' },
+        chiefdom: { id: '', name: '', email: '', tenantId: '' },
         address1: '',
         address2: '',
-        county: {
+        district: {
           id: '',
           name: ''
         }
@@ -670,10 +670,10 @@ describe('siteReducer', () => {
         siteType: '',
         email: '',
         account: { id: '', name: '', email: '', tenantId: '' },
-        subCounty: { id: '', name: '', email: '', tenantId: '' },
+        chiefdom: { id: '', name: '', email: '', tenantId: '' },
         address1: '',
         address2: '',
-        county: {
+        district: {
           id: '',
           name: ''
         }
@@ -688,10 +688,10 @@ describe('siteReducer', () => {
           siteType: '',
           email: '',
           account: { id: '', name: '', email: '', tenantId: '' },
-          subCounty: { id: '', name: '', email: '', tenantId: '' },
+          chiefdom: { id: '', name: '', email: '', tenantId: '' },
           address1: '',
           address2: '',
-          county: {
+          district: {
             id: '',
             name: ''
           }

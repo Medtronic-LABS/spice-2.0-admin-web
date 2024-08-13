@@ -1,22 +1,22 @@
-import countyReducer from '../reducer';
+import districtReducer from '../reducer';
 import * as types from '../actionTypes';
 
-describe('countyReducer', () => {
+describe('districtReducer', () => {
   it('should handle loading actions as true', () => {
     const initialState: any = {
       loading: false
     };
     const loadingActions = [
-      types.FETCH_COUNTY_LIST_REQUEST,
-      types.FETCH_COUNTY_DETAIL_REQUEST,
+      types.FETCH_DISTRICT_LIST_REQUEST,
+      types.FETCH_DISTRICT_DETAIL_REQUEST,
       types.FETCH_CLINICAL_WORKFLOW_REQUEST,
-      types.CREATE_COUNTY_REQUEST,
-      types.UPDATE_COUNTY_DETAIL_REQUEST,
-      types.DELETE_COUNTY_ADMIN_REQUEST,
-      types.ACTIVATE_COUNTY_REQUEST,
-      types.DEACTIVATE_COUNTY_REQUEST,
-      types.CREATE_COUNTY_ADMIN_REQUEST,
-      types.UPDATE_COUNTY_ADMIN_REQUEST,
+      types.CREATE_DISTRICT_REQUEST,
+      types.UPDATE_DISTRICT_DETAIL_REQUEST,
+      types.DELETE_DISTRICT_ADMIN_REQUEST,
+      types.ACTIVATE_DISTRICT_REQUEST,
+      types.DEACTIVATE_DISTRICT_REQUEST,
+      types.CREATE_DISTRICT_ADMIN_REQUEST,
+      types.UPDATE_DISTRICT_ADMIN_REQUEST,
       types.CREATE_COUNTY_WORKFLOW_MODULE_REQUEST,
       types.UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST,
       types.DELETE_COUNTY_WORKFLOW_MODULE_REQUEST
@@ -26,7 +26,7 @@ describe('countyReducer', () => {
       const expectedState = {
         loading: true
       };
-      expect(countyReducer(initialState, action)).toEqual(expectedState);
+      expect(districtReducer(initialState, action)).toEqual(expectedState);
     });
   });
 
@@ -36,17 +36,17 @@ describe('countyReducer', () => {
       error: null
     };
     const loadingActions = [
-      types.CREATE_COUNTY_SUCCESS,
-      types.CREATE_COUNTY_ADMIN_SUCCESS,
-      types.UPDATE_COUNTY_ADMIN_SUCCESS,
-      types.CREATE_COUNTY_ADMIN_FAIL,
-      types.UPDATE_COUNTY_ADMIN_FAIL,
-      types.DELETE_COUNTY_ADMIN_SUCCESS,
-      types.DELETE_COUNTY_ADMIN_FAIL,
-      types.ACTIVATE_COUNTY_SUCCESS,
-      types.ACTIVATE_COUNTY_FAIL,
-      types.DEACTIVATE_COUNTY_SUCCESS,
-      types.DEACTIVATE_COUNTY_FAIL,
+      types.CREATE_DISTRICT_SUCCESS,
+      types.CREATE_DISTRICT_ADMIN_SUCCESS,
+      types.UPDATE_DISTRICT_ADMIN_SUCCESS,
+      types.CREATE_DISTRICT_ADMIN_FAIL,
+      types.UPDATE_DISTRICT_ADMIN_FAIL,
+      types.DELETE_DISTRICT_ADMIN_SUCCESS,
+      types.DELETE_DISTRICT_ADMIN_FAIL,
+      types.ACTIVATE_DISTRICT_SUCCESS,
+      types.ACTIVATE_DISTRICT_FAIL,
+      types.DEACTIVATE_DISTRICT_SUCCESS,
+      types.DEACTIVATE_DISTRICT_FAIL,
       types.FETCH_CLINICAL_WORKFLOW_FAILURE,
       types.CREATE_COUNTY_WORKFLOW_MODULE_SUCCESS,
       types.UPDATE_COUNTY_WORKFLOW_MODULE_SUCCESS,
@@ -58,68 +58,68 @@ describe('countyReducer', () => {
         loading: false,
         error: null
       };
-      expect(countyReducer(initialState, action)).toEqual(expectedState);
+      expect(districtReducer(initialState, action)).toEqual(expectedState);
     });
   });
 
-  it('should handle FETCH_COUNTY_SUCCESS', () => {
+  it('should handle FETCH_DISTRICT_SUCCESS', () => {
     const initialState: any = {
       loading: false,
-      countyList: [],
+      districtList: [],
       total: 0,
       error: null
     };
     const action: any = {
-      type: types.FETCH_COUNTY_LIST_SUCCESS,
+      type: types.FETCH_DISTRICT_LIST_SUCCESS,
       payload: {
-        countyList: [
-          { id: 1, name: 'County 1' },
-          { id: 2, name: 'County 2' }
+        districtList: [
+          { id: 1, name: 'District 1' },
+          { id: 2, name: 'District 2' }
         ],
         total: 2
       }
     };
     const expectedState = {
       loading: false,
-      countyList: [
-        { id: 1, name: 'County 1' },
-        { id: 2, name: 'County 2' }
+      districtList: [
+        { id: 1, name: 'District 1' },
+        { id: 2, name: 'District 2' }
       ],
       total: 2,
       error: null
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle CLEAR_COUNTY', () => {
+  it('should handle CLEAR_DISTRICT', () => {
     const initialState: any = {
       loading: false,
-      countyList: [],
+      districtList: [],
       total: 0,
       error: null
     };
     const action: any = {
-      type: types.CLEAR_COUNTY_LIST
+      type: types.CLEAR_DISTRICT_LIST
     };
     const expectedState = {
       loading: false,
-      countyList: [],
+      districtList: [],
       total: 0,
       error: null
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_FAILURE', () => {
+  it('should handle FETCH_DISTRICT_FAILURE', () => {
     const initialState: any = {
       loading: false,
       error: null
     };
-    const error: any = 'Error fetching county';
+    const error: any = 'Error fetching district';
     const loadingActions = [
-      types.FETCH_COUNTY_LIST_FAILURE,
-      types.CREATE_COUNTY_FAILURE,
-      types.UPDATE_COUNTY_DETAIL_FAIL,
+      types.FETCH_DISTRICT_LIST_FAILURE,
+      types.CREATE_DISTRICT_FAILURE,
+      types.UPDATE_DISTRICT_DETAIL_FAIL,
       types.CREATE_COUNTY_WORKFLOW_MODULE_FAILURE,
       types.UPDATE_COUNTY_WORKFLOW_MODULE_FAILURE,
       types.DELETE_COUNTY_WORKFLOW_MODULE_FAILURE
@@ -130,37 +130,37 @@ describe('countyReducer', () => {
         loading: false,
         error
       };
-      expect(countyReducer(initialState, action)).toEqual(expectedState);
+      expect(districtReducer(initialState, action)).toEqual(expectedState);
     });
   });
 
-  it('should remove all county from state when removing deactivated county list', () => {
+  it('should remove all district from state when removing deactivated district list', () => {
     const initialState: any = {
       loading: false,
-      countyList: [
-        { id: 1, name: 'County 1' },
-        { id: 2, name: 'County 2' }
+      districtList: [
+        { id: 1, name: 'District 1' },
+        { id: 2, name: 'District 2' }
       ],
       error: null
     };
     const action: any = {
-      type: types.REMOVE_DEACTIVATED_COUNTY_LIST
+      type: types.REMOVE_DEACTIVATED_ACCOUNT_LIST
     };
     const expectedState = {
       loading: false,
-      countyList: [],
+      districtList: [],
       error: null
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_DETAIL_FAILURE', () => {
-    const initialState: any = { loading: true, error: null, county: { id: 1, name: 'Test County' } };
-    const action: any = { type: types.FETCH_COUNTY_DETAIL_FAILURE, error: 'Error fetching county details' };
+  it('should handle FETCH_DISTRICT_DETAIL_FAILURE', () => {
+    const initialState: any = { loading: true, error: null, district: { id: 1, name: 'Test District' } };
+    const action: any = { type: types.FETCH_DISTRICT_DETAIL_FAILURE, error: 'Error fetching district details' };
     const expectedState = {
       loading: false,
-      error: 'Error fetching county details',
-      county: {
+      error: 'Error fetching district details',
+      district: {
         id: '',
         maxNoOfUsers: '',
         name: '',
@@ -175,39 +175,39 @@ describe('countyReducer', () => {
       }
     };
 
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_DETAIL_SUCCESS', () => {
+  it('should handle FETCH_DISTRICT_DETAIL_SUCCESS', () => {
     const initialState: any = {
-      county: {},
+      district: {},
       total: 0,
       loading: false,
       error: null
     };
-    const county = { id: 1, name: 'John Doe' };
+    const district = { id: 1, name: 'John Doe' };
     const action: any = {
-      type: types.FETCH_COUNTY_DETAIL_SUCCESS,
-      payload: county
+      type: types.FETCH_DISTRICT_DETAIL_SUCCESS,
+      payload: district
     };
     const expectedState = {
       ...initialState,
-      county,
+      district,
       loading: false
     };
-    const actualState = countyReducer(initialState, action);
+    const actualState = districtReducer(initialState, action);
     expect(actualState).toEqual(expectedState);
   });
 
-  it('should handle SEACRH_COUNTY_USER_SUCCESS', () => {
+  it('should handle SEACRH_DISTRICT_USER_SUCCESS', () => {
     const initialState: any = {
       loading: true,
-      county: {
+      district: {
         users: []
       }
     };
     const action: any = {
-      type: types.SEACRH_COUNTY_USER_SUCCESS,
+      type: types.SEACRH_DISTRICT_USER_SUCCESS,
       payload: [
         { id: 1, name: 'John' },
         { id: 2, name: 'Jane' }
@@ -216,14 +216,14 @@ describe('countyReducer', () => {
 
     const expectedState = {
       loading: false,
-      county: {
+      district: {
         users: [
           { id: 1, name: 'John' },
           { id: 2, name: 'Jane' }
         ]
       }
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
   it('should set loading to true when isLoadMore is false', () => {
@@ -232,7 +232,7 @@ describe('countyReducer', () => {
       loadingMore: false
     };
     const action: any = {
-      type: types.FETCH_COUNTY_DASHBOARD_LIST_REQUEST,
+      type: types.FETCH_DISTRICT_DASHBOARD_LIST_REQUEST,
       payload: {
         isLoadMore: false
       }
@@ -241,11 +241,11 @@ describe('countyReducer', () => {
       loading: true,
       loadingMore: false
     };
-    const resultState = countyReducer(initialState, action);
+    const resultState = districtReducer(initialState, action);
     expect(resultState).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_DASHBOARD_LIST_SUCCESS when isLoadMore is false', () => {
+  it('should handle FETCH_DISTRICT_DASHBOARD_LIST_SUCCESS when isLoadMore is false', () => {
     const initialState: any = {
       dashboardList: [],
       total: 0,
@@ -253,7 +253,7 @@ describe('countyReducer', () => {
       loading: false
     };
     const action: any = {
-      type: types.FETCH_COUNTY_DASHBOARD_LIST_SUCCESS,
+      type: types.FETCH_DISTRICT_DASHBOARD_LIST_SUCCESS,
       payload: {
         isLoadMore: false,
         data: [
@@ -272,10 +272,10 @@ describe('countyReducer', () => {
       loadingMore: false,
       loading: false
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_DASHBOARD_LIST_SUCCESS when isLoadMore is true', () => {
+  it('should handle FETCH_DISTRICT_DASHBOARD_LIST_SUCCESS when isLoadMore is true', () => {
     const initialState: any = {
       dashboardList: [{ id: 1, name: 'Dashboard 1' }],
       total: 1,
@@ -283,7 +283,7 @@ describe('countyReducer', () => {
       loading: false
     };
     const action: any = {
-      type: types.FETCH_COUNTY_DASHBOARD_LIST_SUCCESS,
+      type: types.FETCH_DISTRICT_DASHBOARD_LIST_SUCCESS,
       payload: {
         isLoadMore: true,
         data: [
@@ -303,10 +303,10 @@ describe('countyReducer', () => {
       loadingMore: false,
       loading: false
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_DASHBOARD_LIST_SUCCESS when total is not provided', () => {
+  it('should handle FETCH_DISTRICT_DASHBOARD_LIST_SUCCESS when total is not provided', () => {
     const initialState: any = {
       dashboardList: [],
       total: 0,
@@ -314,7 +314,7 @@ describe('countyReducer', () => {
       loading: false
     };
     const action: any = {
-      type: types.FETCH_COUNTY_DASHBOARD_LIST_SUCCESS,
+      type: types.FETCH_DISTRICT_DASHBOARD_LIST_SUCCESS,
       payload: {
         isLoadMore: false,
         data: [
@@ -332,67 +332,67 @@ describe('countyReducer', () => {
       loadingMore: false,
       loading: false
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_DASHBOARD_LIST_FAIL', () => {
+  it('should handle FETCH_DISTRICT_DASHBOARD_LIST_FAIL', () => {
     const initialState: any = {
       loadingMore: true,
       loading: false,
       dashboardList: [{ id: 1, name: 'Dashboard 1' }]
     };
     const action: any = {
-      type: types.FETCH_COUNTY_DASHBOARD_LIST_FAIL
+      type: types.FETCH_DISTRICT_DASHBOARD_LIST_FAIL
     };
     const expectedState = {
       loadingMore: false,
       loading: false,
       dashboardList: []
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle UPDATE_COUNTY_DETAIL_SUCCESS', () => {
+  it('should handle UPDATE_DISTRICT_DETAIL_SUCCESS', () => {
     const initialState: any = {
       loading: true,
-      county: {
+      district: {
         id: 1,
-        name: 'County 1',
-        email: 'county1@example.com'
+        name: 'District 1',
+        email: 'district1@example.com'
       }
     };
     const action: any = {
-      type: types.UPDATE_COUNTY_DETAIL_SUCCESS,
+      type: types.UPDATE_DISTRICT_DETAIL_SUCCESS,
       data: {
-        name: 'Updated County 1',
+        name: 'Updated District 1',
         phone: '1234567890'
       }
     };
     const expectedState = {
       loading: false,
-      county: {
+      district: {
         id: 1,
-        name: 'Updated County 1',
-        email: 'county1@example.com',
+        name: 'Updated District 1',
+        email: 'district1@example.com',
         phone: '1234567890'
       }
     };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_OPTIONS_REQUEST', () => {
+  it('should handle FETCH_DISTRICT_OPTIONS_REQUEST', () => {
     const initialState: any = {
-      countyOptions: null,
+      districtOptions: null,
       loadingOptions: false
     };
-    const action: any = { type: types.FETCH_COUNTY_OPTIONS_REQUEST };
+    const action: any = { type: types.FETCH_DISTRICT_OPTIONS_REQUEST };
     const expectedState = { ...initialState, loadingOptions: true };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_OPTIONS_SUCCESS', () => {
+  it('should handle FETCH_DISTRICT_OPTIONS_SUCCESS', () => {
     const initialState: any = {
-      countyOptions: null,
+      districtOptions: null,
       loadingOptions: false
     };
     const data = {
@@ -400,25 +400,25 @@ describe('countyReducer', () => {
       option2: 'option2'
     };
     const action: any = {
-      type: types.FETCH_COUNTY_OPTIONS_SUCCESS,
+      type: types.FETCH_DISTRICT_OPTIONS_SUCCESS,
       payload: data
     };
-    const expectedState = { ...initialState, countyOptions: data, loadingOptions: false };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    const expectedState = { ...initialState, districtOptions: data, loadingOptions: false };
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle FETCH_COUNTY_OPTIONS_FAILURE', () => {
+  it('should handle FETCH_DISTRICT_OPTIONS_FAILURE', () => {
     const initialState: any = { loadingOptions: true };
-    const action: any = { type: types.FETCH_COUNTY_OPTIONS_FAILURE };
+    const action: any = { type: types.FETCH_DISTRICT_OPTIONS_FAILURE };
     const expectedState = { loadingOptions: false };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle CLEAR_COUNTY_ADMIN', () => {
+  it('should handle CLEAR_DISTRICT_ADMIN', () => {
     const initialState: any = { admins: [{ id: 1, name: 'John Doe' }], total: 1 };
-    const action: any = { type: types.CLEAR_COUNTY_ADMIN };
+    const action: any = { type: types.CLEAR_DISTRICT_ADMIN };
     const expectedState = { admins: [], total: 0 };
-    expect(countyReducer(initialState, action)).toEqual(expectedState);
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 
   it('should handle FETCH_CLINICAL_WORKFLOW_SUCCESS', () => {
@@ -435,7 +435,7 @@ describe('countyReducer', () => {
       total: 2
     };
     const action: any = { type: types.FETCH_CLINICAL_WORKFLOW_SUCCESS, payload: data };
-    const state = countyReducer(initialState, action);
+    const state = districtReducer(initialState, action);
 
     expect(state.clinicalWorkflows).toEqual(data.data);
     expect(state.clinicalWorkflowsCount).toEqual(data.total);
@@ -449,7 +449,7 @@ describe('countyReducer', () => {
       loading: false
     };
     const action: any = { type: types.RESET_CLINICAL_WORKFLOW_REQUEST };
-    const state = countyReducer(initialState, action);
+    const state = districtReducer(initialState, action);
 
     expect(state.clinicalWorkflows).toEqual([]);
     expect(state.clinicalWorkflowsCount).toEqual(0);
