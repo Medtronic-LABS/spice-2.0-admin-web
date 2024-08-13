@@ -23,16 +23,16 @@ export const fetchSiteList = (parms: IFetchSiteListRequest) =>
     }
   });
 
-export const fetchSiteCounty = (countryId: string) =>
+export const fetchSiteDistrict = (countryId: string) =>
   axios({
     method: 'GET',
-    url: `admin-service/data/county-list/${countryId}`
+    url: `admin-service/data/district-list/${countryId}`
   });
 
-export const fetchSubCounty = (countyId: string) =>
+export const fetchChiefdom = (districtId: string) =>
   axios({
     method: 'GET',
-    url: `admin-service/data/subcounty-by-county-id/${countyId}`
+    url: `admin-service/data/chiefdom-by-district-id/${districtId}`
   });
 
 export const fetchSiteCulture = () =>

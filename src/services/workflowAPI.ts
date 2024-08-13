@@ -15,19 +15,19 @@ export const fetchCustomizationForm = ({
   category,
   cultureId,
   countryId,
-  countyId,
+  districtId,
   clinicalWorkflowId
 }: IFetchCustomizationFormRequest) =>
   axios({
     method: 'POST',
-    url: `/admin-service/${countyId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/details`,
+    url: `/admin-service/${districtId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/details`,
     data: {
       tenantId,
       type: formType,
       category,
       cultureId,
       countryId,
-      countyId,
+      districtId,
       clinicalWorkflowId
     }
   });
@@ -45,21 +45,21 @@ export const updateCustomizationForm = ({
   tenantId,
   payload,
   countryId,
-  countyId,
+  districtId,
   workflowId,
   clinicalWorkflowId,
   cultureId
 }: ICustomizeFormRequest) =>
   axios({
     method: formId ? 'PUT' : 'POST',
-    url: `/admin-service/${countyId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/${
+    url: `/admin-service/${districtId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/${
       formId ? 'update' : 'create'
     }`,
     data: {
       type: formType,
       countryId,
       tenantId,
-      countyId,
+      districtId,
       category,
       formInput: payload,
       id: formId,

@@ -10,7 +10,7 @@ const initialState: ISiteState = {
     email: '',
     address1: '',
     address2: '',
-    county: {
+    district: {
       id: '',
       name: ''
     },
@@ -25,7 +25,7 @@ const initialState: ISiteState = {
     },
     addressUse: '',
     addressType: '',
-    subCounty: {
+    chiefdom: {
       id: '',
       name: ''
     },
@@ -47,7 +47,7 @@ const initialState: ISiteState = {
       tenantId: 0,
       cultureName: '',
       siteLevel: '',
-      subCountyName: ''
+      chiefdomName: ''
     }
   ],
   siteDashboardList: [
@@ -56,16 +56,16 @@ const initialState: ISiteState = {
       name: '',
       siteType: '',
       tenantId: 0,
-      subCounty: ''
+      chiefdom: ''
     }
   ],
   siteUserList: [],
   loading: false,
   error: null,
-  countyList: [],
-  countyDropdownLoading: false,
-  subCountyList: [],
-  subCountyDropdownLoading: false,
+  districtList: [],
+  districtDropdownLoading: false,
+  chiefdomList: [],
+  chiefdomDropdownLoading: false,
   cultureList: [],
   cultureListLoading: false,
   loadingMore: false,
@@ -125,17 +125,17 @@ const siteReducer = (state: ISiteState = initialState, action = {} as SiteAction
         total: 0,
         siteUserList: []
       };
-    case SITE_ACTION_TYPES.FETCH_COUNTY_DROPDOWN_SUCCESS:
+    case SITE_ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_SUCCESS:
       return {
         ...state,
-        countyDropdownLoading: false,
-        countyList: action.payload.countyList || []
+        districtDropdownLoading: false,
+        districtList: action.payload.districtList || []
       };
-    case SITE_ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_SUCCESS:
+    case SITE_ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_SUCCESS:
       return {
         ...state,
-        subCountyDropdownLoading: false,
-        subCountyList: action.payload.subCountyList || []
+        chiefdomDropdownLoading: false,
+        chiefdomList: action.payload.chiefdomList || []
       };
     case SITE_ACTION_TYPES.FETCH_CULTURE_DROPDOWN_SUCCESS:
       return {
@@ -181,17 +181,17 @@ const siteReducer = (state: ISiteState = initialState, action = {} as SiteAction
         ...state,
         loading: true
       };
-    case SITE_ACTION_TYPES.FETCH_COUNTY_DROPDOWN_REQUEST:
+    case SITE_ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_REQUEST:
       return {
         ...state,
-        countyList: [],
-        countyDropdownLoading: true
+        districtList: [],
+        districtDropdownLoading: true
       };
-    case SITE_ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST:
+    case SITE_ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST:
       return {
         ...state,
-        subCountyList: [],
-        subCountyDropdownLoading: true
+        chiefdomList: [],
+        chiefdomDropdownLoading: true
       };
     case SITE_ACTION_TYPES.FETCH_CULTURE_DROPDOWN_REQUEST:
       return {
@@ -217,16 +217,16 @@ const siteReducer = (state: ISiteState = initialState, action = {} as SiteAction
         ...state,
         error: action.error
       };
-    case SITE_ACTION_TYPES.FETCH_COUNTY_DROPDOWN_FAILURE:
+    case SITE_ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_FAILURE:
       return {
         ...state,
-        countyDropdownLoading: false,
+        districtDropdownLoading: false,
         error: action.error
       };
-    case SITE_ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAILURE:
+    case SITE_ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_FAILURE:
       return {
         ...state,
-        subCountyDropdownLoading: false,
+        chiefdomDropdownLoading: false,
         error: action.error
       };
     case SITE_ACTION_TYPES.FETCH_CULTURE_DROPDOWN_FAILURE:
@@ -238,8 +238,8 @@ const siteReducer = (state: ISiteState = initialState, action = {} as SiteAction
     case SITE_ACTION_TYPES.CLEAR_DROPDOWN_VALUES:
       return {
         ...state,
-        countyList: [],
-        subCountyList: [],
+        districtList: [],
+        chiefdomList: [],
         cultureList: []
       };
     case SITE_ACTION_TYPES.FETCH_SITE_DROPDOWN_SUCCESS:

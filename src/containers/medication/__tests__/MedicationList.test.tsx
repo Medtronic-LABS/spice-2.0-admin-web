@@ -19,7 +19,7 @@ jest.mock('../../../constants/appConstants', () => ({
     ADMIN: 'REGION_ADMIN',
     PEER_SUPEVISOR: 'PEER_SUPERVISOR'
   },
-  ACTIVATE_COUNTY_CONFIRMATION: undefined
+  ACTIVATE_ACCOUNT_CONFIRMATION: undefined
 }));
 
 describe('MedicationList', () => {

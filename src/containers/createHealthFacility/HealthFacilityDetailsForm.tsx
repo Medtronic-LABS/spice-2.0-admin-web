@@ -42,10 +42,11 @@ import { userDataSelector } from '../../store/user/selectors';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from './Workflows';
-import { fetchCountyListRequest } from '../../store/county/actions';
-import { countyLoadingSelector, getCountyListSelector } from '../../store/county/selectors';
-import { fetchSubCountyListRequest } from '../../store/subCounty/actions';
-import { subCountyListSelector, subCountyLoadingSelector } from '../../store/subCounty/selectors';
+import { fetchDistrictListRequest } from '../../store/district/actions';
+import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
+import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { NAME_CONSTANTS } from '../../constants/appConstants';
 
 interface IAddUserFormProps {
   formName: string;
@@ -58,8 +59,8 @@ interface IAddUserFormProps {
 
 interface IMatchParams {
   regionId?: string;
-  subCountyId?: string;
-  countyId?: string;
+  chiefdomId?: string;
+  districtId?: string;
 }
 
 /**
@@ -82,16 +83,17 @@ const HealthFacilityDetailsForm = ({
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
-  const countyList = useSelector(getCountyListSelector);
-  const subCountyList = useSelector(subCountyListSelector);
-  const countyLoading = useSelector(countyLoadingSelector);
-  const subCountyLoading = useSelector(subCountyLoadingSelector);
+  const districtList = useSelector(getDistrictListSelector);
+  const chiefdomList = useSelector(chiefdomListSelector);
+  const districtLoading = useSelector(districtLoadingSelector);
+  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
   const languages = useSelector(cultureListSelector);
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
   const countryId = Number(regionId || regionData?.id);
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   // Culture list fetch
   useEffect(() => {
@@ -107,41 +109,41 @@ const HealthFacilityDetailsForm = ({
     }
   }, [dispatch, hfTypesList.length]);
 
-  // County fetch
+  // District fetch
   useEffect(() => {
-    if (!countyList.length) {
-      dispatch(fetchCountyListRequest({ tenantId: String(countryId), isActive: true }));
+    if (!districtList.length) {
+      dispatch(fetchDistrictListRequest({ tenantId: String(countryId), isActive: true }));
     }
-  }, [dispatch, countyList.length, countryId]);
+  }, [dispatch, districtList.length, countryId]);
 
   // Peer Supervisor fetch
   useEffect(() => {
-    const tenantId = form.getState().values.healthFacility?.county?.tenantId;
+    const tenantId = form.getState().values.healthFacility?.district?.tenantId;
     if (tenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.county?.tenantId]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId]);
 
-  // SubCounty fetch
+  // Chiefdom fetch
   useEffect(() => {
-    const countyId = form.getState().values.healthFacility?.county?.tenantId;
-    if (countyId) {
-      dispatch(fetchSubCountyListRequest({ tenantId: countyId }));
+    const districtId = form.getState().values.healthFacility?.district?.tenantId;
+    if (districtId) {
+      dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.county?.id]);
+  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.id]);
 
   // Villages fetch
   useEffect(() => {
-    const countyId = form.getState().values.healthFacility.county?.id;
-    const subCountyId = form.getState().values.healthFacility.subCounty?.id;
-    if (subCountyId && countyId) {
+    const districtId = form.getState().values.healthFacility.district?.id;
+    const chiefdomId = form.getState().values.healthFacility.chiefdom?.id;
+    if (chiefdomId && districtId) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
-          districtId: Number(countyId),
-          chiefdomId: Number(subCountyId)
+          districtId: Number(districtId),
+          chiefdomId: Number(chiefdomId)
         })
       );
       dispatch(
@@ -163,9 +165,9 @@ const HealthFacilityDetailsForm = ({
     countryId,
     dispatch,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility?.county?.id,
+    form.getState().values.healthFacility?.district?.id,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility?.subCounty?.id,
+    form.getState().values.healthFacility?.chiefdom?.id,
     regionId
   ]);
 
@@ -283,7 +285,7 @@ const HealthFacilityDetailsForm = ({
           </div>
           <div className={columnStyle}>
             <Field
-              name={`${formName}.county`}
+              name={`${formName}.district`}
               type='text'
               validate={required}
               render={({ input, meta }) => {
@@ -291,15 +293,15 @@ const HealthFacilityDetailsForm = ({
                   <SelectInput
                     {...(input as any)}
                     {...(meta as any)}
-                    label='County'
-                    errorLabel='county'
+                    label={districtModuleName}
+                    errorLabel={districtModuleName.toLowerCase()}
                     labelKey='name'
                     valueKey='id'
-                    options={countyList || []}
-                    loadingOptions={countyLoading}
+                    options={districtList || []}
+                    loadingOptions={districtLoading}
                     error={(meta.touched && meta.error) || undefined}
                     onChange={(value: any) => {
-                      form.change(`${formName}.subCounty`, undefined);
+                      form.change(`${formName}.chiefdom`, undefined);
                       form.change(`${formName}.peerSupervisors`, undefined);
                       form.change(`${formName}.linkedVillages`, undefined);
                       form.change(`${formName}.city`, undefined);
@@ -315,18 +317,18 @@ const HealthFacilityDetailsForm = ({
           <div className={columnStyle}>
             <Field
               required={true}
-              name={`${formName}.subCounty`}
+              name={`${formName}.chiefdom`}
               validate={required}
               render={({ input, meta }) => (
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label='Sub County'
-                  errorLabel='Sub County'
+                  label={chiefdomModuleName}
+                  errorLabel={chiefdomModuleName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
-                  options={subCountyList}
-                  loadingOptions={subCountyLoading}
+                  options={chiefdomList}
+                  loadingOptions={chiefdomLoading}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(value: any) => {
                     form.change(`${formName}.peerSupervisors`, undefined);

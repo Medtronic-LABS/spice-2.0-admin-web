@@ -1,6 +1,13 @@
 import * as HEALTH_FACILITY_ACTION_TYPES from '../healthFacility/actionTypes';
 
-import { HealthFacilityActions, ICounty, IHFUserGet, IHealthFacility, IHealthFacilityState, ISubCounty } from './types';
+import {
+  HealthFacilityActions,
+  IDistrict,
+  IHFUserGet,
+  IHealthFacility,
+  IHealthFacilityState,
+  IChiefdom
+} from './types';
 
 export const initialState: IHealthFacilityState = {
   hfTotal: 0,
@@ -12,7 +19,7 @@ export const initialState: IHealthFacilityState = {
     phuFocalPersonName: '',
     phuFocalPersonNumber: '',
     address: '',
-    subCounty: {} as ISubCounty,
+    chiefdom: {} as IChiefdom,
     cityName: '',
     latitude: '',
     longitude: '',
@@ -22,7 +29,7 @@ export const initialState: IHealthFacilityState = {
     peerSupervisors: [],
     linkedVillages: [],
     clinicalWorkflows: [],
-    county: {} as ICounty
+    district: {} as IDistrict
   },
   hfTypes: [],
   hfTypesLoading: false,

@@ -34,10 +34,10 @@ export interface ISiteState {
   error: string | null | Error;
   accountList?: ISiteDropdownList[];
   accountDropdownLoading?: boolean;
-  countyList?: ISiteCountyList[];
-  countyDropdownLoading?: boolean;
-  subCountyList?: ISubCountyList[];
-  subCountyDropdownLoading?: boolean;
+  districtList?: ISiteDistrictList[];
+  districtDropdownLoading?: boolean;
+  chiefdomList?: IChiefdomList[];
+  chiefdomDropdownLoading?: boolean;
   cultureList?: ISiteCultureList[];
   cultureListLoading?: boolean;
   loadingMore?: boolean;
@@ -56,7 +56,7 @@ export interface ISiteList {
   tenantId: number;
   cultureName?: string;
   siteLevel: string;
-  subCountyName: string;
+  chiefdomName: string;
 }
 
 export interface ISiteListState {
@@ -104,51 +104,51 @@ export interface ICultureDropdownFailure {
   error: Error;
 }
 
-export interface ISiteCountyList {
+export interface ISiteDistrictList {
   id: string;
   name: string;
 }
 
-export interface ISubCountyList {
+export interface IChiefdomList {
   id: string;
   name: string;
 }
 
-export interface IFetchCountyDropdownSuccessPayload {
-  countyList: ISiteCountyList[];
+export interface IFetchDistrictDropdownSuccessPayload {
+  districtList: ISiteDistrictList[];
 }
 
-export interface IFetchSubCountyDropdownSuccessPayload {
-  subCountyList: ISubCountyList[];
+export interface IFetchChiefdomDropdownSuccessPayload {
+  chiefdomList: IChiefdomList[];
 }
 
-export interface IFetchCountyDropdownRequest {
-  type: typeof ACTION_TYPES.FETCH_COUNTY_DROPDOWN_REQUEST;
+export interface IFetchDistrictDropdownRequest {
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_REQUEST;
   countryId: string;
 }
 
-export interface IFetchCountyDropdownSuccess {
-  type: typeof ACTION_TYPES.FETCH_COUNTY_DROPDOWN_SUCCESS;
-  payload: IFetchCountyDropdownSuccessPayload;
+export interface IFetchDistrictDropdownSuccess {
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_SUCCESS;
+  payload: IFetchDistrictDropdownSuccessPayload;
 }
 
-export interface IFetchCountyDropdownFailure {
-  type: typeof ACTION_TYPES.FETCH_COUNTY_DROPDOWN_FAILURE;
+export interface IFetchDistrictDropdownFailure {
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_DROPDOWN_FAILURE;
   error: Error;
 }
 
-export interface IFetchSubCountyDropdownRequest {
-  type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_REQUEST;
-  countyId: string;
+export interface IFetchChiefdomDropdownRequest {
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_REQUEST;
+  districtId: string;
 }
 
-export interface IFetchSubCountyDropdownSuccess {
-  type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_SUCCESS;
-  payload: IFetchSubCountyDropdownSuccessPayload;
+export interface IFetchChiefdomDropdownSuccess {
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_SUCCESS;
+  payload: IFetchChiefdomDropdownSuccessPayload;
 }
 
-export interface IFetchSubCountyDropdownFailure {
-  type: typeof ACTION_TYPES.FETCH_SUB_COUNTY_DROPDOWN_FAILURE;
+export interface IFetchChiefdomDropdownFailure {
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_DROPDOWN_FAILURE;
   error: Error;
 }
 
@@ -213,14 +213,14 @@ export interface ISiteFormValues {
   account: ISiteDropdownList;
   address1: string;
   address2: string;
-  county: ISiteCountyList;
+  district: ISiteDistrictList;
   postalCode: string;
   phoneNumber: string;
   location: string;
   culture: ISiteCultureList;
   addressUse: ISelectOption;
   addressType: string[];
-  subCounty: ISubCountyList;
+  chiefdom: IChiefdomList;
   city: { label: string; value: { Latitude: number; Longitude: number } };
   latitude: string;
   longitude: string;
@@ -243,17 +243,17 @@ export interface ICreateSiteRequestPayload {
   siteType: string;
   email: string;
   accountId: number;
-  subCounty: object;
+  chiefdom: object;
   address1: string;
   address2: string;
-  countyId: number;
+  districtId: number;
   postalCode: string;
   phoneNumber: string;
   location: string;
   cultureId: number;
   addressUse: string;
   addressType: string;
-  subCountyId: number;
+  chiefdomId: number;
   city: string;
   latitude: string;
   longitude: string;
@@ -265,9 +265,9 @@ export interface ICreateSiteRequestPayload {
 }
 
 export interface ISiteUpdateReqPayload
-  extends Omit<ICreateSiteRequestPayload, 'users' | 'parentOrganizationId' | 'subCounty' | 'account'> {
+  extends Omit<ICreateSiteRequestPayload, 'users' | 'parentOrganizationId' | 'chiefdom' | 'account'> {
   id: string;
-  subCounty: object;
+  chiefdom: object;
   accountId: number;
   users?: any[];
 }
@@ -278,14 +278,14 @@ export interface ISiteSummary {
   email: string;
   address1: string;
   address2: string;
-  county: ISiteCountyList;
+  district: ISiteDistrictList;
   postalCode: string;
   phoneNumber: string;
   location?: string;
   culture: ISiteCultureList;
   addressUse: string;
   addressType: string;
-  subCounty: ISubCountyList;
+  chiefdom: IChiefdomList;
   city?: { label: string; value: { Latitude: number | string; Longitude: number | string } };
   country: string | ISiteDropdownList;
   siteLevel: ISelectOption;
@@ -301,9 +301,9 @@ export interface ICreateSiteRequest {
   failureCb?: (error: Error) => void;
 }
 
-export interface ISubCountyRequest {
+export interface IChiefdomRequest {
   type: typeof ACTION_TYPES.CREATE_SITE_REQUEST;
-  countyId: string;
+  districtId: string;
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }
@@ -498,7 +498,7 @@ export interface ISiteDashboard {
   name: string;
   siteType: string;
   tenantId: number;
-  subCounty?: string;
+  chiefdom?: string;
 }
 export interface IFetchSiteDashboardListSuccess {
   type: typeof ACTION_TYPES.FETCH_SITE_DASHBOARD_LIST_SUCCESS;
@@ -569,12 +569,12 @@ export type SiteActions =
   | IFetchSiteListSuccess
   | IFetchSiteListFailure
   | ICultureDropdownFailure
-  | IFetchCountyDropdownRequest
-  | IFetchCountyDropdownSuccess
-  | IFetchCountyDropdownFailure
-  | IFetchSubCountyDropdownRequest
-  | IFetchSubCountyDropdownSuccess
-  | IFetchSubCountyDropdownFailure
+  | IFetchDistrictDropdownRequest
+  | IFetchDistrictDropdownSuccess
+  | IFetchDistrictDropdownFailure
+  | IFetchChiefdomDropdownRequest
+  | IFetchChiefdomDropdownSuccess
+  | IFetchChiefdomDropdownFailure
   | ICreateSiteRequest
   | ICreateSiteSuccess
   | ICreateSiteFailure

@@ -1,7 +1,7 @@
 import { Field } from 'react-final-form';
 import SelectInput from '../../formFields/SelectInput';
 import { required } from '../../../utils/validation';
-import APPCONSTANTS from '../../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../../constants/appConstants';
 import Checkbox from '../../formFields/Checkbox';
 
 export const SiteUserForm = ({
@@ -15,11 +15,12 @@ export const SiteUserForm = ({
   fields,
   isSiteUser,
   selectedAdmins,
-  countyDetails,
-  subCountyDetails,
+  districtDetails,
+  chiefdomDetails,
   isAdminForm
 }: any) => {
-  const { ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN, REGION_ADMIN, SUPER_ADMIN } = APPCONSTANTS.ROLES;
+  const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN, REGION_ADMIN, SUPER_ADMIN } = APPCONSTANTS.ROLES;
+  const { chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   return (
     <>
@@ -77,21 +78,21 @@ export const SiteUserForm = ({
         </>
       ) : !isAdminForm ? (
         <>
-          {[ACCOUNT_ADMIN, HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN].includes(selectedAdmins) && (
+          {[DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
               <Field
-                name={`${name}.county`}
+                name={`${name}.district`}
                 type='text'
                 validate={required}
                 render={({ input, meta }) => (
                   <SelectInput
                     {...(input as any)}
-                    label='County'
-                    errorLabel='county'
+                    label='District'
+                    errorLabel='district'
                     labelKey='name'
                     valueKey='id'
-                    options={countyDetails.list}
-                    loadingOptions={countyDetails.loaing}
+                    options={districtDetails.list}
+                    loadingOptions={districtDetails.loaing}
                     error={isError(meta)}
                     isModel={true}
                   />
@@ -99,21 +100,21 @@ export const SiteUserForm = ({
               />
             </div>
           )}
-          {[HEALTH_FACILITY_ADMIN, SUB_COUNTY_ADMIN].includes(selectedAdmins) && (
+          {[HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
               <Field
-                name={`${name}.subCounty`}
+                name={`${name}.chiefdom`}
                 type='text'
                 validate={required}
                 render={({ input, meta }) => (
                   <SelectInput
                     {...(input as any)}
-                    label='Sub County'
-                    errorLabel='subCounty'
+                    label={chiefdomModuleName}
+                    errorLabel='chiefdom'
                     labelKey='name'
                     valueKey='id'
-                    options={subCountyDetails.list}
-                    loadingOptions={subCountyDetails.loading}
+                    options={chiefdomDetails.list}
+                    loadingOptions={chiefdomDetails.loading}
                     error={isError(meta)}
                     isModel={true}
                   />

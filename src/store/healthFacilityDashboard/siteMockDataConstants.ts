@@ -4,13 +4,13 @@ const SITE_MOCK_DATA = {
       id: 261,
       name: 'Hostor',
       tenantId: 372,
-      subCountyName: 'Dar es Salaam- Sanofi',
+      chiefdomName: 'Dar es Salaam- Sanofi',
       culture: 'English - India',
       siteLevel: 'Level 3',
       siteType: 'Clinic'
     }
   ],
-  SITE_COUNTY_LIST_RESPONSE: [
+  SITE_DISTRICT_LIST_RESPONSE: [
     {
       id: '29',
       createdBy: 1,
@@ -24,7 +24,7 @@ const SITE_MOCK_DATA = {
       deleted: false
     }
   ],
-  SITE_SUB_COUNTY_RESPONSE: [
+  SITE_CHIEFDOM_RESPONSE: [
     {
       id: '654',
       name: 'Temeke'
@@ -45,8 +45,8 @@ const SITE_MOCK_DATA = {
     siteType: 'Clinic',
     addressUse: 'Home',
     addressType: 'Physical',
-    countyId: 29,
-    subCountyId: 654,
+    districtId: 29,
+    chiefdomId: 654,
     culture: 1,
     latitude: '1',
     longitude: '1',
@@ -56,7 +56,7 @@ const SITE_MOCK_DATA = {
     accountId: 2,
     parentOrganizationId: 136,
     tenantId: 136,
-    subCounty: {
+    chiefdom: {
       id: 14
     },
     countryId: 2,
@@ -140,7 +140,7 @@ const SITE_MOCK_DATA = {
       name: 'Tanzaniaa',
       tenantId: '207'
     },
-    county: {
+    district: {
       id: '68',
       name: 'Arusha'
     },
@@ -150,7 +150,7 @@ const SITE_MOCK_DATA = {
       tenantId: '80',
       email: ''
     },
-    subCounty: {
+    chiefdom: {
       id: '11',
       name: 'Arusha- Sanofi',
       tenantId: '159'
@@ -244,7 +244,7 @@ const SITE_MOCK_DATA = {
       id: '1',
       name: 'KKKT Mtoni Dispensary',
       tenantId: '43',
-      subCountyName: 'Dar es Salaam- Sanofi',
+      chiefdomName: 'Dar es Salaam- Sanofi',
       cultureName: 'English - India',
       siteLevel: 'Level 1',
       siteType: 'Clinic'
@@ -256,11 +256,11 @@ const SITE_MOCK_DATA = {
         id: 82,
         name: 'SDA Hospital Obuasi',
         tenantId: 180,
-        subCountyName: 'Ashanti Region-CHAG',
+        chiefdomName: 'Ashanti Region-CHAG',
         cultureName: 'English - India',
         siteLevel: 'Level 3',
         siteType: 'Clinic',
-        subCounty: ''
+        chiefdom: ''
       }
     ],
     total: 10,

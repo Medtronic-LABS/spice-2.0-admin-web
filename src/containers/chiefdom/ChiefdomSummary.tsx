@@ -59,10 +59,7 @@ const ChiefdomSummary = () => {
   const adminLoading = useSelector(healthFacilityLoadingSelector);
   const isReadOnly = currentRole === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN;
   const { chiefdomId, tenantId }: { chiefdomId: string; tenantId: string } = useParams();
-  const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
   const countryIdValue = useCountryId();
 
   // Edit Chiefdom
@@ -85,7 +82,7 @@ const ChiefdomSummary = () => {
           setShowChiefdomEditModal(false);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_SUCCESS, chiefdomSName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_SUCCESS, chiefdomModuleName)
           );
         },
         failureCb: (e: Error) =>
@@ -93,7 +90,7 @@ const ChiefdomSummary = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_FAIL, chiefdomSName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_FAIL, chiefdomModuleName)
             )
           )
       })
@@ -128,7 +125,7 @@ const ChiefdomSummary = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_DETAIL_FETCH_ERROR, chiefdomSName)
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_DETAIL_FETCH_ERROR, chiefdomModuleName)
               )
             )
         })
@@ -177,7 +174,7 @@ const ChiefdomSummary = () => {
           setShowChiefdomAdminModal(false);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_UPDATE_SUCCESS, chiefdomSName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_UPDATE_SUCCESS, chiefdomModuleName)
           );
         },
         failureCb: (e: Error) =>
@@ -185,7 +182,7 @@ const ChiefdomSummary = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_UPDATE_FAIL, chiefdomSName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_UPDATE_FAIL, chiefdomModuleName)
             )
           )
       })
@@ -218,7 +215,7 @@ const ChiefdomSummary = () => {
           getChiefdomDetails(searchTerm);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_CREATE_SUCCESS, chiefdomSName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_CREATE_SUCCESS, chiefdomModuleName)
           );
         },
         failureCb: (e: Error) =>
@@ -226,7 +223,7 @@ const ChiefdomSummary = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_CREATE_FAIL, chiefdomSName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_CREATE_FAIL, chiefdomModuleName)
             )
           )
       })
@@ -240,7 +237,7 @@ const ChiefdomSummary = () => {
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_SUCCESS, chiefdomSName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_SUCCESS, chiefdomModuleName)
           );
           getChiefdomDetails(searchTerm);
         },
@@ -249,7 +246,7 @@ const ChiefdomSummary = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_FAIL, chiefdomSName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_FAIL, chiefdomModuleName)
             )
           )
       })
@@ -266,8 +263,8 @@ const ChiefdomSummary = () => {
 
   const data = useMemo(
     () => [
-      { label: `${chiefdomSName} Name`, value: ChiefdomDetail.name },
-      { label: districtSName, value: ChiefdomDetail.districtName }
+      { label: `${chiefdomModuleName} Name`, value: ChiefdomDetail.name },
+      { label: districtModuleName, value: ChiefdomDetail.districtName }
     ],
     [ChiefdomDetail]
   );
@@ -306,9 +303,9 @@ const ChiefdomSummary = () => {
       <div className='row g-0dot625'>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={isReadOnly ? undefined : `Edit ${chiefdomSName}`}
+            buttonLabel={isReadOnly ? undefined : `Edit ${chiefdomModuleName}`}
             isEdit={true}
-            header={`${chiefdomSName} Summary`}
+            header={`${chiefdomModuleName} Summary`}
             onButtonClick={openChiefdomEditModal}
           >
             <div className='row gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
@@ -323,8 +320,8 @@ const ChiefdomSummary = () => {
         </div>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={isReadOnly ? undefined : `Add ${chiefdomSName} Admin`}
-            header={`${chiefdomSName} Admin`}
+            buttonLabel={isReadOnly ? undefined : `Add ${chiefdomModuleName} Admin`}
+            header={`${chiefdomModuleName} Admin`}
             isSearch={true}
             onSearch={handleSearch}
             searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
@@ -337,14 +334,17 @@ const ChiefdomSummary = () => {
               isDelete={!isReadOnly}
               onRowEdit={handleEditChiefdomAdminClick}
               onDeleteClick={handleChiefdomAdminDelete}
-              deleteTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_TITLE, chiefdomSName)}
-              confirmationTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_CONFIRMATION, chiefdomSName)}
+              deleteTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_TITLE, chiefdomModuleName)}
+              confirmationTitle={formatUserToastMsg(
+                APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_CONFIRMATION,
+                chiefdomModuleName
+              )}
             />
           </DetailCard>
         </div>
       </div>
       <ModalForm
-        title={`Edit ${chiefdomSName}`}
+        title={`Edit ${chiefdomModuleName}`}
         cancelText='Cancel'
         submitText='Submit'
         show={showChiefdomEditModal}
@@ -355,7 +355,7 @@ const ChiefdomSummary = () => {
         <ChiefdomForm isEdit={true} />
       </ModalForm>
       <ModalForm
-        title={`${isChiefdomAdminEdit ? 'Edit' : 'Add'} ${chiefdomSName} Admin`}
+        title={`${isChiefdomAdminEdit ? 'Edit' : 'Add'} ${chiefdomModuleName} Admin`}
         cancelText='Cancel'
         submitText='Submit'
         show={showChiefdomAdminModal}

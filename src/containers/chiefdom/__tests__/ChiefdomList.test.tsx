@@ -1,12 +1,12 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { MemoryRouter, Route } from 'react-router-dom';
-import userEvent from '@testing-library/user-event';
 import ChiefdomList from '../ChiefdomList';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
-import { IChiefdomDetail } from '../../../store/chiefdom/types';
+import { IChiefdomDetail, IChiefdomList } from '../../../store/chiefdom/types';
+import { waitFor } from '@testing-library/react';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/edit.svg', () => ({
@@ -93,8 +93,8 @@ describe('Chiefdom List', () => {
     });
   });
 
-  it('should render the component and handle action callbacks', async () => {
-    render(
+  it('should component render', () => {
+    const componentWrapper = mount(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/tenant/1']}>
           <Route path='/tenant/:tenantId'>
@@ -104,34 +104,18 @@ describe('Chiefdom List', () => {
       </Provider>
     );
 
-    // Ensure that the CustomTable component is rendered
-    const customTable = await screen.findByRole('table'); // or use another appropriate query
-    expect(customTable).toBeInTheDocument();
-
-    // Get the dispatched actions
+    expect(componentWrapper.find('CustomTable')).toHaveLength(1);
     const actions = store.getActions();
     const fetchOUListAction = actions.find((action: { type: string }) => action.type === 'FETCH_CHIEFDOM_LIST_REQUEST');
-
-    // Check if failureCb is part of the action payload and mock the failure callback if necessary
-    if (fetchOUListAction && fetchOUListAction.failureCb) {
-      const failureCbSpy = jest.spyOn(fetchOUListAction, 'failureCb');
-
-      // Trigger the failure callback
-      fetchOUListAction.failureCb({ message: 'error' });
-
-      // Verify the callback was called
-      await waitFor(() => {
-        expect(failureCbSpy).toHaveBeenCalled();
-      });
-
-      failureCbSpy.mockRestore();
-    } else {
-      throw new Error('fetchOUListAction or failureCb is not defined');
-    }
+    fetchOUListAction.failureCb({ message: 'error' });
+    const failureCbSpy = jest.spyOn(fetchOUListAction, 'failureCb');
+    waitFor(() => {
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+    failureCbSpy.mockRestore();
   });
-
-  it('should redirect to create Chiefdom', async () => {
-    render(
+  it('should redirect create Chiefdom', () => {
+    const componentWrapper = mount(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/tenant/1']}>
           <Route path='/tenant/:tenantId'>
@@ -141,11 +125,103 @@ describe('Chiefdom List', () => {
       </Provider>
     );
 
-    const button = screen.getByRole('button', { name: /create/i });
-    userEvent.click(button);
+    const customtableMock: any = componentWrapper.find('DetailCard').props();
+    customtableMock.onButtonClick();
+    waitFor(() => {
+      expect(customtableMock.onButtonClick()).toHaveBeenCalled();
+    });
+  });
+  it('should open Chiefdom edit modal', () => {
+    const componentWrapper = mount(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/tenant/1']}>
+          <Route path='/tenant/:tenantId'>
+            <ChiefdomList />
+          </Route>
+        </MemoryRouter>
+      </Provider>
+    );
 
-    await waitFor(() => {
-      expect(button).toHaveFocus();
+    const customtableMock: any = componentWrapper.find('CustomTable').props();
+    customtableMock.onRowEdit(mockChiefdomDetail);
+    waitFor(() => {
+      expect(customtableMock.onRowEdit).toHaveBeenCalled();
+    });
+    componentWrapper.update();
+    const actions = store.getActions();
+    const OUModalAction = actions.find((action: { type: string }) => action.type === 'FETCH_CHIEFDOM_BY_ID_REQUEST');
+    OUModalAction.successCb(mockChiefdomDetail);
+    OUModalAction.failureCb({ message: 'error' });
+    expect(OUModalAction).toBeDefined();
+    const successCbSpy = jest.spyOn(OUModalAction, 'successCb');
+    const failureCbSpy = jest.spyOn(OUModalAction, 'failureCb');
+    waitFor(() => {
+      expect(successCbSpy).toHaveBeenCalled();
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+    successCbSpy.mockRestore();
+    failureCbSpy.mockRestore();
+  });
+  it('should submit form data', () => {
+    const componentWrapper = mount(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/tenant/1']}>
+          <Route path='/tenant/:tenantId'>
+            <ChiefdomList />
+          </Route>
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const customtableMock: any = componentWrapper.find('CustomTable').props();
+    customtableMock.onRowEdit(mockChiefdomDetail);
+    waitFor(() => {
+      expect(customtableMock.onRowEdit).toHaveBeenCalled();
+    });
+    componentWrapper.update();
+    const handlePage = jest.fn();
+    const modalMockProps: any = componentWrapper.find('Memo()[title="Edit Chiefdom"]').props();
+    modalMockProps.handleFormSubmit(mockChiefdomDetail);
+    const actions = store.getActions();
+    const OUModalAction = actions.find((action: { type: string }) => action.type === 'UPDATE_CHIEFDOM_REQUEST');
+    OUModalAction.failureCb({ message: 'error' });
+    expect(OUModalAction).toBeDefined();
+    waitFor(() => {
+      expect(handlePage).toHaveBeenCalled();
+    });
+    const failureCbSpy = jest.spyOn(OUModalAction, 'failureCb');
+    waitFor(() => {
+      expect(failureCbSpy).toHaveBeenCalled();
+      failureCbSpy.mockRestore();
+    });
+  });
+  it('should redirect chiefdom summary', () => {
+    const mockChiefdomList: IChiefdomList = {
+      id: '1',
+      tenantId: 'tenant-1',
+      name: 'Chiefdom 1',
+      email: 'chiefdom1@example.com',
+      district: 'District 1',
+      account: {
+        name: 'district 1'
+      },
+      districtName: 'Chiefdom 1'
+    };
+
+    const componentWrapper = mount(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/tenant/1']}>
+          <Route path='/tenant/:tenantId'>
+            <ChiefdomList />
+          </Route>
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const customtableMock: any = componentWrapper.find('CustomTable').props();
+    customtableMock.handleRowClick(mockChiefdomList);
+    waitFor(() => {
+      expect(customtableMock.handleRowClick(mockChiefdomList)).toHaveBeenCalled();
     });
   });
 });

@@ -11,7 +11,7 @@ export interface IProps {
   handleDeactivate?: (data: any) => void;
   editorContent: string;
   setEditorContent: React.Dispatch<React.SetStateAction<any>>;
-  isAccount?: boolean;
+  isDistrict?: boolean;
   disableDeleteConsentBtn?: boolean;
   setSelectedFormType?: React.Dispatch<React.SetStateAction<{ name: string; id: number }>>;
 }
@@ -21,7 +21,7 @@ const ConsentForm = ({
   handleClose,
   submitConsentForm,
   handleDeactivate,
-  isAccount = true,
+  isDistrict = true,
   editorContent,
   disableDeleteConsentBtn = true,
   setEditorContent,
@@ -40,7 +40,7 @@ const ConsentForm = ({
   return (
     <ModalViewer show={true} title={title} handleCancel={handleClose} size='modal-lg' renderInsideForm={true}>
       <>
-        {isAccount && (
+        {isDistrict && (
           <div className='d-flex'>
             <div className={styles['consent-form-title']}>
               <label>{formTypeLabel}</label>
@@ -64,7 +64,7 @@ const ConsentForm = ({
           </div>
         )}
         <TextEditor
-          editorConfig={{ height: 340, disabled: isAccount && !isFormTypeSelected }}
+          editorConfig={{ height: 340, disabled: isDistrict && !isFormTypeSelected }}
           editorContent={editorContent}
           setEditorContent={setEditorContent}
         />
@@ -73,7 +73,7 @@ const ConsentForm = ({
             type='button'
             className='btn danger-btn me-auto'
             data-dismiss='modal'
-            disabled={(isAccount && !isFormTypeSelected) || !editorContent || disableDeleteConsentBtn}
+            disabled={(isDistrict && !isFormTypeSelected) || !editorContent || disableDeleteConsentBtn}
             onClick={handleDeactivate}
           >
             Delete Consent
@@ -82,7 +82,7 @@ const ConsentForm = ({
             Cancel
           </button>
           <button
-            disabled={isAccount && !isFormTypeSelected}
+            disabled={isDistrict && !isFormTypeSelected}
             onClick={() => submitConsentForm(editorContent)}
             className='btn primary-btn'
           >

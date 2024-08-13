@@ -16,7 +16,6 @@ import {
 import { composeValidators, required, validateEntityName } from '../../utils/validation';
 import { roleSelector } from '../../store/user/selectors';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import TagInput from '../formBuilder/components/fieldUI/TagInput';
 
 interface IChiefdomFormProps {
   nestingKey?: string;
@@ -34,10 +33,7 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
   const districtOptionsLoading = useSelector(districtOptionsLoadingSelector);
   const { regionId, districtId, tenantId } = useParams<{ regionId?: string; districtId?: string; tenantId: string }>();
 
-  const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   useEffect(() => {
     if (regionId && tenantId && !isEdit) {
@@ -92,8 +88,8 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label={`${chiefdomSName} Name`}
-              errorLabel={`${chiefdomSName.toLocaleLowerCase()} name`}
+              label={`${chiefdomModuleName} Name`}
+              errorLabel={`${chiefdomModuleName.toLocaleLowerCase()} name`}
               capitalize={true}
               error={(meta.touched && meta.error) || undefined}
             />
@@ -115,27 +111,9 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
                   loadingOptions={districtOptionsLoading || districtLoading}
                   labelKey='name'
                   valueKey='id'
-                  label={districtSName}
-                  errorLabel={districtSName.toLocaleLowerCase()}
+                  label={districtModuleName}
+                  errorLabel={districtModuleName.toLocaleLowerCase()}
                   error={(meta.touched && meta.error) || undefined}
-                />
-              );
-            }}
-          />
-        </div>
-      )}
-      {!isEdit && (
-        <div className='col-12'>
-          <Field
-            name={'village'}
-            type='text'
-            validate={composeValidators(required, validateEntityName)}
-            render={({ input, meta }) => {
-              return (
-                <TagInput
-                  {...input}
-                  label={`Villages`}
-                  error={!input.value.length && meta.touched ? 'Please add the village name' : ''}
                 />
               );
             }}

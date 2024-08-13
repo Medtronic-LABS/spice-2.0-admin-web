@@ -17,7 +17,7 @@ import { emailSelector, getUserSuiteAccessSelector, userIdSelector } from '../..
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
-import { SU_SA_RA, SU_SA_RA_AA, SU_SA_RA_AA_OUA_HFA } from '../../routes';
+import { SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
 
 interface IUserMenuItem {
   label: string;
@@ -48,13 +48,13 @@ const UserMenu = ({ role }: any) => {
           label: 'Locked Users',
           icon: LockedUserIcon,
           route: PROTECTED_ROUTES.lockedUsers,
-          roles: SU_SA_RA_AA_OUA_HFA
+          roles: SU_SA_RA_DA_CDA_HFA
         },
         {
           label: 'Legal Terms',
           icon: IconLegal,
           route: PROTECTED_ROUTES.legalTerms,
-          roles: SU_SA_RA_AA
+          roles: SU_SA_RA_DA
         },
         {
           label: 'My Profile',

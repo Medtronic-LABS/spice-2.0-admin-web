@@ -27,7 +27,11 @@ import {
   IDownloadFileRequest,
   IDownloadFileSuccess,
   IDownloadFileFailure,
-  IUploadFilePayload
+  IUploadFilePayload,
+  IFetchRegionDetailReqPayload,
+  IFetchCountryDetailReq,
+  IFetchCountryDetailSuccess,
+  IFetchCountryDetailFail
 } from './types';
 
 export const fetchRegionsRequest = ({
@@ -117,6 +121,21 @@ export const regionDetailsSuccess = (payload: { list: IRegionDetailList[]; total
 
 export const regionDetailsFailure = (error: Error): IRegionDetailsFailure => ({
   type: REGION_TYPES.FETCH_REGION_DETAIL_FAILURE,
+  error
+});
+
+export const fetchCountryDetailReq = (payload: IFetchRegionDetailReqPayload): IFetchCountryDetailReq => ({
+  type: REGION_TYPES.FETCH_COUNTRY_DETAILS_REQUEST,
+  payload
+});
+
+export const fetchCountryDetailSuccess = (payload: IRegionDetail): IFetchCountryDetailSuccess => ({
+  type: REGION_TYPES.FETCH_COUNTRY_DETAILS_SUCCESS,
+  payload
+});
+
+export const fetchCountryDetailFail = (error: Error): IFetchCountryDetailFail => ({
+  type: REGION_TYPES.FETCH_COUNTRY_DETAILS_FAILURE,
   error
 });
 

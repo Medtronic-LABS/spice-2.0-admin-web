@@ -35,17 +35,17 @@ import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
 import { goToUrl } from './utils/routeUtil';
 import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
-import CountyList from './containers/county/CountyList';
-import CreateAccount from './containers/createCounty/CreateCounty';
-import CountySummary from './containers/county/CountySummary';
-import CountyDashboard from './containers/county/CountyDashboard';
+import DistrictList from './containers/district/DistrictList';
+import CreateDistrict from './containers/createDistrict/CreateDistrict';
+import DistrictSummary from './containers/district/DistrictSummary';
+import DistrictDashboard from './containers/district/DistrictDashboard';
 import LockedUsers from './containers/lockedUsers/LockedUsers';
 import UserList from './containers/user/UserList';
 import Admins from './containers/admins/AdminList';
-import SubCountyDashboard from './containers/subCounty/SubCountyDashboard';
-import CreateSubCounty from './containers/createSubCounty/CreateSubCounty';
-import SubCountyList from './containers/subCounty/SubCountyList';
-import SubCountySummary from './containers/subCounty/SubCountySummary';
+import ChiefdomDashboard from './containers/chiefdom/ChiefdomDashboard';
+import CreateChiefdom from './containers/createChiefdom/CreateChiefdom';
+import ChiefdomList from './containers/chiefdom/ChiefdomList';
+import ChiefdomSummary from './containers/chiefdom/ChiefdomSummary';
 import RegionCustomization from './containers/region/RegionCustomization';
 import RegionFormCustomization from './containers/region/RegionFormCustomization';
 interface IRoute {
@@ -58,15 +58,15 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, ACCOUNT_ADMIN, SUB_COUNTY_ADMIN } =
+export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } =
   APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
 export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
-export const SU_SA_RA_AA = [...SU_SA_RA, ACCOUNT_ADMIN];
+export const SU_SA_RA_DA = [...SU_SA_RA, DISTRICT_ADMIN];
 export const SU_SA_HFA = [...SU_SA, HEALTH_FACILITY_ADMIN];
-export const SU_SA_RA_AA_OUA = [...SU_SA_RA_AA, SUB_COUNTY_ADMIN];
-export const OUA_SIA = [SUB_COUNTY_ADMIN, HEALTH_FACILITY_ADMIN];
-export const SU_SA_RA_AA_OUA_HFA = [...SU_SA_RA_AA_OUA, HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
+export const CDA_SIA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 export const HFA = [HEALTH_FACILITY_ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
@@ -90,16 +90,16 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.CountyDashboard,
+      path: PROTECTED_ROUTES.DistrictDashboard,
       exact: true,
-      component: CountyDashboard,
+      component: DistrictDashboard,
       authorisedRoles: [REGION_ADMIN]
     },
     {
-      path: PROTECTED_ROUTES.SubCountyDashboard,
+      path: PROTECTED_ROUTES.ChiefdomDashboard,
       exact: true,
-      component: SubCountyDashboard,
-      authorisedRoles: [ACCOUNT_ADMIN]
+      component: ChiefdomDashboard,
+      authorisedRoles: [DISTRICT_ADMIN]
     },
     {
       path: PROTECTED_ROUTES.region,
@@ -114,27 +114,27 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.countyByRegion,
+      path: PROTECTED_ROUTES.districtByRegion,
       exact: true,
-      component: CountyList,
+      component: DistrictList,
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.createCountyByRegion,
+      path: PROTECTED_ROUTES.createDistrictByRegion,
       exact: true,
-      component: CreateAccount,
+      component: CreateDistrict,
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.countySummary,
+      path: PROTECTED_ROUTES.districtSummary,
       exact: true,
-      component: CountySummary,
-      authorisedRoles: SU_SA_RA_AA
+      component: DistrictSummary,
+      authorisedRoles: SU_SA_RA_DA
     },
     {
-      path: PROTECTED_ROUTES.createSubCountyByRegion,
+      path: PROTECTED_ROUTES.createChiefdomByRegion,
       exact: true,
-      component: CreateSubCounty,
+      component: CreateChiefdom,
       authorisedRoles: SU_SA
     },
     {
@@ -144,28 +144,28 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.createSubCountyByCounty,
+      path: PROTECTED_ROUTES.createChiefdomByDistrict,
       exact: true,
-      component: CreateSubCounty,
-      authorisedRoles: SU_SA_RA_AA
+      component: CreateChiefdom,
+      authorisedRoles: SU_SA_RA_DA
     },
     {
-      path: PROTECTED_ROUTES.subCountyByRegion,
+      path: PROTECTED_ROUTES.chiefdomByRegion,
       exact: true,
-      component: SubCountyList,
+      component: ChiefdomList,
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.subCountyByCounty,
+      path: PROTECTED_ROUTES.chiefdomByDistrict,
       exact: true,
-      component: SubCountyList,
-      authorisedRoles: SU_SA_RA_AA
+      component: ChiefdomList,
+      authorisedRoles: SU_SA_RA_DA
     },
     {
-      path: PROTECTED_ROUTES.subCountySummary,
+      path: PROTECTED_ROUTES.chiefdomSummary,
       exact: true,
-      component: SubCountySummary,
-      authorisedRoles: SU_SA_RA_AA_OUA
+      component: ChiefdomSummary,
+      authorisedRoles: SU_SA_RA_DA_CDA
     },
     {
       path: PROTECTED_ROUTES.createRegion,
@@ -357,13 +357,13 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.lockedUsers,
       exact: true,
       component: LockedUsers,
-      authorisedRoles: SU_SA_RA_AA_OUA_HFA
+      authorisedRoles: SU_SA_RA_DA_CDA_HFA
     },
     {
       path: PROTECTED_ROUTES.adminBySuperAdmin,
       exact: true,
       component: Admins,
-      authorisedRoles: SU_SA_RA_AA_OUA_HFA
+      authorisedRoles: SU_SA_RA_DA_CDA_HFA
     }
   ];
 })();

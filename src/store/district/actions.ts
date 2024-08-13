@@ -51,6 +51,15 @@ import {
   IFetchClinicalWorkflowReq,
   IFetchClinicalWorkflowSuccess,
   IFetchClinicalWorkflowFailure,
+  ICreateCountyWorkflowModule,
+  ICreateCountyWorkflowModuleSuccess,
+  ICreateCountyWorkflowModuleFail,
+  IUpdateCountyWorkflowModule,
+  IUpdateCountyWorkflowModuleSuccess,
+  IUpdateCountyWorkflowModuleFail,
+  IDeleteCountyWorkflowModule,
+  IDeleteCountyWorkflowModuleSuccess,
+  IDeleteCountyWorkflowModuleFail,
   IFetchClinicalWorkflowReqPayload,
   IFetchClinicalWorkflowSuccessPayload
 } from './types';
@@ -338,6 +347,66 @@ export const fetchClinicalWorkflowSuccess = (
 
 export const fetchClinicalWorkflowFailure = (): IFetchClinicalWorkflowFailure => ({
   type: DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE
+});
+
+export const createCountyWorkflowModule = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<ICreateCountyWorkflowModule, 'type'>): ICreateCountyWorkflowModule => ({
+  type: DISTRICT_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const createCountyWorkflowModuleSuccess = (): ICreateCountyWorkflowModuleSuccess => ({
+  type: DISTRICT_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_SUCCESS
+});
+
+export const createCountyWorkflowModuleFailure = (error: Error): ICreateCountyWorkflowModuleFail => ({
+  type: DISTRICT_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_FAILURE,
+  error
+});
+
+export const updateCountyWorkflowModule = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<IUpdateCountyWorkflowModule, 'type'>): IUpdateCountyWorkflowModule => ({
+  type: DISTRICT_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const updateCountyWorkflowModuleSuccess = (): IUpdateCountyWorkflowModuleSuccess => ({
+  type: DISTRICT_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_SUCCESS
+});
+
+export const updateCountyWorkflowModuleFailure = (error: Error): IUpdateCountyWorkflowModuleFail => ({
+  type: DISTRICT_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_FAILURE,
+  error
+});
+
+export const deleteCountyWorkflowModule = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<IDeleteCountyWorkflowModule, 'type'>): IDeleteCountyWorkflowModule => ({
+  type: DISTRICT_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const deleteCountyWorkflowModuleSuccess = (): IDeleteCountyWorkflowModuleSuccess => ({
+  type: DISTRICT_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_SUCCESS
+});
+
+export const deleteCountyWorkflowModuleFailure = (error: Error): IDeleteCountyWorkflowModuleFail => ({
+  type: DISTRICT_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_FAILURE,
+  error
 });
 
 export const resetClinicalWorkflow = () => ({

@@ -6,8 +6,8 @@ interface IRegion {
   id: string | number;
   tenantId: string | number;
   name: string;
-  countyCount: number;
-  subCountyCount: number;
+  districtCount: number;
+  chiefdomCount: number;
   healthFacilityCount: number;
 }
 
@@ -106,6 +106,21 @@ export interface IRegionDetailsRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IFetchCountryDetailReq {
+  type: typeof ACTION_TYPES.FETCH_COUNTRY_DETAILS_REQUEST;
+  payload: IFetchRegionDetailReqPayload;
+}
+
+export interface IFetchCountryDetailSuccess {
+  type: typeof ACTION_TYPES.FETCH_COUNTRY_DETAILS_SUCCESS;
+  payload: IRegionDetail;
+}
+
+export interface IFetchCountryDetailFail {
+  type: typeof ACTION_TYPES.FETCH_COUNTRY_DETAILS_FAILURE;
+  error: Error;
+}
+
 export interface IRegionAdmin {
   id: string;
   firstName: string;
@@ -130,14 +145,14 @@ export interface IRegionDetailList {
   countryname: string;
   countryid: number;
   countrytenantid: number;
-  countycode: string | null;
-  countyname: string;
-  countyid: number;
-  countytenantid: number;
-  subcountycode: string | null;
-  subcountyname: string;
-  subcountyid: number;
-  subcountytenantid: number;
+  districtcode: string | null;
+  districtname: string;
+  districtid: number;
+  districttenantid: number;
+  chiefdomcode: string | null;
+  chiefdomname: string;
+  chiefdomid: number;
+  chiefdomtenantid: number;
   villagecode: string | null;
   villagename: string;
   villageid: number;
@@ -295,4 +310,7 @@ export type RegionActions =
   | IRegionDetailsFailure
   | IDownloadFileRequest
   | IDownloadFileSuccess
-  | IDownloadFileFailure;
+  | IDownloadFileFailure
+  | IFetchCountryDetailReq
+  | IFetchCountryDetailSuccess
+  | IFetchCountryDetailFail;

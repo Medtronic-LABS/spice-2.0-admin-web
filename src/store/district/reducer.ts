@@ -41,6 +41,9 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
     case DISTRICT_TYPES.DEACTIVATE_DISTRICT_REQUEST:
     case DISTRICT_TYPES.CREATE_DISTRICT_ADMIN_REQUEST:
     case DISTRICT_TYPES.UPDATE_DISTRICT_ADMIN_REQUEST:
+    case DISTRICT_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_REQUEST:
+    case DISTRICT_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST:
+    case DISTRICT_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_REQUEST:
       return {
         ...state,
         loading: true
@@ -62,6 +65,9 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
     case DISTRICT_TYPES.FETCH_DISTRICT_LIST_FAILURE:
     case DISTRICT_TYPES.CREATE_DISTRICT_FAILURE:
     case DISTRICT_TYPES.UPDATE_DISTRICT_DETAIL_FAIL:
+    case DISTRICT_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_FAILURE:
+    case DISTRICT_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_FAILURE:
+    case DISTRICT_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_FAILURE:
       return {
         ...state,
         loading: false,
@@ -84,6 +90,9 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
     case DISTRICT_TYPES.DEACTIVATE_DISTRICT_SUCCESS:
     case DISTRICT_TYPES.DEACTIVATE_DISTRICT_FAIL:
     case DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE:
+    case DISTRICT_TYPES.CREATE_COUNTY_WORKFLOW_MODULE_SUCCESS:
+    case DISTRICT_TYPES.UPDATE_COUNTY_WORKFLOW_MODULE_SUCCESS:
+    case DISTRICT_TYPES.DELETE_COUNTY_WORKFLOW_MODULE_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -175,6 +184,13 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
         clinicalWorkflowsCount: action.payload?.total,
         loading: false
       };
+    case DISTRICT_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST:
+      return {
+        ...state,
+        clinicalWorkflows: [],
+        clinicalWorkflowsCount: 0
+      };
+
     default:
       return {
         ...state

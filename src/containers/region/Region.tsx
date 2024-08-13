@@ -11,9 +11,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
-import { downloadFileRequest, uploadFileRequest, regionDetailsRequest } from '../../store/region/actions';
-import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import {
+  downloadFileRequest,
+  uploadFileRequest,
+  regionDetailsRequest,
+  fetchCountryDetailReq
+} from '../../store/region/actions';
+import {
+  getIsUploadingSelector,
+  getLoadingSelector,
+  getRegionDetailsSelector,
+  getRegionIdSelector
+} from '../../store/region/selectors';
+import toastCenter from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import arrayMutators from 'final-form-arrays';
 import { fileDownload } from '../../utils/commonUtils';
@@ -25,13 +35,13 @@ import { IMatchParams } from '../../store/region/types';
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const { regionId } = useParams<IMatchParams>();
+  const { regionId, tenantId } = useParams<IMatchParams>();
   const regionDetails = useSelector(getRegionDetailsSelector);
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
-  const countyModuleName = NAME_CONSTANTS.county;
+  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
 
   const onDownloadClick = () => {
     dispatch(
@@ -81,8 +91,25 @@ const Region = (): React.ReactElement => {
   }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]);
 
   useEffect(() => {
-    fetchRegionDetails();
-  }, [fetchRegionDetails]);
+    if (regionId) {
+      fetchRegionDetails();
+    }
+  }, [dispatch, fetchRegionDetails, listParams, regionId]);
+
+  const getCountryDetails = useCallback(() => {
+    dispatch(
+      fetchCountryDetailReq({
+        id: regionId,
+        tenantId
+      })
+    );
+  }, [dispatch, regionId, tenantId]);
+
+  useEffect(() => {
+    if (regionId && tenantId && !regionDetailsId) {
+      getCountryDetails();
+    }
+  }, [getCountryDetails, regionDetailsId, regionId, tenantId]);
 
   return (
     <>
@@ -120,13 +147,13 @@ const Region = (): React.ReactElement => {
                 columnsDef={[
                   {
                     id: 1,
-                    name: 'countyname',
-                    label: countyModuleName
+                    name: 'districtname',
+                    label: districtModuleName
                   },
                   {
                     id: 2,
-                    name: 'subcountyname',
-                    label: 'SUB COUNTY'
+                    name: 'chiefdomname',
+                    label: chiefdomModuleName
                   },
                   {
                     id: 3,
