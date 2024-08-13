@@ -125,7 +125,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
       ...dataParams,
       formInput: undefined,
       testName: dataParams.testName,
-      codeDetails: { code: dataParams.code, url: dataParams.url }
+      codeDetails: { code: dataParams.codeDetails?.code, url: dataParams.codeDetails?.url }
     };
     dispatch(
       labtestCustomization({

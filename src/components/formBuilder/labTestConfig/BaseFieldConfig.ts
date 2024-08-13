@@ -67,20 +67,20 @@ export const baseFieldMeta: IBaseFieldMeta = {
     order: 1.4,
     label: 'Code',
     type: 'text',
-    required: true,
+    required: false,
     component: 'TEXT_FIELD'
   },
   url: {
     order: 1.5,
     label: 'URL',
     type: 'text',
-    required: true,
+    required: false,
     component: 'TEXT_FIELD'
   },
   action: { order: 1.6, label: 'Action', type: 'text', required: false, component: 'TEXT_FIELD' },
   resource: {
     order: 1.7,
-    label: 'Resource',
+    label: 'Field Type',
     options: resourceOptions,
     required: true,
     labelKey: 'label',
