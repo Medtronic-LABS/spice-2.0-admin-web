@@ -41,18 +41,8 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
-    inputProps = { ...inputProps, disabled: true };
-  }
-  // disable fields for customization
-  if (isCustomizationForm && !isWorkFlowCustomization) {
-    if (
-      APPCONSTANTS.DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION?.includes(fieldName) ||
-      (obj?.isNeededDefault && ['isMandatory', 'visibility', 'isEnabled'].includes(fieldName)) ||
-      ['fieldName', 'title', 'optionsList', 'inputType'].includes(fieldName)
-    ) {
-      inputProps = { ...inputProps, ...{ disabled: true } };
-    }
+  if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
+    inputProps = { ...inputProps, required: true };
   }
   return inputProps;
 };
