@@ -94,6 +94,7 @@ const LabTestCustomizationLayout = () => {
   };
 
   const onSubmit = (dataParams: any) => {
+    const { state = {} } = history.location;
     const formatData = presentableJson(dataParams);
     const data = {
       id: JSON.parse(formId) ? formId : undefined,
@@ -105,7 +106,8 @@ const LabTestCustomizationLayout = () => {
       testName: labTestName,
       displayOrder: 1,
       countryId: Number(regionId),
-      tenantId: null
+      tenantId: null,
+      ...state
     };
     dispatch(
       labtestCustomization({

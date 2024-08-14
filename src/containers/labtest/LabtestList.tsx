@@ -105,7 +105,8 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
         .replace(':regionId', regionId as string)
         .replace(':labTestName', encodeURIComponent(data.testName))
         .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
-        .replace(':testId', data?.id || null)
+        .replace(':testId', data?.id || null),
+        { codeDetails: data.codeDetails }
     );
   };
 

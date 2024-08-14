@@ -141,18 +141,16 @@ export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
     unitGenderMap[unitType].add(gender);
   });
 
-  // Function to check if a unitType has both genders
-  const hasBothGenders = (unitType: string) =>
-    unitGenderMap[unitType] && unitGenderMap[unitType].size === genderList.length;
-
   // Filter the unitList based on the genders associated with each unitType
   const filteredUnitList: IUnit[] = [];
   const removedUnits: IRemovedUnits = { units: [], indices: [], genders: {} };
 
   (unitList || []).forEach((unit, index) => {
     const unitType = unit.id;
-    if (hasBothGenders(unitType)) {
-      removedUnits.units.push(unit);
+    if (unitGenderMap[unitType]) {
+      if (unitGenderMap[unitType].size === genderList.length) {
+        removedUnits.units.push(unit);
+      }
       removedUnits.indices.push(index);
       removedUnits.genders[unitType] = genderList.filter((gender) => unitGenderMap[unitType].has(gender.id));
     } else {
