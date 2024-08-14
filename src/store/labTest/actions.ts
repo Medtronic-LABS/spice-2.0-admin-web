@@ -17,7 +17,10 @@ import {
   ILabTestCustomizationFailure,
   IFetchLabTestCustomizationRequest,
   IFetchLabTestCustomizationSuccess,
-  IFetchLabTestCustomizationFailure
+  IFetchLabTestCustomizationFailure,
+  IValidateLabtestRequest,
+  IValidateLabtestSuccess,
+  IValidateLabtestFailure
 } from './types';
 
 export const fetchLabtestsRequest = ({
@@ -123,5 +126,27 @@ export const fetchUnitListSuccess = (payload: IUnit[]): IFetchUnitListSuccess =>
 
 export const fetchUnitListFail = (error: Error): IFetchUnitListFailure => ({
   type: ACTION_TYPES.FETCH_UNIT_LIST_FAILURE,
+  error
+});
+
+export const validateLabtestRequest = ({
+  name,
+  countryId,
+  successCb,
+  failureCb
+}: Omit<IValidateLabtestRequest, 'type'>): IValidateLabtestRequest => ({
+  type: ACTION_TYPES.VALIDATE_LABTEST_REQUEST,
+  name,
+  countryId,
+  successCb,
+  failureCb
+});
+
+export const validateLabtestSuccess = (): IValidateLabtestSuccess => ({
+  type: ACTION_TYPES.VALIDATE_LABTEST_SUCCESS
+});
+
+export const validateLabtestFailure = (error: Error): IValidateLabtestFailure => ({
+  type: ACTION_TYPES.VALIDATE_LABTEST_FAILURE,
   error
 });

@@ -25,7 +25,6 @@ export const resourceOptions = [
   { label: 'Date', key: 'Date' },
   { label: 'Integer', key: 'Integer' },
   { label: 'Quantity', key: 'Quantity' },
-  { label: 'Range', key: 'Range' },
   { label: 'String', key: 'String' }
 ];
 

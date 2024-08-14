@@ -55,3 +55,10 @@ export const fetchUnitList = () =>
     method: 'GET',
     url: '/admin-service/unit/list/LABTEST'
   });
+
+export const validateLabtest = (data: { name: string, countryId: any }) =>
+  axios({
+    method: 'POST',
+    url: 'admin-service/lab-test-customization/validate',
+    data
+  });

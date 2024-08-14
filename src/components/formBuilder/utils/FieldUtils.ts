@@ -118,8 +118,7 @@ interface IGender {
 
 const genderList: IGender[] = [
   { name: 'Male', id: 'Male' },
-  { name: 'Female', id: 'Female' },
-  { name: 'Both', id: 'Both' }
+  { name: 'Female', id: 'Female' }
 ];
 
 interface IRemovedUnits {

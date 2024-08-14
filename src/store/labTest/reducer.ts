@@ -52,6 +52,7 @@ const labtestReducer = (state = initialState, action = {} as LabtestActions): IL
         ...state,
         customizationLoading: false
       };
+    case ACTION_TYPES.VALIDATE_LABTEST_REQUEST:
     case ACTION_TYPES.FETCH_LABTEST_REQUEST:
     case ACTION_TYPES.DELETE_LABTEST_REQUEST:
       return {
@@ -71,6 +72,7 @@ const labtestReducer = (state = initialState, action = {} as LabtestActions): IL
         total: action.payload.total,
         loading: false
       };
+    case ACTION_TYPES.VALIDATE_LABTEST_FAILURE:
     case ACTION_TYPES.FETCH_LABTEST_FAILURE:
     case ACTION_TYPES.DELETE_LABTEST_FAILURE: {
       return {
@@ -79,6 +81,11 @@ const labtestReducer = (state = initialState, action = {} as LabtestActions): IL
         error: action.error
       };
     }
+    case ACTION_TYPES.VALIDATE_LABTEST_SUCCESS:
+      return {
+        ...state,
+        loading: false
+      };
     case ACTION_TYPES.FETCH_UNIT_LIST_REQUEST:
       return {
         ...state,

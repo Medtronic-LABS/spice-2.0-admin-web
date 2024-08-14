@@ -2,14 +2,20 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import * as labtestService from '../../services/labtestAPI';
-import { IDeleteLabtestRequest, IFetchLabtestsRequest, ILabTestCustomizationRequest } from './types';
+import {
+  IDeleteLabtestRequest,
+  IFetchLabtestsRequest,
+  ILabTestCustomizationRequest,
+  IValidateLabtestRequest
+} from './types';
 import * as labtestActions from './actions';
 import {
   DELETE_LABTEST_REQUEST,
   FETCH_LABTEST_CUSTOMIZATION_REQUEST,
   FETCH_LABTEST_REQUEST,
   FETCH_UNIT_LIST_REQUEST,
-  LABTEST_CUSTOMIZATION_REQUEST
+  LABTEST_CUSTOMIZATION_REQUEST,
+  VALIDATE_LABTEST_REQUEST
 } from './actionTypes';
 
 /*
@@ -98,6 +104,22 @@ export function* labTestCustomizationSaga({ data, successCb, failureCb }: ILabTe
 }
 
 /*
+  Worker Saga: Fired on VALIDATE_LABTEST_REQUEST action
+*/
+export function* validateLabtest({ name, countryId, successCb, failureCb }: IValidateLabtestRequest): SagaIterator {
+  try {
+    yield call(labtestService.validateLabtest, { name, countryId });
+    yield put(labtestActions.validateLabtestSuccess());
+    successCb?.();
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(labtestActions.validateLabtestFailure(e));
+    }
+  }
+}
+
+/*
   Starts worker saga on latest dispatched specific action.
 */
 function* labtestSaga() {
@@ -106,6 +128,7 @@ function* labtestSaga() {
   yield all([takeLatest(DELETE_LABTEST_REQUEST, deleteLabtest)]);
   yield all([takeLatest(LABTEST_CUSTOMIZATION_REQUEST, labTestCustomizationSaga)]);
   yield all([takeLatest(FETCH_UNIT_LIST_REQUEST, fetchUnitList)]);
+  yield all([takeLatest(VALIDATE_LABTEST_REQUEST, validateLabtest)]);
 }
 
 export default labtestSaga;

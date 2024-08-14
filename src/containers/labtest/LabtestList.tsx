@@ -8,7 +8,12 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import APPCONSTANTS from '../../constants/appConstants';
 import { ReactComponent as CustomizeIcon } from '../../assets/images/account-customize.svg';
-import { fetchLabtestsRequest, deleteLabtestRequest, labtestCustomization } from '../../store/labTest/actions';
+import {
+  fetchLabtestsRequest,
+  deleteLabtestRequest,
+  labtestCustomization,
+  validateLabtestRequest
+} from '../../store/labTest/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { labtestLoadingSelector, labtestsSelector, labtestCountSelector } from '../../store/labTest/selectors';
 import { ILabTest } from '../../store/labTest/types';
@@ -96,17 +101,34 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
   };
 
   const onNextClicked = (data: any, customizeClicked?: boolean) => {
-    if (!customizeClicked) {
-      setLabTestModalState({ ...labTestModalState, isNextClicked: true });
-    }
-    props.history.push(
-      PROTECTED_ROUTES.customizeLabTest
-        .replace(':tenantId', tenantId)
-        .replace(':regionId', regionId as string)
-        .replace(':labTestName', encodeURIComponent(data.testName))
-        .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
-        .replace(':testId', data?.id || null),
-        { codeDetails: data.codeDetails }
+    dispatch(
+      validateLabtestRequest({
+        name: data.testName,
+        countryId: Number(props.match.params.regionId || 0),
+        successCb: () => {
+          if (!customizeClicked) {
+            setLabTestModalState({ ...labTestModalState, isNextClicked: true });
+          }
+          props.history.push(
+            PROTECTED_ROUTES.customizeLabTest
+              .replace(':tenantId', tenantId)
+              .replace(':regionId', regionId as string)
+              .replace(':labTestName', encodeURIComponent(data.testName))
+              .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
+              .replace(':testId', data?.id || null),
+            { codeDetails: data.codeDetails }
+          );
+        },
+        failureCb: (error: any) => {
+          toastCenter.error(
+            ...getErrorToastArgs(
+              error,
+              APPCONSTANTS.ERROR,
+              APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', data.testName).replace('update', 'create')
+            )
+          );
+        }
+      })
     );
   };
 

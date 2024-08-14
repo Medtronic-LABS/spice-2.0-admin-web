@@ -127,6 +127,23 @@ export interface IFetchUnitListFailure {
   error: Error;
 }
 
+export interface IValidateLabtestRequest {
+  type: typeof ACTION_TYPES.VALIDATE_LABTEST_REQUEST;
+  name: string;
+  countryId: number;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IValidateLabtestSuccess {
+  type: typeof ACTION_TYPES.VALIDATE_LABTEST_SUCCESS;
+}
+
+export interface IValidateLabtestFailure {
+  type: typeof ACTION_TYPES.VALIDATE_LABTEST_FAILURE;
+  error: Error;
+}
+
 export type LabtestActions =
   | IFetchLabtestsRequest
   | IFetchLabtestsSuccess
@@ -142,4 +159,7 @@ export type LabtestActions =
   | IDeleteLabtestFailure
   | IFetchUnitListRequest
   | IFetchUnitListSuccess
-  | IFetchUnitListFailure;
+  | IFetchUnitListFailure
+  | IValidateLabtestRequest
+  | IValidateLabtestSuccess
+  | IValidateLabtestFailure;
