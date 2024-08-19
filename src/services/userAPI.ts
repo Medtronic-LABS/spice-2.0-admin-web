@@ -130,7 +130,7 @@ export const fetchLockedUsers = (
       skip,
       limit,
       roleType: role,
-      ...(search ? { searchTerm: search } : {})
+      searchTerm: search || ''
     }
   });
 

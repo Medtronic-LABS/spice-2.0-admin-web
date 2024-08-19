@@ -414,7 +414,7 @@ export const fetchDistrictListRequest = ({
 });
 
 export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF,
   payload
 });
 
@@ -438,7 +438,7 @@ export const fetchChiefdomListRequest = ({
 });
 
 export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
-  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF,
   payload
 });
 

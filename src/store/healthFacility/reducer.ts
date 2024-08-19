@@ -67,17 +67,7 @@ export const initialState: IHealthFacilityState = {
   hfDropdownOptions: {
     list: [],
     regionTenantId: ''
-  },
-  hfDashboardList: [
-    {
-      id: 0,
-      name: '',
-      type: '',
-      tenantId: 0,
-      chiefdom: ''
-    }
-  ],
-  loadingMore: false
+  }
 };
 
 const healthFacilityReducer = (

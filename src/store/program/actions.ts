@@ -1,4 +1,4 @@
-import { IFetchHFDropdownSuccessPayload } from '../healthFacility/types';
+import { IFetchSiteDropdownSuccessPayload } from '../healthFacilityDashboard/types';
 import * as PROGRAM_TYPES from './actionTypes';
 
 import {
@@ -141,7 +141,7 @@ export const fetchHFDropdownRequest = ({
   };
 };
 
-export const fetchSiteDropdownSuccess = (payload: IFetchHFDropdownSuccessPayload): IFetchSiteDropdownSuccess => ({
+export const fetchSiteDropdownSuccess = (payload: IFetchSiteDropdownSuccessPayload): IFetchSiteDropdownSuccess => ({
   type: PROGRAM_TYPES.FETCH_HF_DROPDOWN_SUCCESS,
   payload
 });

@@ -534,14 +534,14 @@ export interface ISetSiteSummary {
 }
 
 export interface IFetchSiteDropdownSuccessPayload {
-  total: number;
-  siteList: Array<{
+  total?: number;
+  list: Array<{
     id: string;
     name: string;
     email?: string;
     tenantId: string;
   }>;
-  regionTenantId: string;
+  countryId: string;
 }
 
 export interface IFetchSiteDropdownRequest {

@@ -44,7 +44,7 @@ export const fetchDeactivatedAccounts = (
       skip,
       limit,
       sort,
-      search: search || '',
+      searchTerm: search || '',
       tenantId
     }
   });

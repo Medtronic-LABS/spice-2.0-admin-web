@@ -32,20 +32,8 @@ export interface IFetchProgramListSuccessPayload {
   limit: number | null;
 }
 export interface IProgramFormValues {
-  healthFacilities: ISites[];
+  healthFacility: ISites[];
   name: string;
-}
-
-interface IHealthFacilities {
-  id: string;
-}
-export interface IGetProgramDetails {
-  healthFacilities: IHealthFacilities[];
-  id: string;
-  country: { id: string };
-  tenantId: string;
-  deletedSites: string[];
-  active: boolean;
 }
 
 export interface IFetchProgramListRequest {
@@ -81,7 +69,7 @@ export interface IProgramDetails extends IProgramFormValues {
   id: string;
   country: { id: string };
   tenantId: string;
-  deletedHealthFacilities: string[];
+  deletedSites: string[];
   active: boolean;
 }
 export interface IFetchProgramDetailsRequest {
@@ -103,7 +91,7 @@ export interface IFetchProgramDetailsFailure {
 
 export interface ICreateProgramReqPayload {
   name: string;
-  country: { id: string };
+  country: string;
   healthFacility: string[] | number[];
   tenantId: string;
 }
@@ -132,8 +120,8 @@ export interface ICreateProgramFail {
 export interface IUpdateProgramDetails {
   id: string;
   tenantId: string;
-  healthFacilities: string[] | number[];
-  deletedHealthFacilities: string[];
+  healthFacility: string[] | number[];
+  deletedSites: string[];
   active: boolean;
 }
 

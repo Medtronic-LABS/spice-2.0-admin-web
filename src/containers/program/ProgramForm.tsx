@@ -60,14 +60,14 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
       </div>
       <div className='col-lg-6 col-6'>
         <Field
-          name='program.healthFacilities'
+          name='program.healthFacility'
           type='text'
           validate={required}
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
-              label='Health Facilities'
-              errorLabel='health Facilities'
+              label='Health Facility'
+              errorLabel='health facility'
               valueKey='id'
               labelKey='name'
               isMulti={true}
