@@ -100,36 +100,42 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     setLabTestModalState({ isOpen: true, isEdit: true, data, isNextClicked: false });
   };
 
-  const onNextClicked = (data: any, customizeClicked?: boolean) => {
-    dispatch(
-      validateLabtestRequest({
-        name: data.testName,
-        countryId: Number(props.match.params.regionId || 0),
-        successCb: () => {
-          if (!customizeClicked) {
-            setLabTestModalState({ ...labTestModalState, isNextClicked: true });
-          }
-          props.history.push(
-            PROTECTED_ROUTES.customizeLabTest
-              .replace(':tenantId', tenantId)
-              .replace(':regionId', regionId as string)
-              .replace(':labTestName', encodeURIComponent(data.testName))
-              .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
-              .replace(':testId', data?.id || null),
-            { codeDetails: data.codeDetails }
-          );
-        },
-        failureCb: (error: any) => {
-          toastCenter.error(
-            ...getErrorToastArgs(
-              error,
-              APPCONSTANTS.ERROR,
-              APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', data.testName).replace('update', 'create')
-            )
-          );
-        }
-      })
+  const routeToLabtestCustomizationPage = (data: any) => {
+    props.history.push(
+      PROTECTED_ROUTES.customizeLabTest
+        .replace(':tenantId', tenantId)
+        .replace(':regionId', regionId as string)
+        .replace(':labTestName', encodeURIComponent(data.testName))
+        .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
+        .replace(':testId', data?.id || null),
+      { codeDetails: data.codeDetails }
     );
+  };
+
+  const onNextClicked = (data: any, customizeClicked?: boolean) => {
+    if (!customizeClicked) {
+      setLabTestModalState({ ...labTestModalState, isNextClicked: true });
+      dispatch(
+        validateLabtestRequest({
+          name: data.testName,
+          countryId: Number(props.match.params.regionId || 0),
+          successCb: () => {
+            routeToLabtestCustomizationPage(data);
+          },
+          failureCb: (error: any) => {
+            toastCenter.error(
+              ...getErrorToastArgs(
+                error,
+                APPCONSTANTS.ERROR,
+                APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', data.testName).replace('update', 'create')
+              )
+            );
+          }
+        })
+      );
+    } else {
+      routeToLabtestCustomizationPage(data);
+    }
   };
 
   const handleEditLabTestSubmit = (dataParams: any) => {
