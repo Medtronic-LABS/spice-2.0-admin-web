@@ -76,6 +76,11 @@ const superAdminRoutes: ISideMenuItem[] = [
     route: PROTECTED_ROUTES.programByRegion,
     collapsible: false,
     type: 'regionAdmin'
+  },
+  {
+    label: 'Workflow',
+    route: PROTECTED_ROUTES.workflowByRegion,
+    disabled: false
   }
 ];
 const adminRoutes: ISideMenuItem[] = [

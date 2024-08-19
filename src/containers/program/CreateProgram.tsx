@@ -30,8 +30,8 @@ const CreateProgram = (props: IRouteProps): React.ReactElement => {
     const data = {
       name: program.name.trim(),
       tenantId,
-      healthFacility: program.healthFacility.map((healthFacility: { id: any }) => healthFacility.id),
-      country: regionId
+      healthFacilities: program.healthFacilities.map((healthFacility: { id: any }) => healthFacility.id),
+      country: { id: regionId }
     } as unknown as ICreateProgramReqPayload;
     dispatch(createProgram({ data, successCb: onCreateSuccess, failureCb: onCreateFail }));
   };

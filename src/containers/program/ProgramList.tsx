@@ -117,15 +117,15 @@ const ProgramList = (): React.ReactElement => {
   };
 
   const handleProgramEditSubmit = ({ program }: { program: IProgramDetails }) => {
-    const oldSites = editProgramDetailsModal.data?.healthFacility.map((site) => site.id) || [];
-    const newSites = program.healthFacility.map((healthFacility) => healthFacility.id);
-    const deletedSites = editProgramDetailsModal.data?.deletedSites || [];
+    const existingHFData = editProgramDetailsModal.data?.healthFacilities.map((site) => site.id) || [];
+    const newHFData = program.healthFacilities.map((healthFacility) => healthFacility.id);
+    const deletedHealthFacilities = editProgramDetailsModal.data?.deletedHealthFacilities || [];
 
     const data = {
       id: program.id,
       tenantId,
-      healthFacility: program.healthFacility.map((healthFacility) => healthFacility.id),
-      deletedSites: getDeletedSites(oldSites, newSites, deletedSites),
+      healthFacilities: program.healthFacilities.map((healthFacility) => healthFacility.id),
+      deletedHealthFacilities: getDeletedSites(existingHFData, newHFData, deletedHealthFacilities),
       active: program.active
     };
     dispatch(updateProgram({ data, successCb: onUpdateSuccess, failureCb: onUpdateFail }));

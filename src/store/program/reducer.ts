@@ -9,10 +9,10 @@ const initialState: IProgramState = {
   program: {
     id: '',
     name: '',
-    healthFacility: [],
+    healthFacilities: [],
     country: { id: '' },
     tenantId: '',
-    deletedSites: [],
+    deletedHealthFacilities: [],
     active: false
   },
   hfDropdownLoading: false,

@@ -16,12 +16,9 @@ import {
   IFetchDistrictOptionsRequest,
   IActivateDistrictReq,
   IDistrict,
-  ICreateCountyWorkflowModule,
   IFetchClinicalWorkflowReq,
   IClinicalWorkflow,
-  IUpdateCountyWorkflowModule,
   IFetchClinicalWorkflowSuccessPayload,
-  IDeleteCountyWorkflowModule,
   IFetchDistrictOptionsPayload
 } from './types';
 import * as districtActions from './actions';
@@ -298,66 +295,6 @@ export function* fetchClinicalWorkflows({ data }: IFetchClinicalWorkflowReq): Sa
 }
 
 /*
-  Worker Saga: Fired on CREATE_COUNTY_WORKFLOW_MODULE_REQUEST action
-*/
-export function* createCountyWorkflowRequest({
-  data,
-  successCb,
-  failureCb
-}: ICreateCountyWorkflowModule): SagaIterator {
-  try {
-    yield call(districtService.createCountyWorkflowModule, data);
-    successCb?.();
-    yield put(districtActions.createCountyWorkflowModuleSuccess());
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(districtActions.createCountyWorkflowModuleFailure(e));
-    }
-  }
-}
-
-/*
-  Worker Saga: Fired on UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST action
-*/
-export function* updateCountyWorkflowRequest({
-  data,
-  successCb,
-  failureCb
-}: IUpdateCountyWorkflowModule): SagaIterator {
-  try {
-    yield call(districtService.updateCountyWorkflowModule, data);
-    successCb?.();
-    yield put(districtActions.updateCountyWorkflowModuleSuccess());
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(districtActions.updateCountyWorkflowModuleFailure(e));
-    }
-  }
-}
-
-/*
-  Worker Saga: Fired on DELETE_COUNTY_WORKFLOW_MODULE_REQUEST action
-*/
-export function* deleteCountyWorkflowRequest({
-  data,
-  successCb,
-  failureCb
-}: IDeleteCountyWorkflowModule): SagaIterator {
-  try {
-    yield call(districtService.deleteCountyWorkflowModule, data);
-    successCb?.();
-    yield put(districtActions.deleteCountyWorkflowModuleSuccess());
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(districtActions.deleteCountyWorkflowModuleFailure(e));
-    }
-  }
-}
-
-/*
   Starts worker saga on latest dispatched specific action.
 */
 function* districtSaga() {
@@ -373,9 +310,6 @@ function* districtSaga() {
   yield all([takeLatest(DEACTIVATE_DISTRICT_REQUEST, deactivateDistrict)]);
   yield all([takeLatest(FETCH_DISTRICT_OPTIONS_REQUEST, fetchDistrictOptions)]);
   yield all([takeLatest(FETCH_CLINICAL_WORKFLOW_REQUEST, fetchClinicalWorkflows)]);
-  yield all([takeLatest(CREATE_COUNTY_WORKFLOW_MODULE_REQUEST, createCountyWorkflowRequest)]);
-  yield all([takeLatest(UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST, updateCountyWorkflowRequest)]);
-  yield all([takeLatest(DELETE_COUNTY_WORKFLOW_MODULE_REQUEST, deleteCountyWorkflowRequest)]);
 }
 
 export default districtSaga;

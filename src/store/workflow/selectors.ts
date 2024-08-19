@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
 
 export const formMetaSelector = (state: AppState) => state.workflow.formMeta;
@@ -13,4 +14,3 @@ const getClinicalWorkflowsCount = (state: AppState) => state.workflow.clinicalWo
 export const workflowLoadingSelector = createSelector(loadingSelector, (loading) => loading);
 export const getClinicalWorkflowsCountSelector = createSelector(getClinicalWorkflowsCount, (workflows) => workflows);
 export const getClinicalWorkflowSelector = createSelector(getClinicalWorkflows, (workflows) => workflows);
-export const getFormMetaSelector = createSelector(formMetaSelector, (formMeta) => formMeta);

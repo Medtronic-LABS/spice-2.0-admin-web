@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
 
-import { formJSONSelector, getFormMetaSelector, loadingSelector } from '../../store/workflow/selectors';
+import { formJSONSelector, formMetaSelector, loadingSelector } from '../../store/workflow/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import Loader from '../loader/Loader';
@@ -28,7 +28,7 @@ const WorkflowFormCustomization = () => {
   const { tenantId, regionId, form, clinicalWorkflowId, workflowId: wfId } = useParams<IMatchParams>();
   const formType = decodeURIComponent(form);
   const workflowId = decodeURIComponent(wfId);
-  const formGetMeta = useSelector(getFormMetaSelector) || [];
+  const formGetMeta = useSelector(formMetaSelector) || [];
   const { id: formId } = useSelector(formJSONSelector) || {};
   const loading = useSelector(loadingSelector);
 
@@ -47,7 +47,6 @@ const WorkflowFormCustomization = () => {
     presentableJson,
     hashFieldIdsWithTitle,
     hashFieldIdsWithFieldName,
-    sethashFieldIdsWithFieldName,
 
     // reorder props
     isFamilyOrderModelOpen,
@@ -62,7 +61,7 @@ const WorkflowFormCustomization = () => {
         tenantId,
         countryId: regionId,
         formType: 'Module',
-        category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
+        category: 'Input_form',
         clinicalWorkflowId,
         successCb: ({ formInput }) => {
           const formJSON = JSON.parse(formInput)?.formLayout;
@@ -99,7 +98,7 @@ const WorkflowFormCustomization = () => {
       customizeFormRequest({
         formType: 'Module',
         formId,
-        category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
+        category: 'Input_form',
         tenantId,
         countryId: regionId ? regionId : '',
         payload: newData,
@@ -142,8 +141,6 @@ const WorkflowFormCustomization = () => {
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));
     setFormData(formValues);
   };
-  const accordianRef = useRef<any>([]);
-  const newlyAddedIdsRef = useRef<any>([]);
   return (
     <>
       {formData && !loading ? (
@@ -163,14 +160,9 @@ const WorkflowFormCustomization = () => {
             setCollapsedGroup={setCollapsedGroup}
             hashFieldIdsWithTitle={hashFieldIdsWithTitle}
             hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-            sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             isShow={true}
             addNewFieldDisabled={false}
             isFieldNameChangable={true}
-            isCustomizationForm={true}
-            isWorkFlowCustomization={true}
-            newlyAddedIdsRef={newlyAddedIdsRef.current}
-            accordianRef={accordianRef}
           />
           <ReorderView
             formRef={formRef}
