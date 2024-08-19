@@ -53,14 +53,13 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.siteSummary },
 
   { route: PROTECTED_ROUTES.workflowByRegion },
-  { route: PROTECTED_ROUTES.workflowByCounty },
 
   { route: PROTECTED_ROUTES.medicationByRegion },
   { route: PROTECTED_ROUTES.labtestList },
   { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] },
   { route: PROTECTED_ROUTES.labTestByRegion },
   { route: PROTECTED_ROUTES.customizationByRegion },
-  { route: PROTECTED_ROUTES.countyWorkflowCustomization }
+  { route: PROTECTED_ROUTES.workflowCustomization }
 ];
 
 const routesWithoutBreadcrumb = [
@@ -68,7 +67,8 @@ const routesWithoutBreadcrumb = [
   PROTECTED_ROUTES.DistrictDashboard,
   PROTECTED_ROUTES.ChiefdomDashboard,
   PROTECTED_ROUTES.siteDashboard,
-  PROTECTED_ROUTES.dashboard
+  PROTECTED_ROUTES.dashboard,
+  PROTECTED_ROUTES.workflowByRegion
 ];
 const header = (
   isBCDisabled: boolean,

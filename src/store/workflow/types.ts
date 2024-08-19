@@ -75,6 +75,76 @@ export interface IAccount {
   };
 }
 
+export interface IWorkflowModuleReqPayload {
+  name?: string;
+  viewScreens?: string[];
+  countryId?: string;
+  tenantId: string;
+  id?: string;
+}
+export interface ICreateWorkflowModule {
+  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IUpdateWorkflowModule {
+  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IAdminEditFormValues {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  username: string;
+  gender: string;
+  countryCode: string;
+  timezone: ITimezone;
+  country: { countryCode?: string; id?: string };
+  tenantId?: string;
+}
+export interface IAccountAdmin extends Omit<IAdminEditFormValues, 'timezone'> {
+  timezone: string;
+}
+export interface IClinicalWorkflow {
+  id: string;
+  name: string;
+  isActive?: boolean;
+  default?: boolean;
+  isDeleted?: boolean;
+  coreType?: string;
+  workflowId?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  moduleType?: string;
+  country?: string;
+  tenantId?: string;
+  viewScreens?: string[];
+  workflow?: string;
+}
+
+export interface IAccount {
+  id: string;
+  users: IAccountAdmin[];
+  name: string;
+  maxNoOfUsers: string;
+  tenantId: string;
+  updatedAt?: string;
+  clinicalWorkflow?: IClinicalWorkflow[] | string[];
+  customizedWorkflow?: IClinicalWorkflow[] | string[];
+  country?: {
+    countryCode: string;
+    tenantId?: string;
+    id?: string;
+  };
+}
+
 export interface IWorkflowState {
   formJSON: null | any;
   consentForm: null | any;

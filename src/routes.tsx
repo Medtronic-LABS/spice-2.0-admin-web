@@ -50,6 +50,8 @@ import RegionCustomization from './containers/region/RegionCustomization';
 import RegionFormCustomization from './containers/region/RegionFormCustomization';
 import ProgramList from './containers/program/ProgramList';
 import ProgramForm from './containers/program/CreateProgram';
+import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
+import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -378,6 +380,18 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: ProgramForm,
       authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.workflowByRegion,
+      exact: true,
+      component: WorkflowCustomization,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.workflowCustomization,
+      exact: true,
+      component: WorkflowFormCustomization,
+      authorisedRoles: SU_SA_RA
     }
   ];
 })();

@@ -11,55 +11,82 @@ export const PROTECTED_ROUTES = {
   landingPage: '/home',
   profile: '/profile',
   dashboard: '/home',
+  createSuperAdmin: '/super-admin/create',
+  screen: '/screening-form',
+  superAdmin: '/super-admin',
+  deactivatedRecords: '/deactivated-records',
+  lockedUsers: '/locked-users',
+  legalTerms: '#',
+
+  // region
+  regionDashboard: '/region',
+  createRegion: '/region/create',
   region: '/region/:regionId/:tenantId',
+  regionSummary: '/region/:regionId/:tenantId',
+
+  // region customization
+  customizationByRegion: '/region/:regionId/:tenantId/customize',
+  accordianViewRegionCustomizationForm: '/region/:regionId/:tenantId/:form/regionCustomize',
+
+  // district
+  DistrictDashboard: '/district',
+  createDistrictByRegion: '/region/:regionId/:tenantId/district/create',
+  districtByRegion: '/region/:regionId/:tenantId/district',
+  districtAdminByRegion: '/region/:regionId/:tenantId/district-admin',
+  districtSummary: '/district/:districtId/:tenantId',
+
+  // chiefdom
+  ChiefdomDashboard: '/chiefdom',
+  createChiefdomByRegion: '/region/:regionId/:tenantId/chiefdom/create',
+  createChiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom/create',
+  chiefdomByRegion: '/region/:regionId/:tenantId/chiefdom',
+  chiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom',
+  chiefdomAdminByRegion: '/region/:regionId/:tenantId/chiefdom-admin',
+  chiefdomAdminByDistrict: '/district/:districtId/:tenantId/chiefdom-admin',
+  chiefdomSummary: '/chiefdom/:chiefdomId/:tenantId',
+  // hf
+  siteDashboard: '/site',
+  createHealthFacility: '/region/:regionId/health-facility/create',
   healthFacilityBySuperAdmin: '/region/:regionId/health-facility/list',
   healthFacilityByAdmin: '/health-facility/list',
   healthFacilitySummary: '/health-facility/:healthFacilityId/:hfTenantId',
-  createHealthFacility: '/region/:regionId/health-facility/create',
-  usersBySuperAdmin: '/region/:regionId/users/list',
-  usersByAdmin: '/users/list',
-  adminBySuperAdmin: '/region/:regionId/admin/list',
-  medicationByRegion: '/region/:regionId/medication/list',
-  createMedication: '/region/:regionId/medication/create',
-  labtestList: '/region/:regionId/:tenantId/lab-test',
-  customizeLabTest: '/region/:regionId/:tenantId/:labTestName/lab-test/:identifier/:testId',
-  createRegion: '/region/create',
-  createSuperAdmin: '/super-admin/create',
-  screen: '/screening-form',
-  accordianViewRegionCustomizationForm: '/region/:regionId/:tenantId/:form/regionCustomize',
-  accordianViewAccountWorlflowCustomizationForm:
-    '/region/:regionId/:tenantId/:form/accountCustomize/:clinicalWorkflowId/:workflowId',
-  regionDashboard: '/region',
-  DistrictDashboard: '/district',
-  ChiefdomDashboard: '/chiefdom',
-  siteDashboard: '/site',
-  createDistrictByRegion: '/region/:regionId/:tenantId/district/create',
-  createChiefdomByRegion: '/region/:regionId/:tenantId/chiefdom/create',
-  createChiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom/create',
-  customizationByRegion: '/region/:regionId/:tenantId/customize',
-  countyWorkflowCustomization: '/region/:regionId/:tenantId/customize/countyWorkflow',
-
-  districtByRegion: '/region/:regionId/:tenantId/district',
-
-  districtAdminByRegion: '/region/:regionId/:tenantId/district-admin',
-
-  chiefdomByRegion: '/region/:regionId/:tenantId/chiefdom',
-  chiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom',
-
-  chiefdomAdminByRegion: '/region/:regionId/:tenantId/chiefdom-admin',
-  chiefdomAdminByDistrict: '/district/:districtId/:tenantId/chiefdom-admin',
-
   siteAdminByRegion: '/region/:regionId/:tenantId/siteAdmin',
   siteAdminByDistrict: '/district/:districtId/:tenantId/siteAdmin',
   siteAdminByChiefdom: '/chiefdom/:chiefdomId/:tenantId/siteAdmin',
-
   hfByRegion: '/region/:regionId/:tenantId/health-facility',
   hfByDistrict: '/district/:districtId/:tenantId/health-facility',
   hfByChiefdom: '/chiefdom/:chiefdomId/:tenantId/health-facility',
   createHFByRegion: '/region/:regionId/:tenantId/health-facility/create',
   createHFByChiefdom: '/chiefdom/:chiefdomId/:tenantId/health-facility/create',
   createHFByDistrict: '/district/:districtId/:tenantId/health-facility/create',
+  siteSummary: '/site/:siteId/:tenantId',
 
+  // user
+  usersBySuperAdmin: '/region/:regionId/users/list',
+  usersByAdmin: '/users/list',
+  userByRegion: '/region/:regionId/:tenantId/user',
+  userByDistrict: '/district/:districtId/:tenantId/user',
+  userByChiefdom: '/chiefdom/:chiefdomId/:tenantId/user',
+
+  // admin
+  adminBySuperAdmin: '/region/:regionId/admin/list',
+
+  // labtest
+  labtestList: '/region/:regionId/:tenantId/lab-test',
+  customizeLabTest: '/region/:regionId/:tenantId/:labTestName/lab-test/:identifier/:testId',
+  labTestByRegion: '/region/:regionId/:tenantId/lab-test',
+  createLabTest: '/region/:regionId/:tenantId/lab-test/create',
+  editLabTest: '/region/:regionId/:tenantId/lab-test/:labTestId/:labTestTenantId',
+
+  // medication
+  createMedication: '/region/:regionId/medication/create',
+  medicationByRegion: '/region/:regionId/medication/list',
+
+  // program
+  programByRegion: '/region/:regionId/:tenantId/program',
+  createProgramByRegion: '/region/:regionId/:tenantId/program/create',
+
+  // group
   groupByRegion: '/region/:regionId/:tenantId/group',
   groupByDistrict: '/district/:districtId/:tenantId/group',
   groupByChiefdom: '/chiefdom/:chiefdomId/:tenantId/group',
@@ -69,29 +96,9 @@ export const PROTECTED_ROUTES = {
   createGroupByDistrict: '/district/:districtId/:tenantId/group/create',
   createGroupBySite: '/site/:siteId/:tenantId/group/create',
 
-  programByRegion: '/region/:regionId/:tenantId/program',
-  createProgramByRegion: '/region/:regionId/:tenantId/program/create',
-
-  userByRegion: '/region/:regionId/:tenantId/user',
-  userByDistrict: '/district/:districtId/:tenantId/user',
-  userByChiefdom: '/chiefdom/:chiefdomId/:tenantId/user',
-
-  regionSummary: '/region/:regionId/:tenantId',
-  districtSummary: '/district/:districtId/:tenantId',
-  chiefdomSummary: '/chiefdom/:chiefdomId/:tenantId',
-  siteSummary: '/site/:siteId/:tenantId',
-
+  // workflow
   workflowByRegion: '/region/:regionId/:tenantId/workflow',
-  workflowByCounty: '/county/:accountId/:tenantId/workflow',
-
-  labTestByRegion: '/region/:regionId/:tenantId/lab-test',
-  createLabTest: '/region/:regionId/:tenantId/lab-test/create',
-  editLabTest: '/region/:regionId/:tenantId/lab-test/:labTestId/:labTestTenantId',
-
-  superAdmin: '/super-admin',
-  deactivatedRecords: '/deactivated-records',
-  lockedUsers: '/locked-users',
-  legalTerms: '#'
+  workflowCustomization: '/region/:regionId/:tenantId/:form/workflowCustomize/:clinicalWorkflowId/:workflowId'
 };
 
 export const HOME_PAGE_BY_ROLE = {
