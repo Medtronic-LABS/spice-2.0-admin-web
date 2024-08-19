@@ -3,6 +3,7 @@ import { all, call, put, takeLatest, select } from 'redux-saga/effects';
 import { AppState } from '../rootReducer';
 
 import * as siteListService from '../../services/siteAPI';
+import { getHFForDropdown } from '../../services/programAPI';
 import {
   IFetchSiteListRequest,
   ICreateSiteRequest,
@@ -63,7 +64,8 @@ import {
   DELETE_SITE_USER_REQUEST,
   FETCH_CHIEFDOM_DROPDOWN_REQUEST,
   FETCH_SITE_DASHBOARD_LIST_REQUEST,
-  FETCH_SITE_DROPDOWN_REQUEST
+  FETCH_SITE_DROPDOWN_REQUEST,
+  FETCH_HF_DROPDOWN_REQUEST
 } from './actionTypes';
 
 /*
@@ -340,23 +342,6 @@ export function* fetchSiteDashboardList({
 }
 
 /*
-  Worker Saga: Fired on FETCH_SITE_DROPDOWN_REQUEST action
-*/
-export function* fetchSitesForDropdown({ tenantId, regionTenantId = '' }: IFetchSiteDropdownRequest): SagaIterator {
-  try {
-    const {
-      data: { entityList: siteList, totalCount }
-    } = yield call(siteListService.getSitesForDropdown as any, { tenantId });
-    const payload = { siteList: siteList || [], total: totalCount, regionTenantId: regionTenantId || '' };
-    yield put(fetchSiteDropdownSuccess(payload));
-  } catch (e) {
-    if (e instanceof Error) {
-      yield put(fetchSiteDropdownFailure(e));
-    }
-  }
-}
-
-/*
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
@@ -374,7 +359,6 @@ function* siteSaga() {
   yield all([takeLatest(CREATE_SITE_USER_REQUEST, createSiteUserRequest)]);
   yield all([takeLatest(FETCH_CULTURE_DROPDOWN_REQUEST, fetchSiteCultureList)]);
   yield all([takeLatest(FETCH_SITE_DASHBOARD_LIST_REQUEST, fetchSiteDashboardList)]);
-  yield all([takeLatest(FETCH_SITE_DROPDOWN_REQUEST, fetchSitesForDropdown)]);
 }
 
 export default siteSaga;

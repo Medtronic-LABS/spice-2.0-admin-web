@@ -73,9 +73,9 @@ import {
   DELETE_HEALTH_FACILITY_USER_REQUEST,
   CREATE_HEALTH_FACILITY_USER_REQUEST,
   UPDATE_HEALTH_FACILITY_USER_REQUEST,
-  FETCH_CHIEFDOM_LIST_REQUEST,
-  FETCH_DISTRICT_LIST_REQUEST,
-  FETCH_VILLAGES_LIST_REQUEST,
+  FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF,
+  FETCH_DISTRICT_LIST_REQUEST_FOR_HF,
+  FETCH_VILLAGES_LIST_REQUEST_FOR_HF,
   FETCH_PEER_SUPERVISOR_LIST_REQUEST,
   FETCH_WORKFLOW_LIST_REQUEST,
   FETCH_HEALTH_FACILITY_TYPES_REQUEST,
@@ -530,9 +530,9 @@ function* healthFacilitySaga() {
   yield all([takeLatest(DELETE_HEALTH_FACILITY_USER_REQUEST, deleteHFUserRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_USER_REQUEST, updateHFUserSagaRequest)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_USER_REQUEST, createHFUserSagaRequest)]);
-  yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST, fetchDistrictListSagaRequest)]);
-  yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST, fetchChiefdomListSagaRequest)]);
-  yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST, fetchVillagesListSagaRequest)]);
+  yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST_FOR_HF, fetchDistrictListSagaRequest)]);
+  yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF, fetchChiefdomListSagaRequest)]);
+  yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST_FOR_HF, fetchVillagesListSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_LIST_REQUEST, fetchPeerSupervisorListSagaRequest)]);
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_VALIDATION, peerSupervisorValidationSagaRequest)]);

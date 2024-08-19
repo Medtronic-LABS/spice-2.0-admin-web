@@ -70,6 +70,12 @@ const superAdminRoutes: ISideMenuItem[] = [
     route: PROTECTED_ROUTES.customizationByRegion,
     collapsible: false,
     type: 'regionAdmin'
+  },
+  {
+    label: 'Program',
+    route: PROTECTED_ROUTES.programByRegion,
+    collapsible: false,
+    type: 'regionAdmin'
   }
 ];
 const adminRoutes: ISideMenuItem[] = [

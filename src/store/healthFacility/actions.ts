@@ -364,19 +364,19 @@ export const fetchDistrictListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchDistrictListRequest, 'type'>): IFetchDistrictListRequest => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF,
   countryId,
   successCb,
   failureCb
 });
 
 export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF,
   payload
 });
 
 export const fetchDistrictListFailure = (error: Error): IFetchDistrictListFailure => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_FAILURE,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_FAILURE_FOR_HF,
   error
 });
 
@@ -387,7 +387,7 @@ export const fetchChiefdomListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchChiefdomListRequest, 'type'>): IFetchChiefdomListRequest => ({
-  type: HF_TYPES.FETCH_CHIEFDOM_LIST_REQUEST,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF,
   countryId,
   districtId,
   successCb,
@@ -395,12 +395,12 @@ export const fetchChiefdomListRequest = ({
 });
 
 export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
-  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF,
   payload
 });
 
 export const fetchChiefdomListFailure = (error: Error): IFetchChiefdomListFailure => ({
-  type: HF_TYPES.FETCH_CHIEFDOM_LIST_FAILURE,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_FAILURE_FOR_HF,
   error
 });
 
@@ -412,7 +412,7 @@ export const fetchVillagesListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchVillagesListRequest, 'type'>): IFetchVillagesListRequest => ({
-  type: HF_TYPES.FETCH_VILLAGES_LIST_REQUEST,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF,
   countryId,
   districtId,
   chiefdomId,
@@ -421,12 +421,12 @@ export const fetchVillagesListRequest = ({
 });
 
 export const fetchVillagesListSuccess = (payload: IFetchVillagespayload): IFetchVillagesListSuccess => ({
-  type: HF_TYPES.FETCH_VILLAGES_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_SUCCESS_FOR_HF,
   payload
 });
 
 export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailure => ({
-  type: HF_TYPES.FETCH_VILLAGES_LIST_FAILURE,
+  type: HF_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF,
   error
 });
 

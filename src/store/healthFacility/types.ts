@@ -34,6 +34,8 @@ export interface IHealthFacilityState {
   error: string | null | Error;
   clinicalWorkflowList: IWorkflow[];
   clinicalWorkflowLoading: boolean;
+  hfDropdownLoading: boolean;
+  hfDropdownOptions: any;
 }
 
 export interface IHealthFacility {
@@ -417,19 +419,19 @@ export interface IDistrict {
 }
 
 export interface IFetchDistrictListRequest {
-  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST;
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF;
   countryId: number;
   successCb?: (data: IDistrict[], total: number) => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IFetchDistrictListSuccess {
-  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS;
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF;
   payload: { list: IDistrict[]; total: number };
 }
 
 export interface IFetchDistrictListFailure {
-  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_FAILURE;
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_FAILURE_FOR_HF;
   error: Error;
 }
 
@@ -439,7 +441,7 @@ export interface IChiefdom {
 }
 
 export interface IFetchChiefdomListRequest {
-  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST;
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF;
   countryId: number;
   districtId?: number;
   successCb?: (data: IChiefdom[], total: number) => void;
@@ -447,17 +449,17 @@ export interface IFetchChiefdomListRequest {
 }
 
 export interface IFetchChiefdomListSuccess {
-  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS;
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF;
   payload: { list: IChiefdom[]; total: number };
 }
 
 export interface IFetchChiefdomListFailure {
-  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_FAILURE;
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_FAILURE_FOR_HF;
   error: Error;
 }
 
 export interface IFetchVillagesListRequest {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST;
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF;
   countryId: number;
   districtId: number;
   chiefdomId: number;
@@ -471,12 +473,12 @@ export interface IFetchVillagespayload {
 }
 
 export interface IFetchVillagesListSuccess {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_SUCCESS;
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_SUCCESS_FOR_HF;
   payload: IFetchVillagespayload;
 }
 
 export interface IFetchVillagesListFailure {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE;
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF;
   error: Error;
 }
 export interface IFetchVillagesListFromHFRequest {

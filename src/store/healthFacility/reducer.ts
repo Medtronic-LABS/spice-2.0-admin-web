@@ -59,7 +59,12 @@ export const initialState: IHealthFacilityState = {
   countryList: [],
   clinicalWorkflowList: [],
   clinicalWorkflowLoading: false,
-  error: null
+  error: null,
+  hfDropdownLoading: false,
+  hfDropdownOptions: {
+    list: [],
+    regionTenantId: ''
+  }
 };
 
 const healthFacilityReducer = (
@@ -172,53 +177,53 @@ const healthFacilityReducer = (
         ...state,
         villagesList: []
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF:
       return {
         ...state,
         districtLoading: true
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF:
       return {
         ...state,
         districtLoading: false,
         districtList: action.payload.list,
         districtTotal: action.payload.total
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_FAILURE:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_DISTRICT_LIST_FAILURE_FOR_HF:
       return {
         ...state,
         districtLoading: false
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF:
       return {
         ...state,
         chiefdomLoading: true
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF:
       return {
         ...state,
         chiefdomLoading: false,
         chiefdomList: action.payload.list,
         chiefdomTotal: action.payload.total
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CHIEFDOM_LIST_FAILURE:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CHIEFDOM_LIST_FAILURE_FOR_HF:
       return {
         ...state,
         chiefdomLoading: false
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF:
       return {
         ...state,
         villagesLoading: true
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_SUCCESS_FOR_HF:
       return {
         ...state,
         villagesLoading: false,
         villagesList: action.payload.list,
         villagesTotal: action.payload.total
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF:
       return {
         ...state,
         villagesLoading: false

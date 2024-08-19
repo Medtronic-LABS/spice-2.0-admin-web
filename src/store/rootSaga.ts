@@ -7,6 +7,7 @@ import workflowSaga from './workflow/sagas';
 import labtestSaga from './labTest/sagas';
 import districtSaga from './district/sagas';
 import chiefdomSaga from './chiefdom/sagas';
+import programSaga from './program/sagas';
 
 export function* rootSaga() {
   yield all([fork(userSaga)]);
@@ -17,4 +18,5 @@ export function* rootSaga() {
   yield all([fork(workflowSaga)]);
   yield all([fork(districtSaga)]);
   yield all([fork(chiefdomSaga)]);
+  yield all([fork(programSaga)]);
 }

@@ -15,7 +15,7 @@ const getChiefdomDropdownLoading = (state: AppState) => state.healthFacilityDash
 const getCultureDropdownLoading = (state: AppState) => state.healthFacilityDashboardReducer.cultureListLoading;
 const getLoadingMore = (state: AppState) => state.healthFacilityDashboardReducer.loadingMore;
 const getSiteDashboardList = (state: AppState) => state.healthFacilityDashboardReducer.siteDashboardList;
-const getSiteListDropdown = (state: AppState) => state.healthFacilityDashboardReducer.siteDropdownOptions;
+const getSiteListDropdown = (state: AppState) => state.program.hfDropdownOptions;
 const getSiteListDropdownLoading = (state: AppState) => state.healthFacilityDashboardReducer.siteDropdownLoading;
 
 export const siteSelector = createSelector(getSite, (healthFacilityDashboardReducer) => healthFacilityDashboardReducer);

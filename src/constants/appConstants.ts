@@ -151,6 +151,7 @@ const APPCONSTANTS = {
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin user should not be added.',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
+  USER_DETAILS_CREATE_SUCCESS: 'User details created successfully.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
   USER_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
   USER_DELETE_CONFIRMATION: 'Are you sure you want to delete the user?',
@@ -159,6 +160,16 @@ const APPCONSTANTS = {
   USER_DELETE_FAIL: 'Unable to delete the user. Please try after sometime.',
   USER_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
   USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
+  // Admin
+  ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
+  ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',
+  ADMIN_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
+  ADMIN_DELETE_TITLE: 'Delete Admin',
+  ADMIN_DELETE_SUCCESS: 'Admin deleted successfully.',
+  ADMIN_DELETE_FAIL: 'Unable to delete the user. Please try after sometime.',
+  ADMIN_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
+  ADMIN_LIST_FETCH_ERROR: 'Unable to load Admins. Please try after sometime.',
+  ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
   // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
@@ -201,7 +212,7 @@ const APPCONSTANTS = {
   },
 
   //
-  ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
+
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
   SEARCH_BY_NAME_EMAIL: 'Name / Email',
   SEARCH_BY_NAME: 'Search Name',
