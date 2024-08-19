@@ -8,6 +8,7 @@ export interface IDatePickerFields extends IBaseFields {
   startDate?: string;
   endDate?: string;
   testValidityDays?: string;
+  disableFutureDate?: boolean;
 }
 
 const getEmptyData = (): IDatePickerFields => ({
@@ -20,7 +21,8 @@ const getEmptyData = (): IDatePickerFields => ({
   isEnabled: true,
   testValidityDays: '',
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  isDefault: false
+  isDefault: false,
+  disableFutureDate: false
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -29,7 +31,8 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isMandatory: {},
   isEnabled: {},
   visibility: {},
-  testValidityDays: {}
+  testValidityDays: {},
+  disableFutureDate: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {

@@ -450,9 +450,8 @@ const RenderFields = ({
       );
     }
     case 'DATE_PICKER': {
-      let parseFn = (val: any) => val;
+      const parseFn = (val: any) => val;
       const value = obj[fieldName] || null;
-      parseFn = (val: any) => val;
       return (
         <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
           <DatePickerWrapper
