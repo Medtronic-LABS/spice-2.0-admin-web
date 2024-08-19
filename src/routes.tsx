@@ -38,6 +38,8 @@ import ChiefdomList from './containers/chiefdom/ChiefdomList';
 import ChiefdomSummary from './containers/chiefdom/ChiefdomSummary';
 import RegionCustomization from './containers/region/RegionCustomization';
 import RegionFormCustomization from './containers/region/RegionFormCustomization';
+import ProgramList from './containers/program/ProgramList';
+import ProgramForm from './containers/program/CreateProgram';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -360,6 +362,18 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: Admins,
       authorisedRoles: SU_SA_RA_DA_CDA_HFA
+    },
+    {
+      path: PROTECTED_ROUTES.programByRegion,
+      exact: true,
+      component: ProgramList,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.createProgramByRegion,
+      exact: true,
+      component: ProgramForm,
+      authorisedRoles: SU_SA
     }
   ];
 })();

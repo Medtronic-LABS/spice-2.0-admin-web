@@ -410,13 +410,14 @@ export const fetchDistrictListRequest = ({
   failureCb
 }: Omit<IFetchDistrictListRequest, 'type'>): IFetchDistrictListRequest => ({
   type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF,
   countryId,
   successCb,
   failureCb
 });
 
 export const fetchDistrictListSuccess = (payload: { list: IDistrict[]; total: number }): IFetchDistrictListSuccess => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF,
   payload
 });
 
@@ -440,7 +441,7 @@ export const fetchChiefdomListRequest = ({
 });
 
 export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({
-  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS,
+  type: HF_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF,
   payload
 });
 
@@ -472,34 +473,6 @@ export const fetchVillagesListSuccess = (payload: IFetchVillagespayload): IFetch
 
 export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailure => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF,
-  error
-});
-
-// UNLINKED VILLAGES LIST
-export const fetchUnlinkedVillagesRequest = ({
-  countryId,
-  districtId,
-  chiefdomId,
-  healthFacilityId,
-  successCb,
-  failureCb
-}: Omit<IFetchUnlinkedVillagesRequest, 'type'>): IFetchUnlinkedVillagesRequest => ({
-  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST,
-  countryId,
-  districtId,
-  chiefdomId,
-  healthFacilityId,
-  successCb,
-  failureCb
-});
-
-export const fetchUnlinkedVillagesListSuccess = (payload: IFetchVillagespayload): IFetchUnlinkedVillagesSuccess => ({
-  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_SUCCESS,
-  payload
-});
-
-export const fetchUnlinkedVillagesListFailure = (error: Error): IFetchUnlinkedVillagesFailure => ({
-  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE,
   error
 });
 

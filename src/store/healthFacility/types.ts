@@ -42,33 +42,6 @@ export interface IHealthFacilityState {
   clinicalWorkflowLoading: boolean;
   hfDropdownLoading: boolean;
   hfDropdownOptions: any;
-  hfDashboardList: IHFDashboard[];
-  loadingMore: boolean;
-}
-
-export interface IHFDashboard {
-  id: number;
-  name: string;
-  type: string;
-  tenantId: number;
-  chiefdom?: string;
-}
-
-export interface IFetchHFDashboardListSuccessPayload {
-  siteDashboardList: IHFDashboard[];
-  total: number;
-  isLoadMore?: boolean;
-}
-
-export interface IFetchHFDashboardListRequest {
-  type: typeof ACTION_TYPES.FETCH_HF_DASHBOARD_LIST_REQUEST;
-  isLoadMore?: boolean;
-  skip: number;
-  limit: number | null;
-  searchTerm?: string;
-  countryId: string;
-  successCb?: (payload: IFetchHFDashboardListSuccessPayload) => void;
-  failureCb?: (error: Error) => void;
 }
 
 export interface IHealthFacility {
@@ -497,7 +470,7 @@ export interface IFetchDistrictListRequest {
 }
 
 export interface IFetchDistrictListSuccess {
-  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS;
+  type: typeof ACTION_TYPES.FETCH_DISTRICT_LIST_SUCCESS_FOR_HF;
   payload: { list: IDistrict[]; total: number };
 }
 
@@ -520,7 +493,7 @@ export interface IFetchChiefdomListRequest {
 }
 
 export interface IFetchChiefdomListSuccess {
-  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS;
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_SUCCESS_FOR_HF;
   payload: { list: IChiefdom[]; total: number };
 }
 
@@ -529,7 +502,8 @@ export interface IFetchChiefdomListFailure {
   error: Error;
 }
 
-interface IVillagesRequestPayload {
+export interface IFetchVillagesListRequest {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF;
   countryId: number;
   districtId: number;
   chiefdomId: number;
@@ -553,29 +527,6 @@ export interface IFetchVillagesListSuccess {
 
 export interface IFetchVillagesListFailure {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF;
-  error: Error;
-}
-
-interface IVillagesRequestPayload {
-  countryId: number;
-  districtId: number;
-  chiefdomId: number;
-  successCb?: (data: IVillages[], total: number) => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IFetchUnlinkedVillagesRequest extends IVillagesRequestPayload {
-  type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST;
-  healthFacilityId?: number;
-}
-
-export interface IFetchUnlinkedVillagesSuccess {
-  type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_SUCCESS;
-  payload: IFetchVillagespayload;
-}
-
-export interface IFetchUnlinkedVillagesFailure {
-  type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE;
   error: Error;
 }
 export interface IFetchUnlinkedVillagesRequest extends IVillagesRequestPayload {

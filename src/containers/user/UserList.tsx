@@ -188,7 +188,9 @@ const UserList = (): React.ReactElement => {
   };
 
   const siteUserSuccess = useCallback(() => {
-    const successMessage = isOpenUserModal.isEdit ? APPCONSTANTS.USER_UPDATE_SUCCESS : APPCONSTANTS.USER_CREATE_SUCCESS;
+    const successMessage = isOpenUserModal.isEdit
+      ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
+      : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });

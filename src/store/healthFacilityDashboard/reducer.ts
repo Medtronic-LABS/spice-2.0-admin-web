@@ -242,30 +242,6 @@ const siteReducer = (state: ISiteState = initialState, action = {} as SiteAction
         chiefdomList: [],
         cultureList: []
       };
-    case SITE_ACTION_TYPES.FETCH_SITE_DROPDOWN_SUCCESS:
-      return {
-        ...state,
-        siteDropdownLoading: false,
-        siteDropdownOptions: { list: action.payload.siteList || [], regionTenantId: action.payload.regionTenantId }
-      };
-    case SITE_ACTION_TYPES.FETCH_SITE_DROPDOWN_REQUEST:
-      return {
-        ...state,
-        siteDropdownLoading: true,
-        siteDropdownOptions: { list: [], regionTenantId: '' }
-      };
-    case SITE_ACTION_TYPES.FETCH_SITE_DROPDOWN_FAILURE:
-      return {
-        ...state,
-        siteDropdownLoading: false,
-        error: action.error
-      };
-    case SITE_ACTION_TYPES.CLEAR_SITE_DROPDOWN_OPTIONS:
-      return {
-        ...state,
-        siteDropdownLoading: false,
-        siteDropdownOptions: { list: [], regionTenantId: '' }
-      };
     default:
       return state;
   }

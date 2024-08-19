@@ -179,10 +179,10 @@ const UserList = (): React.ReactElement => {
     userForEdit.current = { users: [] as IHFUserGet[] };
   };
 
-  const siteUserSuccess = useCallback(() => {
+  const adminSuccess = useCallback(() => {
     const successMessage = isOpenUserModal.isEdit
-      ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS
-      : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS;
+      ? APPCONSTANTS.ADMIN_DETAILS_UPDATE_SUCCESS
+      : APPCONSTANTS.ADMIN_DETAILS_CREATE_SUCCESS;
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
@@ -213,7 +213,7 @@ const UserList = (): React.ReactElement => {
         data,
         isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
         null,
-        siteUserSuccess,
+        adminSuccess,
         (e) => {
           toastCenter.error(
             ...getErrorToastArgs(
@@ -227,7 +227,7 @@ const UserList = (): React.ReactElement => {
         }
       );
     },
-    [isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, siteUserSuccess, tenantId]
+    [isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, adminSuccess, tenantId]
   );
 
   const userFormRenderer = (form?: FormApi<any>) => {
