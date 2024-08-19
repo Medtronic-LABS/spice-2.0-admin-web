@@ -1,9 +1,12 @@
 import axios from 'axios';
 import {
   FormLogType,
+  IWorkflowModuleReqPayload,
   ICustomizeFormRequest,
   IDeactivateConsentRequest,
-  IFetchCustomizationFormRequest
+  IFetchClinicalWorkflowReqPayload,
+  IFetchCustomizationFormRequest,
+  IDeleteWorkflowModuleReqPayload
 } from '../store/workflow/types';
 
 export const fetchCustomizationForm = ({
@@ -76,4 +79,32 @@ export const deactivateConsentForm = ({ formType, formId, category, tenantId }: 
       category,
       id: formId
     }
+  });
+
+export const fetchClinicalWorkflows = (data: IFetchClinicalWorkflowReqPayload) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/clinical-workflow/list',
+    data
+  });
+
+export const createWorkflowModule = (data: IWorkflowModuleReqPayload) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/clinical-workflow/create',
+    data
+  });
+
+export const updateWorkflowModule = (data: IWorkflowModuleReqPayload) =>
+  axios({
+    method: 'PUT',
+    url: '/admin-service/clinical-workflow/update',
+    data
+  });
+
+export const deleteWorkflowModule = (data: IDeleteWorkflowModuleReqPayload) =>
+  axios({
+    method: 'PUT',
+    url: '/admin-service/clinical-workflow/remove',
+    data
   });

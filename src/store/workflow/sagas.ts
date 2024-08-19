@@ -7,14 +7,23 @@ import {
   IFetchCustomizationFormRequest,
   IDeactivateConsentRequest,
   IFetchFormMetaRequest,
-  FormLogType
+  FormLogType,
+  IFetchClinicalWorkflowReq,
+  IClinicalWorkflow,
+  ICreateWorkflowModule,
+  IUpdateWorkflowModule,
+  IDeleteWorkflowModule
 } from './types';
 import * as workflowActions from './actions';
 import {
   CUSTOMIZE_FORM_REQUEST,
   FETCH_CUSTOMIZATION_FORM_REQUEST,
   DEACTIVATE_CONSENT_FORM_REQUEST,
-  FETCH_FORM_META_REQUEST
+  FETCH_FORM_META_REQUEST,
+  FETCH_CLINICAL_WORKFLOW_REQUEST,
+  CREATE_WORKFLOW_MODULE_REQUEST,
+  UPDATE_WORKFLOW_MODULE_REQUEST,
+  DELETE_WORKFLOW_MODULE_REQUEST
 } from './actionTypes';
 import { camel2Title } from '../../utils/validation';
 import { FormTypes } from '../../containers/region/RegionCustomization';
@@ -46,10 +55,10 @@ export function* fetchCustomizationForm({
       clinicalWorkflowId
     } as any);
     successCb?.(data);
-    if (category === 'input_form') {
+    if (category.toLowerCase() === 'input_form') {
       const newData = { ...data, form_input: JSON.parse(data?.formInput) };
       yield put(workflowActions.fetchCustomizationFormSuccess({ payload: newData }));
-    } else if (category === 'Consent_form') {
+    } else if (category.toLowerCase() === 'consent_form') {
       yield put(workflowActions.fetchConsentFormSuccess({ payload: data }));
     }
   } catch (e) {
@@ -190,6 +199,77 @@ export function* deactivateConsentForm({
 }
 
 /*
+  Worker Saga: Fired on FETCH_CLINICAL_WORKFLOW_REQUEST action
+*/
+export function* fetchClinicalWorkflows({ data }: IFetchClinicalWorkflowReq): SagaIterator {
+  try {
+    const { data: worflowsResponse } = yield call(workflowService.fetchClinicalWorkflows, data);
+    const { entityList: workflows } = worflowsResponse;
+    const { totalCount: total } = worflowsResponse;
+    const sortedWokflows = workflows.sort((workflowA: IClinicalWorkflow, workflowB: IClinicalWorkflow) =>
+      (workflowA.moduleType || 0) > (workflowB.moduleType || 0) ? 1 : -1
+    );
+    const payload = {
+      data: (sortedWokflows || []) as IClinicalWorkflow[],
+      total
+    };
+    yield put(workflowActions.fetchClinicalWorkflowSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      yield put(workflowActions.fetchClinicalWorkflowFailure());
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on CREATE_WORKFLOW_MODULE_REQUEST action
+*/
+export function* createWorkflowRequest({ data, successCb, failureCb }: ICreateWorkflowModule): SagaIterator {
+  try {
+    yield call(workflowService.createWorkflowModule, data);
+    successCb?.();
+    yield put(workflowActions.createWorkflowModuleSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(workflowActions.createWorkflowModuleFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on DELETE_WORKFLOW_MODULE_REQUEST action
+*/
+export function* deleteWorkflowRequest({ data, successCb, failureCb }: IDeleteWorkflowModule): SagaIterator {
+  try {
+    yield call(workflowService.deleteWorkflowModule, data);
+    successCb?.();
+    yield put(workflowActions.deleteWorkflowModuleSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(workflowActions.deleteWorkflowModuleFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on UPDATE_WORKFLOW_MODULE_REQUEST action
+*/
+export function* updateWorkflowRequest({ data, successCb, failureCb }: IUpdateWorkflowModule): SagaIterator {
+  try {
+    yield call(workflowService.updateWorkflowModule, data);
+    successCb?.();
+    yield put(workflowActions.updateWorkflowModuleSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(workflowActions.updateWorkflowModuleFailure(e));
+    }
+  }
+}
+
+/*
   Starts worker saga on latest dispatched specific action.
 */
 function* workflowSaga() {
@@ -197,6 +277,10 @@ function* workflowSaga() {
   yield all([takeLatest(FETCH_FORM_META_REQUEST, fetchFormMeta)]);
   yield all([takeLatest(CUSTOMIZE_FORM_REQUEST, customizeForm)]);
   yield all([takeLatest(DEACTIVATE_CONSENT_FORM_REQUEST, deactivateConsentForm)]);
+  yield all([takeLatest(FETCH_CLINICAL_WORKFLOW_REQUEST, fetchClinicalWorkflows)]);
+  yield all([takeLatest(CREATE_WORKFLOW_MODULE_REQUEST, createWorkflowRequest)]);
+  yield all([takeLatest(UPDATE_WORKFLOW_MODULE_REQUEST, updateWorkflowRequest)]);
+  yield all([takeLatest(DELETE_WORKFLOW_MODULE_REQUEST, deleteWorkflowRequest)]);
 }
 
 export default workflowSaga;

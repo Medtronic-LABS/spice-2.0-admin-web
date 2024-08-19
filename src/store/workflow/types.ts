@@ -1,7 +1,79 @@
+import { IFetchClinicalWorkflowSuccessPayload } from '../district/types';
+import { ITimezone } from '../user/types';
 import * as ACTION_TYPES from './actionTypes';
 
 export type FormLogType = 'screeninglog' | 'bplog' | 'glucoselog' | 'patient';
 export type FormType = 'screening' | 'enrollment' | 'assessment' | 'Module';
+
+export interface IWorkflowModuleReqPayload {
+  name?: string;
+  viewScreens?: string[];
+  countryId?: string;
+  tenantId: string;
+  id?: string;
+}
+export interface ICreateWorkflowModule {
+  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IUpdateWorkflowModule {
+  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IAdminEditFormValues {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  username: string;
+  gender: string;
+  countryCode: string;
+  timezone: ITimezone;
+  country: { countryCode?: string; id?: string };
+  tenantId?: string;
+}
+export interface IAccountAdmin extends Omit<IAdminEditFormValues, 'timezone'> {
+  timezone: string;
+}
+export interface IClinicalWorkflow {
+  id: string;
+  name: string;
+  isActive?: boolean;
+  default?: boolean;
+  isDeleted?: boolean;
+  coreType?: string;
+  workflowId?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  moduleType?: string;
+  country?: string;
+  tenantId?: string;
+  viewScreens?: string[];
+  workflow?: string;
+}
+
+export interface IAccount {
+  id: string;
+  users: IAccountAdmin[];
+  name: string;
+  maxNoOfUsers: string;
+  tenantId: string;
+  updatedAt?: string;
+  clinicalWorkflow?: IClinicalWorkflow[] | string[];
+  customizedWorkflow?: IClinicalWorkflow[] | string[];
+  country?: {
+    countryCode: string;
+    tenantId?: string;
+    id?: string;
+  };
+}
 
 export interface IWorkflowState {
   formJSON: null | any;
@@ -9,6 +81,54 @@ export interface IWorkflowState {
   formMeta: null | any;
   loading: boolean;
   loadingMeta: boolean;
+  clinicalWorkflowsCount: number;
+  clinicalWorkflows: any[];
+}
+
+export interface IWorkflowModuleReqPayload {
+  name?: string;
+  viewScreens?: string[];
+  countryId?: string;
+  tenantId: string;
+  id?: string;
+}
+export interface IFetchClinicalWorkflowReq {
+  type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST;
+  data: IFetchClinicalWorkflowReqPayload;
+}
+
+export interface IDeleteWorkflowModuleReqPayload {
+  id: string;
+  tenantId: string;
+}
+
+export interface ICreateWorkflowModule {
+  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IUpdateWorkflowModule {
+  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IDeleteWorkflowModule {
+  type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_REQUEST;
+  data: IDeleteWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchClinicalWorkflowReqPayload {
+  countryId: string;
+  tenantId?: string;
+  limit: number | null;
+  skip: number;
+  searchTerm: string;
 }
 
 export interface IFetchCustomizationFormRequest {
@@ -111,6 +231,82 @@ export interface IClearFormJSON {
 export interface IClearConsentForm {
   type: typeof ACTION_TYPES.CLEAR_CONSENT_FORM;
 }
+export interface IFetchClinicalWorkflowSuccess {
+  type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS;
+  payload: IFetchClinicalWorkflowSuccessPayload;
+}
+export interface IAccountOption {
+  name: string;
+  id: string;
+  tenantId: string;
+}
+
+export interface IDashboardAccounts {
+  id: string;
+  name: string;
+  ouCount: number;
+  siteCount: number;
+  tenantId: string;
+}
+
+export interface IResetWorkFlowModule {
+  type: typeof ACTION_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST;
+}
+
+export interface ICreateWorkflowModule {
+  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface ICreateWorkflowModuleSuccess {
+  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_SUCCESS;
+}
+
+export interface ICreateWorkflowModuleFail {
+  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_FAILURE;
+  error: Error;
+}
+
+export interface IUpdateWorkflowModule {
+  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST;
+  data: IWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IDeleteWorkflowModule {
+  type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_REQUEST;
+  data: IDeleteWorkflowModuleReqPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IUpdateWorkflowModuleSuccess {
+  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_SUCCESS;
+}
+
+export interface IUpdateWorkflowModuleFail {
+  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_FAILURE;
+  error: Error;
+}
+export interface IDeleteWorkflowModuleSuccess {
+  type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_SUCCESS;
+}
+
+export interface IDeleteWorkflowModuleReqPayload {
+  id: string;
+  tenantId: string;
+}
+
+export interface IDeleteWorkflowModuleFail {
+  type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_FAILURE;
+  error: Error;
+}
+
+export interface IResetWorkFlowModule {
+  type: typeof ACTION_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST;
+}
 
 export type WorkflowActions =
   | IFetchCustomizationFormRequest
@@ -129,4 +325,17 @@ export type WorkflowActions =
   | IClearConsentForm
   | IDeactivateConsentRequest
   | IDeactivateConsentSuccess
-  | IDeactivateConsentFailure;
+  | IDeactivateConsentFailure
+  | IFetchClinicalWorkflowSuccess
+  | IResetWorkFlowModule
+  | ICreateWorkflowModule
+  | ICreateWorkflowModule
+  | ICreateWorkflowModuleSuccess
+  | ICreateWorkflowModuleFail
+  | IUpdateWorkflowModule
+  | IUpdateWorkflowModuleSuccess
+  | IUpdateWorkflowModuleFail
+  | IDeleteWorkflowModule
+  | IDeleteWorkflowModuleSuccess
+  | IDeleteWorkflowModuleFail
+  | IResetWorkFlowModule;

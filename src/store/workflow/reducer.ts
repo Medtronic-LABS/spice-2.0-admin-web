@@ -7,7 +7,9 @@ const initialState: IWorkflowState = {
   consentForm: null,
   formMeta: null,
   loading: false,
-  loadingMeta: false
+  loadingMeta: false,
+  clinicalWorkflows: [],
+  clinicalWorkflowsCount: 0
 };
 
 const workflowReducer = (state = initialState, action = {} as WorkflowActions): IWorkflowState => {
@@ -23,12 +25,6 @@ const workflowReducer = (state = initialState, action = {} as WorkflowActions): 
         ...state,
         loading: false,
         consentForm: null
-      };
-    case WORKFLOW_TYPES.FETCH_CUSTOMIZATION_FORM_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        formJSON: action.payload
       };
     case WORKFLOW_TYPES.FETCH_CUSTOMIZATION_FORM_REQUEST:
     case WORKFLOW_TYPES.DEACTIVATE_CONSENT_FORM_REQUEST:
@@ -68,6 +64,25 @@ const workflowReducer = (state = initialState, action = {} as WorkflowActions): 
       return {
         ...state,
         consentForm: null
+      };
+    case WORKFLOW_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS:
+      return {
+        ...state,
+        clinicalWorkflows: action?.payload?.data || [],
+        clinicalWorkflowsCount: action?.payload?.total,
+        loading: false
+      };
+    case WORKFLOW_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST:
+      return {
+        ...state,
+        clinicalWorkflows: [],
+        clinicalWorkflowsCount: 0
+      };
+    case WORKFLOW_TYPES.FETCH_CUSTOMIZATION_FORM_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        formJSON: action.payload
       };
     default:
       return {

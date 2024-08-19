@@ -1,3 +1,8 @@
+import {
+  IFetchClinicalWorkflowFailure,
+  IFetchClinicalWorkflowSuccess,
+  IFetchClinicalWorkflowSuccessPayload
+} from '../district/types';
 import * as WORKFLOW_TYPES from './actionTypes';
 import {
   IFetchFormMetaRequest,
@@ -16,7 +21,19 @@ import {
   IFetchConsentFormFailure,
   IDeactivateConsentRequest,
   IDeactivateConsentSuccess,
-  IDeactivateConsentFailure
+  IDeactivateConsentFailure,
+  IFetchClinicalWorkflowReq,
+  IFetchClinicalWorkflowReqPayload,
+  IClinicalWorkflow,
+  ICreateWorkflowModule,
+  ICreateWorkflowModuleSuccess,
+  ICreateWorkflowModuleFail,
+  IUpdateWorkflowModule,
+  IUpdateWorkflowModuleSuccess,
+  IUpdateWorkflowModuleFail,
+  IDeleteWorkflowModule,
+  IDeleteWorkflowModuleSuccess,
+  IDeleteWorkflowModuleFail
 } from './types';
 
 export const fetchCustomizationFormRequest = ({
@@ -40,6 +57,23 @@ export const fetchCustomizationFormRequest = ({
   clinicalWorkflowId,
   successCb,
   failureCb
+});
+
+export const fetchClinicalWorkflowSuccess = (payload: {
+  data: IClinicalWorkflow[];
+  total: number;
+}): IFetchClinicalWorkflowSuccess => ({
+  type: WORKFLOW_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS,
+  payload
+});
+
+export const fetchClinicalWorkflowFailure = (): IFetchClinicalWorkflowFailure => ({
+  type: WORKFLOW_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE
+});
+
+export const fetchClinicalWorkflow = (data: IFetchClinicalWorkflowReqPayload): IFetchClinicalWorkflowReq => ({
+  type: WORKFLOW_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST,
+  data
 });
 
 export const fetchCustomizationFormSuccess = ({
@@ -163,4 +197,68 @@ export const deactivateConsentFailure = (): IDeactivateConsentFailure => ({
 
 export const clearConsentForm = () => ({
   type: WORKFLOW_TYPES.CLEAR_CONSENT_FORM
+});
+
+export const createWorkflowModule = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<ICreateWorkflowModule, 'type'>): ICreateWorkflowModule => ({
+  type: WORKFLOW_TYPES.CREATE_WORKFLOW_MODULE_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const createWorkflowModuleSuccess = (): ICreateWorkflowModuleSuccess => ({
+  type: WORKFLOW_TYPES.CREATE_WORKFLOW_MODULE_SUCCESS
+});
+
+export const createWorkflowModuleFailure = (error: Error): ICreateWorkflowModuleFail => ({
+  type: WORKFLOW_TYPES.CREATE_WORKFLOW_MODULE_FAILURE,
+  error
+});
+
+export const updateWorkflowModule = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<IUpdateWorkflowModule, 'type'>): IUpdateWorkflowModule => ({
+  type: WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const updateWorkflowModuleSuccess = (): IUpdateWorkflowModuleSuccess => ({
+  type: WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_SUCCESS
+});
+
+export const updateWorkflowModuleFailure = (error: Error): IUpdateWorkflowModuleFail => ({
+  type: WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_FAILURE,
+  error
+});
+
+export const deleteWorkflowModule = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<IDeleteWorkflowModule, 'type'>): IDeleteWorkflowModule => ({
+  type: WORKFLOW_TYPES.DELETE_WORKFLOW_MODULE_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const deleteWorkflowModuleSuccess = (): IDeleteWorkflowModuleSuccess => ({
+  type: WORKFLOW_TYPES.DELETE_WORKFLOW_MODULE_SUCCESS
+});
+
+export const deleteWorkflowModuleFailure = (error: Error): IDeleteWorkflowModuleFail => ({
+  type: WORKFLOW_TYPES.DELETE_WORKFLOW_MODULE_FAILURE,
+  error
+});
+
+export const resetClinicalWorkflow = () => ({
+  type: WORKFLOW_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST
 });

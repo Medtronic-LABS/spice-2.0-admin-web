@@ -5,8 +5,6 @@ import {
   IDistrictAdmin,
   IDistrictDeactivate,
   IFetchDistrictList,
-  ICountyWorkflowModuleReqPayload,
-  IDeleteCountyWorkflowModuleReqPayload,
   IFetchClinicalWorkflowReqPayload,
   IFetchDistrictOptionsPayload
 } from '../store/district/types';
@@ -130,26 +128,5 @@ export const fetchClinicalWorkflows = (data: IFetchClinicalWorkflowReqPayload) =
   axios({
     method: 'POST',
     url: '/admin-service/clinical-workflow/list',
-    data
-  });
-
-export const createCountyWorkflowModule = (data: ICountyWorkflowModuleReqPayload) =>
-  axios({
-    method: 'POST',
-    url: '/admin-service/clinical-workflow/create',
-    data
-  });
-
-export const updateCountyWorkflowModule = (data: ICountyWorkflowModuleReqPayload) =>
-  axios({
-    method: 'PUT',
-    url: '/admin-service/clinical-workflow/update',
-    data
-  });
-
-export const deleteCountyWorkflowModule = (data: IDeleteCountyWorkflowModuleReqPayload) =>
-  axios({
-    method: 'PUT',
-    url: '/admin-service/clinical-workflow/remove',
     data
   });
