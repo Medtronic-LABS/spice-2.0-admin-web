@@ -172,7 +172,9 @@ const Region = (): React.ReactElement => {
             value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
             label: healthFacility,
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.hfByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.healthFacilityByRegion
+              .replace(':regionId', regionId)
+              .replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           }
         ]

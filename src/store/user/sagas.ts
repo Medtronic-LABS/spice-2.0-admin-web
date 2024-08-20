@@ -67,7 +67,8 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       country,
       suiteAccess,
       formDataId: organizations[0]?.formDataId,
-      countryId: undefined
+      countryId: undefined,
+      organizations
     };
     successCb?.(payload);
     yield put(userActions.loginSuccess(payload));
@@ -149,7 +150,8 @@ export function* fetchLoggedInUser(): SagaIterator {
       formDataId: organizations[0]?.formDataId,
       country,
       suiteAccess,
-      countryId: undefined
+      countryId: undefined,
+      organizations
     };
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {

@@ -79,6 +79,17 @@ const MOCK_DATA_CONSTANTS = {
         }
       }
     ]
+  },
+  ID_AND_TENANT_ID_REQUEST_PAYLOAD: {
+    id: '1',
+    tenantId: '4'
+  },
+  COUNTRY_DETAILS_RESPONSE: {
+    id: '1',
+    tenantId: '2',
+    name: 'Kenya',
+    list: [],
+    total: 2
   }
 };
 

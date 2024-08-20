@@ -548,7 +548,7 @@ describe('Fetch the site dashboard list', () => {
       }
     ).toPromise();
     expect(fetchSiteDashboardListSpy).toHaveBeenCalledWith({ ...siteDashboardListRequestPayload, tenantId: '4' });
-    expect(dispatched).toEqual([siteActions.fetchSiteDashboardListSuccess(siteDashboardListResponsePayload)]);
+    expect(dispatched).toEqual([siteActions.fetchHFDashboardListSuccess(siteDashboardListResponsePayload)]);
   });
 
   it('Fails to fetch site dashboard list and dispatches failure', async () => {
@@ -570,7 +570,7 @@ describe('Fetch the site dashboard list', () => {
       }
     ).toPromise();
     expect(fetchSiteDashboardListSpy).toHaveBeenCalledWith({ ...siteDashboardListRequestPayload, tenantId: '4' });
-    expect(dispatched).toEqual([siteActions.fetchSiteDashboardListFailure(error)]);
+    expect(dispatched).toEqual([siteActions.fetchHFDashboardListFailure(error)]);
   });
 });
 

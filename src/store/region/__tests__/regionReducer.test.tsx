@@ -39,6 +39,30 @@ describe('Region Reducer', () => {
     expect(newState).toEqual(expectedState);
   });
 
+  it('should handle fetch cointry detail request: FETCH_COUNTRY_DETAILS_REQUEST', () => {
+    const action: any = { type: REGION_TYPES.FETCH_COUNTRY_DETAILS_REQUEST };
+    const expectedState = {
+      ...mainInitialState,
+      loading: true
+    };
+    const newState = regionReducer(mainInitialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_COUNTRY_DETAILS_SUCCESS', () => {
+    const action: any = {
+      type: REGION_TYPES.FETCH_COUNTRY_DETAILS_SUCCESS,
+      payload: { list: MOCK_REGION_DETAIL.entityList, total: MOCK_REGION_DETAIL.totalCount, ...MOCK_REGION_DETAIL }
+    };
+    const expectedState = {
+      ...mainInitialState,
+      loading: false,
+      error: null,
+      detail: action.payload
+    };
+    expect(regionReducer(initialState, action)).toEqual(expectedState);
+  });
+
   it('should handle client registry status success: FETCH_CLIENT_REGISTRY_STATUS_SUCCESS', () => {
     const action: any = {
       type: REGION_TYPES.FETCH_CLIENT_REGISTRY_STATUS_SUCCESS,

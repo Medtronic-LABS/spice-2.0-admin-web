@@ -128,7 +128,7 @@ const ChiefdomDashboard = () => {
             value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
             label: 'Site',
             disableEllipsis: true,
-            route: PROTECTED_ROUTES.hfByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
+            route: PROTECTED_ROUTES.healthFacilityByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
             onClick: () => {
               if (!chiefdomDetail.id || chiefdomDetail.id !== id) {
                 onDashboardExit(id, tenantId, name);
