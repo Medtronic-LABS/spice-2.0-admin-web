@@ -66,6 +66,8 @@ const HealthFacilityList = (): React.ReactElement => {
 
   const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
+  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
+
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false,
@@ -182,19 +184,12 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
 
-  const validateLinkedRestrictions = (
-    missingIds: number[],
-    tenantId: number,
-    healthFacility: any,
-    linkedVillageIds: number[]
-  ) => {
+  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacility: any) => {
     dispatch(
       validateLinkedRestrictionsRequest({
       validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId,
-        healthFacilityId: healthFacility.id,
-        linkedVillageIds,
+        tenantId: hfTenantId,
         successCb: () => {
           fetchWorkflowList(healthFacility);
         },
@@ -279,8 +274,8 @@ const HealthFacilityList = (): React.ReactElement => {
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel={`Add ${healthFacilitySName}`}
-          header={healthFacilitySName}
+          buttonLabel='Add Health Facility'
+          header='Health Facility'
           isSearch={true}
           onSearch={handleSearch}
           onButtonClick={openCreateHealthFacility}

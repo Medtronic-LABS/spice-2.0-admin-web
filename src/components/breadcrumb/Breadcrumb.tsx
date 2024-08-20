@@ -3,8 +3,12 @@ import { Link, NavLink } from 'react-router-dom';
 import { matchPath, useLocation } from 'react-router';
 
 import { ReactComponent as HomeIcon } from '../../assets/images/home.svg';
-import { PROTECTED_ROUTES } from '../../constants/route';
+import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES } from '../../constants/route';
 import { useDispatch, useSelector } from 'react-redux';
+import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { districtSelector } from '../../store/district/selectors';
+import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
+import { healthFacilitySelector } from '../../store/healthFacility/selectors';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { districtSelector } from '../../store/district/selectors';
 import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
@@ -40,14 +44,50 @@ const districtRoutes = [
   PROTECTED_ROUTES.createChiefdomByDistrict,
   PROTECTED_ROUTES.createHealthFacilityByDistrict
 ];
+const chiefdomRoutes = [
+  PROTECTED_ROUTES.chiefdomSummary,
+  PROTECTED_ROUTES.healthFacilityByChiefdom,
+  PROTECTED_ROUTES.userByChiefdom,
+  PROTECTED_ROUTES.createHealthFacilityByChiefdom
+];
 
-const customBreadcrumbs = [
-  { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
-  { route: PROTECTED_ROUTES.createHealthFacility, label: 'Add Health Facility', appendParent: true },
-  { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true },
-  { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
-  { route: PROTECTED_ROUTES.createAccountByRegion, label: 'Create County', appendParent: true },
-  { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' }
+const districtRoutes = [
+  PROTECTED_ROUTES.districtSummary,
+  PROTECTED_ROUTES.chiefdomByDistrict,
+  PROTECTED_ROUTES.healthFacilityByDistrict,
+  PROTECTED_ROUTES.userByDistrict,
+  PROTECTED_ROUTES.createChiefdomByDistrict,
+  PROTECTED_ROUTES.createHealthFacilityByDistrict
+];
+
+const regionRoutes = [
+  PROTECTED_ROUTES.regionSummary,
+  PROTECTED_ROUTES.districtByRegion,
+  PROTECTED_ROUTES.chiefdomByRegion,
+  PROTECTED_ROUTES.healthFacilityByRegion,
+  PROTECTED_ROUTES.userByRegion,
+  PROTECTED_ROUTES.createDistrictByRegion,
+  PROTECTED_ROUTES.createChiefdomByRegion,
+  PROTECTED_ROUTES.createHealthFacilityByRegion,
+  PROTECTED_ROUTES.createMedication,
+  PROTECTED_ROUTES.createLabTest,
+  PROTECTED_ROUTES.medicationByRegion,
+  PROTECTED_ROUTES.labTestByRegion,
+  PROTECTED_ROUTES.programByRegion,
+  PROTECTED_ROUTES.createProgramByRegion,
+  PROTECTED_ROUTES.customizationByRegion,
+  PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
+  PROTECTED_ROUTES.workflowCustomization,
+  PROTECTED_ROUTES.workflowByRegion
+];
+
+const siteRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.healthFacilityByRegion];
+
+const dashboardRoutes = [
+  PROTECTED_ROUTES.regionDashboard,
+  PROTECTED_ROUTES.districtDashboard,
+  PROTECTED_ROUTES.chiefdomDashboard,
+  PROTECTED_ROUTES.healthFacilityDashboard
 ];
 
 /**
@@ -64,31 +104,31 @@ const Breadcrumb = (): React.ReactElement => {
   const role = useSelector(roleSelector);
 
   const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
+    district: districtModuleName,
+    chiefdom: chiefdomModuleName,
+    healthFacility: healthFacilityModuleName
   } = NAME_CONSTANTS;
 
   const customBreadcrumbs = [
     { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
     { route: PROTECTED_ROUTES.createLabTest, label: 'Add Lab Test', appendParent: true },
     { route: PROTECTED_ROUTES.createRegion, label: 'Create Region', appendParent: true },
-    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtSName}`, appendParent: true },
-    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomSName}`, appendParent: true },
-    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomSName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtModuleName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomModuleName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomModuleName}`, appendParent: true },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByRegion,
-      label: `Create ${healthFacilitySName}`,
+      label: `Create ${healthFacilityModuleName}`,
       appendParent: true
     },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByDistrict,
-      label: `Create ${healthFacilitySName}`,
+      label: `Create ${healthFacilityModuleName}`,
       appendParent: true
     },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByChiefdom,
-      label: `Create ${healthFacilitySName}`,
+      label: `Create ${healthFacilityModuleName}`,
       appendParent: true
     },
     { route: PROTECTED_ROUTES.profile, label: 'Settings' },
@@ -183,8 +223,8 @@ const Breadcrumb = (): React.ReactElement => {
       result.push({
         label: healthFacility.name,
         route: PROTECTED_ROUTES.healthFacilitySummary
-          .replace(':healthFacilityId', healthFacility.id?.toString())
-          .replace(':tenantId', healthFacility.tenantId?.toString())
+          .replace(':healthFacilityId', healthFacility.id.toString())
+          .replace(':tenantId', healthFacility.tenantId.toString())
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
@@ -350,7 +390,8 @@ const Breadcrumb = (): React.ReactElement => {
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
-        to={PROTECTED_ROUTES.landingPage}
+        onClick={clearData}
+        to={HOME_PAGE_BY_ROLE[role]}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

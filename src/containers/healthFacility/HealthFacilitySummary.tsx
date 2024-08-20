@@ -13,6 +13,7 @@ import { FormApi } from 'final-form';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
+import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import UserForm from '../../components/userForm/UserForm';
 import {
   clearSupervisorList,
@@ -326,18 +327,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (
-    missingIds: number[],
-    tenantId: number,
-    healthFacilityParams: any,
-    linkedVillageIds: number[]
-  ) => {
+  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacilityParams: any) => {
     dispatch(
       validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId,
-        healthFacilityId: healthFacilityParams?.id,
-        linkedVillageIds,
+        tenantId: hfTenantId,
         successCb: () => {
           fetchWorkflowList(healthFacilityParams);
         },
@@ -362,7 +356,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility, linkedVillagesIds);
+      validatePeerSupervisor(missingIds, Number(healthFacilityData.tenantId), healthFacility);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(
@@ -416,7 +410,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -450,7 +444,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({
@@ -512,8 +506,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
         isSiteUser={true}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
-        parentOrgId={healthFacility?.chiefdom?.tenantId}
-        ignoreTenantId={tenantId}
       />
     );
   };

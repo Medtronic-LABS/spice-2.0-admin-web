@@ -27,6 +27,7 @@ import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
 import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
 import CreateHealthFacility from './containers/createHealthFacility/CreateHealthFacility';
+import CreateHealthFacility from './containers/createHealthFacility/CreateHealthFacility';
 import MedicationList from './containers/medication/MedicationList';
 import AddMedication from './containers/medication/AddMedication';
 import MyProfile from './containers/myProfile/MyProfile';
@@ -49,6 +50,11 @@ import SubCountyList from './containers/subCounty/SubCountyList';
 import SubCountySummary from './containers/subCounty/SubCountySummary';
 import RegionCustomization from './containers/region/RegionCustomization';
 import RegionFormCustomization from './containers/region/RegionFormCustomization';
+import ProgramList from './containers/program/ProgramList';
+import ProgramForm from './containers/program/CreateProgram';
+import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
+import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
+import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -72,9 +78,9 @@ export const SU_SA = [SUPER_ADMIN, SUPER_USER];
 export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
 export const SU_SA_RA_AA = [...SU_SA_RA, ACCOUNT_ADMIN];
 export const SU_SA_HFA = [...SU_SA, HEALTH_FACILITY_ADMIN];
-export const SU_SA_RA_AA_OUA = [...SU_SA_RA_AA, OPERATING_UNIT_ADMIN];
-export const SU_SA_RA_AA_OUA_SIA = [...SU_SA_RA_AA_OUA, SITE_ADMIN];
-export const A = [HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
+export const CDA_HFA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
+export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
@@ -85,40 +91,40 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: Object.values(APPCONSTANTS.ROLES)
     },
     {
+      path: PROTECTED_ROUTES.dashboard,
+      exact: true,
+      component: Dashboard,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.profile,
+      exact: true,
+      component: MyProfile,
+      authorisedRoles: Object.values(APPCONSTANTS.ROLES)
+    },
+    {
+      path: PROTECTED_ROUTES.deactivatedRecords,
+      exact: true,
+      component: DeactivatedRecords,
+      authorisedRoles: SU_SA_RA
+    },
+    {
+      path: PROTECTED_ROUTES.lockedUsers,
+      exact: true,
+      component: LockedUsers,
+      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+    },
+    {
+      path: PROTECTED_ROUTES.regionDashboard,
+      exact: true,
+      component: RegionDashboard,
+      authorisedRoles: SU_SA
+    },
+    {
       path: PROTECTED_ROUTES.region,
       exact: true,
       component: Region,
       authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.createRegion,
-      exact: true,
-      component: CreateRegion,
-      authorisedRoles: SU_SA
-    },
-    {
-      path: PROTECTED_ROUTES.accountByRegion,
-      exact: true,
-      component: AccountList,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.createAccountByRegion,
-      exact: true,
-      component: CreateAccount,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.accountSummary,
-      exact: true,
-      component: AccountSummary,
-      authorisedRoles: SU_SA_RA_AA
-    },
-    {
-      path: PROTECTED_ROUTES.accountDashboard,
-      exact: true,
-      component: AccountDashboard,
-      authorisedRoles: [REGION_ADMIN]
     },
     {
       path: PROTECTED_ROUTES.createRegion,
@@ -205,22 +211,10 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: CDA_HFA
     },
     {
-      path: PROTECTED_ROUTES.createChiefdomByDistrict,
-      exact: true,
-      component: CreateChiefdom,
-      authorisedRoles: SU_SA_RA_DA
-    },
-    {
-      path: PROTECTED_ROUTES.healthFacilityDashboard,
-      exact: true,
-      component: HealthFacilityDashboard,
-      authorisedRoles: CDA_HFA
-    },
-    {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
-      authorisedRoles: SU_SA_HFA
+      authorisedRoles: SU_SA_RA_DA_CDA_HFA
     },
     {
       path: PROTECTED_ROUTES.healthFacilityByRegion,
@@ -337,46 +331,34 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: SU_SA
     },
     {
-      path: PROTECTED_ROUTES.profile,
-      exact: true,
-      component: MyProfile,
-      authorisedRoles: SU_SA_HFA
-    },
-    {
       path: PROTECTED_ROUTES.customizeLabTest,
       exact: true,
       component: LabTestCustomizationLayout,
       authorisedRoles: SU_SA_HFA
     },
     {
-      path: PROTECTED_ROUTES.deactivatedRecords,
+      path: PROTECTED_ROUTES.programByRegion,
       exact: true,
-      component: DeactivatedRecords,
+      component: ProgramList,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.createProgramByRegion,
+      exact: true,
+      component: ProgramForm,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.workflowByRegion,
+      exact: true,
+      component: WorkflowCustomization,
       authorisedRoles: SU_SA_RA
     },
     {
-      path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
+      path: PROTECTED_ROUTES.workflowCustomization,
       exact: true,
-      component: RegionFormCustomization,
+      component: WorkflowFormCustomization,
       authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.customizationByRegion,
-      exact: true,
-      component: RegionCustomization,
-      authorisedRoles: SU_SA_RA
-    },
-    {
-      path: PROTECTED_ROUTES.lockedUsers,
-      exact: true,
-      component: LockedUsers,
-      authorisedRoles: SU_SA_RA_AA_OUA_HFA
-    },
-    {
-      path: PROTECTED_ROUTES.adminBySuperAdmin,
-      exact: true,
-      component: Admins,
-      authorisedRoles: SU_SA_RA_AA_OUA_HFA
     }
   ];
 })();

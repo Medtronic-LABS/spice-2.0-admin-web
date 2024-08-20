@@ -23,7 +23,7 @@ import {
   IFetchVillagesListFromHFRequest,
   IFetchUserDetailRequest,
   IDeleteHFRequest,
-  IFetchUnlinkedVillagesRequest
+  IFetchHFDashboardListRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -64,10 +64,9 @@ import {
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
   deleteHealthFacilityFailure,
-  validateLinkedRestrictionsFailure,
-  fetchUnlinkedVillagesListSuccess,
-  fetchUnlinkedVillagesListFailure,
-  validateLinkedRestrictionsSuccess
+  fetchPeerSupervisorValidationsFailure,
+  fetchHFDashboardListFailure,
+  fetchHFDashboardListSuccess
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -89,8 +88,8 @@ import {
   FETCH_CULTURE_LIST_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
   DELETE_HEALTH_FACILITY_REQUEST,
-  LINKED_RESTRICTIONS_VALIDATION_REQUEST,
-  FETCH_UNLINKED_VILLAGES_REQUEST
+  FETCH_PEER_SUPERVISOR_VALIDATION,
+  FETCH_HF_DASHBOARD_LIST_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';

@@ -49,7 +49,7 @@ export interface IHealthFacilityState {
 export interface IHFDashboard {
   id: number;
   name: string;
-  type: string;
+  siteType: string;
   tenantId: number;
   chiefdom?: string;
 }
@@ -146,6 +146,7 @@ export interface IFetchHFListSuccessPayload {
 export interface IFetchHFListRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST;
   countryId: number;
+  tenantIds?: number[];
   skip: number;
   limit: number | null;
   searchTerm?: string;
@@ -702,12 +703,8 @@ export interface IFetchCountryListFailure {
   type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_FAILURE;
 }
 
-export interface IClearHFSummary {
+export interface IClearSiteSummary {
   type: typeof ACTION_TYPES.CLEAR_HF_SUMMARY;
-}
-
-export interface IClearHFDropdown {
-  type: typeof ACTION_TYPES.CLEAR_HF_DROPDOWN_OPTIONS;
 }
 
 export type IFetchCultureListSuccessPayload = ICulture[];
@@ -781,6 +778,7 @@ export type HealthFacilityActions =
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
   | IFetchCountryListFailure
-  | IValidateLinkedRestrictions
-  | IValidateLinkedRestrictionsSuccess
-  | IValidateLinkedRestrictionsFailure;
+  | IFetchHFDashboardListRequest
+  | IFetchHFDashboardListSuccess
+  | IFetchHFDashboardListFailure
+  | ISetHFSummary;

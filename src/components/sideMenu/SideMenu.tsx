@@ -1,85 +1,33 @@
-import { useMemo } from 'react';
-import { matchPath, NavLink, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-
-import APPCONSTANTS from '../../constants/appConstants';
-import { PROTECTED_ROUTES } from '../../constants/route';
+import { memo, useCallback, useEffect } from 'react';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  PROTECTED_ROUTES,
+  SIDE_MENU_MAPPER,
+  regionRoutesWithSideMenu,
+  districtRoutesWithSideMenu,
+  chiefdomWithSideMenu,
+  hfWithSideMenu
+} from '../../constants/route';
 import styles from './SideMenu.module.scss';
-import { roleSelector, userDataSelector } from '../../store/user/selectors';
-import useRouteParams from '../../hooks/useRouteParams';
-
-interface ISideMenuItem {
-  label: string;
-  route: string;
-  disabled?: boolean;
-  childRoutes?: string[];
-  collapsible?: boolean;
-  type?: string;
-}
+import { fetchSideMenuRequest, clearSideMenu, setSideMenu } from '../../store/common/actions';
+import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
+import { ISideMenu } from '../../store/common/types';
+import Loader from '../loader/Loader';
+import { countryIdSelector, roleSelector } from '../../store/user/selectors';
+import APPCONSTANTS from '../../constants/appConstants';
 
 interface ISideMenuProps {
   className?: string;
 }
 
-const superAdminRoutes: ISideMenuItem[] = [
-  {
-    label: 'Region',
-    route: PROTECTED_ROUTES.region,
-    disabled: false
-  },
-  {
-    label: 'County',
-    route: PROTECTED_ROUTES.accountByRegion,
-    collapsible: true,
-    disabled: false
-  },
-  {
-    label: 'Medication Database',
-    route: PROTECTED_ROUTES.medicationByRegion,
-    disabled: false
-  },
-  {
-    label: 'Lab Test Database',
-    route: PROTECTED_ROUTES.labtestList,
-    disabled: false
-  },
-  {
-    label: 'Health Facility',
-    route: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
-    disabled: false,
-    childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
-  },
-  {
-    label: 'Users',
-    route: PROTECTED_ROUTES.usersBySuperAdmin,
-    disabled: false
-  },
-  {
-    label: 'Admins',
-    route: PROTECTED_ROUTES.adminBySuperAdmin,
-    disabled: false
-  },
-  {
-    label: 'Region Customization',
-    route: PROTECTED_ROUTES.customizationByRegion,
-    collapsible: false,
-    type: 'regionAdmin'
-  }
-];
-const adminRoutes: ISideMenuItem[] = [
-  {
-    label: 'Health Facility',
-    route: PROTECTED_ROUTES.healthFacilityByAdmin,
-    childRoutes: [PROTECTED_ROUTES.healthFacilitySummary]
-  },
-  {
-    label: 'Users',
-    route: PROTECTED_ROUTES.usersByAdmin
-  }
-];
-
-const SideMenu = ({ className }: ISideMenuProps) => {
+const SideMenu = memo(({ className }: ISideMenuProps) => {
+  const dispatch = useDispatch();
   const { pathname } = useLocation();
+
+  const sideMenuLoading = useSelector(getLoadingSelector);
+  const countryId = useSelector(countryIdSelector);
+  const countryIdValue = countryId?.id;
 
   const sideMenuLoading = useSelector(getLoadingSelector);
   const countryId = useSelector(countryIdSelector);
@@ -99,13 +47,13 @@ const SideMenu = ({ className }: ISideMenuProps) => {
 
   let formName: string = '';
   if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-    formName = NAMING_VARIABLES.country;
+    formName = 'country';
   } else if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-    formName = NAMING_VARIABLES.district;
+    formName = 'district';
   } else if (role === APPCONSTANTS.ROLES.DISTRICT_ADMIN) {
-    formName = NAMING_VARIABLES.chiefdom;
+    formName = 'chiefdom';
   } else if (role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-    formName = NAMING_VARIABLES.healthFacility;
+    formName = 'healthfacility';
   }
 
   const fetchSideMenu = useCallback(
@@ -158,9 +106,6 @@ const SideMenu = ({ className }: ISideMenuProps) => {
                 list: choosenRoutes
               })
             );
-          },
-          failureCb: () => {
-            toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_SIDEMENU_ERROR);
           }
         })
       ),
@@ -175,7 +120,9 @@ const SideMenu = ({ className }: ISideMenuProps) => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearSideMenu());
+      if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
+        dispatch(clearSideMenu());
+      }
     };
   }, []);
 
@@ -192,19 +139,19 @@ const SideMenu = ({ className }: ISideMenuProps) => {
       }
       if (
         districtRoutesWithSideMenu.find((districtRoute) => matchPath(pathname, { path: districtRoute, exact: true })) &&
-        (currentRouteName.includes('DISTRICT_BY') || currentRouteName === 'DISTRICT_SUMMARY')
+        currentRouteName.includes('DISTRICT_BY')
       ) {
         return true;
       }
       if (
         chiefdomWithSideMenu.find((chiefdomRoute) => matchPath(pathname, { path: chiefdomRoute, exact: true })) &&
-        (currentRouteName.includes('CHIEFDOM_BY') || currentRouteName === 'CHIEFDOM_SUMMARY')
+        currentRouteName.includes('CHIEFDOM_BY')
       ) {
         return true;
       }
       if (
         hfWithSideMenu.find((hfRoute) => matchPath(pathname, { path: hfRoute, exact: true })) &&
-        (currentRouteName.includes('HEALTH_FACILITY_BY') || currentRouteName === 'HEALTH_FACILITY_SUMMARY')
+        currentRouteName.includes('HEALTH_FACILITY_BY')
       ) {
         return true;
       }
