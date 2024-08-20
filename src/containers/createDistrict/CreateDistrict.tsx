@@ -57,7 +57,7 @@ const CreateDistrict: React.FC = () => {
   const handleNavigation = useCallback(() => {
     let redirectTo: string;
     if (countryId) {
-      redirectTo = PROTECTED_ROUTES.DistrictDashboard;
+      redirectTo = PROTECTED_ROUTES.districtDashboard;
     } else {
       redirectTo = PROTECTED_ROUTES.districtByRegion
         .replace(':regionId', sessionStorageServices.getItem(APPCONSTANTS.FORM_ID))

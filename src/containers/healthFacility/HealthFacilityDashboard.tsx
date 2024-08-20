@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { IHFDashboard } from '../../store/healthFacility/types';
@@ -21,12 +21,11 @@ import toastCenter from '../../utils/toastCenter';
 
 import styles from './HealthFacility.module.scss';
 import { clearHFSummary, fetchHFDashboardListRequest, setHFSummary } from '../../store/healthFacility/actions';
-import { clearSideMenu } from '../../store/common/actions';
 
-const HealthFacilityDashboard = () => {
+const SiteDashboard = () => {
   const dispatch = useDispatch();
-  const hfDashboardList = useSelector(hfDashboardListSelector);
-  const hfCount = useSelector(healthFacilityListTotalSelector);
+  const siteDashboardList = useSelector(hfDashboardListSelector);
+  const siteCount = useSelector(healthFacilityListTotalSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const loadingMore = useSelector(hfLoadingMoreSelector);
   const currentRole = useSelector(roleSelector);
@@ -34,9 +33,6 @@ const HealthFacilityDashboard = () => {
   const chiefdomId = useSelector(formDataIdSelector);
   const loggedInUsertenantId = useSelector(tenantIdSelector);
   const countryId = useSelector(countryIdSelector)?.id;
-  const {
-    healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
-  } = NAME_CONSTANTS;
 
   const fetchDetails = useCallback(
     (
@@ -68,29 +64,21 @@ const HealthFacilityDashboard = () => {
   );
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
-    total: hfCount,
-    itemsPerPage: APPCONSTANTS.HF_PER_PAGE,
+    total: siteCount,
+    itemsPerPage: APPCONSTANTS.SITES_PER_PAGE,
     onLoadMore: ({ skip, limit }) => {
       fetchDetails(skip, limit, searchText.current, true, currentRole);
     }
   });
 
-  /**
-   * To clear sidemenu
-   */
   useEffect(() => {
-    dispatch(clearSideMenu());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchDetails(0, APPCONSTANTS.HF_PER_PAGE);
+    fetchDetails(0, APPCONSTANTS.SITES_PER_PAGE);
   }, [dispatch, fetchDetails]);
 
   const onSearch = useCallback(
     (search: string) => {
       searchText.current = search;
-      fetchDetails(0, APPCONSTANTS.HF_PER_PAGE, search, false, resetPage);
+      fetchDetails(0, APPCONSTANTS.SITES_PER_PAGE, search, false, resetPage);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [fetchDetails, resetPage]
@@ -98,10 +86,10 @@ const HealthFacilityDashboard = () => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      hfDashboardList.map(({ name, id, type, tenantId }: IHFDashboard) => ({
+      siteDashboardList.map(({ name, id, siteType, tenantId }: IHFDashboard) => ({
         title: name,
-        subTitle: type,
-        // To remove HF Detail cache in store
+        subTitle: siteType,
+        // To remove Site Detail cache in store
         setBreadcrumbDetails: () => {
           dispatch(clearHFSummary());
           dispatch(setHFSummary({ name, id, tenantId }));
@@ -111,12 +99,12 @@ const HealthFacilityDashboard = () => {
           .replace(':tenantId', tenantId.toString()),
         data: []
       })),
-    [dispatch, hfDashboardList]
+    [dispatch, siteDashboardList]
   );
-  const noHFAvailable = !(searchText.current || parsedData.length);
+  const noSitesAvailable = !(searchText.current || parsedData.length);
   const noSearchResultAvailable = Boolean(searchText.current && !parsedData.length);
 
-  const createHFRoute = PROTECTED_ROUTES.createHealthFacilityByChiefdom
+  const createSiteRoute = PROTECTED_ROUTES.createHealthFacilityByChiefdom
     .replace(':chiefdomId', chiefdomId)
     .replace(':tenantId', loggedInUsertenantId);
   const loaderWrapperClass = loadingMore
@@ -128,16 +116,14 @@ const HealthFacilityDashboard = () => {
         <div
           className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column ${styles.header}`}
         >
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{healthFacilityPName}</h4>
-          {!noHFAvailable && (
+          <h4 className='page-title mb-sm-0 mb-0dot5'>Sites</h4>
+          {!noSitesAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${healthFacilitySName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder='Search Site' onSearch={onSearch} isOutlined={false} />
               </span>
-              <Link to={createHFRoute} className='ms-sm-1dot5' tabIndex={-1}>
-                {currentRole !== APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN && (
-                  <button className='btn primary-btn'>Create {healthFacilitySName}</button>
-                )}
+              <Link to={createSiteRoute} className='ms-sm-1dot5' tabIndex={-1}>
+                {currentRole !== 'SITE_ADMIN' && <button className='btn primary-btn'>Create Site</button>}
               </Link>
             </>
           )}
@@ -145,24 +131,24 @@ const HealthFacilityDashboard = () => {
         <div className='col-12'>
           <div className='row gx-1dot25 gy-1dot25'>
             {parsedData.map((summaryProps: ISummaryCardProps, i: number) => (
-              <div key={`hf${i}`} className='col-lg-4 col-md-6 col-12 mx-md-0 mx-auto'>
-                <SummaryCard disableImg={true} titleClassName={styles.hfSummaryTitle} {...summaryProps} />
+              <div key={`site${i}`} className='col-lg-4 col-md-6 col-12 mx-md-0 mx-auto'>
+                <SummaryCard disableImg={true} titleClassName={styles.siteSummaryTitle} {...summaryProps} />
               </div>
             ))}
           </div>
         </div>
-        {noHFAvailable && !loading && (
+        {noSitesAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {healthFacilitySName.toLowerCase()}</div>
-            <Link to={createHFRoute} className='mx-auto' tabIndex={-1}>
-              <button className='btn primary-btn'>Create {healthFacilitySName}</button>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an site</div>
+            <Link to={createSiteRoute} className='mx-auto' tabIndex={-1}>
+              <button className='btn primary-btn'>Create Site</button>
             </Link>
           </div>
         )}
         {noSearchResultAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {healthFacilityPName} available</div>
+            <div className='fw-bold highlight-text'>No sites available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}
@@ -183,4 +169,4 @@ const HealthFacilityDashboard = () => {
   );
 };
 
-export default HealthFacilityDashboard;
+export default SiteDashboard;

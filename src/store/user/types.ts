@@ -42,6 +42,13 @@ export interface IUserFormProps {
   isRegionCreate?: boolean;
 }
 
+export interface IOrganizations {
+  id: number;
+  name: string;
+  formName: string;
+  parentOrganizationId: number;
+}
+
 export interface IUser {
   userId: string;
   email: string;

@@ -9,15 +9,19 @@ import { FETCH_SIDEMENU_REQUEST } from './actionTypes';
   Worker Saga: Fired on FETCH_SIDEMENU_REQUEST action
 */
 export function* fetchSideMenu(action: IFetchSideMenuRequest): SagaIterator {
-  const { countryId, roleName, successCb, failureCb } = action.payload;
+  const { countryId, tenantId, formName, successCb, failureCb } = action.payload;
   try {
     const response = yield call(commonService.getSideMenu, {
       countryId,
-      roleName
+      tenantId,
+      formName
     });
     const payload = {
       list: response.data.entity.menus,
-      roleName
+      routeIds: {
+        id: response.data.entity.formDataId,
+        tenantId: response.data.entity.tenantId
+      }
     };
     successCb?.(payload);
   } catch (e: any) {

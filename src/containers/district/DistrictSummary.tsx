@@ -292,7 +292,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const handleNavigation = () => {
     let redirectTo: string;
     if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-      redirectTo = PROTECTED_ROUTES.DistrictDashboard;
+      redirectTo = PROTECTED_ROUTES.districtDashboard;
     } else {
       redirectTo = PROTECTED_ROUTES.districtByRegion
         .replace(':regionId', sessionStorageServices.getItem(APPCONSTANTS.FORM_ID))

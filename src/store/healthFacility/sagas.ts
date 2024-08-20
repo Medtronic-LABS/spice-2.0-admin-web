@@ -1,5 +1,6 @@
 import { SagaIterator } from 'redux-saga';
 import { all, call, put, select, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
 import * as hfService from '../../services/healthFacilityAPI';
 import {
@@ -22,7 +23,7 @@ import {
   IFetchVillagesListFromHFRequest,
   IFetchUserDetailRequest,
   IDeleteHFRequest,
-  IFetchUnlinkedVillagesRequest
+  IFetchHFDashboardListRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -63,10 +64,9 @@ import {
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
   deleteHealthFacilityFailure,
-  validateLinkedRestrictionsFailure,
-  fetchUnlinkedVillagesListSuccess,
-  fetchUnlinkedVillagesListFailure,
-  validateLinkedRestrictionsSuccess
+  fetchPeerSupervisorValidationsFailure,
+  fetchHFDashboardListFailure,
+  fetchHFDashboardListSuccess
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -88,8 +88,8 @@ import {
   FETCH_CULTURE_LIST_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
   DELETE_HEALTH_FACILITY_REQUEST,
-  LINKED_RESTRICTIONS_VALIDATION_REQUEST,
-  FETCH_UNLINKED_VILLAGES_REQUEST
+  FETCH_PEER_SUPERVISOR_VALIDATION,
+  FETCH_HF_DASHBOARD_LIST_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
@@ -627,7 +627,7 @@ export function* fetchCountryList(): SagaIterator {
 /*
   Worker Saga: Fired on FETCH_HF_DASHBOARD_LIST_REQUEST action
 */
-export function* fetchHealthFacilityDashboardList({
+export function* fetchSiteDashboardList({
   isLoadMore,
   skip,
   limit,
@@ -685,8 +685,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_VILLAGES_LIST_USER_LINKED, fetchVillagesListUserLinkedSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);
   yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
-  yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchHealthFacilityDashboardList)]);
-  yield all([takeLatest(FETCH_UNLINKED_VILLAGES_REQUEST, fetchUnlinkedVillagesSagaRequest)]);
+  yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchSiteDashboardList)]);
 }
 
 export default healthFacilitySaga;

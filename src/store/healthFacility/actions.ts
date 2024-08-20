@@ -76,7 +76,14 @@ import {
   IClearVillagesList,
   IPeerSupervisorValidation,
   IChiefdom,
-  IDistrict
+  IDistrict,
+  IClearSiteSummary,
+  IFetchHFDashboardListRequest,
+  IFetchHFDashboardListSuccessPayload,
+  IFetchHFDashboardListSuccess,
+  IFetchHFDashboardListFailure,
+  IHealthFacilitySummary,
+  ISetHFSummary
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -171,7 +178,7 @@ export const clearAllDependentData = (): IClearDependentData => ({
   type: HF_TYPES.CLEAR_ALL_DEPENDENT_DATA
 });
 
-export const clearHFSummary = (): IClearHFSummary => ({
+export const clearHFSummary = (): IClearSiteSummary => ({
   type: HF_TYPES.CLEAR_HF_SUMMARY
 });
 

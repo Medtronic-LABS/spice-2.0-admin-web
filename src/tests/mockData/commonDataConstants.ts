@@ -1,7 +1,8 @@
 const MOCK_DATA_CONSTANTS = {
   MOCK_SIDEMENU_REQUEST: {
-    countryId: 1,
-    roleName: 'SUPER_ADMIN'
+    countryId: '1',
+    tenantId: '1',
+    formName: 'country'
   },
   MOCK_SIDEMENU: [
     {

@@ -5,7 +5,7 @@ import configureMockStore from 'redux-mock-store';
 import Router, { MemoryRouter, useParams } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import ChiefdomForm from '../ChiefdomForm';
-import { fetchDistrictDetailReq, fetchDistrictOptionsRequest } from '../../../store/district/actions';
+import { fetchDistrictListDetailReq, fetchDistrictOptionsRequest } from '../../../store/district/actions';
 import {
   districtOptionsLoadingSelector,
   districtOptionsSelector,
@@ -97,10 +97,10 @@ describe('ChiefdomForm', () => {
   });
 
   it('dispatch fetchDistrictDetailReq', async () => {
-    dispatchMock(fetchDistrictDetailReq({ tenantId: '1', id: '2' }));
+    dispatchMock(fetchDistrictListDetailReq({ tenantId: '1', id: '2' }));
     jest.spyOn(Router, 'useParams').mockReturnValue({ regionId: '1', districtId: '1', tenantId: '1' });
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(fetchDistrictDetailReq({ tenantId: '1', id: '2' }));
+      expect(dispatchMock).toHaveBeenCalledWith(fetchDistrictListDetailReq({ tenantId: '1', id: '2' }));
     });
   });
 });

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
@@ -58,6 +59,8 @@ const HealthFacilityList = (): React.ReactElement => {
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+
+  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
@@ -175,19 +178,12 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
 
-  const validateLinkedRestrictions = (
-    missingIds: number[],
-    tenantId: number,
-    healthFacility: any,
-    linkedVillageIds: number[]
-  ) => {
+  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacility: any) => {
     dispatch(
       validateLinkedRestrictionsRequest({
       validateLinkedRestrictionsRequest({
         ids: missingIds,
-        tenantId,
-        healthFacilityId: healthFacility.id,
-        linkedVillageIds,
+        tenantId: hfTenantId,
         successCb: () => {
           fetchWorkflowList(healthFacility);
         },
@@ -230,8 +226,14 @@ const HealthFacilityList = (): React.ReactElement => {
     }
   };
   const openCreateHealthFacility = () => {
-    const url = PROTECTED_ROUTES.createHealthFacility;
-    history.push(url.replace(':regionId', countryIdValue as string));
+    const url = ((regionId && PROTECTED_ROUTES.createHealthFacilityByRegion) ||
+      (districtId && PROTECTED_ROUTES.createHealthFacilityByDistrict) ||
+      (chiefdomId && PROTECTED_ROUTES.createHealthFacilityByChiefdom)) as string;
+    history.push(
+      url
+        .replace(':tenantId', tenantId)
+        .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
+    );
   };
 
   const handleRowClick = (data: any) => {
@@ -266,10 +268,11 @@ const HealthFacilityList = (): React.ReactElement => {
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel={`Add ${healthFacilitySName}`}
-          header={healthFacilitySName}
+          buttonLabel='Add Health Facility'
+          header='Health Facility'
           isSearch={true}
           onSearch={handleSearch}
+          onButtonClick={openCreateHealthFacility}
           onButtonClick={openCreateHealthFacility}
         >
           <CustomTable

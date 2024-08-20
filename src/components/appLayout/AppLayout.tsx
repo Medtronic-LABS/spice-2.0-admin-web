@@ -15,60 +15,38 @@ interface IAppLayout {
 }
 
 const routesWithSideMenu = [
+  { route: PROTECTED_ROUTES.regionSummary },
+  { route: PROTECTED_ROUTES.customizationByRegion },
+  { route: PROTECTED_ROUTES.districtSummary, disabledRoles: [APPCONSTANTS.ROLES.DISTRICT_ADMIN] },
   { route: PROTECTED_ROUTES.districtByRegion },
-  { route: PROTECTED_ROUTES.districtAdminByRegion },
-  { route: PROTECTED_ROUTES.healthFacilityByAdmin },
-  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin },
-  { route: PROTECTED_ROUTES.usersByAdmin },
-  { route: PROTECTED_ROUTES.usersBySuperAdmin },
-  { route: PROTECTED_ROUTES.adminBySuperAdmin },
   { route: PROTECTED_ROUTES.chiefdomByRegion },
   { route: PROTECTED_ROUTES.chiefdomByDistrict },
-
-  { route: PROTECTED_ROUTES.chiefdomAdminByRegion },
-  { route: PROTECTED_ROUTES.chiefdomAdminByDistrict },
-
-  { route: PROTECTED_ROUTES.hfByRegion },
-  { route: PROTECTED_ROUTES.hfByDistrict },
-  { route: PROTECTED_ROUTES.hfByChiefdom },
-
-  { route: PROTECTED_ROUTES.siteAdminByRegion },
-  { route: PROTECTED_ROUTES.siteAdminByDistrict },
-  { route: PROTECTED_ROUTES.siteAdminByChiefdom },
-
-  { route: PROTECTED_ROUTES.groupByRegion },
-  { route: PROTECTED_ROUTES.groupByDistrict },
-  { route: PROTECTED_ROUTES.groupByChiefdom },
-  { route: PROTECTED_ROUTES.groupBySite },
-
-  { route: PROTECTED_ROUTES.programByRegion },
-
+  { route: PROTECTED_ROUTES.chiefdomSummary, disabledRoles: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN] },
+  { route: PROTECTED_ROUTES.healthFacilityByRegion },
+  { route: PROTECTED_ROUTES.healthFacilityByDistrict },
+  { route: PROTECTED_ROUTES.healthFacilityByChiefdom },
+  { route: PROTECTED_ROUTES.healthFacilitySummary },
+  { route: PROTECTED_ROUTES.adminByRegion },
+  { route: PROTECTED_ROUTES.adminByDistrict },
+  { route: PROTECTED_ROUTES.adminByChiefdom },
+  { route: PROTECTED_ROUTES.adminByHealthFacility },
   { route: PROTECTED_ROUTES.userByRegion },
   { route: PROTECTED_ROUTES.userByDistrict },
   { route: PROTECTED_ROUTES.userByChiefdom },
-
-  { route: PROTECTED_ROUTES.regionSummary },
-  { route: PROTECTED_ROUTES.districtSummary, disabledRoles: [APPCONSTANTS.ROLES.DISTRICT_ADMIN] },
-  { route: PROTECTED_ROUTES.chiefdomSummary, disabledRoles: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN] },
-  { route: PROTECTED_ROUTES.siteSummary },
-
-  { route: PROTECTED_ROUTES.workflowByRegion },
-
-  { route: PROTECTED_ROUTES.medicationByRegion },
-  { route: PROTECTED_ROUTES.labtestList },
-  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummary] },
+  { route: PROTECTED_ROUTES.userByHealthFacility },
   { route: PROTECTED_ROUTES.labTestByRegion },
-  { route: PROTECTED_ROUTES.customizationByRegion },
+  { route: PROTECTED_ROUTES.medicationByRegion },
+  { route: PROTECTED_ROUTES.programByRegion },
+  { route: PROTECTED_ROUTES.workflowByRegion },
   { route: PROTECTED_ROUTES.workflowCustomization }
 ];
 
 const routesWithoutBreadcrumb = [
-  PROTECTED_ROUTES.regionDashboard,
-  PROTECTED_ROUTES.DistrictDashboard,
-  PROTECTED_ROUTES.ChiefdomDashboard,
-  PROTECTED_ROUTES.siteDashboard,
   PROTECTED_ROUTES.dashboard,
-  PROTECTED_ROUTES.workflowByRegion
+  PROTECTED_ROUTES.regionDashboard,
+  PROTECTED_ROUTES.districtDashboard,
+  PROTECTED_ROUTES.chiefdomDashboard,
+  PROTECTED_ROUTES.healthFacilityDashboard
 ];
 const header = (
   isBCDisabled: boolean,
