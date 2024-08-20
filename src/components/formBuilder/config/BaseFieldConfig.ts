@@ -88,8 +88,8 @@ export const baseFieldMeta: IBaseFieldMeta = {
     valueKey: 'name',
     component: 'SELECT_INPUT'
   },
-  minValue: { order: 2.1, label: 'Min Value', type: 'number', required: true, component: 'TEXT_FIELD' },
-  maxValue: { order: 2.2, label: 'Max Value', type: 'number', required: true, component: 'TEXT_FIELD' },
+  minValue: { order: 2.1, label: 'Min Value', type: 'number', required: false, component: 'TEXT_FIELD' },
+  maxValue: { order: 2.2, label: 'Max Value', type: 'number', required: false, component: 'TEXT_FIELD' },
   minLength: { order: 2.3, label: 'Min Length', type: 'number', required: true, component: 'TEXT_FIELD' },
   maxLength: { order: 2.4, label: 'Max Length', type: 'number', required: true, component: 'TEXT_FIELD' },
   contentLength: { order: 2.5, label: 'Field Length', type: 'number', required: true, component: 'TEXT_FIELD' },
@@ -134,20 +134,28 @@ export const baseFieldMeta: IBaseFieldMeta = {
     valueKey: 'id',
     component: 'SELECT_INPUT'
   },
-  testValidityDays: {
+  minDays: {
     order: 5.3,
-    label: 'Test Validity in Days',
-    required: true,
+    label: 'Min Days',
+    required: false,
+    type: 'number',
+    component: 'TEXT_FIELD'
+  },
+  maxDays: {
+    order: 5.4,
+    label: 'Max Days',
+    required: false,
+    type: 'number',
     component: 'TEXT_FIELD'
   },
   startDate: {
-    order: 5.4,
+    order: 5.5,
     label: 'Start Date',
     required: false,
     component: 'DATE_PICKER'
   },
   endDate: {
-    order: 5.5,
+    order: 5.6,
     label: 'End Date',
     required: false,
     component: 'DATE_PICKER'

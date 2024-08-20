@@ -36,12 +36,15 @@ const getComponentsByFieldName = (
   if (
     obj.fieldName === 'TestedOn' &&
     obj.orderId === 1 &&
-    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title'].includes(fieldName)
+    ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title', 'maxDays', 'disableFutureDate'].includes(fieldName)
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
   if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
     inputProps = { ...inputProps, required: true };
+  }
+  if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
+    inputProps = { ...inputProps, disabled: true };
   }
   return inputProps;
 };
@@ -71,7 +74,7 @@ interface IComponentProps {
   isRegionCustomizeForm?: boolean;
 }
 
-export const CheckboxComponent = ({ name, fieldName, inputProps = {}, obj }: IComponentProps) => {
+export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj }: IComponentProps) => {
   const checkBoxChange = useCallback(
     (isChecked: boolean) => {
       if (fieldName === 'isResult') {
@@ -80,6 +83,17 @@ export const CheckboxComponent = ({ name, fieldName, inputProps = {}, obj }: ICo
     },
     [fieldName, obj]
   );
+
+  useEffect(() => {
+    if (obj?.disableFutureDate) {
+      // For old records
+      if (!obj.minDays) {
+        form.change(`${name}.minDays`, null);
+      }
+      form.change(`${name}.maxDays`, null);
+    }
+  }, [obj?.disableFutureDate, obj.minDays, form, name]);
+
   useEffect(() => {
     checkBoxChange(obj?.isResult);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -399,7 +413,7 @@ const RenderFields = ({
 
   switch (inputProps?.component) {
     case 'CHECKBOX': {
-      return <CheckboxComponent name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
+      return <CheckboxComponent form={form} name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
     }
     case 'SELECT_INPUT': {
       return (

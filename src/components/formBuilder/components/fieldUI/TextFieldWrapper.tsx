@@ -10,6 +10,7 @@ const TextFieldWrapper = ({
   customParseFn,
   customValue,
   customError,
+  formError,
   customOnBlurFn,
   fieldName,
   obj,
@@ -22,8 +23,8 @@ const TextFieldWrapper = ({
     if (inputProps?.type === 'number') {
       const isDefaultPrevent =
         obj?.inputType !== InputTypes.DECIMAL
-          ? event.key === '.' || event.key.toLowerCase() === 'e'
-          : event.key.toLowerCase() === 'e';
+          ? event.key === '.' || event.key?.toLowerCase() === 'e'
+          : event.key?.toLowerCase() === 'e';
       return isDefaultPrevent && event.preventDefault();
     }
   };
@@ -43,16 +44,17 @@ const TextFieldWrapper = ({
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => keyDownFn(event)}
             onBlurCapture={onBlurFn}
             error={
+              (meta.error && formError && meta.error) ||
               (meta.data?.customError && meta.data?.customError.toString()) ||
               (meta.error && customError && customError.toString()) ||
-              (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label.toLowerCase()) ||
+              (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label?.toLowerCase()) ||
               (meta.error &&
                 inputProps.type === 'number' &&
-                'Please enter a valid ' + inputProps?.label.toLowerCase()) ||
+                'Please enter a valid ' + inputProps?.label?.toLowerCase()) ||
               (meta.error &&
                 meta.error +
                   ' ' +
-                  (fieldName.toLowerCase() === 'interval' && input.value ? '' : inputProps?.label.toLowerCase()))
+                  (fieldName?.toLowerCase() === 'interval' && input.value ? '' : inputProps?.label?.toLowerCase()))
             }
             isShowLabel={inputProps?.visible}
             required={inputProps?.required}

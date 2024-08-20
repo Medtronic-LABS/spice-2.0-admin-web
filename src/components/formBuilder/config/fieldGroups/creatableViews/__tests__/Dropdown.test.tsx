@@ -52,7 +52,6 @@ describe('Spinner Container Test Cases', () => {
         code: {},
         isResult: {},
         resource: {},
-        unitList: {},
         url: {}
       });
     });

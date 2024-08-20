@@ -1,7 +1,7 @@
 import React from 'react';
 import { Field } from 'react-final-form';
 import TextInput from '../../components/formFields/TextInput';
-import { composeValidators, minLength, required } from '../../utils/validation';
+import { composeValidators, containsOnlyLettersAndNumbers, minLength, required } from '../../utils/validation';
 import { FormApi } from 'final-form';
 
 const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: FormApi | undefined }) => {
@@ -16,8 +16,8 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
             render={({ input, meta }) => (
               <TextInput
                 {...input}
-                label={`${isEdit ? 'Edit' : 'Add'} Lab Test`}
-                errorLabel='add lab test'
+                label={'Lab Test Name'}
+                errorLabel='lab test name'
                 capitalize={true}
                 error={(meta.touched && meta.error) || undefined}
               />
@@ -28,7 +28,7 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
           <Field
             name='codeDetails.code'
             type='text'
-            validate={composeValidators(required)}
+            validate={composeValidators(required, containsOnlyLettersAndNumbers)}
             render={({ input, meta }) => (
               <TextInput {...input} label='Code' errorLabel='code' error={(meta.touched && meta.error) || undefined} />
             )}
