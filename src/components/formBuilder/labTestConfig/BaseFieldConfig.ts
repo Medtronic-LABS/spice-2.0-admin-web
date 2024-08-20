@@ -148,20 +148,28 @@ export const baseFieldMeta: IBaseFieldMeta = {
     type: 'number',
     component: 'TEXT_FIELD'
   },
-  testValidityDays: {
+  minDays: {
     order: 5.3,
-    label: 'Test Validity in Days',
-    required: true,
+    label: 'Min Days',
+    required: false,
+    type: 'number',
+    component: 'TEXT_FIELD'
+  },
+  maxDays: {
+    order: 5.4,
+    label: 'Max Days',
+    required: false,
+    type: 'number',
     component: 'TEXT_FIELD'
   },
   startDate: {
-    order: 5.4,
+    order: 5.5,
     label: 'Start Date',
     required: false,
     component: 'DATE_PICKER'
   },
   endDate: {
-    order: 5.5,
+    order: 5.6,
     label: 'End Date',
     required: false,
     component: 'DATE_PICKER'

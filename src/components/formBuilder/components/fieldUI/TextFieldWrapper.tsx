@@ -10,7 +10,6 @@ const TextFieldWrapper = ({
   customParseFn,
   customValue,
   customError,
-  newError,
   formError,
   customOnBlurFn,
   customOnChangeFn,
@@ -42,37 +41,33 @@ const TextFieldWrapper = ({
       value={value}
       validate={inputProps?.disabledValidation ? () => null : composeValidators(...formValidators(inputProps || {}))}
     >
-      {({ input, meta }) => {
-        return (
-          <>
-            <TextInput
-              {...input}
-              label={inputProps?.label || 'Label'}
-              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => keyDownFn(event)}
-              onBlurCapture={onBlurFn}
-              onChangeCapture={onChangeFn}
-              error={
-                (meta.error && formError && meta.error) ||
-                (meta.data?.customError && meta.data?.customError.toString()) ||
-                (customError && customError.toString()) ||
-                (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label?.toLowerCase()) ||
-                (meta.error &&
-                  inputProps.type === 'number' &&
-                  'Please enter a valid ' + inputProps?.label?.toLowerCase()) ||
-                (meta.error &&
-                  meta.error +
-                    ' ' +
-                    (fieldName?.toLowerCase() === 'interval' && input.value ? '' : inputProps?.label?.toLowerCase()))
-              }
-              isShowLabel={inputProps?.visible}
-              required={inputProps?.required}
-              capitalize={capitalize}
-              disabled={inputProps?.disabled}
-              onlyAsterisk={onlyAsterisk}
-            />
-          </>
-        );
-      }}
+      {({ input, meta }) => (
+        <>
+          <TextInput
+            {...input}
+            label={inputProps?.label || 'Label'}
+            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => keyDownFn(event)}
+            onBlurCapture={onBlurFn}
+            error={
+              (meta.error && formError && meta.error) ||
+              (meta.data?.customError && meta.data?.customError.toString()) ||
+              (meta.error && customError && customError.toString()) ||
+              (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label?.toLowerCase()) ||
+              (meta.error &&
+                inputProps.type === 'number' &&
+                'Please enter a valid ' + inputProps?.label?.toLowerCase()) ||
+              (meta.error &&
+                meta.error +
+                  ' ' +
+                  (fieldName?.toLowerCase() === 'interval' && input.value ? '' : inputProps?.label?.toLowerCase()))
+            }
+            isShowLabel={inputProps?.visible}
+            required={inputProps?.required}
+            capitalize={capitalize}
+            disabled={inputProps?.disabled}
+          />
+        </>
+      )}
     </Field>
   );
 };

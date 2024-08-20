@@ -137,7 +137,7 @@ const RangesFieldsComponent = ({ form, item, name, obj, index, rangesFieldConfig
 };
 
 const RangesConfig = ({ name, obj, field, form }: any) => {
-  const rangesFieldConfigs = {
+  const rangesFieldConfigs: any = {
     unitType: {
       name: 'unitType',
       label: 'Unit',
@@ -238,7 +238,7 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
             validate={(values) => {
               // custom validation to check all fields are valid
               const ranges: any = [];
-              (values || []).forEach((item: any) => {
+              (values || []).forEach((item: any, index: number) => {
                 const errors: any = {};
                 Object.keys(item).forEach((key: any) => {
                   const error = required(item[key]);
@@ -246,6 +246,9 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
                     errors[key] = error + rangesFieldConfigs[key]?.label?.toLowerCase();
                   }
                 });
+                if (!errors.maxRange && Number(values[index]?.minRange) >= Number(values[index]?.maxRange)) {
+                  errors.maxRange = 'Max value should be greater than min value';
+                }
                 ranges.push(Object.keys(errors).length ? errors : null);
               });
               if (ranges.every((element: any) => element === null)) {
