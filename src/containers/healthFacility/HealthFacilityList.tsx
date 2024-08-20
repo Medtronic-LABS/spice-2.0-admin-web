@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
@@ -9,7 +9,7 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 import ModalForm from '../../components/modal/ModalForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
-import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
+import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import { FormApi } from 'final-form';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
@@ -37,6 +37,13 @@ interface IModalState {
   isOpen: boolean;
 }
 
+interface IMatchParams {
+  regionId?: string;
+  tenantId: string;
+  districtId?: string;
+  chiefdomId?: string;
+}
+
 const HealthFacilityList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -48,6 +55,8 @@ const HealthFacilityList = (): React.ReactElement => {
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+
+  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
@@ -164,11 +173,11 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], tenantId: number, healthFacility: any) => {
+  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacility: any) => {
     dispatch(
       validationPeerSupervisor({
         ids: missingIds,
-        tenantId,
+        tenantId: hfTenantId,
         successCb: () => {
           fetchWorkflowList(healthFacility);
         },
@@ -207,23 +216,29 @@ const HealthFacilityList = (): React.ReactElement => {
     }
   };
   const openCreateHealthFacility = () => {
-    const url = PROTECTED_ROUTES.createHealthFacility;
-    history.push(url.replace(':regionId', countryIdValue as string));
+    const url = ((regionId && PROTECTED_ROUTES.createHealthFacilityByRegion) ||
+      (districtId && PROTECTED_ROUTES.createHealthFacilityByDistrict) ||
+      (chiefdomId && PROTECTED_ROUTES.createHealthFacilityByChiefdom)) as string;
+    history.push(
+      url
+        .replace(':tenantId', tenantId)
+        .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
+    );
   };
 
   const handleRowClick = (data: any) => {
     history.push(
-      PROTECTED_ROUTES.healthFacilitySummary.replace(':healthFacilityId', data.id).replace(':hfTenantId', data.tenantId)
+      PROTECTED_ROUTES.healthFacilitySummary.replace(':healthFacilityId', data.id).replace(':tenantId', data.tenantId)
     );
   };
 
   const handleHFDelete = useCallback(
-    ({ data: { id, tenantId } }: { data: { id: number; tenantId: number } }) => {
+    ({ data: { id, tenantId: hfTenantId } }: { data: { id: number; tenantId: number } }) => {
       dispatch(
         deleteHealthFacilityRequest({
           data: {
             id,
-            tenantId
+            tenantId: hfTenantId
           },
           successCb: () => {
             toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DELETE_SUCCESS);
@@ -245,17 +260,11 @@ const HealthFacilityList = (): React.ReactElement => {
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel={`${isSuperUser ? 'Add Health Facility' : ''}`}
+          buttonLabel='Add Health Facility'
           header='Health Facility'
           isSearch={true}
           onSearch={handleSearch}
-          onButtonClick={
-            isSuperUser
-              ? openCreateHealthFacility
-              : () => {
-                  //
-                }
-          }
+          onButtonClick={openCreateHealthFacility}
         >
           <CustomTable
             rowData={healthFacilityList}

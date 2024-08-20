@@ -64,7 +64,17 @@ export const initialState: IHealthFacilityState = {
   hfDropdownOptions: {
     list: [],
     regionTenantId: ''
-  }
+  },
+  hfDashboardList: [
+    {
+      id: 0,
+      name: '',
+      siteType: '',
+      tenantId: 0,
+      chiefdom: ''
+    }
+  ],
+  loadingMore: false
 };
 
 const healthFacilityReducer = (
@@ -72,6 +82,22 @@ const healthFacilityReducer = (
   action = {} as HealthFacilityActions
 ): IHealthFacilityState => {
   switch (action.type) {
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HF_DASHBOARD_LIST_REQUEST:
+      return {
+        ...state,
+        [action.isLoadMore ? 'loadingMore' : 'loading']: true
+      };
+
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HF_DASHBOARD_LIST_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        loadingMore: false,
+        hfDashboardList: action.payload.isLoadMore
+          ? [...state.hfDashboardList, ...action.payload.siteDashboardList]
+          : action.payload.siteDashboardList,
+        hfTotal: action.payload.isLoadMore ? state.hfTotal : action.payload.total
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_SUCCESS:
       return {
         ...state,
@@ -106,6 +132,12 @@ const healthFacilityReducer = (
       return {
         ...state,
         healthFacility: action.payload,
+        loading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.SET_HF_SUMMARY:
+      return {
+        ...state,
+        healthFacility: { ...state.healthFacility, ...action.data },
         loading: false
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_REQUEST:

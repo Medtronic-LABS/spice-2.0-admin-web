@@ -82,7 +82,7 @@ const LabTestCustomizationLayout = () => {
   }, [dispatch, testName, regionId, tenantId]);
 
   const onCancel = () => {
-    history.push(PROTECTED_ROUTES.labtestList.replace(':tenantId', tenantId).replace(':regionId', regionId));
+    history.push(PROTECTED_ROUTES.labTestByRegion.replace(':tenantId', tenantId).replace(':regionId', regionId));
   };
 
   const onSubmit = (dataParams: any) => {

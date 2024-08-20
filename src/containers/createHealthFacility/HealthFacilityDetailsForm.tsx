@@ -39,7 +39,7 @@ import { userDataSelector } from '../../store/user/selectors';
 import { IObjectData } from '../../store/healthFacility/types';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
-import Workflows from './Workflows';
+import Workflows from '../healthFacility/Workflows';
 import { fetchDistrictListRequest } from '../../store/district/actions';
 import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';

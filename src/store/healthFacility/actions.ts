@@ -77,7 +77,14 @@ import {
   IClearVillagesList,
   IPeerSupervisorValidation,
   IChiefdom,
-  IDistrict
+  IDistrict,
+  IClearSiteSummary,
+  IFetchHFDashboardListRequest,
+  IFetchHFDashboardListSuccessPayload,
+  IFetchHFDashboardListSuccess,
+  IFetchHFDashboardListFailure,
+  IHealthFacilitySummary,
+  ISetHFSummary
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -168,6 +175,48 @@ export const clearVillageList = (): IClearVillagesList => ({
 });
 export const clearAllDependentData = (): IClearDependentData => ({
   type: HF_TYPES.CLEAR_ALL_DEPENDENT_DATA
+});
+
+export const clearHFSummary = (): IClearSiteSummary => ({
+  type: HF_TYPES.CLEAR_HF_SUMMARY
+});
+
+export const fetchHFDashboardListRequest = ({
+  skip,
+  limit,
+  isLoadMore,
+  searchTerm,
+  countryId,
+  successCb,
+  failureCb
+}: Omit<IFetchHFDashboardListRequest, 'type'>): IFetchHFDashboardListRequest => {
+  return {
+    type: HF_TYPES.FETCH_HF_DASHBOARD_LIST_REQUEST,
+    skip,
+    limit,
+    isLoadMore,
+    countryId,
+    searchTerm,
+    successCb,
+    failureCb
+  };
+};
+
+export const fetchHFDashboardListSuccess = (
+  payload: IFetchHFDashboardListSuccessPayload
+): IFetchHFDashboardListSuccess => ({
+  type: HF_TYPES.FETCH_HF_DASHBOARD_LIST_SUCCESS,
+  payload
+});
+
+export const fetchHFDashboardListFailure = (error: Error): IFetchHFDashboardListFailure => ({
+  type: HF_TYPES.FETCH_HF_DASHBOARD_LIST_FAILURE,
+  error
+});
+
+export const setHFSummary = (data: Partial<IHealthFacilitySummary>): ISetHFSummary => ({
+  type: HF_TYPES.SET_HF_SUMMARY,
+  data
 });
 
 export const fetchHFSummaryRequest = ({

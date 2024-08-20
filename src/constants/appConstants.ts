@@ -36,7 +36,10 @@ const APPCONSTANTS = {
     SITE_ADMIN: 'SITE_ADMIN'
   },
   ROUTE_NAMES: {
-    REGION: 'region'
+    REGION: 'region',
+    DISTRICT: 'district',
+    CHIEFDOM: 'chiefdom',
+    HEALTHFACILITY: 'health-facility'
   },
   IS_SIDEMENU_COLLAPSED: 'isSmCollapsed',
   REGIONS_PER_PAGE: 10,

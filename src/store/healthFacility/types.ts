@@ -36,6 +36,33 @@ export interface IHealthFacilityState {
   clinicalWorkflowLoading: boolean;
   hfDropdownLoading: boolean;
   hfDropdownOptions: any;
+  hfDashboardList: IHFDashboard[];
+  loadingMore: boolean;
+}
+
+export interface IHFDashboard {
+  id: number;
+  name: string;
+  siteType: string;
+  tenantId: number;
+  chiefdom?: string;
+}
+
+export interface IFetchHFDashboardListSuccessPayload {
+  siteDashboardList: IHFDashboard[];
+  total: number;
+  isLoadMore?: boolean;
+}
+
+export interface IFetchHFDashboardListRequest {
+  type: typeof ACTION_TYPES.FETCH_HF_DASHBOARD_LIST_REQUEST;
+  isLoadMore?: boolean;
+  skip: number;
+  limit: number | null;
+  searchTerm?: string;
+  countryId: string;
+  successCb?: (payload: IFetchHFDashboardListSuccessPayload) => void;
+  failureCb?: (error: Error) => void;
 }
 
 export interface IHealthFacility {
@@ -52,7 +79,7 @@ export interface IHealthFacility {
   longitude: string;
   postalCode: string;
   language: string;
-  tenantId: number;
+  tenantId: number | string;
   peerSupervisors?: IPeerSupervisor[];
   linkedVillages: IVillages[];
   clinicalWorkflows: IClinicalWorkflows[];
@@ -112,6 +139,7 @@ export interface IFetchHFListSuccessPayload {
 export interface IFetchHFListRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST;
   countryId: number;
+  tenantIds?: number[];
   skip: number;
   limit: number | null;
   searchTerm?: string;
@@ -119,6 +147,27 @@ export interface IFetchHFListRequest {
   tenantBased?: boolean;
   successCb?: (data: IFetchHFListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
+}
+
+export interface IFetchHFDashboardListSuccessPayload {
+  siteDashboardList: IHFDashboard[];
+  total: number;
+  isLoadMore?: boolean;
+}
+
+export interface IFetchHFDashboardListSuccess {
+  type: typeof ACTION_TYPES.FETCH_HF_DASHBOARD_LIST_SUCCESS;
+  payload: IFetchHFDashboardListSuccessPayload;
+}
+
+export interface IFetchHFDashboardListFailure {
+  type: typeof ACTION_TYPES.FETCH_HF_DASHBOARD_LIST_FAILURE;
+  error: Error;
+}
+
+export interface ISetHFSummary {
+  type: typeof ACTION_TYPES.SET_HF_SUMMARY;
+  data?: Partial<IHealthFacilitySummary>;
 }
 
 export interface IFetchHFListSuccess {
@@ -595,6 +644,10 @@ export interface IFetchCountryListFailure {
   type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_FAILURE;
 }
 
+export interface IClearSiteSummary {
+  type: typeof ACTION_TYPES.CLEAR_HF_SUMMARY;
+}
+
 export type IFetchCultureListSuccessPayload = ICulture[];
 
 export type IFetchCountryListSuccessPayload = ICountryCode[];
@@ -662,4 +715,8 @@ export type HealthFacilityActions =
   | IFetchCultureListFailure
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
-  | IFetchCountryListFailure;
+  | IFetchCountryListFailure
+  | IFetchHFDashboardListRequest
+  | IFetchHFDashboardListSuccess
+  | IFetchHFDashboardListFailure
+  | ISetHFSummary;

@@ -134,7 +134,9 @@ const DistrictDashboard = () => {
             type: 'number',
             value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
             label: 'Health Facility',
-            route: PROTECTED_ROUTES.hfByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
+            route: PROTECTED_ROUTES.healthFacilityByDistrict
+              .replace(':districtId', formDataId)
+              .replace(':tenantId', _id),
             onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
           }
         ]

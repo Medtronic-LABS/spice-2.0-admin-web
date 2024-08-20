@@ -68,7 +68,8 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       country,
       suiteAccess,
       formDataId: organizations[0]?.formDataId,
-      countryId: undefined
+      countryId: undefined,
+      organizations
     };
     successCb?.(payload);
     yield put(userActions.loginSuccess(payload));
@@ -153,7 +154,8 @@ export function* fetchLoggedInUser(): SagaIterator {
       formDataId: organizations[0]?.formDataId,
       country,
       suiteAccess,
-      countryId: undefined
+      countryId: undefined,
+      organizations
     };
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {
@@ -353,7 +355,7 @@ export function* fetchTimezoneList(): SagaIterator {
 export function* fetchCommunityListRequest(action: IActionProps): SagaIterator {
   const { countryId, successCB, failureCB } = action;
   try {
-    const {data: entityList}  = yield call(userService.fetchCommunityListRequest, countryId);
+    const { data: entityList } = yield call(userService.fetchCommunityListRequest, countryId);
     yield put(userActions.fetchCommunityListSuccess(entityList));
     successCB?.(entityList);
   } catch (e) {

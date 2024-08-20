@@ -1,5 +1,5 @@
 import { SagaIterator } from 'redux-saga';
-import { all, call, put, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
 import * as hfService from '../../services/healthFacilityAPI';
 import {
@@ -21,7 +21,8 @@ import {
   IFetchHFTypesRequest,
   IFetchVillagesListFromHFRequest,
   IFetchUserDetailRequest,
-  IDeleteHFRequest
+  IDeleteHFRequest,
+  IFetchHFDashboardListRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -62,7 +63,9 @@ import {
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
   deleteHealthFacilityFailure,
-  fetchPeerSupervisorValidationsFailure
+  fetchPeerSupervisorValidationsFailure,
+  fetchHFDashboardListFailure,
+  fetchHFDashboardListSuccess
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -84,9 +87,11 @@ import {
   FETCH_CULTURE_LIST_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
   DELETE_HEALTH_FACILITY_REQUEST,
-  FETCH_PEER_SUPERVISOR_VALIDATION
+  FETCH_PEER_SUPERVISOR_VALIDATION,
+  FETCH_HF_DASHBOARD_LIST_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
+import { AppState } from '../rootReducer';
 
 /*
   Worker Saga: Fired on FETCH_HEALTH_FACILITY_LIST_REQUEST action
@@ -516,6 +521,41 @@ export function* fetchCountryList(): SagaIterator {
 }
 
 /*
+  Worker Saga: Fired on FETCH_HF_DASHBOARD_LIST_REQUEST action
+*/
+export function* fetchSiteDashboardList({
+  isLoadMore,
+  skip,
+  limit,
+  searchTerm,
+  countryId,
+  successCb,
+  failureCb
+}: IFetchHFDashboardListRequest): SagaIterator {
+  try {
+    const organizations = yield select((state: AppState) => state.user.user.organizations);
+    const tenantIds = [...organizations].map((org: any) => org.id);
+    const {
+      data: { entityList: siteDashboardList, totalCount: total }
+    } = yield call(hfService.fetchHealthFacilityList as any, {
+      countryId,
+      limit,
+      skip,
+      searchTerm,
+      tenantIds
+    });
+    const payload = { siteDashboardList: siteDashboardList || [], total, isLoadMore };
+    successCb?.(payload);
+    yield put(fetchHFDashboardListSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchHFDashboardListFailure(e));
+    }
+  }
+}
+
+/*
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
@@ -540,6 +580,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);
   yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
+  yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchSiteDashboardList)]);
 }
 
 export default healthFacilitySaga;

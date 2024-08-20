@@ -3,17 +3,21 @@ import { Link, NavLink } from 'react-router-dom';
 import { matchPath, useLocation } from 'react-router';
 
 import { ReactComponent as HomeIcon } from '../../assets/images/home.svg';
-import { PROTECTED_ROUTES } from '../../constants/route';
+import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES } from '../../constants/route';
 import { useDispatch, useSelector } from 'react-redux';
+import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { districtSelector } from '../../store/district/selectors';
+import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
+import { healthFacilitySelector } from '../../store/healthFacility/selectors';
 import { roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS from '../../constants/appConstants';
+import { clearDistrictDetails, setDistrictDetails } from '../../store/district/actions';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 
 import styles from './Breadcrumb.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { healthFacilitySelector } from '../../store/healthFacility/selectors';
-import { clearHealthFaciliityDetail } from '../../store/healthFacility/actions';
-import { getRegionDetailsSelector } from '../../store/region/selectors';
-import { clearRegionDetail } from '../../store/region/actions';
+import { clearRegionDetail, setRegionDetail } from '../../store/region/actions';
+import { clearChiefdomDetail, setChiefdomDetails } from '../../store/chiefdom/actions';
+import { clearHFSummary, setHFSummary } from '../../store/healthFacility/actions';
 
 interface ISection {
   route: string;
@@ -21,16 +25,50 @@ interface ISection {
   appendParent?: boolean;
 }
 
-const superAdminRoutes = [PROTECTED_ROUTES.region, PROTECTED_ROUTES.healthFacilityBySuperAdmin];
-const adminRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.healthFacilityByAdmin];
+const chiefdomRoutes = [
+  PROTECTED_ROUTES.chiefdomSummary,
+  PROTECTED_ROUTES.healthFacilityByChiefdom,
+  PROTECTED_ROUTES.userByChiefdom,
+  PROTECTED_ROUTES.createHealthFacilityByChiefdom
+];
 
-const customBreadcrumbs = [
-  { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
-  { route: PROTECTED_ROUTES.createHealthFacility, label: 'Add Health Facility', appendParent: true },
-  { route: PROTECTED_ROUTES.profile, label: 'Settings', appendParent: true },
-  { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
-  { route: PROTECTED_ROUTES.createDistrictByRegion, label: 'Create District', appendParent: true },
-  { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' }
+const districtRoutes = [
+  PROTECTED_ROUTES.districtSummary,
+  PROTECTED_ROUTES.chiefdomByDistrict,
+  PROTECTED_ROUTES.healthFacilityByDistrict,
+  PROTECTED_ROUTES.userByDistrict,
+  PROTECTED_ROUTES.createChiefdomByDistrict,
+  PROTECTED_ROUTES.createHealthFacilityByDistrict
+];
+
+const regionRoutes = [
+  PROTECTED_ROUTES.regionSummary,
+  PROTECTED_ROUTES.districtByRegion,
+  PROTECTED_ROUTES.chiefdomByRegion,
+  PROTECTED_ROUTES.healthFacilityByRegion,
+  PROTECTED_ROUTES.userByRegion,
+  PROTECTED_ROUTES.createDistrictByRegion,
+  PROTECTED_ROUTES.createChiefdomByRegion,
+  PROTECTED_ROUTES.createHealthFacilityByRegion,
+  PROTECTED_ROUTES.createMedication,
+  PROTECTED_ROUTES.createLabTest,
+  PROTECTED_ROUTES.medicationByRegion,
+  PROTECTED_ROUTES.labTestByRegion,
+  PROTECTED_ROUTES.programByRegion,
+  PROTECTED_ROUTES.createProgramByRegion,
+  PROTECTED_ROUTES.customizationByRegion,
+  PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
+  PROTECTED_ROUTES.workflowCustomization,
+  PROTECTED_ROUTES.workflowByRegion
+];
+
+const siteRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.healthFacilityByRegion];
+
+const dashboardRoutes = [
+  PROTECTED_ROUTES.regionDashboard,
+  PROTECTED_ROUTES.districtDashboard,
+  PROTECTED_ROUTES.chiefdomDashboard,
+  PROTECTED_ROUTES.healthFacilityDashboard
 ];
 
 /**
@@ -41,8 +79,50 @@ const Breadcrumb = (): React.ReactElement => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const region = useSelector(getRegionDetailsSelector);
+  const district = useSelector(districtSelector);
+  const chiefdom = useSelector(getChiefdomDetailSelector);
   const healthFacility = useSelector(healthFacilitySelector);
   const role = useSelector(roleSelector);
+
+  const {
+    district: districtModuleName,
+    chiefdom: chiefdomModuleName,
+    healthFacility: healthFacilityModuleName
+  } = NAME_CONSTANTS;
+
+  const customBreadcrumbs = [
+    { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
+    { route: PROTECTED_ROUTES.createLabTest, label: 'Add Lab Test', appendParent: true },
+    { route: PROTECTED_ROUTES.createRegion, label: 'Create Region', appendParent: true },
+    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtModuleName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomModuleName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomModuleName}`, appendParent: true },
+    {
+      route: PROTECTED_ROUTES.createHealthFacilityByRegion,
+      label: `Create ${healthFacilityModuleName}`,
+      appendParent: true
+    },
+    {
+      route: PROTECTED_ROUTES.createHealthFacilityByDistrict,
+      label: `Create ${healthFacilityModuleName}`,
+      appendParent: true
+    },
+    {
+      route: PROTECTED_ROUTES.createHealthFacilityByChiefdom,
+      label: `Create ${healthFacilityModuleName}`,
+      appendParent: true
+    },
+    { route: PROTECTED_ROUTES.profile, label: 'Settings' },
+    { route: PROTECTED_ROUTES.superAdmin, label: 'Super Admin' },
+    { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
+    { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' },
+    { route: PROTECTED_ROUTES.legalTerms, label: 'Legal Terms' },
+    { route: PROTECTED_ROUTES.createProgramByRegion, label: 'Create Program', appendParent: true },
+    { route: PROTECTED_ROUTES.createLabTest, label: 'Create Lab Test', appendParent: true },
+    { route: PROTECTED_ROUTES.editLabTest, label: 'Edit Lab Test', appendParent: true },
+    { route: PROTECTED_ROUTES.accordianViewRegionCustomizationForm, label: 'Screening Form', appendParent: true },
+    { route: PROTECTED_ROUTES.workflowCustomization, label: '', appendParent: true }
+  ];
 
   const activeRoute = useMemo(
     () =>
@@ -54,36 +134,78 @@ const Breadcrumb = (): React.ReactElement => {
       Boolean(matchPath(pathname, { path: route, exact: true }))
     );
     if (breadCrumb) {
-      return { ...breadCrumb, route: pathname };
+      if (
+        Boolean(
+          matchPath(pathname, {
+            path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm,
+            exact: true
+          }) ||
+            matchPath(pathname, {
+              path: PROTECTED_ROUTES.workflowCustomization,
+              exact: true
+            })
+        )
+      ) {
+        const pathArray = pathname.split('/');
+        const formName = decodeURIComponent(pathArray[4]);
+        return {
+          ...breadCrumb,
+          label: `${formName.charAt(0).toUpperCase() + formName.slice(1)} Form`,
+          route: pathname
+        };
+      } else {
+        return { ...breadCrumb, route: pathname };
+      }
     }
   }, [pathname]);
 
-  const showHealthFacility = activeRoute.includes(':healthFacilityId');
+  const showSite = activeRoute.includes(':healthFacilityId');
+  const showOU =
+    (role !== APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || chiefdomRoutes.includes(activeRoute)) &&
+    (showSite || activeRoute.includes(':chiefdomId'));
+  const showAccount =
+    (role !== APPCONSTANTS.ROLES.DISTRICT_ADMIN || districtRoutes.includes(activeRoute)) &&
+    (showOU || activeRoute.includes(':districtId'));
   const showRegion =
-    ([APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role) ||
-      superAdminRoutes.includes(activeRoute)) &&
-    (showHealthFacility || activeRoute.includes(':regionId'));
+    (role !== APPCONSTANTS.ROLES.REGION_ADMIN || regionRoutes.includes(activeRoute)) &&
+    (showAccount || activeRoute.includes(':regionId'));
 
   const sections: ISection[] = useMemo(() => {
     const result = [];
     if (customBreadcrumb && !customBreadcrumb.appendParent) {
       // we have a custom breadcrumb for certain routes
-      // this block executes when current route is one of customBreadcrumb routes
+      // this if block executes when current route is one of customBreadcrumb routes
       result.push(customBreadcrumb);
-      return result;
+      return result; // function execution ends here
     }
     if (region?.name && showRegion) {
       result.push({
         label: region.name,
-        route: PROTECTED_ROUTES.region.replace(':regionId', region.id).replace(':tenantId', region.tenantId)
+        route: PROTECTED_ROUTES.regionSummary.replace(':regionId', region.id).replace(':tenantId', region.tenantId)
       });
     }
-    if (healthFacility?.name && showHealthFacility) {
+    if (district?.name && showAccount) {
+      result.push({
+        label: district.name,
+        route: PROTECTED_ROUTES.districtSummary
+          .replace(':districtId', district.id)
+          .replace(':tenantId', district.tenantId)
+      });
+    }
+    if (chiefdom?.name && showOU) {
+      result.push({
+        label: chiefdom.name,
+        route: PROTECTED_ROUTES.chiefdomSummary
+          .replace(':chiefdomId', chiefdom.id)
+          .replace(':tenantId', chiefdom.tenantId)
+      });
+    }
+    if (healthFacility?.name && showSite) {
       result.push({
         label: healthFacility.name,
         route: PROTECTED_ROUTES.healthFacilitySummary
-          .replace(':healthFacilityId', String(healthFacility.id))
-          .replace(':hfTenantId', String(healthFacility.tenantId))
+          .replace(':healthFacilityId', healthFacility.id.toString())
+          .replace(':tenantId', healthFacility.tenantId.toString())
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
@@ -100,14 +222,22 @@ const Breadcrumb = (): React.ReactElement => {
     return result;
   }, [
     customBreadcrumb,
-    healthFacility.id,
-    healthFacility.name,
-    healthFacility.tenantId,
-    region.id,
     region.name,
+    region.id,
     region.tenantId,
-    showHealthFacility,
-    showRegion
+    showRegion,
+    district.name,
+    district.id,
+    district.tenantId,
+    showAccount,
+    chiefdom.name,
+    chiefdom.id,
+    chiefdom.tenantId,
+    showOU,
+    healthFacility.name,
+    healthFacility.id,
+    healthFacility.tenantId,
+    showSite
   ]);
 
   const dispatchData = useCallback((routeObject: any, name: string) => {
@@ -118,30 +248,105 @@ const Breadcrumb = (): React.ReactElement => {
     };
   }, []);
 
+  const urlRouteIdDispatch = useCallback(
+    (label: any, routeInitArray?: string[], currentRouteArr?: any[]) => {
+      let routeObject: any = {};
+      if (routeInitArray && currentRouteArr && routeInitArray.length === currentRouteArr.length) {
+        routeInitArray?.forEach((route: string, i: number) => {
+          routeObject = { ...routeObject, [i === 1 ? 'name' : route]: currentRouteArr[i] };
+        });
+        if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.REGION) {
+          dispatch(setRegionDetail(dispatchData(routeObject, label)));
+        }
+        if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.DISTRICT) {
+          dispatch(setDistrictDetails(dispatchData(routeObject, label)));
+        }
+        if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.CHIEFDOM) {
+          dispatch(setChiefdomDetails(dispatchData(routeObject, label)));
+        }
+        if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY) {
+          dispatch(setHFSummary(dispatchData(routeObject, label)));
+        }
+      }
+    },
+    [dispatch, dispatchData]
+  );
+
+  const dataPersistOnRefresh = useCallback(() => {
+    const storedBC = sessionStorageServices.getItem('breadCrumbs');
+    if (storedBC) {
+      const breadCrumbs = JSON.parse(storedBC);
+      breadCrumbs.forEach((bc: ISection) => {
+        const isCustomPath = Boolean(
+          customBreadcrumbs.find(({ route }) => Boolean(matchPath(bc.route, { path: route, exact: true })))
+        );
+        if (!isCustomPath) {
+          const routeMatch = Object.values(PROTECTED_ROUTES).find((route) =>
+            Boolean(matchPath(bc.route, { path: route, exact: true }))
+          );
+          const routeInitArray = routeMatch?.split('/');
+          const currentRouteArr = bc.route?.split('/');
+
+          urlRouteIdDispatch(bc.label, routeInitArray, currentRouteArr);
+        }
+      });
+      sessionStorageServices.deleteItem('breadCrumbs');
+    }
+  }, [urlRouteIdDispatch]);
+
   const prevPathname = useRef(pathname);
-  // Clearing the region/district/chiefdom/site data in reducer, to prevent showing wrong data in breadcrumb
+  // Clearing the region/account/ou/site data in reducer, to prevent showing wrong data in breadcrumb
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       const prevRoute = {
-        isRegionRoute: Boolean(
-          superAdminRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isSiteRoute: Boolean(
+          siteRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
         ),
-        isAdminRoute: Boolean(
-          adminRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isOURoute: Boolean(
+          chiefdomRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        ),
+        isAccountRoute: Boolean(
+          districtRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        ),
+        isRegionRoute: Boolean(
+          regionRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        ),
+        isDashboardRoute: Boolean(
+          dashboardRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
         )
       };
       const currRoute = {
-        isRegionRoute: Boolean(
-          superAdminRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        isSiteRoute: Boolean(siteRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))),
+        isOURoute: Boolean(chiefdomRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))),
+        isAccountRoute: Boolean(
+          districtRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
         ),
-        isAdminRoute: Boolean(adminRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true }))))
+        isRegionRoute: Boolean(
+          regionRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        ),
+        isDashboardRoute: Boolean(
+          dashboardRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        )
       };
-      if (prevRoute.isAdminRoute && currRoute.isRegionRoute) {
-        dispatch(clearHealthFaciliityDetail());
+      if (!prevRoute.isDashboardRoute && currRoute.isDashboardRoute) {
+        dispatch(clearDistrictDetails());
+        dispatch(clearChiefdomDetail());
+      }
+      if ((prevRoute.isOURoute || prevRoute.isSiteRoute) && !currRoute.isOURoute && !currRoute.isSiteRoute) {
+        dispatch(clearChiefdomDetail());
+      }
+      if (
+        (prevRoute.isOURoute || prevRoute.isSiteRoute || prevRoute.isAccountRoute) &&
+        !currRoute.isOURoute &&
+        !currRoute.isSiteRoute &&
+        !currRoute.isAccountRoute
+      ) {
+        dispatch(clearDistrictDetails());
       }
       prevPathname.current = pathname;
     }
-  }, [dispatch, dispatchData, pathname, region]);
+    dataPersistOnRefresh();
+  }, [district, dataPersistOnRefresh, dispatch, dispatchData, chiefdom, pathname, region, healthFacility]);
 
   const sessionStoreEvent = useCallback(() => {
     sessionStorageServices.setItem(`breadCrumbs`, `${JSON.stringify(sections)}`);
@@ -156,15 +361,18 @@ const Breadcrumb = (): React.ReactElement => {
 
   const clearData = useCallback(() => {
     dispatch(clearRegionDetail());
-    // clear district, chiefdom and facility details
+    dispatch(clearDistrictDetails());
+    dispatch(clearChiefdomDetail());
+    dispatch(clearHFSummary());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
-        to={'/home'}
         onClick={clearData}
+        to={HOME_PAGE_BY_ROLE[role]}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

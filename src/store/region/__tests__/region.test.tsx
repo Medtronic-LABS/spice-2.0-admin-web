@@ -7,7 +7,8 @@ import {
   fetchRegionsSaga,
   fetchClientRegistryStatus,
   uploadFileSaga,
-  downloadFileSaga
+  downloadFileSaga,
+  fetchCountryDetail
 } from '../sagas';
 import * as ACTION_TYPES from '../actionTypes';
 import * as regionActions from '../actions';
@@ -18,6 +19,8 @@ const fetchRegionListData = MOCK_DATA_CONSTANTS.FETCH_REGION_LIST_REPONSE;
 const fetchRegionListRequest = MOCK_DATA_CONSTANTS.FETCH_REGION_LIST_REQUEST_PAYLOAD;
 const fetchRegionDetailPayload = MOCK_DATA_CONSTANTS.REGION_DETAILS_REQUEST_PAYLOAD;
 const fetchRegionDetailResponsePayload = MOCK_DATA_CONSTANTS.FETCH_REGION_DETAIL_RESPONSE_PAYLOAD;
+const fetchCountryDetailsResponsePayload = MOCK_DATA_CONSTANTS.COUNTRY_DETAILS_RESPONSE;
+const fetchCountryDetailRequestMockData = MOCK_DATA_CONSTANTS.ID_AND_TENANT_ID_REQUEST_PAYLOAD;
 
 describe('Fetch Region', () => {
   it('Fetch list of Regions and dispatches success', async () => {
@@ -72,7 +75,12 @@ describe('Fetch Region', () => {
         type: ACTION_TYPES.FETCH_REGIONS_REQUEST
       }
     ).toPromise();
-    expect(fetchRegionListSpy).toHaveBeenCalledWith({ ...fetchRegionListRequest });
+    expect(fetchRegionListSpy).toHaveBeenCalledWith(
+      fetchRegionListRequest.limit,
+      fetchRegionListRequest.skip,
+      undefined,
+      fetchRegionListRequest.search
+    );
     expect(dispatched).toEqual([regionActions.fetchRegionsFailure(error)]);
   });
 });
@@ -289,5 +297,45 @@ describe('Download File', () => {
     ).toPromise();
     expect(downloadFileSpy).toHaveBeenCalledWith(1);
     expect(dispatched).toEqual([regionActions.downloadFileFailure({ error })]);
+  });
+});
+
+describe('Fetch country details', () => {
+  it('Fetches region details and dispatches success', async () => {
+    const fetchRegionDetailSpy = jest.spyOn(regionService, 'getCountryDetail').mockImplementation(() => {
+      return Promise.resolve({ data: { entity: fetchCountryDetailsResponsePayload } } as AxiosResponse);
+    });
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchCountryDetail,
+      {
+        payload: fetchCountryDetailRequestMockData,
+        type: ACTION_TYPES.FETCH_COUNTRY_DETAILS_REQUEST
+      }
+    ).toPromise();
+    expect(fetchRegionDetailSpy).toHaveBeenCalledWith(fetchCountryDetailRequestMockData);
+    expect(dispatched).toEqual([regionActions.fetchCountryDetailSuccess(fetchCountryDetailsResponsePayload)]);
+  });
+  it('Fetches region details and dispatches failure', async () => {
+    const error = new Error('Error in fetching country');
+    const fetchRegionDetailSpy = jest.spyOn(regionService, 'getCountryDetail').mockImplementation(() => {
+      return Promise.reject(error);
+    });
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchCountryDetail,
+      {
+        payload: fetchCountryDetailRequestMockData,
+        type: ACTION_TYPES.FETCH_COUNTRY_DETAILS_REQUEST
+      }
+    ).toPromise();
+    expect(fetchRegionDetailSpy).toHaveBeenCalledWith(fetchCountryDetailRequestMockData);
+    expect(dispatched).toEqual([regionActions.fetchCountryDetailFail(error)]);
   });
 });

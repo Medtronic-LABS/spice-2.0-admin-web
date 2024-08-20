@@ -7,7 +7,8 @@ import {
   getRegionsSelector,
   getRegionsCountSelector,
   getRegionsLoadingMoreSelector,
-  getClientRegistryStatusSelector
+  getClientRegistryStatusSelector,
+  getRegionIdSelector
 } from '../selectors';
 import { initialState as mainInitialState } from '../reducer';
 
@@ -54,5 +55,9 @@ test('getLoadingSelector should return loading from state', () => {
 });
 // Test getRegionDetailsSelector
 test('getRegionDetailsSelector should return regionDetails from state', () => {
-  expect(getRegionDetailsSelector(initialState)).toEqual(initialState.region.regionDetails);
+  expect(getRegionDetailsSelector(initialState)).toEqual(initialState.region.detail);
+});
+// Test getRegionIdSelector
+test('getRegionIdSelector should return region id from state', () => {
+  expect(getRegionIdSelector(initialState)).toEqual(initialState.region.detail.id);
 });

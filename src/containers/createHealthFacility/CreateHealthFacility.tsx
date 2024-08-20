@@ -9,12 +9,12 @@ import SiteAddUserIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
 import UserForm from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
-import Workflows from './Workflows';
+import Workflows from '../healthFacility/Workflows';
 import APPCONSTANTS from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { formatHealthFacility, formatHFUserData } from './HealthFacilitySummary';
+import { formatHealthFacility, formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 import { IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import {
@@ -70,7 +70,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   };
 
   const onGotoList = () => {
-    const url = PROTECTED_ROUTES.healthFacilityBySuperAdmin;
+    const url = PROTECTED_ROUTES.healthFacilityByRegion;
     history.push(url.replace(':tenantId', tenantId).replace(/(:regionId)/, regionId as string));
   };
 

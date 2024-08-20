@@ -68,7 +68,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
         .replace(':districtId', districtId)
         .replace(':tenantId', tenantId);
     } else {
-      redirectTo = PROTECTED_ROUTES.ChiefdomDashboard;
+      redirectTo = PROTECTED_ROUTES.chiefdomDashboard;
     }
     history.push(redirectTo);
   };

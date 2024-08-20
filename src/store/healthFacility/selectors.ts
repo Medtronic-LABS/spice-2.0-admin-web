@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
-import { IHealthFacility } from './types';
 
 const getHealthFacility = (state: AppState) => state.healthFacility.healthFacility;
 const getLoading = (state: AppState) => state.healthFacility.loading;
@@ -33,6 +32,8 @@ const getCultureLoading = (state: AppState) => state.healthFacility.cultureListL
 const getCultureList = (state: AppState) => state.healthFacility.cultureList;
 const getCountryList = (state: AppState) => state.healthFacility.countryList;
 const getCountryListLoading = (state: AppState) => state.healthFacility.countryListLoading;
+const getHFDashboardList = (state: AppState) => state.healthFacility.hfDashboardList;
+const getLoadingMore = (state: AppState) => state.healthFacility.loadingMore;
 
 export const healthFacilitySelector = createSelector(getHealthFacility, (site) => site);
 export const healthFacilityLoadingSelector = createSelector(getLoading, (loading) => loading);
@@ -79,3 +80,5 @@ export const cultureLoadingSelector = createSelector(getCultureLoading, (loading
 export const cultureListSelector = createSelector(getCultureList, (list) => list);
 export const countryListSelector = createSelector(getCountryList, (list) => list);
 export const countryLoadingSelector = createSelector(getCountryListLoading, (loading) => loading);
+export const hfDashboardListSelector = createSelector(getHFDashboardList, (siteDashboardList) => siteDashboardList);
+export const hfLoadingMoreSelector = createSelector(getLoadingMore, (loadingMore) => loadingMore);

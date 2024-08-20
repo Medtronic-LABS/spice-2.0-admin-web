@@ -10,7 +10,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
-import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
+import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import UserForm from '../../components/userForm/UserForm';
 import {
   clearSupervisorList,
@@ -45,7 +45,7 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IMatchParams {
   healthFacilityId: string;
-  hfTenantId: string;
+  tenantId: string;
 }
 
 interface ISummaryUsersState {
@@ -106,7 +106,7 @@ export const formatHFUserData = (userData: any[], countryId: number | string, te
 };
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { healthFacilityId, hfTenantId } = useParams<IMatchParams>();
+  const { healthFacilityId, tenantId } = useParams<IMatchParams>();
   const healthFacility = useSelector(healthFacilitySelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const countryId = useSelector(countryIdSelector);
@@ -171,7 +171,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       clearVillageHFList();
     };
     // eslint-disable-next-line
-  }, [listParams, hfTenantId, dispatch]);
+  }, [listParams, tenantId, dispatch]);
 
   /*
    * Load initial health facility summary details
@@ -179,14 +179,14 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const refreshHFDetails = useCallback(() => {
     dispatch(
       fetchHFSummaryRequest({
-        tenantId: Number(hfTenantId),
+        tenantId: Number(tenantId),
         id: Number(healthFacilityId),
         failureCb: (e) => {
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR);
         }
       })
     );
-  }, [dispatch, healthFacilityId, hfTenantId]);
+  }, [dispatch, healthFacilityId, tenantId]);
 
   const fetchFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, errorMessage));
@@ -196,7 +196,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
     dispatch(
       fetchHFUserListRequest({
         countryId: countryIdValue,
-        tenantId: hfTenantId,
+        tenantIds: [tenantId],
+        roleNames: [],
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
@@ -282,11 +283,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], tenantId: number, healthFacilityParams: any) => {
+  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacilityParams: any) => {
     dispatch(
       validationPeerSupervisor({
         ids: missingIds,
-        tenantId,
+        tenantId: hfTenantId,
         successCb: () => {
           fetchWorkflowList(healthFacilityParams);
         },
@@ -309,7 +310,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, healthFacilityData.tenantId, healthFacility);
+      validatePeerSupervisor(missingIds, Number(healthFacilityData.tenantId), healthFacility);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(
@@ -362,7 +363,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, hfTenantId);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -396,7 +397,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, hfTenantId);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({
@@ -415,7 +416,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       deleteHFUserRequest({
         data: {
           id,
-          tenantIds: [Number(hfTenantId)]
+          tenantIds: [Number(tenantId)]
         },
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS);
@@ -457,7 +458,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         entityName='healthFacility'
         isSiteUser={true}
         enableAutoPopulate={true}
-        hfTenantId={Number(hfTenantId)}
+        hfTenantId={Number(tenantId)}
       />
     );
   };
