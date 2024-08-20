@@ -29,7 +29,7 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
           <Field
             name='codeDetails.code'
             type='text'
-            validate={composeValidators(required)}
+            validate={composeValidators(required, containsOnlyLettersAndNumbers)}
             render={({ input, meta }) => (
               <TextInput {...input} label='Code' errorLabel='code' error={(meta.touched && meta.error) || undefined} />
             )}
