@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
 import IconButton from '../button/IconButton';
 import Searchbar from '../searchbar/Searchbar';
@@ -6,6 +6,8 @@ import CustomTooltip from '../tooltip';
 import styles from './DetailCard.module.scss';
 import Filter from '../tableFilter/Filter';
 
+// Type for the setter functions
+type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
 interface IDetailCardProps {
   header: string;
   buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -26,7 +28,8 @@ interface IDetailCardProps {
   onFilterData?: IFilteredData[];
   className?: string;
   bodyClassName?: string;
-  onFilter?: (selectedIds: {roleNameList: string[], facilityTenantIds: string[]}) => void;
+  setSelectedRole?: SetSelectedState;
+  setSelectedFacility?: SetSelectedState;
 }
 
 interface IFilteredData {
@@ -61,7 +64,8 @@ const DetailCard = ({
   onFilterData,
   className = '',
   bodyClassName = '',
-  onFilter
+  setSelectedRole,
+  setSelectedFacility
 }: IDetailCardProps): React.ReactElement => {
   const buttonClass = `${buttonLabel && onButtonClick ? 'me-1 mt-1' : 'mt-0'} mt-lg-0`;
   const searchClass = `${isSearch ? 'mt-1' : ''} mt-lg-0`;
@@ -84,8 +88,13 @@ const DetailCard = ({
    * @returns React.ReactElement | null
    */
   const renderFilter = (isFacility: boolean, filteredData: IFilteredData) => {
-    return isFilter && onFilter ? (
-      <Filter filterData={filteredData} onFilter={onFilter} isFacility={isFacility} />
+    return isFilter ? (
+      <Filter
+        filterData={filteredData}
+        isFacility={isFacility}
+        setSelectedRole={setSelectedRole}
+        setSelectedFacility={setSelectedFacility}
+      />
     ) : null;
   };
 

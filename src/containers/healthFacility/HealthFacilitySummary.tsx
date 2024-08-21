@@ -95,13 +95,21 @@ export const formatHFUserData = (userData: any[], countryId: number | string, te
     culture: user.culture,
     countryCode: user.country.phoneNumberCode || user.countryCode,
     country: { id: Number(countryId) },
-    tenantId: user?.healthFacility?.tenantId ? Number(user.healthFacility.tenantId) : Number(tenantId) || user.tenantId,
+    tenantId: user?.healthfacility?.tenantId ? Number(user.healthfacility.tenantId) : Number(tenantId) || user.tenantId,
     supervisorId: Number(user.supervisor?.id),
-    roleIds: Array.isArray(user.role) ? (user.role || []).map(({ id }: { id: any }) => id) : [user.role.id],
+    roleIds: Array.isArray(user.roles)
+      ? (user.roles || [])
+          .map((id: any) => {
+            return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+          })
+          .flat()
+      : [user.role.id],
     villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
     village: user?.village,
     timezone: user?.timezone,
-    district: user?.district
+    district: user?.district,
+    chiefdom: user?.chiefdom,
+    redRisk: user?.redRisk
   }));
 };
 const HealthFacilitySummary = (): React.ReactElement => {

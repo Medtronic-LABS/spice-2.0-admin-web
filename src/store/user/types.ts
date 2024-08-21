@@ -208,6 +208,7 @@ export interface IRoles {
   suiteAccessName?: string;
   displayName?: string;
   groupName?: string;
+  tenantIds?: any[];
 }
 
 export interface IGroupRoles {

@@ -27,6 +27,7 @@ export const fetchHealthFacilityList = ({
       limit: limit || null,
       skip: skip || null,
       countryId,
+      tenantIds,
       userBased,
       tenantBased,
       searchTerm: searchTerm || '',

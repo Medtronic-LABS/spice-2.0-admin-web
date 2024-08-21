@@ -1,5 +1,5 @@
 const APPCONSTANTS = {
-  APP_TYPE: 'admin',
+  APP_TYPE: 'spice web',
   HASH_ALGORITM: 'sha512',
   AUTHTOKEN: 'at',
   USER_TENANTID: 'uti',
@@ -150,6 +150,10 @@ const APPCONSTANTS = {
     clinical: 'clinical',
     customized: 'customized'
   },
+  spiceRole: {
+    spice: 'spice web',
+    spiceInsights: 'SPICE INSIGHTS'
+  },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin user should not be added.',
@@ -166,7 +170,8 @@ const APPCONSTANTS = {
   // Admin
   ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
   ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',
-  ADMIN_DETAILS_UPDATE_ERROR: 'Unable to update user. Please try after sometime.',
+  ADMIN_DETAILS_UPDATE_ERROR: 'Unable to update admin. Please try after sometime.',
+  ADMIN_DETAILS_CREATE_ERROR: 'Unable to create admin. Please try after sometime.',
   ADMIN_DELETE_TITLE: 'Delete Admin',
   ADMIN_DELETE_SUCCESS: 'Admin deleted successfully.',
   ADMIN_DELETE_FAIL: 'Unable to delete the user. Please try after sometime.',
@@ -200,6 +205,7 @@ const APPCONSTANTS = {
   ENTER_PASSWORD: 'Please enter new password.',
   ENTER_CONFIRM_PASSWORD: 'Please enter confirm password.',
   PASSWORD_SHOULD_NOT_MATCH_ACC_NAME: `New password should not match the user's account name.`,
+  FETCH_SIDEMENU_ERROR: 'Unable to fetch sidemenu. Please try after sometime',
   COMMON_PASSWORDS_ARE_NOT_ALLOWED: 'Common passwords are not allowed.',
   CONFIRM_PASSWORD_SHOULD_MATCH: 'Confirm new password should match with new password.',
   LOGIN_GENERAL_ERROR: 'Unable to login. Please try after sometime.',
@@ -359,6 +365,16 @@ export const ROLE_LABELS = {
   [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
   [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
   [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
+};
+
+// used in sidemenu, admin and user module
+export const NAMING_VARIABLES = {
+  country: 'country',
+  region: 'region',
+  district: 'district',
+  chiefdom: 'chiefdom',
+  healthFacility: 'healthfacility',
+  redRisk: 'RED_RISK_USER'
 };
 
 export default APPCONSTANTS;

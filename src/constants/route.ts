@@ -43,7 +43,7 @@ export const PROTECTED_ROUTES = {
   healthFacilityByDistrict: '/district/:districtId/:tenantId/health-facility',
   healthFacilityByChiefdom: '/chiefdom/:chiefdomId/:tenantId/health-facility',
 
-  createHealthFacilityByRegion: '/region/:regionId/health-facility/create',
+  createHealthFacilityByRegion: '/region/:regionId/:tenantId/health-facility/create',
   createHealthFacilityByDistrict: '/district/:districtId/:tenantId/health-facility/create',
   createHealthFacilityByChiefdom: '/chiefdom/:chiefdomId/:tenantId/health-facility/create',
 
@@ -80,6 +80,7 @@ export const SIDE_MENU_MAPPER = {
   HEALTH_FACILITY_BY_REGION: PROTECTED_ROUTES.healthFacilityByRegion,
   ADMINS_BY_SUPER_ADMIN: PROTECTED_ROUTES.adminByRegion,
   USERS_BY_SUPER_ADMIN: PROTECTED_ROUTES.userByRegion,
+  PROGRAM_BY_SUPER_ADMIN: PROTECTED_ROUTES.programByRegion,
   LAB_TEST_DATABASE_BY_SUPER_ADMIN: PROTECTED_ROUTES.labTestByRegion,
   MEDICATION_DATABASE_BY_SUPER_ADMIN: PROTECTED_ROUTES.medicationByRegion,
   WORKFLOW_BY_SUPER_ADMIN: PROTECTED_ROUTES.workflowByRegion,

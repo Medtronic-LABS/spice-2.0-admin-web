@@ -7,20 +7,14 @@ import { FormApi } from 'final-form';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { columnDef } from './userListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
-import {
-  countryIdSelector,
-  emailSelector,
-  roleSelector,
-  userDataSelector,
-  userRolesSelector
-} from '../../store/user/selectors';
+import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageHFList,
@@ -55,7 +49,6 @@ const UserList = (): React.ReactElement => {
   const { tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
-  const regionData = useSelector(userDataSelector).country;
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const role = useSelector(roleSelector);
@@ -69,25 +62,37 @@ const UserList = (): React.ReactElement => {
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
+  const [selectedFacility, setSelectedFacility] = useState<string[]>();
+  const [selectedRole, setSelectedRole] = useState<string[]>();
 
-  const refreshHFUserList = useCallback(
-    (selectedIds?: { roleNameList: string[]; facilityTenantIds: string[] }) =>
-      dispatch(
-        fetchHFUserListRequest({
-          countryId: countryIdValue,
-          skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-          limit: listParams.rowsPerPage,
-          searchTerm: listParams.searchTerm,
-          roleNames: selectedIds?.roleNameList || [],
-          siteUsers: true,
-          tenantIds: selectedIds?.facilityTenantIds || [],
-          failureCb: (e: Error) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
-          }
-        })
-      ),
-    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]
+  const spiceUserRole = rolesGrouped?.SPICE?.filter(
+    (data: { suiteAccessName: string }) => data.suiteAccessName !== 'spice web'
   );
+
+  const refreshHFUserList = useCallback(() => {
+    return dispatch(
+      fetchHFUserListRequest({
+        countryId: countryIdValue,
+        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+        limit: listParams.rowsPerPage,
+        searchTerm: listParams.searchTerm,
+        roleNames: selectedRole || [],
+        siteUsers: true,
+        tenantIds: selectedFacility || [],
+        failureCb: (e: Error) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
+        }
+      })
+    );
+  }, [
+    dispatch,
+    countryIdValue,
+    listParams.page,
+    listParams.rowsPerPage,
+    listParams.searchTerm,
+    selectedRole,
+    selectedFacility
+  ]);
 
   useEffect(() => {
     refreshHFUserList();
@@ -95,7 +100,7 @@ const UserList = (): React.ReactElement => {
       dispatch(clearSupervisorList());
       dispatch(clearVillageHFList());
     };
-  }, [dispatch, refreshHFUserList]);
+  }, [dispatch, refreshHFUserList, selectedFacility, selectedRole]);
 
   useEffect(() => {
     if (!rolesGrouped?.hasOwnProperty('SPICE')) {
@@ -207,10 +212,13 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
+      const [getRedRisk] = spiceUserRole.filter(
+        (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
+      );
       const userObj = formatHFUserData(users, countryIdValue, tenantId);
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
-        data,
+        { ...data, roleIds: data.redRisk ? [...data.roleIds, getRedRisk.id] : data.roleIds },
         isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
         null,
         siteUserSuccess,
@@ -282,7 +290,7 @@ const UserList = (): React.ReactElement => {
       fetchHFListRequest({
         countryId: countryIdValue,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: -1,
+        limit: null,
         searchTerm: listParams.searchTerm,
         userBased: !isSuperUser,
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
@@ -290,15 +298,10 @@ const UserList = (): React.ReactElement => {
     );
   }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
 
-  const onFilter = (selectedIds: any) => {
-    refreshHFUserList(selectedIds);
-  };
-
   useEffect(() => {
     fetchList();
-  }, [listParams, dispatch, fetchList]);
+  }, [listParams, dispatch]);
 
-  const roletest = rolesGrouped?.SPICE?.filter((data: { suiteAccessName: string }) => data.suiteAccessName !== 'admin');
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
@@ -310,11 +313,12 @@ const UserList = (): React.ReactElement => {
           onSearch={handleSearch}
           searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
           onButtonClick={handleAddUserClick}
-          onFilter={onFilter}
+          setSelectedRole={setSelectedRole}
+          setSelectedFacility={setSelectedFacility}
           isFilter={true}
           onFilterData={[
             { name: 'Filter by Facility', isFacility: true, isSearchable: true, data: healthFacilityList },
-            { name: 'Filter by Role', isFacility: false, isSearchable: false, data: roletest }
+            { name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole }
           ]}
         >
           <CustomTable

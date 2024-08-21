@@ -93,6 +93,7 @@ export const fetchHFListRequest = ({
   skip,
   limit,
   searchTerm,
+  tenantIds,
   userBased,
   successCb,
   failureCb
@@ -102,6 +103,7 @@ export const fetchHFListRequest = ({
   limit,
   countryId,
   searchTerm,
+  tenantIds,
   userBased,
   successCb,
   failureCb
