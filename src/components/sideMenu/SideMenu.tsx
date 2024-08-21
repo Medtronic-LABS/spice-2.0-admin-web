@@ -15,7 +15,8 @@ import { getLoadingSelector, getSideMenuSelector } from '../../store/common/sele
 import { ISideMenu } from '../../store/common/types';
 import Loader from '../loader/Loader';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
+import toastCenter from '../../utils/toastCenter';
 
 interface ISideMenuProps {
   className?: string;
@@ -47,13 +48,13 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
 
   let formName: string = '';
   if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-    formName = 'country';
+    formName = NAMING_VARIABLES.country;
   } else if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-    formName = 'district';
+    formName = NAMING_VARIABLES.district;
   } else if (role === APPCONSTANTS.ROLES.DISTRICT_ADMIN) {
-    formName = 'chiefdom';
+    formName = NAMING_VARIABLES.chiefdom;
   } else if (role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-    formName = 'healthfacility';
+    formName = NAMING_VARIABLES.healthFacility;
   }
 
   const fetchSideMenu = useCallback(
@@ -106,6 +107,9 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
                 list: choosenRoutes
               })
             );
+          },
+          failureCb: () => {
+            toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_SIDEMENU_ERROR);
           }
         })
       ),
@@ -139,19 +143,19 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       }
       if (
         districtRoutesWithSideMenu.find((districtRoute) => matchPath(pathname, { path: districtRoute, exact: true })) &&
-        currentRouteName.includes('DISTRICT_BY')
+        (currentRouteName.includes('DISTRICT_BY') || currentRouteName === 'DISTRICT_SUMMARY')
       ) {
         return true;
       }
       if (
         chiefdomWithSideMenu.find((chiefdomRoute) => matchPath(pathname, { path: chiefdomRoute, exact: true })) &&
-        currentRouteName.includes('CHIEFDOM_BY')
+        (currentRouteName.includes('CHIEFDOM_BY') || currentRouteName === 'CHIEFDOM_SUMMARY')
       ) {
         return true;
       }
       if (
         hfWithSideMenu.find((hfRoute) => matchPath(pathname, { path: hfRoute, exact: true })) &&
-        currentRouteName.includes('HEALTH_FACILITY_BY')
+        (currentRouteName.includes('HEALTH_FACILITY_BY') || currentRouteName === 'HEALTH_FACILITY_SUMMARY')
       ) {
         return true;
       }

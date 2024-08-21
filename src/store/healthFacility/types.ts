@@ -142,7 +142,6 @@ export interface IFetchHFListSuccessPayload {
 export interface IFetchHFListRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST;
   countryId: number;
-  tenantIds?: number[];
   skip: number;
   limit: number | null;
   searchTerm?: string;
@@ -197,7 +196,15 @@ export interface IHFUserGet {
   villages?: number[];
   supervisor: string | null;
   district?: { tenantId: string | number };
-  organizations: Array<{ id: number; name: string; parentOrganizationId: number | null; formDataId: number }>;
+  county?: { tenantId: string | number };
+  organizations: Array<{
+    formName: string;
+    displayName: boolean;
+    id: number;
+    name: string;
+    parentOrganizationId: number | null;
+    formDataId: number;
+  }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
 }
 
@@ -227,6 +234,7 @@ export interface IHFUserPost {
   supervisorId?: number;
   villageIds?: number[];
   timezone?: { id: number };
+  redRisk?: boolean;
 }
 
 export interface IOptionsResponse {

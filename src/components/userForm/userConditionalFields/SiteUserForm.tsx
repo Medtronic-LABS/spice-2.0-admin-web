@@ -1,7 +1,7 @@
 import { Field } from 'react-final-form';
 import SelectInput from '../../formFields/SelectInput';
 import { required } from '../../../utils/validation';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES, NAME_CONSTANTS } from '../../../constants/appConstants';
 import Checkbox from '../../formFields/Checkbox';
 
 export const SiteUserForm = ({
@@ -12,15 +12,17 @@ export const SiteUserForm = ({
   cultureList,
   timezoneList,
   isTmezoneListLoading,
-  fields,
   isSiteUser,
   selectedAdmins,
   districtDetails,
   chiefdomDetails,
-  isAdminForm
+  isAdminForm,
+  healthFacilityList,
+  hfLoading,
+  formDetails
 }: any) => {
-  const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN, REGION_ADMIN, SUPER_ADMIN } = APPCONSTANTS.ROLES;
-  const { chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
+  const { chiefdom: chiefdomModuleName, district } = NAMING_VARIABLES;
 
   return (
     <>
@@ -66,7 +68,7 @@ export const SiteUserForm = ({
               )}
             />
           </div>
-          {fields?.value[index]?.roleName?.value !== 'SITE_ADMIN' && (
+          {formDetails.fields?.value[index]?.roleName?.value !== APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN && (
             <div className='col-6'>
               <Field
                 name={`${name}.redRisk`}
@@ -81,14 +83,14 @@ export const SiteUserForm = ({
           {[DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
               <Field
-                name={`${name}.district`}
+                name={`${name}.${district}`}
                 type='text'
                 validate={required}
                 render={({ input, meta }) => (
                   <SelectInput
                     {...(input as any)}
-                    label='District'
-                    errorLabel='district'
+                    label={NAME_CONSTANTS.district}
+                    errorLabel={NAME_CONSTANTS.district}
                     labelKey='name'
                     valueKey='id'
                     options={districtDetails.list}
@@ -103,14 +105,14 @@ export const SiteUserForm = ({
           {[HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
               <Field
-                name={`${name}.chiefdom`}
+                name={`${name}.${chiefdomModuleName}`}
                 type='text'
                 validate={required}
                 render={({ input, meta }) => (
                   <SelectInput
                     {...(input as any)}
-                    label={chiefdomModuleName}
-                    errorLabel='chiefdom'
+                    label={NAME_CONSTANTS.chiefdom}
+                    errorLabel={NAME_CONSTANTS.chiefdom}
                     labelKey='name'
                     valueKey='id'
                     options={chiefdomDetails.list}
@@ -119,6 +121,30 @@ export const SiteUserForm = ({
                     isModel={true}
                   />
                 )}
+              />
+            </div>
+          )}
+          {selectedAdmins === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN && (
+            <div className='col-sm-6 col-12'>
+              <Field
+                name={`${name}.${NAMING_VARIABLES.healthFacility}`}
+                type='text'
+                validate={required}
+                render={({ input, meta }) => {
+                  return (
+                    <SelectInput
+                      {...(input as any)}
+                      label='Assigned Health Facility'
+                      errorLabel='assigned health facility'
+                      labelKey='name'
+                      valueKey='id'
+                      options={healthFacilityList}
+                      loadingOptions={hfLoading}
+                      error={isError(meta)}
+                      isModel={true}
+                    />
+                  );
+                }}
               />
             </div>
           )}

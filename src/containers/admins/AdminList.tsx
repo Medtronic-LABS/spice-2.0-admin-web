@@ -6,20 +6,14 @@ import { FormApi } from 'final-form';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES, NAME_CONSTANTS } from '../../constants/appConstants';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { columnDef } from './adminListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
-import {
-  countryIdSelector,
-  emailSelector,
-  roleSelector,
-  userDataSelector,
-  userRolesSelector
-} from '../../store/user/selectors';
+import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageHFList,
@@ -32,7 +26,6 @@ import {
 } from '../../store/healthFacility/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
-  healthFacilityListSelector,
   healthFacilityListUsersTotalSelector,
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
@@ -64,28 +57,27 @@ const UserList = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
-  const healthFacilityList = useSelector(healthFacilityListSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const { chiefdom: chiefdomModuleName, district: districtModuleName } = NAME_CONSTANTS;
+  const [selectedRole, setSelectedRole] = useState<string[]>();
 
   const refreshHFUserList = useCallback(
-    (selectedIds?: { roleNameList: string[]; facilityTenantIds: string[] }) =>
+    () =>
       dispatch(
         fetchHFUserListRequest({
           countryId: countryIdValue,
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
-          roleNames: selectedIds?.roleNameList || [],
+          roleNames: selectedRole || [],
           siteUsers: false,
-          tenantIds: selectedIds?.facilityTenantIds || [],
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
           }
         })
       ),
-    [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]
+    [dispatch, countryIdValue, listParams.page, listParams.rowsPerPage, listParams.searchTerm, selectedRole]
   );
 
   useEffect(() => {
@@ -94,7 +86,7 @@ const UserList = (): React.ReactElement => {
       dispatch(clearSupervisorList());
       dispatch(clearVillageHFList());
     };
-  }, [dispatch, refreshHFUserList]);
+  }, [dispatch, refreshHFUserList, selectedRole]);
 
   useEffect(() => {
     if (!rolesGrouped?.hasOwnProperty('SPICE')) {
@@ -219,9 +211,7 @@ const UserList = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              isOpenUserModal.isEdit
-                ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
-                : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
+              isOpenUserModal.isEdit ? APPCONSTANTS.ADMIN_DETAILS_UPDATE_ERROR : APPCONSTANTS.ADMIN_DETAILS_CREATE_ERROR
             )
           );
         }
@@ -282,7 +272,7 @@ const UserList = (): React.ReactElement => {
       fetchHFListRequest({
         countryId: countryIdValue,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: -1,
+        limit: null,
         searchTerm: listParams.searchTerm,
         userBased: !isSuperUser,
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
@@ -290,15 +280,14 @@ const UserList = (): React.ReactElement => {
     );
   }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
 
-  const onFilter = (selectedIds: any) => {
-    refreshHFUserList(selectedIds);
-  };
-
   useEffect(() => {
     fetchList();
   }, [listParams, dispatch, fetchList]);
 
-  const roleList = rolesGrouped?.SPICE?.filter((data: { suiteAccessName: string }) => data.suiteAccessName === 'admin');
+  const roleSpiceList = rolesGrouped?.SPICE?.filter(
+    (data: { suiteAccessName: string }) => data.suiteAccessName === 'spice web'
+  );
+
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
@@ -310,9 +299,16 @@ const UserList = (): React.ReactElement => {
           onSearch={handleSearch}
           searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
           onButtonClick={handleAddUserClick}
-          onFilter={onFilter}
           isFilter={true}
-          onFilterData={[{ name: 'Filter by Admin', isFacility: false, isSearchable: false, data: roleList }]}
+          setSelectedRole={setSelectedRole}
+          onFilterData={[
+            {
+              name: 'Filter by Admin',
+              isFacility: false,
+              isSearchable: false,
+              data: [...(rolesGrouped['SPICE INSIGHTS'] || []), ...(roleSpiceList || [])]
+            }
+          ]}
         >
           <CustomTable
             rowData={hfUserList}
