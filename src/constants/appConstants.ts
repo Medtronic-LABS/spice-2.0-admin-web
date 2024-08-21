@@ -239,6 +239,7 @@ const APPCONSTANTS = {
   YES: 'Yes',
   NO: 'No',
 
+  // LAB TEST
   LABTEST_CREATION_SUCCESS: 'Lab test created successfully.',
   LABTEST_CREATION_ERROR: 'Unable to create lab tests. Please try after sometime.',
   LABTEST_FETCH_ERROR: 'Unable to load lab tests. Please try after sometime.',
@@ -257,6 +258,8 @@ const APPCONSTANTS = {
   LABTEST_RESULT_RANGES_CREATE_FAIL: 'Unable to create lab result ranges. Please try after sometime.',
   LABTEST_RESULT_RANGES_UPDATE_SUCCESS: 'Labtest result ranges updated successfully.',
   LABTEST_RESULT_RANGES_UPDATE_FAIL: 'Unable to update lab result ranges. Please try after sometime.',
+  REQUIRED_MANDATORY_FAILED: 'At least two fields need to be mandatory.',
+
   EMAIL_ALREADY_EXISTS_ERR_MSG: 'Email ID already exists',
   EMR_ERR_MSG: 'Email ID already exists in EMR role',
   SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',

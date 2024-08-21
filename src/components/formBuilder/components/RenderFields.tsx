@@ -35,6 +35,7 @@ const getComponentsByFieldName = (
   }
   if (
     obj.fieldName === 'TestedOn' &&
+    obj.orderId === 1 &&
     ['fieldName', 'isMandatory', 'isEnabled', 'visibility', 'title'].includes(fieldName)
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };

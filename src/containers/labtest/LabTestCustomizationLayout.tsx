@@ -94,6 +94,11 @@ const LabTestCustomizationLayout = () => {
   };
 
   const onSubmit = (dataParams: any) => {
+    const newData: any = Object.values(dataParams)[0];
+    if ((Object.values(newData) || []).filter((v: any) => v.isMandatory).length < 2) {
+      toastCenter.error(APPCONSTANTS.ERROR, APPCONSTANTS.REQUIRED_MANDATORY_FAILED);
+      return;
+    }
     const { state = {} } = history.location;
     const formatData = presentableJson(dataParams);
     const data = {
