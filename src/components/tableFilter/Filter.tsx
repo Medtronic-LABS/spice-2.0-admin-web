@@ -11,8 +11,9 @@ interface IFilteredData {
 
 interface ITableFilterProps {
   filterData: IFilteredData;
-  onFilter: (selectedIds: { roleNameList: string[]; facilityTenantIds: string[] }) => void;
   isFacility: boolean;
+  setSelectedRole: any;
+  setSelectedFacility: any;
 }
 
 interface IOption {
@@ -20,10 +21,13 @@ interface IOption {
   tenantId: string;
 }
 
-const TableFilter: React.FC<ITableFilterProps> = ({ filterData, onFilter, isFacility }: ITableFilterProps) => {
+const TableFilter: React.FC<ITableFilterProps> = ({
+  filterData,
+  isFacility,
+  setSelectedFacility,
+  setSelectedRole
+}: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [roleNameList, setRoleNameList] = useState<string[]>([]);
-  const [facilityTenantIds, setFacilityTenantIds] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -36,30 +40,26 @@ const TableFilter: React.FC<ITableFilterProps> = ({ filterData, onFilter, isFaci
    */
 
   const handleSelectChange = (option: IOption) => {
-    setSelectedOptions((prev) => {
-      if (prev.includes(option.name)) {
-        return prev.filter((item) => item !== option.name);
-      } else {
-        return [...prev, option.name];
-      }
-    });
     if (isFacility) {
-      setFacilityTenantIds((prev) => {
-        const updatedOptions = prev.includes(option.tenantId)
-          ? prev.filter((item) => item !== option.tenantId)
-          : [...prev, option.tenantId];
-        onFilter({ roleNameList, facilityTenantIds: updatedOptions });
-        return updatedOptions;
+      setSelectedFacility((prev: string[]) => {
+        const updatedFacilityTenantIds = prev?.includes(option?.tenantId)
+          ? prev.filter((tenantId) => tenantId !== option?.tenantId)
+          : [...(prev || []), option?.tenantId];
+        return updatedFacilityTenantIds;
       });
     } else {
-      setRoleNameList((prev) => {
-        const updatedOptions = prev.includes(option.name)
-          ? prev.filter((item) => item !== option.name)
-          : [...prev, option.name];
-        onFilter({ roleNameList: updatedOptions, facilityTenantIds });
-        return updatedOptions;
+      setSelectedRole((prev: string[]) => {
+        const updatedRoleNameList = prev?.includes(option?.name)
+          ? prev.filter((name) => name !== option?.name)
+          : [...(prev || []), option?.name];
+        return updatedRoleNameList;
       });
     }
+
+    // Update the selected options state for UI purposes
+    setSelectedOptions((prev) => {
+      return prev.includes(option.name) ? prev.filter((name) => name !== option.name) : [...prev, option.name];
+    });
   };
 
   /**
@@ -117,6 +117,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({ filterData, onFilter, isFaci
    * @returns A formatted string of health facility names.
    */
   const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(', ')}`;
+
   return (
     <div className={styles.selectHeader}>
       <div

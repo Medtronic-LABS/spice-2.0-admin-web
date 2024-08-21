@@ -5,7 +5,7 @@ import UserFormMeta from './userFormMeta';
 const useUserFormUtils = () => {
   const { mobileRoles, isCHPRole } = UserFormMeta();
   const isCHASelected = useCallback(
-    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
+    (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
     [mobileRoles]
   );
 

@@ -14,7 +14,7 @@ import BinIcon from '../../assets/images/bin.svg';
 import ResetIcon from '../../assets/images/reset.svg';
 import Radio from '../formFields/Radio';
 import SelectInput from '../formFields/SelectInput';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES, NAME_CONSTANTS } from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
 import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
@@ -242,7 +242,19 @@ const UserForm = ({
           !isCultureListLoading &&
           cultureList?.find(
             (culture: { id: any }) => culture.id === (initialEditValue?.cultureId || APPCONSTANTS.DEFAULT_CULTURE.id)
-          )
+          ),
+        district:
+          initialEditValue?.organizations.filter(
+            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
+          ) || '',
+        chiefdom:
+          initialEditValue?.organizations.filter(
+            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.chiefdom
+          ) || '',
+        healthfacility:
+          initialEditValue?.organizations.filter(
+            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.healthFacility
+          ) || ''
       }
     ],
     [cultureList, initialEditValue, isCultureListLoading, isEdit]
@@ -532,14 +544,16 @@ const UserForm = ({
   const isCHUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
       // getting CHA user selected status
-      const newChaStatus = [...isCHAUser];
-      newChaStatus[index] = isCHASelected(roles);
-      setUserAsCHA(newChaStatus);
+      if (isSiteUser) {
+        const newChaStatus = [...isCHAUser];
+        newChaStatus[index] = isCHASelected(roles);
+        setUserAsCHA(newChaStatus);
 
-      // getting CHP user selected status
-      const newChpStatus = [...isCHPUser];
-      newChpStatus[index] = isCHPSelected(roles);
-      setUserAsCHP(newChpStatus);
+        // getting CHP user selected status
+        const newChpStatus = [...isCHPUser];
+        newChpStatus[index] = isCHPSelected(roles);
+        setUserAsCHP(newChpStatus);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [roleOptions, roleOptions.current]
@@ -598,19 +612,22 @@ const UserForm = ({
     }
   };
 
-  // HF List fetch
-  useEffect(() => {
-    if (countryId && !isHF && !isEdit) {
-      dispatch(
-        fetchHFListRequest({
-          countryId,
-          skip: 0,
-          limit: null,
-          userBased: !(role === SUPER_ADMIN || role === SUPER_USER)
-        })
-      );
-    }
-  }, [countryId, dispatch, healthFacilityList?.length, isEdit, isHF, role]);
+  const chiefdomBasedHfList = useCallback(
+    (values: IRoles) => {
+      if (countryId) {
+        dispatch(
+          fetchHFListRequest({
+            countryId,
+            skip: 0,
+            limit: null,
+            tenantIds: values.tenantIds,
+            userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER)
+          })
+        );
+      }
+    },
+    [countryId, dispatch, role]
+  );
 
   useEffect(() => {
     if (isEdit && !isProfile) {
@@ -662,7 +679,7 @@ const UserForm = ({
       roleOptions.current = [rolesGrouped.SPICE];
       setAutoFetchData([initialEditDataForRole]);
     }
-  }, [initialValue, isEdit, rolesGrouped.SPICE]);
+  }, [data, defaultSelectedRole, initialEditData, initialValue, isAdminForm, isEdit, rolesGrouped.SPICE]);
 
   useEffect(() => {
     initData();
@@ -683,9 +700,9 @@ const UserForm = ({
   const getAdminRoles = () => {
     const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
       if (isSiteUser) {
-        return roleData.suiteAccessName.toLowerCase() !== 'admin';
+        return roleData.suiteAccessName.toLowerCase() !== APPCONSTANTS.spiceRole.spice;
       } else {
-        return roleData.suiteAccessName.toLowerCase() === 'admin';
+        return roleData.suiteAccessName.toLowerCase() === APPCONSTANTS.spiceRole.spice;
       }
     });
     return filteredRoles || [];
@@ -721,12 +738,31 @@ const UserForm = ({
   }, [dispatch, fetchDetails, selectedAdmins]);
 
   useEffect(() => {
-    const districtId = form.getState().values.users?.[0]?.district?.tenantId;
+    const districtDataId = form.getState().values.users?.[0]?.district?.tenantId;
+    const [existingDistrict] = initialEditData;
+    const existingDistrictId = existingDistrict?.organizations?.filter(
+      (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
+    );
+    const districtId = districtDataId ?? existingDistrictId?.[0]?.id;
     if (districtId) {
       dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, form.getState().values.users?.[0]?.district?.tenantId]);
+
+  useEffect(() => {
+    const chiefdomData = form.getState().values.users?.[0]?.chiefdom;
+    const [existingDistrict] = initialEditData;
+    const existingchiefdomDataId = existingDistrict?.organizations?.filter(
+      (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.chiefdom
+    );
+    const chiefdomDetails = chiefdomData ?? existingchiefdomDataId?.[0];
+    const chiefdomId = chiefdomData?.tenantId ?? existingchiefdomDataId?.[0]?.id;
+    if (chiefdomId) {
+      chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [chiefdomId] });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.getState().values.users?.[0]?.chiefdom?.tenantId, initialEditData]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -941,11 +977,13 @@ const UserForm = ({
                             mandatoryOptions={mandatoryReportRoles || []}
                             disabledOptions={disabledReportRoles.current[index] || []}
                             loading={isRolesLoading}
-                            error={isError(meta) && !reportRoles?.length}
-                            onChange={(values: any, { option, action }: { option: any; action: string }) => {
-                              form.change(`${formName}[${index}].roles`, [...spiceRole, ...values]);
-                              updateRoleOptionsAndDisableRoles(index);
-                              getReportRoles(index, undefined, action === 'select-option' ? option : null);
+                            error={isError(meta) && !spiceInsightsRole?.length}
+                            onChange={(values: any) => {
+                              if (spiceRole.length) {
+                                form.change(`${formName}[${index}].roles`, [...[spiceRole], ...values]);
+                              } else {
+                                form.change(`${formName}[${index}].roles`, [...values]);
+                              }
                               input.onChange(values);
                             }}
                           />
@@ -1065,7 +1103,7 @@ const UserForm = ({
                     isAutoPopulate={autoFetched[index]}
                   />
                 </div>
-                {(isSiteUser || selectedAdmins === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) && (
+                {isSiteUser && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1141,9 +1179,12 @@ const UserForm = ({
                   chiefdomDetails={{ list: chiefdomList || [], loading: chiefdomLoading }}
                   siteRolesChange={siteRolesChange}
                   selectedAdmins={selectedAdmins}
-                  fields={fields}
                   role={role}
                   isSiteUser={isSiteUser}
+                  healthFacilityList={healthFacilityList}
+                  hfLoading={hfLoading}
+                  chiefdomBasedHfList={chiefdomBasedHfList}
+                  formDetails={{ form, formName, fields }}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>
