@@ -265,33 +265,8 @@ const UserForm = ({
     () => [
       {
         ...initialEditValue,
-        hfTenantIds: isEdit
-          ? (initialEditValue?.organizations || [])
-              .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
-              .map((org: any) => org.id)
-          : [],
-        suiteAccess: initialEditValue?.suiteAccess?.map((org: any) => ({
-          ...org,
-          isFixed: APPCONSTANTS.spiceRole.spiceInsights !== org.groupName
-        })),
-        culture:
-          !isCultureListLoading &&
-          cultureList?.find(
-            (culture: { id: any }) => culture.id === (initialEditValue?.cultureId || APPCONSTANTS.DEFAULT_CULTURE.id)
-          ),
-        district:
-          initialEditValue?.organizations?.filter(
-            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
-          ) || '',
-        chiefdom:
-          initialEditValue?.organizations?.filter(
-            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.chiefdom
-          ) || '',
-        healthfacility:
-          initialEditValue?.organizations?.filter(
-            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.healthFacility
-          ) || '',
-        countryCode: { phoneNumberCode: initialEditValue?.countryCode, id: initialEditValue?.countryCode }
+        selectedRoles: initialEditValue?.role || [],
+        hfTenantIds: isEdit ? (initialEditValue?.organizations || []).map((org: any) => org.id) : []
       }
     ],
     [cultureList, initialEditValue, districtList, chiefdomList, isCultureListLoading, isEdit]
@@ -521,6 +496,28 @@ const UserForm = ({
     return !isLastChild && <div className='divider mx-neg-1dot25 mb-1dot5' />;
   };
 
+  const mobileRoles = useMemo(() => ['CHW'], []);
+  const newMobileRoles = useMemo(() => ['CHW', 'PEER_SUPERVISOR'], []);
+  const adminRoles = useMemo(
+    () => ['HEALTH_FACILITY_ADMIN', 'PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'SECHN', 'CHA', 'MCHA'],
+    []
+  );
+  const superAdminRoles = useMemo(() => ['SUPER_ADMIN'], []);
+  const hfCreateRoles = useMemo(
+    () => [
+      'HEALTH_FACILITY_ADMIN',
+      'PROVIDER',
+      'MID_WIFE',
+      'LAB_ASSISTANT',
+      'SRN',
+      'SECHN',
+      'CHA',
+      'MCHA',
+      'PEER_SUPERVISOR'
+    ],
+    []
+  );
+
   // roles based CHW related utils
   const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.roles, [form]);
 
@@ -547,12 +544,12 @@ const UserForm = ({
       const newDisabledRoles = [...disabledRoles.current];
       let validRoles: string[] = [];
       const selectedAllRoles = [...(selectedRoles(index) || [])];
-      if (selectedAllRoles.some((ro: IRoles) => ro.name === HEALTH_FACILITY_ADMIN)) {
-        validRoles = [HEALTH_FACILITY_ADMIN];
-      } else if (selectedAllRoles.some((ro: IRoles) => ro.name !== HEALTH_FACILITY_ADMIN)) {
-        validRoles = (newRoleOptions[index] || [])
-          .filter((role) => role.name !== HEALTH_FACILITY_ADMIN)
-          .map((role) => role.name);
+      if (selectedAllRoles.some((ro: IRoles) => newMobileRoles.includes(ro.name))) {
+        validRoles = newMobileRoles;
+      } else if (selectedAllRoles.some((ro: IRoles) => adminRoles.includes(ro.name))) {
+        validRoles = adminRoles;
+      } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
+        validRoles = superAdminRoles;
       } else {
         validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
       }
@@ -566,7 +563,6 @@ const UserForm = ({
       isHF,
       isHFCreate,
       mobileRoles,
-      peerSupervisorRoles,
       rolesGrouped,
       selectedRoles,
       superAdminRoles,
@@ -981,14 +977,16 @@ const UserForm = ({
                             options={getAdminRoles()}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
-                                ...(autoFetched[index] ? mandatoryRoles : []),
+                                ...(mandatoryRoles ? mandatoryRoles : []),
                                 ...(disabledRoles.current[index] || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                                 : null;
                             }}
-                            mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                            required={true}
+                            options={roleOptions.current?.[index] || []}
+                            mandatoryOptions={mandatoryRoles ? mandatoryRoles : []}
                             disabledOptions={disabledRoles.current[index]}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
