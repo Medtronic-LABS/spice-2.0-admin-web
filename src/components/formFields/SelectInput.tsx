@@ -53,6 +53,7 @@ interface ISelectBoxProps {
   name?: string;
   menuPlacement?: string;
   autoSelect?: boolean;
+  autoSelectValue?: any;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {
@@ -95,6 +96,7 @@ const SelectInput = ({
   isMulti = false,
   menuPlacement = 'auto',
   autoSelect = true,
+  autoSelectValue = '',
   optionPropStyles,
   isOptionDisabled,
   name = '',
@@ -106,7 +108,7 @@ const SelectInput = ({
   useEffect(() => {
     if (options && options.length === 1 && name && required && autoSelect) {
       setTimeout(() => {
-        change(name, options[0]);
+        change(name, autoSelectValue || options[0]);
       }, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

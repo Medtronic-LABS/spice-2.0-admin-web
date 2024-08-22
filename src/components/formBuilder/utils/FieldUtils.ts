@@ -45,15 +45,15 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     maxLength: false,
     minLength: false,
     contentLength: false,
-    startsWith: false
+    startsWith: false,
+    unitList: false,
+    ranges: false
   };
   const resultFields = {
     code: true,
     url: true,
     resource: true,
-    unitList: true,
-    condition: true,
-    ranges: true
+    condition: true
   };
   let finalFields: any = {};
   if (fieldValue) {
@@ -62,22 +62,28 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
       case InputTypes.DECIMAL:
         inputTypeRelatedFields.minValue = true;
         inputTypeRelatedFields.maxValue = true;
+        inputTypeRelatedFields.unitList = true;
+        inputTypeRelatedFields.ranges = true;
         break;
       case InputTypes.PHONE_NUMBER:
         inputTypeRelatedFields.contentLength = true;
         inputTypeRelatedFields.startsWith = true;
+        inputTypeRelatedFields.unitList = true;
+        inputTypeRelatedFields.ranges = true;
         break;
       case InputTypes.DEFAULT:
       default:
         inputTypeRelatedFields.minLength = true;
         inputTypeRelatedFields.maxLength = true;
+        inputTypeRelatedFields.unitList = false;
+        inputTypeRelatedFields.ranges = false;
     }
   }
   if (isResult) {
     finalFields = {
       ...finalFields,
       ...inputTypeRelatedFields,
-      ...{ ...resultFields, ranges: obj.viewType === 'EditText', unitList: obj.viewType === 'EditText' }
+      ...resultFields
     };
   } else {
     Object.keys(resultFields).forEach((key: any) => {

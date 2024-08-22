@@ -1,3 +1,5 @@
+import { IResourceOptions } from '../config/BaseFieldConfig';
+
 interface IAttributeProps {
   label?: string;
   error?: string;
@@ -16,6 +18,13 @@ export interface ITextAttributeProps extends IAttributeProps {
 
 export interface ISelectAttributeProps extends IAttributeProps {
   options?: any[];
+  labelKey?: string;
+  valueKey?: string;
+  isMulti?: boolean;
+}
+
+export interface IResourceSelectAttributeProps extends IAttributeProps {
+  options?: IResourceOptions;
   labelKey?: string;
   valueKey?: string;
   isMulti?: boolean;
@@ -50,7 +59,7 @@ export interface IBaseFieldMeta {
   unitList?: ISelectAttributeProps;
   code?: ITextAttributeProps;
   url?: ITextAttributeProps;
-  resource?: ISelectAttributeProps;
+  resource?: IResourceSelectAttributeProps;
   isResult?: IAttributeProps;
   totalCount?: ISelectAttributeProps;
   mandatoryCount?: ISelectAttributeProps;

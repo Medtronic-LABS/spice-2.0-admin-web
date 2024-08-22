@@ -139,9 +139,17 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
   };
 
   const handleEditLabTestSubmit = (dataParams: any) => {
+    let formInput = JSON.parse(dataParams.formInput || '');
+    const formLayout = (formInput?.formLayout || []).map((item: any) => {
+      if (item.viewType === 'CardView') {
+        item.title = dataParams.testName;
+      }
+      return item;
+    });
+    formInput = { ...formInput, formLayout };
     const data = {
       ...dataParams,
-      formInput: undefined,
+      formInput: JSON.stringify(formInput),
       testName: dataParams.testName,
       codeDetails: { code: dataParams.codeDetails?.code, url: dataParams.codeDetails?.url }
     };

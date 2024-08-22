@@ -138,6 +138,7 @@ export const SelectInputValues = ({
   let options: any = inputProps?.options || [];
   let parseFn = (val: any) => val;
   let value = obj[fieldName] || null;
+  let autoSelectValue = null;
 
   // parse as number
   if (fieldName === 'orientation') {
@@ -170,9 +171,10 @@ export const SelectInputValues = ({
     };
   }
   if (fieldName === 'resource') {
-    options = inputProps?.options;
+    options = inputProps?.options[obj?.viewType === 'Spinner' ? InputTypes.DEFAULT : obj?.inputType] || [];
     parseFn = (val: any) => val?.key;
     value = options?.find(({ key: resource }: any) => obj[fieldName] === resource) || null;
+    autoSelectValue = options.length === 1 ? options[0]?.key : null;
   }
   // parse with custom logic
   if (fieldName === 'inputType') {
@@ -208,6 +210,7 @@ export const SelectInputValues = ({
         customParseFn={parseFn}
         inputProps={inputProps}
         isMulti={inputProps?.isMulti}
+        autoSelectValue={autoSelectValue}
       />
     </div>
   );
