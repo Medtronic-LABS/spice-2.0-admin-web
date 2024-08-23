@@ -215,7 +215,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
         tenantBased: true,
-        isSiteUsers: null,
+        siteUsers: true,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();

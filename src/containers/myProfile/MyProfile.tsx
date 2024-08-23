@@ -8,6 +8,7 @@ import UserForm from '../../components/userForm/UserForm';
 import ModalForm from '../../components/modal/ModalForm';
 import Loader from '../../components/loader/Loader';
 import { countryIdSelector, userIdSelector } from '../../store/user/selectors';
+import { countryIdSelector, userIdSelector } from '../../store/user/selectors';
 import { IUserRole } from '../../store/healthFacility/types';
 import { fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
@@ -93,7 +94,7 @@ const MyProfile = (): React.ReactElement => {
         name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
       };
       postData.country = {
-        phoneNumberCode: postData?.countryCode?.phoneNumberCode
+        phoneNumberCode: postData.countryCode
       };
       userForEdit.current = { users: [postData] as IEditUserDetail[] };
     }
@@ -110,11 +111,12 @@ const MyProfile = (): React.ReactElement => {
       firstName: user.firstName.trim(),
       lastName: user.lastName.trim(),
       gender: user.gender,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      countryCode: user?.country?.phoneNumberCode,
       phoneNumber: user.phoneNumber,
-      timezone: []
+      username: user.email,
+      countryCode: user?.country?.phoneNumberCode,
+      country: { id: countryId },
+      roleIds: [roleId?.id],
+      timezone: { id: Number(user.timezone.id) }
     };
     setLoading(true);
     dispatch(

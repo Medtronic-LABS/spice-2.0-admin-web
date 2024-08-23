@@ -49,7 +49,7 @@ export interface IHealthFacilityState {
 export interface IHFDashboard {
   id: number;
   name: string;
-  siteType: string;
+  type: string;
   tenantId: number;
   chiefdom?: string;
 }
@@ -703,8 +703,12 @@ export interface IFetchCountryListFailure {
   type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_FAILURE;
 }
 
-export interface IClearSiteSummary {
+export interface IClearHFSummary {
   type: typeof ACTION_TYPES.CLEAR_HF_SUMMARY;
+}
+
+export interface IClearHFDropdown {
+  type: typeof ACTION_TYPES.CLEAR_HF_DROPDOWN_OPTIONS;
 }
 
 export type IFetchCultureListSuccessPayload = ICulture[];
@@ -781,4 +785,6 @@ export type HealthFacilityActions =
   | IFetchHFDashboardListRequest
   | IFetchHFDashboardListSuccess
   | IFetchHFDashboardListFailure
-  | ISetHFSummary;
+  | ISetHFSummary
+  | IClearHFSummary
+  | IClearHFDropdown;

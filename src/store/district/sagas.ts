@@ -22,7 +22,7 @@ import {
   IFetchDistrictOptionsPayload
 } from './types';
 import * as districtActions from './actions';
-import * as siteActions from '../healthFacilityDashboard/actions';
+import * as hfActions from '../healthFacility/actions';
 import {
   FETCH_DISTRICT_LIST_REQUEST,
   CREATE_DISTRICT_REQUEST,
@@ -35,10 +35,7 @@ import {
   DEACTIVATE_DISTRICT_REQUEST,
   FETCH_DISTRICT_OPTIONS_REQUEST,
   ACTIVATE_DISTRICT_REQUEST,
-  FETCH_CLINICAL_WORKFLOW_REQUEST,
-  CREATE_COUNTY_WORKFLOW_MODULE_REQUEST,
-  UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST,
-  DELETE_COUNTY_WORKFLOW_MODULE_REQUEST
+  FETCH_CLINICAL_WORKFLOW_REQUEST
 } from './actionTypes';
 import { AppState } from '../rootReducer';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -226,7 +223,7 @@ export function* deactivateDistrict({ data, successCb, failureCb }: IDeactivateD
   try {
     yield call(districtService.deactivateDistrict, data);
     yield put(districtActions.deactivateDistrictSuccess());
-    yield put(siteActions.clearSiteDropdown());
+    yield put(hfActions.clearHFDropdown());
     successCb?.();
   } catch (e) {
     if (e instanceof Error) {

@@ -776,6 +776,13 @@ export interface IUnlockUsersFailure {
   type: typeof USER_TYPES.UNLOCK_USERS_FAILURE;
 }
 
+export interface IUnlockUsersRequest {
+  type: typeof USER_TYPES.UNLOCK_USERS_REQUEST;
+  userId: string;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess

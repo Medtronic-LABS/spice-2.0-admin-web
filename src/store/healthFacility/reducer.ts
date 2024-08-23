@@ -72,7 +72,7 @@ export const initialState: IHealthFacilityState = {
     {
       id: 0,
       name: '',
-      siteType: '',
+      type: '',
       tenantId: 0,
       chiefdom: ''
     }
@@ -356,6 +356,7 @@ const healthFacilityReducer = (
       };
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HEALTH_FACILITY_DETAIL:
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HF_SUMMARY:
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HF_SUMMARY:
       return {
         ...state,
         healthFacility: initialState.healthFacility
@@ -393,15 +394,6 @@ const healthFacilityReducer = (
         countryListLoading: false
       };
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA:
-      return {
-        ...state,
-        healthFacility: {} as IHealthFacility,
-        chiefdomList: [],
-        villagesList: [],
-        unlinkedVillagesList: [],
-        villagesFromHFList: { list: [], hfTenantIds: null }
-      };
-    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HF_FORM_DATA:
       return {
         ...state,
         healthFacility: {} as IHealthFacility,

@@ -63,7 +63,7 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
           ...getCustomizationFormDataTypes,
           successCb: (data) => {
             setEditorContent('');
-            setEditorContent(data?.formInput);
+            setEditorContent(data?.formInput || '');
           },
           failureCb: (e) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.FETCH_CONSENT_FORM_ERROR));

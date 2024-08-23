@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
 import Searchbar from '../../components/searchbar/Searchbar';
 import Loader from '../../components/loader/Loader';
-import Dropdown from '../../components/dropdown/Dropdown';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
@@ -26,7 +26,7 @@ import styles from './Region.module.scss';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { fetchTimezoneListRequest } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
-import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
+import { clearHFSummary } from '../../store/healthFacility/actions';
 import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
 import { clearChiefdomDetail } from '../../store/chiefdom/actions';
 import { IRegionDetail } from '../../store/region/types';
@@ -47,6 +47,7 @@ const Region = (): React.ReactElement => {
   const loadingMore = useSelector(getRegionsLoadingMoreSelector);
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
+  const { push } = useHistory();
 
   const {
     region: regionModuleName,
@@ -54,14 +55,6 @@ const Region = (): React.ReactElement => {
     chiefdom: chiefdomModuleName,
     healthFacility
   } = NAME_CONSTANTS;
-
-  const regionDropdownMenuItems = [
-    {
-      route: PROTECTED_ROUTES.createSuperAdmin,
-      menuText: 'Super Admin'
-    },
-    { route: PROTECTED_ROUTES.createRegion, menuText: regionModuleName }
-  ];
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,
@@ -107,7 +100,7 @@ const Region = (): React.ReactElement => {
     dispatch(clearRegionDetail());
     dispatch(clearDistrictDetails());
     dispatch(clearChiefdomDetail());
-    dispatch(clearSiteSummary());
+    dispatch(clearHFSummary());
     dispatch(clearClientRegistryStatus());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -198,9 +191,9 @@ const Region = (): React.ReactElement => {
               <span className='ms-sm-auto mb-sm-0 mb-1'>
                 <Searchbar placeholder={`Search ${regionModuleName}`} onSearch={onSearch} isOutlined={false} />
               </span>
-              <span className='ms-sm-1dot5'>
-                <Dropdown label='Create new' menuItems={regionDropdownMenuItems} />
-              </span>
+              <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
+                Create {regionModuleName}
+              </button>
             </>
           )}
         </div>
@@ -216,8 +209,10 @@ const Region = (): React.ReactElement => {
         {noRegionsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionModuleName} or super admin</div>
-            <Dropdown label='Create new' menuItems={regionDropdownMenuItems} className='mx-auto' />
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionModuleName}</div>
+            <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
+              Create {regionModuleName}
+            </button>
           </div>
         )}
         {noSearchResultAvailable && (
