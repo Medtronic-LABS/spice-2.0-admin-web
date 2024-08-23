@@ -31,7 +31,7 @@ const initialStateGetter = () =>
     user: userInitialStateGetter(),
     userRoles: {},
     isRolesLoading: false,
-    isResetPasswordLoading: false,
+    isUsernameLoading: false,
     error: null,
     loading: false,
     cultureListLoading: false,
@@ -139,7 +139,6 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         loading: true
       };
     case USERTYPES.RESET_PASSWORD_REQUEST:
-    case USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET:
       return {
         ...state,
         isResetPasswordLoading: true
@@ -152,12 +151,29 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         ...state,
         isResetPasswordLoading: false
       };
+    case USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET:
+      return {
+        ...state,
+        isUsernameLoading: true
+      };
+    case USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS:
+      return {
+        ...state,
+        isUsernameLoading: false
+      };
+    case USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL:
+      return {
+        ...state,
+        isUsernameLoading: false
+      };
     case USERTYPES.CHANGE_PASSWORD_FAILURE:
     case USERTYPES.CHANGE_PASSWORD_SUCCESS:
     case USERTYPES.CHANGE_OWN_PASSWORD_FAILURE:
     case USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS:
     case USERTYPES.USER_FORGOT_PASSWORD_SUCCESS:
     case USERTYPES.USER_FORGOT_PASSWORD_FAILURE:
+    case USERTYPES.RESET_PASSWORD_FAILURE:
+    case USERTYPES.RESET_PASSWORD_SUCCESS:
       return {
         ...state,
         loading: false

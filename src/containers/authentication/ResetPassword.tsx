@@ -45,6 +45,8 @@ const ResetPassword = (props: Props) => {
   const getUsername = useCallback(() => {
     const params = new URLSearchParams(document.location.search);
     const token = params.get('token') || '';
+    const params = new URLSearchParams(document.location.search);
+    const token = params.get('token') || '';
     dispatch(
       getUserName(
         token,
@@ -83,9 +85,7 @@ const ResetPassword = (props: Props) => {
 
   const { email } = props;
 
-  return isResetPasswordLoading ? (
-    <Loader />
-  ) : passwordState.isTokenValid ? (
+  return passwordState.isTokenValid ? (
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <div className={`${styles.brand} text-center`}>
