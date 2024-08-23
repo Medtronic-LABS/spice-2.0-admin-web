@@ -85,9 +85,7 @@ const ResetPassword = (props: Props) => {
 
   const { email } = props;
 
-  return isResetPasswordLoading ? (
-    <Loader />
-  ) : passwordState.isTokenValid ? (
+  return passwordState.isTokenValid ? (
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <div className={`${styles.brand} text-center`}>

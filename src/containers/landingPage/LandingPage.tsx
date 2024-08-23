@@ -85,7 +85,7 @@ const LandingPage = (): React.ReactElement => {
         <div className='row p-2'>
           <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
         </div>
-        <div className={`row ${styles.reportCardText} py-1`}>
+        <div className={`row ${styles.reportCardText} pb-1`}>
           <p>{name}</p>
         </div>
       </>
@@ -94,7 +94,7 @@ const LandingPage = (): React.ReactElement => {
 
   return (
     <div className={`position-relative ${styles.landingPageContainer}`}>
-      <div className='row'>
+      <div className='row justify-content-center'>
         {suites.map((data) => (
           <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
             {!data.hasDomain ? (
