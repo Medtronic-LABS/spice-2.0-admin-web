@@ -21,6 +21,7 @@ import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
 
 export interface IChiefdomFormValues {
+  village: string[];
   chiefdom: {
     name: string;
     district?: IDistrictOption;
@@ -98,10 +99,11 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
    * @param {IChiefdomFormValues} formValues - The form values containing the chiefdom and user data.
    */
 
-  const onSubmit = ({ chiefdom: { district, ...chiefdom }, users }: IChiefdomFormValues) => {
+  const onSubmit = ({ chiefdom: { district, ...chiefdom }, users, village }: IChiefdomFormValues) => {
     const payload = {
       ...chiefdom,
       name: chiefdom.name.trim(),
+      villages: village.map((e: string) => ({ name: e })),
       users: users.map((user: any) => {
         return {
           ...user,

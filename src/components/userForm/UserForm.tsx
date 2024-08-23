@@ -188,7 +188,7 @@ const UserForm = ({
       }
       if (!isSiteUser) {
         const [selectedAdminRole] = initialEditValue.role;
-        getSelectedAdmin(selectedAdminRole);
+        setSelectedAdmins(selectedAdminRole?.name);
       }
     }
   }, [initialEditValue, isHF, isEdit, isSuperAdmin, isSiteUser]);
@@ -234,15 +234,15 @@ const UserForm = ({
             (culture: { id: any }) => culture.id === (initialEditValue?.cultureId || APPCONSTANTS.DEFAULT_CULTURE.id)
           ),
         district:
-          initialEditValue?.organizations.filter(
+          initialEditValue?.organizations?.filter(
             (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
           ) || '',
         chiefdom:
-          initialEditValue?.organizations.filter(
+          initialEditValue?.organizations?.filter(
             (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.chiefdom
           ) || '',
         healthfacility:
-          initialEditValue?.organizations.filter(
+          initialEditValue?.organizations?.filter(
             (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.healthFacility
           ) || ''
       }
@@ -633,7 +633,7 @@ const UserForm = ({
     } else {
       setAutoFetchData(initialValue);
     }
-  }, [data, defaultSelectedRole, initialEditData, initialValue, isAdminForm, isEdit, rolesGrouped.SPICE]);
+  }, [defaultSelectedRole, initialEditData, initialValue, isAdminForm, isEdit, rolesGrouped.SPICE]);
 
   useEffect(() => {
     initData();
@@ -663,10 +663,6 @@ const UserForm = ({
       }
     });
     return filteredRoles || [];
-  };
-
-  const getSelectedAdmin = (value: any) => {
-    setSelectedAdmins(value.name);
   };
 
   const fetchDetails = useCallback(() => {
@@ -829,7 +825,7 @@ const UserForm = ({
                               // CHW User selection
                               isCHUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index, values);
-                              getSelectedAdmin(values);
+                              setSelectedAdmins(values?.name);
                               // fetch HF list based on CHW selection
                               if (isCHPSelected(values)) {
                                 if (!isEdit && !autoFetched[index]) {
@@ -865,7 +861,7 @@ const UserForm = ({
                             onChange={(values: any) => {
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, values]);
-                              getSelectedAdmin(values);
+                              setSelectedAdmins(values?.name);
                               // fetch HF list based on CHW selection
                               input.onChange(values);
                             }}

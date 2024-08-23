@@ -31,8 +31,8 @@ export const DynamicCHForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label='Select Peer Supervisor'
-                  errorLabel='select peer supervisor'
+                  label='Select Community health assistant'
+                  errorLabel='Community health assistant'
                   labelKey='name'
                   valueKey='id'
                   disabled={isProfile}
@@ -85,26 +85,26 @@ export const DynamicCHForm = ({
         </>
       )}
       {isChaUser && (
-          <div className='col-sm-6 col-12'>
-            <Field
-              name={`${name}.comunityUnit`}
-              type='text'
-              render={({ input, meta }) => (
-                <SelectInput
-                  {...(input as any)}
-                  label='Comunity Unit'
-                  errorLabel='comunityUnit'
-                  required={false}
-                  labelKey='name'
-                  valueKey='id'
-                  options={communityList}
-                  error={isError(meta)}
-                  isModel={true}
-                />
-              )}
-            />
-          </div>
-        )}
+        <div className='col-sm-6 col-12'>
+          <Field
+            name={`${name}.comunityUnit`}
+            type='text'
+            render={({ input, meta }) => (
+              <SelectInput
+                {...(input as any)}
+                label='Comunity Unit'
+                errorLabel='comunityUnit'
+                required={false}
+                labelKey='name'
+                valueKey='id'
+                options={communityList}
+                error={isError(meta)}
+                isModel={true}
+              />
+            )}
+          />
+        </div>
+      )}
     </>
   );
 };
