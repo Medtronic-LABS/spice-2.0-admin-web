@@ -92,8 +92,7 @@ export const updatePassword = (data: { userId: number; oldPassword: string; newP
 export const forgotPassword = (username: string) =>
   axios({
     method: 'post',
-    url: `/user-service/user/forgot-password/${username}/${APPCONSTANTS.APP_TYPE}`,
-    data: username
+    url: `/user-service/user/forgot-password/${username}/${APPCONSTANTS.APP_TYPE}`
   });
 
 export const resetPasswordReq = (data: { email: string; password: string }, token: string) =>

@@ -10,19 +10,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
-import {
-  downloadFileRequest,
-  uploadFileRequest,
-  regionDetailsRequest,
-  fetchCountryDetailReq
-} from '../../store/region/actions';
-import {
-  getIsUploadingSelector,
-  getLoadingSelector,
-  getRegionDetailsSelector,
-  getRegionIdSelector
-} from '../../store/region/selectors';
-import toastCenter from '../../utils/toastCenter';
+import { downloadFileRequest, regionDetailsRequest, uploadFileRequest } from '../../store/region/actions';
+import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import arrayMutators from 'final-form-arrays';
 import { fileDownload } from '../../utils/commonUtils';
@@ -82,7 +72,9 @@ const Region = (): React.ReactElement => {
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           search: listParams.searchTerm,
-          failureCb: (e) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DETAIL_FETCH_ERROR)
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DETAIL_FETCH_ERROR));
+          }
         })
       );
     }

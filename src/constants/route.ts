@@ -3,7 +3,7 @@ import APPCONSTANTS from './appConstants';
 export const PUBLIC_ROUTES = {
   login: '/',
   forgotPassword: '/forgot-password',
-  resetPassword: '/reset-password/:token',
+  resetPassword: '/reset-password',
   privacyPolicy: '/privacy-policy'
 };
 

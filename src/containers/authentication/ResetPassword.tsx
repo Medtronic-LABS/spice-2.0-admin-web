@@ -40,7 +40,8 @@ const ResetPassword = (props: Props) => {
   }, [props.history]);
 
   const getUsername = useCallback(() => {
-    const { token } = props.match.params;
+    const params = new URLSearchParams(document.location.search);
+    const token = params.get('token') || '';
     dispatch(
       getUserName(
         token,
@@ -79,7 +80,7 @@ const ResetPassword = (props: Props) => {
 
   const { email } = props;
 
-  return (
+  return passwordState.isTokenValid ? (
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <div className={`${styles.brand} text-center`}>
@@ -106,6 +107,8 @@ const ResetPassword = (props: Props) => {
         </div>
       </div>
     </div>
+  ) : (
+    <></>
   );
 };
 
