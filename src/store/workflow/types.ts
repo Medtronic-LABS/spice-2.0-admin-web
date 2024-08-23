@@ -3,7 +3,7 @@ import { ITimezone } from '../user/types';
 import * as ACTION_TYPES from './actionTypes';
 
 export type FormLogType = 'screeninglog' | 'bplog' | 'glucoselog' | 'patient';
-export type FormType = 'screening' | 'enrollment' | 'assessment' | 'Module';
+export type FormType = 'Screening' | 'Enrollment' | 'Assessment' | 'Module';
 
 export interface IWorkflowModuleReqPayload {
   name?: string;

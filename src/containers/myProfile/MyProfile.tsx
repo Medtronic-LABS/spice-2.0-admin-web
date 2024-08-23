@@ -7,12 +7,13 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import UserForm from '../../components/userForm/UserForm';
 import ModalForm from '../../components/modal/ModalForm';
 import Loader from '../../components/loader/Loader';
-import { userDataSelector, userIdSelector } from '../../store/user/selectors';
+import { countryIdSelector, userIdSelector } from '../../store/user/selectors';
 import { IUserRole } from '../../store/healthFacility/types';
 import { fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
 import { IEditUserDetail, IRoles } from '../../store/user/types';
+import sessionStorageServices from '../../global/sessionStorageServices';
 
 const MyProfile = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -22,7 +23,8 @@ const MyProfile = (): React.ReactElement => {
   const [loading, setLoading] = useState<boolean>(false);
   const userForEdit = useRef({ users: [] as IEditUserDetail[] });
 
-  const regionData = useSelector(userDataSelector);
+  const country = useSelector(countryIdSelector);
+  const countryId = Number(country?.id || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID));
   const formatRoles = (user: IEditUserDetail) =>
     `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
 
@@ -62,7 +64,8 @@ const MyProfile = (): React.ReactElement => {
       {
         label: 'Role',
         value: formatRoles(userDetails || ({} as IEditUserDetail))
-      }
+      },
+      { label: 'Timezone', value: userDetails?.timezone?.description, colClassName: 'col-12 col-sm-12' }
     ];
     if (userDetails?.id && (userDetails.roles || []).some((userRole: IUserRole) => userRole.name === 'CHW')) {
       data.push(
@@ -88,6 +91,9 @@ const MyProfile = (): React.ReactElement => {
         ...postData.supervisor,
         name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
       };
+      postData.country = {
+        phoneNumberCode: postData.countryCode
+      };
       userForEdit.current = { users: [postData] as IEditUserDetail[] };
     }
   }, [userDetails]);
@@ -97,14 +103,18 @@ const MyProfile = (): React.ReactElement => {
   }, []);
 
   const handleEdit = ({ users: [user] }: { users: IEditUserDetail[] }) => {
+    const [roleId] = user?.roles;
     const payload = {
       id: user.id,
+      firstName: user.firstName.trim(),
+      lastName: user.lastName.trim(),
       gender: user.gender,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      countryCode: user?.country?.phoneNumberCode,
       phoneNumber: user.phoneNumber,
-      timezone: []
+      username: user.email,
+      countryCode: user?.country?.phoneNumberCode,
+      country: { id: countryId },
+      roleIds: [roleId?.id],
+      timezone: { id: Number(user.timezone.id) }
     };
     setLoading(true);
     dispatch(
@@ -156,7 +166,7 @@ const MyProfile = (): React.ReactElement => {
               disableOptions={true}
               isProfile={true}
               isEdit={true}
-              countryId={regionData?.country?.id}
+              countryId={countryId}
             />
           );
         }}

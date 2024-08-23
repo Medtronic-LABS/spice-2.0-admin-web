@@ -133,6 +133,13 @@ export const fetchLockedUsers = (
     }
   });
 
+export const unlockUsers = (id: string) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/unlock',
+    data: { id }
+  });
+
 export const fetchCommunityListRequest = (countryId: number) =>
   axios({
     method: 'POST',

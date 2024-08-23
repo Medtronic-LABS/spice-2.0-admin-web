@@ -37,7 +37,7 @@ export const PROTECTED_ROUTES = {
   chiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom',
   chiefdomSummary: '/chiefdom/:chiefdomId/:tenantId',
 
-  healthFacilityDashboard: '/site',
+  healthFacilityDashboard: '/health-facility',
   healthFacilitySummary: '/health-facility/:healthFacilityId/:tenantId',
   healthFacilityByRegion: '/region/:regionId/:tenantId/health-facility',
   healthFacilityByDistrict: '/district/:districtId/:tenantId/health-facility',

@@ -211,6 +211,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
         tenantBased: true,
+        siteUsers: true,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();
@@ -521,7 +522,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
                 {
                   id: 1,
                   name: 'name',
-                  label: 'ADMIN NAME',
+                  label: 'NAME',
                   width: '20%',
                   cellFormatter: formatName
                 },

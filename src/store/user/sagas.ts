@@ -7,6 +7,7 @@ import {
   IFetchUserByIdRequest,
   IFetchUserRolesRequest,
   ILoginRequest,
+  IUnlockUsersRequest,
   IUpdateUserRequest,
   IUser
 } from './types';
@@ -365,6 +366,22 @@ export function* fetchCommunityListRequest(action: IActionProps): SagaIterator {
 }
 
 /*
+  Worker Saga: Fired on UNLOCK_USERS_REQUEST action
+*/
+export function* unlockUsers({ userId, successCb, failureCb }: IUnlockUsersRequest): SagaIterator {
+  try {
+    yield call(userService.unlockUsers as any, userId);
+    successCb?.();
+    yield put(userActions.unlockUsersSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(userActions.unlockUsersFailure());
+    }
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
@@ -383,6 +400,7 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
   yield all([takeLatest(USERTYPES.FETCH_LOCKED_USERS_REQUEST, fetchLockedUsers)]);
   yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST_REQUEST, fetchCommunityListRequest)]);
+  yield all([takeLatest(USERTYPES.UNLOCK_USERS_REQUEST, unlockUsers)]);
 }
 
 export default userSaga;

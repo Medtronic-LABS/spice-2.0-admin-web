@@ -23,9 +23,7 @@ const EmailField = forwardRef(
       clearEmail = false,
       isDisabled = false,
       enableAutoPopulate,
-      onFindExistingUser,
-      parentOrgId,
-      tenantId
+      onFindExistingUser
     }: {
       isEdit: boolean | undefined;
       name: string;
@@ -37,8 +35,6 @@ const EmailField = forwardRef(
       entityName?: string;
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
-      parentOrgId?: string;
-      tenantId?: string;
     },
     ref
   ) => {
@@ -57,7 +53,6 @@ const EmailField = forwardRef(
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [validating, setValidating] = useState(!isEdit);
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
@@ -79,12 +74,12 @@ const EmailField = forwardRef(
     );
 
     const validateIsEmailExist = useCallback(
-      () =>
+      (email: string) =>
         error ||
-        (validating && !submitEnabledStatus.current
+        (!submitEnabledStatus.current && lastCheckedEmail.current !== email
           ? ' ' // blank space is given as error to block submition till the user already exist validation is completed
           : ''),
-      [error, validating]
+      [error]
     );
 
     const clearEmailFn = useCallback(() => {
@@ -140,7 +135,6 @@ const EmailField = forwardRef(
         } else if (!data?.username) {
           setError('');
         }
-        setValidating(false);
         setLoading(false);
         lastCheckedEmail.current = email;
         form.change?.(`${name}.email`, email + ' '); // to trigger onchange space added
@@ -155,10 +149,12 @@ const EmailField = forwardRef(
           if (!isValidEmail(email, checkSameEmailAgain)) {
             return;
           }
-          setValidating(true);
           setLoading(true);
-          await fetchUserByEmail(email).then((res) => fetchUserByEmailResFn(res, email));
-          submitEnabledStatus.current = true;
+          await fetchUserByEmail(email).then((res) => {
+            submitEnabledStatus.current = true;
+            fetchUserByEmailResFn(res, email);
+          });
+
           setNetworkError(false);
         } catch (e: any) {
           setLoading(false);

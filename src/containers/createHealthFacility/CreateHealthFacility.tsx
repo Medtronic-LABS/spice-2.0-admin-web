@@ -1,6 +1,6 @@
 import { FormApi, Tools } from 'final-form';
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
 import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import FormContainer from '../../components/formContainer/FormContainer';
@@ -22,9 +22,12 @@ import {
   workflowListSelector,
   workflowLoadingSelector
 } from '../../store/healthFacility/selectors';
+import { roleSelector, countryIdSelector } from '../../store/user/selectors';
 
 interface IMatchParams {
   regionId?: string;
+  districtId?: string;
+  chiefdomId?: string;
   tenantId: string;
 }
 
@@ -50,7 +53,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
 
   const [autoFetch, setAutoFetchState] = useState([] as any[]);
 
-  const { regionId, tenantId } = props.match.params;
+  const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
+  const country = useSelector(countryIdSelector);
+  const countryId = Number(regionId || country?.id);
+  const role = useSelector(roleSelector);
 
   useEffect(() => {
     return () => {
@@ -70,8 +76,15 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   };
 
   const onGotoList = () => {
-    const url = PROTECTED_ROUTES.healthFacilityByRegion;
-    history.push(url.replace(':tenantId', tenantId).replace(/(:regionId)/, regionId as string));
+    const url = ((regionId && PROTECTED_ROUTES.healthFacilityByRegion) ||
+      (districtId && PROTECTED_ROUTES.healthFacilityByDistrict) ||
+      (chiefdomId && role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN && PROTECTED_ROUTES.healthFacilityDashboard) ||
+      (chiefdomId && PROTECTED_ROUTES.healthFacilityByChiefdom)) as string;
+    history.push(
+      url
+        .replace(':tenantId', tenantId)
+        .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
+    );
   };
 
   /**
@@ -107,10 +120,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
    * @param values
    */
   const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
-    if (submittedData.isNextClicked && regionId) {
+    if (submittedData.isNextClicked && countryId) {
       const postData = {
-        ...formatHealthFacility({ ...healthFacility }, regionId),
-        users: formatHFUserData(users, regionId)
+        ...formatHealthFacility({ ...healthFacility }, countryId),
+        users: formatHFUserData(users, countryId)
       };
       if (postData.clinicalWorkflowIds.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
@@ -119,7 +132,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       if (!workflows.length) {
         dispatch(
           fetchWorkflowListRequest({
-            countryId: Number(regionId),
+            countryId,
             successCb: (flows) => {
               setSubmittedData({
                 data: { healthFacility: { ...healthFacility, workflows: flows.map((v: any) => v.id) }, users },
@@ -171,9 +184,9 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                       </FormContainer>
                     </div>
                     <div className='col-lg-6 col-12'>
-                      <FormContainer label='Add User' icon={SiteAddUserIcon}>
+                      <FormContainer label='Add Health Facility Admin' icon={SiteAddUserIcon}>
                         <UserForm
-                          countryId={Number(regionId)}
+                          countryId={countryId}
                           form={form}
                           enableAutoPopulate={true}
                           isHF={true}

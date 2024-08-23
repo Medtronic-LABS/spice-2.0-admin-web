@@ -10,7 +10,7 @@ export interface IChiefdom {
 export interface IChiefdomSummary {
   id: string;
   name: string;
-  siteCount: number;
+  healthFacilityCount: number;
   groupCount: number;
   tenantId: string;
 }

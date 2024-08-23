@@ -78,7 +78,7 @@ import {
   IPeerSupervisorValidation,
   IChiefdom,
   IDistrict,
-  IClearSiteSummary,
+  IClearHFSummary,
   IFetchHFDashboardListRequest,
   IFetchHFDashboardListSuccessPayload,
   IFetchHFDashboardListSuccess,
@@ -179,7 +179,7 @@ export const clearAllDependentData = (): IClearDependentData => ({
   type: HF_TYPES.CLEAR_ALL_DEPENDENT_DATA
 });
 
-export const clearHFSummary = (): IClearSiteSummary => ({
+export const clearHFSummary = (): IClearHFSummary => ({
   type: HF_TYPES.CLEAR_HF_SUMMARY
 });
 
@@ -362,6 +362,7 @@ export const fetchHFUserListRequest = ({
   searchTerm,
   roleNames,
   siteUsers,
+  tenantId,
   tenantIds,
   successCb,
   failureCb
@@ -373,6 +374,7 @@ export const fetchHFUserListRequest = ({
   searchTerm,
   roleNames,
   siteUsers,
+  tenantId,
   tenantIds,
   successCb,
   failureCb
@@ -604,4 +606,8 @@ export const fetchCountryListSuccess = (payload: IFetchCountryListSuccessPayload
 
 export const fetchCountryListFailure = (): IFetchCountryListFailure => ({
   type: HF_TYPES.FETCH_COUNTRY_LIST_FAILURE
+});
+
+export const clearHFDropdown = () => ({
+  type: HF_TYPES.CLEAR_HF_DROPDOWN_OPTIONS
 });

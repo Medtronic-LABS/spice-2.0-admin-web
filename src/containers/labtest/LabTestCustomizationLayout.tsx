@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
 
-import { formMetaSelector } from '../../store/workflow/selectors';
+import { getFormMetaSelector } from '../../store/workflow/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import Loader from '../../components/loader/Loader';
@@ -30,7 +30,7 @@ const LabTestCustomizationLayout = () => {
   const { tenantId, regionId, labTestName, identifier: uniqueName, testId: formId } = useParams<IMatchParams>();
   const testName = decodeURIComponent(labTestName);
   const uniqueId = decodeURIComponent(uniqueName);
-  const formGetMeta = useSelector(formMetaSelector) || [];
+  const formGetMeta = useSelector(getFormMetaSelector) || [];
   const loading = useSelector(labTestJSONLoadingSelector);
 
   const {

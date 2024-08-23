@@ -7,7 +7,6 @@ import workflowReducer from './workflow/reducer';
 import labtestReducer from './labTest/reducer';
 import districtReducer from './district/reducer';
 import chiefdomReducer from './chiefdom/reducer';
-import healthFacilityDashboardReducer from './healthFacilityDashboard/reducer';
 import programReducer from './program/reducer';
 import commonReducer from './common/reducer';
 
@@ -20,7 +19,6 @@ const appReducer = combineReducers({
   workflow: workflowReducer,
   district: districtReducer,
   chiefdom: chiefdomReducer,
-  healthFacilityDashboardReducer,
   program: programReducer,
   common: commonReducer
 });

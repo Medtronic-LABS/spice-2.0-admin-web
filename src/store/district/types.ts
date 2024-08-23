@@ -200,8 +200,8 @@ export interface IFetchDashboardDistrict {
 export interface IDashboardDistrict {
   id: string;
   name: string;
-  ouCount: number;
-  siteCount: number;
+  chiefdomCount: number;
+  healthFacilityCount: number;
   tenantId: string;
 }
 

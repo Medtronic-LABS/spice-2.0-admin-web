@@ -653,6 +653,9 @@ const UserForm = ({
 
   const getAdminRoles = () => {
     const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
+      if (roleData.name === 'RED_RISK_USER' || roleData.displayName === null) {
+        return false;
+      }
       if (isSiteUser) {
         return roleData.suiteAccessName.toLowerCase() !== APPCONSTANTS.spiceRole.spice;
       } else {
