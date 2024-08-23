@@ -40,6 +40,25 @@ const APPCONSTANTS = {
     REPORT_ADMIN: 'REPORT_ADMIN',
     SITE_ADMIN: 'SITE_ADMIN'
   },
+  ALL_ROLES: {
+    SUPER_USER: 'SUPER_USER',
+    SUPER_ADMIN: 'SUPER_ADMIN',
+    REGION_ADMIN: 'REGION_ADMIN',
+    DISTRICT_ADMIN: 'DISTRICT_ADMIN',
+    CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN',
+    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
+    HEALTH_COACH: 'HEALTH_COACH',
+    HEALTH_SCREENER: 'HEALTH_SCREENER',
+    HRIO: 'HRIO',
+    LAB_TECHNICIAN: 'LAB_TECHNICIAN',
+    NUTRITIONIST: 'NUTRITIONIST',
+    COUNSELOR: 'COUNSELOR',
+    PHARMACIST: 'PHARMACIST',
+    PROVIDER: 'PROVIDER',
+    NURSE: 'NURSE',
+    PHYSICIAN_PRESCRIBER: 'PHYSICIAN_PRESCRIBER',
+    REPORT_ADMIN: 'REPORT_ADMIN'
+  },
   ROUTE_NAMES: {
     REGION: 'region',
     DISTRICT: 'district',
@@ -52,7 +71,7 @@ const APPCONSTANTS = {
   CHIEFDOM_PER_PAGE: 15,
   SUPERADMINS_PER_PAGE: 10,
   DISTRICT_PER_PAGE: 10,
-  SITES_PER_PAGE: 15,
+  HF_PER_PAGE: 15,
   LINK_EXPIRED: 'Link has expired.',
   ALERT: 'Alert',
   PASSWORD_SET_SUCCESS: 'Password has been set successfully.',
@@ -73,11 +92,11 @@ const APPCONSTANTS = {
   REGION_CREATION_ERROR: 'Unable to create region. Please try after sometime.',
   REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
   REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
-  // DISTRICT
+
   ACTIVATE_ACCOUNT_CONFIRMATION: 'Are you sure want to activate the account?',
   ACTIVATE_ACCOUNT_TITLE: 'Activate Account',
-  ACCOUNT_DISTRICT_SUCCESS: 'Account activated successfully.',
-  ACCOUNT_DISTRICT_FAIL: 'Unable to activate the account. Please try after sometime.',
+  ACTIVATE_ACCOUNT_SUCCESS: 'Account activated successfully.',
+  ACCOUNT_ACCOUNT_FAIL: 'Unable to activate the account. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
@@ -87,6 +106,7 @@ const APPCONSTANTS = {
   ACCOUNT_WORKFLOW_DELETE_SUCCESS: 'Account workflow module deleted successfully.',
   ACCOUNT_WORKFLOW_DELETE_ERROR: 'Unable to delete the account workflow. Please try after sometime.',
   ACCOUNT_WORKFLOW_ALREADY_EXISTS: 'Account workflow name already exists.',
+  // DISTRICT
   DISTRICT_UPDATE_SUCCESS: 'Module_Name name updated successfully.',
   DISTRICT_UPDATE_FAIL: 'Unable to update module_name summary. Please try after sometime.',
   DISTRICT_DEACTIVATE_SUCCESS: 'Module_Name deactivated successfully.',
@@ -346,7 +366,7 @@ const APPCONSTANTS = {
     { value: 'PHYSICIAN_PRESCRIBER', label: 'Physician Prescriber' },
     { value: 'PROVIDER', label: 'Provider' },
     { value: 'COUNSELOR', label: 'Counselor' },
-    { value: 'SITE_ADMIN', label: 'Site Admin' }
+    { value: 'HEALTH_FACILITY_ADMIN', label: 'Health Facility Admin' }
   ],
   // utils
 
@@ -375,10 +395,23 @@ export const NAME_CONSTANTS = {
 };
 
 export const ROLE_LABELS = {
-  [APPCONSTANTS.ROLES.SUPER_USER]: 'Super User',
-  [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
-  [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
+  [APPCONSTANTS.ALL_ROLES.SUPER_USER]: 'Super User',
+  [APPCONSTANTS.ALL_ROLES.SUPER_ADMIN]: 'Super Admin',
+  [APPCONSTANTS.ALL_ROLES.REGION_ADMIN]: 'Region Admin',
+  [APPCONSTANTS.ALL_ROLES.DISTRICT_ADMIN]: 'District Admin',
+  [APPCONSTANTS.ALL_ROLES.CHIEFDOM_ADMIN]: 'Chiefdom Admin',
+  [APPCONSTANTS.ALL_ROLES.HEALTH_COACH]: 'Health Coach',
+  [APPCONSTANTS.ALL_ROLES.HEALTH_SCREENER]: 'Health Screener',
+  [APPCONSTANTS.ALL_ROLES.HRIO]: 'HRIO',
+  [APPCONSTANTS.ALL_ROLES.LAB_TECHNICIAN]: 'Lab Technician',
+  [APPCONSTANTS.ALL_ROLES.COUNSELOR]: 'Counselor',
+  [APPCONSTANTS.ALL_ROLES.NUTRITIONIST]: 'Nutritionist',
+  [APPCONSTANTS.ALL_ROLES.PHARMACIST]: 'Pharmacist',
+  [APPCONSTANTS.ALL_ROLES.PROVIDER]: 'Provider',
+  [APPCONSTANTS.ALL_ROLES.NURSE]: 'Nurse',
+  [APPCONSTANTS.ALL_ROLES.PHYSICIAN_PRESCRIBER]: 'Physician Prescriber',
+  [APPCONSTANTS.ALL_ROLES.REPORT_ADMIN]: 'Report Admin',
+  [APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN]: 'Health Facility Admin'
 };
 
 // used in sidemenu, admin and user module

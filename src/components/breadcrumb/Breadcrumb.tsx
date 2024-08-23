@@ -219,8 +219,8 @@ const Breadcrumb = (): React.ReactElement => {
       result.push({
         label: healthFacility.name,
         route: PROTECTED_ROUTES.healthFacilitySummary
-          .replace(':healthFacilityId', healthFacility.id.toString())
-          .replace(':tenantId', healthFacility.tenantId.toString())
+          .replace(':healthFacilityId', healthFacility.id?.toString())
+          .replace(':tenantId', healthFacility.tenantId?.toString())
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {

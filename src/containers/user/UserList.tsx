@@ -67,7 +67,9 @@ const UserList = (): React.ReactElement => {
   const [selectedRole, setSelectedRole] = useState<string[]>();
 
   const spiceUserRole = rolesGrouped?.SPICE?.filter(
-    (data: { suiteAccessName: string }) => data.suiteAccessName !== 'spice web'
+    (data: { suiteAccessName: string; name: string; displayName: string }) =>
+      data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
+      (data.name !== 'RED_RISK_USER' || data.displayName !== null)
   );
 
   const refreshHFUserList = useCallback(() => {
@@ -79,6 +81,7 @@ const UserList = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         roleNames: selectedRole || [],
         siteUsers: true,
+        tenantId,
         tenantIds: selectedFacility || [],
         failureCb: (e: Error) => {
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
@@ -92,6 +95,7 @@ const UserList = (): React.ReactElement => {
     listParams.rowsPerPage,
     listParams.searchTerm,
     selectedRole,
+    tenantId,
     selectedFacility
   ]);
 

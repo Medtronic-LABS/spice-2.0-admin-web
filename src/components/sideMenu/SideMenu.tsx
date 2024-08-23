@@ -124,9 +124,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
 
   useEffect(() => {
     return () => {
-      if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-        dispatch(clearSideMenu());
-      }
+      dispatch(clearSideMenu());
     };
   }, []);
 

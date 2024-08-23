@@ -72,7 +72,7 @@ export const initialState: IHealthFacilityState = {
     {
       id: 0,
       name: '',
-      siteType: '',
+      type: '',
       tenantId: 0,
       chiefdom: ''
     }

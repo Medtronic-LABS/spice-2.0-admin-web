@@ -17,6 +17,7 @@ export default function Header() {
   const lastName: string = useSelector(lastNameSelector) || '';
   const role = useSelector(roleSelector);
   const roleDetail = useSelector(roleDetailSelector);
+  const roleDisplayName = roleDetail?.displayName;
   return (
     <div>
       <nav
@@ -40,7 +41,7 @@ export default function Header() {
               <div className={`lh-1dot375 text-capitalize ${styles.name}`}>
                 {firstName || lastName ? `${firstName} ${lastName}` : 'Settings'}
               </div>
-              <div className='subtle-small-text'>{roleDetail?.displayName || ''}</div>
+              <div className='subtle-small-text'>{roleDisplayName || ROLE_LABELS[role]}</div>
             </div>
             <img src={CaretDownIcon} alt='' className='ms-0dot625' />
           </div>

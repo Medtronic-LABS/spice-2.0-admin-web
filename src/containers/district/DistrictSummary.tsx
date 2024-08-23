@@ -299,7 +299,6 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         .replace(':tenantId', sessionStorageServices.getItem(APPCONSTANTS.ID));
     }
     history.push(redirectTo);
-    history.push(PROTECTED_ROUTES.dashboard);
   };
 
   const handleDeactivate = (values: IDistrictDeactivateFormValues) => {

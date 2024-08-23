@@ -6,20 +6,19 @@ import { FormApi } from 'final-form';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS, { NAMING_VARIABLES, NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { columnDef } from './adminListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
-import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { countryIdSelector, emailSelector, userRolesSelector } from '../../store/user/selectors';
 import {
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
   deleteHFUserRequest,
-  fetchHFListRequest,
   fetchHFUserListRequest,
   fetchUserDetailRequest,
   updateHFUserRequest
@@ -27,7 +26,6 @@ import {
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   healthFacilityListUsersTotalSelector,
-  healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
   healthFacilityUsersLoadingSelector,
   userDetailLoadingSelector
@@ -49,18 +47,16 @@ const UserList = (): React.ReactElement => {
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
-  const role = useSelector(roleSelector);
   const email = useSelector(emailSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
   const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
-  const loading = useSelector(healthFacilityLoadingSelector);
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
-  const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const { chiefdom: chiefdomModuleName, district: districtModuleName } = NAME_CONSTANTS;
   const [selectedRole, setSelectedRole] = useState<string[]>();
+  const [adminSubmitLoading, setAdminSubmitLoading] = useState<boolean>(false);
 
   const refreshHFUserList = useCallback(
     () =>
@@ -72,12 +68,13 @@ const UserList = (): React.ReactElement => {
           searchTerm: listParams.searchTerm,
           roleNames: selectedRole || [],
           siteUsers: false,
+          tenantId,
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
           }
         })
       ),
-    [dispatch, countryIdValue, listParams.page, listParams.rowsPerPage, listParams.searchTerm, selectedRole]
+    [dispatch, countryIdValue, listParams.page, listParams.rowsPerPage, listParams.searchTerm, selectedRole, tenantId]
   );
 
   useEffect(() => {
@@ -177,6 +174,7 @@ const UserList = (): React.ReactElement => {
       : APPCONSTANTS.ADMIN_DETAILS_CREATE_SUCCESS;
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
+    setAdminSubmitLoading(false);
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
   }, [isOpenUserModal.isEdit, refreshHFUserList]);
 
@@ -201,12 +199,14 @@ const UserList = (): React.ReactElement => {
       const [selectedUser] = users;
       const userObj = formatHFUserData(users, countryIdValue, tenantId || selectedUser.district?.tenantId);
       const data: IHFUserPost = userObj[0];
+      setAdminSubmitLoading(true);
       onSubmitHandler(
         data,
         isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
         null,
         adminSuccess,
         (e) => {
+          setAdminSubmitLoading(false);
           toastCenter.error(
             ...getErrorToastArgs(
               e,
@@ -264,33 +264,13 @@ const UserList = (): React.ReactElement => {
     );
   };
 
-  const requestFailure = (e: Error, errorMessage: string) =>
-    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, errorMessage));
-
-  const fetchList = useCallback(() => {
-    dispatch(
-      fetchHFListRequest({
-        countryId: countryIdValue,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: null,
-        searchTerm: listParams.searchTerm,
-        userBased: !isSuperUser,
-        failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
-      })
-    );
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
-
-  useEffect(() => {
-    fetchList();
-  }, [listParams, dispatch, fetchList]);
-
   const roleSpiceList = rolesGrouped?.SPICE?.filter(
     (data: { suiteAccessName: string }) => data.suiteAccessName === 'spice web'
   );
 
   return (
     <>
-      {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
+      {(hfUserLoading || hfUserDetailLoading || adminSubmitLoading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add Admin'

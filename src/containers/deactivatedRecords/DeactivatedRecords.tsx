@@ -61,10 +61,10 @@ const DeactivatedRecords = (): React.ReactElement => {
         data: { tenantId: Number(value?.tenantId) },
         successCb: () => {
           fetchDetails();
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_DISTRICT_SUCCESS);
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACTIVATE_ACCOUNT_SUCCESS);
         },
         failureCb: (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_DISTRICT_FAIL));
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_ACCOUNT_FAIL));
         }
       })
     );

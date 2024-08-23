@@ -18,7 +18,7 @@ import DistrictAdminFormIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { userDataSelector } from '../../store/user/selectors';
+import { countryIdSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface IDistrictFormValues {
@@ -38,8 +38,7 @@ const CreateDistrict: React.FC = () => {
   const formInstance = useRef<FormApi<IDistrictFormValues> | undefined>(undefined);
 
   const loading = useSelector((state: AppState) => state.district.loading);
-  const userData = useSelector(userDataSelector);
-  const countryId = userData?.id;
+  const countryId = useSelector(countryIdSelector)?.id;
   const { district: districtModuleName } = NAME_CONSTANTS;
 
   const resetFields = useCallback(([subStrOfKey]: [string], state: any, utils: Tools<IDistrictFormValues>) => {

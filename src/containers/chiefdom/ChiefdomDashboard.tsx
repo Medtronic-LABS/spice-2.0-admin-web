@@ -118,14 +118,14 @@ const ChiefdomDashboard = () => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      chiefdomDashboardList?.map(({ siteCount, name, id, tenantId }: IChiefdomSummary) => ({
+      chiefdomDashboardList?.map(({ healthFacilityCount, name, id, tenantId }: IChiefdomSummary) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.chiefdomSummary.replace(':chiefdomId', id).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit(id, tenantId, name),
         data: [
           {
             type: 'number',
-            value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
+            value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
             label: 'Site',
             disableEllipsis: true,
             route: PROTECTED_ROUTES.healthFacilityByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
