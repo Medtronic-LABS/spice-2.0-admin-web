@@ -126,6 +126,13 @@ const Login = (props: any): React.ReactElement => {
                       errorLabel='password'
                       error={(meta.touched && meta.error) || undefined}
                       className={styles.passwordBox}
+                      onChange={(e) => {
+                        initialFormValues.current = {
+                          ...initialFormValues.current,
+                          password: e.target.value
+                        };
+                        input.onChange(e);
+                      }}
                     />
                   )}
                 />
