@@ -63,15 +63,15 @@ const LandingPage = (): React.ReactElement => {
         icon: InsightsLogo,
         hasDomain: true,
         suiteAccessName: INSIGHTS,
-        domainUrl: ''
+        domainUrl: undefined
       }
     ],
     [regionId, tenantId, role]
   );
 
   useEffect(() => {
-    const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite: ISpiceSuite) =>
-      userSuiteAccess.includes(suite.suiteAccessName)
+    const authorisedSuites: ISpiceSuite[] = spiceSuites.filter(
+      (suite: ISpiceSuite) => userSuiteAccess.includes(suite.suiteAccessName) || suite.name === 'Insights'
     );
     if (authorisedSuites.length === 1) {
       const { hasDomain, domainUrl } = authorisedSuites[0];

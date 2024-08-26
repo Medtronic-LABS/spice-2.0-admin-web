@@ -7,8 +7,10 @@ import { PUBLIC_ROUTES } from '../../constants/route';
 import { useCallback, useEffect, useState } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
 import { info } from '../../utils/toastCenter';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getUserName, resetPassword } from '../../store/user/actions';
+import { resetPasswordLoadingSelector } from '../../store/user/selectors';
+import Loader from '../../components/loader/Loader';
 
 interface IRouteProps extends RouteComponentProps<{ token: string }> {}
 interface IResetPasswordState {
@@ -27,6 +29,7 @@ type Props = IRouteProps & IStateProps;
 
 const ResetPassword = (props: Props) => {
   const dispatch = useDispatch();
+  const isResetPasswordLoading = useSelector(resetPasswordLoadingSelector);
 
   const [passwordState, setPasswordState] = useState<IResetPasswordState>({
     isTokenValid: false,
@@ -80,7 +83,9 @@ const ResetPassword = (props: Props) => {
 
   const { email } = props;
 
-  return passwordState.isTokenValid ? (
+  return isResetPasswordLoading ? (
+    <Loader />
+  ) : passwordState.isTokenValid ? (
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <div className={`${styles.brand} text-center`}>
