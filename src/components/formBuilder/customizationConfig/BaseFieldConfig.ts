@@ -127,14 +127,6 @@ export const baseFieldMeta: IBaseFieldMeta = {
     label: 'Target Fields',
     component: 'TARGET_VIEWS'
   },
-  defaultValue: {
-    order: 5.2,
-    label: 'Default Value',
-    required: false,
-    labelKey: 'name',
-    valueKey: 'id',
-    component: 'SELECT_INPUT'
-  },
   minDays: {
     order: 5.3,
     label: 'Min Days',
