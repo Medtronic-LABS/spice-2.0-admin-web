@@ -101,6 +101,27 @@ export interface ICountry {
   tenantId?: number;
 }
 
+export interface IUserState {
+  isLoggedIn: boolean;
+  loggingIn: boolean;
+  loggingOut: boolean;
+  user: IUser;
+  defaultRole: string[];
+  userRoles: IGroupRoles;
+  isRolesLoading: boolean;
+  error: string | null;
+  loading: boolean;
+  cultureListLoading?: boolean;
+  initializing: boolean;
+  isPasswordSet: boolean;
+  email: string;
+  errorMessage: string;
+  showLoader: boolean;
+  token: string;
+  userTenantId: string;
+  isResetPasswordLoading: boolean;
+}
+
 export type ILoginSuccessPayload = IUser;
 
 export interface ILoginFailurePayload {
