@@ -225,7 +225,6 @@ export const baseFieldMeta: IBaseFieldMeta = {
   isAboveUpperLimit: { order: 13, label: 'Is Above Upper Limit', component: 'CHECKBOX' },
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },
-  isEnabled: { order: 15, label: 'Is Enabled', component: 'CHECKBOX' },
   isResult: { order: 15.6, label: 'Is Result', component: 'CHECKBOX' },
   disableFutureDate: { order: 15.2, label: 'Disable Future Dates', component: 'CHECKBOX' },
   isNeedAction: { order: 15.3, label: 'Action Needed', component: 'CHECKBOX' },

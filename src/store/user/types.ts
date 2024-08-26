@@ -123,7 +123,7 @@ export interface IUserState {
   showLoader: boolean;
   token: string;
   userTenantId: string;
-  communityList: [];
+  isResetPasswordLoading: boolean;
 }
 
 export type ILoginSuccessPayload = IUser;
