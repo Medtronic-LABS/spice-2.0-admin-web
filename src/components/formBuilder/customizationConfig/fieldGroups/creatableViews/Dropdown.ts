@@ -6,7 +6,6 @@ import { IComponentConfig, IFieldViewType } from '../../../types/CustomizationCo
 export interface IDropdownFields extends IBaseFields {
   hint?: string;
   visibility: string;
-  defaultValue?: string;
   isNew?: boolean;
   optionsList?: Array<{ name: string; id: string }>;
   errorMessage?: string;
@@ -27,7 +26,6 @@ const getEmptyData = (): IDropdownFields => ({
   hint: '',
   optionsList: [],
   errorMessage: '',
-  defaultValue: '',
   isDefault: false,
   isResult: true
 });
@@ -37,7 +35,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEnabled: {},
   isEnrollment: {},
   isMandatory: {},
-  defaultValue: {},
   title: {},
   fieldName: {},
   optionsList: {},

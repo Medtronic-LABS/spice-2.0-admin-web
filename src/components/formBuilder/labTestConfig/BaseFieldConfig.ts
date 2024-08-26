@@ -148,20 +148,6 @@ export const baseFieldMeta: IBaseFieldMeta = {
     type: 'number',
     component: 'TEXT_FIELD'
   },
-  minDays: {
-    order: 5.3,
-    label: 'Min Days',
-    required: false,
-    type: 'number',
-    component: 'TEXT_FIELD'
-  },
-  maxDays: {
-    order: 5.4,
-    label: 'Max Days',
-    required: false,
-    type: 'number',
-    component: 'TEXT_FIELD'
-  },
   startDate: {
     order: 5.5,
     label: 'Start Date',
