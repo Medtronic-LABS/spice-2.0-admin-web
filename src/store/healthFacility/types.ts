@@ -517,6 +517,7 @@ export interface IFetchDistrictListFailure {
 }
 
 export interface IChiefdom {
+  tenantId: string | undefined;
   id: number;
   name: string;
 }

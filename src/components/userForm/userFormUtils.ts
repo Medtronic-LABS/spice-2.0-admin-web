@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
+import APPCONSTANTS from '../../constants/appConstants';
 
 const useUserFormUtils = () => {
   const { mobileRoles, isCHPRole } = UserFormMeta();
@@ -31,7 +32,17 @@ const useUserFormUtils = () => {
       input.onChange(v);
     }
   };
-  return { isCHASelected, isCHPSelected, isRoleExists, disableSiteRoles, siteRolesChange };
+
+  const getSuiteAccessList = (rolesGrouped: any) =>
+    Object.keys(rolesGrouped || {})
+      .map((userRole: any) => ({
+        groupName: userRole,
+        id: userRole,
+        isFixed: APPCONSTANTS.spiceRole.spiceInsights !== userRole
+      }))
+      .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
+
+  return { isCHASelected, isCHPSelected, isRoleExists, disableSiteRoles, siteRolesChange, getSuiteAccessList };
 };
 
 export default useUserFormUtils;

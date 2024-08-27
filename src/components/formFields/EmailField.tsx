@@ -23,7 +23,9 @@ const EmailField = forwardRef(
       clearEmail = false,
       isDisabled = false,
       enableAutoPopulate,
-      onFindExistingUser
+      onFindExistingUser,
+      parentOrgId,
+      ignoreTenantId
     }: {
       isEdit: boolean | undefined;
       name: string;
@@ -35,6 +37,8 @@ const EmailField = forwardRef(
       entityName?: string;
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
+      parentOrgId?: string;
+      ignoreTenantId?: string;
     },
     ref
   ) => {
@@ -52,7 +56,7 @@ const EmailField = forwardRef(
     );
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const errorValue = useRef<string>('');
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
@@ -67,6 +71,7 @@ const EmailField = forwardRef(
         resetEmailField: () => {
           lastCheckedEmail.current = '';
           errorValue.current = '';
+          errorValue.current = '';
           setDisabled(false);
         }
       }),
@@ -75,11 +80,11 @@ const EmailField = forwardRef(
 
     const validateIsEmailExist = useCallback(
       (email: string) =>
-        error ||
+        errorValue.current ||
         (!submitEnabledStatus.current && lastCheckedEmail.current !== email
           ? ' ' // blank space is given as error to block submition till the user already exist validation is completed
           : ''),
-      [error]
+      [errorValue]
     );
 
     const clearEmailFn = useCallback(() => {
@@ -128,9 +133,9 @@ const EmailField = forwardRef(
         if (enableAutoPopulate && data?.username === email) {
           onFindExistingUser?.(data);
           setDisabled(true);
-
           errorValue.current = '';
         } else if (!enableAutoPopulate) {
+          errorValue.current = data !== null ? alreadyExistError : '';
           errorValue.current = data !== null ? alreadyExistError : '';
           errorValue.current = data !== null ? alreadyExistError : '';
         } else if (!data?.username) {
@@ -152,7 +157,7 @@ const EmailField = forwardRef(
             return;
           }
           setLoading(true);
-          await fetchUserByEmail(email).then((res) => {
+          await fetchUserByEmail(email, parentOrgId, ignoreTenantId).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });
@@ -175,6 +180,7 @@ const EmailField = forwardRef(
               newError = alreadyExistError;
             }
             errorValue.current = newError;
+            setNetworkError(false);
             form.change?.(`${name}.email`, email + ' '); // to trigger onchange space added
             form.change?.(`${name}.email`, email);
             lastCheckedEmail.current = email;
@@ -185,16 +191,18 @@ const EmailField = forwardRef(
           }
         }
       },
-      [tenantId, fetchUserByEmailResFn, form, name, emrError, differentOrgError, siteAdminError, alreadyExistError]
+      [
+        parentOrgId,
+        ignoreTenantId,
+        fetchUserByEmailResFn,
+        form,
+        name,
+        emrError,
+        differentOrgError,
+        siteAdminError,
+        alreadyExistError
+      ]
     );
-
-    useEffect(() => {
-      if (lastOrgId.current !== parentOrgId) {
-        lastOrgId.current = parentOrgId;
-        validateUser(currentEmail.current, true);
-      }
-    }, [parentOrgId, validateUser]);
-
     return (
       <Field
         name={`${name}.username`}
