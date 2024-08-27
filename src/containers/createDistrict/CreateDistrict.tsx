@@ -20,6 +20,7 @@ import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { countryIdSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import { IRoles } from '../../store/user/types';
 
 export interface IDistrictFormValues {
   district: {
@@ -39,7 +40,9 @@ const CreateDistrict: React.FC = () => {
 
   const loading = useSelector((state: AppState) => state.district.loading);
   const countryId = useSelector(countryIdSelector)?.id;
-  const { district: districtModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName }
+  } = NAME_CONSTANTS;
 
   const resetFields = useCallback(([subStrOfKey]: [string], state: any, utils: Tools<IDistrictFormValues>) => {
     try {
@@ -70,18 +73,26 @@ const CreateDistrict: React.FC = () => {
       const districtUsers = [...users] as any;
       const data = {
         name: district.name.trim(),
-        users: districtUsers.map((user: any) => ({
-          ...user,
-          firstName: user.firstName.trim(),
-          lastName: user.lastName.trim(),
-          gender: user.gender,
-          phoneNumber: user.phoneNumber,
-          username: user.email,
-          countryCode: user.country.phoneNumberCode,
-          country: { id: regionId },
-          roleIds: [user.role[0].id],
-          timezone: { id: Number(user.timezone.id) }
-        })),
+        users: districtUsers.map((user: any) => {
+          let insightIds: number[] = [];
+          if (user.roles) {
+            insightIds = user.roles
+              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+              ?.map((role: IRoles) => role.id);
+          }
+          return {
+            ...user,
+            firstName: user.firstName.trim(),
+            lastName: user.lastName.trim(),
+            gender: user.gender,
+            phoneNumber: user.phoneNumber,
+            username: user.email,
+            countryCode: user.country.phoneNumberCode,
+            country: { id: regionId },
+            roleIds: [user.role[0].id, ...insightIds],
+            timezone: { id: Number(user.timezone.id) }
+          };
+        }),
         countryId: Number(regionId),
         parentOrganizationId: Number(tenantId),
         tenantId: Number(tenantId)
@@ -93,7 +104,7 @@ const CreateDistrict: React.FC = () => {
             handleNavigation();
             toastCenter.success(
               APPCONSTANTS.SUCCESS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_CREATION_SUCCESS, districtModuleName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_CREATION_SUCCESS, districtSName)
             );
           },
           failureCb: (e: Error) =>
@@ -101,7 +112,7 @@ const CreateDistrict: React.FC = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_CREATION_FAIL, districtModuleName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_CREATION_FAIL, districtSName)
               )
             )
         })
@@ -124,12 +135,12 @@ const CreateDistrict: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${districtModuleName} Details`} icon={DistrictFormIcon}>
+                  <FormContainer label={`${districtSName} Details`} icon={DistrictFormIcon}>
                     <DistrictForm form={formInstance.current} />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${districtModuleName} Admin`} icon={DistrictAdminFormIcon}>
+                  <FormContainer label={`${districtSName} Admin`} icon={DistrictAdminFormIcon}>
                     <UserForm
                       form={formInstance.current}
                       countryId={Number(regionId)}

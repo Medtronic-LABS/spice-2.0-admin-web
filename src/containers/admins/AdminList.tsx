@@ -54,7 +54,10 @@ const UserList = (): React.ReactElement => {
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
-  const { chiefdom: chiefdomModuleName, district: districtModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [adminSubmitLoading, setAdminSubmitLoading] = useState<boolean>(false);
 
@@ -286,6 +289,7 @@ const UserList = (): React.ReactElement => {
           setSelectedRole={setSelectedRole}
           onFilterData={[
             {
+              id: 1,
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
@@ -295,7 +299,7 @@ const UserList = (): React.ReactElement => {
         >
           <CustomTable
             rowData={hfUserList}
-            columnsDef={columnDef({ chiefdomModuleName, districtModuleName })}
+            columnsDef={columnDef({ chiefdomModuleName: chiefdomSName, districtModuleName: districtSName })}
             isDelete={true}
             isEdit={true}
             onRowEdit={openEditModal}

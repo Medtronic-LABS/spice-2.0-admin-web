@@ -100,31 +100,31 @@ const Breadcrumb = (): React.ReactElement => {
   const role = useSelector(roleSelector);
 
   const {
-    district: districtModuleName,
-    chiefdom: chiefdomModuleName,
-    healthFacility: healthFacilityModuleName
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
 
   const customBreadcrumbs = [
     { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
     { route: PROTECTED_ROUTES.createLabTest, label: 'Add Lab Test', appendParent: true },
     { route: PROTECTED_ROUTES.createRegion, label: 'Create Region', appendParent: true },
-    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtModuleName}`, appendParent: true },
-    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomModuleName}`, appendParent: true },
-    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomModuleName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtSName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomSName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomSName}`, appendParent: true },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByRegion,
-      label: `Create ${healthFacilityModuleName}`,
+      label: `Create ${healthFacilitySName}`,
       appendParent: true
     },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByDistrict,
-      label: `Create ${healthFacilityModuleName}`,
+      label: `Create ${healthFacilitySName}`,
       appendParent: true
     },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByChiefdom,
-      label: `Create ${healthFacilityModuleName}`,
+      label: `Create ${healthFacilitySName}`,
       appendParent: true
     },
     { route: PROTECTED_ROUTES.profile, label: 'Settings' },

@@ -37,6 +37,7 @@ interface IDetailCardProps {
 }
 
 interface IFilteredData {
+  id: number;
   name: string;
   isSearchable: boolean;
   isFacility: boolean;
@@ -100,6 +101,7 @@ const DetailCard = ({
         isFacility={isFacility}
         setSelectedRole={setSelectedRole}
         setSelectedFacility={setSelectedFacility}
+        key={filteredData?.id}
       />
     ) : null;
   };

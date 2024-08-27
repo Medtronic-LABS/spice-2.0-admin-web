@@ -33,7 +33,9 @@ const HealthFacilityDashboard = () => {
   const chiefdomId = useSelector(formDataIdSelector);
   const loggedInUsertenantId = useSelector(tenantIdSelector);
   const countryId = useSelector(countryIdSelector)?.id;
-  const { healthFacility: healthFacilityModuleName } = NAME_CONSTANTS;
+  const {
+    healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
+  } = NAME_CONSTANTS;
 
   const fetchDetails = useCallback(
     (
@@ -117,15 +119,15 @@ const HealthFacilityDashboard = () => {
         <div
           className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column ${styles.header}`}
         >
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{healthFacilityModuleName}s</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{healthFacilityPName}</h4>
           {!noHFAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${healthFacilityModuleName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${healthFacilitySName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <Link to={createHFRoute} className='ms-sm-1dot5' tabIndex={-1}>
                 {currentRole !== APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN && (
-                  <button className='btn primary-btn'>Create {healthFacilityModuleName}</button>
+                  <button className='btn primary-btn'>Create {healthFacilitySName}</button>
                 )}
               </Link>
             </>
@@ -143,17 +145,15 @@ const HealthFacilityDashboard = () => {
         {noHFAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>
-              Create an {healthFacilityModuleName.toLowerCase()}
-            </div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {healthFacilitySName.toLowerCase()}</div>
             <Link to={createHFRoute} className='mx-auto' tabIndex={-1}>
-              <button className='btn primary-btn'>Create {healthFacilityModuleName}</button>
+              <button className='btn primary-btn'>Create {healthFacilitySName}</button>
             </Link>
           </div>
         )}
         {noSearchResultAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {healthFacilityModuleName}s available</div>
+            <div className='fw-bold highlight-text'>No {healthFacilityPName} available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

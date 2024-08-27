@@ -33,7 +33,10 @@ const DistrictDashboard = () => {
   const loadingMore = useSelector(districtDashboardLoadingMoreSelector);
   const countryId = useSelector(countryIdSelector);
   const { push } = useHistory();
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName, p: districtPName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: count,
@@ -50,7 +53,7 @@ const DistrictDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
               )
             );
           }
@@ -82,7 +85,7 @@ const DistrictDashboard = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
             )
           )
       })
@@ -104,7 +107,7 @@ const DistrictDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
               )
             )
         })
@@ -126,7 +129,7 @@ const DistrictDashboard = () => {
             {
               type: 'number',
               value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-              label: chiefdomModuleName,
+              label: chiefdomSName,
               disableEllipsis: true,
               route: PROTECTED_ROUTES.chiefdomByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
               onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
@@ -158,14 +161,14 @@ const DistrictDashboard = () => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className='col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column'>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{districtModuleName}s</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{districtPName}</h4>
           {!noDistrictAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${districtModuleName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${districtSName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <button className='ms-sm-1dot5 btn primary-btn' onClick={navigateToCreateDistrict}>
-                Create {districtModuleName}
+                Create {districtSName}
               </button>
             </>
           )}
@@ -182,15 +185,15 @@ const DistrictDashboard = () => {
         {noDistrictAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {districtModuleName.toLowerCase()}</div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {districtSName.toLowerCase()}</div>
             <button className='btn primary-btn mx-auto' onClick={navigateToCreateDistrict}>
-              Create {districtModuleName}
+              Create {districtSName}
             </button>
           </div>
         )}
         {noSearchRecordsAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {districtModuleName} available</div>
+            <div className='fw-bold highlight-text'>No {districtSName} available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

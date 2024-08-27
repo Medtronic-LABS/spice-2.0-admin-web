@@ -88,32 +88,41 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
 };
 
 export const formatHFUserData = (userData: any[], countryId: number | string, tenantId?: number | string) => {
-  return userData.map((user: any) => ({
-    id: Number(user?.id),
-    firstName: user.firstName,
-    lastName: user.lastName,
-    gender: user.gender,
-    username: user.username,
-    phoneNumber: user.phoneNumber,
-    culture: user.culture,
-    countryCode: user.country.phoneNumberCode || user.countryCode,
-    country: { id: Number(countryId) },
-    tenantId: user?.healthfacility?.tenantId ? Number(user.healthfacility.tenantId) : Number(tenantId) || user.tenantId,
-    supervisorId: Number(user.supervisor?.id),
-    roleIds: Array.isArray(user.roles)
-      ? (user.roles || [])
-          .map((id: any) => {
-            return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-          })
-          .flat()
-      : [user.role.id],
-    villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
-    village: user?.village,
-    timezone: user?.timezone,
-    district: user?.district,
-    chiefdom: user?.chiefdom,
-    redRisk: user?.redRisk
-  }));
+  return userData.map((user: any) => {
+    let spiceInsightsIds: number[] = [];
+    let spiceId: number[] = [];
+    if (user.role) {
+      spiceId = [user.role.id];
+    }
+    if (user.roles) {
+      spiceInsightsIds = user.roles
+        ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+        ?.map((role: IRoles) => role.id);
+    }
+    const roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
+    return {
+      id: Number(user?.id),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      gender: user.gender,
+      username: user.username,
+      phoneNumber: user.phoneNumber,
+      culture: user.culture,
+      countryCode: user.country.phoneNumberCode || user.countryCode,
+      country: { id: Number(countryId) },
+      tenantId: user?.healthfacility?.tenantId
+        ? Number(user.healthfacility.tenantId)
+        : Number(tenantId) || user.tenantId,
+      supervisorId: Number(user.supervisor?.id),
+      roleIds,
+      villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
+      village: user?.village,
+      timezone: user?.timezone,
+      district: user?.district,
+      chiefdom: user?.chiefdom,
+      redRisk: user?.redRisk
+    };
+  });
 };
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -138,7 +147,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
 
   const lableData = useMemo(
     () => [
@@ -146,8 +159,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: `${healthFacilitySName} Type`, value: healthFacility?.type },
       { label: 'PHU Focal Person Name', value: healthFacility?.phuFocalPersonName },
       { label: 'PHU Focal Person No', value: healthFacility?.phuFocalPersonNumber },
-      { label: districtModuleName, value: healthFacility?.district?.name },
-      { label: chiefdomModuleName, value: healthFacility?.chiefdom?.name },
+      { label: districtSName, value: healthFacility?.district?.name },
+      { label: chiefdomSName, value: healthFacility?.chiefdom?.name },
       { label: 'Address', value: healthFacility?.address },
       { label: 'City/Village', value: healthFacility?.cityName },
       { label: 'Latitude', value: healthFacility?.latitude },

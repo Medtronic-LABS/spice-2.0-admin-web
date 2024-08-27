@@ -19,6 +19,7 @@ import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { roleSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
+import { IRoles } from '../../store/user/types';
 
 export interface IChiefdomFormValues {
   chiefdom: {
@@ -48,7 +49,9 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
   const role = useSelector(roleSelector);
   const countryIdValue = useCountryId();
 
-  const { chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   /**
    * Navigates back to the appropriate route based on available IDs and user role.
@@ -103,6 +106,12 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
       ...chiefdom,
       name: chiefdom.name.trim(),
       users: users.map((user: any) => {
+        let insightIds: number[] = [];
+        if (user.roles) {
+          insightIds = user.roles
+            ?.filter((userRole: IRoles) => userRole.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+            ?.map((insightRole: IRoles) => insightRole.id);
+        }
         return {
           ...user,
           firstName: user.firstName.trim(),
@@ -112,7 +121,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
           phoneNumber: user.phoneNumber,
           countryCode: user.country.phoneNumberCode,
           country: { id: countryIdValue },
-          roleIds: [user.role[0].id],
+          roleIds: [user.role[0].id, ...insightIds],
           timezone: { id: Number(user.timezone?.id) }
         };
       }),
@@ -129,7 +138,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
           navigateBack();
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_SUCCESS, chiefdomModuleName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_SUCCESS, chiefdomSName)
           );
         },
         failureCb: (e: Error) =>
@@ -137,7 +146,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_FAIL, chiefdomModuleName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_CREATION_FAIL, chiefdomSName)
             )
           )
       })
@@ -157,12 +166,12 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${chiefdomModuleName} Details`} icon={ChiefdomFormIcon}>
+                  <FormContainer label={`${chiefdomSName} Details`} icon={ChiefdomFormIcon}>
                     <ChiefdomForm form={form} nestingKey='chiefdom' />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${chiefdomModuleName} Admin`} icon={ChiefdomAdminFormIcon}>
+                  <FormContainer label={`${chiefdomSName} Admin`} icon={ChiefdomAdminFormIcon}>
                     <UserForm
                       form={form}
                       countryId={countryIdValue}
