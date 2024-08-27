@@ -32,7 +32,9 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
   const [editorContent, setEditorContent] = useState('');
   const [isDeactivatePopupOpen, setDeactivatePopupOpen] = useState(false);
   const [selectedFormType, setSelectedFormType] = useState({ name: '', id: -1 } as { name: string; id: number });
-  const { district: districtModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName }
+  } = NAME_CONSTANTS;
 
   /**
    * To remove Consent form cache in store
@@ -167,7 +169,7 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
         handleCancel={deactivatePopupCancel}
         handleSubmit={deactivateSubmit}
         popupSize='modal-md'
-        confirmationMessage={formatUserToastMsg(APPCONSTANTS.DELETE_CONSENT_CONFIRMATION, districtModuleName)}
+        confirmationMessage={formatUserToastMsg(APPCONSTANTS.DELETE_CONSENT_CONFIRMATION, districtSName)}
       />
     </>
   );

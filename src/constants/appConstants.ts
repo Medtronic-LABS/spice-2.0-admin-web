@@ -386,10 +386,24 @@ const APPCONSTANTS = {
 };
 
 export const NAME_CONSTANTS = {
-  region: 'Region',
-  district: 'County',
-  chiefdom: 'Sub County',
-  healthFacility: 'Health Facility'
+  // s for singular name
+  // p for plural name
+  region: {
+    s: 'Region',
+    p: 'Regions'
+  },
+  district: {
+    s: 'County',
+    p: 'Counties'
+  },
+  chiefdom: {
+    s: 'Sub County',
+    p: 'Sub Counties'
+  },
+  healthFacility: {
+    s: 'Health Facility',
+    p: 'Health Facilities'
+  }
 };
 
 export const ROLE_LABELS = {

@@ -93,7 +93,11 @@ const HealthFacilityDetailsForm = ({
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
   const countryId = Number(regionId || regionData?.id);
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
 
   // Culture list fetch
   useEffect(() => {
@@ -288,8 +292,8 @@ const HealthFacilityDetailsForm = ({
                   <SelectInput
                     {...(input as any)}
                     {...(meta as any)}
-                    label={districtModuleName}
-                    errorLabel={districtModuleName.toLowerCase()}
+                    label={districtSName}
+                    errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
                     valueKey='id'
                     options={districtList || []}
@@ -319,8 +323,8 @@ const HealthFacilityDetailsForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label={chiefdomModuleName}
-                  errorLabel={chiefdomModuleName.toLowerCase()}
+                  label={chiefdomSName}
+                  errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
                   options={chiefdomList}

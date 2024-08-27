@@ -16,6 +16,7 @@ import RegionFormIcon from '../../assets/images/info-grey.svg';
 import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
+import { IRoles } from '../../store/user/types';
 
 export interface IRegionFormValues {
   region: {
@@ -50,16 +51,25 @@ const CreateRegion: React.FC = () => {
     ({ region, users }: IRegionFormValues) => {
       const data = {
         ...region,
-        users: users.map((user: any) => ({
-          ...user,
-          firstName: user.firstName.trim(),
-          lastName: user.lastName.trim(),
-          username: user.email,
-          gender: user.gender,
-          phoneNumber: user.phoneNumber,
-          countryCode: user.country.phoneNumberCode,
-          timezone: { id: Number(user.timezone.id) }
-        }))
+        users: users.map((user: any) => {
+          let insightsIds: number[] = [];
+          if (user.roles) {
+            insightsIds = user.roles
+              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+              ?.map((role: IRoles) => role.id);
+          }
+          return {
+            ...user,
+            firstName: user.firstName.trim(),
+            lastName: user.lastName.trim(),
+            username: user.email,
+            gender: user.gender,
+            phoneNumber: user.phoneNumber,
+            countryCode: user.country.phoneNumberCode,
+            timezone: { id: Number(user.timezone.id) },
+            roleIds: [user.role[0].id, ...insightsIds]
+          };
+        })
       };
 
       dispatch(

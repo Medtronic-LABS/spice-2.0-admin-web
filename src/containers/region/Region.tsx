@@ -39,7 +39,10 @@ const Region = (): React.ReactElement => {
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   const onDownloadClick = () => {
     dispatch(
@@ -146,12 +149,12 @@ const Region = (): React.ReactElement => {
                   {
                     id: 1,
                     name: 'districtname',
-                    label: districtModuleName
+                    label: districtSName
                   },
                   {
                     id: 2,
                     name: 'chiefdomname',
-                    label: chiefdomModuleName
+                    label: chiefdomSName
                   },
                   {
                     id: 3,
