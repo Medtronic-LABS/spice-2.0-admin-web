@@ -40,6 +40,8 @@ export interface IUserFormProps {
   isAdminForm?: boolean;
   defaultSelectedRole?: string;
   isRegionCreate?: boolean;
+  parentOrgId?: string;
+  ignoreTenantId?: string;
 }
 
 export interface IOrganizations {

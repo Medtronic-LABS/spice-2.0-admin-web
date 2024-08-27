@@ -468,6 +468,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
         isSiteUser={true}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
+        parentOrgId={healthFacility?.chiefdom?.tenantId}
+        ignoreTenantId={tenantId}
       />
     );
   };

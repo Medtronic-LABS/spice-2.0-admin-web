@@ -185,7 +185,7 @@ const MultiSelect = (props: any) => {
       } else if (props.optionsDisabled) {
         return { ...base, display: 'none' };
       } else {
-        return props.isDisabled ? { ...base, display: 'none' } : base;
+        return removeProps.data.isFixed || props.isDisabled ? { ...base, display: 'none' } : base;
       }
     },
     control: (baseStyles: any, state: ControlProps<unknown, false, GroupBase<unknown>>) => ({

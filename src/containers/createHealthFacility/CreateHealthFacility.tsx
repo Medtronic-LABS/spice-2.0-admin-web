@@ -196,6 +196,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           defaultSelectedRole={APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN}
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
+                          parentOrgId={chiefdomId}
+                          ignoreTenantId={tenantId}
                         />
                         <></>
                       </FormContainer>

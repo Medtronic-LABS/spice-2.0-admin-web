@@ -146,7 +146,10 @@ const UserList = (): React.ReactElement => {
       );
     } else {
       const postData = { ...value };
-      const allSuiteAccess = value.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
+      const allSuiteAccess = value.roles.map((r: IRoles) => ({
+        groupName: r.groupName,
+        id: r.groupName
+      }));
       postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
       postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
