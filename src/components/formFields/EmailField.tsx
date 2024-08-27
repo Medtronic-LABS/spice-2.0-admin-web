@@ -23,7 +23,9 @@ const EmailField = forwardRef(
       clearEmail = false,
       isDisabled = false,
       enableAutoPopulate,
-      onFindExistingUser
+      onFindExistingUser,
+      parentOrgId,
+      ignoreTenantId
     }: {
       isEdit: boolean | undefined;
       name: string;
@@ -35,6 +37,8 @@ const EmailField = forwardRef(
       entityName?: string;
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
+      parentOrgId?: string;
+      ignoreTenantId?: string;
     },
     ref
   ) => {
@@ -52,7 +56,6 @@ const EmailField = forwardRef(
     );
 
     const [loading, setLoading] = useState(false);
-    // const [error, setError] = useState('');
     const errorValue = useRef<string>('');
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
@@ -129,7 +132,6 @@ const EmailField = forwardRef(
         if (enableAutoPopulate && data?.username === email) {
           onFindExistingUser?.(data);
           setDisabled(true);
-
           errorValue.current = '';
         } else if (!enableAutoPopulate) {
           errorValue.current = data !== null ? alreadyExistError : '';
@@ -151,7 +153,7 @@ const EmailField = forwardRef(
             return;
           }
           setLoading(true);
-          await fetchUserByEmail(email, tenantId).then((res) => {
+          await fetchUserByEmail(email, parentOrgId, ignoreTenantId).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });
@@ -174,6 +176,7 @@ const EmailField = forwardRef(
               newError = alreadyExistError;
             }
             errorValue.current = newError;
+            setNetworkError(false);
             form.change?.(`${name}.email`, email + ' '); // to trigger onchange space added
             form.change?.(`${name}.email`, email);
             lastCheckedEmail.current = email;
@@ -184,7 +187,17 @@ const EmailField = forwardRef(
           }
         }
       },
-      [tenantId, fetchUserByEmailResFn, form, name, emrError, differentOrgError, siteAdminError, alreadyExistError]
+      [
+        parentOrgId,
+        ignoreTenantId,
+        fetchUserByEmailResFn,
+        form,
+        name,
+        emrError,
+        differentOrgError,
+        siteAdminError,
+        alreadyExistError
+      ]
     );
     return (
       <Field

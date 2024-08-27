@@ -34,13 +34,14 @@ export const updateUser = (payload: IUpdateUserDetail) =>
     data: payload
   });
 
-export const fetchUserByEmail = (email: string, tenantId: number | undefined) =>
+export const fetchUserByEmail = (email: string, parentOrganizationId?: string, ignoreTenantId?: string) =>
   axios({
     method: 'POST',
     url: '/user-service/user/validate-user',
     data: {
       email,
-      tenantId
+      parentOrganizationId,
+      ignoreTenantId
     }
   });
 
