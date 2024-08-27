@@ -50,10 +50,10 @@ const Region = (): React.ReactElement => {
   const { push } = useHistory();
 
   const {
-    region: regionModuleName,
-    district: districtModuleName,
-    chiefdom: chiefdomModuleName,
-    healthFacility
+    region: { s: regionSName, p: regionPName },
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
@@ -148,7 +148,7 @@ const Region = (): React.ReactElement => {
           {
             type: 'number',
             value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
-            label: districtModuleName,
+            label: districtSName,
             disableEllipsis: true,
             route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
@@ -156,14 +156,14 @@ const Region = (): React.ReactElement => {
           {
             type: 'number',
             value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-            label: chiefdomModuleName,
+            label: chiefdomSName,
             route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
           },
           {
             type: 'number',
             value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-            label: healthFacility,
+            label: healthFacilitySName,
             disableEllipsis: true,
             route: PROTECTED_ROUTES.healthFacilityByRegion
               .replace(':regionId', regionId)
@@ -185,14 +185,14 @@ const Region = (): React.ReactElement => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column`}>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{regionModuleName}</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{regionPName}</h4>
           {!noRegionsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${regionModuleName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${regionSName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
-                Create {regionModuleName}
+                Create {regionSName}
               </button>
             </>
           )}
@@ -209,15 +209,15 @@ const Region = (): React.ReactElement => {
         {noRegionsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionModuleName}</div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionSName}</div>
             <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
-              Create {regionModuleName}
+              Create {regionSName}
             </button>
           </div>
         )}
         {noSearchResultAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No regions available</div>
+            <div className='fw-bold highlight-text'>No {regionPName} available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

@@ -144,7 +144,9 @@ const UserForm = ({
   const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
   const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles } = userMeta();
   const districtList = useSelector(getDistrictListSelector);
-  const { district: districtModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName }
+  } = NAME_CONSTANTS;
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
     () => [
@@ -267,9 +269,11 @@ const UserForm = ({
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
       if (isAdminForm && defaultSelectedRole) {
+        const [suiteAccess] = getSuiteAccessList(rolesGrouped);
         fields.update(index, {
           ...form.getState().values?.users[index],
-          role: [rolesGrouped.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)]
+          role: [rolesGrouped.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)],
+          suiteAccess: [suiteAccess]
         });
       }
       disabledRoles.current = [];
@@ -386,15 +390,15 @@ const UserForm = ({
     }
   }, [countryList.length, dispatch]);
   useEffect(() => {
-    if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile && countryId) {
+    if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile && (countryId || isRegionCreate)) {
       dispatch(
         fetchUserRolesAction({
-          countryId,
+          countryId: countryId || null,
           failureCb: (_) => toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR)
         })
       );
     }
-  }, [countryId, dispatch, isProfile, rolesGrouped]);
+  }, [countryId, dispatch, isProfile, rolesGrouped, isRegionCreate]);
 
   const isError = (meta: any) => (meta.touched && meta.error) || undefined;
 
@@ -410,9 +414,11 @@ const UserForm = ({
                   idRefs.current.push(new Date().getTime());
                   const dataToPush = { ...initialValue[0] };
                   if (isAdminForm && defaultSelectedRole) {
+                    const [suiteAccess] = getSuiteAccessList(rolesGrouped);
                     dataToPush.role = [
                       rolesGrouped.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)
                     ];
+                    dataToPush.suiteAccess = [suiteAccess];
                   }
                   fields.push(dataToPush);
                 }
@@ -713,7 +719,7 @@ const UserForm = ({
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtModuleName)
+              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
             )
           )
       })
@@ -837,7 +843,7 @@ const UserForm = ({
                     )}
                   />
                 </div>
-                {(isSPICE || isAdminForm) && !isRegionCreate && (
+                {(isSPICE || isAdminForm) && (
                   <div className={`${'col-sm-6'} `}>
                     <Field
                       name={`${name}.role`}

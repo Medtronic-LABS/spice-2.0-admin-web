@@ -161,7 +161,7 @@ export const fetchUserRolesAction = ({
   successCb,
   failureCb
 }: {
-  countryId: number;
+  countryId: number | null;
   successCb?: (payload: IGroupRoles) => void;
   failureCb?: (error: Error) => void;
 }): IFetchUserRolesRequest => {

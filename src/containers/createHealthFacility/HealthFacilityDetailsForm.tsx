@@ -91,7 +91,11 @@ const HealthFacilityDetailsForm = ({
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
   const countryId = Number(regionId || regionData?.id);
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
 
   // Culture list fetch
   useEffect(() => {
@@ -172,8 +176,8 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label='Health Facility Name'
-                  errorLabel='health facility name'
+                  label={`${healthFacilitySName} Name`}
+                  errorLabel={`${healthFacilitySName.toLowerCase()} name`}
                   disabled={isEdit}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
@@ -189,7 +193,7 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <SelectInput
                   {...(input as any)}
-                  label='Health Facility Type'
+                  label={`${healthFacilitySName} Type`}
                   errorLabel='type'
                   labelKey='name'
                   valueKey='id'
@@ -260,8 +264,8 @@ const HealthFacilityDetailsForm = ({
                   <SelectInput
                     {...(input as any)}
                     {...(meta as any)}
-                    label={districtModuleName}
-                    errorLabel={districtModuleName.toLowerCase()}
+                    label={districtSName}
+                    errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
                     valueKey='id'
                     options={districtList || []}
@@ -290,8 +294,8 @@ const HealthFacilityDetailsForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label={chiefdomModuleName}
-                  errorLabel={chiefdomModuleName.toLowerCase()}
+                  label={chiefdomSName}
+                  errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
                   options={chiefdomList}

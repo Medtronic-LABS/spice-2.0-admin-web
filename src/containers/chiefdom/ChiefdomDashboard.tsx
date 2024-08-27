@@ -37,7 +37,9 @@ const ChiefdomDashboard = () => {
   const loadingMore = useSelector(chiefdomLoadingMoreSelector);
   const chiefdomDetail = useSelector(getChiefdomDetailSelector);
   const countryId = useSelector(countryIdSelector);
-  const { chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    chiefdom: { s: chiefdomSName, p: chiefdomPName }
+  } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: chiefdomCount,
@@ -54,7 +56,7 @@ const ChiefdomDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomModuleName)
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
               )
             );
           }
@@ -73,7 +75,7 @@ const ChiefdomDashboard = () => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomModuleName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
             )
           )
       })
@@ -107,7 +109,7 @@ const ChiefdomDashboard = () => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomModuleName)
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
               )
             )
         })
@@ -163,14 +165,14 @@ const ChiefdomDashboard = () => {
         <div
           className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column ${styles.header}`}
         >
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{chiefdomModuleName}s</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{chiefdomPName}</h4>
           {!noChiefdomsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${chiefdomModuleName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${chiefdomSName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <Link to={createChiefdomRoute} className='ms-sm-1dot5' tabIndex={-1}>
-                <button className='btn primary-btn'>Create {chiefdomModuleName}</button>
+                <button className='btn primary-btn'>Create {chiefdomSName}</button>
               </Link>
             </>
           )}
@@ -187,15 +189,15 @@ const ChiefdomDashboard = () => {
         {noChiefdomsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {chiefdomModuleName.toLowerCase()}</div>
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {chiefdomSName.toLowerCase()}</div>
             <Link to={createChiefdomRoute} className='mx-auto' tabIndex={-1}>
-              <button className='btn primary-btn'>Create {chiefdomModuleName}</button>
+              <button className='btn primary-btn'>Create {chiefdomSName}</button>
             </Link>
           </div>
         )}
         {noSearchResultAvailable && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>No {chiefdomModuleName.toLowerCase()}s available</div>
+            <div className='fw-bold highlight-text'>No {chiefdomPName.toLowerCase()} available</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Try changing the search keyword</div>
           </div>
         )}

@@ -34,7 +34,10 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
   const districtOptionsLoading = useSelector(districtOptionsLoadingSelector);
   const { regionId, districtId, tenantId } = useParams<{ regionId?: string; districtId?: string; tenantId: string }>();
 
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   useEffect(() => {
     if (regionId && tenantId && !isEdit) {
@@ -89,8 +92,8 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label={`${chiefdomModuleName} Name`}
-              errorLabel={`${chiefdomModuleName.toLocaleLowerCase()} name`}
+              label={`${chiefdomSName} Name`}
+              errorLabel={`${chiefdomSName.toLocaleLowerCase()} name`}
               capitalize={true}
               error={(meta.touched && meta.error) || undefined}
             />
@@ -112,8 +115,8 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
                   loadingOptions={districtOptionsLoading || districtLoading}
                   labelKey='name'
                   valueKey='id'
-                  label={districtModuleName}
-                  errorLabel={districtModuleName.toLocaleLowerCase()}
+                  label={districtSName}
+                  errorLabel={districtSName.toLocaleLowerCase()}
                   error={(meta.touched && meta.error) || undefined}
                 />
               );

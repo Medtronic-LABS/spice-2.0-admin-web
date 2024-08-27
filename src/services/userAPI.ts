@@ -55,7 +55,7 @@ export const validatePhoneNumber = (phoneNumber: string, id: number | null) =>
     }
   });
 
-export const fetchUserRoles = (countryId: number) =>
+export const fetchUserRoles = (countryId: number | null) =>
   axios({
     method: 'POST',
     url: '/user-service/user/roles-list',

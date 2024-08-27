@@ -321,8 +321,8 @@ const UserList = (): React.ReactElement => {
           setSelectedFacility={setSelectedFacility}
           isFilter={true}
           onFilterData={[
-            { name: 'Filter by Facility', isFacility: true, isSearchable: true, data: healthFacilityList },
-            { name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole }
+            { id: 1, name: 'Filter by Facility', isFacility: true, isSearchable: true, data: healthFacilityList },
+            { id: 2, name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole }
           ]}
         >
           <CustomTable

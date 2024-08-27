@@ -54,7 +54,11 @@ const HealthFacilityList = (): React.ReactElement => {
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
 
   const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
@@ -260,8 +264,8 @@ const HealthFacilityList = (): React.ReactElement => {
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel='Add Health Facility'
-          header='Health Facility'
+          buttonLabel={`Add ${healthFacilitySName}`}
+          header={healthFacilitySName}
           isSearch={true}
           onSearch={handleSearch}
           onButtonClick={openCreateHealthFacility}
@@ -284,14 +288,14 @@ const HealthFacilityList = (): React.ReactElement => {
               {
                 id: 3,
                 name: 'district',
-                label: districtModuleName,
+                label: districtSName,
                 width: '30%',
                 cellFormatter: ({ district }) => district?.name
               },
               {
-                id: 3,
+                id: 4,
                 name: 'chiefdom',
-                label: chiefdomModuleName,
+                label: chiefdomSName,
                 width: '30%',
                 cellFormatter: ({ chiefdom }) => chiefdom?.name
               }
@@ -312,7 +316,7 @@ const HealthFacilityList = (): React.ReactElement => {
       </div>
       <ModalForm
         show={editHealthFacilityModal.isOpen}
-        title={`Edit Health Facility`}
+        title={`Edit ${healthFacilitySName}`}
         cancelText={submittedData?.isNextClicked ? 'Back' : 'Cancel'}
         submitText={submittedData?.isNextClicked ? 'Submit' : 'Next'}
         handleCancel={closeHealthFacilityEditModal}

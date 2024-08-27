@@ -59,7 +59,10 @@ const ChiefdomList = (): React.ReactElement => {
     tenantId = ''
   } = useParams<{ regionId?: string; districtId?: string; tenantId?: string }>();
 
-  const { district: districtModuleName, chiefdom: chiefdomModuleName } = NAME_CONSTANTS;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   /**
    * to load Chiefdom List data.
@@ -77,7 +80,7 @@ const ChiefdomList = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_LIST_FETCH_ERROR, chiefdomModuleName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_LIST_FETCH_ERROR, chiefdomSName)
             )
           )
       })
@@ -141,7 +144,7 @@ const ChiefdomList = (): React.ReactElement => {
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_FAIL, chiefdomModuleName)
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_FAIL, chiefdomSName)
               )
             )
         })
@@ -174,7 +177,7 @@ const ChiefdomList = (): React.ReactElement => {
           handlePage(APPCONSTANTS.INITIAL_PAGE);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_SUCCESS, chiefdomModuleName)
+            formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_SUCCESS, chiefdomSName)
           );
         },
         failureCb: (e: Error) =>
@@ -182,7 +185,7 @@ const ChiefdomList = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_FAIL, chiefdomModuleName)
+              formatUserToastMsg(APPCONSTANTS.CHIEFDOM_UPDATE_FAIL, chiefdomSName)
             )
           )
       })
@@ -208,8 +211,8 @@ const ChiefdomList = (): React.ReactElement => {
       <div className={`row g-0dot625`}>
         <div className='col-12'>
           <DetailCard
-            buttonLabel={`Add ${chiefdomModuleName}`}
-            header={chiefdomModuleName}
+            buttonLabel={`Add ${chiefdomSName}`}
+            header={chiefdomSName}
             isSearch={true}
             onSearch={handleSearch}
             onButtonClick={openAddChiefdom}
@@ -221,7 +224,7 @@ const ChiefdomList = (): React.ReactElement => {
                 {
                   id: 2,
                   name: 'districtName',
-                  label: districtModuleName,
+                  label: districtSName,
                   width: '200px',
                   cellFormatter: (ouList: IChiefdomList) => ouList.districtName
                 }
@@ -235,14 +238,14 @@ const ChiefdomList = (): React.ReactElement => {
               isRowEdit={true}
               onRowEdit={openChiefdomEditModal}
               handleRowClick={handleRowClick as any}
-              confirmationTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_DELETE_CONFIRMATION, chiefdomModuleName)}
-              deleteTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_DELETE_TITLE, chiefdomModuleName)}
+              confirmationTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_DELETE_CONFIRMATION, chiefdomSName)}
+              deleteTitle={formatUserToastMsg(APPCONSTANTS.CHIEFDOM_DELETE_TITLE, chiefdomSName)}
             />
           </DetailCard>
         </div>
       </div>
       <ModalForm
-        title={`Edit ${chiefdomModuleName}`}
+        title={`Edit ${chiefdomSName}`}
         cancelText='Cancel'
         submitText='Submit'
         show={showChiefdomEditModal}

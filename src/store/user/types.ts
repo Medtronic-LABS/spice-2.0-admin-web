@@ -199,7 +199,7 @@ export interface IFetchUserByEmailFail {
 }
 export interface IFetchUserRolesRequest {
   type: typeof USER_TYPES.FETCH_USER_ROLES_REQUEST;
-  countryId: number;
+  countryId: number | null;
   successCb?: (payload: IGroupRoles) => void;
   failureCb?: (error: Error) => void;
 }

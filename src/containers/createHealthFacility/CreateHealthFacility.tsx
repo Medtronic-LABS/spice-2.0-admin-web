@@ -10,7 +10,7 @@ import Loader from '../../components/loader/Loader';
 import UserForm from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import Workflows from '../healthFacility/Workflows';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -57,6 +57,9 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const country = useSelector(countryIdSelector);
   const countryId = Number(regionId || country?.id);
   const role = useSelector(roleSelector);
+  const {
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
 
   useEffect(() => {
     return () => {
@@ -175,7 +178,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                 ) : (
                   <>
                     <div className='col-lg-6 col-12'>
-                      <FormContainer label='Health Facility Details' icon={SiteDetailsIcon}>
+                      <FormContainer label={`${healthFacilitySName} Details`} icon={SiteDetailsIcon}>
                         <HealthFacilityDetailsForm
                           formName='healthFacility'
                           form={formInstance}
@@ -184,7 +187,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                       </FormContainer>
                     </div>
                     <div className='col-lg-6 col-12'>
-                      <FormContainer label='Add Health Facility Admin' icon={SiteAddUserIcon}>
+                      <FormContainer label={`Add ${healthFacilitySName} Admin`} icon={SiteAddUserIcon}>
                         <UserForm
                           countryId={countryId}
                           form={form}

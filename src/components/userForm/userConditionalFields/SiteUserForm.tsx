@@ -22,7 +22,11 @@ export const SiteUserForm = ({
   formDetails
 }: any) => {
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
-  const { chiefdom: chiefdomModuleName, district } = NAMING_VARIABLES;
+  const { chiefdom: chiefdomNamingVariable, district: districtNamingVariable } = NAMING_VARIABLES;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   return (
     <>
@@ -83,14 +87,14 @@ export const SiteUserForm = ({
           {[DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
               <Field
-                name={`${name}.${district}`}
+                name={`${name}.${districtNamingVariable}`}
                 type='text'
                 validate={required}
                 render={({ input, meta }) => (
                   <SelectInput
                     {...(input as any)}
-                    label={NAME_CONSTANTS.district}
-                    errorLabel={NAME_CONSTANTS.district}
+                    label={districtSName}
+                    errorLabel={districtSName}
                     labelKey='name'
                     valueKey='id'
                     options={districtDetails.list}
@@ -105,14 +109,14 @@ export const SiteUserForm = ({
           {[HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) && (
             <div className='col-sm-6 col-12'>
               <Field
-                name={`${name}.${chiefdomModuleName}`}
+                name={`${name}.${chiefdomNamingVariable}`}
                 type='text'
                 validate={required}
                 render={({ input, meta }) => (
                   <SelectInput
                     {...(input as any)}
-                    label={NAME_CONSTANTS.chiefdom}
-                    errorLabel={NAME_CONSTANTS.chiefdom}
+                    label={chiefdomSName}
+                    errorLabel={chiefdomSName}
                     labelKey='name'
                     valueKey='id'
                     options={chiefdomDetails.list}
