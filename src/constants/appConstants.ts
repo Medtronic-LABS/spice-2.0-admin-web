@@ -1,5 +1,5 @@
 const APPCONSTANTS = {
-  APP_TYPE: 'spice web',
+  APP_TYPE: 'web',
   HASH_ALGORITM: 'sha512',
   AUTHTOKEN: 'at',
   USER_TENANTID: 'uti',
