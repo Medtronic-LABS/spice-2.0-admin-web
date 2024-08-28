@@ -134,7 +134,7 @@ const MultiSelect = (props: any) => {
         ? !newProps.disabledOptions.some((dOptions: any) => dOptions.id === opt.value)
         : true
     );
-  const handleChange = (selected: IOption[]) => {
+  const handleChange = (selected: IOption[], actionMeta: any) => {
     if (
       selected.length > 0 &&
       !isAllSelected.current &&
@@ -150,7 +150,8 @@ const MultiSelect = (props: any) => {
               label.toLowerCase().includes(selectInput?.toLowerCase()) &&
               (newProps.value || []).filter((opt: IOption) => opt.label === label).length === 0
           )
-        ].sort(comparator)
+        ].sort(comparator),
+        actionMeta
       );
     } else if (
       selected.length > 0 &&
@@ -158,15 +159,18 @@ const MultiSelect = (props: any) => {
       JSON.stringify(selected.sort(comparator)) !== JSON.stringify(filteredFinalOptions(filteredOptions))
     ) {
       // Each role selected
-      return newProps.onChange(selected);
+      return newProps.onChange(selected, actionMeta);
     } else {
       // Select All unclicked
-      return newProps.onChange([
-        ...(props?.mandatoryOptions || []),
-        ...(newProps.value || [])?.filter(
-          ({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase())
-        )
-      ]);
+      return newProps.onChange(
+        [
+          ...(props?.mandatoryOptions || []),
+          ...(newProps.value || [])?.filter(
+            ({ label }: IOption) => !label?.toLowerCase().includes(selectInput?.toLowerCase())
+          )
+        ],
+        actionMeta
+      );
     }
   };
 
@@ -255,6 +259,7 @@ const MultiSelect = (props: any) => {
           required={null}
           options={[allOption, ...newProps.options]}
           placeholder={newProps.placeholder || ''}
+          menuPortalTarget={props.isModel ? document.body.getElementsByClassName('modal-show')[0] : false}
           onChange={handleChange}
           components={{
             Option: multiOption,
@@ -297,6 +302,7 @@ const MultiSelect = (props: any) => {
           ...newProps.components
         }}
         menuPlacement={newProps.menuPlacement ?? 'auto'}
+        menuPortalTarget={props.isModel ? document.body.getElementsByClassName('modal-show')[0] : false}
         onKeyDown={onKeyDown}
         tabSelectsValue={false}
         hideSelectedOptions={true}

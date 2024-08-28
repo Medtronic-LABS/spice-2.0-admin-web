@@ -270,7 +270,7 @@ const AccordianView = ({
   setFormMeta,
   onCancel,
   targetIds,
-  onSubmit,
+  onSubmit: onSubmitFinal,
   accordianRef,
   newlyAddedIdsRef,
   setEditGroupedFieldsOrder,
@@ -299,13 +299,26 @@ const AccordianView = ({
   );
 
   // return field which has error
-  const getFinalFormError = (errors: any) => {
+  const getFinalFormError = (errors: any, values: any) => {
     let errorField: any = null;
-    Object.keys(errors).forEach((familyName: string) => {
+    let newErrors = { ...errors };
+    // manual error validation for code and url fields
+    const familyGroup = Object.keys(values)[0];
+    const valueObject: any = Object.values(values)[0] as any;
+    for (const [key, value] of Object.entries(valueObject)) {
+      if ((value as any)?.code && !(value as any).url) {
+        newErrors = { ...errors, [familyGroup]: { [key]: { url: 'Please enter the url' } } };
+      }
+      if (!(value as any).code && (value as any).url) {
+        newErrors = { ...errors, [familyGroup]: { [key]: { code: 'Please enter the code' } } };
+      }
+    }
+    // form errorField
+    Object.keys(newErrors).forEach((familyName: string) => {
       if (!errorField) {
         let fieldGroupName: any;
-        for (fieldGroupName in errors[familyName]) {
-          if (errors[familyName][fieldGroupName]) {
+        for (fieldGroupName in newErrors[familyName]) {
+          if (newErrors[familyName][fieldGroupName]) {
             errorField = formMeta[familyName][fieldGroupName];
             break;
           }
@@ -324,7 +337,7 @@ const AccordianView = ({
         prev[currKey as keyof typeof prev] = currKey === key ? !prev[currKey] : false;
       });
     } else {
-      foundError = getFinalFormError(finalFormState?.errors);
+      foundError = getFinalFormError(finalFormState?.errors, finalFormState?.values);
     }
     setCollapsedGroup(prev);
     setTimeout(() => {
@@ -446,22 +459,20 @@ const AccordianView = ({
     const finalFormState = formRef.current.getState();
     event.preventDefault();
     let foundError: any = null;
-    if (!finalFormState.valid) {
-      foundError = getFinalFormError(finalFormState.errors);
-      if (!!foundError?.id) {
-        const prev = { ...collapsedGroup };
-        Object.keys(prev).forEach((currKey: string) => {
-          prev[currKey as keyof typeof prev] = currKey === foundError.family ? true : false;
-        });
-        setCollapsedGroup(prev);
-        setTimeout(() => {
-          fieldGroupRef.current[
-            `${foundError.family}_${foundError.id}${foundError.subField ? '_' + foundError.subField : ''}`
-          ].scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 0);
-      }
-    } else {
-      onSubmit(finalFormState.values);
+    foundError = getFinalFormError(finalFormState.errors, finalFormState.values);
+    if (!!foundError?.id) {
+      const prev = { ...collapsedGroup };
+      Object.keys(prev).forEach((currKey: string) => {
+        prev[currKey as keyof typeof prev] = currKey === foundError.family ? true : false;
+      });
+      setCollapsedGroup(prev);
+      setTimeout(() => {
+        fieldGroupRef.current[
+          `${foundError.family}_${foundError.id}${foundError.subField ? '_' + foundError.subField : ''}`
+        ].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    } else if (finalFormState.valid) {
+      onSubmitFinal(finalFormState.values);
     }
   };
 
@@ -476,6 +487,9 @@ const AccordianView = ({
       const field = fields[fieldName];
       field.data.customError = error;
       field.touched = true;
+      state.formState.errors[fieldName] = error;
+    } else {
+      delete state.formState.errors[fieldName];
     }
   };
 
@@ -489,10 +503,8 @@ const AccordianView = ({
         }}
         initialValues={formMeta}
         // tslint:disable-next-line:no-empty
-        onSubmit={() => {
-          //
-        }}
-        render={({ form, submitting, values }) => {
+        onSubmit={() => {}}
+        render={({ form, submitting, values, errors }) => {
           formRef.current = form;
           return (
             <form onSubmit={(event) => handleFormSubmit(event)}>

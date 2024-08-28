@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
-import { useParams } from 'react-router-dom';
+
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
@@ -40,9 +40,6 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
-    inputProps = { ...inputProps, required: true };
-  }
   if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
     inputProps = { ...inputProps, disabled: true };
   }
@@ -71,7 +68,9 @@ interface IComponentProps {
   hashFieldIdsWithFieldName?: any;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
-  isRegionCustomizeForm?: boolean;
+  codeRef?: React.MutableRefObject<string>;
+  urlRef?: React.MutableRefObject<string>;
+  input?: any;
 }
 
 export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj }: IComponentProps) => {
@@ -250,9 +249,7 @@ export const TextFieldComponent = ({
   obj,
   inputProps,
   targetIds,
-  newlyAddedIds,
   handleUpdateFieldName,
-  hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
   isFieldNameChangable,
   isRegionCustomizeForm
@@ -360,6 +357,7 @@ export const TextFieldComponent = ({
     };
     parseFn = (value: any) => (value % 1 === 0 ? value : null);
   }
+  const newInputProps = useRef(inputProps);
 
   if (inputProps?.type === 'sliderValue') {
     parseFn = (value: any) => {
@@ -373,13 +371,36 @@ export const TextFieldComponent = ({
   if (inputProps?.type === 'number' && obj.inputType !== InputTypes.DECIMAL) {
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
+
+  const getAsterisk = () => {
+    const codeValue = form.getFieldState(`${name}.code`)?.value;
+    const urlValue = form.getFieldState(`${name}.url`)?.value;
+    return codeValue || urlValue;
+  };
+  const getAsteriskError = (field: string, props?: any) => {
+    const codeValue = form.getFieldState(`${name}.code`)?.value;
+    const urlValue = form.getFieldState(`${name}.url`)?.value;
+    if (field === 'code' && !codeValue && urlValue) {
+      return 'Please enter the code';
+    } else if (field === 'code') {
+      return '';
+    }
+    if (field === 'url' && !urlValue && codeValue) {
+      return 'Please enter the url';
+    } else if (field === 'url') {
+      return '';
+    }
+  };
+
   return (
     <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
       <TextFieldWrapper
         name={`${name}.${fieldName}`}
         customValue={obj.fieldName}
+        customError={['code', 'url'].includes(fieldName) ? getAsteriskError(fieldName, inputProps) : ''}
         customParseFn={parseFn}
-        inputProps={inputProps}
+        inputProps={['code', 'url'].includes(fieldName) ? newInputProps.current : inputProps}
+        onlyAsterisk={['code', 'url'].includes(fieldName) && getAsterisk()}
         customOnBlurFn={customOnBlurFn}
         obj={obj}
         fieldName={fieldName}
@@ -404,8 +425,11 @@ const RenderFields = ({
   isFieldNameChangable,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isRegionCustomizeForm = false
+  input,
+  ...rest
 }: any) => {
+  const codeRef = useRef('');
+  const urlRef = useRef('');
   // Toggle text field component to select component on disable mode
   const { form: formType } = useParams<IMatchParams>();
 
@@ -502,7 +526,9 @@ const RenderFields = ({
           hashFieldIdsWithTitle={hashFieldIdsWithTitle}
           hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
           isFieldNameChangable={isFieldNameChangable}
-          isRegionCustomizeForm={isRegionCustomizeForm}
+          codeRef={codeRef}
+          urlRef={urlRef}
+          input={input}
         />
       );
     }

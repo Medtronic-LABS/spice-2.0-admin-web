@@ -41,12 +41,10 @@ import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
-import Workflows from '../healthFacility/Workflows';
-import { fetchDistrictListRequest } from '../../store/district/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
-import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';
-import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
-import { NAME_CONSTANTS } from '../../constants/appConstants';
+import Workflows from './Workflows';
+import { IVillages } from '../../store/healthFacility/types';
+import toastCenter from '../../utils/toastCenter';
+import APPCONSTANTS from '../../constants/appConstants';
 
 interface IAddUserFormProps {
   formName: string;
@@ -153,7 +151,12 @@ const HealthFacilityDetailsForm = ({
           countryId,
           districtId: Number(districtId),
           chiefdomId: Number(chiefdomId),
-          healthFacilityId: data?.id ? data.id : undefined
+          healthFacilityId: data?.id ? data.id : undefined,
+          successCb: (list: IVillages[]) => {
+            if (!list.length) {
+              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
+            }
+          }
         })
       );
     }

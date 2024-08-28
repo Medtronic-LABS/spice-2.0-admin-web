@@ -14,6 +14,7 @@ interface ITextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   removeErrorContainer?: boolean;
   capitalize?: boolean;
   lowerCase?: boolean;
+  onlyAsterisk?: boolean;
 }
 
 const TextInput = ({
@@ -24,6 +25,7 @@ const TextInput = ({
   helpertext,
   toolTipTitle,
   required = true,
+  onlyAsterisk = false,
   showLoader = false,
   removeErrorContainer = false,
   capitalize = false,
@@ -55,7 +57,7 @@ const TextInput = ({
         <>
           <label htmlFor={props.name}>
             {label}
-            {required && <span className='input-asterisk'>*</span>}
+            {(required || onlyAsterisk) && <span className='input-asterisk'>*</span>}
           </label>
           <br />
         </>

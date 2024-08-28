@@ -176,8 +176,11 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
     const updatedUserRoles = {
       ...userRoles,
       SPICE: [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
-        ? userRoles?.SPICE
-        : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
+        ? userRoles.SPICE
+        : userRoles.SPICE.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN),
+      'SPICE INSIGHTS': [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
+        ? userRoles['SPICE INSIGHTS']
+        : userRoles['SPICE INSIGHTS'].filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.REPORT_ADMIN)
     };
     successCb?.(updatedUserRoles);
     yield put(userActions.fetchUserRolesActionSuccess(updatedUserRoles));

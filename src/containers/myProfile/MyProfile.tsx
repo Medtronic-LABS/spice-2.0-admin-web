@@ -87,6 +87,7 @@ const MyProfile = (): React.ReactElement => {
       postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
       postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
+      postData.insightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       postData.supervisor = {
         ...postData.supervisor,
         name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
