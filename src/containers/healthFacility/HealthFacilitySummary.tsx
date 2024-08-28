@@ -84,19 +84,35 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
   return postData;
 };
 
-export const formatHFUserData = (userData: any[], countryId: number | string, tenantId?: number | string) => {
+export const formatHFUserData = (
+  userData: any[],
+  countryId: number | string,
+  tenantId?: number | string | undefined,
+  isHFCreate = false
+) => {
   return userData.map((user: any) => {
-    let spiceInsightsIds: number[] = [];
-    let spiceId: number[] = [];
-    if (user.role) {
-      spiceId = [user.role.id];
+    let roleIds: number[] = [];
+    if (isHFCreate) {
+      roleIds = Array.isArray(user.roles)
+        ? (user.roles || [])
+            .map((id: any) => {
+              return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+            })
+            .flat()
+        : [user.role.id];
+    } else {
+      let spiceInsightsIds: number[] = [];
+      let spiceId: number[] = [];
+      if (user.role) {
+        spiceId = [user.role.id];
+      }
+      if (user.roles) {
+        spiceInsightsIds = user.roles
+          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+          ?.map((role: IRoles) => role.id);
+      }
+      roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     }
-    if (user.roles) {
-      spiceInsightsIds = user.roles
-        ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
-        ?.map((role: IRoles) => role.id);
-    }
-    const roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     return {
       id: Number(user?.id),
       firstName: user.firstName,
