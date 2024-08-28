@@ -62,8 +62,8 @@ const LandingDashboard = (): React.ReactElement => {
   });
   const dashboardMenu = [
     { name: 'Admin', logo: admin, link: PROTECTED_ROUTES.regionDashboard },
-    { name: 'Reports', logo: report, link: PROTECTED_ROUTES.region },
-    { name: 'Insights', logo: insights, link: PROTECTED_ROUTES.region }
+    { name: 'Reports', logo: report, link: '#' },
+    { name: 'Insights', logo: insights, link: '#' }
   ];
 
   return (

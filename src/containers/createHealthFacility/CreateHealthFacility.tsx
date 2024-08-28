@@ -124,7 +124,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     if (submittedData.isNextClicked && countryId) {
       const postData = {
         ...formatHealthFacility({ ...healthFacility }, countryId),
-        users: formatHFUserData(users, countryId)
+        users: formatHFUserData(users, countryId, undefined, true)
       };
       if (postData.clinicalWorkflowIds.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
@@ -185,7 +185,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                       </FormContainer>
                     </div>
                     <div className='col-lg-6 col-12'>
-                      <FormContainer label={`Add ${healthFacilitySName} Admin`} icon={SiteAddUserIcon}>
+                      <FormContainer label={`Add User`} icon={SiteAddUserIcon}>
                         <UserForm
                           countryId={countryId}
                           form={form}
@@ -193,8 +193,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           isHF={true}
                           isHFCreate={true}
                           entityName='healthFacility'
-                          isAdminForm={true}
-                          defaultSelectedRole={APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN}
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
                           parentOrgId={chiefdomId}

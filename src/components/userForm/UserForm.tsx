@@ -149,7 +149,7 @@ const UserForm = ({
   const [insightsRole, setInsightsRole] = useState<IRoles[]>([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
-  const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles } = userMeta();
+  const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles } = userMeta();
   const districtList = useSelector(getDistrictListSelector);
   const {
     district: { s: districtSName }
@@ -275,11 +275,14 @@ const UserForm = ({
     (fields: any, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}]`);
       fields.update(index, { ...initialValue[0] });
-      if (isAdminForm && defaultSelectedRole) {
+      if ((isAdminForm && defaultSelectedRole) || isHFCreate) {
         const [suiteAccess] = getSuiteAccessList(rolesGrouped);
         fields.update(index, {
           ...form.getState().values?.users[index],
-          role: [rolesGrouped.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)],
+          role:
+            isAdminForm && defaultSelectedRole
+              ? [rolesGrouped.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)]
+              : [],
           suiteAccess: [suiteAccess]
         });
       }
@@ -426,10 +429,12 @@ const UserForm = ({
                   idRefs.current.push(new Date().getTime());
                   const dataToPush = { ...initialValue[0] };
                   if (isAdminForm && defaultSelectedRole) {
-                    const [suiteAccess] = getSuiteAccessList(rolesGrouped);
                     dataToPush.role = [
                       rolesGrouped.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)
                     ];
+                  }
+                  if ((isAdminForm && defaultSelectedRole) || isHFCreate) {
+                    const [suiteAccess] = getSuiteAccessList(rolesGrouped);
                     dataToPush.suiteAccess = [suiteAccess];
                   }
                   fields.push(dataToPush);
@@ -497,9 +502,9 @@ const UserForm = ({
       // role options
       const newRoleOptions = [...roleOptions.current];
       if (isHFCreate && (mandatoryRoleOptions ? !isCHPSelected(mandatoryRoleOptions) : true)) {
-        newRoleOptions[index] = (rolesGrouped.SPICE ? [...rolesGrouped.SPICE] : [])
-          .filter((r: IRoles) => hfCreateRoles.includes(r.name))
-          .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
+        newRoleOptions[index] = (rolesGrouped.SPICE ? [...rolesGrouped.SPICE] : []).sort((a: any, b: any) =>
+          a.displayName > b.displayName ? 1 : -1
+        );
       } else if (isHF) {
         newRoleOptions[index] = (rolesGrouped.SPICE ? [...rolesGrouped.SPICE] : [])
           .filter((r: IRoles) => r.name !== 'SUPER_ADMIN')
@@ -534,7 +539,6 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       adminRoles,
-      hfCreateRoles,
       isCHPSelected,
       isHF,
       isHFCreate,
@@ -705,7 +709,12 @@ const UserForm = ({
       if (roleData.name === 'RED_RISK_USER' || roleData.displayName === null) {
         return false;
       }
-      if (isSiteUser) {
+      if (isHFCreate) {
+        return (
+          roleData.suiteAccessName.toLowerCase() !== APPCONSTANTS.spiceRole.spice ||
+          roleData.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN
+        );
+      } else if (isSiteUser) {
         return roleData.suiteAccessName.toLowerCase() !== APPCONSTANTS.spiceRole.spice;
       } else {
         return roleData.suiteAccessName.toLowerCase() === APPCONSTANTS.spiceRole.spice;
@@ -808,9 +817,9 @@ const UserForm = ({
             roles: allRoles = [],
             role: spiceRole = [],
             spiceInsightsRole = []
-          } = { ...form.getState().values?.users?.[index] };
-          const isSPICE = (formSuiteAccess || []).some((v: any) => v.groupName === 'SPICE');
-          const isSPICEInsights = (formSuiteAccess || []).some((v: any) => v.groupName === 'SPICE INSIGHTS');
+          } = form.getState().values?.users?.[index];
+          const isSPICE = (formSuiteAccess || []).some((v: any) => v?.groupName === 'SPICE');
+          const isSPICEInsights = (formSuiteAccess || []).some((v: any) => v?.groupName === 'SPICE INSIGHTS');
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -873,7 +882,7 @@ const UserForm = ({
                       type='text'
                       validate={required}
                       render={({ input, meta }) => {
-                        return isSiteUser ? (
+                        return isSiteUser || isHFCreate ? (
                           <MultiSelect
                             {...(input as any)}
                             label='SPICE Role'
