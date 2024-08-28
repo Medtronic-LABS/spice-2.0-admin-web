@@ -10,7 +10,7 @@ import PasswordChangeIcon from '../../assets/images/reset-password.svg';
 import ResetPasswordFields, { generatePassword } from '../../containers/authentication/ResetPasswordFields';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeOwnPassword } from '../../store/user/actions';
-import { emailSelector, userIdSelector } from '../../store/user/selectors';
+import { emailSelector, getUserSuiteAccessSelector, userIdSelector } from '../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
@@ -23,16 +23,17 @@ interface IUserMenuItem {
   roles: string[];
 }
 
-const { ROLES } = APPCONSTANTS;
+const { ROLES, SUITE_ACCESS } = APPCONSTANTS;
 
 const UserMenu = ({ role }: any) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const email = useSelector(emailSelector);
   const userId = useSelector(userIdSelector);
+  const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
   const [passwordModal, setPasswordModal] = useState(false);
   const [submitEnable, setSubmitEnabled] = useState(false);
-  const menus = [
+  const menus = userSuiteAccess.includes(SUITE_ACCESS.ADMIN) ? [
     {
       label: 'Deactivated Records',
       icon: IconDeactivated,
@@ -63,7 +64,7 @@ const UserMenu = ({ role }: any) => {
       route: location.pathname,
       roles: Object.values(ROLES)
     }
-  ];
+  ] : [];
 
   const permittedMenus = menus.filter(({ roles }) => roles?.includes(role));
   const handleClick = (modalcheck: any, event: any) => {

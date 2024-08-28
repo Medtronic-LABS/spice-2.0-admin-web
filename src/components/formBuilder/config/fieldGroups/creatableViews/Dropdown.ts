@@ -38,7 +38,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   optionsList: {},
-  errorMessage: {},
   isEditable: {},
   isResult: {},
   code: {},

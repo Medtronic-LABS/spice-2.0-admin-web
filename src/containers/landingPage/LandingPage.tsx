@@ -43,9 +43,10 @@ const LandingPage = (): React.ReactElement => {
         icon: AdminPortalLogo,
         hasDomain: false,
         suiteAccessName: ADMIN,
-        domainUrl: HOME_PAGE_BY_ROLE[role]
-          .replace(':regionId', regionId?.toString())
-          .replace(':tenantId', tenantId?.toString()),
+        domainUrl:
+          HOME_PAGE_BY_ROLE[role]
+            ?.replace(':regionId', regionId?.toString())
+            .replace(':tenantId', tenantId?.toString()) || '',
         disabled: false
       },
       {

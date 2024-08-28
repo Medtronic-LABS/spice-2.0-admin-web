@@ -218,7 +218,6 @@ export const baseFieldMeta: IBaseFieldMeta = {
     required: true,
     component: 'TEXT_FIELD'
   },
-  errorMessage: { order: 12, label: 'Error Message', type: 'text', required: false, component: 'TEXT_FIELD' },
   isAboveUpperLimit: { order: 13, label: 'Is Above Upper Limit', component: 'CHECKBOX' },
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },

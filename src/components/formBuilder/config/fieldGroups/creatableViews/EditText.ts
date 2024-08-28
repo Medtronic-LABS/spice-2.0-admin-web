@@ -59,7 +59,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   code: {},
   url: {},
   resource: {},
-  errorMessage: {},
   minValue: {},
   maxValue: {},
   inputType: {},
