@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
-import { useParams } from 'react-router-dom';
+
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
@@ -41,9 +41,6 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
-    inputProps = { ...inputProps, required: true };
-  }
   if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
     inputProps = { ...inputProps, disabled: true };
   }
@@ -72,7 +69,9 @@ interface IComponentProps {
   hashFieldIdsWithFieldName?: any;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
-  isRegionCustomizeForm?: boolean;
+  codeRef?: React.MutableRefObject<string>;
+  urlRef?: React.MutableRefObject<string>;
+  input?: any;
 }
 
 export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj }: IComponentProps) => {
@@ -372,9 +371,6 @@ export const TextFieldComponent = ({
   if (inputProps?.type === 'number' && obj.inputType !== InputTypes.DECIMAL) {
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
-  if (['minDays', 'maxDays', 'minValue', 'maxValue', 'minLength', 'maxLength'].includes(fieldName)) {
-    parseFn = (value: any) => (value > 0 ? value : null);
-  }
 
   const getAsterisk = () => {
     const codeValue = form.getFieldState(`${name}.code`)?.value;
@@ -386,8 +382,6 @@ export const TextFieldComponent = ({
     const urlValue = form.getFieldState(`${name}.url`)?.value;
     if (field === 'code' && !codeValue && urlValue) {
       return 'Please enter the code';
-    } else if (field === 'code' && codeValue && containsOnlyLettersAndNumbers(codeValue)) {
-      return ' Please enter a valid code';
     } else if (field === 'code') {
       return '';
     }
@@ -431,7 +425,8 @@ const RenderFields = ({
   isFieldNameChangable,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isRegionCustomizeForm = false
+  input,
+  ...rest
 }: any) => {
   const codeRef = useRef('');
   const urlRef = useRef('');
@@ -545,7 +540,9 @@ const RenderFields = ({
           hashFieldIdsWithTitle={hashFieldIdsWithTitle}
           hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
           isFieldNameChangable={isFieldNameChangable}
-          isRegionCustomizeForm={isRegionCustomizeForm}
+          codeRef={codeRef}
+          urlRef={urlRef}
+          input={input}
         />
       );
     }

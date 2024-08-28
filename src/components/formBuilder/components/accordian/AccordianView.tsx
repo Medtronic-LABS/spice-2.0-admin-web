@@ -291,7 +291,7 @@ const AccordianView = ({
   setFormMeta,
   onCancel,
   targetIds,
-  onSubmit,
+  onSubmit: onSubmitFinal,
   accordianRef,
   newlyAddedIdsRef,
   setEditGroupedFieldsOrder,
@@ -322,6 +322,7 @@ const AccordianView = ({
 
   // return field which has error
   const getFinalFormError = (errors: any, values: any) => {
+  const getFinalFormError = (errors: any, values: any) => {
     let errorField: any = null;
     let newErrors = { ...errors };
     // manual error validation for code and url fields
@@ -331,10 +332,7 @@ const AccordianView = ({
       if ((value as any)?.code && !(value as any).url) {
         newErrors = { ...errors, [familyGroup]: { [key]: { url: 'Please enter the url' } } };
       }
-      if (
-        (!(value as any).code && (value as any).url) ||
-        ((value as any)?.code && containsOnlyLettersAndNumbers((value as any)?.code))
-      ) {
+      if (!(value as any).code && (value as any).url) {
         newErrors = { ...errors, [familyGroup]: { [key]: { code: 'Please enter the code' } } };
       }
     }

@@ -32,8 +32,6 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   isMandatory: {},
-  isEnabled: {},
-  visibility: {},
   disableFutureDate: {},
   minDays: {},
   maxDays: {}

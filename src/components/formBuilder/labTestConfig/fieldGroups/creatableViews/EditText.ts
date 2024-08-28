@@ -44,9 +44,6 @@ const getEmptyData = (): IEditTextFields => ({
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
-  visibility: {},
-  isEnabled: {},
-  isEnrollment: {},
   isMandatory: {},
   isNeedAction: { disabled: true },
   maxLength: {},
