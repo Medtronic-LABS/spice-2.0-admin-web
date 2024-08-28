@@ -11,6 +11,7 @@ import ResetPasswordFields, { generatePassword } from '../../containers/authenti
 import { useDispatch, useSelector } from 'react-redux';
 import { changeOwnPassword } from '../../store/user/actions';
 import { emailSelector, getUserSuiteAccessSelector, userIdSelector } from '../../store/user/selectors';
+import { emailSelector, getUserSuiteAccessSelector, userIdSelector } from '../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
@@ -35,24 +36,6 @@ const UserMenu = ({ role }: any) => {
   const [submitEnable, setSubmitEnabled] = useState(false);
   const menus = userSuiteAccess.includes(SUITE_ACCESS.ADMIN)
     ? [
-        {
-          label: 'Deactivated Records',
-          icon: IconDeactivated,
-          route: PROTECTED_ROUTES.deactivatedRecords,
-          roles: SU_SA_RA
-        },
-        {
-          label: 'Locked Users',
-          icon: LockedUserIcon,
-          route: PROTECTED_ROUTES.lockedUsers,
-          roles: SU_SA_RA_DA_CDA_HFA
-        },
-        {
-          label: 'Legal Terms',
-          icon: IconLegal,
-          route: PROTECTED_ROUTES.legalTerms,
-          roles: SU_SA_RA_DA
-        },
         {
           label: 'My Profile',
           icon: IconProfile,
