@@ -291,7 +291,7 @@ const AccordianView = ({
   setFormMeta,
   onCancel,
   targetIds,
-  onSubmit,
+  onSubmit: onSubmitFinal,
   accordianRef,
   newlyAddedIdsRef,
   setEditGroupedFieldsOrder,

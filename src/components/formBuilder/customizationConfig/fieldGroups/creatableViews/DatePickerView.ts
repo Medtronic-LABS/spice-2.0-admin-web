@@ -27,9 +27,9 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   isMandatory: {},
-  isEnabled: {},
-  visibility: {},
-  testValidityDays: {}
+  disableFutureDate: {},
+  minDays: {},
+  maxDays: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {

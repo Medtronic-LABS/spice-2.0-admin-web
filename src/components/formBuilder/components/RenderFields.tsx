@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
-import { useParams } from 'react-router-dom';
+
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
 import { InputTypes } from '../config/BaseFieldConfig';
@@ -42,9 +42,6 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
-    inputProps = { ...inputProps, required: true };
-  }
   if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
     inputProps = { ...inputProps, disabled: true };
   }
@@ -76,7 +73,6 @@ interface IComponentProps {
   codeRef?: React.MutableRefObject<string>;
   urlRef?: React.MutableRefObject<string>;
   input?: any;
-  isCustomizationForm?: boolean;
 }
 
 export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj }: IComponentProps) => {
@@ -376,11 +372,6 @@ export const TextFieldComponent = ({
   if (inputProps?.type === 'number' && obj.inputType !== InputTypes.DECIMAL) {
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
-  if (
-    ['minDays', 'maxDays', 'minValue', 'maxValue', 'minLength', 'maxLength', 'lengthGreaterThan'].includes(fieldName)
-  ) {
-    parseFn = (value: any) => (value > 0 ? value : null);
-  }
 
   const getAsterisk = () => {
     const codeValue = form.getFieldState(`${name}.code`)?.value;
@@ -392,8 +383,6 @@ export const TextFieldComponent = ({
     const urlValue = form.getFieldState(`${name}.url`)?.value;
     if (field === 'code' && !codeValue && urlValue) {
       return 'Please enter the code';
-    } else if (field === 'code' && codeValue && containsOnlyLettersAndNumbers(codeValue)) {
-      return ' Please enter a valid code';
     } else if (field === 'code') {
       return '';
     }
@@ -438,13 +427,10 @@ const RenderFields = ({
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
   input,
-  isCustomizationForm,
-  isWorkFlowCustomization,
   ...rest
 }: any) => {
   const codeRef = useRef('');
   const urlRef = useRef('');
-  const { form: formType } = useParams<IMatchParams>();
   // Toggle text field component to select component on disable mode
   inputProps = {
     ...inputProps,
@@ -563,7 +549,6 @@ const RenderFields = ({
           codeRef={codeRef}
           urlRef={urlRef}
           input={input}
-          isCustomizationForm={isCustomizationForm}
         />
       );
     }

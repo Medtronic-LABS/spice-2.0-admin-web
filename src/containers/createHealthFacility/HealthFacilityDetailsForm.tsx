@@ -42,18 +42,10 @@ import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
-import Workflows from '../healthFacility/Workflows';
-import { fetchDistrictDetailReq, fetchDistrictListRequest } from '../../store/district/actions';
-import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
-import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
-import {
-  chiefdomListSelector,
-  chiefdomLoadingSelector,
-  getChiefdomDetailSelector
-} from '../../store/chiefdom/selectors';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import Workflows from './Workflows';
+import { IVillages } from '../../store/healthFacility/types';
 import toastCenter from '../../utils/toastCenter';
-import sessionStorageServices from '../../global/sessionStorageServices';
+import APPCONSTANTS from '../../constants/appConstants';
 
 interface IAddUserFormProps {
   formName: string;
@@ -216,7 +208,12 @@ const HealthFacilityDetailsForm = ({
           countryId,
           districtId: Number(districtId),
           chiefdomId: Number(chiefdomId),
-          healthFacilityId: data?.id ? data.id : undefined
+          healthFacilityId: data?.id ? data.id : undefined,
+          successCb: (list: IVillages[]) => {
+            if (!list.length) {
+              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
+            }
+          }
         })
       );
     }
