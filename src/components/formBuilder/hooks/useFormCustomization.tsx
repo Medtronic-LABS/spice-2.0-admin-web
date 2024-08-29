@@ -38,8 +38,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
 
   const hashFieldIdsWithTitleRef = useRef<any>({});
   const hashFieldIdsWithTitle = hashFieldIdsWithTitleRef.current;
-  const hashFieldIdsWithFieldNameRef = useRef<any>({});
-  const hashFieldIdsWithFieldName = hashFieldIdsWithFieldNameRef.current;
+  const [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName] = useState<any>({});
 
   const { pathname } = useLocation();
   const isRegionCustomizeForm = Boolean(

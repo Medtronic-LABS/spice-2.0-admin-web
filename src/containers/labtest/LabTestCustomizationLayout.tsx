@@ -207,7 +207,8 @@ const LabTestCustomizationLayout = () => {
             collapsedGroup={collapsedGroup}
             setCollapsedGroup={setCollapsedGroup}
             hashFieldIdsWithTitle={hashFieldIdsWithTitle}
-            hashFieldIdsWithFieldName={{ ...hashFieldIdsWithFieldName, TestedOn: 'TestedOn' }}
+            hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+            sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             addNewFieldDisabled={false}
             isFieldNameChangable={true}
             isCustomizationForm={false}

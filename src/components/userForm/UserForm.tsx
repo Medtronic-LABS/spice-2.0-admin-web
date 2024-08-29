@@ -262,8 +262,11 @@ const UserForm = ({
 
   const phNumberFieldRef = React.createRef<{ resetPhoneNumberField?: (value?: string) => void }>();
 
-  const autoPopulateUserData = (user: any, index: number) => {
+  const phNumberFieldRef = React.createRef<{ resetPhoneNumberField?: (value?: string) => void }>();
+
+  const autoPopulateUserData = (user: any, index: number, fields: any) => {
     phNumberFieldRef.current?.resetPhoneNumberField?.(user.phoneNumber);
+    form.reset();
     const userData = {
       ...user
     };
@@ -277,9 +280,13 @@ const UserForm = ({
       form.change(`${formName}[${index}].username`, '');
       toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
     };
-    if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
-      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE);
-    } else if (isCHPSelected(userData.role) && isHFCreate) {
+    const isReportAdmin = isRoleExists(userData.role, ['REPORT_ADMIN']);
+    const isSuperAdmin = isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER']);
+    if (isSuperAdmin || isReportAdmin) {
+      emailDisabledFn(
+        APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE.replace('Super', isReportAdmin ? 'Report' : 'Super')
+      );
+    } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
@@ -751,7 +758,7 @@ const UserForm = ({
   };
 
   const showSupervisorVillageFn = (index: number) => {
-    const { supervisor, villages: selectedVillages } = form.getState().values?.users?.[index] || {};
+    const { supervisor, villages: selectedVillages = [] } = form.getState().values?.users?.[index] || {};
     if (!isCHWUser[index] && (supervisor?.id || selectedVillages.length)) {
       form.change(`${formName}[${index}].supervisor`, '');
       form.change(`${formName}[${index}].villages`, []);
@@ -1066,9 +1073,7 @@ const UserForm = ({
                     entityName={entityName}
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
-                    onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
-                    parentOrgId={parentOrgId}
-                    ignoreTenantId={ignoreTenantId}
+                    onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index, fields)}
                   />
                 </div>
                 <div className='col-sm-6 col-12'>
