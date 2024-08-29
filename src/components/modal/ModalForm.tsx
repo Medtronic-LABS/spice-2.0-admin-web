@@ -2,9 +2,9 @@ import ReactDOM from 'react-dom';
 import { Form } from 'react-final-form';
 import React, { useRef } from 'react';
 import { FormApi } from 'final-form';
+import { resetFields } from '../../utils/commonUtils';
 
 import close from '../../assets/images/close.svg';
-
 import styles from './ModalForm.module.scss';
 
 export type IModalSize = 'modal-md' | 'modal-lg' | 'modal-xl';
@@ -75,7 +75,10 @@ const ModalForm = React.memo(
                 }
               }}
               initialValues={initialValues}
-              mutators={{ ...mutators }}
+              mutators={{
+                ...mutators,
+                resetFields
+              }}
               render={({ handleSubmit, form, values }) => {
                 return (
                   <form

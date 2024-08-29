@@ -29,6 +29,7 @@ interface IAccordinaViewProps {
   allowedFields: any;
   hashFieldIdsWithTitle?: any;
   hashFieldIdsWithFieldName?: any;
+  sethashFieldIdsWithFieldName?: any;
   culture?: any;
   isShow?: boolean;
   addNewFieldDisabled?: boolean;
@@ -281,6 +282,7 @@ const AccordianView = ({
   allowedFields,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
+  sethashFieldIdsWithFieldName,
   culture,
   isShow,
   addNewFieldDisabled,
@@ -360,7 +362,9 @@ const AccordianView = ({
     // update newly added ids and fieldname value
     if (isFieldNameChangable) {
       if (fieldGroupName in hashFieldIdsWithFieldName) {
-        delete hashFieldIdsWithFieldName[fieldGroupName];
+        const newhashFieldIdsWithFieldName = { ...hashFieldIdsWithFieldName };
+        delete newhashFieldIdsWithFieldName[fieldGroupName];
+        sethashFieldIdsWithFieldName(newhashFieldIdsWithFieldName);
       }
       if (fieldGroupName in hashFieldIdsWithTitle) {
         delete hashFieldIdsWithTitle[fieldGroupName];

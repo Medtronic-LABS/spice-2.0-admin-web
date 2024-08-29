@@ -52,6 +52,7 @@ const LabTestCustomizationLayout = () => {
     presentableJson,
     hashFieldIdsWithTitle,
     hashFieldIdsWithFieldName,
+    sethashFieldIdsWithFieldName,
 
     // reorder props
     isFamilyOrderModelOpen,
@@ -172,6 +173,18 @@ const LabTestCustomizationLayout = () => {
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));
     setFormData(formValues);
   };
+  useEffect(() => {
+    if ('TestedOn' in hashFieldIdsWithFieldName) {
+      return;
+    } else {
+      const newhashFieldIdsWithFieldName = {
+        ...hashFieldIdsWithFieldName,
+        TestedOn: 'TestedOn'
+      };
+      sethashFieldIdsWithFieldName(newhashFieldIdsWithFieldName);
+    }
+  }, [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName]);
+
   return (
     <>
       {formData && !loading ? (
@@ -192,7 +205,8 @@ const LabTestCustomizationLayout = () => {
             collapsedGroup={collapsedGroup}
             setCollapsedGroup={setCollapsedGroup}
             hashFieldIdsWithTitle={hashFieldIdsWithTitle}
-            hashFieldIdsWithFieldName={{ ...hashFieldIdsWithFieldName, TestedOn: 'TestedOn' }}
+            hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+            sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             addNewFieldDisabled={false}
             isFieldNameChangable={true}
             isShow={true}

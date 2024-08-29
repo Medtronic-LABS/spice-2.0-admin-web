@@ -34,8 +34,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
 
   const hashFieldIdsWithTitleRef = useRef<any>({});
   const hashFieldIdsWithTitle = hashFieldIdsWithTitleRef.current;
-  const hashFieldIdsWithFieldNameRef = useRef<any>({});
-  const hashFieldIdsWithFieldName = hashFieldIdsWithFieldNameRef.current;
+  const [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName] = useState<any>({});
 
   const { pathname } = useLocation();
   const isRegionCustomizeForm = Boolean(
@@ -85,12 +84,13 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   // format initial data by family
   const groupViewsByFamily = (obj: any) => {
     const res: { [groupName: string]: any } = {};
+    const newhashFieldIdsWithFieldName = { ...hashFieldIdsWithFieldName };
     Object.values(obj).forEach((view: any) => {
       if (view.family) {
         // temp ID to track Display name changes
-        hashFieldIdsWithTitle[view.id] = view.title;
+        hashFieldIdsWithTitle[view.id.trim()] = view.title.trim();
         // temp ID to track Field name changes
-        hashFieldIdsWithFieldName[view.id] = view.fieldName;
+        newhashFieldIdsWithFieldName[view.id.trim()] = view.fieldName.trim();
         res[view.family] = { ...res[view.family], ...{ [view.id]: view } };
       } else if (view.viewType === 'CardView' && !view.family) {
         res[view.id] = { [view.id]: view };
@@ -105,6 +105,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
         return;
       }
     });
+    sethashFieldIdsWithFieldName(newhashFieldIdsWithFieldName);
     return res;
   };
 
@@ -152,6 +153,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
     presentableJson,
     hashFieldIdsWithTitle,
     hashFieldIdsWithFieldName,
+    sethashFieldIdsWithFieldName,
 
     // reorder props
     isFamilyOrderModelOpen,

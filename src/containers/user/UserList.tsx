@@ -212,9 +212,9 @@ const UserList = (): React.ReactElement => {
   );
 
   /**
-   * Handler for edit user form submit.
+   * Handler for edit/add user form submit.
    */
-  const handleEditSubmit = useCallback(
+  const handleUserSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
       const [getRedRisk] = spiceUserRole.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
@@ -361,7 +361,7 @@ const UserList = (): React.ReactElement => {
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}
-          handleFormSubmit={handleEditSubmit}
+          handleFormSubmit={handleUserSubmit}
           initialValues={{ users: userForEdit.current }}
           render={userFormRenderer}
           mutators={{ ...arrayMutators }}

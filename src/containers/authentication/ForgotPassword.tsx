@@ -21,7 +21,12 @@ const ForgotPassword = (props: IRouteProps) => {
   };
 
   const onSubmitForm = (values: any) => {
-    dispatch(forgotPasswordRequest({ email: values.email, successCB: backToLogin }));
+    dispatch(
+      forgotPasswordRequest({
+        email: values.email,
+        successCB: backToLogin
+      })
+    );
   };
   return (
     <div className={styles.loginPage}>

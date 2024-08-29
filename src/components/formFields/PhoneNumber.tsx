@@ -2,7 +2,7 @@ import { Field, FieldRenderProps } from 'react-final-form';
 import { composeValidators, normalizePhone, required, validateMobile } from '../../utils/validation';
 import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -20,7 +20,7 @@ interface IProps {
   countryCode: string;
 }
 
-const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode }: IProps) => {
+const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, index }: IProps, ref) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -114,6 +114,22 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
     [id, countryCode, form, name, alreadyExistError]
   );
 
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        resetPhoneNumberField: (value?: string) => {
+          lastCheckedNumber.current = '';
+          error.current = '';
+          if (value) {
+            validatePhoneNumberFn(value, true);
+          }
+        }
+      };
+    },
+    [error, validatePhoneNumberFn]
+  );
+
   useEffect(() => {
     if (currentphoneNumber && countryCode) {
       validatePhoneNumberFn(currentphoneNumber.current, true);
@@ -174,5 +190,5 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
       }}
     />
   );
-};
+});
 export default PhoneNumberField;

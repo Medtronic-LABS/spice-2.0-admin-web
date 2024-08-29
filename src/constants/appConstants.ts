@@ -146,7 +146,7 @@ const APPCONSTANTS = {
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
-  SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin user should not be added.',
+  SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_CREATE_SUCCESS: 'User details created successfully.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
@@ -261,6 +261,7 @@ const APPCONSTANTS = {
   LABTEST_RESULT_RANGES_UPDATE_FAIL: 'Unable to update lab result ranges. Please try after sometime.',
   REQUIRED_MANDATORY_FAILED: 'At least two fields need to be mandatory.',
 
+  FORGOT_USER_FAILURE_ERR_MSG: 'Unable to submit the request. Please try after sometime.',
   EMAIL_ALREADY_EXISTS_ERR_MSG: 'Email ID already exists',
   EMR_ERR_MSG: 'Email ID already exists in EMR role',
   SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',
@@ -360,15 +361,5 @@ export const NAME_CONSTANTS = {
     p: 'Health Facilities'
   }
 };
-
-export const ROLE_LABELS = {
-  [APPCONSTANTS.ROLES.SUPER_USER]: 'Super User',
-  [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
-  [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
-};
-
-export const COMMON_INSIGHTS_ADMINROLE = ['EMR_QUICKSIGHT_SPICE_ADMIN', 'EMR_QUICKSIGHT_TC_ADMIN'];
-export const COMMON_INSIGHTS_USERROLE = ['EMR_SITE_USER'];
 
 export default APPCONSTANTS;
