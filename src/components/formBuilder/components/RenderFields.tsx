@@ -372,6 +372,9 @@ export const TextFieldComponent = ({
   if (inputProps?.type === 'number' && obj.inputType !== InputTypes.DECIMAL) {
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
+  if (['minDays', 'maxDays', 'minValue', 'maxValue', 'minLength', 'maxLength'].includes(fieldName)) {
+    parseFn = (value: any) => (value > 0 ? value : null);
+  }
 
   const getAsterisk = () => {
     const codeValue = form.getFieldState(`${name}.code`)?.value;
@@ -383,6 +386,8 @@ export const TextFieldComponent = ({
     const urlValue = form.getFieldState(`${name}.url`)?.value;
     if (field === 'code' && !codeValue && urlValue) {
       return 'Please enter the code';
+    } else if (field === 'code' && codeValue && containsOnlyLettersAndNumbers(codeValue)) {
+      return ' Please enter a valid code';
     } else if (field === 'code') {
       return '';
     }

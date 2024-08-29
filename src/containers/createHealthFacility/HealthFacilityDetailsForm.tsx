@@ -229,7 +229,12 @@ const HealthFacilityDetailsForm = ({
   ]);
 
   useEffect(() => {
-    const { district, chiefdom, city, linkedVillages } = form.getState().values.healthFacility;
+    const { district, chiefdom, city, linkedVillages } = form.getState().values?.healthFacility || {
+      district: {},
+      chiefdom: {},
+      city: {},
+      linkedVillages: []
+    };
     if (!isEdit && !district?.id && (chiefdom?.id || city?.id || (linkedVillages || []).length)) {
       form.batch(() => {
         form.change(`${formName}.chiefdom`, undefined);

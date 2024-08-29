@@ -267,7 +267,11 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const autoPopulateUserData = (user: any, index: number) => {
+  const phNumberFieldRef = React.createRef<{ resetPhoneNumberField?: (value?: string) => void }>();
+
+  const autoPopulateUserData = (user: any, index: number, fields: any) => {
+    phNumberFieldRef.current?.resetPhoneNumberField?.(user.phoneNumber);
+    form.reset();
     const userData = {
       ...user
     };
@@ -281,9 +285,13 @@ const UserForm = ({
       form.change(`${formName}[${index}].username`, '');
       toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
     };
-    if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
-      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE);
-    } else if (isCHPSelected(userData.role) && isHFCreate) {
+    const isReportAdmin = isRoleExists(userData.role, ['REPORT_ADMIN']);
+    const isSuperAdmin = isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER']);
+    if (isSuperAdmin || isReportAdmin) {
+      emailDisabledFn(
+        APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE.replace('Super', isReportAdmin ? 'Report' : 'Super')
+      );
+    } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
@@ -299,8 +307,8 @@ const UserForm = ({
       userData.selectedRoles = [...(userData.roles || [])];
       userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
       if (userData.organizations.length === 1) {
-        const { formDataId: id, name } = userData.organizations[0];
-        userData.healthFacility = { id, name };
+        const { formDataId: id, name, id: tenantId } = userData.organizations[0];
+        userData.healthFacility = { id, name, tenantId };
       }
       form.batch(() => {
         form.change(`${formName}[${index}].id`, userData.id || '');
@@ -318,6 +326,7 @@ const UserForm = ({
           id: userData.countryCode
         });
         form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
+        form.change(`${formName}[${index}].username`, userData.username || '');
         form.change(`${formName}[${index}].healthFacility`, userData.healthFacility || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
         form.change(`${formName}[${index}].villages`, userData.villages || []);
@@ -423,6 +432,7 @@ const UserForm = ({
             newAutoFetched[index] = false;
             setAutoFetched(newAutoFetched);
             emailFieldRef.current?.resetEmailField?.();
+            phNumberFieldRef.current?.resetPhoneNumberField?.();
             resetAdminForm(fields, index);
           }}
         >
@@ -733,7 +743,7 @@ const UserForm = ({
   };
 
   const showSupervisorVillageFn = (index: number) => {
-    const { supervisor, villages: selectedVillages } = form.getState().values?.users?.[index] || {};
+    const { supervisor, villages: selectedVillages = [] } = form.getState().values?.users?.[index] || {};
     if (!isCHWUser[index] && (supervisor?.id || selectedVillages.length)) {
       form.change(`${formName}[${index}].supervisor`, '');
       form.change(`${formName}[${index}].villages`, []);
@@ -747,6 +757,7 @@ const UserForm = ({
         fields.map((name: string, index: number) => {
           const isLastChild = (fields?.length || 0) === index + 1;
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
+
           // SUITE options
           const suiteAccess = getSuiteAccessList(rolesGrouped);
           const {
@@ -1052,9 +1063,7 @@ const UserForm = ({
                     entityName={entityName}
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
-                    onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
-                    parentOrgId={parentOrgId}
-                    ignoreTenantId={ignoreTenantId}
+                    onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index, fields)}
                   />
                 </div>
                 <div className='col-sm-6 col-12'>
@@ -1093,6 +1102,7 @@ const UserForm = ({
                 </div>
                 <div className='col-sm-6 col-12'>
                   <PhoneNumberField
+                    ref={phNumberFieldRef}
                     id={form.getState().values.users[index]?.id}
                     fieldName='phoneNumber'
                     form={form}

@@ -33,6 +33,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   const hashFieldIdsWithTitleRef = useRef<any>({});
   const hashFieldIdsWithTitle = hashFieldIdsWithTitleRef.current;
   const [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName] = useState<any>({});
+  const [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName] = useState<any>({});
 
   const resetCollapsedCalculation = (keys: string[]) => {
     const res: { [k: string]: boolean } = {};
@@ -83,7 +84,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
         // temp ID to track Display name changes
         hashFieldIdsWithTitle[view.id.trim()] = view.title.trim();
         // temp ID to track Field name changes
-        newhashFieldIdsWithFieldName[view.id.trim()] = view.fieldName?.trim();
+        newhashFieldIdsWithFieldName[view.id.trim()] = view.fieldName.trim();
         res[view.family] = { ...res[view.family], ...{ [view.id]: view } };
       } else if (view.viewType === 'CardView' && !view.family) {
         res[view.id] = { [view.id]: view };

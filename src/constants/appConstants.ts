@@ -146,6 +146,7 @@ const APPCONSTANTS = {
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
+  SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_CREATE_SUCCESS: 'User details created successfully.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
@@ -348,22 +349,5 @@ export const NAME_CONSTANTS = {
     p: 'Health Facilities'
   }
 };
-
-export const ROLE_LABELS = {
-  [APPCONSTANTS.ROLES.SUPER_USER]: 'Super User',
-  [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
-  [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
-};
-
-export const SIDE_MENU_FETCHING_HIERARCHY = {
-  region: 'SUPER_ADMIN',
-  district: 'REGION_ADMIN',
-  chiefdom: 'DISTRICT_ADMIN',
-  'health-facility': 'CHIEFDOM_ADMIN'
-};
-
-export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
-export const COMMON_INSIGHTS_USERROLE = ['CFR_SITE_USER'];
 
 export default APPCONSTANTS;
