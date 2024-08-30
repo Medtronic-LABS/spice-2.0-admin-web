@@ -54,7 +54,7 @@ const TextFieldWrapper = ({
               error={
                 (meta.error && formError && meta.error) ||
                 (meta.data?.customError && meta.data?.customError.toString()) ||
-                (customError && customError.toString()) ||
+                (meta.error && customError && customError.toString()) ||
                 (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label?.toLowerCase()) ||
                 (meta.error &&
                   inputProps.type === 'number' &&

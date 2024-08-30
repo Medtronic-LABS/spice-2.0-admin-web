@@ -1,75 +1,29 @@
-import { InputTypes } from '../config/BaseFieldConfig';
-import CARD_VIEW_CONFIG from '../config/fieldGroups/CardView';
-import EDIT_TEXT_CONFIG from '../config/fieldGroups/creatableViews/EditText';
-import RADIO_GROUP_CONFIG from '../config/fieldGroups/creatableViews/RadioGroup';
-import DROPDOWN_CONFIG from '../config/fieldGroups/creatableViews/Dropdown';
-import CHECKBOX_CONFIG from '../config/fieldGroups/creatableViews/CheckBox';
-import TEXT_LABEL_CONFIG from '../config/fieldGroups/TextLabel';
+import { InputTypes } from '../labTestConfig/BaseFieldConfig';
+import CARD_VIEW_CONFIG from '../labTestConfig/fieldGroups/CardView';
+import EDIT_TEXT_CONFIG from '../labTestConfig/fieldGroups/creatableViews/EditText';
+import RADIO_GROUP_CONFIG from '../labTestConfig/fieldGroups/creatableViews/RadioGroup';
+import DROPDOWN_CONFIG from '../labTestConfig/fieldGroups/creatableViews/Dropdown';
+import CHECKBOX_CONFIG from '../labTestConfig/fieldGroups/creatableViews/CheckBox';
+import TEXT_LABEL_CONFIG from '../labTestConfig/fieldGroups/TextLabel';
 import { IComponentConfig } from '../types/ComponentConfig';
-import SINGLE_SELECTION_VIEW_CONFIG from '../config/fieldGroups/creatableViews/SingleSelectionView';
-import DATE_PICKER_CONFIG from '../config/fieldGroups/creatableViews/DatePickerView';
-import DIALOG_CHECKBOX_CONFIG from '../config/fieldGroups/creatableViews/DialogCheckbox';
-import MENTAL_HEALTH_CONFIG from '../config/fieldGroups/MentalHealthView';
+import DATE_PICKER_CONFIG from '../labTestConfig/fieldGroups/creatableViews/DatePickerView';
 
 export const creatableViews = [
-  { label: 'BP Input', value: 'BP', isAccountCustomizable: false },
-  { label: 'Radio Input', value: 'RadioGroup', isAccountCustomizable: true },
-  { label: 'Age Input', value: 'Age', isAccountCustomizable: false },
-  { label: 'Height Input', value: 'Height', isAccountCustomizable: false },
-  { label: 'Time View', value: 'TimeView', isAccountCustomizable: false },
-  { label: 'Text Input', value: 'EditText', isAccountCustomizable: true },
-  { label: 'Select Input', value: 'Spinner', isAccountCustomizable: true },
-  { label: 'Slider', value: 'ScaleIndicator', isAccountCustomizable: true },
-  { label: 'Multi Select Input', value: 'CheckBox', isAccountCustomizable: true },
-  { label: 'Single Selection', value: 'SingleSelectionView', isAccountCustomizable: true },
-  { label: 'Dialog Checkbox', value: 'DialogCheckbox', isAccountCustomizable: false },
-  { label: 'Instructions', value: 'Instruction', isAccountCustomizable: true },
-  { label: 'Information Label', value: 'InformationLabel', isAccountCustomizable: false },
-  { label: 'Date Input', value: 'DatePicker', isAccountCustomizable: true }
-];
-
-export const unitMeasurementFields = ['glucose', 'hba1c'];
-
-export const isEditableFields = [
-  'firstName',
-  'middleName',
-  'lastName',
-  'phoneNumber',
-  'phoneNumberCategory',
-  'landmark',
-  'occupation',
-  'insuranceStatus',
-  'insuranceType',
-  'insuranceId',
-  'otherInsurance'
+  { label: 'Text', value: 'EditText' },
+  { label: 'Dropdown', value: 'Spinner' },
+  { label: 'Date', value: 'DatePicker' }
 ];
 
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
   switch (viewType) {
     case 'RadioGroup':
       return RADIO_GROUP_CONFIG;
-    case 'SingleSelectionView':
-      return SINGLE_SELECTION_VIEW_CONFIG;
-    case 'Age':
-      return AGE_CONFIG;
-    case 'Height':
-      return HEIGHT_CONFIG;
-    case 'TimeView':
-      return TIME_VIEW_CONFIG;
     case 'EditText':
       return EDIT_TEXT_CONFIG;
     case 'Spinner':
       return DROPDOWN_CONFIG;
     case 'CheckBox':
       return CHECKBOX_CONFIG;
-    case 'DialogCheckbox':
-      return DIALOG_CHECKBOX_CONFIG;
-    case 'ScaleIndicator':
-      return SCALE_INDICATOR_CONFIG;
-    case 'Instruction':
-      return INSTRUCTION_CONFIG;
-    case 'MentalHealthView':
-      return MENTAL_HEALTH_CONFIG;
     case 'TextLabel':
       return TEXT_LABEL_CONFIG;
     case 'DatePicker':

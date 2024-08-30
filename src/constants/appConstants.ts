@@ -24,20 +24,36 @@ const APPCONSTANTS = {
   LAST_NAME_LENGTH: 100,
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
-    ADMIN: 'admin',
-    CFR: 'cfr'
+    ADMIN: 'spice web',
+    CFR: 'cfr web',
+    INSIGHTS: 'insights'
   },
   ROLES: {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
-    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
-    PEER_SUPERVISOR: 'PEER_SUPERVISOR',
     REGION_ADMIN: 'REGION_ADMIN',
-    ACCOUNT_ADMIN: 'COUNTY_ADMIN',
-    OPERATING_UNIT_ADMIN: 'OPERATING_UNIT_ADMIN',
+    DISTRICT_ADMIN: 'DISTRICT_ADMIN',
+    CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN',
+    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN'
+  },
+  ALL_ROLES: {
+    SUPER_USER: 'SUPER_USER',
+    SUPER_ADMIN: 'SUPER_ADMIN',
+    REGION_ADMIN: 'REGION_ADMIN',
+    DISTRICT_ADMIN: 'DISTRICT_ADMIN',
+    CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN',
+    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
+    HEALTH_COACH: 'HEALTH_COACH',
+    HEALTH_SCREENER: 'HEALTH_SCREENER',
+    HRIO: 'HRIO',
     LAB_TECHNICIAN: 'LAB_TECHNICIAN',
-    REPORT_ADMIN: 'REPORT_ADMIN',
-    FACILITY_REPORT_ADMIN: 'FACILITY_REPORT_ADMIN'
+    NUTRITIONIST: 'NUTRITIONIST',
+    COUNSELOR: 'COUNSELOR',
+    PHARMACIST: 'PHARMACIST',
+    PROVIDER: 'PROVIDER',
+    NURSE: 'NURSE',
+    PHYSICIAN_PRESCRIBER: 'PHYSICIAN_PRESCRIBER',
+    REPORT_ADMIN: 'REPORT_ADMIN'
   },
   ROUTE_NAMES: {
     REGION: 'region',
@@ -125,6 +141,17 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
+  WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select a clinical workflow',
+  CUSTOMIZED_WORKFLOW: 'Customized Workflow',
+  CLINICAL_WORKFLOW: 'Clinical Workflow',
+  WORKFLOW_MODULE: {
+    clinical: 'clinical',
+    customized: 'customized'
+  },
+  spiceRole: {
+    spice: 'spice web',
+    spiceInsights: 'SPICE INSIGHTS'
+  },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
@@ -293,19 +320,6 @@ const APPCONSTANTS = {
     { label: 'Inactive site', value: 'Inactive site' },
     { label: 'Other', value: 'Other' }
   ],
-  SITE_ROLES: [
-    { value: 'HEALTH_COACH', label: 'Health Coach' },
-    { value: 'HEALTH_SCREENER', label: 'Health Screener' },
-    { value: 'HRIO', label: 'HRIO' },
-    { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
-    { value: 'NUTRITIONIST', label: 'Nutritionist' },
-    { value: 'PHARMACIST', label: 'Pharmacist' },
-    { value: 'NURSE', label: 'Nurse' },
-    { value: 'PHYSICIAN_PRESCRIBER', label: 'Physician Prescriber' },
-    { value: 'PROVIDER', label: 'Provider' },
-    { value: 'COUNSELOR', label: 'Counselor' },
-    { value: 'SITE_ADMIN', label: 'Site Admin' }
-  ],
   // utils
 
   MONTHS: [
@@ -322,7 +336,8 @@ const APPCONSTANTS = {
     'November',
     'December'
   ],
-  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType']
+  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType'],
+  CUSTOMIZATION_FORM_CATEGORY: 'Input_form'
 };
 
 export const NAME_CONSTANTS = {

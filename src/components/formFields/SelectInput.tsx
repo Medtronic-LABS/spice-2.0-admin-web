@@ -54,7 +54,7 @@ interface ISelectBoxProps {
   autoSelect?: boolean;
   name?: string;
   menuPlacement?: string;
-  autoSelect?: boolean;
+  autoSelectValue?: any;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {

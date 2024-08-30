@@ -13,7 +13,6 @@ import UserForm from '../../components/userForm/UserForm';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { columnDef } from './userListMeta';
-import { columnDef } from './userListMeta';
 import CustomTable from '../../components/customTable/CustomTable';
 import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import {
@@ -177,7 +176,6 @@ const UserList = (): React.ReactElement => {
       postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
       postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-      postData.insightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       userForEdit.current = { users: [{ ...postData }] };
       setIsOpenUserModal({ isOpen: true, isEdit: true });
     }
@@ -218,9 +216,9 @@ const UserList = (): React.ReactElement => {
   );
 
   /**
-   * Handler for edit/add user form submit.
+   * Handler for edit user form submit.
    */
-  const handleUserSubmit = useCallback(
+  const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
       const [getRedRisk] = spiceUserRole.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
@@ -237,7 +235,9 @@ const UserList = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              isOpenUserModal.isEdit ? APPCONSTANTS.USER_UPDATE_ERROR : APPCONSTANTS.USER_CREATE_ERROR
+              isOpenUserModal.isEdit
+                ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
+                : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
             )
           );
         }
@@ -310,26 +310,6 @@ const UserList = (): React.ReactElement => {
     fetchList();
   }, []);
 
-  const requestFailure = (e: Error, errorMessage: string) =>
-    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, errorMessage));
-
-  const fetchList = useCallback(() => {
-    dispatch(
-      fetchHFListRequest({
-        countryId: countryIdValue,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: null,
-        searchTerm: listParams.searchTerm,
-        userBased: !isSuperUser,
-        failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
-      })
-    );
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
-
-  useEffect(() => {
-    fetchList();
-  }, [listParams, dispatch]);
-
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
@@ -387,7 +367,7 @@ const UserList = (): React.ReactElement => {
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={handleCancelClick}
-          handleFormSubmit={handleUserSubmit}
+          handleFormSubmit={handleEditSubmit}
           initialValues={{ users: userForEdit.current }}
           render={userFormRenderer}
           mutators={{ ...arrayMutators }}

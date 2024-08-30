@@ -20,7 +20,8 @@ const RenderFieldGroups = ({
   addNewFieldDisabled,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isRegionCustomizeForm = false
+  isCustomizationForm = false,
+  isWorkFlowCustomization = false
 }: any) => {
   let componentConfig: IComponentConfig | ICustomizationComponentConfig;
 
@@ -47,9 +48,11 @@ const RenderFieldGroups = ({
         .map((field) => {
           if (componentConfig.customizableFieldMeta.hasOwnProperty(field)) {
             const inputProps = {
-              ...baseFieldMeta[field as keyof IBaseFieldMeta],
+              ...(isCustomizationForm
+                ? regionBaseFieldMeta[field as keyof IBaseFieldMeta]
+                : baseFieldMeta[field as keyof IBaseFieldMeta]),
               ...componentConfig.customizableFieldMeta[field as keyof IBaseFieldMeta],
-              ...(isRegionCustomizeForm ? { disabled: obj.readOnly === true } : {})
+              ...(isCustomizationForm ? { disabled: obj.readOnly === true } : {})
             };
             return (
               <RenderFields
@@ -64,12 +67,12 @@ const RenderFieldGroups = ({
                 isNew={isNew}
                 newlyAddedIds={newlyAddedIds}
                 handleUpdateFieldName={handleUpdateFieldName}
-                // isAccountCustomization={isAccountCustomization}
                 isFieldNameChangable={isFieldNameChangable}
                 addNewFieldDisabled={addNewFieldDisabled}
                 hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                 hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-                isRegionCustomizeForm={isRegionCustomizeForm}
+                isCustomizationForm={isCustomizationForm}
+                isWorkFlowCustomization={isWorkFlowCustomization}
               />
             );
           } else {

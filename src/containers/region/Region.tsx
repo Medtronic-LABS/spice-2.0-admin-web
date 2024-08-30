@@ -3,8 +3,6 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
@@ -12,8 +10,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
 import styles from './Region.module.scss';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
-import { downloadFileRequest, regionDetailsRequest, uploadFileRequest } from '../../store/region/actions';
-import { getIsUploadingSelector, getLoadingSelector, getRegionDetailsSelector } from '../../store/region/selectors';
+import {
+  downloadFileRequest,
+  uploadFileRequest,
+  regionDetailsRequest,
+  fetchCountryDetailReq
+} from '../../store/region/actions';
+import {
+  getIsUploadingSelector,
+  getLoadingSelector,
+  getRegionDetailsSelector,
+  getRegionIdSelector
+} from '../../store/region/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import arrayMutators from 'final-form-arrays';

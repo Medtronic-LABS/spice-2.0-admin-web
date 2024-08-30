@@ -1,18 +1,18 @@
 import { useRef, useState } from 'react';
 import { IComponentConfig } from '../types/ComponentConfig';
 import { IComponentConfig as IRegionComponentConfig } from '../types/CustomizationComponentConfig';
+import { IComponentConfig as IRegionComponentConfig } from '../types/CustomizationComponentConfig';
 import { FormApi } from 'final-form';
-import { getConfigByViewType, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
+import { getConfigByViewType } from '../utils/FieldUtils';
+import {
+  isEditableFields,
+  unitMeasurementFields,
+  getConfigByViewType as getRegionConfigViewType
+} from '../utils/CustomizationFieldUtils';
 import { ISelectFormOptions } from '../../../components/formFields/SelectInput';
 import APPCONSTANTS from '../../../constants/appConstants';
-import { useParams } from 'react-router-dom';
 import { camel2Title } from '../../../utils/validation';
-import { matchPath, useLocation } from 'react-router-dom';
-import { PROTECTED_ROUTES } from '../../../constants/route';
-
-interface IMatchParams {
-  form: string;
-}
+import { useParams } from 'react-router-dom';
 
 interface IMatchParams {
   form: string;
@@ -40,15 +40,10 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   const hashFieldIdsWithTitle = hashFieldIdsWithTitleRef.current;
   const [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName] = useState<any>({});
 
-  const { pathname } = useLocation();
-  const isRegionCustomizeForm = Boolean(
-    matchPath(pathname, { path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm, exact: true })
-  );
-
   const resetCollapsedCalculation = (keys: string[]) => {
     const res: { [k: string]: boolean } = {};
     keys.forEach((key: string, index: number) => {
-      res[key] = index === 0 && !isRegionCustomizeForm ? true : false;
+      res[key] = index === 0 && !isRegionFormCustomization ? true : false;
     });
     return res as { [key: string]: boolean };
   };
@@ -94,7 +89,7 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
         // temp ID to track Display name changes
         hashFieldIdsWithTitle[view.id.trim()] = view.title.trim();
         // temp ID to track Field name changes
-        newhashFieldIdsWithFieldName[view.id.trim()] = view.fieldName.trim();
+        newhashFieldIdsWithFieldName[view.id.trim()] = view.fieldName?.trim();
         res[view.family] = { ...res[view.family], ...{ [view.id]: view } };
       } else if (view.viewType === 'CardView' && !view.family) {
         res[view.id] = { [view.id]: view };
@@ -108,11 +103,13 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
       if (!isRegionFormCustomization) {
         return;
       }
-      if (formType === 'enrollment' && isEditableFields.includes(view.id) && !('isEditable' in view)) {
-        view.isEditable = true;
-      }
-      if (unitMeasurementFields.includes(view.id) && !('unitMeasurement' in view)) {
-        view.unitMeasurement = undefined;
+      if (isRegionFormCustomization) {
+        if (formType === 'enrollment' && isEditableFields.includes(view.id) && !('isEditable' in view)) {
+          view.isEditable = true;
+        }
+        if (unitMeasurementFields.includes(view.id) && !('unitMeasurement' in view)) {
+          view.unitMeasurement = undefined;
+        }
       }
     });
     sethashFieldIdsWithFieldName(newhashFieldIdsWithFieldName);

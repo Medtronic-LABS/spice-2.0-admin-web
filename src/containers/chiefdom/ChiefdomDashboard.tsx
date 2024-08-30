@@ -189,7 +189,7 @@ const ChiefdomDashboard = () => {
         </div>
         {noChiefdomsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>Let’s Get Started!</div>
+            <div className='fw-bold highlight-text'>Letâ€™s Get Started!</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {chiefdomSName.toLowerCase()}</div>
             <Link to={createChiefdomRoute} className='mx-auto' tabIndex={-1}>
               <button className='btn primary-btn'>Create {chiefdomSName}</button>

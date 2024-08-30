@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
@@ -46,6 +46,8 @@ const RegionFormCustomization = () => {
     [cultureList]
   );
   const [currentCulture, setCulture] = useState(defaultCulture);
+  const accordianRef = useRef<any>([]);
+  const newlyAddedIdsRef = useRef<any>([]);
 
   const {
     formRef,
@@ -61,6 +63,7 @@ const RegionFormCustomization = () => {
     resetCollapsedCalculation,
     getSortedData,
     presentableJson,
+    sethashFieldIdsWithFieldName,
 
     // reorder props
     isFamilyOrderModelOpen,
@@ -75,8 +78,8 @@ const RegionFormCustomization = () => {
         fetchCustomizationFormRequest({
           tenantId,
           countryId: regionId,
-          formType: form as FormType,
-          category: 'input_form',
+          formType: (form.charAt(0).toUpperCase() + form.slice(1)) as FormType,
+          category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
           cultureId,
           successCb: ({ formInput, cultureId: existingCulture }) => {
             if (!currentCulture?.id && cultureList?.length) {
@@ -141,7 +144,7 @@ const RegionFormCustomization = () => {
       customizeFormRequest({
         formType: form as FormType,
         formId,
-        category: 'input_form',
+        category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
         tenantId,
         countryId: regionId ? regionId : '',
         cultureId: currentCulture?.id,
@@ -212,9 +215,12 @@ const RegionFormCustomization = () => {
             collapsedGroup={collapsedGroup}
             setCollapsedGroup={setCollapsedGroup}
             isShow={false}
+            sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             addNewFieldDisabled={true}
             isFieldNameChangable={false}
-            isRegionCustomizeForm={true}
+            isCustomizationForm={true}
+            newlyAddedIdsRef={newlyAddedIdsRef.current}
+            accordianRef={accordianRef}
           />
           <ReorderView
             formRef={formRef}

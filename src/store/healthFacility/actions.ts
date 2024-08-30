@@ -83,7 +83,14 @@ import {
   IFetchHFDashboardListSuccess,
   IFetchHFDashboardListFailure,
   IHealthFacilitySummary,
-  ISetHFSummary
+  ISetHFSummary,
+  IFetchUnlinkedVillagesRequest,
+  IFetchUnlinkedVillagesSuccess,
+  IFetchUnlinkedVillagesFailure,
+  IValidateLinkedRestrictions,
+  IValidateLinkedRestrictionsSuccess,
+  IValidateLinkedRestrictionsFailure,
+  IObjectData
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -278,7 +285,7 @@ export const fetchHFTypesRequest = ({
   successCb
 });
 
-export const fetchHFTypesSuccess = (payload: Array<{ id: string; name: string }>): IFetchHFTypesSuccess => ({
+export const fetchHFTypesSuccess = (payload: IObjectData[]): IFetchHFTypesSuccess => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS,
   payload
 });
@@ -606,6 +613,19 @@ export const fetchWorkflowListRequest = ({
   failureCb
 });
 
+export const validationPeerSupervisor = ({
+  ids,
+  tenantId,
+  successCb,
+  failureCb
+}: Omit<IPeerSupervisorValidation, 'type'>): IPeerSupervisorValidation => ({
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+  ids,
+  tenantId,
+  successCb,
+  failureCb
+});
+
 export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetchWorkflowListSuccess => ({
   type: HF_TYPES.FETCH_WORKFLOW_LIST_SUCCESS,
   payload
@@ -613,6 +633,11 @@ export const fetchWorkflowListSuccess = (payload: { list: IWorkflow[] }): IFetch
 
 export const fetchWorkflowListFailure = (error: Error): IFetchWorkflowListFailure => ({
   type: HF_TYPES.FETCH_WORKFLOW_LIST_FAILURE,
+  error
+});
+
+export const fetchPeerSupervisorValidationsFailure = (error: Error): any => ({
+  type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
   error
 });
 

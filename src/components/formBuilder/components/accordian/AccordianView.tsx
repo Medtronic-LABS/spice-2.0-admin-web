@@ -9,7 +9,12 @@ import Accordian from '../../../../components/accordian/Accordian';
 import APPCONSTANTS from '../../../../constants/appConstants';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
-import { creatableViews, getConfigByViewType, isEditableFields, unitMeasurementFields } from '../../utils/FieldUtils';
+import { creatableViews, getConfigByViewType } from '../../utils/FieldUtils';
+import {
+  creatableViews as workflowCreatableViews,
+  getConfigByViewType as getWorkFlowConfigViewType
+} from '../../utils/CustomizationFieldUtils';
+import { isEditableFields, unitMeasurementFields } from '../../utils/CustomizationFieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
 import { containsOnlyLettersAndNumbers } from '../../../../utils/validation';
 
@@ -37,7 +42,8 @@ interface IAccordinaViewProps {
   isShow?: boolean;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
-  isRegionCustomizeForm?: boolean;
+  isCustomizationForm?: boolean;
+  isWorkFlowCustomization?: boolean;
 }
 
 export interface IFormValues {
@@ -54,7 +60,8 @@ export const addNewFieldFn = ({
   hashFieldIdsWithFieldName,
   accordianRef,
   setFormMeta,
-  isDeletable = undefined
+  isDeletable = undefined,
+  isWorkFlowCustomization = false
 }: {
   family: string;
   view: string;
@@ -66,6 +73,7 @@ export const addNewFieldFn = ({
   accordianRef: React.MutableRefObject<any>;
   setFormMeta: any;
   isDeletable?: boolean;
+  isWorkFlowCustomization?: boolean;
 }) => {
   const finalFormState = { ...formRef.current.getState() };
   const formValues = cloneDeep(finalFormState.values);
@@ -75,7 +83,12 @@ export const addNewFieldFn = ({
   const dropdownelement = document.getElementById('newfieldoptions');
   dropdownelement?.classList.remove('show');
   // add new field to form meta
-  const nxtView: any = getConfigByViewType(view).getEmptyData();
+  let nxtView: any;
+  if (isWorkFlowCustomization) {
+    nxtView = getWorkFlowConfigViewType(view).getEmptyData();
+  } else {
+    nxtView = getConfigByViewType(view).getEmptyData();
+  }
   nxtView.family = family;
   nxtView.orderId = Object.values(formValues[family]).filter((item: any) => item.viewType !== 'CardView').length + 1;
   if (isDeletable !== undefined) {
@@ -142,7 +155,7 @@ const AccordianHeader = ({
               </button>
             )}
             <ul className='dropdown-menu' aria-labelledby='newfieldoptions' id='dropdownMenu'>
-              {[...creatableViews]
+              {getCreateableViews()
                 .sort((a, b) => (a.label > b.label ? 1 : -1))
                 .map((view, index) => {
                   return (
@@ -182,7 +195,8 @@ const AccordianBody = ({
   hashFieldIdsWithFieldName,
   addNewFieldDisabled,
   isFieldNameChangable,
-  isRegionCustomizeForm
+  isCustomizationForm,
+  isWorkFlowCustomization
 }: any) => {
   const getDeleteIconCondition = (fieldGroupName: any, isNew: any) => {
     if (!isCustomizationForm || isWorkFlowCustomization) {
@@ -225,27 +239,25 @@ const AccordianBody = ({
                     newlyAddedIds={newlyAddedIds}
                     isNew={isNew}
                     handleUpdateFieldName={handleUpdateFieldName}
-                    // isAccountCustomization={isAccountCustomization}
                     isFieldNameChangable={isFieldNameChangable}
                     addNewFieldDisabled={addNewFieldDisabled}
                     hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                     hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-                    isRegionCustomizeForm={isRegionCustomizeForm}
+                    isCustomizationForm={isCustomizationForm}
+                    isWorkFlowCustomization={isWorkFlowCustomization}
                   />
                 </div>
-                {currentFamilyGroup[fieldGroupName]?.isDeletable !== undefined
-                  ? currentFamilyGroup[fieldGroupName]?.deletable
-                  : (isNew || !currentFamilyGroup[fieldGroupName]?.isDefault) && (
-                      <div className={`col-12 d-flex justify-content-end mt-1 danger-text lh-1dot25`}>
-                        <div
-                          onClick={() => handleDeleteField(familyName, fieldGroupName)}
-                          className='pointer d-flex align-items-center'
-                        >
-                          <img className='me-0dot5' title='Delete' src={BinIcon} alt='' />
-                          <span className={`${styles.customizationFont}`}>Delete</span>
-                        </div>
-                      </div>
-                    )}
+                {getDeleteIconCondition(fieldGroupName, isNew) && (
+                  <div className={`col-12 d-flex justify-content-end mt-1 danger-text lh-1dot25`}>
+                    <div
+                      onClick={() => handleDeleteField(familyName, fieldGroupName)}
+                      className='pointer d-flex align-items-center'
+                    >
+                      <img className='me-0dot5' title='Delete' src={BinIcon} alt='' />
+                      <span className={`${styles.customizationFont}`}>Delete</span>
+                    </div>
+                  </div>
+                )}
               </div>
               {Object.keys(currentFamilyGroup).length - 1 > index && <div className='col-12 divider m-0dot125' />}
             </Fragment>
@@ -308,7 +320,8 @@ const AccordianView = ({
   isShow,
   addNewFieldDisabled,
   isFieldNameChangable,
-  isRegionCustomizeForm = false
+  isCustomizationForm = false,
+  isWorkFlowCustomization = false
 }: IAccordinaViewProps) => {
   const fieldGroupRef = useRef<any>([]);
   const newlyAddedIds = newlyAddedIdsRef;
@@ -407,7 +420,7 @@ const AccordianView = ({
             }
           });
         }
-        if (v?.targetViews?.length && !isRegionCustomizeForm) {
+        if (v?.targetViews?.length) {
           const fieldToRemove = v.targetViews.findIndex(
             (selectedField: any) => selectedField.value === formValues[familyName][fieldGroupName].id
           );
@@ -431,7 +444,8 @@ const AccordianView = ({
       hashFieldIdsWithTitle,
       hashFieldIdsWithFieldName,
       accordianRef,
-      setFormMeta
+      setFormMeta,
+      isWorkFlowCustomization
     });
   };
 
@@ -451,17 +465,20 @@ const AccordianView = ({
       formValues[familyName][newFieldName].id = newFieldName;
       formValues[familyName][newFieldName].fieldName = newFieldLabel;
 
-      // toggle fields based on fieldname
-      if (isEditableFields.includes(newFieldName) && isRegionCustomizeForm) {
-        formValues[familyName][newFieldName].isEditable = true;
-      } else if ('isEditable' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].isEditable;
+      if (isCustomizationForm) {
+        // toggle fields based on fieldname
+        if (isEditableFields.includes(newFieldName)) {
+          formValues[familyName][newFieldName].isEditable = true;
+        } else if ('isEditable' in formValues[familyName][newFieldName]) {
+          delete formValues[familyName][newFieldName].isEditable;
+        }
+        if (unitMeasurementFields.includes(newFieldName)) {
+          formValues[familyName][newFieldName].unitMeasurement = undefined;
+        } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
+          delete formValues[familyName][newFieldName].unitMeasurement;
+        }
       }
-      if (unitMeasurementFields.includes(newFieldName)) {
-        formValues[familyName][newFieldName].unitMeasurement = undefined;
-      } else if ('unitMeasurement' in formValues[familyName][newFieldName]) {
-        delete formValues[familyName][newFieldName].unitMeasurement;
-      }
+
       delete formValues[familyName][currentFieldID];
 
       // update newly added ids
@@ -593,7 +610,8 @@ const AccordianView = ({
                               isFieldNameChangable={isFieldNameChangable}
                               hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                               hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-                              isRegionCustomizeForm={isRegionCustomizeForm}
+                              isCustomizationForm={isCustomizationForm}
+                              isWorkFlowCustomization={isWorkFlowCustomization}
                             />
                           }
                         />

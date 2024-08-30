@@ -16,8 +16,6 @@ const userInitialStateGetter = (): IUser => ({
   country: {},
   suiteAccess: [],
   countryId: undefined
-  suiteAccess: [],
-  countryId: undefined
 });
 
 // This should be function instead of object,
@@ -196,7 +194,7 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
     case USERTYPES.FETCH_COMMUNITY_LIST_SUCCESS:
       return {
         ...state,
-        communityListLoading: true,
+        communityListLoading: false,
         communityList: action.payload.entityList
       };
     case USERTYPES.UPDATE_PASSWORD_REQUEST:

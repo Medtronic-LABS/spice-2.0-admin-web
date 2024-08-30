@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
-import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
-import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
+import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
 import Login from './containers/authentication/Login';
 import { AppLayout } from './components/appLayout/AppLayout';
 
@@ -20,7 +19,6 @@ import {
 } from './store/user/selectors';
 import Region from './containers/region/Region';
 import RegionDashboard from './containers/region/RegionDashboard';
-import Dashboard from './containers/dashboard/Dashboard';
 import CreateRegion from './containers/createRegion/CreateRegion';
 import ForgotPassword from './containers/authentication/ForgotPassword';
 import ResetPassword from './containers/authentication/ResetPassword';
@@ -89,12 +87,6 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: LandingPage,
       authorisedRoles: Object.values(APPCONSTANTS.ROLES)
-    },
-    {
-      path: PROTECTED_ROUTES.dashboard,
-      exact: true,
-      component: Dashboard,
-      authorisedRoles: SU_SA
     },
     {
       path: PROTECTED_ROUTES.profile,
@@ -392,6 +384,7 @@ export const AppRoutes = () => {
   const loading = useSelector(loadingSelector);
   const isLoggedIn = useSelector(getIsLoggedInSelector);
   const role = useSelector(roleSelector);
+  const data = useSelector(userDataSelector);
 
   const params = new URLSearchParams(document.location.search);
   const url = useRef(params.get('next') || '');
@@ -423,7 +416,7 @@ export const AppRoutes = () => {
             />
           ) : null
         )}
-        <Redirect exact={true} to={HOME_PAGE_BY_ROLE[role]} />
+        <Redirect exact={true} to={PROTECTED_ROUTES.landingPage} />
       </Switch>
     </AppLayout>
   ) : (

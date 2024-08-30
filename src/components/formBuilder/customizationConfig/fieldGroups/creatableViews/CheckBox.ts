@@ -10,7 +10,7 @@ export interface ICheckBoxFields extends IBaseFields {
   isNew?: boolean;
   optionsList?: Array<{ name: string; id: string }>;
   errorMessage?: string;
-  isDefault?: boolean;
+  isNotDefault?: boolean;
 }
 
 const getEmptyData = (): ICheckBoxFields => ({
@@ -20,14 +20,16 @@ const getEmptyData = (): ICheckBoxFields => ({
   fieldName: '',
   family: '',
   selectAll: true,
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
+  condition: [],
   hint: '',
   optionsList: [],
   errorMessage: '',
-  isDefault: false
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -39,12 +41,15 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   optionsList: {},
+  condition: {},
   errorMessage: {},
-  isEditable: {}
+  isEditable: {},
+  unitMeasurement: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
+  json.condition = json.condition?.filter((val: any) => !!val);
   return json;
 };
 

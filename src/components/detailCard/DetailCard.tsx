@@ -8,8 +8,6 @@ import Filter from '../tableFilter/Filter';
 
 // Type for the setter functions
 type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
-// Type for the setter functions
-type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
 interface IDetailCardProps {
   header: string;
   buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;

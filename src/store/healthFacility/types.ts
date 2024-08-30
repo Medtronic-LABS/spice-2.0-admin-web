@@ -3,7 +3,7 @@ import * as ACTION_TYPES from './actionTypes';
 
 export interface IHealthFacilityState {
   healthFacility: IHealthFacility;
-  hfTypes: Array<{ id: string; name: string }>;
+  hfTypes: IObjectData[];
   hfTypesLoading: boolean;
   loading: boolean;
   healthFacilityList: IHealthFacility[];
@@ -219,7 +219,6 @@ export interface IUserRole {
   displayName?: string;
   groupName?: string;
   suiteAccessName?: string;
-  suiteAccessName?: string;
 }
 
 export interface IHFUserPost {
@@ -407,13 +406,13 @@ export interface IUpdateHFDetailsFailure {
 
 export interface IFetchHFTypesRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST;
-  successCb?: (data: Array<{ id: string; name: string }>) => void;
+  successCb?: (data: IObjectData[]) => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IFetchHFTypesSuccess {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_SUCCESS;
-  payload: Array<{ id: string; name: string }>;
+  payload: IObjectData[];
 }
 
 export interface IFetchHFTypesFailure {
@@ -549,10 +548,6 @@ interface IVillagesRequestPayload {
   failureCb?: (error: Error) => void;
 }
 
-export interface IFetchVillagesListRequest extends IVillagesRequestPayload {
-  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST;
-}
-
 export interface IFetchVillagespayload {
   list: IVillages[];
   total: number;
@@ -567,6 +562,15 @@ export interface IFetchVillagesListFailure {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF;
   error: Error;
 }
+
+interface IVillagesRequestPayload {
+  countryId: number;
+  districtId: number;
+  chiefdomId: number;
+  successCb?: (data: IVillages[], total: number) => void;
+  failureCb?: (error: Error) => void;
+}
+
 export interface IFetchUnlinkedVillagesRequest extends IVillagesRequestPayload {
   type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST;
   healthFacilityId?: number;
@@ -634,6 +638,14 @@ export interface IWorkflow {
 export interface IFetchWorkflowListRequest {
   type: typeof ACTION_TYPES.FETCH_WORKFLOW_LIST_REQUEST;
   countryId: number;
+  successCb?: (data: IWorkflow[]) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IPeerSupervisorValidation {
+  type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION;
+  ids: number[];
+  tenantId: number;
   successCb?: (data: IWorkflow[]) => void;
   failureCb?: (error: Error) => void;
 }
@@ -781,4 +793,9 @@ export type HealthFacilityActions =
   | IFetchHFDashboardListRequest
   | IFetchHFDashboardListSuccess
   | IFetchHFDashboardListFailure
-  | ISetHFSummary;
+  | ISetHFSummary
+  | IClearHFSummary
+  | IClearHFDropdown
+  | IValidateLinkedRestrictions
+  | IValidateLinkedRestrictionsSuccess
+  | IValidateLinkedRestrictionsFailure;

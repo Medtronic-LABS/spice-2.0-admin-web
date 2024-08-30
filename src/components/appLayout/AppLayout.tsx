@@ -37,16 +37,15 @@ const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.labTestByRegion },
   { route: PROTECTED_ROUTES.medicationByRegion },
   { route: PROTECTED_ROUTES.programByRegion },
-  { route: PROTECTED_ROUTES.workflowByRegion },
-  { route: PROTECTED_ROUTES.workflowCustomization }
+  { route: PROTECTED_ROUTES.workflowByRegion }
 ];
 
 const routesWithoutBreadcrumb = [
-  PROTECTED_ROUTES.dashboard,
   PROTECTED_ROUTES.regionDashboard,
   PROTECTED_ROUTES.districtDashboard,
   PROTECTED_ROUTES.chiefdomDashboard,
-  PROTECTED_ROUTES.healthFacilityDashboard
+  PROTECTED_ROUTES.healthFacilityDashboard,
+  PROTECTED_ROUTES.landingPage
 ];
 const header = (
   isBCDisabled: boolean,
@@ -91,7 +90,7 @@ export const AppLayout = ({ children }: IAppLayout) => {
     [pathname, role]
   );
   const isBreadcrumbDisabled = useMemo(
-    () => Boolean(routesWithoutBreadcrumb.find(({ route }) => matchPath(pathname, { path: route, exact: true }))),
+    () => Boolean(routesWithoutBreadcrumb.find((route) => matchPath(pathname, { path: route, exact: true }))),
     [pathname]
   );
   const initializingApp = useSelector(initializingSelector);

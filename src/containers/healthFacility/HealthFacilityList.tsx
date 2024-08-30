@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useHistory, useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
@@ -13,7 +12,6 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import { FormApi } from 'final-form';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -30,7 +28,6 @@ import {
   healthFacilityListTotalSelector,
   healthFacilityLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { countryIdSelector, roleSelector } from '../../store/user/selectors';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { formatHealthFacility } from './HealthFacilitySummary';
@@ -184,12 +181,19 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacility: any) => {
+  const validateLinkedRestrictions = (
+    missingIds: number[],
+    hfTenantId: number,
+    healthFacility: any,
+    linkedVillageIds: number[]
+  ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
       validateLinkedRestrictionsRequest({
         ids: missingIds,
         tenantId: hfTenantId,
+        healthFacilityId: healthFacility.id,
+        linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacility);
         },

@@ -87,7 +87,7 @@ const CreateDistrict: React.FC = () => {
             gender: user.gender,
             phoneNumber: user.phoneNumber,
             username: user.email,
-            countryCode: user.country.phoneNumberCode,
+            countryCode: user?.countryCode?.phoneNumberCode || user.country?.phoneNumberCode,
             country: { id: regionId },
             roleIds: [user.role[0].id, ...insightIds],
             timezone: { id: Number(user.timezone.id) }

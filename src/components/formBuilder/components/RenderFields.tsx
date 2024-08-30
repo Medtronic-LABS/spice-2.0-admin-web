@@ -4,15 +4,21 @@ import { Field } from 'react-final-form';
 import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
 import { camel2Title, containsOnlyLettersAndNumbers } from '../../../utils/validation';
-import { InputTypes } from '../config/BaseFieldConfig';
-import { inputTypesSwitch, isEditableFields, unitMeasurementFields } from '../utils/FieldUtils';
+import { InputTypes } from '../labTestConfig/BaseFieldConfig';
+import { resultSwitch } from '../utils/FieldUtils';
+import { isEditableFields, unitMeasurementFields } from '../utils/CustomizationFieldUtils';
 import ConditionConfig from './fieldUI/ConditionConfig';
+import RangesConfig from './fieldUI/RangesConfig';
 import OptionList from './fieldUI/OptionList';
 import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
 import TextFieldWrapper from './fieldUI/TextFieldWrapper';
 import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
 import DatePickerWrapper from './fieldUI/DatePickerWrapper';
+import { unitsSelector } from '../../../store/labTest/selectors';
+import { useSelector } from 'react-redux';
 import APPCONSTANTS from '../../../constants/appConstants';
+import TextInputArray from './fieldUI/TextInputArray';
+import Questionnaire from './fieldUI/Questionnaire';
 
 interface IMatchParams {
   form: string;
@@ -27,7 +33,8 @@ const getComponentsByFieldName = (
   obj: any,
   isNew?: boolean,
   isFieldNameChangable?: boolean,
-  isRegionCustomizeForm?: boolean
+  isCustomizationForm?: boolean,
+  isWorkFlowCustomization?: boolean
 ) => {
   let inputProps = {};
   if (fieldName === 'fieldName') {
@@ -44,15 +51,18 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  // disable fields for region customization
-  if (isRegionCustomizeForm && APPCONSTANTS.DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION?.includes(fieldName)) {
-    inputProps = { ...inputProps, ...{ disabled: true } };
-  }
-  if (['code', 'url'].includes(fieldName) && (obj.code || obj.url)) {
-    inputProps = { ...inputProps, required: true };
-  }
   if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
     inputProps = { ...inputProps, disabled: true };
+  }
+  // disable fields for customization
+  if (isCustomizationForm && !isWorkFlowCustomization) {
+    if (
+      APPCONSTANTS.DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION?.includes(fieldName) ||
+      (obj?.isNeededDefault && ['isMandatory', 'visibility', 'isEnabled'].includes(fieldName)) ||
+      ['fieldName', 'title', 'optionsList', 'inputType'].includes(fieldName)
+    ) {
+      inputProps = { ...inputProps, ...{ disabled: true } };
+    }
   }
   return inputProps;
 };
@@ -79,10 +89,20 @@ interface IComponentProps {
   hashFieldIdsWithFieldName?: any;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
-  isRegionCustomizeForm?: boolean;
+  codeRef?: React.MutableRefObject<string>;
+  urlRef?: React.MutableRefObject<string>;
+  input?: any;
+  isCustomizationForm?: boolean;
 }
 
-export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj }: IComponentProps) => {
+export const CheckboxComponent = ({
+  form,
+  name,
+  fieldName,
+  inputProps = {},
+  obj,
+  isCustomizationForm
+}: IComponentProps) => {
   const checkBoxChange = useCallback(
     (isChecked: boolean) => {
       if (fieldName === 'isResult') {
@@ -107,7 +127,15 @@ export const CheckboxComponent = ({ form, name, fieldName, inputProps = {}, obj 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div className={`col-sm-4 ${fieldName === 'disableFutureDate' ? 'col-12 col-md-6 col-lg-4 col-xl-3' : 'col-lg-2'}`}>
+    <div
+      className={`col-sm-4 ${
+        fieldName === 'disableFutureDate'
+          ? isCustomizationForm
+            ? 'col-4'
+            : 'col-12 col-md-6 col-lg-4 col-xl-3'
+          : 'col-lg-2'
+      }`}
+    >
       <div className='h-100 d-flex align-item-center py-1'>
         <Field
           name={`${name}.${fieldName}`}
@@ -210,7 +238,7 @@ export const SelectInputValues = ({
     value = customValue;
   }
   return (
-    <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
+    <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
       <SelectFieldWrapper
         name={name}
         customValue={value}
@@ -259,8 +287,9 @@ export const TextFieldComponent = ({
   targetIds,
   handleUpdateFieldName,
   hashFieldIdsWithFieldName,
+  hashFieldIdsWithTitle,
   isFieldNameChangable,
-  isRegionCustomizeForm
+  isCustomizationForm
 }: IComponentProps) => {
   let parseFn = (value: any) => value;
   let capitalize = false;
@@ -283,7 +312,6 @@ export const TextFieldComponent = ({
     });
     return otherTitles;
   };
-
   const errorRef = useRef('');
   if (fieldName === 'fieldName' || fieldName === 'title') {
     if (isFieldNameChangable) {
@@ -308,7 +336,7 @@ export const TextFieldComponent = ({
         if (!isNaN(propsValue)) {
           errorRef.current = 'Invalid ';
         }
-        if (isRegionCustomizeForm && otherTitleNames.includes(propsValue) && fieldName === 'title') {
+        if (isCustomizationForm && otherTitleNames.includes(propsValue) && fieldName === 'title') {
           errorRef.current = 'Cannot enter duplicate ';
         }
         return errorRef.current;
@@ -319,7 +347,7 @@ export const TextFieldComponent = ({
             fieldNameValue = '';
           }
           const otherFieldNames =
-            fieldName === 'fieldName' ? filterDuplicates() : isRegionCustomizeForm ? filterTitleDuplicates() : [];
+            fieldName === 'fieldName' ? filterDuplicates() : isCustomizationForm ? filterTitleDuplicates() : [];
           let newFieldName = fieldNameValue;
           let newFieldLabel = fieldNameValue;
           if (otherFieldNames.includes(fieldNameValue) || !fieldNameValue) {
@@ -379,7 +407,9 @@ export const TextFieldComponent = ({
   if (inputProps?.type === 'number' && obj.inputType !== InputTypes.DECIMAL) {
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
-  if (['minDays', 'maxDays', 'minValue', 'maxValue', 'minLength', 'maxLength'].includes(fieldName)) {
+  if (
+    ['minDays', 'maxDays', 'minValue', 'maxValue', 'minLength', 'maxLength', 'lengthGreaterThan'].includes(fieldName)
+  ) {
     parseFn = (value: any) => (value > 0 ? value : null);
   }
 
@@ -406,7 +436,7 @@ export const TextFieldComponent = ({
   };
 
   return (
-    <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
+    <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
       <TextFieldWrapper
         name={`${name}.${fieldName}`}
         customValue={obj.fieldName}
@@ -438,46 +468,63 @@ const RenderFields = ({
   isFieldNameChangable,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isRegionCustomizeForm = false
+  input,
+  isCustomizationForm,
+  isWorkFlowCustomization,
+  ...rest
 }: any) => {
   const codeRef = useRef('');
   const urlRef = useRef('');
-  // Toggle text field component to select component on disable mode
   const { form: formType } = useParams<IMatchParams>();
-
+  // Toggle text field component to select component on disable mode
   inputProps = {
     ...inputProps,
-    ...getComponentsByFieldName(fieldName, obj, isNew, isFieldNameChangable, isRegionCustomizeForm)
+    ...getComponentsByFieldName(
+      fieldName,
+      obj,
+      isNew,
+      isFieldNameChangable,
+      isCustomizationForm,
+      isWorkFlowCustomization
+    )
   };
 
-  if (
-    fieldName === 'isEditable' &&
-    (!isRegionCustomizeForm || (isEditableFields.includes(obj.id) && formType === 'enrollment'))
-  ) {
-    return null;
-  }
-  if (fieldName === 'readOnly' && isRegionCustomizeForm) {
-    return null;
-  }
-  if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
-    return null;
-  }
+  if (isCustomizationForm) {
+    if (fieldName === 'isEditable' && (!isEditableFields.includes(obj.id) || formType !== 'enrollment')) {
+      return null;
+    }
+    if (fieldName === 'readOnly') {
+      return null;
+    }
+    if (fieldName === 'unitMeasurement' && !unitMeasurementFields.includes(obj.id)) {
+      return null;
+    }
 
-  if (fieldName === 'isEnrollment' && isRegionCustomizeForm && formType !== 'assessment') {
-    obj.isEnrollment = undefined;
-    return null;
-  }
+    if (fieldName === 'isEnrollment' && isCustomizationForm && formType !== 'assessment') {
+      obj.isEnrollment = undefined;
+      return null;
+    }
 
-  if (
-    fieldName === 'condition' &&
-    !['Spinner', 'RadioGroup', 'EditText', 'SingleSelectionView'].includes(obj.viewType)
-  ) {
-    return null;
+    if (
+      fieldName === 'condition' &&
+      !['Spinner', 'RadioGroup', 'EditText', 'SingleSelectionView'].includes(obj.viewType)
+    ) {
+      return null;
+    }
   }
 
   switch (inputProps?.component) {
     case 'CHECKBOX': {
-      return <CheckboxComponent form={form} name={name} fieldName={fieldName} inputProps={inputProps} obj={obj} />;
+      return (
+        <CheckboxComponent
+          form={form}
+          name={name}
+          fieldName={fieldName}
+          inputProps={inputProps}
+          obj={obj}
+          isCustomizationForm={isCustomizationForm}
+        />
+      );
     }
     case 'SELECT_INPUT': {
       return (
@@ -494,7 +541,6 @@ const RenderFields = ({
       );
     }
 
-    // Custom Field UI
     case 'INSTRUCTIONS': {
       const fieldVal = obj[fieldName]?.length ? obj[fieldName] : [''];
       return (
@@ -506,7 +552,6 @@ const RenderFields = ({
                   label={inputProps?.label || ''}
                   defaultValue={fieldVal as unknown as string[]}
                   required={false}
-                  obj={obj}
                   onChange={(value: string[]) => {
                     form.mutators.setValue(`${name}.${fieldName}`, value);
                   }}
@@ -517,16 +562,17 @@ const RenderFields = ({
         </div>
       );
     }
+
     case 'OPTION_LIST': {
       return (
-        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
+        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
           <OptionList field={fieldName} name={`${name}.${fieldName}`} obj={obj} form={form} inputProps={inputProps} />
         </div>
       );
     }
     case 'TARGET_VIEWS': {
       return (
-        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
+        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
           <MultiSelectOptionList
             label={'Target Views'}
             field={fieldName}
@@ -537,6 +583,31 @@ const RenderFields = ({
             targetIds={targetIds}
           />
         </div>
+      );
+    }
+    case 'QUESTIONNAIRE': {
+      return (
+        <Questionnaire
+          label={'Questionnaire'}
+          defaultValue={obj[fieldName]}
+          required={false}
+          onChange={(value: any) => {
+            fieldName[fieldName] = value;
+          }}
+        />
+      );
+    }
+    case 'CONDITION_CONFIG': {
+      return (
+        <ConditionConfig
+          field={fieldName}
+          name={`${name}.${fieldName}`}
+          obj={obj}
+          form={form}
+          targetIds={targetIds}
+          unAddedFields={unAddedFields}
+          newlyAddedIds={newlyAddedIds}
+        />
       );
     }
     case 'RANGES_CONFIG': {
@@ -569,7 +640,7 @@ const RenderFields = ({
       const parseFn = (val: any) => val;
       const value = obj[fieldName] || null;
       return (
-        <div className='col-12 col-md-6 col-lg-4 col-xl-3'>
+        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
           <DatePickerWrapper
             fieldName={fieldName}
             name={`${name}.${fieldName}`}
@@ -600,7 +671,10 @@ const RenderFields = ({
           hashFieldIdsWithTitle={hashFieldIdsWithTitle}
           hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
           isFieldNameChangable={isFieldNameChangable}
-          isRegionCustomizeForm={isRegionCustomizeForm}
+          codeRef={codeRef}
+          urlRef={urlRef}
+          input={input}
+          isCustomizationForm={isCustomizationForm}
         />
       );
     }

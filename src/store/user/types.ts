@@ -441,14 +441,6 @@ export interface ILoginFailurePayload {
   error: string;
 }
 
-// export interface ILoginRequestPayload {
-//   username: string;
-//   password: string;
-//   rememberMe: boolean;
-//   successCb?: (payload: ILoginSuccessPayload) => void;
-//   failureCb?: (error: Error) => void;
-// }
-
 export interface ITimezone {
   id: string | number;
   description?: string;
@@ -487,14 +479,6 @@ export interface ILoginSuccess {
 export interface ILoginFailure {
   type: typeof USER_TYPES.LOGIN_FAILURE;
   payload: ILoginFailurePayload;
-}
-
-export interface IAddToken {
-  type: typeof USER_TYPES.AUTH_TOKEN;
-  payload: string;
-}
-export interface IRemoveToken {
-  type: typeof USER_TYPES.REMOVE_TOKEN;
 }
 export interface IAddUserTenantId {
   type: typeof USER_TYPES.ADD_USER_TENANT_ID;
@@ -856,7 +840,6 @@ export type UserActions =
   | IUpdatePasswordReq
   | IUpdatePasswordSuccess
   | IUpdatePasswordFail
-  | ILoginRequestPayload
   | IFetchCultureListSuccessPayload
   | IFetchTimezoneListSuccessPayload
   | IFetchTimezoneListSuccessPayload

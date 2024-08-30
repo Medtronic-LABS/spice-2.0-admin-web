@@ -8,7 +8,6 @@ import UserForm from '../../components/userForm/UserForm';
 import ModalForm from '../../components/modal/ModalForm';
 import Loader from '../../components/loader/Loader';
 import { countryIdSelector, userIdSelector } from '../../store/user/selectors';
-import { countryIdSelector, userIdSelector } from '../../store/user/selectors';
 import { IUserRole } from '../../store/healthFacility/types';
 import { fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';

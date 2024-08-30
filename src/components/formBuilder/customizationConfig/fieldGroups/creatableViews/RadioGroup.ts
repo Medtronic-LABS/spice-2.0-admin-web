@@ -9,7 +9,7 @@ export interface IRadioGroupFields extends IBaseFields {
   defaultValue?: string;
   optionsList: Array<{ name: string; id: string }>;
   errorMessage?: string;
-  isDefault?: boolean;
+  isNotDefault?: boolean;
 }
 
 const getEmptyData = (): IRadioGroupFields => ({
@@ -18,14 +18,16 @@ const getEmptyData = (): IRadioGroupFields => ({
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
   isEnrollment: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
+  condition: [],
   optionsList: [],
   orientation: 0,
   errorMessage: '',
-  isDefault: false
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -35,13 +37,17 @@ const customizableFieldMeta: IBaseFieldMeta = {
   fieldName: {},
   isMandatory: {},
   optionsList: {},
+  condition: {},
   errorMessage: {},
   isEnabled: {},
-  isEditable: {}
+  isEditable: {},
+  isEnrollment: {},
+  unitMeasurement: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
+  json.condition = json.condition?.filter((val: any) => !!val);
   return json;
 };
 
