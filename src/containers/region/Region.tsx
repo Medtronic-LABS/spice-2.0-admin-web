@@ -3,7 +3,6 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
@@ -23,12 +22,10 @@ import {
   getRegionDetailsSelector,
   getRegionIdSelector
 } from '../../store/region/selectors';
-import toastCenter from '../../utils/toastCenter';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import arrayMutators from 'final-form-arrays';
 import { fileDownload } from '../../utils/commonUtils';
-import { useParams } from 'react-router-dom';
-import { IMatchParams } from '../../store/region/types';
 import { useParams } from 'react-router-dom';
 import { IMatchParams } from '../../store/region/types';
 

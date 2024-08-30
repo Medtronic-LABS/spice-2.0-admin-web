@@ -24,21 +24,17 @@ const APPCONSTANTS = {
   LAST_NAME_LENGTH: 100,
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
-    ADMIN: 'admin',
-    CFR: 'cfr',
+    ADMIN: 'spice web',
+    CFR: 'cfr web',
     INSIGHTS: 'insights'
   },
   ROLES: {
     SUPER_USER: 'SUPER_USER',
     SUPER_ADMIN: 'SUPER_ADMIN',
-    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
-    PEER_SUPERVISOR: 'PEER_SUPERVISOR',
     REGION_ADMIN: 'REGION_ADMIN',
     DISTRICT_ADMIN: 'DISTRICT_ADMIN',
     CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN',
-    LAB_TECHNICIAN: 'LAB_TECHNICIAN',
-    REPORT_ADMIN: 'REPORT_ADMIN',
-    SITE_ADMIN: 'SITE_ADMIN'
+    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN'
   },
   ALL_ROLES: {
     SUPER_USER: 'SUPER_USER',
@@ -166,7 +162,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_TITLE: 'Delete Health Facility',
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
-  CLINICAL_WORKFLOW_FETCH_SUCCESS: 'Unable to load the clinical workflows. Please try after sometime.',
+  CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
   WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select a clinical workflow',
   CUSTOMIZED_WORKFLOW: 'Customized Workflow',
   CLINICAL_WORKFLOW: 'Clinical Workflow',
@@ -257,7 +253,6 @@ const APPCONSTANTS = {
   SEARCH_BY_EMAIL: 'Search Email',
   GENDER_OPTIONS: [
     { value: 'Male', label: 'Male' },
-    { value: 'Female', label: 'Female' }
     { value: 'Female', label: 'Female' }
   ],
   SESSION_EXPIRED: 'Session got expired. Please login again.',
@@ -355,19 +350,6 @@ const APPCONSTANTS = {
     { label: 'Inactive site', value: 'Inactive site' },
     { label: 'Other', value: 'Other' }
   ],
-  SITE_ROLES: [
-    { value: 'HEALTH_COACH', label: 'Health Coach' },
-    { value: 'HEALTH_SCREENER', label: 'Health Screener' },
-    { value: 'HRIO', label: 'HRIO' },
-    { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
-    { value: 'NUTRITIONIST', label: 'Nutritionist' },
-    { value: 'PHARMACIST', label: 'Pharmacist' },
-    { value: 'NURSE', label: 'Nurse' },
-    { value: 'PHYSICIAN_PRESCRIBER', label: 'Physician Prescriber' },
-    { value: 'PROVIDER', label: 'Provider' },
-    { value: 'COUNSELOR', label: 'Counselor' },
-    { value: 'HEALTH_FACILITY_ADMIN', label: 'Health Facility Admin' }
-  ],
   // utils
 
   MONTHS: [
@@ -384,7 +366,8 @@ const APPCONSTANTS = {
     'November',
     'December'
   ],
-  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType']
+  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType'],
+  CUSTOMIZATION_FORM_CATEGORY: 'Input_form'
 };
 
 export const NAME_CONSTANTS = {

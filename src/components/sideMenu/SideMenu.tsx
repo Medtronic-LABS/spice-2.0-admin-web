@@ -29,10 +29,6 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const sideMenuLoading = useSelector(getLoadingSelector);
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id;
-
-  const sideMenuLoading = useSelector(getLoadingSelector);
-  const countryId = useSelector(countryIdSelector);
-  const countryIdValue = countryId?.id;
   const role = useSelector(roleSelector);
 
   const { list: sideMenuList } = useSelector(getSideMenuSelector);

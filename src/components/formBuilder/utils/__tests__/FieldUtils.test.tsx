@@ -1,12 +1,12 @@
-import { InputTypes } from '../../config/BaseFieldConfig';
-import CARD_VIEW_CONFIG from '../../config/fieldGroups/CardView';
-import TEXT_LABEL_CONFIG from '../../config/fieldGroups/TextLabel';
-import CHECKBOX_CONFIG from '../../config/fieldGroups/creatableViews/CheckBox';
-import EDIT_TEXT_CONFIG from '../../config/fieldGroups/creatableViews/EditText';
-import RADIO_GROUP_CONFIG from '../../config/fieldGroups/creatableViews/RadioGroup';
-import DROPDOWN_CONFIG from '../../config/fieldGroups/creatableViews/Dropdown';
+import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
+import CARD_VIEW_CONFIG from '../../labTestConfig/fieldGroups/CardView';
+import TEXT_LABEL_CONFIG from '../../labTestConfig/fieldGroups/TextLabel';
+import CHECKBOX_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/CheckBox';
+import EDIT_TEXT_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/EditText';
+import RADIO_GROUP_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/RadioGroup';
+import DROPDOWN_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/Dropdown';
 import { creatableViews, getConfigByViewType, resultSwitch } from '../FieldUtils';
-import DATE_PICKER_CONFIG from '../../config/fieldGroups/creatableViews/DatePickerView';
+import DATE_PICKER_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/DatePickerView';
 
 describe('Your Module', () => {
   describe('creatableViews', () => {

@@ -197,6 +197,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
                           parentOrgId={chiefdomId}
                           ignoreTenantId={tenantId}
+                          isSiteUser={true}
                         />
                         <></>
                       </FormContainer>

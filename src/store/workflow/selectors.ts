@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { createSelector } from 'reselect';
 import { AppState } from '../rootReducer';
 
 export const formMetaSelector = (state: AppState) => state.workflow.formMeta;

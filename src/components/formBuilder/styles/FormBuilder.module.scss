@@ -200,3 +200,9 @@ label {
   width: 100%;
   border: none !important;
 }
+
+.conditionsContainer {
+  border: 1px solid $field-border-color;
+  border-radius: 10px;
+  padding-top: 1rem;
+}

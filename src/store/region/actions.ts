@@ -23,7 +23,6 @@ import {
   IRegionDetailsSuccess,
   IRegionDetailsFailure,
   IRegionDetailList,
-  IRegionDetailList,
   IDownloadFileRequest,
   IDownloadFileSuccess,
   IDownloadFileFailure,

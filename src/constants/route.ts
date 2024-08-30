@@ -10,7 +10,6 @@ export const PUBLIC_ROUTES = {
 export const PROTECTED_ROUTES = {
   landingPage: '/home',
   profile: '/profile',
-  dashboard: '/home',
   createSuperAdmin: '/super-admin/create',
   screen: '/screening-form',
   superAdmin: '/super-admin',
@@ -122,8 +121,8 @@ export const hfWithSideMenu = [
 ];
 
 export const HOME_PAGE_BY_ROLE = {
-  [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.dashboard,
-  [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.dashboard,
+  [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.regionDashboard,
+  [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.regionDashboard,
   [APPCONSTANTS.ROLES.REGION_ADMIN]: PROTECTED_ROUTES.districtDashboard,
   [APPCONSTANTS.ROLES.DISTRICT_ADMIN]: PROTECTED_ROUTES.chiefdomDashboard,
   [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN]: PROTECTED_ROUTES.healthFacilityDashboard,

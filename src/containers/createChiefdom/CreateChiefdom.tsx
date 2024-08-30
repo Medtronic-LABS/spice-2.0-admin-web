@@ -119,7 +119,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
           gender: user.gender,
           username: user.email,
           phoneNumber: user.phoneNumber,
-          countryCode: user.country.phoneNumberCode,
+          countryCode: user?.countryCode?.phoneNumberCode || user.country.phoneNumberCode,
           country: { id: countryIdValue },
           roleIds: [user.role[0].id, ...insightIds],
           timezone: { id: Number(user.timezone?.id) }

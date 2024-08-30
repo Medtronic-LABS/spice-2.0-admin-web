@@ -9,7 +9,7 @@ import styles from './Header.module.scss';
 import { logoutRequest } from '../../store/user/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { firstNameSelector, lastNameSelector, roleDetailSelector, roleSelector } from '../../store/user/selectors';
-import { firstNameSelector, lastNameSelector, roleDetailSelector, roleSelector } from '../../store/user/selectors';
+import { ROLE_LABELS } from '../../constants/appConstants';
 
 export default function Header() {
   const dispatch = useDispatch();

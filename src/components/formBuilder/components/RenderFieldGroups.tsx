@@ -1,8 +1,11 @@
-import { baseFieldMeta } from '../config/BaseFieldConfig';
-import { IBaseFieldMeta } from '../types/BaseFieldMeta';
+import { baseFieldMeta } from '../labTestConfig/BaseFieldConfig';
 import { IComponentConfig } from '../types/ComponentConfig';
 import { getConfigByViewType } from '../utils/FieldUtils';
+import { IBaseFieldMeta } from '../types/BaseFieldMeta';
 import RenderFields from './RenderFields';
+import { baseFieldMeta as regionBaseFieldMeta } from '../customizationConfig/BaseFieldConfig';
+import { IComponentConfig as ICustomizationComponentConfig } from '../types/CustomizationComponentConfig';
+import { getConfigByViewType as getCustomizationConfigViewType } from '../utils/CustomizationFieldUtils';
 
 const RenderFieldGroups = ({
   obj,
@@ -17,23 +20,39 @@ const RenderFieldGroups = ({
   addNewFieldDisabled,
   hashFieldIdsWithTitle,
   hashFieldIdsWithFieldName,
-  isRegionCustomizeForm = false
+  isCustomizationForm = false,
+  isWorkFlowCustomization = false
 }: any) => {
-  const componentConfig: IComponentConfig = getConfigByViewType(obj?.viewType);
+  let componentConfig: IComponentConfig | ICustomizationComponentConfig;
+
+  if (isCustomizationForm) {
+    componentConfig = getCustomizationConfigViewType(obj?.viewType);
+  } else {
+    componentConfig = getConfigByViewType(obj?.viewType);
+  }
   return (
     <>
       {Object.keys(obj)
-        .sort(
-          (fieldA: string, fieldB: string) =>
+        .sort((fieldA: string, fieldB: string) => {
+          if (isCustomizationForm) {
+            return (
+              (regionBaseFieldMeta[fieldA as keyof IBaseFieldMeta]?.order || 0) -
+              (regionBaseFieldMeta[fieldB as keyof IBaseFieldMeta]?.order || 0)
+            );
+          }
+          return (
             (baseFieldMeta[fieldA as keyof IBaseFieldMeta]?.order || 0) -
             (baseFieldMeta[fieldB as keyof IBaseFieldMeta]?.order || 0)
-        )
+          );
+        })
         .map((field) => {
           if (componentConfig.customizableFieldMeta.hasOwnProperty(field)) {
             const inputProps = {
-              ...baseFieldMeta[field as keyof IBaseFieldMeta],
+              ...(isCustomizationForm
+                ? regionBaseFieldMeta[field as keyof IBaseFieldMeta]
+                : baseFieldMeta[field as keyof IBaseFieldMeta]),
               ...componentConfig.customizableFieldMeta[field as keyof IBaseFieldMeta],
-              ...(isRegionCustomizeForm ? { disabled: obj.readOnly === true } : {})
+              ...(isCustomizationForm ? { disabled: obj.readOnly === true } : {})
             };
             return (
               <RenderFields
@@ -48,12 +67,12 @@ const RenderFieldGroups = ({
                 isNew={isNew}
                 newlyAddedIds={newlyAddedIds}
                 handleUpdateFieldName={handleUpdateFieldName}
-                // isAccountCustomization={isAccountCustomization}
                 isFieldNameChangable={isFieldNameChangable}
                 addNewFieldDisabled={addNewFieldDisabled}
                 hashFieldIdsWithTitle={hashFieldIdsWithTitle}
                 hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
-                isRegionCustomizeForm={isRegionCustomizeForm}
+                isCustomizationForm={isCustomizationForm}
+                isWorkFlowCustomization={isWorkFlowCustomization}
               />
             );
           } else {

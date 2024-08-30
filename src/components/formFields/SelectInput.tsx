@@ -52,7 +52,6 @@ interface ISelectBoxProps {
   autoSelect?: boolean;
   name?: string;
   menuPlacement?: string;
-  autoSelect?: boolean;
   autoSelectValue?: any;
 }
 

@@ -13,13 +13,13 @@ export const fetchLabTest = (data: IFetchLabtest) =>
     data
   });
 
-export const fetchLabtestCustomization = ({ name }: { name: any }) =>
+export const fetchLabtestCustomization = ({ name, countryId }: { name: any; countryId: number }) =>
   axios({
     method: 'POST',
     url: `/admin-service/lab-test-customization/get-by-unique-name`,
     data: {
       name,
-      countryId: '1'
+      countryId
     }
   });
 
@@ -56,7 +56,7 @@ export const fetchUnitList = () =>
     url: '/admin-service/unit/list/LABTEST'
   });
 
-export const validateLabtest = (data: { name: string, countryId: any }) =>
+export const validateLabtest = (data: { name: string; countryId: any }) =>
   axios({
     method: 'POST',
     url: 'admin-service/lab-test-customization/validate',

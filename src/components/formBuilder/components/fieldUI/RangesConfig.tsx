@@ -8,7 +8,7 @@ import styles from '../../styles/FormBuilder.module.scss';
 import SelectFieldWrapper from './SelectFieldWrapper';
 import TextFieldWrapper from './TextFieldWrapper';
 import { filterUnitsandGender, IUnit } from '../../utils/FieldUtils';
-import { InputTypes } from '../../config/BaseFieldConfig';
+import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
 
 const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index }: any) => {
   let options: any = config?.options || [];

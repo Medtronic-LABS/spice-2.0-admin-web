@@ -30,9 +30,7 @@ const Checkbox = ({ label, readOnly, switchCheckbox, ...inputProps }: ICheckboxP
             type='checkbox'
             name={inputProps.name || label}
             {...inputProps}
-            className={`${
-              switchCheckbox ? '' : inputProps.disabled ? styles.checkbox + styles.disabled : styles.checkbox
-            } `}
+            className={`${switchCheckbox ? '' : styles.checkbox} `}
             ref={checkboxRef}
             onKeyPress={onKeyPress}
           />

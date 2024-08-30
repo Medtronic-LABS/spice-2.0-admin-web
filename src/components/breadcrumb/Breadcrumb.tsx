@@ -9,7 +9,7 @@ import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { districtSelector } from '../../store/district/selectors';
 import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
 import { healthFacilitySelector } from '../../store/healthFacility/selectors';
-import { roleSelector } from '../../store/user/selectors';
+import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { clearDistrictDetails, setDistrictDetails } from '../../store/district/actions';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 
@@ -25,21 +25,6 @@ interface ISection {
   appendParent?: boolean;
 }
 
-const chiefdomRoutes = [
-  PROTECTED_ROUTES.chiefdomSummary,
-  PROTECTED_ROUTES.healthFacilityByChiefdom,
-  PROTECTED_ROUTES.userByChiefdom,
-  PROTECTED_ROUTES.createHealthFacilityByChiefdom
-];
-
-const districtRoutes = [
-  PROTECTED_ROUTES.districtSummary,
-  PROTECTED_ROUTES.chiefdomByDistrict,
-  PROTECTED_ROUTES.healthFacilityByDistrict,
-  PROTECTED_ROUTES.userByDistrict,
-  PROTECTED_ROUTES.createChiefdomByDistrict,
-  PROTECTED_ROUTES.createHealthFacilityByDistrict
-];
 const chiefdomRoutes = [
   PROTECTED_ROUTES.chiefdomSummary,
   PROTECTED_ROUTES.healthFacilityByChiefdom,
@@ -98,6 +83,8 @@ const Breadcrumb = (): React.ReactElement => {
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const healthFacility = useSelector(healthFacilitySelector);
   const role = useSelector(roleSelector);
+  const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
+  const { CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
   const {
     district: { s: districtSName },
@@ -382,12 +369,23 @@ const Breadcrumb = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const redirectBasedOnUser = useCallback(
+    (currentUserRole: string, userRoles: string[]) => {
+      if (userRoles.includes(CFR) || userRoles.includes(INSIGHTS)) {
+        return PROTECTED_ROUTES.landingPage;
+      } else {
+        return HOME_PAGE_BY_ROLE[currentUserRole];
+      }
+    },
+    [CFR, INSIGHTS]
+  );
+
   return (
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>
       <Link
         className={`${styles.homeIcon} d-inline-flex align-items-center justify-content-center me-0dot75 lh-0`}
         onClick={clearData}
-        to={HOME_PAGE_BY_ROLE[role]}
+        to={redirectBasedOnUser(role, userSuiteAccess)}
       >
         <HomeIcon className='d-inline-block' aria-labelledby='Home' />
       </Link>

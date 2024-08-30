@@ -8,8 +8,6 @@ import Filter from '../tableFilter/Filter';
 
 // Type for the setter functions
 type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
-// Type for the setter functions
-type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
 interface IDetailCardProps {
   header: string;
   buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -28,8 +26,6 @@ interface IDetailCardProps {
   onCustomClick?: (data: any) => void;
   isFilter?: boolean;
   onFilterData?: IFilteredData[];
-  isFilter?: boolean;
-  onFilterData?: IFilteredData[];
   className?: string;
   bodyClassName?: string;
   setSelectedRole?: SetSelectedState;
@@ -42,6 +38,7 @@ interface IFilteredData {
   isSearchable: boolean;
   isFacility: boolean;
   data: any[];
+  isShow: boolean;
 }
 
 /**
@@ -65,8 +62,6 @@ const DetailCard = ({
   isSearch = false,
   onButtonClick,
   onCustomClick,
-  isFilter,
-  onFilterData,
   isFilter,
   onFilterData,
   className = '',

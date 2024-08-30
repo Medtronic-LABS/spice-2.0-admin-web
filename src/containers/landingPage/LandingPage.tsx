@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { roleSelector, userDataSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
+import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { useHistory } from 'react-router';
 import { HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
@@ -28,10 +28,6 @@ const LandingPage = (): React.ReactElement => {
   const history = useHistory();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
-  const userData = useSelector(userDataSelector);
-  const {
-    country: { id: regionId, tenantId }
-  } = userData;
 
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
@@ -43,10 +39,7 @@ const LandingPage = (): React.ReactElement => {
         icon: AdminPortalLogo,
         hasDomain: false,
         suiteAccessName: ADMIN,
-        domainUrl:
-          HOME_PAGE_BY_ROLE[role]
-            ?.replace(':regionId', regionId?.toString())
-            .replace(':tenantId', tenantId?.toString()) || '',
+        domainUrl: HOME_PAGE_BY_ROLE[role],
         disabled: false
       },
       {
@@ -67,7 +60,7 @@ const LandingPage = (): React.ReactElement => {
         domainUrl: undefined
       }
     ],
-    [regionId, tenantId, role]
+    [role]
   );
 
   useEffect(() => {

@@ -38,7 +38,8 @@ const ChiefdomDashboard = () => {
   const chiefdomDetail = useSelector(getChiefdomDetailSelector);
   const countryId = useSelector(countryIdSelector);
   const {
-    chiefdom: { s: chiefdomSName, p: chiefdomPName }
+    chiefdom: { s: chiefdomSName, p: chiefdomPName },
+    healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
   } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
@@ -128,7 +129,7 @@ const ChiefdomDashboard = () => {
           {
             type: 'number',
             value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-            label: 'Site',
+            label: healthFacilitySName,
             disableEllipsis: true,
             route: PROTECTED_ROUTES.healthFacilityByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
             onClick: () => {
@@ -188,7 +189,7 @@ const ChiefdomDashboard = () => {
         </div>
         {noChiefdomsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
-            <div className='fw-bold highlight-text'>Let’s Get Started!</div>
+            <div className='fw-bold highlight-text'>Letâ€™s Get Started!</div>
             <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create an {chiefdomSName.toLowerCase()}</div>
             <Link to={createChiefdomRoute} className='mx-auto' tabIndex={-1}>
               <button className='btn primary-btn'>Create {chiefdomSName}</button>

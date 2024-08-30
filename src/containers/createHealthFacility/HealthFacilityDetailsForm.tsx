@@ -39,6 +39,7 @@ import {
 } from '../../store/healthFacility/actions';
 import { useParams } from 'react-router';
 import { userDataSelector } from '../../store/user/selectors';
+import { IObjectData, IVillages } from '../../store/healthFacility/types';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from '../healthFacility/Workflows';
@@ -46,7 +47,8 @@ import { fetchDistrictListRequest } from '../../store/district/actions';
 import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
-import { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import toastCenter from '../../utils/toastCenter';
 
 interface IAddUserFormProps {
   formName: string;
@@ -83,6 +85,8 @@ const HealthFacilityDetailsForm = ({
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
+  const unlinkedVillagesList = useSelector(unlinkedVillagesListSelector);
+  const unlinkedVillagesLoading = useSelector(unlinkedVillagesLoadingSelector);
   const districtList = useSelector(getDistrictListSelector);
   const chiefdomList = useSelector(chiefdomListSelector);
   const districtLoading = useSelector(districtLoadingSelector);
@@ -228,9 +232,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='type'
                   labelKey='name'
                   valueKey='id'
-                  defaultValue={hfTypesList.find(
-                    (type: { id: string; name: string }) => type.name === (data.type?.name || data.type)
-                  )}
+                  defaultValue={hfTypesList.find((type: IObjectData) => type.name === (data.type?.name || data.type))}
                   options={hfTypesList}
                   loadingOptions={hfTypesLoading}
                   error={(meta.touched && meta.error) || undefined}

@@ -68,6 +68,7 @@ const LabTestCustomizationLayout = () => {
   useEffect(() => {
     dispatch(
       fetchLabTestCustomizationRequest({
+        countryId: Number(regionId),
         name: uniqueId,
         successCb: ({ formInput }: { formInput: any }) => {
           const formJSON = JSON.parse(formInput)?.formLayout;
@@ -209,6 +210,7 @@ const LabTestCustomizationLayout = () => {
             sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             addNewFieldDisabled={false}
             isFieldNameChangable={true}
+            isCustomizationForm={false}
             isShow={true}
           />
           <ReorderView

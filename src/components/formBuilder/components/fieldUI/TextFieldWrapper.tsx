@@ -2,7 +2,7 @@ import React from 'react';
 import { Field } from 'react-final-form';
 import TextInput from '../../../../components/formFields/TextInput';
 import { composeValidators, formValidators } from '../../../../utils/validation';
-import { InputTypes } from '../../config/BaseFieldConfig';
+import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
 
 const TextFieldWrapper = ({
   name,
@@ -54,7 +54,7 @@ const TextFieldWrapper = ({
               error={
                 (meta.error && formError && meta.error) ||
                 (meta.data?.customError && meta.data?.customError.toString()) ||
-                (customError && customError.toString()) ||
+                (meta.error && customError && customError.toString()) ||
                 (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label?.toLowerCase()) ||
                 (meta.error &&
                   inputProps.type === 'number' &&

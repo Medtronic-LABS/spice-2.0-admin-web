@@ -149,7 +149,7 @@ export const listCities = (countryId: number, searchTerm: string) =>
 
 export const fetchVillagesListfromHF = (countryId: number, districtId: number, chiefdomId: number) =>
   axios({
-    url: '/admin-service/healthfacility/unlinked-villages-list',
+    url: '/admin-service/healthfacility/villages-list',
     method: 'POST',
     data: { countryId, districtId, chiefdomId }
   });
@@ -164,6 +164,13 @@ export const fetchPeerSupervisorList = (tenantIds: number[]) =>
 export const fetchWorkflowList = (data: any) =>
   axios({
     url: '/admin-service/clinical-workflow/list',
+    method: 'POST',
+    data
+  });
+
+export const peerSupervisorValidation = (data: any) =>
+  axios({
+    url: '/user-service/user/validate-peer-supervisors',
     method: 'POST',
     data
   });

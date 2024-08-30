@@ -12,20 +12,7 @@ interface ITextInputArray {
   required?: boolean;
   disabled?: boolean;
   obj?: {
-    family: string;
-    fieldName: string;
-    id: string;
-    instructions: [];
-    isEnabled: boolean;
-    isMandatory: boolean;
-    isNotDefault: boolean;
-    isSummary: boolean;
-    orderId: number;
     readOnly?: boolean;
-    title: string;
-    titleCulture: string;
-    viewType: string;
-    visibility: string;
   };
 }
 
@@ -55,6 +42,7 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
     keys.current.push(Number(keys.current[keys.current.length - 1] || 0) + 1);
     setValue([...value, '']);
   };
+
   const renderListItems = () =>
     value?.map((txt, i) => (
       <Fragment key={keys.current[i]}>

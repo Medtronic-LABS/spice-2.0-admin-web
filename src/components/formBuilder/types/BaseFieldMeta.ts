@@ -1,4 +1,4 @@
-import { IResourceOptions } from '../config/BaseFieldConfig';
+import { IResourceOptions } from '../labTestConfig/BaseFieldConfig';
 
 interface IAttributeProps {
   label?: string;
@@ -68,7 +68,6 @@ export interface IBaseFieldMeta {
   family?: ISelectAttributeProps;
   isMandatory?: IAttributeProps;
   isEnabled?: IAttributeProps;
-  isEnrollment?: IAttributeProps;
   isAboveUpperLimit?: IAttributeProps;
   disableFutureDate?: IAttributeProps;
   isNeedAction?: IAttributeProps;
@@ -79,8 +78,11 @@ export interface IBaseFieldMeta {
   optionsList?: IAttributeProps;
   startsWith?: IAttributeProps;
   condition?: IAttributeProps;
-  readOnly?: IAttributeProps;
   ranges?: IAttributeProps;
   startDate?: IAttributeProps;
   endDate?: IAttributeProps;
+  isEnrollment?: IAttributeProps;
+  unitMeasurement?: ISelectAttributeProps;
+  isSummary?: IAttributeProps;
+  readOnly?: IAttributeProps;
 }

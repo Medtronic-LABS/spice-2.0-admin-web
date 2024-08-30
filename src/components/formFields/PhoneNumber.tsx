@@ -2,7 +2,7 @@ import { Field, FieldRenderProps } from 'react-final-form';
 import { composeValidators, normalizePhone, required, validateMobile } from '../../utils/validation';
 import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -20,7 +20,7 @@ interface IProps {
   countryCode: string;
 }
 
-const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, index }: IProps, ref) => {
+const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode }: IProps) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -36,7 +36,7 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
   const lastCheckedNumber = useRef<string>(currentphoneNumber.current);
   const errorRef = useRef<string>('');
   const [loading, setLoading] = useState(false);
-  const error = useRef('');
+  const [validating, setValidating] = useState(false);
   const [isNetworkError, setNetworkError] = useState(false);
   const alreadyExistError = APPCONSTANTS.PHONE_NUMBER_ALREADY_EXISTS_ERR_MSG;
   const duplicationError = APPCONSTANTS.PHONE_NUMBER_DUPLICATION_ERR_MSG;
@@ -48,12 +48,15 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
   };
 
   const validateIfNumberExist = useCallback(
-    (phoneNumber: string) =>
-      error.current ||
-      (!submitEnabledStatus.current && lastCheckedNumber.current !== phoneNumber
-        ? ' ' // blank space is given as error to block submition till number already exist validation is completed
-        : ''),
-    [error, submitEnabledStatus]
+    (phoneNumber: string) => {
+      return (
+        errorRef.current ||
+        ((validating || !submitEnabledStatus.current) && lastCheckedNumber.current !== phoneNumber
+          ? ' ' // blank space is given as error to block submition till number already exist validation is completed
+          : '')
+      );
+    },
+    [errorRef.current, submitEnabledStatus, validating]
   );
 
   const validateDuplication = useCallback(
@@ -87,10 +90,12 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
         if (!isValidPhoneNumber(phoneNumber, checkSameNumberAgain)) {
           return;
         }
+        setValidating(true);
         setLoading(true);
         await validatePhoneNumber(phoneNumber, id, countryCode || '').then((res) => {
           submitEnabledStatus.current = true;
-          error.current = '';
+          errorRef.current = '';
+          setValidating(false);
           setLoading(false);
           lastCheckedNumber.current = phoneNumber;
           form.change?.(`${name}.phoneNumber`, phoneNumber + ' '); // to trigger onchange space added
@@ -100,7 +105,7 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
       } catch (e: any) {
         setLoading(false);
         if (e instanceof ApiError && e.statusCode === 409) {
-          error.current = alreadyExistError;
+          errorRef.current = alreadyExistError;
           form.change?.(`${name}.phoneNumber`, phoneNumber + ' '); // to trigger onchange space added
           form.change?.(`${name}.phoneNumber`, phoneNumber);
           lastCheckedNumber.current = phoneNumber;
@@ -112,22 +117,6 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
       }
     },
     [id, countryCode, form, name, alreadyExistError]
-  );
-
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        resetPhoneNumberField: (value?: string) => {
-          lastCheckedNumber.current = '';
-          error.current = '';
-          if (value) {
-            validatePhoneNumberFn(value, true);
-          }
-        }
-      };
-    },
-    [error, validatePhoneNumberFn]
   );
 
   useEffect(() => {
@@ -153,7 +142,6 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
               ) {
                 input.onBlur(event);
                 submitEnabledStatus.current = false;
-                error.current = '';
                 validatePhoneNumberFn(input.value);
               }
             }}
@@ -190,5 +178,5 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
       }}
     />
   );
-});
+};
 export default PhoneNumberField;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
@@ -47,6 +47,7 @@ const WorkflowFormCustomization = () => {
     presentableJson,
     hashFieldIdsWithTitle,
     hashFieldIdsWithFieldName,
+    sethashFieldIdsWithFieldName,
 
     // reorder props
     isFamilyOrderModelOpen,
@@ -61,7 +62,7 @@ const WorkflowFormCustomization = () => {
         tenantId,
         countryId: regionId,
         formType: 'Module',
-        category: 'Input_form',
+        category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
         clinicalWorkflowId,
         successCb: ({ formInput }) => {
           const formJSON = JSON.parse(formInput)?.formLayout;
@@ -98,7 +99,7 @@ const WorkflowFormCustomization = () => {
       customizeFormRequest({
         formType: 'Module',
         formId,
-        category: 'Input_form',
+        category: APPCONSTANTS.CUSTOMIZATION_FORM_CATEGORY,
         tenantId,
         countryId: regionId ? regionId : '',
         payload: newData,
@@ -141,6 +142,8 @@ const WorkflowFormCustomization = () => {
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));
     setFormData(formValues);
   };
+  const accordianRef = useRef<any>([]);
+  const newlyAddedIdsRef = useRef<any>([]);
   return (
     <>
       {formData && !loading ? (
@@ -160,9 +163,14 @@ const WorkflowFormCustomization = () => {
             setCollapsedGroup={setCollapsedGroup}
             hashFieldIdsWithTitle={hashFieldIdsWithTitle}
             hashFieldIdsWithFieldName={hashFieldIdsWithFieldName}
+            sethashFieldIdsWithFieldName={sethashFieldIdsWithFieldName}
             isShow={true}
             addNewFieldDisabled={false}
             isFieldNameChangable={true}
+            isCustomizationForm={true}
+            isWorkFlowCustomization={true}
+            newlyAddedIdsRef={newlyAddedIdsRef.current}
+            accordianRef={accordianRef}
           />
           <ReorderView
             formRef={formRef}

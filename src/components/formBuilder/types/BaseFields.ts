@@ -7,7 +7,6 @@ export interface IBaseFields {
   fieldName: string;
   family: string;
   isEnabled?: boolean;
-  isEnrollment?: boolean;
   visibility: string;
   isMandatory?: boolean;
   condition?: ICondition[];
@@ -15,4 +14,6 @@ export interface IBaseFields {
   isNeededDefault?: string;
   totalCount?: number;
   isEditable?: boolean;
+  isEnrollment?: boolean;
+  isSummary?: boolean;
 }

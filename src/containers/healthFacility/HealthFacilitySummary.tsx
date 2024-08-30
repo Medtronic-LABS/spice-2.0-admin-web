@@ -6,12 +6,10 @@ import arrayMutators from 'final-form-arrays';
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
-import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import UserForm from '../../components/userForm/UserForm';
 import {
@@ -40,7 +38,6 @@ import {
   healthFacilitySelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { countryIdSelector, emailSelector, roleSelector } from '../../store/user/selectors';
 import { countryIdSelector, emailSelector, roleSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
@@ -116,6 +113,7 @@ export const formatHFUserData = (
       }
       roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     }
+    const isSuperAdmin = user.roles.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
     return {
       id: Number(user?.id),
       firstName: user.firstName,
@@ -124,8 +122,8 @@ export const formatHFUserData = (
       username: user.username,
       phoneNumber: user.phoneNumber,
       culture: user.culture,
-      countryCode: user.country.phoneNumberCode || user.countryCode,
-      country: { id: Number(countryId) },
+      countryCode: user?.countryCode?.phoneNumberCode,
+      country: isSuperAdmin ? null : { id: Number(countryId) },
       tenantId: user?.healthfacility?.tenantId
         ? Number(user.healthfacility.tenantId)
         : Number(tenantId) || user.tenantId,
@@ -324,11 +322,18 @@ const HealthFacilitySummary = (): React.ReactElement => {
       })
     );
 
-  const validatePeerSupervisor = (missingIds: number[], hfTenantId: number, healthFacilityParams: any) => {
+  const validateLinkedRestrictions = (
+    missingIds: number[],
+    hfTenantId: number,
+    healthFacilityParams: any,
+    linkedVillageIds: number[]
+  ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
         ids: missingIds,
         tenantId: hfTenantId,
+        healthFacilityId: healthFacility.id,
+        linkedVillageIds,
         successCb: () => {
           fetchWorkflowList(healthFacilityParams);
         },
@@ -353,7 +358,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           missingIds.push(supervisor.id);
         }
       }
-      validatePeerSupervisor(missingIds, Number(healthFacilityData.tenantId), healthFacility);
+      validateLinkedRestrictions(missingIds, Number(healthFacilityData.tenantId), healthFacility, linkedVillagesIds);
     } else {
       if (postData.clinicalWorkflowIds.length) {
         dispatch(
@@ -441,7 +446,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({

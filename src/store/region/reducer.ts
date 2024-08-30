@@ -1,22 +1,4 @@
 import * as REGION_TYPES from './actionTypes';
-import * as REGION_TYPES from './actionTypes';
-
-import { RegionActions, IRegionState } from './types';
-
-export const initialState: IRegionState = {
-  regions: [],
-  total: 0,
-  loading: false,
-  loadingMore: false,
-  error: null,
-  detail: {
-    id: '',
-    tenantId: '',
-    name: '',
-    list: [],
-    total: 0
-  },
-  isClientRegistryEnabled: undefined,
 import { RegionActions, IRegionState } from './types';
 
 export const initialState: IRegionState = {
@@ -38,7 +20,6 @@ export const initialState: IRegionState = {
   downloading: false
 };
 
-const regionReducer = (state = initialState, action = {} as RegionActions): IRegionState => {
 const regionReducer = (state = initialState, action = {} as RegionActions): IRegionState => {
   switch (action.type) {
     case REGION_TYPES.FETCH_REGION_DETAIL_REQUEST:

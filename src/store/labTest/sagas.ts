@@ -69,11 +69,12 @@ export function* fetchUnitList(): SagaIterator {
 /*
   Worker Saga: Fired on FETCH_LABTEST_CUSTOMIZATION_REQUEST action
 */
-export function* fetchLabTestCustomizationSaga({ name, successCb, failureCb }: any): SagaIterator {
+export function* fetchLabTestCustomizationSaga({ name, countryId, successCb, failureCb }: any): SagaIterator {
   try {
     const {
       data: { entity: data }
     } = yield call(labtestService.fetchLabtestCustomization, {
+      countryId,
       name
     } as any);
     successCb?.(data);

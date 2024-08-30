@@ -4,6 +4,7 @@ import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 
 interface IFilteredData {
+  isShow: any;
   name: string;
   isSearchable: boolean;
   data: any[];
@@ -117,53 +118,56 @@ const TableFilter: React.FC<ITableFilterProps> = ({
    * @returns A formatted string of health facility names.
    */
   const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(', ')}`;
-
   return (
-    <div className={styles.selectHeader}>
-      <div
-        className={`${styles.selectHeader} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1`}
-        onClick={handleDropdownToggle}
-      >
-        <div className='d-flex align-items-center'>
-          <FilterListIcon />
-          <span className='text-secondary py-0dot25 px-1'>{filterData.name}</span>
-        </div>
-        <div className={`text-secondary ${styles.arrow} ${isOpen ? 'open' : ''}`} />
-      </div>
-      {isOpen && (
-        <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded p-0dot5`}>
-          {filterData.isSearchable && (
-            <input
-              type='text'
-              placeholder='Search Facility'
-              className='form-control mb-1'
-              onChange={(e) => handleSearchChange(e.target.value)}
-            />
+    <>
+      {filterData.isShow && (
+        <div className={styles.selectHeader}>
+          <div
+            className={`${styles.selectHeader} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1`}
+            onClick={handleDropdownToggle}
+          >
+            <div className='d-flex align-items-center'>
+              <FilterListIcon />
+              <span className='text-secondary py-0dot25 px-1'>{filterData.name}</span>
+            </div>
+            <div className={`text-secondary ${styles.arrow} ${isOpen ? 'open' : ''}`} />
+          </div>
+          {isOpen && (
+            <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded p-0dot5`}>
+              {filterData.isSearchable && (
+                <input
+                  type='text'
+                  placeholder='Search Facility'
+                  className='form-control mb-1'
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                />
+              )}
+              <ul className='list-unstyled mb-0'>
+                {filteredOptions.map((option) => (
+                  <li
+                    key={option.id}
+                    className={`${styles.selectOption} px-1 py-0dot5 ${
+                      selectedOptions.includes(option.name) && styles.selectedDropdown
+                    }`}
+                  >
+                    <label className='d-flex align-items-center fs-6'>
+                      <input
+                        type='checkbox'
+                        value={option.id}
+                        checked={selectedOptions.includes(option.name)}
+                        onChange={() => handleSelectChange(option)}
+                        className='mr-2'
+                      />
+                      {!isFacility ? option.displayName : option.name} {formatHealthFacility(option)}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
-          <ul className='list-unstyled mb-0'>
-            {filteredOptions.map((option) => (
-              <li
-                key={option.id}
-                className={`${styles.selectOption} px-1 py-0dot5 ${
-                  selectedOptions.includes(option.name) && styles.selectedDropdown
-                }`}
-              >
-                <label className='d-flex align-items-center fs-6'>
-                  <input
-                    type='checkbox'
-                    value={option.id}
-                    checked={selectedOptions.includes(option.name)}
-                    onChange={() => handleSelectChange(option)}
-                    className='mr-2'
-                  />
-                  {!isFacility ? option.displayName : option.name} {formatHealthFacility(option)}
-                </label>
-              </li>
-            ))}
-          </ul>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
