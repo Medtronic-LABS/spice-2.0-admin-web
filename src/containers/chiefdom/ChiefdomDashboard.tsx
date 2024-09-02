@@ -38,7 +38,8 @@ const ChiefdomDashboard = () => {
   const chiefdomDetail = useSelector(getChiefdomDetailSelector);
   const countryId = useSelector(countryIdSelector);
   const {
-    chiefdom: { s: chiefdomSName, p: chiefdomPName }
+    chiefdom: { s: chiefdomSName, p: chiefdomPName },
+    healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
   } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
@@ -128,7 +129,7 @@ const ChiefdomDashboard = () => {
           {
             type: 'number',
             value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-            label: 'Site',
+            label: healthFacilitySName,
             disableEllipsis: true,
             route: PROTECTED_ROUTES.healthFacilityByChiefdom.replace(':chiefdomId', id).replace(':tenantId', tenantId),
             onClick: () => {

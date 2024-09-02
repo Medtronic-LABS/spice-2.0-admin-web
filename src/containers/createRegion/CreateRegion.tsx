@@ -65,7 +65,7 @@ const CreateRegion: React.FC = () => {
             username: user.email,
             gender: user.gender,
             phoneNumber: user.phoneNumber,
-            countryCode: user.country.phoneNumberCode,
+            countryCode: user.countryCode,
             timezone: { id: Number(user.timezone.id) },
             roleIds: [user.role[0].id, ...insightsIds]
           };

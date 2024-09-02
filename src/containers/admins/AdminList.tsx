@@ -293,6 +293,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
+              isShow: true,
               data: [...(rolesGrouped['SPICE INSIGHTS'] || []), ...(roleSpiceList || [])]
             }
           ]}

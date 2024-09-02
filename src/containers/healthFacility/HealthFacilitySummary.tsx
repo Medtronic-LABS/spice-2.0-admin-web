@@ -117,6 +117,7 @@ export const formatHFUserData = (
       }
       roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     }
+    const isSuperAdmin = user.roles.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
     return {
       id: Number(user?.id),
       firstName: user.firstName,
@@ -125,8 +126,8 @@ export const formatHFUserData = (
       username: user.username,
       phoneNumber: user.phoneNumber,
       culture: user.culture,
-      countryCode: user.country.phoneNumberCode || user.countryCode,
-      country: { id: Number(countryId) },
+      countryCode: user?.country?.phoneNumberCode || user?.countryCode,
+      country: isSuperAdmin ? null : { id: Number(countryId) },
       tenantId: user?.healthfacility?.tenantId
         ? Number(user.healthfacility.tenantId)
         : Number(tenantId) || user.tenantId,
@@ -408,7 +409,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -442,7 +443,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId);
+    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({
