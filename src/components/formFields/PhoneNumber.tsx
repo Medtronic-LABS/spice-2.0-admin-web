@@ -2,7 +2,7 @@ import { Field, FieldRenderProps } from 'react-final-form';
 import { composeValidators, normalizePhone, required, validateMobile } from '../../utils/validation';
 import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -17,9 +17,10 @@ interface IProps {
   form: FormApi<any>;
   formName: string;
   index: number;
+  countryCode: string;
 }
 
-const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps) => {
+const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode }: IProps) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -33,8 +34,8 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
   );
 
   const lastCheckedNumber = useRef<string>(currentphoneNumber.current);
+  const errorRef = useRef<string>('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [validating, setValidating] = useState(false);
   const [isNetworkError, setNetworkError] = useState(false);
   const alreadyExistError = APPCONSTANTS.PHONE_NUMBER_ALREADY_EXISTS_ERR_MSG;
@@ -47,12 +48,15 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
   };
 
   const validateIfNumberExist = useCallback(
-    (phoneNumber: string) =>
-      error ||
-      ((validating || !submitEnabledStatus.current) && lastCheckedNumber.current !== phoneNumber
-        ? ' ' // blank space is given as error to block submition till number already exist validation is completed
-        : ''),
-    [error, submitEnabledStatus, validating]
+    (phoneNumber: string) => {
+      return (
+        errorRef.current ||
+        ((validating || !submitEnabledStatus.current) && lastCheckedNumber.current !== phoneNumber
+          ? ' ' // blank space is given as error to block submition till number already exist validation is completed
+          : '')
+      );
+    },
+    [errorRef.current, submitEnabledStatus, validating]
   );
 
   const validateDuplication = useCallback(
@@ -88,9 +92,9 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
         }
         setValidating(true);
         setLoading(true);
-        await validatePhoneNumber(phoneNumber, id).then((res) => {
+        await validatePhoneNumber(phoneNumber, id, countryCode || '').then((res) => {
           submitEnabledStatus.current = true;
-          setError('');
+          errorRef.current = '';
           setValidating(false);
           setLoading(false);
           lastCheckedNumber.current = phoneNumber;
@@ -101,7 +105,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
       } catch (e: any) {
         setLoading(false);
         if (e instanceof ApiError && e.statusCode === 409) {
-          setError(alreadyExistError);
+          errorRef.current = alreadyExistError;
           form.change?.(`${name}.phoneNumber`, phoneNumber + ' '); // to trigger onchange space added
           form.change?.(`${name}.phoneNumber`, phoneNumber);
           lastCheckedNumber.current = phoneNumber;
@@ -112,9 +116,14 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index }: IProps
         }
       }
     },
-    [id, form, name, alreadyExistError]
+    [id, countryCode, form, name, alreadyExistError]
   );
 
+  useEffect(() => {
+    if (currentphoneNumber && countryCode) {
+      validatePhoneNumberFn(currentphoneNumber.current, true);
+    }
+  }, [currentphoneNumber, countryCode]);
   return (
     <Field
       name={`${name}.${fieldName}`}

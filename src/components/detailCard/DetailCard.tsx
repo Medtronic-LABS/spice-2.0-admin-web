@@ -38,6 +38,7 @@ interface IFilteredData {
   isSearchable: boolean;
   isFacility: boolean;
   data: any[];
+  isShow: boolean;
 }
 
 /**

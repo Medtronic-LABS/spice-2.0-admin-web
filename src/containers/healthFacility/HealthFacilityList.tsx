@@ -81,6 +81,7 @@ const HealthFacilityList = (): React.ReactElement => {
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
         userBased: !isSuperUser,
+        tenantIds: [tenantId],
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );

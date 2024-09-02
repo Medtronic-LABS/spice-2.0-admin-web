@@ -192,13 +192,13 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           countryId={countryId}
                           form={form}
                           enableAutoPopulate={true}
-                          isHF={true}
                           isHFCreate={true}
                           entityName='healthFacility'
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
                           parentOrgId={chiefdomId}
                           ignoreTenantId={tenantId}
+                          isSiteUser={true}
                         />
                         <></>
                       </FormContainer>

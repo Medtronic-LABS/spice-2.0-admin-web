@@ -220,7 +220,7 @@ export interface IHFUserPost {
   gender: string;
   username: string;
   phoneNumber: string;
-  country: { id: number };
+  country?: { id: number } | null;
   countryCode: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];

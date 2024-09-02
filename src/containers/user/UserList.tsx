@@ -39,6 +39,7 @@ import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
 
 interface IMatchParams {
   tenantId: string;
@@ -81,7 +82,7 @@ const UserList = (): React.ReactElement => {
         roleNames: selectedRole || [],
         siteUsers: true,
         tenantId,
-        tenantIds: selectedFacility || [],
+        tenantIds: role === HEALTH_FACILITY_ADMIN || role === CHIEFDOM_ADMIN ? [tenantId] : selectedFacility || [],
         failureCb: (e: Error) => {
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
         }
@@ -321,8 +322,15 @@ const UserList = (): React.ReactElement => {
           setSelectedFacility={setSelectedFacility}
           isFilter={true}
           onFilterData={[
-            { id: 1, name: 'Filter by Facility', isFacility: true, isSearchable: true, data: healthFacilityList },
-            { id: 2, name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole }
+            {
+              id: 1,
+              name: 'Filter by Facility',
+              isFacility: true,
+              isSearchable: true,
+              data: healthFacilityList,
+              isShow: role !== HEALTH_FACILITY_ADMIN
+            },
+            { id: 2, name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole, isShow: true }
           ]}
         >
           <CustomTable

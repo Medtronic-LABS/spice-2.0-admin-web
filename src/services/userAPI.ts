@@ -45,12 +45,13 @@ export const fetchUserByEmail = (email: string, parentOrganizationId?: string, i
     }
   });
 
-export const validatePhoneNumber = (phoneNumber: string, id: number | null) =>
+export const validatePhoneNumber = (phoneNumber: string, id: number | null, countryCode: string) =>
   axios({
     method: 'POST',
     url: '/user-service/user/validate-phonenumber',
     data: {
       phoneNumber,
+      countryCode,
       id
     }
   });
