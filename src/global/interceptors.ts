@@ -5,6 +5,7 @@ import ERRORS from '../constants/errors';
 import APPCONSTANTS from '../constants/appConstants';
 import sessionStorageServices from './sessionStorageServices';
 import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/actions';
+import { PUBLIC_ROUTES } from '../constants/route';
 
 const responseStatusReturn = (response: AxiosResponse, store: any) => {
   const { status } = response;
@@ -78,6 +79,8 @@ export const setupInterceptors = (store: any) => {
     }
   );
 
-  // get logged in user while refresh
-  store.dispatch(fetchLoggedInUser());
+  // get logged in user while refresh expect privacy policy page
+  if (document.location.pathname !== PUBLIC_ROUTES.privacyPolicy) {
+    store.dispatch(fetchLoggedInUser());
+  }
 };

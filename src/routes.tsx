@@ -33,6 +33,8 @@ import LabTestList from './containers/labtest/LabtestList';
 import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
 import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
+import { goToUrl } from './utils/routeUtil';
+import PrivacyPolicy from './containers/privacyPolicy/PrivacyPolicy';
 
 interface IRoute {
   path: string;
@@ -320,6 +322,11 @@ const publicRoutes = [
     path: PUBLIC_ROUTES.resetPassword,
     exact: true,
     component: ResetPassword
+  },
+  {
+    path: PUBLIC_ROUTES.privacyPolicy,
+    exact: true,
+    component: PrivacyPolicy
   }
 ];
 export const AppRoutes = () => {
