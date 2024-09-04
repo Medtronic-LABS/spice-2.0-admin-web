@@ -93,7 +93,7 @@ const MyProfile = (): React.ReactElement => {
         name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
       };
       postData.country = {
-        phoneNumberCode: postData.countryCode
+        phoneNumberCode: postData?.countryCode?.phoneNumberCode
       };
       userForEdit.current = { users: [postData] as IEditUserDetail[] };
     }
@@ -112,7 +112,7 @@ const MyProfile = (): React.ReactElement => {
       gender: user.gender,
       phoneNumber: user.phoneNumber,
       username: user.email,
-      countryCode: user?.country?.phoneNumberCode,
+      countryCode: user?.countryCode?.phoneNumberCode,
       country: { id: countryId },
       roleIds: [roleId?.id],
       timezone: { id: Number(user.timezone.id) }

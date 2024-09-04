@@ -309,6 +309,7 @@ const MultiSelect = (props: any) => {
         backspaceRemovesValue={false}
         blurInputOnSelect={true}
         styles={multiSelectStyles}
+        isClearable={newProps.isClearable}
       />
       <div className={styles.error}>
         {newProps.error} {newProps.error && newProps.errorLabel}

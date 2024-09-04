@@ -440,7 +440,7 @@ const UserForm = ({
           }
         >
           <img className='me-0dot5' src={PlusIcon} alt='' />
-          {'Add Another User'}
+          {isHF || isHFCreate ? APPCONSTANTS.ADD_ANOTHER_USER : APPCONSTANTS.ADD_ANOTHER_ADMIN}
         </div>
       )
     );
@@ -838,6 +838,7 @@ const UserForm = ({
                         isMulti={true}
                         isModel={true}
                         required={true}
+                        isClearable={false}
                         onChange={(values: OnChangeValue<any, true>, actionMeta: ActionMeta<any>) => {
                           const selectedGroupName = values.map((option: any) => option.groupName) || [];
                           switch (actionMeta.action) {
@@ -1108,7 +1109,7 @@ const UserForm = ({
                     name={name}
                     formName={formName}
                     index={index}
-                    countryCode={form.getState().values?.users[index]?.country?.phoneNumberCode}
+                    countryCode={form.getState().values?.users[index]?.countryCode?.phoneNumberCode}
                   />
                 </div>
                 {isSiteUser ||

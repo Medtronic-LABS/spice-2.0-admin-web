@@ -27,6 +27,7 @@ export interface IChiefdomFormValues {
     district?: IDistrictOption;
   };
   users: IUserFormValues[];
+  village: string[];
 }
 
 export interface IParams {
@@ -101,10 +102,11 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
    * @param {IChiefdomFormValues} formValues - The form values containing the chiefdom and user data.
    */
 
-  const onSubmit = ({ chiefdom: { district, ...chiefdom }, users }: IChiefdomFormValues) => {
+  const onSubmit = ({ chiefdom: { district, ...chiefdom }, users, village }: IChiefdomFormValues) => {
     const payload = {
       ...chiefdom,
       name: chiefdom.name.trim(),
+      villages: village.map((e: string) => ({ name: e })),
       users: users.map((user: any) => {
         let insightIds: number[] = [];
         if (user.roles) {

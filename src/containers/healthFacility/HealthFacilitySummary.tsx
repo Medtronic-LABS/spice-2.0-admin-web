@@ -104,7 +104,13 @@ export const formatHFUserData = (
       let spiceInsightsIds: number[] = [];
       let spiceId: number[] = [];
       if (user.role) {
-        spiceId = [user.role.id];
+        spiceId = Array.isArray(user.roles)
+          ? (user.roles || [])
+              .map((id: any) => {
+                return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+              })
+              .flat()
+          : [user.role.id];
       }
       if (user.roles) {
         spiceInsightsIds = user.roles

@@ -44,6 +44,7 @@ const TextEditor = ({ editorContent, setEditorContent, editorConfig }: ITextEdit
     style: {
       background: 'white'
     },
+    dataEnableGrammarly: 'false',
     minHeight: (editorConfig?.height && editorConfig?.height - 40) || 400
   };
 

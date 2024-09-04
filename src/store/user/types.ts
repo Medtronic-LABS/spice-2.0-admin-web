@@ -65,6 +65,10 @@ export interface IUser {
   organizations?: IOrganizations[] | [];
 }
 
+export interface IPhoneNumberCode {
+  phoneNumberCode: string;
+  id: string;
+}
 export interface IUserDetail {
   id?: string;
   firstName: string;
@@ -74,7 +78,7 @@ export interface IUserDetail {
   gender: string;
   phoneNumber: string;
   roles: IUserRole[];
-  countryCode?: string;
+  countryCode?: IPhoneNumberCode;
   villages?: IVillages[];
   supervisor?: IPeerSupervisor;
 }
@@ -382,7 +386,7 @@ export interface IUserDetail {
   redRisk?: boolean;
   isUpdated?: boolean;
   roleName?: string | ISelectOption;
-  countryCode?: string;
+  countryCode?: IPhoneNumberCode;
   village?: string;
 }
 

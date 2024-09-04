@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useEffect } from 'react';
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import {
   districtCountSelector,
   districtLoadingSelector,
@@ -28,6 +28,9 @@ const DeactivatedRecords = (): React.ReactElement => {
   const tenantId = useSelector(tenantIdSelector);
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
+  const {
+    district: { s: districtSName, p: districtPName }
+  } = NAME_CONSTANTS;
 
   const fetchDetails = useCallback(() => {
     dispatch(
@@ -101,7 +104,11 @@ const DeactivatedRecords = (): React.ReactElement => {
   return (
     <div className='row g-0dot625'>
       <div className='col-12'>
-        <DetailCard header='Deactivated Account' isSearch={true} onSearch={handleSearch}>
+        <DetailCard
+          header={`Deactivated ${deactivatedRecordsCount > 1 ? districtPName : districtSName}`}
+          isSearch={true}
+          onSearch={handleSearch}
+        >
           <CustomTable
             loading={loading}
             rowData={deactivatedRecords}

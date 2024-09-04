@@ -192,6 +192,7 @@ const APPCONSTANTS = {
   USER_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
   USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
   NO_VILLAGE_FOUND: 'No village available. Villages are already linked to other users.',
+  ADD_ANOTHER_USER: 'Add Another User',
   // Admin
   ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
   ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',
@@ -203,6 +204,7 @@ const APPCONSTANTS = {
   ADMIN_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
   ADMIN_LIST_FETCH_ERROR: 'Unable to load Admins. Please try after sometime.',
   ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
+  ADD_ANOTHER_ADMIN: 'Add Another Admin',
   // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
