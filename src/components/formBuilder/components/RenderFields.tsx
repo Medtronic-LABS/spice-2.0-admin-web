@@ -31,6 +31,10 @@ const getComponentsByFieldName = (
   if (fieldName === 'fieldName') {
     inputProps = { ...inputProps, ...{ component: !isNew || isFieldNameChangable ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
   }
+  if (fieldName === 'isResult') {
+    inputProps = { ...inputProps, ...{ disabled: true } };
+    obj.isResult = true;
+  }
   // disabled fields based on run time conditions
   if (!isNew && (fieldName === 'fieldName' || fieldName === 'inputType')) {
     inputProps = { ...inputProps, ...{ disabled: true } };

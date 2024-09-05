@@ -13,8 +13,7 @@ export const creatableViews = [
   { label: 'Dropdown', value: 'Spinner' },
   { label: 'Date', value: 'DatePicker' }
   { label: 'Text', value: 'EditText' },
-  { label: 'Dropdown', value: 'Spinner' },
-  { label: 'Date', value: 'DatePicker' }
+  { label: 'Dropdown', value: 'Spinner' }
 ];
 
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
