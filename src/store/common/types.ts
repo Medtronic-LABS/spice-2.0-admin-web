@@ -4,15 +4,14 @@ export interface ICommanState {
   loading: boolean;
   sideMenu: {
     list: ISideMenu[];
-    regionId?: string;
+    fetchedFor: string;
   };
   error: string | null | Error;
 }
 
 export interface IFetchSideMenuPayload {
-  countryId?: string;
-  tenantId: string;
-  formName: string;
+  countryId?: number;
+  roleName: string;
   successCb?: (payload: any) => void;
   failureCb?: (error: any) => void;
 }
@@ -34,7 +33,7 @@ export interface ISideMenu {
 
 export interface ISetSideMenuPayload {
   list: ISideMenu[];
-  regionId?: string;
+  fetchedFor?: string;
 }
 
 /*

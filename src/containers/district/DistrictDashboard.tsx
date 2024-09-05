@@ -22,6 +22,7 @@ import { countryIdSelector, formDataIdSelector, tenantIdSelector } from '../../s
 
 import styles from './District.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { clearSideMenu } from '../../store/common/actions';
 
 const DistrictDashboard = () => {
   const dispatch = useDispatch();
@@ -74,6 +75,14 @@ const DistrictDashboard = () => {
     },
     [countryId, dispatch]
   );
+
+  /**
+   * To clear sidemenu
+   */
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(

@@ -6,7 +6,7 @@ import { useParams } from 'react-router';
 
 import SelectInput from '../formFields/SelectInput';
 import TextInput from '../formFields/TextInput';
-import { fetchDistrictListDetailReq, fetchDistrictOptionsRequest } from '../../store/district/actions';
+import { fetchDistrictDetailReq, fetchDistrictOptionsRequest } from '../../store/district/actions';
 import {
   districtOptionsLoadingSelector,
   districtOptionsSelector,
@@ -55,7 +55,7 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
   useEffect(() => {
     if (showDistrictField && !isEdit && districtId && district?.id !== districtId) {
       dispatch(
-        fetchDistrictListDetailReq({
+        fetchDistrictDetailReq({
           tenantId,
           id: districtId
         })

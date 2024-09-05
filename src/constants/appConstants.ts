@@ -413,7 +413,6 @@ export const ROLE_LABELS = {
   [APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN]: 'Health Facility Admin'
 };
 
-// used in sidemenu, admin and user module
 export const NAMING_VARIABLES = {
   country: 'country',
   region: 'region',
@@ -421,6 +420,13 @@ export const NAMING_VARIABLES = {
   chiefdom: 'chiefdom',
   healthFacility: 'healthfacility',
   redRisk: 'RED_RISK_USER'
+};
+
+export const SIDE_MENU_FETCHING_HIERARCHY = {
+  region: 'SUPER_ADMIN',
+  district: 'REGION_ADMIN',
+  chiefdom: 'DISTRICT_ADMIN',
+  'health-facility': 'CHIEFDOM_ADMIN'
 };
 
 export const COMMON_INSIGHTS_ADMINROLE = ['EMR_QUICKSIGHT_SPICE_ADMIN', 'EMR_QUICKSIGHT_TC_ADMIN'];

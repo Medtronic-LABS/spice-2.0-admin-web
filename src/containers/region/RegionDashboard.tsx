@@ -32,6 +32,7 @@ import { clearChiefdomDetail } from '../../store/chiefdom/actions';
 import { IRegionDetail } from '../../store/region/types';
 import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { clearSideMenu } from '../../store/common/actions';
 
 /**
  * Lists all the regions
@@ -73,6 +74,11 @@ const Region = (): React.ReactElement => {
       );
     }
   });
+
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(

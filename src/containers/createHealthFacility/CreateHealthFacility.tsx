@@ -23,6 +23,7 @@ import {
   workflowLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { roleSelector, countryIdSelector } from '../../store/user/selectors';
+import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IMatchParams {
   regionId?: string;
@@ -55,7 +56,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
 
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const country = useSelector(countryIdSelector);
-  const countryId = Number(regionId || country?.id);
+  const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
   const {
     healthFacility: { s: healthFacilitySName }

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useHistory, RouteComponentProps } from 'react-router-dom';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
-import { fetchDistrictListDetailReq, updateDistrictDetail, decactivateDistrictReq } from '../../store/district/actions';
+import { fetchDistrictDetailReq, updateDistrictDetail, decactivateDistrictReq } from '../../store/district/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import Loader from '../../components/loader/Loader';
@@ -67,7 +67,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const getDistrictDetail = useCallback(
     (search?: string) => {
       dispatch(
-        fetchDistrictListDetailReq({
+        fetchDistrictDetailReq({
           tenantId,
           id: districtId,
           searchTerm: search,

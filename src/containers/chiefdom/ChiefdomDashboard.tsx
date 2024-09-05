@@ -28,6 +28,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
 import styles from './Chiefdom.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { clearSideMenu } from '../../store/common/actions';
 
 const ChiefdomDashboard = () => {
   const dispatch = useDispatch();
@@ -82,6 +83,14 @@ const ChiefdomDashboard = () => {
       })
     );
   }, [dispatch]);
+
+  /**
+   * To clear sidemenu
+   */
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * To clear cache and set current Chiefdom details

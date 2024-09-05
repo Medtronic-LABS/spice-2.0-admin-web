@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
-import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
+import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
 import Login from './containers/authentication/Login';
 import { AppLayout } from './components/appLayout/AppLayout';
 
@@ -96,7 +96,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.lockedUsers,
       exact: true,
       component: LockedUsers,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+      authorisedRoles: Object.values(APPCONSTANTS.ROLES)
     },
     {
       path: PROTECTED_ROUTES.regionDashboard,
@@ -138,7 +138,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.districtSummary,
       exact: true,
       component: DistrictSummary,
-      authorisedRoles: SU_SA_RA_DA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.chiefdomDashboard,
@@ -150,7 +150,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.chiefdomSummary,
       exact: true,
       component: ChiefdomSummary,
-      authorisedRoles: SU_SA_RA_DA_CDA
+      authorisedRoles: SU_SA_RA_DA
     },
     {
       path: PROTECTED_ROUTES.chiefdomByRegion,
@@ -294,7 +294,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.adminByHealthFacility,
       exact: true,
       component: Admins,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+      authorisedRoles: SU_SA_RA_DA_CDA
     },
     {
       path: PROTECTED_ROUTES.createMedication,

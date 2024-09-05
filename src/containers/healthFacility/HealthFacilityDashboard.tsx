@@ -21,6 +21,7 @@ import toastCenter from '../../utils/toastCenter';
 
 import styles from './HealthFacility.module.scss';
 import { clearHFSummary, fetchHFDashboardListRequest, setHFSummary } from '../../store/healthFacility/actions';
+import { clearSideMenu } from '../../store/common/actions';
 
 const HealthFacilityDashboard = () => {
   const dispatch = useDispatch();
@@ -73,6 +74,14 @@ const HealthFacilityDashboard = () => {
       fetchDetails(skip, limit, searchText.current, true, currentRole);
     }
   });
+
+  /**
+   * To clear sidemenu
+   */
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchDetails(0, APPCONSTANTS.HF_PER_PAGE);

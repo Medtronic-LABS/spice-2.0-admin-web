@@ -6,7 +6,7 @@ export const initialState: ICommanState = {
   loading: false,
   sideMenu: {
     list: [],
-    regionId: ''
+    fetchedFor: ''
   },
   error: null
 };
@@ -29,7 +29,7 @@ const regionReducer = (state = initialState, action = {} as CommonActions): ICom
         ...state,
         sideMenu: {
           list: action.payload.list,
-          regionId: action.payload?.regionId || ''
+          fetchedFor: action.payload?.fetchedFor || ''
         },
         loading: false
       };

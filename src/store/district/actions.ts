@@ -64,7 +64,7 @@ export const fetchDistrictListRequest = ({
   successCb,
   failureCb
 }: {
-  tenantId: string;
+  tenantId: string | number;
   isActive: boolean;
   skip?: number;
   limit?: number | null;
@@ -97,7 +97,7 @@ export const searchUserSuccess = (payload: IDistrictAdmin[]): ISearchDistrictAdm
   payload
 });
 
-export const fetchDistrictListDetailReq = (payload: IFetchDistrictDetailReqPayload): IFetchDistrictDetailReq => ({
+export const fetchDistrictDetailReq = (payload: IFetchDistrictDetailReqPayload): IFetchDistrictDetailReq => ({
   type: DISTRICT_TYPES.FETCH_DISTRICT_DETAIL_REQUEST,
   payload
 });
