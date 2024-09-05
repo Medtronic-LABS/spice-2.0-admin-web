@@ -371,7 +371,10 @@ const UserForm = ({
         form.change(`${formName}[${index}].lastName`, userData.lastName || '');
         form.change(`${formName}[${index}].gender`, userData.gender || '');
         form.change(`${formName}[${index}].country`, userData.country || null);
-        form.change(`${formName}[${index}].countryCode`, userData.countryCode || '');
+        form.change(`${formName}[${index}].countryCode`, {
+          phoneNumberCode: userData.countryCode || '',
+          id: userData.countryCode
+        });
         form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
         form.change(`${formName}[${index}].healthFacility`, userData.healthFacility || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');

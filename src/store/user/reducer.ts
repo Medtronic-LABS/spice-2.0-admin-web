@@ -1,6 +1,7 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import * as USERTYPES from './actionTypes';
+import { lockedUsers } from './selectors';
 
 import { IUserState, IUser } from './types';
 
@@ -42,7 +43,10 @@ const initialStateGetter = () =>
     userTenantId: '',
     timezoneList: [],
     cultureList: [],
-    communityList: []
+    communityList: [],
+    isLockedUserLoading: false,
+    lockedUsers: [],
+    totalLockedUers: 0
   } as unknown as IUserState);
 
 const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {
@@ -199,18 +203,22 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
       };
     case USERTYPES.UPDATE_PASSWORD_REQUEST:
     case USERTYPES.CREATE_PASSWORD_REQUEST:
-    case USERTYPES.FETCH_LOCKED_USERS_REQUEST:
     case USERTYPES.UNLOCK_USERS_REQUEST:
       return {
         ...state,
         loading: true
       };
+    case USERTYPES.FETCH_LOCKED_USERS_REQUEST:
+      return {
+        ...state,
+        isLockedUserLoading: true
+      };
     case USERTYPES.FETCH_LOCKED_USERS_SUCCESS:
       return {
         ...state,
-        loading: false,
         lockedUsers: action.payload.lockedUsers,
-        totalLockedUsers: action.payload.totalCount
+        totalLockedUsers: action.payload.totalCount,
+        isLockedUserLoading: false
       };
     case USERTYPES.UNLOCK_USERS_SUCCESS:
     case USERTYPES.UNLOCK_USERS_FAILURE:

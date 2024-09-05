@@ -101,28 +101,6 @@ export interface ICountry {
   tenantId?: number;
 }
 
-export interface IUserState {
-  isLoggedIn: boolean;
-  loggingIn: boolean;
-  loggingOut: boolean;
-  user: IUser;
-  defaultRole: string[];
-  userRoles: IGroupRoles;
-  isRolesLoading: boolean;
-  error: string | null;
-  loading: boolean;
-  cultureListLoading?: boolean;
-  initializing: boolean;
-  isPasswordSet: boolean;
-  email: string;
-  errorMessage: string;
-  showLoader: boolean;
-  token: string;
-  userTenantId: string;
-  communityList: [];
-  isResetPasswordLoading: boolean;
-}
-
 export type ILoginSuccessPayload = IUser;
 
 export interface ILoginFailurePayload {
@@ -425,6 +403,12 @@ export interface IUserState {
   totalLockedUsers?: number;
   userTenantId: string;
   cultureList?: ICulture[];
+  isResetPasswordLoading: boolean;
+  defaultRole: string[];
+  userRoles: IGroupRoles;
+  isRolesLoading: boolean;
+  communityList: [];
+  islockedUsersLoading?: boolean;
 }
 
 export interface ILoginFailurePayload {

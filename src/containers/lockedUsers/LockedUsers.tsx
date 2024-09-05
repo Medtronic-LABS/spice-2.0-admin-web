@@ -7,7 +7,13 @@ import APPCONSTANTS from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchLockedUsersRequest, unlockUsersRequest } from '../../store/user/actions';
-import { lockedUsers, lockedUsersCount, roleSelector, tenantIdSelector } from '../../store/user/selectors';
+import {
+  isLockedUserLoading,
+  lockedUsers,
+  lockedUsersCount,
+  roleSelector,
+  tenantIdSelector
+} from '../../store/user/selectors';
 import { ILockedUsers } from '../../store/user/types';
 
 const LockedUsers = (): React.ReactElement => {
@@ -16,6 +22,7 @@ const LockedUsers = (): React.ReactElement => {
   const tenantId = useSelector(tenantIdSelector);
   const lockedUsersList = useSelector(lockedUsers);
   const lockedUsersTotal = useSelector(lockedUsersCount);
+  const lockedUserLoading = useSelector(isLockedUserLoading);
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
 
@@ -88,7 +95,7 @@ const LockedUsers = (): React.ReactElement => {
           onSearch={handleSearch}
         >
           <CustomTable
-            loading={false}
+            loading={lockedUserLoading}
             rowData={lockedUsersList}
             columnsDef={columnDefs}
             isEdit={false}
