@@ -155,10 +155,8 @@ const HealthFacilityDetailsForm = ({
 
   // District fetch
   useEffect(() => {
-    if (!districtList.length) {
-      dispatch(fetchDistrictListRequest({ tenantId: countryId, isActive: true }));
-    }
-  }, [dispatch, districtList.length, countryId]);
+    dispatch(fetchDistrictListRequest({ countryId }));
+  }, [countryId, dispatch]);
 
   // Peer Supervisor fetch
   useEffect(() => {

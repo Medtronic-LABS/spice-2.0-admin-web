@@ -105,8 +105,8 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
       PROTECTED_ROUTES.customizeLabTest
         .replace(':tenantId', tenantId)
         .replace(':regionId', regionId as string)
-        .replace(':labTestName', encodeURIComponent(data.testName))
-        .replace(':identifier', data.uniqueName || camelCase(data.testName) + Date.now())
+        .replace(':labTestName', encodeURIComponent(data.testName.trim()))
+        .replace(':identifier', data.uniqueName || camelCase(data.testName.trim()) + Date.now())
         .replace(':testId', data?.id || null),
       { codeDetails: data.codeDetails }
     );
@@ -123,8 +123,8 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     formInput = { ...formInput, formLayout };
     const data = {
       ...dataParams,
-      formInput: undefined,
-      testName: dataParams.testName,
+      formInput: JSON.stringify(formInput),
+      testName: dataParams.testName.trim(),
       codeDetails: { code: dataParams.codeDetails?.code, url: dataParams.codeDetails?.url }
     };
     dispatch(

@@ -63,7 +63,7 @@ interface IModalState {
 export const formatHealthFacility = (hf: any, countryId: number | string) => {
   const postData = {
     id: hf.id,
-    name: hf.name,
+    name: hf.name.trim(),
     type: hf.type.name,
     phuFocalPersonName: hf.phuFocalPersonName,
     phuFocalPersonNumber: hf.phuFocalPersonNumber,
@@ -402,8 +402,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
             const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
             postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
             postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
-            postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-            postData.insightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
+            postData.reportRoles = postData.roles.filter((r: IRoles) => r.groupName === 'REPORTS') || [];
+            postData.selectedReportRoles = postData.roles.filter((r: IRoles) => r.groupName === 'REPORTS') || [];
             postData.supervisor = postData.supervisor && {
               ...postData.supervisor,
               name: `${postData.supervisor.firstName || ''} ${postData.supervisor.lastName || ''}`

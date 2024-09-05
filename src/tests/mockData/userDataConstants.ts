@@ -75,14 +75,14 @@ const MOCK_DATA_CONSTANTS = {
   USER_ROLES_RESPONSE_PAYLOAD: {
     data: {
       entity: {
-        'SPICE INSIGHTS': [
+        REPORTS: [
           {
             id: 1,
             name: 'REPORT_ADMIN',
             level: 1,
             suiteAccessName: 'cfr',
             displayName: 'Report Admin',
-            groupName: 'SPICE INSIGHTS'
+            groupName: 'REPORTS'
           }
         ],
         SPICE: [

@@ -86,8 +86,8 @@ const MyProfile = (): React.ReactElement => {
       const allSuiteAccess = postData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
       postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
-      postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-      postData.insightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
+      postData.reportRoles = postData.roles.filter((r: IRoles) => r.groupName === 'REPORTS') || [];
+      postData.selectedReportRoles = postData.roles.filter((r: IRoles) => r.groupName === 'REPORTS') || [];
       postData.supervisor = {
         ...postData.supervisor,
         name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`

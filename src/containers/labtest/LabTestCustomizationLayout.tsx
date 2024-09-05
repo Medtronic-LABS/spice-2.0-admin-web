@@ -111,7 +111,7 @@ const LabTestCustomizationLayout = () => {
         formLayout: formatData
       }).toString(),
       uniqueName,
-      testName: labTestName,
+      testName: labTestName.trim(),
       displayOrder: 1,
       countryId: Number(regionId),
       tenantId: null,
