@@ -1100,7 +1100,7 @@ const UserForm = ({
                     name={name}
                     formName={formName}
                     index={index}
-                    countryCode={form.getState().values?.users[index]?.countryCode?.phoneNumberCode}
+                    isAutoPopulate={autoFetched[index]}
                   />
                 </div>
                 {showHealthFacilityFn(index) && (

@@ -11,6 +11,7 @@ import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
 import { creatableViews, getConfigByViewType } from '../../utils/FieldUtils';
 import RenderFieldGroups from '../RenderFieldGroups';
+import { containsOnlyLettersAndNumbers } from '../../../../utils/validation';
 
 interface IAccordinaViewProps {
   formRef: any;
@@ -332,7 +333,10 @@ const AccordianView = ({
       if ((value as any)?.code && !(value as any).url) {
         newErrors = { ...errors, [familyGroup]: { [key]: { url: 'Please enter the url' } } };
       }
-      if (!(value as any).code && (value as any).url) {
+      if (
+        (!(value as any).code && (value as any).url) ||
+        ((value as any)?.code && containsOnlyLettersAndNumbers((value as any)?.code))
+      ) {
         newErrors = { ...errors, [familyGroup]: { [key]: { code: 'Please enter the code' } } };
       }
     }

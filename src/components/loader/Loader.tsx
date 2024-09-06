@@ -10,12 +10,14 @@ interface IStateProps {
   className?: string;
   isProgressVisible?: boolean;
   callBack?: (x: boolean) => void;
+  isBackgroundTransparent?: boolean;
 }
 
 const Loader = ({
   isFullScreen = true,
   className = '',
   isProgressVisible = false,
+  isBackgroundTransparent = true,
   callBack = (x: boolean) => x
 }: IStateProps) => {
   useEffect(() => {
@@ -30,7 +32,11 @@ const Loader = ({
   }, []);
   const count = useProgressiveIncrementorHook({ displayProgress: isProgressVisible, callBack });
   return (
-    <div className={`${styles.loaderBackdrop} ${isFullScreen ? styles.fullScreen : ''}`}>
+    <div
+      className={`${styles.loaderBackdrop} ${isFullScreen ? styles.fullScreen : ''} ${
+        isBackgroundTransparent ? '' : styles.backgroundOpaque
+      }`}
+    >
       <div className={`${className}`}>
         <div id='mdt-logo' style={{ width: 75, height: 75 }}>
           {isProgressVisible && <div className={styles.loaderContainer}>{count}%</div>}

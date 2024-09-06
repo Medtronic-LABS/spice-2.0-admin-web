@@ -10,6 +10,8 @@ import APPCONSTANTS from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
 import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
+import { goToUrl } from '../../utils/routeUtil';
+import Loader from '../../components/loader/Loader';
 
 const { ADMIN, CFR } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -96,15 +98,19 @@ const LandingPage = (): React.ReactElement => {
   return (
     <div className={`position-relative ${styles.landingPageContainer}`}>
       <div className='row justify-content-center'>
-        {suites.map((data) => (
-          <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
-            {!data.hasDomain ? (
-              <Link to={data.domainUrl} children={renderCardContent(data)} />
-            ) : (
-              <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
-            )}
-          </div>
-        ))}
+        {suites.length > 1 ? (
+          suites.map((data) => (
+            <div className={`card ${styles.customCard}`} key={`suite-${data.id}`}>
+              {!data.hasDomain ? (
+                <Link to={data.domainUrl} children={renderCardContent(data)} />
+              ) : (
+                <a href={data.domainUrl} target='_blank' rel='noreferrer' children={renderCardContent(data)} />
+              )}
+            </div>
+          ))
+        ) : (
+          <Loader isFullScreen={false} isBackgroundTransparent={false} />
+        )}
       </div>
     </div>
   );

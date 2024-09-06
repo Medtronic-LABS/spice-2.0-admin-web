@@ -2,7 +2,7 @@ import { Field, FieldRenderProps } from 'react-final-form';
 import { composeValidators, normalizePhone, required, validateMobile } from '../../utils/validation';
 import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -17,10 +17,10 @@ interface IProps {
   form: FormApi<any>;
   formName: string;
   index: number;
-  countryCode: string;
+  isAutoPopulate?: boolean;
 }
 
-const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, index }: IProps, ref) => {
+const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, index, isAutoPopulate }: IProps, ref) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -121,14 +121,18 @@ const PhoneNumberField = forwardRef(({ id, name, fieldName, form, formName, inde
         resetPhoneNumberField: (value?: string) => {
           lastCheckedNumber.current = '';
           error.current = '';
-          if (value) {
-            validatePhoneNumberFn(value, true);
-          }
         }
       };
     },
-    [error, validatePhoneNumberFn]
+    [error]
   );
+
+  useEffect(() => {
+    if (isAutoPopulate && form?.getState().values[formName][index]?.phoneNumber) {
+      validatePhoneNumberFn(form?.getState().values[formName][index]?.phoneNumber, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoPopulate]);
 
   return (
     <Field
