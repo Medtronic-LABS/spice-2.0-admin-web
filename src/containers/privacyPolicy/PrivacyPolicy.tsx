@@ -191,7 +191,7 @@ const PrivacyPolicy = () => {
           If you have questions or comments about this Privacy Statement, please contact us{' '}
         </span>
         <span>
-          <a href='mailto:privayandsecurity@medtroniclabs.org' style={{ color: 'blue', textDecoration: 'underline' }}>
+          <a href='mailto:privacyandsecurity@medtroniclabs.org' style={{ color: 'blue', textDecoration: 'underline' }}>
             <span>here</span>
           </a>
         </span>
