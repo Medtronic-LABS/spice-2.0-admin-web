@@ -74,7 +74,7 @@ export function* fetchChiefdomDetail(action: IFetchChiefdomDetailReq): SagaItera
           chiefdomDetail: {
             ...chiefdomDetail,
             district: {
-              id: chiefdomDetail.countryId,
+              id: chiefdomDetail.districtId,
               name: chiefdomDetail.districtName
             }
           },
