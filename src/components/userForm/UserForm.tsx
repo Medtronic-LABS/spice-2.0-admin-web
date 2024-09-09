@@ -259,7 +259,6 @@ const UserForm = ({
 
   const autoPopulateUserData = (user: any, index: number) => {
     phNumberFieldRef.current?.resetPhoneNumberField?.(user.phoneNumber);
-    form.reset();
     const userData = {
       ...user
     };
