@@ -5,12 +5,20 @@ import { SIDE_MENU_MAPPER, routesWithSideMenu } from '../../constants/route';
 import styles from './SideMenu.module.scss';
 import { fetchSideMenuRequest, setSideMenu } from '../../store/common/actions';
 import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
+import { loadingSelector as userLoadingSelector } from '../../store/user/selectors';
+import { getLoadingSelector as regionLoadingSelector } from '../../store/region/selectors';
+import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import { ISideMenu } from '../../store/common/types';
 import Loader from '../loader/Loader';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
 import APPCONSTANTS, { SIDE_MENU_FETCHING_HIERARCHY } from '../../constants/appConstants';
 import toastCenter from '../../utils/toastCenter';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { getMedicationLoadingSelector } from '../../store/medication/selectors';
+import { labtestLoadingSelector } from '../../store/labTest/selectors';
+import { districtLoadingSelector } from '../../store/district/selectors';
+import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { programLoadingSelector } from '../../store/program/selectors';
 
 interface ISideMenuProps {
   className?: string;
@@ -21,7 +29,44 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
 
+  const regionLoading = useSelector(regionLoadingSelector);
+  const districtLoading = useSelector(districtLoadingSelector);
+  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const hfLoading = useSelector(healthFacilityLoadingSelector);
+  const medicationLoading = useSelector(getMedicationLoadingSelector);
+  const labTestLoading = useSelector(labtestLoadingSelector);
+  const workflowLoading = useSelector(workflowLoadingSelector);
+  const userLoading = useSelector(userLoadingSelector);
+  const programLoading = useSelector(programLoadingSelector);
+
   const sideMenuLoading = useSelector(getLoadingSelector);
+
+  const getLoading = useCallback(
+    () =>
+      regionLoading ||
+      districtLoading ||
+      chiefdomLoading ||
+      hfLoading ||
+      medicationLoading ||
+      labTestLoading ||
+      workflowLoading ||
+      userLoading ||
+      programLoading
+        ? false
+        : sideMenuLoading,
+    [
+      regionLoading,
+      districtLoading,
+      chiefdomLoading,
+      hfLoading,
+      medicationLoading,
+      labTestLoading,
+      workflowLoading,
+      userLoading,
+      programLoading,
+      sideMenuLoading
+    ]
+  );
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = Number(countryId?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
@@ -105,7 +150,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
 
   return (
     <>
-      {sideMenuLoading && <Loader />}
+      {getLoading() && <Loader />}
       <div className={`${styles.sideMenu} py-0dot25 ${className}`}>
         {[...sideMenuList]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
           const isActive = matchPath(pathname, { exact: true, path: rest.route });

@@ -118,17 +118,16 @@ const HealthFacilityDetailsForm = ({
         })
       );
     }
-
-    if (!isEdit && chiefdomId) {
-      const { values: formValues = {} } = form?.getState?.() || {};
-      const accountsFormValue = (formValues as any)?.site?.operatingunit;
-      if (!accountsFormValue && Number(chiefdom?.id) === Number(chiefdomId)) {
-        form?.change(`${formName}.district` as any, chiefdom.district);
-        form?.change(`${formName}.chiefdom` as any, chiefdom);
-      }
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chiefdomId, form, isEdit, chiefdom.id]);
+  }, []);
+  if (!isEdit && chiefdomId) {
+    const { values: formValues = {} } = form?.getState?.() || {};
+    const chiefdomFormValue = (formValues as any)?.formName?.chiefdom;
+    if (!chiefdomFormValue && Number(chiefdom?.id) === Number(chiefdomId)) {
+      form?.change(`${formName}.district` as any, chiefdom.district);
+      form?.change(`${formName}.chiefdom` as any, chiefdom);
+    }
+  }
 
   // Logic for district autoselecting when the route is createHealthFacilityByDistrict
   // route is createhealthFacilityByDistrict, if isEdit = false and the route contains districtId param
@@ -146,8 +145,8 @@ const HealthFacilityDetailsForm = ({
   }, []);
   if (!isEdit && districtId) {
     const { values: formValues = {} } = form?.getState?.() || {};
-    const accountsFormValue = (formValues as any)?.site?.accounts;
-    if (!accountsFormValue && Number(district?.id) === Number(districtId)) {
+    const districtFormValue = (formValues as any)?.formName?.district;
+    if (!districtFormValue && Number(district?.id) === Number(districtId)) {
       form?.change(`${formName}.district` as any, district);
     }
   }

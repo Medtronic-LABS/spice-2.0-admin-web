@@ -17,6 +17,7 @@ import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import { IRoles } from '../../store/user/types';
+import { fetchCountryListRequest } from '../../store/healthFacility/actions';
 
 export interface IRegionFormValues {
   region: {
@@ -76,6 +77,7 @@ const CreateRegion: React.FC = () => {
         createRegionRequest({
           data,
           successCb: () => {
+            dispatch(fetchCountryListRequest());
             history.push(PROTECTED_ROUTES.regionDashboard);
             toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_CREATION_SUCCESS);
           },
