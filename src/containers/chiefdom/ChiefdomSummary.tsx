@@ -33,6 +33,7 @@ import { IHFUserPost } from '../../store/healthFacility/types';
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
 export interface IAdminEditFormValues {
+  suiteAccess: Array<{ groupName: string; id: string }>;
   id: string;
   firstName: string;
   lastName: string;
@@ -40,9 +41,8 @@ export interface IAdminEditFormValues {
   phoneNumber: string;
   username: string;
   gender: string;
-  countryCode: string;
+  countryCode: { phoneNumberCode: string; id: string };
   timezone: ITimezone;
-  country: { countryCode?: string; phoneNumberCode: string };
   tenantId?: string;
   roles: IRoles[];
   role?: IRoles[];
@@ -108,7 +108,11 @@ const ChiefdomSummary = () => {
   const handleEditChiefdomAdminClick = useCallback(
     (chiefdomAdmin: IAdminEditFormValues) => {
       chiefdomAdmin.role = chiefdomAdmin.roles;
-      chiefdomAdmin.country = { phoneNumberCode: chiefdomAdmin.countryCode };
+      const allSuiteAccess = chiefdomAdmin.roles.map((r: IRoles) => ({
+        groupName: r.groupName,
+        id: r.groupName
+      }));
+      chiefdomAdmin.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       setIsChiefdomAdminEdit(true);
       chiefdomAdminForEdit.current = { users: [chiefdomAdmin] };
       setShowChiefdomAdminModal(true);
@@ -152,8 +156,8 @@ const ChiefdomSummary = () => {
       username: email,
       phoneNumber,
       id,
-      country,
       username,
+      countryCode,
       role = []
     } = users[0];
     const [roleId] = role;
@@ -168,7 +172,7 @@ const ChiefdomSummary = () => {
           timezone: { id: Number(timezone?.id) },
           phoneNumber,
           roleIds: [roleId?.id],
-          countryCode: country.phoneNumberCode,
+          countryCode: countryCode.phoneNumberCode,
           country: { id: countryIdValue },
           tenantId: Number(tenantId)
         },
@@ -192,7 +196,7 @@ const ChiefdomSummary = () => {
     );
   };
   const handleChiefdomAdminCreate = ({
-    users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, country, username, role = [] }]
+    users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, countryCode, username, role = [] }]
   }: typeof chiefdomAdminForEdit.current) => {
     const [roleId] = role;
     const payload: IHFUserPost = {
@@ -202,7 +206,7 @@ const ChiefdomSummary = () => {
       username: email || username,
       timezone: { id: Number(timezone?.id) },
       phoneNumber,
-      countryCode: country.phoneNumberCode,
+      countryCode: countryCode?.phoneNumberCode,
       country: { id: countryIdValue },
       tenantId: Number(ChiefdomDetail.tenantId),
       roleIds: [roleId?.id]

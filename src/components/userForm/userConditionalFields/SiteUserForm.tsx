@@ -33,6 +33,7 @@ export const SiteUserForm = (props: any) => {
     formDetails,
     index
   );
+  const { form, formName } = formDetails;
 
   return (
     <>
@@ -104,6 +105,11 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={districtDetails.loading}
                 error={isError(meta)}
                 isModel={true}
+                onChange={(value: any) => {
+                  form.change(`${formName}[0].chiefdom`, undefined);
+                  form.change(`${formName}[0].healthfacility`, undefined);
+                  input.onChange(value);
+                }}
               />
             )}
           />
@@ -126,6 +132,10 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={chiefdomDetails.loading}
                 error={isError(meta)}
                 isModel={true}
+                onChange={(value: any) => {
+                  form.change(`${formName}[0].healthfacility`, undefined);
+                  input.onChange(value);
+                }}
               />
             )}
           />

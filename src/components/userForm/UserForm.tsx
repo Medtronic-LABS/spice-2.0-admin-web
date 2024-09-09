@@ -75,7 +75,7 @@ export interface IUserFormValues {
   email: string;
   firstName: string;
   lastName: string;
-  countryCode: string | { countryCode: string };
+  countryCode: string | { phoneNumberCode: string; id: string };
   username: string;
   phoneNumber: string;
   timezone: { id: string; description: string };
@@ -763,6 +763,7 @@ const UserForm = ({
   useEffect(() => {
     const districtDataId = form.getState().values.users?.[0]?.district?.tenantId;
     const [existingDistrict] = initialEditData;
+
     const existingDistrictId = existingDistrict?.organizations?.filter(
       (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
     );

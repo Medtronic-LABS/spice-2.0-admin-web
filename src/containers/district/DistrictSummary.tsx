@@ -27,6 +27,7 @@ import {
 } from '../../store/healthFacility/actions';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
+import { IRoles } from '../../store/user/types';
 
 interface IMatchParams {
   districtId: string;
@@ -126,7 +127,18 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   };
 
   const openEditModal = (values: IDistrictAdmin) => {
-    const valuesWithRole = { ...values, country: { phoneNumberCode: values.countryCode }, role: values.roles };
+    const allSuiteAccess = values.roles.map((r: IRoles) => ({
+      groupName: r.groupName,
+      id: r.groupName
+    }));
+
+    const valuesWithRole = {
+      ...values,
+      suiteAccess: [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()],
+      country: { phoneNumberCode: values.countryCode },
+      role: values.roles
+    };
+
     setIsOpenAdminModal(true);
     setAdminInitialValues(valuesWithRole);
     setIsAdd(false);
@@ -177,7 +189,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       gender: admin.gender,
       phoneNumber: admin.phoneNumber,
       username: admin.email,
-      countryCode: admin.country.phoneNumberCode,
+      countryCode: admin.countryCode.phoneNumberCode,
       country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
       roleIds: [roleId?.id],
       timezone: { id: Number(admin.timezone.id) },

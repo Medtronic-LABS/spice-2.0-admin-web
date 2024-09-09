@@ -224,7 +224,7 @@ export interface IHFUserPost {
   username: string;
   phoneNumber: string;
   country?: { id: number } | null;
-  countryCode: string;
+  countryCode?: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
   district?: string | number;

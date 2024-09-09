@@ -160,6 +160,7 @@ export interface IAdminEditFormValues {
   tenantId?: string;
   roles: IRoles[];
   role?: IRoles[];
+  suiteAccess?: Array<{ groupName: string; id: string }>;
 }
 
 export interface IDistrictAdmin extends Omit<IAdminEditFormValues, 'timezone'> {

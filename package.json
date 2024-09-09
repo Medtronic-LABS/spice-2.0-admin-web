@@ -1,6 +1,6 @@
 {
-  "name": "spice_web_sl",
-  "version": "0.1.0",
+  "name": "spice_web",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
