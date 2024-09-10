@@ -525,22 +525,16 @@ const UserForm = ({
   );
   const isCHUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
-      // getting CHA user selected status
-      if (isSiteUser) {
-        const newChaStatus = [...isCHAUser];
-        newChaStatus[index] = isCHASelected(roles);
-        setUserAsCHA(newChaStatus);
-
-        // getting CHP user selected status
-        const newChpStatus = [...isCHPUser];
-        newChpStatus[index] = isCHPSelected(roles);
-        setUserAsCHP(newChpStatus);
+      const newChWStatus = [...isCHWUser];
+      newChWStatus[index] = isCHWSelected(roles);
+      setUserAsCHW(newChWStatus);
+      if (newChWStatus[index]) {
+        isChwSingleHf();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [roleOptions, roleOptions.current]
   );
-
   // Peer Supervisor fetch
   const fetchSupervisorList = useCallback(
     (tenantIds: number[], index: number) => {
@@ -618,7 +612,12 @@ const UserForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFetchData]);
-
+  function isChwSingleHf() {
+    if (healthFacilityList.length === 1) {
+      fetchSupervisorList([healthFacilityList[0].tenantId], 0);
+      fetchVillagesList([healthFacilityList[0].tenantId], undefined, 0);
+    }
+  }
   useEffect(() => {
     if (isEdit) {
       isCHWUserSelectedFn(form.getState().values.users?.[0]?.role, 0);
