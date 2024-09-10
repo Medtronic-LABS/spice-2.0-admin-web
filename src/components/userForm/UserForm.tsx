@@ -18,7 +18,8 @@ import APPCONSTANTS, {
   NAMING_VARIABLES,
   NAME_CONSTANTS,
   COMMON_INSIGHTS_ADMINROLE,
-  COMMON_INSIGHTS_USERROLE
+  COMMON_INSIGHTS_USERROLE,
+  SIDE_MENU_FETCHING_HIERARCHY
 } from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
@@ -42,7 +43,7 @@ import {
   fetchPeerSupervisorListRequest,
   fetchVillagesListFromHFRequest
 } from '../../store/healthFacility/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
+import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   countryListSelector,
   countryLoadingSelector,
@@ -70,6 +71,7 @@ import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chief
 import { fetchDistrictListRequest } from '../../store/district/actions';
 import { formatCountryCode, formatUserToastMsg } from '../../utils/commonUtils';
 import { ActionMeta, OnChangeValue } from 'react-select';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
 
 export interface IUserFormValues {
   email: string;
@@ -83,6 +85,11 @@ export interface IUserFormValues {
   country: { countryCode: string };
   isHF?: boolean;
 }
+
+interface ISideMenuProps {
+  className?: string;
+}
+type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
 
 /**
  * Form for region admin creation
@@ -115,10 +122,18 @@ const UserForm = ({
   ignoreTenantId
 }: IUserFormProps): React.ReactElement => {
   const idRefs = useRef([new Date().getTime()]);
+  const { pathname } = useLocation();
   const formName = 'users';
   const dispatch = useDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
-
+  const role = useSelector(roleSelector);
+  const currentModule: ModuleNames = pathname.split('/')[1];
+  let fetchingFor: string;
+  if (role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
+    fetchingFor = role;
+  } else {
+    fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+  }
   const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange, getSuiteAccessList } = useUserFormUtils();
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
@@ -134,7 +149,6 @@ const UserForm = ({
   const chiefdomList = useSelector(chiefdomListSelector);
   const chiefdomLoading = useSelector(chiefdomLoadingSelector);
   const districtLoading = useSelector(districtLoadingSelector);
-  const role = useSelector(roleSelector);
   const countryList = useSelector(countryListSelector);
   const isCountryListLoading = useSelector(countryLoadingSelector);
   const [peerSupervisors, setPeerSupervisors] = useState([[...peerSupervisorList.list]] as IPeerSupervisor[][]);
@@ -271,7 +285,7 @@ const UserForm = ({
         countryCode: { phoneNumberCode: initialEditValue?.countryCode, id: initialEditValue?.countryCode }
       }
     ],
-    [cultureList, initialEditValue, isCultureListLoading, isEdit]
+    [cultureList, initialEditValue, districtList, chiefdomList, isCultureListLoading, isEdit]
   );
 
   const resetAdminForm = useCallback(
@@ -300,7 +314,7 @@ const UserForm = ({
   const SuperAdminToPeerSuperviserFn = useCallback(
     (roles: IRoles[]) => {
       if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
-        if (healthFacilityList?.length === 0 && countryId) {
+        if (healthFacilityList?.length === 0 && !isSiteUser && countryId) {
           dispatch(
             fetchHFListRequest({
               countryId,
@@ -698,20 +712,62 @@ const UserForm = ({
    */
   const getAdminRoles = (): IRoles[] => {
     const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
-      if (roleData.name === 'RED_RISK_USER' || roleData.displayName === null) {
+      const { name, displayName, suiteAccessName } = roleData;
+      const suiteNameLower = suiteAccessName?.toLowerCase();
+
+      // Early exits for 'RED_RISK_USER' or null display name
+      if (name === 'RED_RISK_USER' || displayName === null) {
         return false;
       }
-      if (isHFCreate) {
-        return (
-          roleData.suiteAccessName.toLowerCase() !== APPCONSTANTS.spiceRole.spice ||
-          roleData.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN
-        );
-      } else if (isSiteUser) {
-        return roleData.suiteAccessName.toLowerCase() !== APPCONSTANTS.spiceRole.spice;
-      } else {
-        return roleData.suiteAccessName.toLowerCase() === APPCONSTANTS.spiceRole.spice;
+
+      // Health facility conditions
+      if (isHFCreate || isHF) {
+        return suiteNameLower !== APPCONSTANTS.spiceRole.spice || name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN;
       }
+
+      // Site user condition
+      if (isSiteUser) {
+        return suiteNameLower !== APPCONSTANTS.spiceRole.spice;
+      }
+      // District level condition
+      const isDistrictLevel =
+        fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.district &&
+        (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
+      const isChiefdomOrHealthFacility =
+        fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
+        (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
+      const isHealthFacility =
+        fetchingFor === SIDE_MENU_FETCHING_HIERARCHY['health-facility'] &&
+        (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
+      if (isDistrictLevel) {
+        return (
+          suiteNameLower === APPCONSTANTS.spiceRole.spice &&
+          name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
+          name !== APPCONSTANTS.ROLES.SUPER_ADMIN
+        );
+      }
+
+      if (isChiefdomOrHealthFacility) {
+        return (
+          suiteNameLower === APPCONSTANTS.spiceRole.spice &&
+          name !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
+          name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
+          name !== APPCONSTANTS.ROLES.SUPER_ADMIN
+        );
+      }
+      if (isHealthFacility) {
+        return (
+          suiteNameLower === APPCONSTANTS.spiceRole.spice &&
+          name !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
+          name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
+          name !== APPCONSTANTS.ROLES.SUPER_ADMIN &&
+          name !== SIDE_MENU_FETCHING_HIERARCHY['health-facility']
+        );
+      }
+      // Default fallback
+      return suiteNameLower === APPCONSTANTS.spiceRole.spice;
     });
+
     return filteredRoles || [];
   };
 
@@ -770,6 +826,8 @@ const UserForm = ({
     const districtId = role === DISTRICT_ADMIN ? hfTenantId : districtDataId ?? existingDistrictId?.[0]?.id;
     if (districtId) {
       dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
+    } else if (!isSiteUser && fetchingFor !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom) {
+      dispatch(fetchChiefdomListRequest({ tenantId: String(hfTenantId) }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, form.getState().values.users?.[0]?.district?.tenantId]);
@@ -778,12 +836,18 @@ const UserForm = ({
     const chiefdomData = form.getState().values.users?.[0]?.chiefdom;
     const [existingDistrict] = initialEditData;
     const existingchiefdomDataId = existingDistrict?.organizations?.filter(
-      (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.chiefdom
+      (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
     );
     const chiefdomDetails = chiefdomData ?? existingchiefdomDataId?.[0];
     const chiefdomId = role === CHIEFDOM_ADMIN ? hfTenantId : chiefdomData?.tenantId ?? existingchiefdomDataId?.[0]?.id;
     if (chiefdomId) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [chiefdomId] });
+    } else if (
+      !isSiteUser &&
+      healthFacilityList.length === 0 &&
+      fetchingFor !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom
+    ) {
+      chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [hfTenantId] });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getState().values.users?.[0]?.chiefdom?.tenantId, initialEditData]);
@@ -1116,56 +1180,58 @@ const UserForm = ({
                     countryCode={form.getState().values?.users[index]?.countryCode?.phoneNumberCode}
                   />
                 </div>
-                {isSiteUser ||
-                  (isHFCreate && !isHF && (
-                    <div className='col-sm-6 col-12'>
-                      <Field
-                        name={`${name}.${NAMING_VARIABLES.healthFacility}`}
-                        type='text'
-                        validate={required}
-                        render={({ input, meta }) => {
-                          return (
-                            <SelectInput
-                              {...(input as any)}
-                              label='Assigned Health Facility'
-                              errorLabel='assigned health facility'
-                              labelKey='name'
-                              valueKey='id'
-                              options={healthFacilityList}
-                              loadingOptions={hfLoading}
-                              error={isError(meta)}
-                              isModel={true}
-                              disabled={isProfile}
-                              onChange={(hf: IHealthFacility) => {
-                                const formData = form.getState()?.values?.users?.[index];
-                                form.change(`${formName}?.[${index}]?.supervisor`, null);
-                                if (autoFetched[index] && formData?.selectedVillages?.length) {
-                                  form.change(`${formName}?.[${index}]?.villages`, [
-                                    ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
-                                  ]);
-                                } else {
-                                  form.change(`${formName}?.[${index}]?.villages`, []);
-                                }
+                {!isHFCreate && !isHF && isSiteUser && (
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.${NAMING_VARIABLES.healthFacility}`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => {
+                        return (
+                          <SelectInput
+                            {...(input as any)}
+                            label='Assigned Health Facility'
+                            errorLabel='assigned health facility'
+                            labelKey='name'
+                            valueKey='id'
+                            options={healthFacilityList}
+                            loadingOptions={hfLoading}
+                            error={isError(meta)}
+                            isModel={true}
+                            disabled={isProfile}
+                            onChange={(hf: IHealthFacility) => {
+                              const formData = form.getState()?.values?.users?.[index];
+                              form.change(`${formName}?.[${index}]?.supervisor`, null);
+                              if (autoFetched[index] && formData?.selectedVillages?.length) {
+                                form.change(`${formName}?.[${index}]?.villages`, [
+                                  ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
+                                ]);
+                              } else {
+                                form.change(`${formName}?.[${index}]?.villages`, []);
+                              }
+                              if (isCHPUser[index]) {
                                 fetchSupervisorList(
-                                  [...formData?.organizations.map((v: any) => v?.id), hf?.tenantId].filter(
+                                  [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
                                     (v: any) => v
                                   ),
                                   index
                                 );
                                 fetchVillagesList(
-                                  [...formData?.organizations.map((v: any) => v?.id), hf?.tenantId].filter(
+                                  [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
                                     (v: any) => v
                                   ),
                                   index
                                 );
-                                input.onChange(hf);
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </div>
-                  ))}
+                              }
+
+                              input.onChange(hf);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </div>
+                )}
                 <DynamicCHForm
                   index={index}
                   form={form}

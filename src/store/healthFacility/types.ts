@@ -447,7 +447,7 @@ export interface IFetchHFUserListRequest {
   userBased?: boolean;
   tenantBased?: boolean;
   roleNames?: string[];
-  siteUsers?: boolean;
+  isSiteUsers?: boolean | null;
   tenantIds?: string[];
   successCb?: (data: IHFUserGet[], total: number) => void;
   failureCb?: (error: Error) => void;

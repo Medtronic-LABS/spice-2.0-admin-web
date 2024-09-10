@@ -43,11 +43,15 @@ import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
 
 interface IMatchParams {
   tenantId: string;
+  regionId: string;
+  districtId: string;
+  chiefdomId: string;
 }
 
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId } = useParams<IMatchParams>();
+  const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
+  // const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);
@@ -80,7 +84,7 @@ const UserList = (): React.ReactElement => {
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
         roleNames: selectedRole || [],
-        siteUsers: true,
+        isSiteUsers: true,
         tenantId,
         tenantIds: role === HEALTH_FACILITY_ADMIN || role === CHIEFDOM_ADMIN ? [tenantId] : selectedFacility || [],
         failureCb: (e: Error) => {
@@ -298,6 +302,7 @@ const UserList = (): React.ReactElement => {
         limit: null,
         searchTerm: listParams.searchTerm,
         userBased: !isSuperUser,
+        tenantIds: [tenantId],
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );

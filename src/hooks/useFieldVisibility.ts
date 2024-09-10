@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import APPCONSTANTS from '../constants/appConstants';
+import APPCONSTANTS, { SIDE_MENU_FETCHING_HIERARCHY } from '../constants/appConstants';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
 
 interface IFieldVisibility {
   showTimezone: boolean;
@@ -10,6 +11,11 @@ interface IFieldVisibility {
   showHealthFacility: boolean;
 }
 
+interface ISideMenuProps {
+  className?: string;
+}
+type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
+
 const useFieldVisibility = (
   isSiteUser: boolean,
   isAdminForm: boolean,
@@ -18,7 +24,16 @@ const useFieldVisibility = (
   formDetails: any,
   index: number
 ): IFieldVisibility => {
+  const { pathname } = useLocation();
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
+  const currentModule: ModuleNames = pathname.split('/')[1];
+  let fetchingFor: string;
+  if (role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
+    fetchingFor = role;
+  } else {
+    fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+  }
+
   return useMemo(() => {
     const showTimezone = true;
 
@@ -32,7 +47,8 @@ const useFieldVisibility = (
       [DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) &&
       role !== DISTRICT_ADMIN &&
       role !== CHIEFDOM_ADMIN &&
-      role !== HEALTH_FACILITY_ADMIN;
+      role !== HEALTH_FACILITY_ADMIN &&
+      fetchingFor !== SIDE_MENU_FETCHING_HIERARCHY.district;
 
     const showChiefdom =
       !isSiteUser &&

@@ -257,7 +257,7 @@ export function* fetchHFUserList({
   limit,
   searchTerm,
   roleNames,
-  siteUsers,
+  isSiteUsers,
   tenantIds,
   successCb,
   failureCb
@@ -272,7 +272,7 @@ export function* fetchHFUserList({
       skip,
       searchTerm,
       roleNames,
-      siteUsers,
+      isSiteUsers,
       tenantIds
     });
     const payload = { users: hfUsers || [], total, limit };

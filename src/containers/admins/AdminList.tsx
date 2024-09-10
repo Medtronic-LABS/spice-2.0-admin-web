@@ -70,7 +70,7 @@ const UserList = (): React.ReactElement => {
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
           roleNames: selectedRole || [],
-          siteUsers: false,
+          isSiteUsers: false,
           tenantId,
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));

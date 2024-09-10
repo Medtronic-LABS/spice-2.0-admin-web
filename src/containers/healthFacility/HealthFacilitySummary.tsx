@@ -119,7 +119,7 @@ export const formatHFUserData = (
       }
       roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     }
-    const isSuperAdmin = user.roles.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
+    const isSuperAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
     return {
       id: Number(user?.id),
       firstName: user.firstName,
@@ -247,7 +247,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
         tenantBased: true,
-        siteUsers: true,
+        isSiteUsers: null,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();
