@@ -50,8 +50,7 @@ interface IMatchParams {
 
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
-  // const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
+  const { tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);

@@ -53,6 +53,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   });
 
   const [autoFetch, setAutoFetchState] = useState([] as any[]);
+  const [selectedchiefdomTenantId, setSelectedchiefdomTenantId] = useState();
 
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const country = useSelector(countryIdSelector);
@@ -61,6 +62,19 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const {
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
+
+  useEffect(() => {
+    formInstance?.subscribe(
+      (formState) => {
+        const nextchiefdomTenantId = formState?.values?.healthFacility?.chiefdom?.tenantId || '';
+        if (nextchiefdomTenantId !== selectedchiefdomTenantId) {
+          setSelectedchiefdomTenantId(nextchiefdomTenantId);
+        }
+      },
+      { values: true }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(clearAllDependentData());
@@ -196,8 +210,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           entityName='healthFacility'
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
-                          parentOrgId={chiefdomId}
-                          ignoreTenantId={tenantId}
+                          parentOrgId={chiefdomId ?? selectedchiefdomTenantId}
+                          ignoreTenantId={''}
                           isSiteUser={true}
                         />
                         <></>

@@ -150,6 +150,12 @@ const healthFacilityReducer = (
         ...state,
         hfUsersLoading: true
       };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_CLEAR_LIST_REQUEST:
+      return {
+        ...state,
+        hfTotal: 0,
+        healthFacilityList: []
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST:
       return {
         ...state,

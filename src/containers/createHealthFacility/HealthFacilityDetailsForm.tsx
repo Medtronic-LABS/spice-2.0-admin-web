@@ -497,7 +497,7 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <MultiSelect
                   {...(input as any)}
-                  label='Linked Peer Supervisor'
+                  label='Linked Community Health Assistant'
                   labelKey='name'
                   valueKey='id'
                   isShowLabel={true}

@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { FormApi } from 'final-form';
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Field, FieldRenderProps } from 'react-final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
@@ -60,11 +60,11 @@ const EmailField = forwardRef(
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
+    const lastOrgId = useRef<string | undefined>(parentOrgId);
     const emrError = APPCONSTANTS.EMR_ERR_MSG;
     const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
     const duplicationError = APPCONSTANTS.EMAIL_DUPLICATION_ERR_MSG;
     const siteAdminError = APPCONSTANTS.SITE_ADMIN_PERMISSION_ERR_MSG;
-
     useImperativeHandle(
       ref,
       () => ({
@@ -199,6 +199,14 @@ const EmailField = forwardRef(
         alreadyExistError
       ]
     );
+
+    useEffect(() => {
+      if (lastOrgId.current !== parentOrgId) {
+        lastOrgId.current = parentOrgId;
+        validateUser(currentEmail.current, true);
+      }
+    }, [parentOrgId, validateUser]);
+
     return (
       <Field
         name={`${name}.username`}

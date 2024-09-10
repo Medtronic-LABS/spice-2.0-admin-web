@@ -1,13 +1,11 @@
 import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
+import { formatHealthFacility } from '../admins/adminListMeta';
 
 const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
 
 const formatRoles = (user: IHFUserGet) =>
   `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(',')}`;
 
-const formatHealthFacility = (user: IHFUserGet) => {
-  return `${(user.organizations || []).map((org) => org.name).join(', ')}`;
-};
 export const columnDef = [
   {
     id: 1,

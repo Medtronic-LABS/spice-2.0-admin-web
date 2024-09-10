@@ -385,7 +385,9 @@ export const fetchHFUserListRequest = ({
   successCb,
   failureCb
 });
-
+export const clearHFListRequest = () => ({
+  type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_CLEAR_LIST_REQUEST
+});
 export const fetchHFUserListSuccess = (payload: IFetchHFUserListSuccessPayload): IFetchHFUserListSuccess => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_SUCCESS,
   payload

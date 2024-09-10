@@ -36,6 +36,7 @@ import {
 import userMeta from './userFormMeta';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
+  clearHFListRequest,
   clearSupervisorList,
   clearVillageHFList,
   fetchCountryListRequest,
@@ -66,9 +67,9 @@ import PhoneNumberField from '../formFields/PhoneNumber';
 import useUserFormUtils from './userFormUtils';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import { SiteUserForm } from './userConditionalFields/SiteUserForm';
-import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
-import { fetchDistrictListRequest } from '../../store/district/actions';
+import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
 import { formatCountryCode, formatUserToastMsg } from '../../utils/commonUtils';
 import { ActionMeta, OnChangeValue } from 'react-select';
 import { NavLink, matchPath, useLocation } from 'react-router-dom';
@@ -336,6 +337,9 @@ const UserForm = ({
     return () => {
       dispatch(clearSupervisorList());
       dispatch(clearVillageHFList());
+      dispatch(clearChiefdomList());
+      dispatch(clearDistrictList());
+      dispatch(clearHFListRequest());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -359,6 +363,7 @@ const UserForm = ({
     } else if (isCHPSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
+      form.change(`${formName}[${index}].countryCode`, '');
       setClearEmail(false);
       const allSuiteAccess = userData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
       userData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];

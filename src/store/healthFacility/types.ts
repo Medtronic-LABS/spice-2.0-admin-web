@@ -463,6 +463,10 @@ export interface IFetchHFUserListFailure {
   error: Error;
 }
 
+export interface IFetchHFUserListClear {
+  type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_CLEAR_LIST_REQUEST;
+}
+
 export interface IDeleteUserPayload {
   id: number;
   tenantIds: number[];
@@ -795,4 +799,5 @@ export type HealthFacilityActions =
   | IClearHFDropdown
   | IValidateLinkedRestrictions
   | IValidateLinkedRestrictionsSuccess
+  | IFetchHFUserListClear
   | IValidateLinkedRestrictionsFailure;

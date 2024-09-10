@@ -27,7 +27,7 @@ const formatRoles = (user: IHFUserGet): string =>
  * @param {string} roleName - The role name to check against the user's current admin role.
  * @returns {string} A comma-separated list of organization names if the role matches; otherwise, an empty string.
  */
-const formatOrganizations = (user: IHFUserGet, roleName: string): string => {
+export const formatOrganizations = (user: IHFUserGet, roleName: string): string => {
   return (user.organizations || [])
     .map((org) => (org.formName === roleName ? org.name : null))
     .filter((name) => name) // Remove null or undefined names
@@ -40,7 +40,7 @@ const formatOrganizations = (user: IHFUserGet, roleName: string): string => {
  * @param {IHFUserGet} user - The user object containing roles and organizations.
  * @returns {string} A comma-separated list of health facility names if the user has the HEALTH_FACILITY_ADMIN role.
  */
-const formatHealthFacility = (user: IHFUserGet): string => formatOrganizations(user, healthFacility);
+export const formatHealthFacility = (user: IHFUserGet): string => formatOrganizations(user, healthFacility);
 
 /**
  * Formats district names for the user with the DISTRICT_ADMIN role.
