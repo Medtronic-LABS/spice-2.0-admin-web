@@ -160,7 +160,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
             APPCONSTANTS.FORM_CUSTOMIZATION_SUCCESS.replace(
-              'Dynamic',
+              'Dynamic customization',
               dataParams.testName.charAt(0).toUpperCase() + dataParams.testName.slice(1)
             )
           );
@@ -172,7 +172,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.ERROR,
-              APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', dataParams.testName)
+              APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic customization', dataParams.testName)
             )
           );
         }

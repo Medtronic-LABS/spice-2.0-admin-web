@@ -126,7 +126,7 @@ const LabTestCustomizationLayout = () => {
             APPCONSTANTS.FORM_CUSTOMIZATION_SUCCESS.replace(
               'Dynamic',
               testName.charAt(0).toUpperCase() + testName.slice(1)
-            ).replace('updated', formId ? 'updated' : 'created')
+            ).replace('updated', data.id ? 'updated' : 'created')
           );
           onCancel();
         },
@@ -137,7 +137,7 @@ const LabTestCustomizationLayout = () => {
               APPCONSTANTS.ERROR,
               APPCONSTANTS.FORM_CUSTOMIZATION_ERROR.replace('dynamic', testName).replace(
                 'update',
-                formId ? 'update' : 'create'
+                data.id ? 'update' : 'create'
               )
             )
           );

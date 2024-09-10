@@ -275,9 +275,7 @@ const UserForm = ({
     const isReportAdmin = isRoleExists(userData.role, [REPORT_ADMIN]);
     const isSuperAdmin = isRoleExists(userData.role, [SUPER_ADMIN, SUPER_USER]);
     if (isSuperAdmin || isReportAdmin) {
-      emailDisabledFn(
-        APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE.replace('Super', isReportAdmin ? 'Report' : 'Super')
-      );
+      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE.replace('Super', 'Super/Report'));
     } else if (isCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
     } else {
