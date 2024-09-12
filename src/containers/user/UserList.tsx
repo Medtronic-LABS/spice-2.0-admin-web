@@ -220,7 +220,7 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      const [getRedRisk] = spiceUserRole.filter(
+      const [getRedRisk] = spiceUserRole?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );
       const userObj = formatHFUserData(users, countryIdValue, tenantId);

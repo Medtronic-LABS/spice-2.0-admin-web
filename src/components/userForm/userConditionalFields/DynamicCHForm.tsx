@@ -16,11 +16,12 @@ export const DynamicCHForm = ({
   isError,
   isChaUser,
   isChpUser,
-  communityList
+  communityList,
+  isHFCreate
 }: any) => {
   return (
     <>
-      {isChpUser && (
+      {isChpUser && !isHFCreate && (
         <>
           <div className='col-sm-6 col-12'>
             <Field

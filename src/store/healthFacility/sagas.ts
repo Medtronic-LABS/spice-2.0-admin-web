@@ -24,7 +24,8 @@ import {
   IDeleteHFRequest,
   IFetchHFDashboardListRequest,
   IFetchUnlinkedVillagesRequest,
-  IPeerSupervisorValidation
+  IPeerSupervisorValidation,
+  IFetchVillagesListUserLinked
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -96,7 +97,8 @@ import {
   FETCH_PEER_SUPERVISOR_VALIDATION,
   FETCH_HF_DASHBOARD_LIST_REQUEST,
   LINKED_RESTRICTIONS_VALIDATION_REQUEST,
-  FETCH_UNLINKED_VILLAGES_REQUEST
+  FETCH_UNLINKED_VILLAGES_REQUEST,
+  FETCH_VILLAGES_LIST_USER_LINKED
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
@@ -484,6 +486,28 @@ export function* fetchPeerSupervisorListSagaRequest({
 }
 
 /*
+  Worker Saga: Fired on FETCH_VILLAGES_LIST_FOR_HF_REQUEST action
+*/
+export function* fetchVillagesListUserLinkedSagaRequest({
+  tenantIds,
+  userId,
+  successCb,
+  failureCb
+}: IFetchVillagesListUserLinked): SagaIterator {
+  try {
+    const {
+      data: { entity: list }
+    } = yield call(hfService.fetchVillagesListfromHF as any, tenantIds, userId);
+    successCb?.({ list, hfTenantIds: tenantIds });
+    yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: tenantIds } }));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchVillagesListFromHFFailure(e));
+    }
+  }
+}
+/*
   Worker Saga: Fired on FETCH_WORKFLOW_LIST_REQUEST action
 */
 export function* fetchWorkflowListSagaRequest({
@@ -643,6 +667,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(LINKED_RESTRICTIONS_VALIDATION_REQUEST, validateLinkedRestrictionsSagaRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_TYPES_REQUEST, fetchHFTypesSaga)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
+  yield all([takeLatest(FETCH_VILLAGES_LIST_USER_LINKED, fetchVillagesListUserLinkedSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);
   yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
   yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchSiteDashboardList)]);

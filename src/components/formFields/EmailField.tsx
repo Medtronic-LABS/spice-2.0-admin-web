@@ -61,7 +61,7 @@ const EmailField = forwardRef(
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
     const lastOrgId = useRef<string | undefined>(parentOrgId);
-    const emrError = APPCONSTANTS.EMR_ERR_MSG;
+    const cfrError = APPCONSTANTS.CFR_ERR_MSG;
     const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
     const duplicationError = APPCONSTANTS.EMAIL_DUPLICATION_ERR_MSG;
     const siteAdminError = APPCONSTANTS.SITE_ADMIN_PERMISSION_ERR_MSG;
@@ -167,7 +167,7 @@ const EmailField = forwardRef(
           ) {
             let newError = '';
             if (e.statusCode === 400) {
-              newError = emrError;
+              newError = cfrError;
             } else if (e.statusCode === 406) {
               newError = differentOrgError;
             } else if (e.statusCode === 412) {
@@ -193,7 +193,7 @@ const EmailField = forwardRef(
         fetchUserByEmailResFn,
         form,
         name,
-        emrError,
+        cfrError,
         differentOrgError,
         siteAdminError,
         alreadyExistError
@@ -234,7 +234,7 @@ const EmailField = forwardRef(
               showLoader={loading}
               label='Email ID'
               errorLabel={
-                [alreadyExistError, emrError, differentOrgError, siteAdminError, ' '].includes(meta.error) ||
+                [alreadyExistError, cfrError, differentOrgError, siteAdminError, ' '].includes(meta.error) ||
                 isNetworkError
                   ? ''
                   : 'email ID'

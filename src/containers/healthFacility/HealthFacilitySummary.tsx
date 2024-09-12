@@ -132,6 +132,8 @@ export const formatHFUserData = (
       country: isSuperAdmin ? null : { id: Number(countryId) },
       tenantId: user?.healthfacility?.tenantId
         ? Number(user.healthfacility.tenantId)
+        : isSuperAdmin
+        ? null
         : Number(tenantId) || user.tenantId,
       supervisorId: Number(user.supervisor?.id),
       roleIds,

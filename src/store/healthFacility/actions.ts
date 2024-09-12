@@ -90,7 +90,8 @@ import {
   IValidateLinkedRestrictions,
   IValidateLinkedRestrictionsSuccess,
   IValidateLinkedRestrictionsFailure,
-  IObjectData
+  IObjectData,
+  IFetchVillagesListUserLinked
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -531,6 +532,20 @@ export const fetchVillagesListFromHFRequest = ({
   countryId,
   districtId,
   chiefdomId,
+  successCb,
+  failureCb
+});
+
+// VILLAGES LIST FROM HF
+export const fetchVillagesListUserLinked = ({
+  tenantIds,
+  userId,
+  successCb,
+  failureCb
+}: Omit<IFetchVillagesListUserLinked, 'type'>): IFetchVillagesListUserLinked => ({
+  type: HF_TYPES.FETCH_VILLAGES_LIST_USER_LINKED,
+  tenantIds,
+  userId,
   successCb,
   failureCb
 });

@@ -15,7 +15,7 @@ describe('<Field />', () => {
     loading: false,
     currentEmail: { current: '' },
     alreadyExistError: '',
-    emrError: '',
+    cfrError: '',
     differentOrgError: '',
     isNetworkError: false,
     onBlur: jest.fn(),
@@ -62,7 +62,7 @@ describe('<Field />', () => {
                   showLoader={props.loading}
                   label='Email ID'
                   errorLabel={
-                    [props.alreadyExistError, props.emrError, props.differentOrgError, ' '].includes(meta.error) ||
+                    [props.alreadyExistError, props.cfrError, props.differentOrgError, ' '].includes(meta.error) ||
                     props.isNetworkError
                       ? ''
                       : 'email ID'

@@ -590,6 +590,14 @@ export interface IFetchVillagesListFromHFRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IFetchVillagesListUserLinked {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED;
+  tenantIds: number[];
+  userId?: number;
+  successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
+  failureCb?: (error: Error) => void;
+}
+
 export interface IFetchVillagesListFromHFSuccess {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_SUCCESS;
   payload: { data: { list: IVillages[]; hfTenantIds: number[] } };

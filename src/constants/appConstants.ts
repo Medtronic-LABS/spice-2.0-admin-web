@@ -306,7 +306,7 @@ const APPCONSTANTS = {
 
   FORGOT_USER_FAILURE_ERR_MSG: 'Unable to submit the request. Please try after sometime.',
   EMAIL_ALREADY_EXISTS_ERR_MSG: 'Email ID already exists',
-  EMR_ERR_MSG: 'Email ID already exists in EMR role',
+  CFR_ERR_MSG: 'Email ID already exists in CFR role',
   SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',
   EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG: 'Email ID already exists in different organization',
   EMAIL_DUPLICATION_ERR_MSG: `Multiple users can't have same`,
@@ -429,7 +429,7 @@ export const SIDE_MENU_FETCHING_HIERARCHY = {
   'health-facility': 'CHIEFDOM_ADMIN'
 };
 
-export const COMMON_INSIGHTS_ADMINROLE = ['EMR_QUICKSIGHT_SPICE_ADMIN', 'EMR_QUICKSIGHT_TC_ADMIN'];
-export const COMMON_INSIGHTS_USERROLE = ['EMR_SITE_USER'];
+export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
+export const COMMON_INSIGHTS_USERROLE = ['CFR_SITE_USER'];
 
 export default APPCONSTANTS;

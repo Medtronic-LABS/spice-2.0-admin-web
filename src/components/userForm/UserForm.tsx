@@ -42,7 +42,9 @@ import {
   fetchCountryListRequest,
   fetchHFListRequest,
   fetchPeerSupervisorListRequest,
-  fetchVillagesListFromHFRequest
+  fetchUnlinkedVillagesRequest,
+  fetchVillagesListFromHFRequest,
+  fetchVillagesListUserLinked
 } from '../../store/healthFacility/actions';
 import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
@@ -73,6 +75,7 @@ import { clearDistrictList, fetchDistrictListRequest } from '../../store/distric
 import { formatCountryCode, formatUserToastMsg } from '../../utils/commonUtils';
 import { ActionMeta, OnChangeValue } from 'react-select';
 import { NavLink, matchPath, useLocation } from 'react-router-dom';
+import { REGION_ADMIN, SUPER_ADMIN } from '../../routes';
 
 export interface IUserFormValues {
   email: string;
@@ -135,7 +138,8 @@ const UserForm = ({
   } else {
     fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
   }
-  const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange, getSuiteAccessList } = useUserFormUtils();
+  const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange, getSuiteAccessList, isHFAdminSelected } =
+    useUserFormUtils();
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
   const healthFacilityList = useSelector(healthFacilityListSelector);
@@ -261,7 +265,11 @@ const UserForm = ({
     () => [
       {
         ...initialEditValue,
-        hfTenantIds: isEdit ? (initialEditValue?.organizations || []).map((org: any) => org.id) : [],
+        hfTenantIds: isEdit
+          ? (initialEditValue?.organizations || [])
+              .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
+              .map((org: any) => org.id)
+          : [],
         suiteAccess: initialEditValue?.suiteAccess?.map((org: any) => ({
           ...org,
           isFixed: APPCONSTANTS.spiceRole.spiceInsights !== org.groupName
@@ -412,9 +420,10 @@ const UserForm = ({
       isCHUserSelectedFn(userData.role, index);
       updateRoleOptionsAndDisableRoles(index, userData.roles);
       if (isCHPSelected(userData.roles)) {
-        const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
-        fetchListWithConditions(selectedRoles(index), tenantIds, 'village', index);
-        fetchListWithConditions(selectedRoles(index), tenantIds, 'supervisor', index);
+        const tenantIds = [...userData.organizations.map((v: any) => v.id)].filter((v: any) => v);
+
+        fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'village', index);
+        fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'supervisor', index);
       }
     }
   };
@@ -520,31 +529,18 @@ const UserForm = ({
     (index: number, mandatoryRoleOptions?: IRoles[]) => {
       // role options
       const newRoleOptions = [...roleOptions.current];
-      if (isHFCreate && (mandatoryRoleOptions ? !isCHPSelected(mandatoryRoleOptions) : true)) {
-        newRoleOptions[index] = (rolesGrouped.SPICE ? [...rolesGrouped.SPICE] : []).sort((a: any, b: any) =>
-          a.displayName > b.displayName ? 1 : -1
-        );
-      } else if (isHF) {
-        newRoleOptions[index] = (rolesGrouped.SPICE ? [...rolesGrouped.SPICE] : [])
-          .filter((r: IRoles) => r.name !== 'SUPER_ADMIN')
-          .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
-      } else {
-        newRoleOptions[index] = (rolesGrouped.SPICE ? [...rolesGrouped.SPICE] : []).sort((a: any, b: any) =>
-          a.displayName > b.displayName ? 1 : -1
-        );
-      }
       roleOptions.current = newRoleOptions;
 
       // role disable
       const newDisabledRoles = [...disabledRoles.current];
       let validRoles: string[] = [];
       const selectedAllRoles = [...(selectedRoles(index) || [])];
-      if (selectedAllRoles.some((ro: IRoles) => mobileRoles.includes(ro.name))) {
-        validRoles = mobileRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => peerSupervisorRoles.includes(ro.name))) {
-        validRoles = peerSupervisorRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
-        validRoles = superAdminRoles;
+      if (selectedAllRoles.some((ro: IRoles) => ro.name === HEALTH_FACILITY_ADMIN)) {
+        validRoles = [HEALTH_FACILITY_ADMIN];
+      } else if (selectedAllRoles.some((ro: IRoles) => ro.name !== HEALTH_FACILITY_ADMIN)) {
+        validRoles = (newRoleOptions[index] || [])
+          .filter((role) => role.name !== HEALTH_FACILITY_ADMIN)
+          .map((role) => role.name);
       } else {
         validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
       }
@@ -565,7 +561,6 @@ const UserForm = ({
       selectedAdmins
     ]
   );
-
   const isCHUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
       // getting CHA user selected status
@@ -602,18 +597,16 @@ const UserForm = ({
   );
   // Villages fetch
   const fetchVillagesList = useCallback(
-    (tenantIds: number[], index: number) => {
+    (tenantIds: number[], userId: string, index: number) => {
       if (tenantIds.length && countryId) {
-        const getSelectedHFDetails: any = healthFacilityList.filter((HFData: any) => {
-          return HFData.tenantId === tenantIds[index];
-        });
-        const [HFDetails] = getSelectedHFDetails || [];
         dispatch(
-          fetchVillagesListFromHFRequest({
-            countryId,
-            districtId: HFDetails?.district?.id,
-            chiefdomId: HFDetails?.chiefdom?.id,
+          fetchVillagesListUserLinked({
+            tenantIds,
+            userId: Number(userId),
             successCb: ({ list }: { list: IVillages[] }) => {
+              if (!list.length) {
+                toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
+              }
               const newVillages = [...villages];
               newVillages[index] = list;
               setVillages(newVillages);
@@ -626,10 +619,16 @@ const UserForm = ({
   );
 
   // Common function for the supervisor and village list fetch with conditions
-  const fetchListWithConditions = (roles: IRoles[], tenantIds: number[] = [], name: string, index: number) => {
+  const fetchListWithConditions = (
+    roles: IRoles[],
+    tenantIds: number[] = [],
+    userId: string,
+    name: string,
+    index: number
+  ) => {
     if (isCHPSelected(roles) && tenantIds.length) {
       if (name === 'village') {
-        return fetchVillagesList(tenantIds, index);
+        return fetchVillagesList(tenantIds, userId, index);
       } else {
         return fetchSupervisorList(tenantIds, index);
       }
@@ -655,9 +654,9 @@ const UserForm = ({
 
   useEffect(() => {
     if (isEdit && !isProfile) {
-      const tenantIds = [...initialEditData[0].hfTenantIds, hfTenantId].filter((v: number) => v);
-      fetchListWithConditions(selectedRoles(0), tenantIds, 'village', 0);
-      fetchListWithConditions(selectedRoles(0), tenantIds, 'supervisor', 0);
+      const tenantIds = [...initialEditData[0].hfTenantIds].filter((v: number) => v);
+      fetchListWithConditions(selectedRoles(0), tenantIds, initialEditData[0]?.id, 'village', 0);
+      fetchListWithConditions(selectedRoles(0), tenantIds, initialEditData[0]?.id, 'supervisor', 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFetchData]);
@@ -735,9 +734,7 @@ const UserForm = ({
         return suiteNameLower !== APPCONSTANTS.spiceRole.spice;
       }
       // District level condition
-      const isDistrictLevel =
-        fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.district &&
-        (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
+      const isDistrictLevel = fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.district;
       const isChiefdomOrHealthFacility =
         fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
         (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
@@ -783,8 +780,8 @@ const UserForm = ({
    */
   const levelBasedInsightsRole = (level?: number) => {
     const filteredRoles = rolesGrouped['SPICE INSIGHTS']?.filter((roleData: any) => {
-      if (isSiteUser) {
-        return COMMON_INSIGHTS_USERROLE.includes(roleData.name);
+      if (isSiteUser && !level) {
+        return roleData.level === level || COMMON_INSIGHTS_USERROLE.includes(roleData.name);
       } else {
         return roleData.level === level || COMMON_INSIGHTS_ADMINROLE.includes(roleData.name);
       }
@@ -831,7 +828,7 @@ const UserForm = ({
     const districtId = role === DISTRICT_ADMIN ? hfTenantId : districtDataId ?? existingDistrictId?.[0]?.id;
     if (districtId) {
       dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
-    } else if (!isSiteUser && fetchingFor !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom) {
+    } else if (!isSiteUser && fetchingFor === REGION_ADMIN) {
       dispatch(fetchChiefdomListRequest({ tenantId: String(hfTenantId) }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -850,7 +847,7 @@ const UserForm = ({
     } else if (
       !isSiteUser &&
       healthFacilityList.length === 0 &&
-      fetchingFor !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom
+      fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom
     ) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [hfTenantId] });
     }
@@ -863,7 +860,9 @@ const UserForm = ({
         .flatMap((initialData) => initialData.role)
         .map((initialRole) => initialRole?.level)
         .filter((level) => level !== undefined);
-      levelBasedInsightsRole(levels);
+      if (levels) {
+        levelBasedInsightsRole(levels);
+      }
     }
   }, [initialEditData, isAdminForm]);
 
@@ -964,10 +963,20 @@ const UserForm = ({
                             isMulti={true}
                             required={true}
                             options={getAdminRoles()}
+                            isOptionDisabled={(option: any) => {
+                              const optionsToBeDisabled = [
+                                ...(autoFetched[index] ? mandatoryRoles : []),
+                                ...(disabledRoles.current[index] || [])
+                              ];
+                              return optionsToBeDisabled.length
+                                ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
+                                : null;
+                            }}
                             mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                            disabledOptions={disabledRoles.current[index]}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
-                            onChange={(values: any) => {
+                            onChange={(values: any, key: number) => {
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, ...values]);
                               // User Modified as Peer Superviser from Super Admin
@@ -975,7 +984,11 @@ const UserForm = ({
                               // CHW User selection
                               isCHUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index, values);
-                              levelBasedInsightsRole();
+                              // Healthfacility create admin page included healthfacility admin
+                              const [isHFSelected] = values.filter(
+                                (selectedName: any) => selectedName?.name === HEALTH_FACILITY_ADMIN
+                              );
+                              levelBasedInsightsRole(isHFSelected?.level ? isHFSelected?.level : null);
                               // fetch HF list based on CHW selection
                               if (isCHPSelected(values)) {
                                 if (!isEdit && !autoFetched[index]) {
@@ -984,14 +997,28 @@ const UserForm = ({
                                     form.change(`${formName}[${index}].villages`, {});
                                   });
                                 }
+
                                 const tenantIds = [
                                   ...(initialEditData[index]?.hfTenantIds || []),
                                   form.getState().values?.users?.[0]?.healthFacility?.tenantId,
                                   ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
-                                  hfTenantId
+                                  isHF ? hfTenantId : []
                                 ].filter((v: number) => v);
-                                fetchListWithConditions(selectedRoles(index), tenantIds, 'village', index);
-                                fetchListWithConditions(selectedRoles(index), tenantIds, 'supervisor', index);
+
+                                fetchListWithConditions(
+                                  selectedRoles(index),
+                                  tenantIds,
+                                  initialEditData[0]?.id,
+                                  'village',
+                                  index
+                                );
+                                fetchListWithConditions(
+                                  selectedRoles(index),
+                                  tenantIds,
+                                  initialEditData[0]?.id,
+                                  'supervisor',
+                                  index
+                                );
                               }
                               input.onChange(values);
                             }}
@@ -1012,6 +1039,7 @@ const UserForm = ({
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, values]);
                               form.change(`${formName}[${index}].spiceInsightsRole`, []);
+
                               levelBasedInsightsRole(values.level);
                               setSelectedAdmins(values?.name);
                               // fetch HF list based on CHW selection
@@ -1203,7 +1231,7 @@ const UserForm = ({
                             loadingOptions={hfLoading}
                             error={isError(meta)}
                             isModel={true}
-                            disabled={isProfile}
+                            disabled={isProfile || isEdit}
                             onChange={(hf: IHealthFacility) => {
                               const formData = form.getState()?.values?.users?.[index];
                               form.change(`${formName}?.[${index}]?.supervisor`, null);
@@ -1214,17 +1242,23 @@ const UserForm = ({
                               } else {
                                 form.change(`${formName}?.[${index}]?.villages`, []);
                               }
+
                               if (isCHPUser[index]) {
                                 fetchSupervisorList(
-                                  [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                    (v: any) => v
-                                  ),
+                                  formData?.organizations
+                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                        (v: any) => v
+                                      )
+                                    : [hf.tenantId],
                                   index
                                 );
                                 fetchVillagesList(
-                                  [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                    (v: any) => v
-                                  ),
+                                  formData?.organizations
+                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                        (v: any) => v
+                                      )
+                                    : [hf.tenantId],
+                                  formData?.id,
                                   index
                                 );
                               }
@@ -1251,11 +1285,12 @@ const UserForm = ({
                   isChpUser={isCHPUser[index]}
                   isChaUser={isCHAUser[index]}
                   communityList={communityList}
+                  isHFCreate={isHFCreate}
+                  isHFAdminSelected={isHFAdminSelected}
                 />
                 <SiteUserForm
                   isAdminForm={isAdminForm}
                   index={index}
-                  isEdit={isEdit}
                   name={name}
                   autoFetched={autoFetched}
                   isError={isError}
@@ -1274,6 +1309,7 @@ const UserForm = ({
                   hfLoading={hfLoading}
                   chiefdomBasedHfList={chiefdomBasedHfList}
                   formDetails={{ form, formName, fields }}
+                  isHFAdminSelected={isHFAdminSelected}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>
