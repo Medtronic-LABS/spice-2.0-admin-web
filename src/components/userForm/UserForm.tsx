@@ -533,6 +533,7 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [roleOptions, roleOptions.current]
   );
+
   // Peer Supervisor fetch
   const fetchSupervisorList = useCallback(
     (tenantIds: number[], index: number) => {
@@ -572,21 +573,24 @@ const UserForm = ({
   );
 
   // Common function for the supervisor and village list fetch with conditions
-  const fetchListWithConditions = (
-    roles: IRoles[],
-    tenantIds: number[] = [],
-    userId: number | string | undefined = undefined,
-    name: string,
-    index: number
-  ) => {
-    if (isCHWSelected(roles) && tenantIds.length) {
-      if (name === 'village') {
-        return fetchVillagesList(tenantIds, userId, index);
-      } else {
-        return fetchSupervisorList(tenantIds, index);
+  const fetchListWithConditions = useCallback(
+    (
+      roles: IRoles[],
+      tenantIds: number[] = [],
+      userId: number | string | undefined = undefined,
+      name: string,
+      index: number
+    ) => {
+      if (isCHWSelected(roles) && tenantIds.length) {
+        if (name === 'village') {
+          return fetchVillagesList(tenantIds, userId, index);
+        } else {
+          return fetchSupervisorList(tenantIds, index);
+        }
       }
-    }
-  };
+    },
+    [fetchSupervisorList, fetchVillagesList, isCHWSelected]
+  );
 
   // HF List fetch
   useEffect(() => {
@@ -610,12 +614,18 @@ const UserForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFetchData]);
-  function isChwSingleHf() {
-    if (healthFacilityList.length === 1) {
+
+  const isChwSingleHf = useCallback(() => {
+    if (!isEdit && healthFacilityList.length === 1) {
       fetchSupervisorList([healthFacilityList[0].tenantId], 0);
       fetchVillagesList([healthFacilityList[0].tenantId], undefined, 0);
     }
-  }
+  }, [fetchSupervisorList, fetchVillagesList, healthFacilityList, isEdit]);
+
+  useEffect(() => {
+    isChwSingleHf();
+  }, [isChwSingleHf]);
+
   useEffect(() => {
     if (isEdit) {
       isCHWUserSelectedFn(form.getState().values.users?.[0]?.role, 0);

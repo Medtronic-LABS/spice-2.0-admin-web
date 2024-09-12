@@ -143,8 +143,8 @@ const HealthFacilityList = (): React.ReactElement => {
         formName='healthFacility'
         form={form as FormApi<any>}
         isEdit={true}
-        data={editHealthFacilityModal.data}
-        submittedData={submittedData}
+        data={{ ...editHealthFacilityModal.data }}
+        submittedData={{ ...submittedData }}
       />
     );
   };
@@ -334,7 +334,7 @@ const HealthFacilityList = (): React.ReactElement => {
         submitText={submittedData?.isNextClicked ? 'Submit' : 'Next'}
         handleCancel={closeHealthFacilityEditModal}
         handleFormSubmit={handleHealthFacilityDetailsSubmit}
-        initialValues={{ healthFacility: editHealthFacilityModal.data }}
+        initialValues={{ healthFacility: { ...editHealthFacilityModal.data } }}
         mutators={arrayMutators}
         render={editHealthFacilityDetailsModalRender}
         size='modal-lg'

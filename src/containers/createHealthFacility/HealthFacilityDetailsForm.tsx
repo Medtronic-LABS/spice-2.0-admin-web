@@ -160,26 +160,26 @@ const HealthFacilityDetailsForm = ({
 
   // Peer Supervisor fetch
   useEffect(() => {
-    const selectedTenantId = form.getState().values.healthFacility?.district?.tenantId;
-    if (selectedTenantId) {
-      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId] }));
+    const tenantId = form.getState().values?.healthFacility?.district?.tenantId;
+    if (tenantId) {
+      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId]);
+  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.tenantId]);
 
   // Chiefdom fetch
   useEffect(() => {
-    const selectedDistrictId = form.getState().values.healthFacility?.district?.tenantId;
-    if (selectedDistrictId) {
-      dispatch(fetchChiefdomListRequest({ tenantId: selectedDistrictId }));
+    const districtId = form.getState().values?.healthFacility?.district?.id;
+    if (districtId) {
+      dispatch(fetchChiefdomListRequest({ countryId, districtId: Number(districtId) }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.id]);
+  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.id]);
 
   // Villages fetch
   useEffect(() => {
-    const districtId = form.getState().values.healthFacility?.district?.id;
-    const chiefdomId = form.getState().values.healthFacility?.chiefdom?.id;
+    const districtId = form.getState().values?.healthFacility?.district?.id;
+    const chiefdomId = form.getState().values?.healthFacility?.chiefdom?.id;
     if (chiefdomId && districtId) {
       dispatch(
         fetchVillagesListRequest({
@@ -220,19 +220,14 @@ const HealthFacilityDetailsForm = ({
     countryId,
     dispatch,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility?.district?.id,
+    form.getState().values?.healthFacility?.district?.id,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility?.chiefdom?.id,
+    form.getState().values?.healthFacility?.chiefdom?.id,
     regionId
   ]);
 
   useEffect(() => {
-    const { district, chiefdom, city, linkedVillages } = form.getState().values?.healthFacility || {
-      district: {},
-      chiefdom: {},
-      city: {},
-      linkedVillages: []
-    };
+    const { district, chiefdom, city, linkedVillages } = form.getState().values.healthFacility;
     if (!isEdit && !district?.id && (chiefdom?.id || city?.id || (linkedVillages || []).length)) {
       form.batch(() => {
         form.change(`${formName}.chiefdom`, undefined);
@@ -362,6 +357,7 @@ const HealthFacilityDetailsForm = ({
                       form.change(`${formName}.peerSupervisors`, undefined);
                       form.change(`${formName}.linkedVillages`, undefined);
                       form.change(`${formName}.city`, undefined);
+                      // formData.current = form.getState().values?.healthFacility;
                       dispatch(clearVillageList());
                       dispatch(clearSupervisorList());
                       input.onChange(value);
@@ -394,6 +390,7 @@ const HealthFacilityDetailsForm = ({
                     form.change(`${formName}.peerSupervisors`, undefined);
                     form.change(`${formName}.city`, undefined);
                     form.change(`${formName}.linkedVillages`, undefined);
+                    // formData.current = form.getState().values?.healthFacility;
                     input.onChange(value);
                   }}
                 />

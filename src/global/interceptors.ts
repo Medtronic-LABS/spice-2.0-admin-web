@@ -17,7 +17,10 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
       case 403:
         throw new ApiError({ ...response.data, name: '403', message: response.data.message }, 403);
       case 404:
-        throw new ApiError(ERRORS.SERVER_ERROR, 404);
+        throw new ApiError(
+          { ...response.data, name: '404', message: response.data.message, msg: ERRORS.SERVER_ERROR },
+          404
+        );
       case 401:
         if (response.config.url === '/auth-service/session') {
           throw new ApiError(

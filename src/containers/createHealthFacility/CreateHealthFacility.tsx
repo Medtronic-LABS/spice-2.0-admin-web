@@ -175,7 +175,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     <>
       <Form
         onSubmit={onSubmit}
-        initialValues={submittedData.data}
+        initialValues={{ ...submittedData.data }}
         mutators={{
           ...arrayMutators,
           resetFields
@@ -196,7 +196,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                         <HealthFacilityDetailsForm
                           formName='healthFacility'
                           form={formInstance}
-                          data={submittedData.data.healthFacility}
+                          data={{ ...submittedData.data.healthFacility }}
                         />
                       </FormContainer>
                     </div>
