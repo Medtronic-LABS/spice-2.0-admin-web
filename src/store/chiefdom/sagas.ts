@@ -22,7 +22,7 @@ import { fetchChiefdomDropdownFailure, fetchChiefdomDropdownSuccess } from './ac
 import APPCONSTANTS from '../../constants/appConstants';
 
 /*
-  Worker Saga: Fired on FETCH_REGIONS_REQUEST action
+  Worker Saga: Fired on FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST action
 */
 export function* fetchChiefdomDashboardList({
   isLoadMore,

@@ -42,7 +42,7 @@ import {
   IFetchDistrictOptionsSuccess,
   IFetchDistrictOptionsFailure,
   IDistrictOption,
-  IActivateDistrictReq,
+  IActivateAccountReq,
   IActivateDistrictSuccess,
   IActivateDistrictFail,
   ISetDistrictDetails,
@@ -245,23 +245,23 @@ export const deleteDistrictAdminFail = (error: Error): IDeleteDistrictAdminFail 
   error
 });
 
-export const activateDistrictReq = ({
+export const activateAccountReq = ({
   data,
   successCb,
   failureCb
-}: Omit<IActivateDistrictReq, 'type'>): IActivateDistrictReq => ({
-  type: DISTRICT_TYPES.ACTIVATE_DISTRICT_REQUEST,
+}: Omit<IActivateAccountReq, 'type'>): IActivateAccountReq => ({
+  type: DISTRICT_TYPES.ACTIVATE_ACCOUNT_REQUEST,
   data,
   successCb,
   failureCb
 });
 
-export const activateDistrictSuccess = (): IActivateDistrictSuccess => ({
-  type: DISTRICT_TYPES.ACTIVATE_DISTRICT_SUCCESS
+export const activateAccountSuccess = (): IActivateDistrictSuccess => ({
+  type: DISTRICT_TYPES.ACTIVATE_ACCOUNT_SUCCESS
 });
 
-export const activateDistrictFail = (error: Error): IActivateDistrictFail => ({
-  type: DISTRICT_TYPES.ACTIVATE_DISTRICT_FAIL,
+export const activateAccountFail = (error: Error): IActivateDistrictFail => ({
+  type: DISTRICT_TYPES.ACTIVATE_ACCOUNT_FAIL,
   error
 });
 

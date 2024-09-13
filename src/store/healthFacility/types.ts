@@ -581,6 +581,10 @@ export interface IFetchUnlinkedVillagesFailure {
   type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE;
   error: Error;
 }
+
+export interface IClearHFFormData {
+  type: typeof ACTION_TYPES.CLEAR_HF_FORM_DATA;
+}
 export interface IFetchVillagesListFromHFRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
   countryId: number;
@@ -808,4 +812,5 @@ export type HealthFacilityActions =
   | IValidateLinkedRestrictions
   | IValidateLinkedRestrictionsSuccess
   | IFetchHFUserListClear
-  | IValidateLinkedRestrictionsFailure;
+  | IValidateLinkedRestrictionsFailure
+  | IClearHFFormData;

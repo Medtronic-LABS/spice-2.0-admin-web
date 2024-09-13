@@ -294,7 +294,8 @@ const UserList = (): React.ReactElement => {
               isFacility: false,
               isSearchable: false,
               data: [...(rolesGrouped['SPICE INSIGHTS'] || []), ...(roleSpiceList || [])],
-              isShow: true
+              isShow: true,
+              filterCount: selectedRole?.length
             }
           ]}
         >

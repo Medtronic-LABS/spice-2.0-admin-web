@@ -191,6 +191,7 @@ const UserList = (): React.ReactElement => {
   const handleCancelClick = () => {
     setIsOpenUserModal({ isOpen: false, isEdit: true });
     userForEdit.current = { users: [] as IHFUserGet[] };
+    fetchList(); // get list of HF for filter dropdown, while closing the modal
   };
 
   const siteUserSuccess = useCallback(() => {
@@ -299,17 +300,16 @@ const UserList = (): React.ReactElement => {
         countryId: countryIdValue,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: null,
-        searchTerm: listParams.searchTerm,
         userBased: !isSuperUser,
         tenantIds: [tenantId],
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
+  }, [dispatch, isSuperUser, countryIdValue]);
 
   useEffect(() => {
     fetchList();
-  }, [listParams, dispatch]);
+  }, []);
 
   return (
     <>
@@ -332,9 +332,18 @@ const UserList = (): React.ReactElement => {
               isFacility: true,
               isSearchable: true,
               data: healthFacilityList,
-              isShow: role !== HEALTH_FACILITY_ADMIN
+              isShow: role !== HEALTH_FACILITY_ADMIN,
+              filterCount: selectedFacility?.length
             },
-            { id: 2, name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole, isShow: true }
+            {
+              id: 2,
+              name: 'Filter by Role',
+              isFacility: false,
+              isSearchable: false,
+              data: spiceUserRole,
+              isShow: true,
+              filterCount: selectedRole?.length
+            }
           ]}
         >
           <CustomTable

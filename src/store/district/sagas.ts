@@ -14,7 +14,7 @@ import {
   IDeleteDistrictAdminReq,
   IDeactivateDistrictReq,
   IFetchDistrictOptionsRequest,
-  IActivateDistrictReq,
+  IActivateAccountReq,
   IDistrict,
   IFetchClinicalWorkflowReq,
   IClinicalWorkflow,
@@ -34,7 +34,7 @@ import {
   DELETE_DISTRICT_ADMIN_REQUEST,
   DEACTIVATE_DISTRICT_REQUEST,
   FETCH_DISTRICT_OPTIONS_REQUEST,
-  ACTIVATE_DISTRICT_REQUEST,
+  ACTIVATE_ACCOUNT_REQUEST,
   FETCH_CLINICAL_WORKFLOW_REQUEST
 } from './actionTypes';
 import { AppState } from '../rootReducer';
@@ -234,17 +234,17 @@ export function* deactivateDistrict({ data, successCb, failureCb }: IDeactivateD
 }
 
 /*
-  Worker Saga: Fired on ACTIVATE_DISTRICT_REQUEST action
+  Worker Saga: Fired on ACTIVATE_ACCOUNT_REQUEST action
 */
-export function* activateDistrict({ data, successCb, failureCb }: IActivateDistrictReq) {
+export function* activateAccount({ data, successCb, failureCb }: IActivateAccountReq) {
   try {
-    yield call(districtService.activateDistrict, data);
-    yield put(districtActions.activateDistrictSuccess());
+    yield call(districtService.activateAccount, data);
+    yield put(districtActions.activateAccountSuccess());
     successCb?.();
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(districtActions.activateDistrictFail(e));
+      yield put(districtActions.activateAccountFail(e));
     }
   }
 }
@@ -303,7 +303,7 @@ function* districtSaga() {
   yield all([takeLatest(UPDATE_DISTRICT_ADMIN_REQUEST, updateDistrictAdminInfo)]);
   yield all([takeLatest(CREATE_DISTRICT_ADMIN_REQUEST, createDistrictAdminInfo)]);
   yield all([takeLatest(DELETE_DISTRICT_ADMIN_REQUEST, removeDistrictAdmin)]);
-  yield all([takeLatest(ACTIVATE_DISTRICT_REQUEST, activateDistrict)]);
+  yield all([takeLatest(ACTIVATE_ACCOUNT_REQUEST, activateAccount)]);
   yield all([takeLatest(DEACTIVATE_DISTRICT_REQUEST, deactivateDistrict)]);
   yield all([takeLatest(FETCH_DISTRICT_OPTIONS_REQUEST, fetchDistrictOptions)]);
   yield all([takeLatest(FETCH_CLINICAL_WORKFLOW_REQUEST, fetchClinicalWorkflows)]);

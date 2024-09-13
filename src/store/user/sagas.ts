@@ -165,7 +165,7 @@ export function* fetchLoggedInUser(): SagaIterator {
 }
 
 /*
-  Worker Saga: Fired on FETCH_LOGGED_IN_USER_REQUEST action
+  Worker Saga: Fired on FETCH_USER_ROLES_REQUEST action
 */
 export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserRolesRequest): SagaIterator {
   try {

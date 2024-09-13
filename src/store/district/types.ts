@@ -293,19 +293,19 @@ export interface IActivateReqPayload {
   successCb: () => void;
   failureCb: () => void;
 }
-export interface IActivateDistrictReq {
-  type: typeof ACTION_TYPES.ACTIVATE_DISTRICT_REQUEST;
+export interface IActivateAccountReq {
+  type: typeof ACTION_TYPES.ACTIVATE_ACCOUNT_REQUEST;
   data: { tenantId: number };
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }
 
 export interface IActivateDistrictSuccess {
-  type: typeof ACTION_TYPES.ACTIVATE_DISTRICT_SUCCESS;
+  type: typeof ACTION_TYPES.ACTIVATE_ACCOUNT_SUCCESS;
 }
 
 export interface IActivateDistrictFail {
-  type: typeof ACTION_TYPES.ACTIVATE_DISTRICT_FAIL;
+  type: typeof ACTION_TYPES.ACTIVATE_ACCOUNT_FAIL;
   error: Error;
 }
 
@@ -452,7 +452,7 @@ export type DistrictActions =
   | IDeleteDistrictAdminReq
   | IDeleteDistrictAdminSuccess
   | IDeleteDistrictAdminFail
-  | IActivateDistrictReq
+  | IActivateAccountReq
   | IActivateDistrictSuccess
   | IActivateDistrictFail
   | IRemoveDeactivatedAccountList

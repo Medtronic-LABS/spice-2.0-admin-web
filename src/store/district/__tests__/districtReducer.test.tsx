@@ -13,13 +13,10 @@ describe('districtReducer', () => {
       types.CREATE_DISTRICT_REQUEST,
       types.UPDATE_DISTRICT_DETAIL_REQUEST,
       types.DELETE_DISTRICT_ADMIN_REQUEST,
-      types.ACTIVATE_DISTRICT_REQUEST,
+      types.ACTIVATE_ACCOUNT_REQUEST,
       types.DEACTIVATE_DISTRICT_REQUEST,
       types.CREATE_DISTRICT_ADMIN_REQUEST,
-      types.UPDATE_DISTRICT_ADMIN_REQUEST,
-      types.CREATE_COUNTY_WORKFLOW_MODULE_REQUEST,
-      types.UPDATE_COUNTY_WORKFLOW_MODULE_REQUEST,
-      types.DELETE_COUNTY_WORKFLOW_MODULE_REQUEST
+      types.UPDATE_DISTRICT_ADMIN_REQUEST
     ];
     loadingActions.forEach((actionType) => {
       const action: any = { type: actionType };
@@ -43,8 +40,8 @@ describe('districtReducer', () => {
       types.UPDATE_DISTRICT_ADMIN_FAIL,
       types.DELETE_DISTRICT_ADMIN_SUCCESS,
       types.DELETE_DISTRICT_ADMIN_FAIL,
-      types.ACTIVATE_DISTRICT_SUCCESS,
-      types.ACTIVATE_DISTRICT_FAIL,
+      types.ACTIVATE_ACCOUNT_SUCCESS,
+      types.ACTIVATE_ACCOUNT_FAIL,
       types.DEACTIVATE_DISTRICT_SUCCESS,
       types.DEACTIVATE_DISTRICT_FAIL,
       types.FETCH_CLINICAL_WORKFLOW_FAILURE,
@@ -57,6 +54,27 @@ describe('districtReducer', () => {
       const expectedState = {
         loading: false,
         error: null
+      };
+      expect(districtReducer(initialState, action)).toEqual(expectedState);
+    });
+  });
+
+  it('should handle all failures', () => {
+    const initialState: any = {
+      loading: false,
+      error: null
+    };
+    const error: any = 'Error fetching district';
+    const loadingActions = [
+      types.FETCH_DISTRICT_LIST_FAILURE,
+      types.CREATE_DISTRICT_FAILURE,
+      types.UPDATE_DISTRICT_DETAIL_FAIL
+    ];
+    loadingActions.forEach((actionType) => {
+      const action: any = { type: actionType, error };
+      const expectedState = {
+        loading: false,
+        error
       };
       expect(districtReducer(initialState, action)).toEqual(expectedState);
     });
@@ -108,30 +126,6 @@ describe('districtReducer', () => {
       error: null
     };
     expect(districtReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle FETCH_DISTRICT_FAILURE', () => {
-    const initialState: any = {
-      loading: false,
-      error: null
-    };
-    const error: any = 'Error fetching district';
-    const loadingActions = [
-      types.FETCH_DISTRICT_LIST_FAILURE,
-      types.CREATE_DISTRICT_FAILURE,
-      types.UPDATE_DISTRICT_DETAIL_FAIL,
-      types.CREATE_COUNTY_WORKFLOW_MODULE_FAILURE,
-      types.UPDATE_COUNTY_WORKFLOW_MODULE_FAILURE,
-      types.DELETE_COUNTY_WORKFLOW_MODULE_FAILURE
-    ];
-    loadingActions.forEach((actionType) => {
-      const action: any = { type: actionType, error };
-      const expectedState = {
-        loading: false,
-        error
-      };
-      expect(districtReducer(initialState, action)).toEqual(expectedState);
-    });
   });
 
   it('should remove all district from state when removing deactivated district list', () => {
@@ -240,6 +234,25 @@ describe('districtReducer', () => {
     const expectedState = {
       loading: true,
       loadingMore: false
+    };
+    const resultState = districtReducer(initialState, action);
+    expect(resultState).toEqual(expectedState);
+  });
+
+  it('should set loading to true when isLoadMore is true', () => {
+    const initialState: any = {
+      loading: false,
+      loadingMore: false
+    };
+    const action: any = {
+      type: types.FETCH_DISTRICT_DASHBOARD_LIST_REQUEST,
+      payload: {
+        isLoadMore: true
+      }
+    };
+    const expectedState = {
+      loading: false,
+      loadingMore: true
     };
     const resultState = districtReducer(initialState, action);
     expect(resultState).toEqual(expectedState);
@@ -436,7 +449,6 @@ describe('districtReducer', () => {
     };
     const action: any = { type: types.FETCH_CLINICAL_WORKFLOW_SUCCESS, payload: data };
     const state = districtReducer(initialState, action);
-
     expect(state.clinicalWorkflows).toEqual(data.data);
     expect(state.clinicalWorkflowsCount).toEqual(data.total);
     expect(state.loading).toEqual(false);
@@ -453,5 +465,67 @@ describe('districtReducer', () => {
 
     expect(state.clinicalWorkflows).toEqual([]);
     expect(state.clinicalWorkflowsCount).toEqual(0);
+  });
+
+  it('should handle CLEAR_DISTRICT_DETAILS', () => {
+    const initialState: any = {
+      district: {
+        name: '',
+        id: '',
+        tenantId: '',
+        maxNoOfUsers: '',
+        users: [],
+        updatedAt: '',
+        country: {
+          countryCode: '',
+          tenantId: '',
+          id: ''
+        }
+      }
+    };
+    const action: any = { type: types.CLEAR_DISTRICT_DETAILS };
+    const state = districtReducer(initialState, action);
+
+    expect(state.district).toEqual(initialState.district);
+  });
+
+  it('should handle SET_DISTRICT_DETAILS', () => {
+    const initialState: any = {
+      district: {
+        name: '',
+        id: '',
+        tenantId: '',
+        maxNoOfUsers: '',
+        users: [],
+        updatedAt: '',
+        country: {
+          countryCode: '',
+          tenantId: '',
+          id: ''
+        }
+      }
+    };
+    const data = {
+      id: 10,
+      tenantId: 10
+    };
+    const action: any = { type: types.SET_DISTRICT_DETAILS, data };
+    const expectedState = {
+      district: {
+        name: '',
+        id: 10,
+        tenantId: 10,
+        maxNoOfUsers: '',
+        users: [],
+        updatedAt: '',
+        country: {
+          countryCode: '',
+          tenantId: '',
+          id: ''
+        }
+      }
+    };
+
+    expect(districtReducer(initialState, action)).toEqual(expectedState);
   });
 });

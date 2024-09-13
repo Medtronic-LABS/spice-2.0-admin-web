@@ -52,15 +52,15 @@ const MOCK_DATA_CONSTANTS = {
     {
       id: '1',
       name: 'District One',
-      ouCount: 3,
-      siteCount: 10,
+      chiefdomCount: 3,
+      healthFacilityCount: 10,
       tenantId: '5'
     },
     {
       id: '2',
       name: 'District Two',
-      ouCount: 13,
-      siteCount: 20,
+      chiefdomCount: 13,
+      healthFacilityCount: 20,
       tenantId: '6'
     }
   ],

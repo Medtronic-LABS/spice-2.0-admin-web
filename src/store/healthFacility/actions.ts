@@ -91,7 +91,8 @@ import {
   IValidateLinkedRestrictionsSuccess,
   IValidateLinkedRestrictionsFailure,
   IObjectData,
-  IFetchVillagesListUserLinked
+  IFetchVillagesListUserLinked,
+  IClearHFFormData
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -518,6 +519,10 @@ export const fetchUnlinkedVillagesListSuccess = (payload: IFetchVillagespayload)
 export const fetchUnlinkedVillagesListFailure = (error: Error): IFetchUnlinkedVillagesFailure => ({
   type: HF_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE,
   error
+});
+
+export const clearHFFormData = (): IClearHFFormData => ({
+  type: HF_TYPES.CLEAR_HF_FORM_DATA
 });
 
 // VILLAGES LIST FROM HF

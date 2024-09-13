@@ -141,7 +141,7 @@ export function* fetchHealthFacilityList({
 }
 
 /*
-  Worker Saga: Fired on CREATE_SITE_REQUEST action
+  Worker Saga: Fired on CREATE_HEALTH_FACILITY_REQUEST action
 */
 export function* createHealthFacilityRequest({ data, successCb, failureCb }: ICreateHFRequest): SagaIterator {
   try {
@@ -216,7 +216,7 @@ export function* fetchHFSummaryRequest({ tenantId, id, successCb, failureCb }: I
 }
 
 /*
-  Worker Saga: Fired on UPDATE_HEALTH_FACILITY_BASIC_DETAILS_REQUEST action
+  Worker Saga: Fired on UPDATE_HEALTH_FACILITY_DETAILS_REQUEST action
 */
 export function* updateHFDetailsRequest({ data, successCb, failureCb }: IUpdateHFDetailsRequest): SagaIterator {
   try {
@@ -337,7 +337,7 @@ export function* updateHFUserSagaRequest({ data, successCb, failureCb }: IUpdate
 }
 
 /*
-  Worker Saga: Fired on FETCH_DISTRICT_LIST_REQUEST action
+  Worker Saga: Fired on FETCH_DISTRICT_LIST_REQUEST_FOR_HF action
 */
 export function* fetchDistrictListSagaRequest({
   countryId,
@@ -360,7 +360,7 @@ export function* fetchDistrictListSagaRequest({
 }
 
 /*
-  Worker Saga: Fired on FETCH_CHIEFDOM_LIST_REQUEST action
+  Worker Saga: Fired on FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF action
 */
 export function* fetchChiefdomListSagaRequest({
   countryId,
@@ -384,7 +384,7 @@ export function* fetchChiefdomListSagaRequest({
 }
 
 /*
-  Worker Saga: Fired on FETCH_VILLAGES_LIST_REQUEST action
+  Worker Saga: Fired on FETCH_VILLAGES_LIST_REQUEST_FOR_HF action
 */
 export function* fetchVillagesListSagaRequest({
   countryId,
@@ -435,7 +435,7 @@ export function* fetchUnlinkedVillagesSagaRequest({
 }
 
 /*
-  Worker Saga: Fired on FETCH_VILLAGES_LIST_FOR_HF_REQUEST action
+  Worker Saga: Fired on FETCH_VILLAGES_LIST_FROM_HF_REQUEST action
 */
 export function* fetchVillagesListFromHFSagaRequest({
   countryId,
@@ -611,7 +611,7 @@ export function* fetchCountryList(): SagaIterator {
 /*
   Worker Saga: Fired on FETCH_HF_DASHBOARD_LIST_REQUEST action
 */
-export function* fetchSiteDashboardList({
+export function* fetchHealthFacilityDashboardList({
   isLoadMore,
   skip,
   limit,
@@ -670,7 +670,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_VILLAGES_LIST_USER_LINKED, fetchVillagesListUserLinkedSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);
   yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
-  yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchSiteDashboardList)]);
+  yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchHealthFacilityDashboardList)]);
   yield all([takeLatest(FETCH_UNLINKED_VILLAGES_REQUEST, fetchUnlinkedVillagesSagaRequest)]);
 }
 

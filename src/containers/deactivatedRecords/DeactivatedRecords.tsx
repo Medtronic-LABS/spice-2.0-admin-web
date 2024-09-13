@@ -9,7 +9,7 @@ import {
 } from '../../store/district/selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  activateDistrictReq,
+  activateAccountReq,
   fetchDistrictListRequest,
   removeDeactivatedAccountList
 } from '../../store/district/actions';
@@ -60,7 +60,7 @@ const DeactivatedRecords = (): React.ReactElement => {
    */
   const openActivateModal = (value: IDistrict) => {
     dispatch(
-      activateDistrictReq({
+      activateAccountReq({
         data: { tenantId: Number(value?.tenantId) },
         successCb: () => {
           fetchDetails();

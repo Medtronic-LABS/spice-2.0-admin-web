@@ -29,6 +29,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { useEffect } from 'react';
 import {
+  clearHFFormData,
   clearSupervisorList,
   clearVillageList,
   fetchCultureListRequest,
@@ -247,6 +248,12 @@ const HealthFacilityDetailsForm = ({
       });
     }
   }, [form, formName, isEdit]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearHFFormData());
+    };
+  }, []);
 
   return (
     <>
@@ -523,32 +530,34 @@ const HealthFacilityDetailsForm = ({
               name={`${formName}.linkedVillages`}
               type='text'
               validate={required}
-              render={({ input, meta }) => (
-                <MultiSelect
-                  {...(input as any)}
-                  label='Linked Villages'
-                  errorLabel='linked villages'
-                  labelKey='name'
-                  valueKey='id'
-                  required={true}
-                  isShowLabel={true}
-                  isSelectAll={true}
-                  placeholder=''
-                  isDefaultSelected={true}
-                  menuPlacement={'auto'}
-                  isModel={true}
-                  isMulti={true}
-                  options={unlinkedVillagesList}
-                  loading={unlinkedVillagesLoading}
-                  error={(meta.touched && meta.error) || undefined}
-                  controlStyles={{
-                    borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
-                    '&:focus-visible': {
-                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
-                    }
-                  }}
-                />
-              )}
+              render={({ input, meta }) => {
+                return (
+                  <MultiSelect
+                    {...(input as any)}
+                    label='Linked Villages'
+                    errorLabel='linked villages'
+                    labelKey='name'
+                    valueKey='id'
+                    required={true}
+                    isShowLabel={true}
+                    isSelectAll={true}
+                    placeholder=''
+                    isDefaultSelected={true}
+                    menuPlacement={'auto'}
+                    isModel={true}
+                    isMulti={true}
+                    options={unlinkedVillagesList}
+                    loading={unlinkedVillagesLoading}
+                    error={(meta.touched && meta.error) || undefined}
+                    controlStyles={{
+                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
+                      '&:focus-visible': {
+                        borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
+                      }
+                    }}
+                  />
+                );
+              }}
             />
           </div>
         </div>

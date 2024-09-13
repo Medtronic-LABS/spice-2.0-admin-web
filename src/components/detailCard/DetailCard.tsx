@@ -39,6 +39,7 @@ interface IFilteredData {
   isFacility: boolean;
   data: any[];
   isShow: boolean;
+  filterCount?: number;
 }
 
 /**
@@ -96,6 +97,7 @@ const DetailCard = ({
         isFacility={isFacility}
         setSelectedRole={setSelectedRole}
         setSelectedFacility={setSelectedFacility}
+        filterCount={filteredData.filterCount}
         key={filteredData?.id}
       />
     ) : null;
