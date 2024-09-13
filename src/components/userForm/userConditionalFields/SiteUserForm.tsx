@@ -23,9 +23,12 @@ export const SiteUserForm = (props: any) => {
     hfLoading,
     formDetails,
     role,
-    isHFAdminSelected
+    isHFAdminSelected,
+    isHFCreate
   } = props;
   const { form, formName } = formDetails;
+  const isHFSelected =
+    isSiteUser || isHFCreate ? isHFAdminSelected(form?.getState()?.values?.users?.[index]?.role) : [];
   const { showCulture, showRedRisk, showDistrict, showChiefdom, showHealthFacility } = useFieldVisibility(
     isSiteUser,
     isAdminForm,
@@ -33,7 +36,7 @@ export const SiteUserForm = (props: any) => {
     role,
     formDetails,
     index,
-    isHFAdminSelected(form?.getState()?.values?.users?.[index]?.role)
+    isHFSelected
   );
 
   return (

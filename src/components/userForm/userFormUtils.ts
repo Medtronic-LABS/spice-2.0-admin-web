@@ -14,10 +14,6 @@ const useUserFormUtils = () => {
     (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
     [isCHPRole]
   );
-  const isDistrictSelected = useCallback(
-    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
-    [isCHPRole]
-  );
   const isRoleExists = useCallback(
     (roles: IRoles[], validRoles: string[] = mobileRoles) =>
       (roles || []).some((userRole: IRoles) => validRoles.includes(userRole.name)),
@@ -41,6 +37,7 @@ const useUserFormUtils = () => {
         isFixed: APPCONSTANTS.spiceRole.spiceInsights !== userRole
       }))
       .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
+
   const isHFAdminSelected = useCallback(
     (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => isHFAdminRole.includes(userRole.name)),
     [isHFAdminRole]

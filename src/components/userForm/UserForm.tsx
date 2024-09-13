@@ -717,7 +717,7 @@ const UserForm = ({
   const getAdminRoles = (): IRoles[] => {
     const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
       const { name, displayName, suiteAccessName } = roleData;
-      const suiteNameLower = suiteAccessName?.toLowerCase();
+      const suiteNameLower = suiteAccessName?.toLowerCase() || '';
 
       // Early exits for 'RED_RISK_USER' or null display name
       if (name === 'RED_RISK_USER' || displayName === null) {
@@ -733,6 +733,7 @@ const UserForm = ({
       if (isSiteUser) {
         return suiteNameLower !== APPCONSTANTS.spiceRole.spice;
       }
+
       // District level condition
       const isDistrictLevel = fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.district;
       const isChiefdomOrHealthFacility =
@@ -741,6 +742,7 @@ const UserForm = ({
       const isHealthFacility =
         fetchingFor === SIDE_MENU_FETCHING_HIERARCHY['health-facility'] &&
         (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
+
       if (isDistrictLevel) {
         return (
           suiteNameLower === APPCONSTANTS.spiceRole.spice &&
@@ -757,6 +759,7 @@ const UserForm = ({
           name !== APPCONSTANTS.ROLES.SUPER_ADMIN
         );
       }
+
       if (isHealthFacility) {
         return (
           suiteNameLower === APPCONSTANTS.spiceRole.spice &&
@@ -766,11 +769,13 @@ const UserForm = ({
           name !== SIDE_MENU_FETCHING_HIERARCHY['health-facility']
         );
       }
+
       // Default fallback
       return suiteNameLower === APPCONSTANTS.spiceRole.spice;
     });
 
-    return filteredRoles || [];
+    // Return filtered roles or an empty array if undefined or null
+    return filteredRoles ?? [];
   };
 
   /**
@@ -1286,7 +1291,6 @@ const UserForm = ({
                   isChaUser={isCHAUser[index]}
                   communityList={communityList}
                   isHFCreate={isHFCreate}
-                  isHFAdminSelected={isHFAdminSelected}
                 />
                 <SiteUserForm
                   isAdminForm={isAdminForm}
@@ -1310,6 +1314,7 @@ const UserForm = ({
                   chiefdomBasedHfList={chiefdomBasedHfList}
                   formDetails={{ form, formName, fields }}
                   isHFAdminSelected={isHFAdminSelected}
+                  isHFCreate={isHFCreate}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>
