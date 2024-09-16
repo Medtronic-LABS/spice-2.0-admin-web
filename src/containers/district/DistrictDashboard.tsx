@@ -22,6 +22,7 @@ import { countryIdSelector, formDataIdSelector, tenantIdSelector } from '../../s
 
 import styles from './District.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { clearSideMenu } from '../../store/common/actions';
 
 const DistrictDashboard = () => {
   const dispatch = useDispatch();
@@ -75,6 +76,14 @@ const DistrictDashboard = () => {
     [countryId, dispatch]
   );
 
+  /**
+   * To clear sidemenu
+   */
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     dispatch(
       fetchDistrictDashboardList({
@@ -118,32 +127,34 @@ const DistrictDashboard = () => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      districtList?.map(({ siteCount, ouCount, name, tenantId: _id, id: formDataId }: IDashboardDistrict) => ({
-        title: name,
-        _id,
-        formId: formDataId,
-        detailRoute: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', _id),
-        setBreadcrumbDetails: () => onDashboardExit({ id: formDataId, name, tenantId: _id }),
-        data: [
-          {
-            type: 'number',
-            value: Number(ouCount) ? appendZeroBefore(ouCount, 2) : '-',
-            label: chiefdomModuleName,
-            disableEllipsis: true,
-            route: PROTECTED_ROUTES.chiefdomByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
-            onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
-          },
-          {
-            type: 'number',
-            value: Number(siteCount) ? appendZeroBefore(siteCount, 2) : '-',
-            label: 'Health Facility',
-            route: PROTECTED_ROUTES.healthFacilityByDistrict
-              .replace(':districtId', formDataId)
-              .replace(':tenantId', _id),
-            onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
-          }
-        ]
-      })),
+      districtList?.map(
+        ({ healthFacilityCount, chiefdomCount, name, tenantId: _id, id: formDataId }: IDashboardDistrict) => ({
+          title: name,
+          _id,
+          formId: formDataId,
+          detailRoute: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', _id),
+          setBreadcrumbDetails: () => onDashboardExit({ id: formDataId, name, tenantId: _id }),
+          data: [
+            {
+              type: 'number',
+              value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
+              label: chiefdomSName,
+              disableEllipsis: true,
+              route: PROTECTED_ROUTES.chiefdomByDistrict.replace(':districtId', formDataId).replace(':tenantId', _id),
+              onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
+            },
+            {
+              type: 'number',
+              value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
+              label: 'Health Facility',
+              route: PROTECTED_ROUTES.healthFacilityByDistrict
+                .replace(':districtId', formDataId)
+                .replace(':tenantId', _id),
+              onClick: () => onDashboardExit({ id: formDataId, name, tenantId: _id })
+            }
+          ]
+        })
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [districtList, onDashboardExit]
   );

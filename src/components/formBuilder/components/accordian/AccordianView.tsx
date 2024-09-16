@@ -23,8 +23,6 @@ interface IAccordinaViewProps {
   formMeta: any;
   accordianRef: any;
   newlyAddedIdsRef: any;
-  accordianRef: any;
-  newlyAddedIdsRef: any;
   setFormMeta: any;
   targetIds: any;
   onSubmit: any;
@@ -135,7 +133,7 @@ const AccordianHeader = ({
               id='edit-field-order'
               data-bs-toggle='dropdown'
               aria-expanded='false'
-              disabled={Object.keys(currentFamilyGroup).length < 3 && !isWorkFlowCustomization}
+              disabled={Object.keys(currentFamilyGroup).length < 3}
               onClick={() => setEditGroupedFieldsOrder({ isOpen: true, familyName })}
             >
               <img className={`me-0dot5 ${styles.editBtnImg}`} width='14' height='14' src={editIcon} alt='edit-icon' />
@@ -288,11 +286,11 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
         )}
       </div>
       {/* ------- JSON viewer ----------- */}
-      <div className='mt-1 bg-black p-2'>
+      {/* <div className='mt-1 bg-black p-2'>
         <code>
           <pre style={{ fontSize: '1rem' }}>{JSON.stringify(_presentableJson(cloneDeep(values)), null, 2)}</pre>
         </code>
-      </div>
+      </div> */}
       {/* ------------------------------- */}
     </>
   );
@@ -336,7 +334,6 @@ const AccordianView = ({
 
   // return field which has error
   const getFinalFormError = (errors: any, values: any) => {
-  const getFinalFormError = (errors: any, values: any) => {
     let errorField: any = null;
     let newErrors = { ...errors };
     // manual error validation for code and url fields
@@ -346,7 +343,10 @@ const AccordianView = ({
       if ((value as any)?.code && !(value as any).url) {
         newErrors = { ...errors, [familyGroup]: { [key]: { url: 'Please enter the url' } } };
       }
-      if (!(value as any).code && (value as any).url) {
+      if (
+        (!(value as any).code && (value as any).url) ||
+        ((value as any)?.code && containsOnlyLettersAndNumbers((value as any)?.code))
+      ) {
         newErrors = { ...errors, [familyGroup]: { [key]: { code: 'Please enter the code' } } };
       }
     }

@@ -21,7 +21,6 @@ import {
   createHFUserRequest,
   deleteHFUserRequest,
   fetchHFListRequest,
-  fetchHFListRequest,
   fetchHFUserListRequest,
   fetchUserDetailRequest,
   updateHFUserRequest
@@ -84,7 +83,7 @@ const UserList = (): React.ReactElement => {
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
         roleNames: selectedRole || [],
-        siteUsers: true,
+        isSiteUsers: true,
         tenantId,
         tenantIds: role === HEALTH_FACILITY_ADMIN || role === CHIEFDOM_ADMIN ? [tenantId] : selectedFacility || [],
         failureCb: (e: Error) => {
@@ -157,7 +156,7 @@ const UserList = (): React.ReactElement => {
             const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
             postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
             postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
-            postData.reportRoles = postData.roles.filter((r: IRoles) => r.groupName === 'REPORTS') || [];
+            postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
             postData.supervisor = {
               ...postData.supervisor,
               name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
@@ -196,7 +195,9 @@ const UserList = (): React.ReactElement => {
   };
 
   const siteUserSuccess = useCallback(() => {
-    const successMessage = isOpenUserModal.isEdit ? APPCONSTANTS.USER_UPDATE_SUCCESS : APPCONSTANTS.USER_CREATE_SUCCESS;
+    const successMessage = isOpenUserModal.isEdit
+      ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
+      : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
@@ -220,7 +221,7 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      const [getRedRisk] = spiceUserRole.filter(
+      const [getRedRisk] = spiceUserRole?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );
       const userObj = formatHFUserData(users, countryIdValue, tenantId);
@@ -331,9 +332,18 @@ const UserList = (): React.ReactElement => {
               isFacility: true,
               isSearchable: true,
               data: healthFacilityList,
-              isShow: role !== HEALTH_FACILITY_ADMIN
+              isShow: role !== HEALTH_FACILITY_ADMIN,
+              filterCount: selectedFacility?.length
             },
-            { id: 2, name: 'Filter by Role', isFacility: false, isSearchable: false, data: spiceUserRole, isShow: true }
+            {
+              id: 2,
+              name: 'Filter by Role',
+              isFacility: false,
+              isSearchable: false,
+              data: spiceUserRole,
+              isShow: true,
+              filterCount: selectedRole?.length
+            }
           ]}
         >
           <CustomTable

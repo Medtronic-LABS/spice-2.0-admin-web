@@ -9,7 +9,7 @@ describe('chiefdomReducer', () => {
     mainExpectedState = initialState;
   });
 
-  it('should handle FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST', () => {
+  it('should handle FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST with loadMore false', () => {
     const action: any = {
       type: ACTION_TYPES.FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST,
       isLoadMore: false
@@ -17,6 +17,17 @@ describe('chiefdomReducer', () => {
     const expectedState = {
       ...mainInitialState,
       loading: true
+    };
+    expect(chiefdomReducer(mainInitialState, action)).toEqual(expectedState);
+  });
+  it('should handle FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST with loadMore true', () => {
+    const action: any = {
+      type: ACTION_TYPES.FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST,
+      isLoadMore: true
+    };
+    const expectedState = {
+      ...mainInitialState,
+      loadingMore: true
     };
     expect(chiefdomReducer(mainInitialState, action)).toEqual(expectedState);
   });

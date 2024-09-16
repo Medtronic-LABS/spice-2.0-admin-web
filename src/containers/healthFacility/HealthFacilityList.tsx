@@ -21,7 +21,6 @@ import {
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   validateLinkedRestrictionsRequest
-  validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
   healthFacilityListSelector,
@@ -60,8 +59,6 @@ const HealthFacilityList = (): React.ReactElement => {
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
-
-  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
   const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
@@ -189,7 +186,6 @@ const HealthFacilityList = (): React.ReactElement => {
   ) => {
     dispatch(
       validateLinkedRestrictionsRequest({
-      validateLinkedRestrictionsRequest({
         ids: missingIds,
         tenantId: hfTenantId,
         healthFacilityId: healthFacility.id,
@@ -199,7 +195,6 @@ const HealthFacilityList = (): React.ReactElement => {
         },
         failureCb: (error) =>
           toastCenter.error(
-            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
             ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
           )
       })
@@ -278,11 +273,10 @@ const HealthFacilityList = (): React.ReactElement => {
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel='Add Health Facility'
-          header='Health Facility'
+          buttonLabel={`Add ${healthFacilitySName}`}
+          header={healthFacilitySName}
           isSearch={true}
           onSearch={handleSearch}
-          onButtonClick={openCreateHealthFacility}
           onButtonClick={openCreateHealthFacility}
         >
           <CustomTable
@@ -312,7 +306,6 @@ const HealthFacilityList = (): React.ReactElement => {
                 name: 'chiefdom',
                 label: chiefdomSName,
                 width: '30%',
-                cellFormatter: ({ chiefdom }) => chiefdom?.name
                 cellFormatter: ({ chiefdom }) => chiefdom?.name
               }
             ]}

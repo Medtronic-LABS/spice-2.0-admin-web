@@ -77,7 +77,7 @@ import {
   IPeerSupervisorValidation,
   IChiefdom,
   IDistrict,
-  IClearSiteSummary,
+  IClearHFSummary,
   IFetchHFDashboardListRequest,
   IFetchHFDashboardListSuccessPayload,
   IFetchHFDashboardListSuccess,
@@ -90,7 +90,9 @@ import {
   IValidateLinkedRestrictions,
   IValidateLinkedRestrictionsSuccess,
   IValidateLinkedRestrictionsFailure,
-  IObjectData
+  IObjectData,
+  IFetchVillagesListUserLinked,
+  IClearHFFormData
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -185,7 +187,7 @@ export const clearAllDependentData = (): IClearDependentData => ({
   type: HF_TYPES.CLEAR_ALL_DEPENDENT_DATA
 });
 
-export const clearHFSummary = (): IClearSiteSummary => ({
+export const clearHFSummary = (): IClearHFSummary => ({
   type: HF_TYPES.CLEAR_HF_SUMMARY
 });
 
@@ -367,7 +369,7 @@ export const fetchHFUserListRequest = ({
   limit,
   searchTerm,
   roleNames,
-  siteUsers,
+  isSiteUsers,
   tenantId,
   tenantIds,
   successCb,
@@ -379,7 +381,7 @@ export const fetchHFUserListRequest = ({
   countryId,
   searchTerm,
   roleNames,
-  siteUsers,
+  isSiteUsers,
   tenantId,
   tenantIds,
   successCb,
@@ -425,7 +427,6 @@ export const fetchDistrictListRequest = ({
   successCb,
   failureCb
 }: Omit<IFetchDistrictListRequest, 'type'>): IFetchDistrictListRequest => ({
-  type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF,
   type: HF_TYPES.FETCH_DISTRICT_LIST_REQUEST_FOR_HF,
   countryId,
   successCb,
@@ -520,42 +521,34 @@ export const fetchUnlinkedVillagesListFailure = (error: Error): IFetchUnlinkedVi
   error
 });
 
-// UNLINKED VILLAGES LIST
-export const fetchUnlinkedVillagesRequest = ({
-  countryId,
-  districtId,
-  chiefdomId,
-  healthFacilityId,
-  successCb,
-  failureCb
-}: Omit<IFetchUnlinkedVillagesRequest, 'type'>): IFetchUnlinkedVillagesRequest => ({
-  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_REQUEST,
-  countryId,
-  districtId,
-  chiefdomId,
-  healthFacilityId,
-  successCb,
-  failureCb
-});
-
-export const fetchUnlinkedVillagesListSuccess = (payload: IFetchVillagespayload): IFetchUnlinkedVillagesSuccess => ({
-  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_SUCCESS,
-  payload
-});
-
-export const fetchUnlinkedVillagesListFailure = (error: Error): IFetchUnlinkedVillagesFailure => ({
-  type: HF_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE,
-  error
+export const clearHFFormData = (): IClearHFFormData => ({
+  type: HF_TYPES.CLEAR_HF_FORM_DATA
 });
 
 // VILLAGES LIST FROM HF
 export const fetchVillagesListFromHFRequest = ({
-  tenantIds,
-  userId,
+  countryId,
+  districtId,
+  chiefdomId,
   successCb,
   failureCb
 }: Omit<IFetchVillagesListFromHFRequest, 'type'>): IFetchVillagesListFromHFRequest => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
+  countryId,
+  districtId,
+  chiefdomId,
+  successCb,
+  failureCb
+});
+
+// VILLAGES LIST FROM HF
+export const fetchVillagesListUserLinked = ({
+  tenantIds,
+  userId,
+  successCb,
+  failureCb
+}: Omit<IFetchVillagesListUserLinked, 'type'>): IFetchVillagesListUserLinked => ({
+  type: HF_TYPES.FETCH_VILLAGES_LIST_USER_LINKED,
   tenantIds,
   userId,
   successCb,
@@ -638,30 +631,6 @@ export const fetchWorkflowListFailure = (error: Error): IFetchWorkflowListFailur
 
 export const fetchPeerSupervisorValidationsFailure = (error: Error): any => ({
   type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
-  error
-});
-
-export const validateLinkedRestrictionsRequest = ({
-  ids,
-  tenantId,
-  healthFacilityId,
-  linkedVillageIds,
-  successCb,
-  failureCb
-}: Omit<IValidateLinkedRestrictions, 'type'>): IValidateLinkedRestrictions => ({
-  type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST,
-  ids,
-  tenantId,
-  healthFacilityId,
-  linkedVillageIds,
-  successCb,
-  failureCb
-});
-export const validateLinkedRestrictionsSuccess = (): IValidateLinkedRestrictionsSuccess => ({
-  type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_SUCCESS
-});
-export const validateLinkedRestrictionsFailure = (error: Error): IValidateLinkedRestrictionsFailure => ({
-  type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_FAILURE,
   error
 });
 

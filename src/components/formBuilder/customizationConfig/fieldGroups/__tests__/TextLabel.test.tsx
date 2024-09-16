@@ -15,10 +15,11 @@ describe('TEXT_LABEL_CONFIG', () => {
       title: '',
       fieldName: '',
       family: '',
+      isSummary: false,
       isMandatory: false,
       isEnabled: true,
       visibility: 'visible',
-      isDefault: true
+      isNotDefault: true
     });
   });
 

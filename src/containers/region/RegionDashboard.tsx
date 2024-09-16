@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
 import Searchbar from '../../components/searchbar/Searchbar';
 import Loader from '../../components/loader/Loader';
-import Dropdown from '../../components/dropdown/Dropdown';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
@@ -27,12 +26,13 @@ import styles from './Region.module.scss';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { fetchTimezoneListRequest } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
-import { clearSiteSummary } from '../../store/healthFacilityDashboard/actions';
-import { clearAccountDetails, resetClinicalWorkflow } from '../../store/account/actions';
-import { clearOperatingUnitDetail } from '../../store/subCounty/actions';
+import { clearHFSummary } from '../../store/healthFacility/actions';
+import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
+import { clearChiefdomDetail } from '../../store/chiefdom/actions';
 import { IRegionDetail } from '../../store/region/types';
-import { getClinicalWorkflowSelector } from '../../store/account/selectors';
+import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { clearSideMenu } from '../../store/common/actions';
 
 /**
  * Lists all the regions
@@ -48,17 +48,14 @@ const Region = (): React.ReactElement => {
   const loadingMore = useSelector(getRegionsLoadingMoreSelector);
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
+  const { push } = useHistory();
 
-  const moduleName = NAME_CONSTANTS.region;
-  const countyModuleName = NAME_CONSTANTS.county;
-
-  const regionDropdownMenuItems = [
-    {
-      route: PROTECTED_ROUTES.createSuperAdmin,
-      menuText: 'Super Admin'
-    },
-    { route: PROTECTED_ROUTES.createRegion, menuText: moduleName }
-  ];
+  const {
+    region: { s: regionSName, p: regionPName },
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,
@@ -77,6 +74,11 @@ const Region = (): React.ReactElement => {
       );
     }
   });
+
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(
@@ -98,7 +100,7 @@ const Region = (): React.ReactElement => {
   }, [dispatch, timezoneList?.length]);
 
   /**
-   * To remove Region, Account, Sub County, Site Details cache in store
+   * To remove Region, District, Chiefdom, Site Details cache in store
    */
   useEffect(() => {
     dispatch(clearRegionDetail());
@@ -142,7 +144,7 @@ const Region = (): React.ReactElement => {
 
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
-      regions.map(({ ouCount, siteCount, countyCount, name, tenantId, id: regionId }: any) => ({
+      regions.map(({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId }: any) => ({
         title: name,
         detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
         setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId }),
@@ -151,8 +153,8 @@ const Region = (): React.ReactElement => {
         data: [
           {
             type: 'number',
-            value: Number(countyCount) ? appendZeroBefore(countyCount, 2) : '-',
-            label: countyModuleName,
+            value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
+            label: districtSName,
             disableEllipsis: true,
             route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
             onClick: () => onDashboardExit({ id: regionId, name, tenantId })
@@ -189,11 +191,11 @@ const Region = (): React.ReactElement => {
     <div className='py-1dot5'>
       <div className='row'>
         <div className={`col-12 mb-1dot25 d-flex align-items-sm-center align-items-start flex-sm-row flex-column`}>
-          <h4 className='page-title mb-sm-0 mb-0dot5'>{moduleName}</h4>
+          <h4 className='page-title mb-sm-0 mb-0dot5'>{regionPName}</h4>
           {!noRegionsAvailable && (
             <>
               <span className='ms-sm-auto mb-sm-0 mb-1'>
-                <Searchbar placeholder={`Search ${moduleName}`} onSearch={onSearch} isOutlined={false} />
+                <Searchbar placeholder={`Search ${regionSName}`} onSearch={onSearch} isOutlined={false} />
               </span>
               <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
                 Create {regionSName}
@@ -213,8 +215,10 @@ const Region = (): React.ReactElement => {
         {noRegionsAvailable && !loading && (
           <div className={`col-12 text-center mt-1 py-3dot75 ${styles.noData}`}>
             <div className='fw-bold highlight-text'>Let’s Get Started!</div>
-            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {moduleName} or super admin</div>
-            <Dropdown label='Create new' menuItems={regionDropdownMenuItems} className='mx-auto' />
+            <div className='subtle-color fs-0dot875 lh-1dot25 mb-1'>Create a new {regionSName}</div>
+            <button className='ms-sm-1dot5 btn primary-btn' onClick={() => push(PROTECTED_ROUTES.createRegion)}>
+              Create {regionSName}
+            </button>
           </div>
         )}
         {noSearchResultAvailable && (

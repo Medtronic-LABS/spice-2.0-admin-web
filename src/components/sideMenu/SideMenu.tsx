@@ -1,55 +1,89 @@
 import { memo, useCallback, useEffect } from 'react';
 import { NavLink, matchPath, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  PROTECTED_ROUTES,
-  SIDE_MENU_MAPPER,
-  regionRoutesWithSideMenu,
-  districtRoutesWithSideMenu,
-  chiefdomWithSideMenu,
-  hfWithSideMenu
-} from '../../constants/route';
+import { SIDE_MENU_MAPPER, routesWithSideMenu } from '../../constants/route';
 import styles from './SideMenu.module.scss';
-import { fetchSideMenuRequest, clearSideMenu, setSideMenu } from '../../store/common/actions';
+import { fetchSideMenuRequest, setSideMenu } from '../../store/common/actions';
 import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
+import { loadingSelector as userLoadingSelector } from '../../store/user/selectors';
+import { getLoadingSelector as regionLoadingSelector } from '../../store/region/selectors';
+import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import { ISideMenu } from '../../store/common/types';
 import Loader from '../loader/Loader';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { SIDE_MENU_FETCHING_HIERARCHY } from '../../constants/appConstants';
+import toastCenter from '../../utils/toastCenter';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import { getMedicationLoadingSelector } from '../../store/medication/selectors';
+import { labtestLoadingSelector } from '../../store/labTest/selectors';
+import { districtLoadingSelector } from '../../store/district/selectors';
+import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { programLoadingSelector } from '../../store/program/selectors';
 
 interface ISideMenuProps {
   className?: string;
 }
+type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
 
 const SideMenu = memo(({ className }: ISideMenuProps) => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
 
+  const regionLoading = useSelector(regionLoadingSelector);
+  const districtLoading = useSelector(districtLoadingSelector);
+  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const hfLoading = useSelector(healthFacilityLoadingSelector);
+  const medicationLoading = useSelector(getMedicationLoadingSelector);
+  const labTestLoading = useSelector(labtestLoadingSelector);
+  const workflowLoading = useSelector(workflowLoadingSelector);
+  const userLoading = useSelector(userLoadingSelector);
+  const programLoading = useSelector(programLoadingSelector);
+
   const sideMenuLoading = useSelector(getLoadingSelector);
+
+  const getLoading = useCallback(
+    () =>
+      regionLoading ||
+      districtLoading ||
+      chiefdomLoading ||
+      hfLoading ||
+      medicationLoading ||
+      labTestLoading ||
+      workflowLoading ||
+      userLoading ||
+      programLoading
+        ? false
+        : sideMenuLoading,
+    [
+      regionLoading,
+      districtLoading,
+      chiefdomLoading,
+      hfLoading,
+      medicationLoading,
+      labTestLoading,
+      workflowLoading,
+      userLoading,
+      programLoading,
+      sideMenuLoading
+    ]
+  );
   const countryId = useSelector(countryIdSelector);
-  const countryIdValue = countryId?.id;
+  const countryIdValue = Number(countryId?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
 
-  const { list: sideMenuList } = useSelector(getSideMenuSelector);
-
-  const [name, route] =
-    Object.entries(PROTECTED_ROUTES).find(([key, value]: [string, string]) =>
-      matchPath(pathname, { path: value, exact: true })
-    ) || [];
+  const { list: sideMenuList, fetchedFor } = useSelector(getSideMenuSelector);
+  const currentModule: ModuleNames = pathname.split('/')[1];
+  const { route: currentRoute } =
+    routesWithSideMenu.find(({ route }) => matchPath(pathname, { path: route, exact: true })) || {};
   const { regionId, districtId, chiefdomId, healthFacilityId, tenantId } = matchPath(pathname, {
-    path: route,
+    path: currentRoute,
     exact: true
   })?.params as any;
-
-  let formName: string = '';
-  if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-    formName = 'country';
-  } else if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-    formName = 'district';
-  } else if (role === APPCONSTANTS.ROLES.DISTRICT_ADMIN) {
-    formName = 'chiefdom';
-  } else if (role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-    formName = 'healthfacility';
+  let fetchingFor: string;
+  if (role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
+    fetchingFor = role;
+  } else {
+    fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
   }
 
   const fetchSideMenu = useCallback(
@@ -57,13 +91,9 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       dispatch(
         fetchSideMenuRequest({
           countryId: regionId || countryIdValue || null,
-          tenantId,
-          formName,
+          roleName: fetchingFor,
           successCb: (payload: any) => {
-            const {
-              list: rawSideMenu,
-              routeIds: { id: routeId, tenantId: routeTenantId }
-            } = payload;
+            const { list: rawSideMenu, roleName: menuFetchedFor } = payload;
 
             const sideMenuWithRoute = [...rawSideMenu]?.map((menu: ISideMenu) => {
               menu = { ...menu };
@@ -75,20 +105,20 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
 
             let choosenRoutes: ISideMenu[] = [...sideMenuWithRoute];
             const pathParams: Array<[string, string]> = [];
-            if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-              pathParams.push([':regionId', regionId || routeId], [':tenantId', routeTenantId || tenantId]);
+            if (menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY.region) {
+              pathParams.push([':regionId', regionId], [':tenantId', tenantId]);
             }
-            if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
-              pathParams.push([':districtId', districtId || routeId], [':tenantId', routeTenantId || tenantId]);
+            if (menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY.district) {
+              pathParams.push([':districtId', districtId], [':tenantId', tenantId]);
             }
-            if (role === APPCONSTANTS.ROLES.DISTRICT_ADMIN) {
-              pathParams.push([':chiefdomId', chiefdomId || routeId], [':tenantId', routeTenantId || tenantId]);
+            if (menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom) {
+              pathParams.push([':chiefdomId', chiefdomId], [':tenantId', tenantId]);
             }
-            if (role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-              pathParams.push(
-                [':healthFacilityId', healthFacilityId || routeId],
-                [':tenantId', routeTenantId || tenantId]
-              );
+            if (
+              menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY['health-facility'] ||
+              menuFetchedFor === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN
+            ) {
+              pathParams.push([':healthFacilityId', healthFacilityId], [':tenantId', tenantId]);
             }
             choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
               menu = { ...menu };
@@ -99,67 +129,31 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
             });
             dispatch(
               setSideMenu({
-                list: choosenRoutes
+                list: choosenRoutes,
+                fetchedFor: menuFetchedFor
               })
             );
+          },
+          failureCb: () => {
+            toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_SIDEMENU_ERROR);
           }
         })
       ),
-    [chiefdomId, countryIdValue, dispatch, districtId, formName, healthFacilityId, regionId, role, tenantId]
+    [chiefdomId, countryIdValue, dispatch, districtId, fetchingFor, healthFacilityId, regionId, tenantId]
   );
 
   useEffect(() => {
-    if (!sideMenuList.length && tenantId) {
+    if (!sideMenuList.length || fetchingFor !== fetchedFor) {
       fetchSideMenu();
     }
-  }, [dispatch, fetchSideMenu, role, sideMenuList.length, tenantId]);
-
-  useEffect(() => {
-    return () => {
-      if (role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER) {
-        dispatch(clearSideMenu());
-      }
-    };
-  }, []);
-
-  const checkActive = (currentRoute: string, currentRouteName: string) => {
-    const isCurrentRouteActive = matchPath(pathname, { exact: true, path: currentRoute });
-    if (isCurrentRouteActive) {
-      return true;
-    } else {
-      if (
-        regionRoutesWithSideMenu.find((regionRoute) => matchPath(pathname, { path: regionRoute, exact: true })) &&
-        currentRouteName.includes('REGION_BY')
-      ) {
-        return true;
-      }
-      if (
-        districtRoutesWithSideMenu.find((districtRoute) => matchPath(pathname, { path: districtRoute, exact: true })) &&
-        currentRouteName.includes('DISTRICT_BY')
-      ) {
-        return true;
-      }
-      if (
-        chiefdomWithSideMenu.find((chiefdomRoute) => matchPath(pathname, { path: chiefdomRoute, exact: true })) &&
-        currentRouteName.includes('CHIEFDOM_BY')
-      ) {
-        return true;
-      }
-      if (
-        hfWithSideMenu.find((hfRoute) => matchPath(pathname, { path: hfRoute, exact: true })) &&
-        currentRouteName.includes('HEALTH_FACILITY_BY')
-      ) {
-        return true;
-      }
-    }
-  };
+  }, [dispatch, fetchSideMenu, fetchedFor, fetchingFor, sideMenuList.length]);
 
   return (
     <>
-      {sideMenuLoading && <Loader />}
+      {getLoading() && <Loader />}
       <div className={`${styles.sideMenu} py-0dot25 ${className}`}>
         {[...sideMenuList]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
-          const isActive = checkActive(rest.route, rest.name);
+          const isActive = matchPath(pathname, { exact: true, path: rest.route });
           return (
             <NavLink
               to={rest.route}

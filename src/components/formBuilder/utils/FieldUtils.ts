@@ -10,8 +10,7 @@ import DATE_PICKER_CONFIG from '../labTestConfig/fieldGroups/creatableViews/Date
 
 export const creatableViews = [
   { label: 'Text', value: 'EditText' },
-  { label: 'Dropdown', value: 'Spinner' },
-  { label: 'Date', value: 'DatePicker' }
+  { label: 'Dropdown', value: 'Spinner' }
 ];
 
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
@@ -42,15 +41,15 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
     maxLength: false,
     minLength: false,
     contentLength: false,
-    startsWith: false
+    startsWith: false,
+    unitList: false,
+    ranges: false
   };
   const resultFields = {
     code: true,
     url: true,
     resource: true,
-    unitList: true,
-    condition: true,
-    ranges: true
+    condition: true
   };
   let finalFields: any = {};
   if (fieldValue) {
@@ -59,22 +58,28 @@ export const resultSwitch = (fieldValue: number | null, obj: any, isResult: bool
       case InputTypes.DECIMAL:
         inputTypeRelatedFields.minValue = true;
         inputTypeRelatedFields.maxValue = true;
+        inputTypeRelatedFields.unitList = true;
+        inputTypeRelatedFields.ranges = true;
         break;
       case InputTypes.PHONE_NUMBER:
         inputTypeRelatedFields.contentLength = true;
         inputTypeRelatedFields.startsWith = true;
+        inputTypeRelatedFields.unitList = true;
+        inputTypeRelatedFields.ranges = true;
         break;
       case InputTypes.DEFAULT:
       default:
         inputTypeRelatedFields.minLength = true;
         inputTypeRelatedFields.maxLength = true;
+        inputTypeRelatedFields.unitList = false;
+        inputTypeRelatedFields.ranges = false;
     }
   }
   if (isResult) {
     finalFields = {
       ...finalFields,
       ...inputTypeRelatedFields,
-      ...{ ...resultFields, ranges: obj.viewType === 'EditText', unitList: obj.viewType === 'EditText' }
+      ...resultFields
     };
   } else {
     Object.keys(resultFields).forEach((key: any) => {
@@ -115,8 +120,7 @@ interface IGender {
 
 const genderList: IGender[] = [
   { name: 'Male', id: 'Male' },
-  { name: 'Female', id: 'Female' },
-  { name: 'Both', id: 'Both' }
+  { name: 'Female', id: 'Female' }
 ];
 
 interface IRemovedUnits {
@@ -138,22 +142,16 @@ export const filterUnitsandGender = (ranges: IRanges[], unitList: IUnit[]) => {
     unitGenderMap[unitType].add(gender);
   });
 
-  // Function to check if a unitType has both genders
-  const hasBothGenders = (unitType: string) =>
-    unitGenderMap[unitType] && unitGenderMap[unitType].size === genderList.length;
-
-  // Function to check if a unitType has both genders
-  const hasBothGenders = (unitType: string) =>
-    unitGenderMap[unitType] && unitGenderMap[unitType].size === genderList.length;
-
   // Filter the unitList based on the genders associated with each unitType
   const filteredUnitList: IUnit[] = [];
   const removedUnits: IRemovedUnits = { units: [], indices: [], genders: {} };
 
   (unitList || []).forEach((unit, index) => {
     const unitType = unit.id;
-    if (hasBothGenders(unitType)) {
-      removedUnits.units.push(unit);
+    if (unitGenderMap[unitType]) {
+      if (unitGenderMap[unitType].size === genderList.length) {
+        removedUnits.units.push(unit);
+      }
       removedUnits.indices.push(index);
       removedUnits.genders[unitType] = genderList.filter((gender) => unitGenderMap[unitType].has(gender.id));
     } else {

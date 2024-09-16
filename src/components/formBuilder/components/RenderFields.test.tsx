@@ -3,7 +3,6 @@ import { Field, Form } from 'react-final-form';
 import RenderFields, { CheckboxComponent, TextFieldComponent } from './RenderFields';
 import { SelectInputValues } from './RenderFields';
 import RangesConfig from './fieldUI/RangesConfig';
-import RangesConfig from './fieldUI/RangesConfig';
 import SelectFieldWrapper from './fieldUI/SelectFieldWrapper';
 import configureMockStore from 'redux-mock-store';
 import arrayMutators from 'final-form-arrays';
@@ -54,20 +53,6 @@ describe('RenderFields Test Cases', () => {
   describe('CheckboxComponent', () => {
     it('renders checkbox with label and disabled state', () => {
       const wrapper = mount(
-        <Provider store={store}>
-          {/* tslint:disable-next-line:no-empty */}
-          <Form onSubmit={() => {}}>
-            {({ handleSubmit }) => (
-              <form onSubmit={handleSubmit}>
-                <CheckboxComponent
-                  name='form'
-                  fieldName='disableFutureDate'
-                  inputProps={{ label: 'Disable Future Date', disabled: true }}
-                />
-              </form>
-            )}
-          </Form>
-        </Provider>
         <Provider store={store}>
           {/* tslint:disable-next-line:no-empty */}
           <Form onSubmit={() => {}}>

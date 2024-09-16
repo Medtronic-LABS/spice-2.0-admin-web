@@ -10,7 +10,7 @@ import {
   fetchFormMetaRequest,
   fetchCustomizationFormRequest
 } from '../../store/workflow/actions';
-import { formJSONSelector, formMetaSelector, loadingSelector } from '../../store/workflow/selectors';
+import { formJSONSelector, getFormMetaSelector, loadingSelector } from '../../store/workflow/selectors';
 import { FormType } from '../../store/workflow/types';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -36,7 +36,7 @@ const RegionFormCustomization = () => {
 
   const history = useHistory();
   const { tenantId, regionId, form } = useParams<IMatchParams>();
-  const formGetMeta = useSelector(formMetaSelector) || [];
+  const formGetMeta = useSelector(getFormMetaSelector) || [];
   const { id: formId } = useSelector(formJSONSelector) || {};
   const loading = useSelector(loadingSelector);
   const cultureList = useSelector(cultureListSelector);
@@ -205,7 +205,7 @@ const RegionFormCustomization = () => {
             formMeta={formData}
             setFormMeta={setFormData}
             addedFields={addedFields}
-            allowedFields={formGetMeta}
+            allowedFields={[...formGetMeta]}
             targetIds={targetIds}
             culture={currentCulture}
             onSubmit={onSubmit}

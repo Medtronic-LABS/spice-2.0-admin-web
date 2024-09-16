@@ -29,6 +29,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { useEffect } from 'react';
 import {
+  clearHFFormData,
   clearSupervisorList,
   clearVillageList,
   fetchCultureListRequest,
@@ -38,17 +39,22 @@ import {
   fetchVillagesListRequest
 } from '../../store/healthFacility/actions';
 import { useParams } from 'react-router';
-import { userDataSelector } from '../../store/user/selectors';
+import { countryIdSelector } from '../../store/user/selectors';
 import { IObjectData, IVillages } from '../../store/healthFacility/types';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Workflows from '../healthFacility/Workflows';
-import { fetchDistrictListRequest } from '../../store/district/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
-import { fetchChiefdomListRequest } from '../../store/chiefdom/actions';
-import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { fetchDistrictDetailReq, fetchDistrictListRequest } from '../../store/district/actions';
+import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
+import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import {
+  chiefdomListSelector,
+  chiefdomLoadingSelector,
+  getChiefdomDetailSelector
+} from '../../store/chiefdom/selectors';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter from '../../utils/toastCenter';
+import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IAddUserFormProps {
   formName: string;
@@ -63,6 +69,7 @@ interface IMatchParams {
   regionId?: string;
   chiefdomId?: string;
   districtId?: string;
+  tenantId: string;
 }
 
 /**
@@ -73,14 +80,12 @@ interface IMatchParams {
 const HealthFacilityDetailsForm = ({
   form,
   formName,
-  modalRef,
   isEdit = false,
   data = {},
   submittedData
-}: IAddUserFormProps & IMatchParams): React.ReactElement => {
+}: IAddUserFormProps): React.ReactElement => {
   const dispatch = useDispatch();
-  const { regionId } = useParams<{ regionId: string }>();
-  const regionData = useSelector(userDataSelector).country;
+  const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const hfTypesList = useSelector(hfTypesSelector);
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
@@ -96,12 +101,56 @@ const HealthFacilityDetailsForm = ({
   const languages = useSelector(cultureListSelector);
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
-  const countryId = Number(regionId || regionData?.id);
+  const country = useSelector(countryIdSelector);
+  const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
+
+  const chiefdom = useSelector(getChiefdomDetailSelector);
+  useEffect(() => {
+    if (!isEdit && chiefdomId && Number(chiefdom?.id) !== Number(chiefdomId)) {
+      dispatch(
+        fetchChiefdomDetail({
+          tenantId,
+          id: chiefdomId
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  if (!isEdit && chiefdomId) {
+    const { values: formValues = {} } = form?.getState?.() || {};
+    const chiefdomFormValue = (formValues as any)?.formName?.chiefdom;
+    if (!chiefdomFormValue && Number(chiefdom?.id) === Number(chiefdomId)) {
+      form?.change(`${formName}.district` as any, chiefdom.district);
+      form?.change(`${formName}.chiefdom` as any, chiefdom);
+    }
+  }
+
+  // Logic for district autoselecting when the route is createHealthFacilityByDistrict
+  // route is createhealthFacilityByDistrict, if isEdit = false and the route contains districtId param
+  const district = useSelector(districtSelector);
+  useEffect(() => {
+    if (!isEdit && districtId && district?.id !== districtId) {
+      dispatch(
+        fetchDistrictDetailReq({
+          tenantId,
+          id: districtId
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  if (!isEdit && districtId) {
+    const { values: formValues = {} } = form?.getState?.() || {};
+    const districtFormValue = (formValues as any)?.formName?.district;
+    if (!districtFormValue && Number(district?.id) === Number(districtId)) {
+      form?.change(`${formName}.district` as any, district);
+    }
+  }
 
   // Culture list fetch
   useEffect(() => {
@@ -119,46 +168,44 @@ const HealthFacilityDetailsForm = ({
 
   // District fetch
   useEffect(() => {
-    if (!districtList.length) {
-      dispatch(fetchDistrictListRequest({ tenantId: String(countryId), isActive: true }));
-    }
-  }, [dispatch, districtList.length, countryId]);
+    dispatch(fetchDistrictListRequest({ tenantId: countryId, isActive: true }));
+  }, [dispatch, countryId]);
 
   // Peer Supervisor fetch
   useEffect(() => {
-    const tenantId = form.getState().values.healthFacility?.district?.tenantId;
-    if (tenantId) {
-      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [tenantId] }));
+    const selectedTenantId = form.getState().values?.healthFacility?.district?.tenantId;
+    if (selectedTenantId) {
+      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.tenantId]);
+  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.tenantId]);
 
   // Chiefdom fetch
   useEffect(() => {
-    const districtId = form.getState().values.healthFacility?.district?.tenantId;
-    if (districtId) {
-      dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
+    const selectedDistrictId = form.getState().values?.healthFacility?.district?.tenantId;
+    if (selectedDistrictId) {
+      dispatch(fetchChiefdomListRequest({ tenantId: selectedDistrictId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values.healthFacility?.district?.id]);
+  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.id]);
 
   // Villages fetch
   useEffect(() => {
-    const districtId = form.getState().values.healthFacility.district?.id;
-    const chiefdomId = form.getState().values.healthFacility.chiefdom?.id;
-    if (chiefdomId && districtId) {
+    const selectedDistrictId = form.getState().values.healthFacility.district?.id;
+    const selectedChiefdomId = form.getState().values.healthFacility.chiefdom?.id;
+    if (selectedChiefdomId && selectedDistrictId) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
-          districtId: Number(districtId),
-          chiefdomId: Number(chiefdomId)
+          districtId: Number(selectedDistrictId),
+          chiefdomId: Number(selectedChiefdomId)
         })
       );
       dispatch(
         fetchUnlinkedVillagesRequest({
           countryId,
-          districtId: Number(districtId),
-          chiefdomId: Number(chiefdomId),
+          districtId: Number(selectedDistrictId),
+          chiefdomId: Number(selectedChiefdomId),
           healthFacilityId: data?.id ? data.id : undefined,
           successCb: (list: IVillages[]) => {
             if (!list.length) {
@@ -173,20 +220,25 @@ const HealthFacilityDetailsForm = ({
     countryId,
     dispatch,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility?.district?.id,
+    form.getState().values?.healthFacility?.district?.id,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    form.getState().values.healthFacility?.chiefdom?.id,
+    form.getState().values?.healthFacility?.chiefdom?.id,
     regionId
   ]);
 
   useEffect(() => {
-    const { district, chiefdom, city, linkedVillages } = form.getState().values?.healthFacility || {
+    const {
+      district: formDistrict,
+      chiefdom: formChiefdom,
+      city,
+      linkedVillages
+    } = form.getState().values?.healthFacility || {
       district: {},
       chiefdom: {},
       city: {},
       linkedVillages: []
     };
-    if (!isEdit && !district?.id && (chiefdom?.id || city?.id || (linkedVillages || []).length)) {
+    if (!isEdit && !formDistrict?.id && (formChiefdom?.id || city?.id || (linkedVillages || []).length)) {
       form.batch(() => {
         form.change(`${formName}.chiefdom`, undefined);
         form.change(`${formName}.city`, undefined);
@@ -194,6 +246,12 @@ const HealthFacilityDetailsForm = ({
       });
     }
   }, [form, formName, isEdit]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearHFFormData());
+    };
+  }, []);
 
   return (
     <>
@@ -299,6 +357,7 @@ const HealthFacilityDetailsForm = ({
                   <SelectInput
                     {...(input as any)}
                     {...(meta as any)}
+                    disabled={Boolean(isEdit || chiefdomId || districtId)}
                     label={districtSName}
                     errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
@@ -329,6 +388,7 @@ const HealthFacilityDetailsForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
+                  disabled={Boolean(isEdit || chiefdomId)}
                   label={chiefdomSName}
                   errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
@@ -442,7 +502,7 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <MultiSelect
                   {...(input as any)}
-                  label='Linked Peer Supervisor'
+                  label='Linked Community Health Assistant'
                   labelKey='name'
                   valueKey='id'
                   isShowLabel={true}
@@ -468,32 +528,34 @@ const HealthFacilityDetailsForm = ({
               name={`${formName}.linkedVillages`}
               type='text'
               validate={required}
-              render={({ input, meta }) => (
-                <MultiSelect
-                  {...(input as any)}
-                  label='Linked Villages'
-                  errorLabel='linked villages'
-                  labelKey='name'
-                  valueKey='id'
-                  required={true}
-                  isShowLabel={true}
-                  isSelectAll={true}
-                  placeholder=''
-                  isDefaultSelected={true}
-                  menuPlacement={'auto'}
-                  isModel={true}
-                  isMulti={true}
-                  options={unlinkedVillagesList}
-                  loading={unlinkedVillagesLoading}
-                  error={(meta.touched && meta.error) || undefined}
-                  controlStyles={{
-                    borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
-                    '&:focus-visible': {
-                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
-                    }
-                  }}
-                />
-              )}
+              render={({ input, meta }) => {
+                return (
+                  <MultiSelect
+                    {...(input as any)}
+                    label='Linked Villages'
+                    errorLabel='linked villages'
+                    labelKey='name'
+                    valueKey='id'
+                    required={true}
+                    isShowLabel={true}
+                    isSelectAll={true}
+                    placeholder=''
+                    isDefaultSelected={true}
+                    menuPlacement={'auto'}
+                    isModel={true}
+                    isMulti={true}
+                    options={unlinkedVillagesList}
+                    loading={unlinkedVillagesLoading}
+                    error={(meta.touched && meta.error) || undefined}
+                    controlStyles={{
+                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
+                      '&:focus-visible': {
+                        borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
+                      }
+                    }}
+                  />
+                );
+              }}
             />
           </div>
         </div>

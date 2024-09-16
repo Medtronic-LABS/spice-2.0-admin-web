@@ -26,8 +26,8 @@ const useUserFormMeta = () => {
     ],
     []
   );
-
-  return { mobileRoles, isCHPRole, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles };
+  const isHFAdminRole = useMemo(() => [HEALTH_FACILITY_ADMIN], [HEALTH_FACILITY_ADMIN]);
+  return { mobileRoles, isCHPRole, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles, isHFAdminRole };
 };
 
 export default useUserFormMeta;

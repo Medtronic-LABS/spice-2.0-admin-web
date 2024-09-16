@@ -7,14 +7,23 @@ import {
   IFetchCustomizationFormRequest,
   IDeactivateConsentRequest,
   IFetchFormMetaRequest,
-  FormLogType
+  FormLogType,
+  IFetchClinicalWorkflowReq,
+  IClinicalWorkflow,
+  ICreateWorkflowModule,
+  IUpdateWorkflowModule,
+  IDeleteWorkflowModule
 } from './types';
 import * as workflowActions from './actions';
 import {
   CUSTOMIZE_FORM_REQUEST,
   FETCH_CUSTOMIZATION_FORM_REQUEST,
   DEACTIVATE_CONSENT_FORM_REQUEST,
-  FETCH_FORM_META_REQUEST
+  FETCH_FORM_META_REQUEST,
+  FETCH_CLINICAL_WORKFLOW_REQUEST,
+  CREATE_WORKFLOW_MODULE_REQUEST,
+  UPDATE_WORKFLOW_MODULE_REQUEST,
+  DELETE_WORKFLOW_MODULE_REQUEST
 } from './actionTypes';
 import { camel2Title } from '../../utils/validation';
 import { FormTypes } from '../../containers/region/RegionCustomization';
@@ -46,7 +55,7 @@ export function* fetchCustomizationForm({
       clinicalWorkflowId
     } as any);
     successCb?.(data);
-    if (category === 'input_form') {
+    if (category.toLowerCase() === 'input_form') {
       const newData = { ...data, form_input: JSON.parse(data?.formInput) };
       yield put(workflowActions.fetchCustomizationFormSuccess({ payload: newData }));
     } else if (category.toLowerCase() === 'consent_form') {

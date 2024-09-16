@@ -9,7 +9,6 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
     <>
       <div className='row gx-1dot25'>
         <div className='col-12 col-lg-6'>
-        <div className='col-12 col-lg-6'>
           <Field
             name='testName'
             type='text'

@@ -12,7 +12,6 @@ export type IFieldViewType =
   | IEditTextFields
   | IRadioGroupFields
   | IDropdownFields
-  | IDropdownFields
   | ICheckBoxFields
   | ICardViewFields
   | ITextLabelFields

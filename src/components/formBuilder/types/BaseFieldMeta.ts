@@ -23,6 +23,13 @@ export interface ISelectAttributeProps extends IAttributeProps {
   isMulti?: boolean;
 }
 
+export interface IResourceSelectAttributeProps extends IAttributeProps {
+  options?: IResourceOptions;
+  labelKey?: string;
+  valueKey?: string;
+  isMulti?: boolean;
+}
+
 export interface IBaseFieldMeta {
   title?: ITextAttributeProps;
   action?: ITextAttributeProps;
@@ -52,7 +59,7 @@ export interface IBaseFieldMeta {
   unitList?: ISelectAttributeProps;
   code?: ITextAttributeProps;
   url?: ITextAttributeProps;
-  resource?: ISelectAttributeProps;
+  resource?: IResourceSelectAttributeProps;
   isResult?: IAttributeProps;
   totalCount?: ISelectAttributeProps;
   mandatoryCount?: ISelectAttributeProps;

@@ -9,10 +9,6 @@ import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { districtSelector } from '../../store/district/selectors';
 import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
 import { healthFacilitySelector } from '../../store/healthFacility/selectors';
-import { getRegionDetailsSelector } from '../../store/region/selectors';
-import { districtSelector } from '../../store/district/selectors';
-import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
-import { healthFacilitySelector } from '../../store/healthFacility/selectors';
 import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { clearDistrictDetails, setDistrictDetails } from '../../store/district/actions';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
@@ -22,6 +18,7 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 import { clearRegionDetail, setRegionDetail } from '../../store/region/actions';
 import { clearChiefdomDetail, setChiefdomDetails } from '../../store/chiefdom/actions';
 import { clearHFSummary, setHFSummary } from '../../store/healthFacility/actions';
+import { clearSideMenu } from '../../store/common/actions';
 
 interface ISection {
   route: string;
@@ -32,6 +29,7 @@ interface ISection {
 const chiefdomRoutes = [
   PROTECTED_ROUTES.chiefdomSummary,
   PROTECTED_ROUTES.healthFacilityByChiefdom,
+  PROTECTED_ROUTES.adminByChiefdom,
   PROTECTED_ROUTES.userByChiefdom,
   PROTECTED_ROUTES.createHealthFacilityByChiefdom
 ];
@@ -40,6 +38,7 @@ const districtRoutes = [
   PROTECTED_ROUTES.districtSummary,
   PROTECTED_ROUTES.chiefdomByDistrict,
   PROTECTED_ROUTES.healthFacilityByDistrict,
+  PROTECTED_ROUTES.adminByDistrict,
   PROTECTED_ROUTES.userByDistrict,
   PROTECTED_ROUTES.createChiefdomByDistrict,
   PROTECTED_ROUTES.createHealthFacilityByDistrict
@@ -50,6 +49,7 @@ const regionRoutes = [
   PROTECTED_ROUTES.districtByRegion,
   PROTECTED_ROUTES.chiefdomByRegion,
   PROTECTED_ROUTES.healthFacilityByRegion,
+  PROTECTED_ROUTES.adminByRegion,
   PROTECTED_ROUTES.userByRegion,
   PROTECTED_ROUTES.createDistrictByRegion,
   PROTECTED_ROUTES.createChiefdomByRegion,
@@ -66,7 +66,12 @@ const regionRoutes = [
   PROTECTED_ROUTES.workflowByRegion
 ];
 
-const siteRoutes = [PROTECTED_ROUTES.healthFacilitySummary, PROTECTED_ROUTES.healthFacilityByRegion];
+const healthFacilityRoutes = [
+  PROTECTED_ROUTES.healthFacilitySummary,
+  PROTECTED_ROUTES.healthFacilityByRegion,
+  PROTECTED_ROUTES.adminByHealthFacility,
+  PROTECTED_ROUTES.userByHealthFacility
+];
 
 const dashboardRoutes = [
   PROTECTED_ROUTES.regionDashboard,
@@ -91,31 +96,31 @@ const Breadcrumb = (): React.ReactElement => {
   const { CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
   const {
-    district: districtModuleName,
-    chiefdom: chiefdomModuleName,
-    healthFacility: healthFacilityModuleName
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
 
   const customBreadcrumbs = [
     { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },
     { route: PROTECTED_ROUTES.createLabTest, label: 'Add Lab Test', appendParent: true },
     { route: PROTECTED_ROUTES.createRegion, label: 'Create Region', appendParent: true },
-    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtModuleName}`, appendParent: true },
-    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomModuleName}`, appendParent: true },
-    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomModuleName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createDistrictByRegion, label: `Create ${districtSName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByRegion, label: `Create ${chiefdomSName}`, appendParent: true },
+    { route: PROTECTED_ROUTES.createChiefdomByDistrict, label: `Create ${chiefdomSName}`, appendParent: true },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByRegion,
-      label: `Create ${healthFacilityModuleName}`,
+      label: `Create ${healthFacilitySName}`,
       appendParent: true
     },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByDistrict,
-      label: `Create ${healthFacilityModuleName}`,
+      label: `Create ${healthFacilitySName}`,
       appendParent: true
     },
     {
       route: PROTECTED_ROUTES.createHealthFacilityByChiefdom,
-      label: `Create ${healthFacilityModuleName}`,
+      label: `Create ${healthFacilitySName}`,
       appendParent: true
     },
     { route: PROTECTED_ROUTES.profile, label: 'Settings' },
@@ -210,8 +215,8 @@ const Breadcrumb = (): React.ReactElement => {
       result.push({
         label: healthFacility.name,
         route: PROTECTED_ROUTES.healthFacilitySummary
-          .replace(':healthFacilityId', healthFacility.id.toString())
-          .replace(':tenantId', healthFacility.tenantId.toString())
+          .replace(':healthFacilityId', healthFacility.id?.toString())
+          .replace(':tenantId', healthFacility.tenantId?.toString())
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
@@ -306,7 +311,7 @@ const Breadcrumb = (): React.ReactElement => {
     if (prevPathname.current !== pathname) {
       const prevRoute = {
         isSiteRoute: Boolean(
-          siteRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+          healthFacilityRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
         ),
         isOURoute: Boolean(
           chiefdomRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
@@ -322,7 +327,9 @@ const Breadcrumb = (): React.ReactElement => {
         )
       };
       const currRoute = {
-        isSiteRoute: Boolean(siteRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))),
+        isSiteRoute: Boolean(
+          healthFacilityRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        ),
         isOURoute: Boolean(chiefdomRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))),
         isAccountRoute: Boolean(
           districtRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
@@ -370,6 +377,7 @@ const Breadcrumb = (): React.ReactElement => {
     dispatch(clearDistrictDetails());
     dispatch(clearChiefdomDetail());
     dispatch(clearHFSummary());
+    dispatch(clearSideMenu());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

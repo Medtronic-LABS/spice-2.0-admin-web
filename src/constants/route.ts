@@ -37,13 +37,13 @@ export const PROTECTED_ROUTES = {
   chiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom',
   chiefdomSummary: '/chiefdom/:chiefdomId/:tenantId',
 
-  healthFacilityDashboard: '/site',
+  healthFacilityDashboard: '/health-facility',
   healthFacilitySummary: '/health-facility/:healthFacilityId/:tenantId',
   healthFacilityByRegion: '/region/:regionId/:tenantId/health-facility',
   healthFacilityByDistrict: '/district/:districtId/:tenantId/health-facility',
   healthFacilityByChiefdom: '/chiefdom/:chiefdomId/:tenantId/health-facility',
 
-  createHealthFacilityByRegion: '/region/:regionId/health-facility/create',
+  createHealthFacilityByRegion: '/region/:regionId/:tenantId/health-facility/create',
   createHealthFacilityByDistrict: '/district/:districtId/:tenantId/health-facility/create',
   createHealthFacilityByChiefdom: '/chiefdom/:chiefdomId/:tenantId/health-facility/create',
 
@@ -72,34 +72,59 @@ export const PROTECTED_ROUTES = {
   workflowCustomization: '/region/:regionId/:tenantId/:form/workflowCustomize/:clinicalWorkflowId/:workflowId'
 };
 
+export const routesWithSideMenu = [
+  { route: PROTECTED_ROUTES.regionSummary },
+  { route: PROTECTED_ROUTES.customizationByRegion },
+  { route: PROTECTED_ROUTES.districtSummary, disabledRoles: [APPCONSTANTS.ROLES.DISTRICT_ADMIN] },
+  { route: PROTECTED_ROUTES.districtByRegion },
+  { route: PROTECTED_ROUTES.chiefdomByRegion },
+  { route: PROTECTED_ROUTES.chiefdomByDistrict },
+  { route: PROTECTED_ROUTES.chiefdomSummary, disabledRoles: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN] },
+  { route: PROTECTED_ROUTES.healthFacilityByRegion },
+  { route: PROTECTED_ROUTES.healthFacilityByDistrict },
+  { route: PROTECTED_ROUTES.healthFacilityByChiefdom },
+  { route: PROTECTED_ROUTES.healthFacilitySummary },
+  { route: PROTECTED_ROUTES.adminByRegion },
+  { route: PROTECTED_ROUTES.adminByDistrict },
+  { route: PROTECTED_ROUTES.adminByChiefdom },
+  { route: PROTECTED_ROUTES.adminByHealthFacility },
+  { route: PROTECTED_ROUTES.userByRegion },
+  { route: PROTECTED_ROUTES.userByDistrict },
+  { route: PROTECTED_ROUTES.userByChiefdom },
+  { route: PROTECTED_ROUTES.userByHealthFacility },
+  { route: PROTECTED_ROUTES.labTestByRegion },
+  { route: PROTECTED_ROUTES.medicationByRegion },
+  { route: PROTECTED_ROUTES.programByRegion },
+  { route: PROTECTED_ROUTES.workflowByRegion }
+];
+
 export const SIDE_MENU_MAPPER = {
-  REGION_BY_SUPER_ADMIN: PROTECTED_ROUTES.regionSummary,
-  REGION_CUSTOMIZATION_BY_SUPER_ADMIN: PROTECTED_ROUTES.customizationByRegion,
+  REGION: PROTECTED_ROUTES.region,
+  REGION_CUSTOMIZATION: PROTECTED_ROUTES.customizationByRegion,
   DISTRICT_BY_REGION: PROTECTED_ROUTES.districtByRegion,
   CHIEFDOM_BY_REGION: PROTECTED_ROUTES.chiefdomByRegion,
   HEALTH_FACILITY_BY_REGION: PROTECTED_ROUTES.healthFacilityByRegion,
-  ADMINS_BY_SUPER_ADMIN: PROTECTED_ROUTES.adminByRegion,
-  USERS_BY_SUPER_ADMIN: PROTECTED_ROUTES.userByRegion,
-  LAB_TEST_DATABASE_BY_SUPER_ADMIN: PROTECTED_ROUTES.labTestByRegion,
-  MEDICATION_DATABASE_BY_SUPER_ADMIN: PROTECTED_ROUTES.medicationByRegion,
-  WORKFLOW_BY_SUPER_ADMIN: PROTECTED_ROUTES.workflowByRegion,
+  ADMINS_BY_REGION: PROTECTED_ROUTES.adminByRegion,
+  USERS_BY_REGION: PROTECTED_ROUTES.userByRegion,
+  PROGRAM_BY_REGION: PROTECTED_ROUTES.programByRegion,
+  LAB_TEST_DATABASE_BY_REGION: PROTECTED_ROUTES.labTestByRegion,
+  MEDICATION_DATABASE_BY_REGION: PROTECTED_ROUTES.medicationByRegion,
+  WORKFLOW_BY_REGION: PROTECTED_ROUTES.workflowByRegion,
 
   DISTRICT_SUMMARY: PROTECTED_ROUTES.districtSummary,
   CHIEFDOM_BY_DISTRICT: PROTECTED_ROUTES.chiefdomByDistrict,
   HEALTH_FACILITY_BY_DISTRICT: PROTECTED_ROUTES.healthFacilityByDistrict,
-  ADMINS_BY_REGION_ADMIN: PROTECTED_ROUTES.adminByDistrict,
-  USERS_BY_REGION_ADMIN: PROTECTED_ROUTES.userByDistrict,
+  ADMINS_BY_DISTRICT: PROTECTED_ROUTES.adminByDistrict,
+  USERS_BY_DISTRICT: PROTECTED_ROUTES.userByDistrict,
 
   CHIEFDOM_SUMMARY: PROTECTED_ROUTES.chiefdomSummary,
   HEALTH_FACILITY_BY_CHIEFDOM: PROTECTED_ROUTES.healthFacilityByChiefdom,
-  ADMINS_BY_DISTRICT_ADMIN: PROTECTED_ROUTES.adminByChiefdom,
-  USERS_BY_DISTRICT_ADMIN: PROTECTED_ROUTES.userByChiefdom,
+  ADMINS_BY_CHIEFDOM: PROTECTED_ROUTES.adminByChiefdom,
+  USERS_BY_CHIEFDOM: PROTECTED_ROUTES.userByChiefdom,
 
   HEALTH_FACILITY_SUMMARY: PROTECTED_ROUTES.healthFacilitySummary,
-  ADMINS_BY_CHIEFDOM_ADMIN: PROTECTED_ROUTES.adminByHealthFacility,
-  USERS_BY_CHIEFDOM_ADMIN: PROTECTED_ROUTES.userByHealthFacility,
-
-  USERS_BY_HEALTH_FACILITY_ADMIN: PROTECTED_ROUTES.userByHealthFacility
+  ADMINS_BY_HEALTH_FACILITY: PROTECTED_ROUTES.adminByHealthFacility,
+  USERS_BY_HEALTH_FACILITY: PROTECTED_ROUTES.userByHealthFacility
 };
 
 export const regionRoutesWithSideMenu = [PROTECTED_ROUTES.region, PROTECTED_ROUTES.regionSummary];

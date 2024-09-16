@@ -1,9 +1,6 @@
 import regionReducer, { initialState } from '../reducer';
 import * as REGION_TYPES from '../actionTypes';
 import MOCK_DATA_CONSTANTS, { MOCK_REGION_DETAIL } from '../../../tests/mockData/regionDataConstants';
-import regionReducer, { initialState } from '../reducer';
-import * as REGION_TYPES from '../actionTypes';
-import MOCK_DATA_CONSTANTS, { MOCK_REGION_DETAIL } from '../../../tests/mockData/regionDataConstants';
 
 describe('Region Reducer', () => {
   let mainInitialState: any;

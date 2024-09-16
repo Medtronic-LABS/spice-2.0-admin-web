@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { IComponentConfig } from '../types/ComponentConfig';
 import { IComponentConfig as IRegionComponentConfig } from '../types/CustomizationComponentConfig';
-import { IComponentConfig as IRegionComponentConfig } from '../types/CustomizationComponentConfig';
 import { FormApi } from 'final-form';
 import { getConfigByViewType } from '../utils/FieldUtils';
 import {

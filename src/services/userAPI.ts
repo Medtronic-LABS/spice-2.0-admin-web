@@ -34,13 +34,14 @@ export const updateUser = (payload: IUpdateUserDetail) =>
     data: payload
   });
 
-export const fetchUserByEmail = (email: string, tenantId: number | undefined) =>
+export const fetchUserByEmail = (email: string, parentOrganizationId?: string, ignoreTenantId?: string) =>
   axios({
     method: 'POST',
     url: '/user-service/user/validate-user',
     data: {
       email,
-      tenantId
+      parentOrganizationId,
+      ignoreTenantId
     }
   });
 
@@ -130,6 +131,20 @@ export const fetchLockedUsers = (
       skip,
       limit,
       roleType: role,
-      ...(search ? { searchTerm: search } : {})
+      searchTerm: search || ''
     }
+  });
+
+export const unlockUsers = (id: string) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/unlock',
+    data: { id }
+  });
+
+export const fetchCommunityListRequest = (countryId: number) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/community-units',
+    data: { countryId }
   });

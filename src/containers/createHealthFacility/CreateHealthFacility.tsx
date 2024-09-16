@@ -23,6 +23,7 @@ import {
   workflowLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { roleSelector, countryIdSelector } from '../../store/user/selectors';
+import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IMatchParams {
   regionId?: string;
@@ -52,14 +53,28 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   });
 
   const [autoFetch, setAutoFetchState] = useState([] as any[]);
+  const [selectedchiefdomTenantId, setSelectedchiefdomTenantId] = useState();
 
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const country = useSelector(countryIdSelector);
-  const countryId = Number(regionId || country?.id);
+  const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
   const {
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
+
+  useEffect(() => {
+    formInstance?.subscribe(
+      (formState) => {
+        const nextchiefdomTenantId = formState?.values?.healthFacility?.chiefdom?.tenantId || '';
+        if (nextchiefdomTenantId !== selectedchiefdomTenantId) {
+          setSelectedchiefdomTenantId(nextchiefdomTenantId);
+        }
+      },
+      { values: true }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(clearAllDependentData());
@@ -159,7 +174,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     <>
       <Form
         onSubmit={onSubmit}
-        initialValues={submittedData.data}
+        initialValues={{ ...submittedData.data }}
         mutators={{
           ...arrayMutators,
           resetFields
@@ -180,7 +195,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                         <HealthFacilityDetailsForm
                           formName='healthFacility'
                           form={formInstance}
-                          data={submittedData.data.healthFacility}
+                          data={{ ...submittedData.data.healthFacility }}
                         />
                       </FormContainer>
                     </div>
@@ -195,8 +210,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           entityName='healthFacility'
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
-                          parentOrgId={chiefdomId}
-                          ignoreTenantId={tenantId}
+                          parentOrgId={chiefdomId ?? selectedchiefdomTenantId}
+                          ignoreTenantId={''}
                           isSiteUser={true}
                         />
                         <></>

@@ -121,9 +121,10 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
 
   useEffect(() => {
     if (currentphoneNumber && countryCode) {
-      validatePhoneNumberFn(currentphoneNumber.current, true);
+      validatePhoneNumberFn(form?.getState().values[formName][index]?.phoneNumber, true);
     }
   }, [currentphoneNumber, countryCode]);
+
   return (
     <Field
       name={`${name}.${fieldName}`}

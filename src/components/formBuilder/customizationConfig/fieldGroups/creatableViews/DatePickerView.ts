@@ -4,13 +4,9 @@ import { IBaseFields } from '../../../types/BaseFields';
 import { IComponentConfig, IFieldViewType } from '../../../types/CustomizationComponentConfig';
 
 export interface IDatePickerFields extends IBaseFields {
-  isDefault?: boolean;
-  isDefault?: boolean;
+  isNotDefault?: boolean;
   startDate?: string;
   endDate?: string;
-  disableFutureDate?: boolean;
-  minDays?: number | null;
-  maxDays?: number | null;
 }
 
 const getEmptyData = (): IDatePickerFields => ({
@@ -19,26 +15,28 @@ const getEmptyData = (): IDatePickerFields => ({
   title: '',
   fieldName: '',
   family: '',
+  isSummary: false,
   isMandatory: false,
   isEnabled: true,
+  startDate: '',
+  endDate: '',
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-  isDefault: false,
-  disableFutureDate: false,
-  minDays: null,
-  maxDays: null
+  isNotDefault: true
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
   title: {},
   fieldName: {},
   isMandatory: {},
-  disableFutureDate: {},
-  minDays: {},
-  maxDays: {}
+  isEnabled: {},
+  visibility: {},
+  startDate: {},
+  endDate: {}
 };
 
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
+  json.startDate = json.startDate?.label ? json.startDate.label : json.startDate;
   return json;
 };
 

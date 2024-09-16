@@ -19,16 +19,6 @@ export const unitMeasurementOptions = [
   { label: '%', key: '%' }
 ];
 
-export const resourceOptions = [
-  { label: 'Boolean', key: 'Boolean' },
-  { label: 'Code', key: 'Code' },
-  { label: 'Date', key: 'Date' },
-  { label: 'Integer', key: 'Integer' },
-  { label: 'Quantity', key: 'Quantity' },
-  { label: 'Range', key: 'Range' },
-  { label: 'String', key: 'String' }
-];
-
 export const baseFieldMeta: IBaseFieldMeta = {
   family: {
     label: 'Family',
@@ -56,41 +46,16 @@ export const baseFieldMeta: IBaseFieldMeta = {
     required: true,
     component: 'TEXT_FIELD'
   },
-  code: {
-    order: 1.4,
-    label: 'Code',
-    type: 'text',
-    required: false,
-    component: 'TEXT_FIELD'
-  },
-  url: {
-    order: 1.5,
-    label: 'URL',
-    type: 'text',
-    required: false,
-    component: 'TEXT_FIELD'
-  },
+  isSummary: { order: 0, label: 'Shown In Summary', component: 'CHECKBOX' },
   action: { order: 1.6, label: 'Action', type: 'text', required: false, component: 'TEXT_FIELD' },
-  resource: {
-    order: 1.7,
-    label: 'Field Type',
-    options: resourceOptions,
-    required: true,
-    labelKey: 'label',
-    valueKey: 'key',
+  unitMeasurement: {
+    order: 2,
+    label: 'Unit Measurement',
+    options: unitMeasurementOptions,
     component: 'SELECT_INPUT'
   },
-  unitList: {
-    order: 1.7,
-    label: 'Unit Types',
-    required: true,
-    isMulti: true,
-    labelKey: 'name',
-    valueKey: 'name',
-    component: 'SELECT_INPUT'
-  },
-  minValue: { order: 2.1, label: 'Min Value', type: 'number', required: false, component: 'TEXT_FIELD' },
-  maxValue: { order: 2.2, label: 'Max Value', type: 'number', required: false, component: 'TEXT_FIELD' },
+  minValue: { order: 2.1, label: 'Min Value', type: 'number', required: true, component: 'TEXT_FIELD' },
+  maxValue: { order: 2.2, label: 'Max Value', type: 'number', required: true, component: 'TEXT_FIELD' },
   minLength: { order: 2.3, label: 'Min Length', type: 'number', required: true, component: 'TEXT_FIELD' },
   maxLength: { order: 2.4, label: 'Max Length', type: 'number', required: true, component: 'TEXT_FIELD' },
   contentLength: { order: 2.5, label: 'Field Length', type: 'number', required: true, component: 'TEXT_FIELD' },
@@ -101,6 +66,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
     order: 1.3,
     label: 'Input Type',
     options: [
+      { key: InputTypes.PHONE_NUMBER, label: 'Phone number' },
       { key: InputTypes.NUMBER, label: 'Number' },
       { key: InputTypes.DECIMAL, label: 'Decimal values' },
       { key: InputTypes.DEFAULT, label: 'Text' }
@@ -127,28 +93,22 @@ export const baseFieldMeta: IBaseFieldMeta = {
     label: 'Target Fields',
     component: 'TARGET_VIEWS'
   },
-  minDays: {
-    order: 5.3,
-    label: 'Min Days',
+  defaultValue: {
+    order: 5.2,
+    label: 'Default Value',
     required: false,
-    type: 'number',
-    component: 'TEXT_FIELD'
-  },
-  maxDays: {
-    order: 5.4,
-    label: 'Max Days',
-    required: false,
-    type: 'number',
-    component: 'TEXT_FIELD'
+    labelKey: 'name',
+    valueKey: 'id',
+    component: 'SELECT_INPUT'
   },
   startDate: {
-    order: 5.5,
+    order: 5.3,
     label: 'Start Date',
     required: false,
     component: 'DATE_PICKER'
   },
   endDate: {
-    order: 5.6,
+    order: 5.4,
     label: 'End Date',
     required: false,
     component: 'DATE_PICKER'
@@ -226,14 +186,14 @@ export const baseFieldMeta: IBaseFieldMeta = {
   selectAll: { order: 14.0, label: 'Select All Options', component: 'CHECKBOX' },
   isMandatory: { order: 14.1, label: 'Is Mandatory', component: 'CHECKBOX' },
   isEnabled: { order: 15, label: 'Is Enabled', component: 'CHECKBOX' },
-  isResult: { order: 15.6, label: 'Is Result', component: 'CHECKBOX' },
+  isEnrollment: { order: 15.1, label: 'Is Enrollment', component: 'CHECKBOX' },
   disableFutureDate: { order: 15.2, label: 'Disable Future Dates', component: 'CHECKBOX' },
   isNeedAction: { order: 15.3, label: 'Action Needed', component: 'CHECKBOX' },
   isNew: { order: 0, label: 'isNew', component: 'CHECKBOX' },
   isEditable: { order: 15.4, label: 'Is Editable', component: 'CHECKBOX' },
   instructions: { order: 15.5, label: 'Instructions', component: 'INSTRUCTIONS' },
-  ranges: { order: 16.0, label: 'Ranges', component: 'RANGES_CONFIG' },
-  // condition: { order: 16.0, label: 'Condition', component: 'CONDITION_CONFIG' },
+  readOnly: { order: 15.6, label: 'readOnly', component: 'CHECKBOX' },
+  condition: { order: 16.0, label: 'Condition', component: 'CONDITION_CONFIG' },
   familyOrder: {
     order: 0,
     type: 'number',

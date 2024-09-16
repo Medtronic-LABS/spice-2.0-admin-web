@@ -51,13 +51,6 @@ export interface IOrganizations {
   parentOrganizationId: number;
 }
 
-export interface IOrganizations {
-  id: number;
-  name: string;
-  formName: string;
-  parentOrganizationId: number;
-}
-
 export interface IUser {
   userId: string;
   email: string;
@@ -97,10 +90,6 @@ export interface IUserDetails extends Omit<IUserDetail, 'timezone'> {
   timezone: string;
   cultureId?: number;
 }
-export interface IUserDetails extends Omit<IUserDetail, 'timezone'> {
-  timezone: string;
-  cultureId?: number;
-}
 export interface IEditUserDetail extends IUserDetail {
   country?: ICountry;
 }
@@ -110,27 +99,6 @@ export interface ICountry {
   phoneNumberCode?: string;
   name?: string;
   tenantId?: number;
-}
-
-export interface IUserState {
-  isLoggedIn: boolean;
-  loggingIn: boolean;
-  loggingOut: boolean;
-  user: IUser;
-  defaultRole: string[];
-  userRoles: IGroupRoles;
-  isRolesLoading: boolean;
-  error: string | null;
-  loading: boolean;
-  cultureListLoading?: boolean;
-  initializing: boolean;
-  isPasswordSet: boolean;
-  email: string;
-  errorMessage: string;
-  showLoader: boolean;
-  token: string;
-  userTenantId: string;
-  isResetPasswordLoading: boolean;
 }
 
 export type ILoginSuccessPayload = IUser;
@@ -396,7 +364,7 @@ export interface IUserDetail {
   redRisk?: boolean;
   isUpdated?: boolean;
   roleName?: string | ISelectOption;
-  countryCode?: string;
+  countryCode?: IPhoneNumberCode;
   village?: string;
 }
 
@@ -435,6 +403,12 @@ export interface IUserState {
   totalLockedUsers?: number;
   userTenantId: string;
   cultureList?: ICulture[];
+  isResetPasswordLoading: boolean;
+  defaultRole: string[];
+  userRoles: IGroupRoles;
+  isRolesLoading: boolean;
+  communityList: [];
+  islockedUsersLoading?: boolean;
 }
 
 export interface ILoginFailurePayload {

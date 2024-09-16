@@ -24,7 +24,6 @@ import {
   updateHFDetailsRequest,
   updateHFUserRequest,
   validateLinkedRestrictionsRequest
-  validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
   IHFUserGet,
@@ -105,7 +104,13 @@ export const formatHFUserData = (
       let spiceInsightsIds: number[] = [];
       let spiceId: number[] = [];
       if (user.role) {
-        spiceId = [user.role.id];
+        spiceId = Array.isArray(user.roles)
+          ? (user.roles || [])
+              .map((id: any) => {
+                return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+              })
+              .flat()
+          : [user.role.id];
       }
       if (user.roles) {
         spiceInsightsIds = user.roles
@@ -114,7 +119,7 @@ export const formatHFUserData = (
       }
       roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     }
-    const isSuperAdmin = user.roles.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
+    const isSuperAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
     return {
       id: Number(user?.id),
       firstName: user.firstName,
@@ -127,6 +132,8 @@ export const formatHFUserData = (
       country: isSuperAdmin ? null : { id: Number(countryId) },
       tenantId: user?.healthfacility?.tenantId
         ? Number(user.healthfacility.tenantId)
+        : isSuperAdmin
+        ? null
         : Number(tenantId) || user.tenantId,
       supervisorId: Number(user.supervisor?.id),
       roleIds,
@@ -242,7 +249,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
         tenantBased: true,
-        siteUsers: true,
+        isSiteUsers: null,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();
@@ -509,6 +516,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
         isSiteUser={true}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
+        parentOrgId={healthFacility?.chiefdom?.tenantId}
+        ignoreTenantId={tenantId}
       />
     );
   };

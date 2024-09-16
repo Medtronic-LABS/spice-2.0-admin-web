@@ -4,8 +4,6 @@ import PlusIcon from '../../../../assets/images/plus_blue.svg';
 import styles from '../../styles/TextInputArray.module.scss';
 import { matchPath, useLocation } from 'react-router';
 import { PROTECTED_ROUTES } from '../../../../constants/route';
-import { matchPath, useLocation } from 'react-router';
-import { PROTECTED_ROUTES } from '../../../../constants/route';
 
 interface ITextInputArray {
   onChange?: (value: string[]) => void;

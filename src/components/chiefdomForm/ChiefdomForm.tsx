@@ -6,7 +6,7 @@ import { useParams } from 'react-router';
 
 import SelectInput from '../formFields/SelectInput';
 import TextInput from '../formFields/TextInput';
-import { fetchDistrictListDetailReq, fetchDistrictOptionsRequest } from '../../store/district/actions';
+import { fetchDistrictDetailReq, fetchDistrictOptionsRequest } from '../../store/district/actions';
 import {
   districtOptionsLoadingSelector,
   districtOptionsSelector,
@@ -16,6 +16,7 @@ import {
 import { composeValidators, required, validateEntityName } from '../../utils/validation';
 import { roleSelector } from '../../store/user/selectors';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import TagInput from '../formBuilder/components/fieldUI/TagInput';
 
 interface IChiefdomFormProps {
   nestingKey?: string;
@@ -54,7 +55,7 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
   useEffect(() => {
     if (showDistrictField && !isEdit && districtId && district?.id !== districtId) {
       dispatch(
-        fetchDistrictListDetailReq({
+        fetchDistrictDetailReq({
           tenantId,
           id: districtId
         })
@@ -117,6 +118,24 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
                   label={districtSName}
                   errorLabel={districtSName.toLocaleLowerCase()}
                   error={(meta.touched && meta.error) || undefined}
+                />
+              );
+            }}
+          />
+        </div>
+      )}
+      {!isEdit && (
+        <div className='col-12'>
+          <Field
+            name={'village'}
+            type='text'
+            validate={composeValidators(required, validateEntityName)}
+            render={({ input, meta }) => {
+              return (
+                <TagInput
+                  {...input}
+                  label={`Villages`}
+                  error={!input.value.length && meta.touched ? 'Please add the village name' : ''}
                 />
               );
             }}

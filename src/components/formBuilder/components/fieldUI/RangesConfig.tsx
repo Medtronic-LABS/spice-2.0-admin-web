@@ -3,7 +3,6 @@ import { FieldArray } from 'react-final-form-arrays';
 import BinIcon from '../../../../assets/images/bin.svg';
 import PlusIcon from '../../../../assets/images/plus_blue.svg';
 import CustomTooltip from '../../../tooltip';
-import CustomTooltip from '../../../tooltip';
 import { required } from '../../../../utils/validation';
 import styles from '../../styles/FormBuilder.module.scss';
 import SelectFieldWrapper from './SelectFieldWrapper';
@@ -157,8 +156,7 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
       valueKey: 'id',
       options: [
         { name: 'Male', id: 'Male' },
-        { name: 'Female', id: 'Female' },
-        { name: 'Both', id: 'Both' }
+        { name: 'Female', id: 'Female' }
       ],
       required: true,
       disabledValidation: true,
@@ -251,7 +249,6 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
                 }
                 ranges.push(Object.keys(errors).length ? errors : null);
               });
-              if (ranges.every((element: any) => element === null)) {
               if (ranges.every((element: any) => element === null)) {
                 return;
               }

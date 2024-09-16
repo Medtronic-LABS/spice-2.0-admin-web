@@ -20,7 +20,7 @@ export const fetchCustomizationForm = ({
 }: IFetchCustomizationFormRequest) =>
   axios({
     method: 'POST',
-    url: `/admin-service/${countyId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/details`,
+    url: `/admin-service/${districtId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/details`,
     data: {
       tenantId,
       type: formType,
@@ -52,7 +52,7 @@ export const updateCustomizationForm = ({
 }: ICustomizeFormRequest) =>
   axios({
     method: formId ? 'PUT' : 'POST',
-    url: `/admin-service/${countyId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/${
+    url: `/admin-service/${districtId || clinicalWorkflowId ? 'workflow' : 'country'}-customization/${
       formId ? 'update' : 'create'
     }`,
     data: {

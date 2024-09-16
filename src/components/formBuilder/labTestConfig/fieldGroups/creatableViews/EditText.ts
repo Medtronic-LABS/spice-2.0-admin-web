@@ -37,7 +37,6 @@ const getEmptyData = (): IEditTextFields => ({
   errorMessage: '',
   inputType: -1,
   isDefault: false,
-  isDefault: false,
   minLength: undefined,
   maxLength: undefined,
   ranges: []

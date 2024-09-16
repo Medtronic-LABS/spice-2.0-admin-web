@@ -8,37 +8,10 @@ import Breadcrumb from '../breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 import SideMenu from '../sideMenu/SideMenu';
 import styles from './AppLayout.module.scss';
-import APPCONSTANTS from '../../constants/appConstants';
 
 interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
 }
-
-const routesWithSideMenu = [
-  { route: PROTECTED_ROUTES.regionSummary },
-  { route: PROTECTED_ROUTES.customizationByRegion },
-  { route: PROTECTED_ROUTES.districtSummary, disabledRoles: [APPCONSTANTS.ROLES.DISTRICT_ADMIN] },
-  { route: PROTECTED_ROUTES.districtByRegion },
-  { route: PROTECTED_ROUTES.chiefdomByRegion },
-  { route: PROTECTED_ROUTES.chiefdomByDistrict },
-  { route: PROTECTED_ROUTES.chiefdomSummary, disabledRoles: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN] },
-  { route: PROTECTED_ROUTES.healthFacilityByRegion },
-  { route: PROTECTED_ROUTES.healthFacilityByDistrict },
-  { route: PROTECTED_ROUTES.healthFacilityByChiefdom },
-  { route: PROTECTED_ROUTES.healthFacilitySummary },
-  { route: PROTECTED_ROUTES.adminByRegion },
-  { route: PROTECTED_ROUTES.adminByDistrict },
-  { route: PROTECTED_ROUTES.adminByChiefdom },
-  { route: PROTECTED_ROUTES.adminByHealthFacility },
-  { route: PROTECTED_ROUTES.userByRegion },
-  { route: PROTECTED_ROUTES.userByDistrict },
-  { route: PROTECTED_ROUTES.userByChiefdom },
-  { route: PROTECTED_ROUTES.userByHealthFacility },
-  { route: PROTECTED_ROUTES.labTestByRegion },
-  { route: PROTECTED_ROUTES.medicationByRegion },
-  { route: PROTECTED_ROUTES.programByRegion },
-  { route: PROTECTED_ROUTES.workflowByRegion }
-];
 
 const routesWithoutBreadcrumb = [
   PROTECTED_ROUTES.regionDashboard,

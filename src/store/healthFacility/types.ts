@@ -26,9 +26,6 @@ export interface IHealthFacilityState {
   unlinkedVillagesList: IVillages[];
   unlinkedVillagesTotal: number;
   unlinkedVillagesLoading: boolean;
-  unlinkedVillagesList: IVillages[];
-  unlinkedVillagesTotal: number;
-  unlinkedVillagesLoading: boolean;
   villagesList: IVillages[];
   villagesTotal: number;
   villagesLoading: boolean;
@@ -49,7 +46,7 @@ export interface IHealthFacilityState {
 export interface IHFDashboard {
   id: number;
   name: string;
-  siteType: string;
+  type: string;
   tenantId: number;
   chiefdom?: string;
 }
@@ -85,7 +82,6 @@ export interface IHealthFacility {
   longitude: string;
   postalCode: string;
   language: string;
-  tenantId: number | string;
   tenantId: number | string;
   peerSupervisors?: IPeerSupervisor[];
   linkedVillages: IVillages[];
@@ -146,7 +142,6 @@ export interface IFetchHFListSuccessPayload {
 export interface IFetchHFListRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST;
   countryId: number;
-  tenantIds?: number[];
   skip: number;
   limit: number | null;
   searchTerm?: string;
@@ -229,7 +224,7 @@ export interface IHFUserPost {
   username: string;
   phoneNumber: string;
   country?: { id: number } | null;
-  countryCode: string;
+  countryCode?: string;
   tenantId?: number; // healthFacility tenantId
   roleIds: number[];
   district?: string | number;
@@ -452,7 +447,7 @@ export interface IFetchHFUserListRequest {
   userBased?: boolean;
   tenantBased?: boolean;
   roleNames?: string[];
-  siteUsers?: boolean;
+  isSiteUsers?: boolean | null;
   tenantIds?: string[];
   successCb?: (data: IHFUserGet[], total: number) => void;
   failureCb?: (error: Error) => void;
@@ -540,7 +535,8 @@ export interface IFetchChiefdomListFailure {
   error: Error;
 }
 
-interface IVillagesRequestPayload {
+export interface IFetchVillagesListRequest {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF;
   countryId: number;
   districtId: number;
   chiefdomId: number;
@@ -585,8 +581,21 @@ export interface IFetchUnlinkedVillagesFailure {
   type: typeof ACTION_TYPES.FETCH_UNLINKED_VILLAGES_FAILURE;
   error: Error;
 }
+
+export interface IClearHFFormData {
+  type: typeof ACTION_TYPES.CLEAR_HF_FORM_DATA;
+}
 export interface IFetchVillagesListFromHFRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_FROM_HF_REQUEST;
+  countryId: number;
+  districtId: number;
+  chiefdomId: number;
+  successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchVillagesListUserLinked {
+  type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED;
   tenantIds: number[];
   userId?: number;
   successCb?: (data: { list: IVillages[]; hfTenantIds: number[] }) => void;
@@ -715,8 +724,12 @@ export interface IFetchCountryListFailure {
   type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_FAILURE;
 }
 
-export interface IClearSiteSummary {
+export interface IClearHFSummary {
   type: typeof ACTION_TYPES.CLEAR_HF_SUMMARY;
+}
+
+export interface IClearHFDropdown {
+  type: typeof ACTION_TYPES.CLEAR_HF_DROPDOWN_OPTIONS;
 }
 
 export type IFetchCultureListSuccessPayload = ICulture[];
@@ -798,4 +811,6 @@ export type HealthFacilityActions =
   | IClearHFDropdown
   | IValidateLinkedRestrictions
   | IValidateLinkedRestrictionsSuccess
-  | IValidateLinkedRestrictionsFailure;
+  | IFetchHFUserListClear
+  | IValidateLinkedRestrictionsFailure
+  | IClearHFFormData;

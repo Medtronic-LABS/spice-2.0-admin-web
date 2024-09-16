@@ -4,17 +4,13 @@ import UserFormMeta from './userFormMeta';
 import APPCONSTANTS from '../../constants/appConstants';
 
 const useUserFormUtils = () => {
-  const { mobileRoles, isCHPRole } = UserFormMeta();
+  const { mobileRoles, isCHPRole, isHFAdminRole } = UserFormMeta();
   const isCHASelected = useCallback(
     (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
     [mobileRoles]
   );
 
   const isCHPSelected = useCallback(
-    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
-    [isCHPRole]
-  );
-  const isDistrictSelected = useCallback(
     (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
     [isCHPRole]
   );
@@ -42,7 +38,19 @@ const useUserFormUtils = () => {
       }))
       .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
 
-  return { isCHASelected, isCHPSelected, isRoleExists, disableSiteRoles, siteRolesChange, getSuiteAccessList };
+  const isHFAdminSelected = useCallback(
+    (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => isHFAdminRole.includes(userRole.name)),
+    [isHFAdminRole]
+  );
+  return {
+    isCHASelected,
+    isCHPSelected,
+    isRoleExists,
+    disableSiteRoles,
+    siteRolesChange,
+    getSuiteAccessList,
+    isHFAdminSelected
+  };
 };
 
 export default useUserFormUtils;

@@ -22,16 +22,21 @@ export const SiteUserForm = (props: any) => {
     healthFacilityList,
     hfLoading,
     formDetails,
-    role
+    role,
+    isHFAdminSelected,
+    isHFCreate
   } = props;
-
+  const { form, formName } = formDetails;
+  const isHFSelected =
+    isSiteUser || isHFCreate ? isHFAdminSelected(form?.getState()?.values?.users?.[index]?.role) : [];
   const { showCulture, showRedRisk, showDistrict, showChiefdom, showHealthFacility } = useFieldVisibility(
     isSiteUser,
     isAdminForm,
     selectedAdmins,
     role,
     formDetails,
-    index
+    index,
+    isHFSelected
   );
 
   return (
@@ -104,6 +109,11 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={districtDetails.loading}
                 error={isError(meta)}
                 isModel={true}
+                onChange={(value: any) => {
+                  form.change(`${formName}[0].chiefdom`, undefined);
+                  form.change(`${formName}[0].healthfacility`, undefined);
+                  input.onChange(value);
+                }}
               />
             )}
           />
@@ -126,6 +136,10 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={chiefdomDetails.loading}
                 error={isError(meta)}
                 isModel={true}
+                onChange={(value: any) => {
+                  form.change(`${formName}[0].healthfacility`, undefined);
+                  input.onChange(value);
+                }}
               />
             )}
           />

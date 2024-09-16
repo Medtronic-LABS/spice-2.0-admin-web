@@ -26,15 +26,11 @@ export const unitMeasurementOptions = [
   { label: '%', key: '%' }
 ];
 
-export const resourceOptions = [
-  { label: 'Boolean', key: 'Boolean' },
-  { label: 'Code', key: 'Code' },
-  { label: 'Date', key: 'Date' },
-  { label: 'Integer', key: 'Integer' },
-  { label: 'Quantity', key: 'Quantity' },
-  { label: 'Range', key: 'Range' },
-  { label: 'String', key: 'String' }
-];
+export const resourceOptions: IResourceOptions = {
+  [InputTypes.DECIMAL]: [{ label: 'Quantity', key: 'Quantity' }],
+  [InputTypes.NUMBER]: [{ label: 'Quantity', key: 'Quantity' }],
+  [InputTypes.DEFAULT]: [{ label: 'String', key: 'String' }]
+};
 
 export const baseFieldMeta: IBaseFieldMeta = {
   family: {
@@ -81,7 +77,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
   resource: {
     order: 1.7,
     label: 'Field Type',
-    options: resourceOptions,
+    options: resourceOptions as IResourceOptions,
     required: true,
     labelKey: 'label',
     valueKey: 'key',

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Route, Switch, Redirect } from 'react-router-dom';
 
-import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
+import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
 import Login from './containers/authentication/Login';
 import { AppLayout } from './components/appLayout/AppLayout';
 
@@ -25,7 +25,6 @@ import ResetPassword from './containers/authentication/ResetPassword';
 import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
 import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
 import CreateHealthFacility from './containers/createHealthFacility/CreateHealthFacility';
-import CreateHealthFacility from './containers/createHealthFacility/CreateHealthFacility';
 import MedicationList from './containers/medication/MedicationList';
 import AddMedication from './containers/medication/AddMedication';
 import MyProfile from './containers/myProfile/MyProfile';
@@ -35,17 +34,17 @@ import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
 import { goToUrl } from './utils/routeUtil';
 import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
-import CountyList from './containers/county/CountyList';
-import CreateAccount from './containers/createCounty/CreateCounty';
-import CountySummary from './containers/county/CountySummary';
-import CountyDashboard from './containers/county/CountyDashboard';
+import DistrictList from './containers/district/DistrictList';
+import CreateDistrict from './containers/createDistrict/CreateDistrict';
+import DistrictSummary from './containers/district/DistrictSummary';
+import DistrictDashboard from './containers/district/DistrictDashboard';
 import LockedUsers from './containers/lockedUsers/LockedUsers';
 import UserList from './containers/user/UserList';
 import Admins from './containers/admins/AdminList';
-import SubCountyDashboard from './containers/subCounty/SubCountyDashboard';
-import CreateSubCounty from './containers/createSubCounty/CreateSubCounty';
-import SubCountyList from './containers/subCounty/SubCountyList';
-import SubCountySummary from './containers/subCounty/SubCountySummary';
+import ChiefdomDashboard from './containers/chiefdom/ChiefdomDashboard';
+import CreateChiefdom from './containers/createChiefdom/CreateChiefdom';
+import ChiefdomList from './containers/chiefdom/ChiefdomList';
+import ChiefdomSummary from './containers/chiefdom/ChiefdomSummary';
 import RegionCustomization from './containers/region/RegionCustomization';
 import RegionFormCustomization from './containers/region/RegionFormCustomization';
 import ProgramList from './containers/program/ProgramList';
@@ -63,18 +62,11 @@ interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
 
-export const {
-  SUPER_USER,
-  SUPER_ADMIN,
-  HEALTH_FACILITY_ADMIN,
-  REGION_ADMIN,
-  ACCOUNT_ADMIN,
-  OPERATING_UNIT_ADMIN,
-  SITE_ADMIN
-} = APPCONSTANTS.ROLES;
+export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } =
+  APPCONSTANTS.ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
 export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
-export const SU_SA_RA_AA = [...SU_SA_RA, ACCOUNT_ADMIN];
+export const SU_SA_RA_DA = [...SU_SA_RA, DISTRICT_ADMIN];
 export const SU_SA_HFA = [...SU_SA, HEALTH_FACILITY_ADMIN];
 export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
 export const CDA_HFA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
@@ -104,7 +96,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.lockedUsers,
       exact: true,
       component: LockedUsers,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+      authorisedRoles: Object.values(APPCONSTANTS.ROLES)
     },
     {
       path: PROTECTED_ROUTES.regionDashboard,
@@ -146,7 +138,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.districtSummary,
       exact: true,
       component: DistrictSummary,
-      authorisedRoles: SU_SA_RA_DA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.chiefdomDashboard,
@@ -158,7 +150,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.chiefdomSummary,
       exact: true,
       component: ChiefdomSummary,
-      authorisedRoles: SU_SA_RA_DA_CDA
+      authorisedRoles: SU_SA_RA_DA
     },
     {
       path: PROTECTED_ROUTES.chiefdomByRegion,
@@ -302,7 +294,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.adminByHealthFacility,
       exact: true,
       component: Admins,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+      authorisedRoles: SU_SA_RA_DA_CDA
     },
     {
       path: PROTECTED_ROUTES.createMedication,
@@ -370,11 +362,6 @@ const publicRoutes = [
     path: PUBLIC_ROUTES.resetPassword,
     exact: true,
     component: ResetPassword
-  },
-  {
-    path: PUBLIC_ROUTES.privacyPolicy,
-    exact: true,
-    component: PrivacyPolicy
   }
 ];
 export const AppRoutes = () => {
@@ -391,9 +378,7 @@ export const AppRoutes = () => {
 
   useEffect(() => {
     if (isLoggedIn && url.current) {
-      const data: any = decryptData(url.current);
-      goToUrl(data?.redirectUrl);
-      url.current = '';
+      goToUrl(url.current);
     }
   }, [data, isLoggedIn, url]);
 

@@ -38,7 +38,10 @@ const Region = (): React.ReactElement => {
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
-  const countyModuleName = NAME_CONSTANTS.county;
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
 
   const onDownloadClick = () => {
     dispatch(
@@ -72,7 +75,7 @@ const Region = (): React.ReactElement => {
     );
 
   const fetchRegionDetails = useCallback(() => {
-    if (regionData?.id) {
+    if (regionId) {
       dispatch(
         regionDetailsRequest({
           countryId: Number(regionId),
@@ -85,11 +88,28 @@ const Region = (): React.ReactElement => {
         })
       );
     }
-  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionData.id]);
+  }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]);
 
   useEffect(() => {
-    fetchRegionDetails();
-  }, [fetchRegionDetails]);
+    if (regionId) {
+      fetchRegionDetails();
+    }
+  }, [dispatch, fetchRegionDetails, listParams, regionId]);
+
+  const getCountryDetails = useCallback(() => {
+    dispatch(
+      fetchCountryDetailReq({
+        id: regionId,
+        tenantId
+      })
+    );
+  }, [dispatch, regionId, tenantId]);
+
+  useEffect(() => {
+    if (regionId && tenantId && !regionDetailsId) {
+      getCountryDetails();
+    }
+  }, [getCountryDetails, regionDetailsId, regionId, tenantId]);
 
   return (
     <>
@@ -127,8 +147,8 @@ const Region = (): React.ReactElement => {
                 columnsDef={[
                   {
                     id: 1,
-                    name: 'countyname',
-                    label: countyModuleName
+                    name: 'districtname',
+                    label: districtSName
                   },
                   {
                     id: 2,

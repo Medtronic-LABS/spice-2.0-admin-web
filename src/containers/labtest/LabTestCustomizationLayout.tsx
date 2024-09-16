@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';

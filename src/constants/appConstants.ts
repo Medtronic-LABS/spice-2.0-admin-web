@@ -1,5 +1,5 @@
 const APPCONSTANTS = {
-  APP_TYPE: 'web',
+  APP_TYPE: 'spice web',
   HASH_ALGORITM: 'sha512',
   AUTHTOKEN: 'at',
   USER_TENANTID: 'uti',
@@ -88,11 +88,11 @@ const APPCONSTANTS = {
   REGION_CREATION_ERROR: 'Unable to create region. Please try after sometime.',
   REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
   REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
-  // ACCOUNT
+
   ACTIVATE_ACCOUNT_CONFIRMATION: 'Are you sure want to activate the account?',
   ACTIVATE_ACCOUNT_TITLE: 'Activate Account',
-  ACCOUNT_ACTIVATE_SUCCESS: 'Account activated successfully.',
-  ACCOUNT_ACTIVATE_FAIL: 'Unable to activate the account. Please try after sometime.',
+  ACTIVATE_ACCOUNT_SUCCESS: 'Account activated successfully.',
+  ACCOUNT_ACCOUNT_FAIL: 'Unable to activate the account. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL: 'Unable to create account workflow module. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS: 'Account workflow module updated successfully.',
@@ -102,21 +102,43 @@ const APPCONSTANTS = {
   ACCOUNT_WORKFLOW_DELETE_SUCCESS: 'Account workflow module deleted successfully.',
   ACCOUNT_WORKFLOW_DELETE_ERROR: 'Unable to delete the account workflow. Please try after sometime.',
   ACCOUNT_WORKFLOW_ALREADY_EXISTS: 'Account workflow name already exists.',
-  ACCOUNT_UPDATE_SUCCESS: 'Account summary updated successfully.',
-  ACCOUNT_UPDATE_FAIL: 'Unable to update account summary. Please try after sometime.',
-  ACCOUNT_DEACTIVATE_SUCCESS: 'Account deactivated successfully.',
-  ACCOUNT_DEACTIVATE_FAIL: 'Unable to deactivate the account. Please try after sometime.',
-  ACCOUNT_CREATION_SUCCESS: 'Account created successfully.',
-  ACCOUNT_CREATION_FAIL: 'Unable to create account. Please try after sometime.',
-  ACCOUNT_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete account admin?',
-  ACCOUNT_ADMIN_DELETE_TITLE: 'Delete Account Admin',
-  ACCOUNT_DETAIL_FETCH_ERROR: 'Unable to load account summary. Please try after sometime.',
-  ACCOUNT_ADMIN_CREATE_SUCCESS: 'Account admin added successfully.',
-  ACCOUNT_ADMIN_CREATE_FAIL: 'Unable to add account admin. Please try after sometime',
-  ACCOUNT_ADMIN_UPDATE_SUCCESS: 'Account admin updated successfully.',
-  ACCOUNT_ADMIN_UPDATE_FAIL: 'Unable to update account admin. Please try after sometime',
-  ACCOUNT_ADMIN_DELETE_SUCCESS: 'Account admin deleted successfully.',
-  ACCOUNT_ADMIN_DELETE_FAIL: 'Unable to delete account admin. Please try after sometime.',
+  // DISTRICT
+  DISTRICT_UPDATE_SUCCESS: 'Module_Name name updated successfully.',
+  DISTRICT_UPDATE_FAIL: 'Unable to update module_name summary. Please try after sometime.',
+  DISTRICT_DEACTIVATE_SUCCESS: 'Module_Name deactivated successfully.',
+  DISTRICT_DEACTIVATE_FAIL: 'Unable to deactivate the module_name. Please try after sometime.',
+  DISTRICT_CREATION_SUCCESS: 'Module_Name created successfully.',
+  DISTRICT_CREATION_FAIL: 'Unable to create module_name. Please try after sometime.',
+  DISTRICT_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete module_name admin?',
+  DISTRICT_ADMIN_DELETE_TITLE: 'Delete Module_Name Admin',
+  DISTRICT_DETAIL_FETCH_ERROR: 'Unable to load module_name summary. Please try after sometime.',
+  DISTRICT_ADMIN_CREATE_SUCCESS: 'Module_Name admin added successfully.',
+  DISTRICT_ADMIN_CREATE_FAIL: 'Unable to add module_name admin. Please try after sometime',
+  DISTRICT_ADMIN_UPDATE_SUCCESS: 'Module_name admin updated successfully.',
+  DISTRICT_ADMIN_UPDATE_FAIL: 'Unable to update module_name admin. Please try after sometime',
+  DISTRICT_ADMIN_DELETE_SUCCESS: 'Module_name admin deleted successfully.',
+  DISTRICT_ADMIN_DELETE_FAIL: 'Unable to delete module_name admin. Please try after sometime.',
+  DISTRICT_FETCH_ERROR: 'Unable to load module_name. Please try after sometime.',
+  DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the module_name consent form?',
+  // CHIEFDOM
+  CHIEFDOM_CREATION_SUCCESS: 'Module_Name created successfully.',
+  CHIEFDOM_CREATION_FAIL: 'Unable to create module_name. Please try after sometime.',
+  CHIEFDOM_ADMIN_FETCH_ERROR: 'Unable to load module_name admins. Please try after sometime.',
+  CHIEFDOM_ADMIN_DELETE_SUCCESS: 'Module_Name admin deleted successfully.',
+  CHIEFDOM_ADMIN_DELETE_FAIL: 'Unable to delete module_name admin. Please try after sometime.',
+  CHIEFDOM_ADMIN_UPDATE_FAIL: 'Unable to update module_name admin. Please try after sometime.',
+  CHIEFDOM_ADMIN_UPDATE_SUCCESS: 'Module_Name admin updated successfully.',
+  CHIEFDOM_ADMIN_DELETE_CONFIRMATION: 'Are you sure want to delete the module_name admin?',
+  CHIEFDOM_ADMIN_DELETE_TITLE: 'Delete Module_Name Admin',
+  CHIEFDOM_FETCH_ERROR: 'Unable to load module_names. Please try after sometime.',
+  CHIEFDOM_LIST_FETCH_ERROR: 'Unable to load module_name list. Please try after sometime.',
+  CHIEFDOM_UPDATE_FAIL: 'Unable to update module_name. Please try after sometime.',
+  CHIEFDOM_UPDATE_SUCCESS: 'Module_Name updated successfully.',
+  CHIEFDOM_DELETE_CONFIRMATION: 'Are you sure want to delete the module_name?',
+  CHIEFDOM_DELETE_TITLE: 'Delete Module_Name',
+  CHIEFDOM_DETAIL_FETCH_ERROR: 'Unable to load module_name summary. Please try after sometime.',
+  CHIEFDOM_ADMIN_CREATE_SUCCESS: 'Module_Name admin created successfully.',
+  CHIEFDOM_ADMIN_CREATE_FAIL: 'Unable to create module_name admin. Please try after sometime.',
   // HF
   HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load health facilities. Please try after sometime.',
   HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load health facility users. Please try after sometime.',
@@ -155,7 +177,6 @@ const APPCONSTANTS = {
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
-  SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_CREATE_SUCCESS: 'User details created successfully.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',
@@ -171,6 +192,19 @@ const APPCONSTANTS = {
   USER_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
   USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
   NO_VILLAGE_FOUND: 'No village available. Villages are already linked to other users.',
+  ADD_ANOTHER_USER: 'Add Another User',
+  // Admin
+  ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
+  ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',
+  ADMIN_DETAILS_UPDATE_ERROR: 'Unable to update admin. Please try after sometime.',
+  ADMIN_DETAILS_CREATE_ERROR: 'Unable to create admin. Please try after sometime.',
+  ADMIN_DELETE_TITLE: 'Delete Admin',
+  ADMIN_DELETE_SUCCESS: 'Admin deleted successfully.',
+  ADMIN_DELETE_FAIL: 'Unable to delete the user. Please try after sometime.',
+  ADMIN_DETAIL_FETCH_FAIL: 'Unable to load the user detail. Please try after sometime.',
+  ADMIN_LIST_FETCH_ERROR: 'Unable to load Admins. Please try after sometime.',
+  ADMIN_DELETE_CONFIRMATION: 'Admin will be deleted from all the linked sites. Are you sure to proceed?',
+  ADD_ANOTHER_ADMIN: 'Add Another Admin',
   // MEDICATION
   MEDICATION_CREATION_SUCCESS: 'Medication created successfully.',
   MEDICATION_CREATION_ERROR: 'Unable to create medication. Please try after sometime.',
@@ -229,7 +263,6 @@ const APPCONSTANTS = {
     { value: 'Yes', label: 'Yes' },
     { value: 'No', label: 'No' }
   ],
-  ACCOUNT_FETCH_ERROR: 'Unable to load accounts. Please try after sometime.',
   DEACTIVATED_RECORDS_FETCH_ERROR: 'Unable to load deactivated records. Please try after sometime.',
 
   UNLOCK_USER_SUCCESS: 'User unlocked successfully.',
@@ -303,7 +336,6 @@ const APPCONSTANTS = {
   DEACTIVATE_CONSENT_FAILURE: 'consent form deletion failed. Please try after sometime.',
   DEACTIVATE_CONSENT_NO_DATA: 'consent data not found. Please try after sometime.',
   DELETE_CONSENT_TITLE: 'Delete confirmation',
-  DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the county consent form?',
   FETCH_FORM_META_ERROR: 'Unable to fetch the form meta data. Please try after sometime.',
 
   REGION_CUSTOMIZATION_SCREENS: [
@@ -341,17 +373,63 @@ const APPCONSTANTS = {
 };
 
 export const NAME_CONSTANTS = {
-  region: 'Region',
-  county: 'County',
-  subCounty: 'Sub County',
-  healthFacility: 'Health Facility'
+  // s for singular name
+  // p for plural name
+  region: {
+    s: 'Region',
+    p: 'Regions'
+  },
+  district: {
+    s: 'County',
+    p: 'Counties'
+  },
+  chiefdom: {
+    s: 'Sub County',
+    p: 'Sub Counties'
+  },
+  healthFacility: {
+    s: 'Health Facility',
+    p: 'Health Facilities'
+  }
 };
 
 export const ROLE_LABELS = {
-  [APPCONSTANTS.ROLES.SUPER_USER]: 'Super User',
-  [APPCONSTANTS.ROLES.SUPER_ADMIN]: 'Super Admin',
-  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: 'Admin',
-  [APPCONSTANTS.ROLES.PEER_SUPERVISOR]: 'Peer Supervisor'
+  [APPCONSTANTS.ALL_ROLES.SUPER_USER]: 'Super User',
+  [APPCONSTANTS.ALL_ROLES.SUPER_ADMIN]: 'Super Admin',
+  [APPCONSTANTS.ALL_ROLES.REGION_ADMIN]: 'Region Admin',
+  [APPCONSTANTS.ALL_ROLES.DISTRICT_ADMIN]: 'District Admin',
+  [APPCONSTANTS.ALL_ROLES.CHIEFDOM_ADMIN]: 'Chiefdom Admin',
+  [APPCONSTANTS.ALL_ROLES.HEALTH_COACH]: 'Health Coach',
+  [APPCONSTANTS.ALL_ROLES.HEALTH_SCREENER]: 'Health Screener',
+  [APPCONSTANTS.ALL_ROLES.HRIO]: 'HRIO',
+  [APPCONSTANTS.ALL_ROLES.LAB_TECHNICIAN]: 'Lab Technician',
+  [APPCONSTANTS.ALL_ROLES.COUNSELOR]: 'Counselor',
+  [APPCONSTANTS.ALL_ROLES.NUTRITIONIST]: 'Nutritionist',
+  [APPCONSTANTS.ALL_ROLES.PHARMACIST]: 'Pharmacist',
+  [APPCONSTANTS.ALL_ROLES.PROVIDER]: 'Provider',
+  [APPCONSTANTS.ALL_ROLES.NURSE]: 'Nurse',
+  [APPCONSTANTS.ALL_ROLES.PHYSICIAN_PRESCRIBER]: 'Physician Prescriber',
+  [APPCONSTANTS.ALL_ROLES.REPORT_ADMIN]: 'Report Admin',
+  [APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN]: 'Health Facility Admin'
 };
+
+export const NAMING_VARIABLES = {
+  country: 'country',
+  region: 'region',
+  district: 'district',
+  chiefdom: 'chiefdom',
+  healthFacility: 'healthfacility',
+  redRisk: 'RED_RISK_USER'
+};
+
+export const SIDE_MENU_FETCHING_HIERARCHY = {
+  region: 'SUPER_ADMIN',
+  district: 'REGION_ADMIN',
+  chiefdom: 'DISTRICT_ADMIN',
+  'health-facility': 'CHIEFDOM_ADMIN'
+};
+
+export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
+export const COMMON_INSIGHTS_USERROLE = ['CFR_SITE_USER'];
 
 export default APPCONSTANTS;

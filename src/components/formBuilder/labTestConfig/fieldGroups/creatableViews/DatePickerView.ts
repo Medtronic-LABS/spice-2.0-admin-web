@@ -5,7 +5,6 @@ import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig
 
 export interface IDatePickerFields extends IBaseFields {
   isDefault?: boolean;
-  isDefault?: boolean;
   startDate?: string;
   endDate?: string;
   disableFutureDate?: boolean;

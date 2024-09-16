@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
 import { useParams } from 'react-router-dom';
 import Checkbox from '../../../components/formFields/Checkbox';
@@ -39,6 +38,10 @@ const getComponentsByFieldName = (
   let inputProps = {};
   if (fieldName === 'fieldName') {
     inputProps = { ...inputProps, ...{ component: !isNew || isFieldNameChangable ? 'TEXT_FIELD' : 'SELECT_INPUT' } };
+  }
+  if (fieldName === 'isResult') {
+    inputProps = { ...inputProps, ...{ disabled: true } };
+    obj.isResult = true;
   }
   // disabled fields based on run time conditions
   if (!isNew && (fieldName === 'fieldName' || fieldName === 'inputType')) {
@@ -208,9 +211,10 @@ export const SelectInputValues = ({
     };
   }
   if (fieldName === 'resource') {
-    options = inputProps?.options;
+    options = inputProps?.options[obj?.viewType === 'Spinner' ? InputTypes.DEFAULT : obj?.inputType] || [];
     parseFn = (val: any) => val?.key;
     value = options?.find(({ key: resource }: any) => obj[fieldName] === resource) || null;
+    autoSelectValue = options.length === 1 ? options[0]?.key : null;
   }
   // parse with custom logic
   if (fieldName === 'inputType') {
@@ -246,6 +250,7 @@ export const SelectInputValues = ({
         customParseFn={parseFn}
         inputProps={inputProps}
         isMulti={inputProps?.isMulti}
+        autoSelectValue={autoSelectValue}
       />
     </div>
   );
@@ -600,19 +605,6 @@ const RenderFields = ({
     case 'CONDITION_CONFIG': {
       return (
         <ConditionConfig
-          field={fieldName}
-          name={`${name}.${fieldName}`}
-          obj={obj}
-          form={form}
-          targetIds={targetIds}
-          unAddedFields={unAddedFields}
-          newlyAddedIds={newlyAddedIds}
-        />
-      );
-    }
-    case 'RANGES_CONFIG': {
-      return (
-        <RangesConfig
           field={fieldName}
           name={`${name}.${fieldName}`}
           obj={obj}

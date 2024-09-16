@@ -7,6 +7,7 @@ import {
   IFetchUserByIdRequest,
   IFetchUserRolesRequest,
   ILoginRequest,
+  IUnlockUsersRequest,
   IUpdateUserRequest,
   IUser
 } from './types';
@@ -175,11 +176,8 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
     const updatedUserRoles = {
       ...userRoles,
       SPICE: [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
-        ? userRoles.SPICE
-        : userRoles.SPICE.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN),
-      'SPICE INSIGHTS': [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
-        ? userRoles['SPICE INSIGHTS']
-        : userRoles['SPICE INSIGHTS'].filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.REPORT_ADMIN)
+        ? userRoles?.SPICE
+        : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
     };
     successCb?.(updatedUserRoles);
     yield put(userActions.fetchUserRolesActionSuccess(updatedUserRoles));
@@ -336,32 +334,6 @@ export function* fetchLockedUsers({
 }
 
 /*
-  Worker Saga: Fired on FETCH_LOCKED_USERS_REQUEST action
-*/
-export function* fetchLockedUsers({
-  tenantId,
-  skip,
-  limit,
-  search,
-  role,
-  successCb,
-  failureCb
-}: IFetchLockedUsersRequest): SagaIterator {
-  try {
-    const {
-      data: { entityList: lockedUsers, totalCount }
-    } = yield call(userService.fetchLockedUsers as any, tenantId, skip, limit, search, role);
-    successCb?.(lockedUsers || []);
-    yield put(userActions.fetchLockedUsersSuccess({ lockedUsers: lockedUsers || [], totalCount }));
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(userActions.fetchLockedUsersFailure());
-    }
-  }
-}
-
-/*
   Worker Saga: Fired on FETCH_TIMEZONE_LIST_REQUEST action
 */
 export function* fetchTimezoneList(): SagaIterator {
@@ -422,6 +394,8 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.CHANGE_OWN_PASSWORD_REQUEST, updatePassword)]);
   yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
   yield all([takeLatest(USERTYPES.FETCH_LOCKED_USERS_REQUEST, fetchLockedUsers)]);
+  yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST_REQUEST, fetchCommunityListRequest)]);
+  yield all([takeLatest(USERTYPES.UNLOCK_USERS_REQUEST, unlockUsers)]);
 }
 
 export default userSaga;

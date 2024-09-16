@@ -1,29 +1,40 @@
 import { useCallback, useMemo, useEffect } from 'react';
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS from '../../constants/appConstants';
-import { accountsCountSelector, accountsLoadingSelector, getAccountsSelector } from '../../store/account/selectors';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import {
+  districtCountSelector,
+  districtLoadingSelector,
+  getDistrictListSelector
+} from '../../store/district/selectors';
 import { useDispatch, useSelector } from 'react-redux';
-import { activateAccountReq, fetchAccountsRequest, removeDeactivatedAccountList } from '../../store/account/actions';
+import {
+  activateAccountReq,
+  fetchDistrictListRequest,
+  removeDeactivatedAccountList
+} from '../../store/district/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { roleSelector, tenantIdSelector } from '../../store/user/selectors';
-import { IAccount } from '../../store/account/types';
+import { IDistrict } from '../../store/district/types';
 import { formatDate } from '../../utils/validation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
 const DeactivatedRecords = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const dispatch = useDispatch();
-  const loading = useSelector(accountsLoadingSelector);
-  const deactivatedRecords = useSelector(getAccountsSelector);
-  const deactivatedRecordsCount = useSelector(accountsCountSelector);
+  const loading = useSelector(districtLoadingSelector);
+  const deactivatedRecords = useSelector(getDistrictListSelector);
+  const deactivatedRecordsCount = useSelector(districtCountSelector);
   const tenantId = useSelector(tenantIdSelector);
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
+  const {
+    district: { s: districtSName, p: districtPName }
+  } = NAME_CONSTANTS;
 
   const fetchDetails = useCallback(() => {
     dispatch(
-      fetchAccountsRequest({
+      fetchDistrictListRequest({
         tenantId: ROLES.REGION_ADMIN === role ? tenantId : '',
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
@@ -47,16 +58,16 @@ const DeactivatedRecords = (): React.ReactElement => {
    * Handler to open activate modal
    * @param values
    */
-  const openActivateModal = (value: IAccount) => {
+  const openActivateModal = (value: IDistrict) => {
     dispatch(
       activateAccountReq({
         data: { tenantId: Number(value?.tenantId) },
         successCb: () => {
           fetchDetails();
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_ACTIVATE_SUCCESS);
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACTIVATE_ACCOUNT_SUCCESS);
         },
         failureCb: (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_ACTIVATE_FAIL));
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_ACCOUNT_FAIL));
         }
       })
     );
@@ -73,7 +84,7 @@ const DeactivatedRecords = (): React.ReactElement => {
         id: 2,
         name: 'updated_at',
         label: 'Deactivated Date',
-        cellFormatter: (data: IAccount) => {
+        cellFormatter: (data: IDistrict) => {
           if (data?.updatedAt) {
             return formatDate(data.updatedAt, { month: 'short', format: 'DD MM, YYYY' });
           } else {
@@ -93,7 +104,11 @@ const DeactivatedRecords = (): React.ReactElement => {
   return (
     <div className='row g-0dot625'>
       <div className='col-12'>
-        <DetailCard header='Deactivated Account' isSearch={true} onSearch={handleSearch}>
+        <DetailCard
+          header={`Deactivated ${deactivatedRecordsCount > 1 ? districtPName : districtSName}`}
+          isSearch={true}
+          onSearch={handleSearch}
+        >
           <CustomTable
             loading={loading}
             rowData={deactivatedRecords}

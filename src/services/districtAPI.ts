@@ -96,7 +96,7 @@ export const deleteDistrictAdmin = (data: { tenantId: string | number; id: strin
     data
   });
 
-export const activateDistrict = (data: { tenantId: number }) =>
+export const activateAccount = (data: { tenantId: number }) =>
   axios({
     url: '/admin-service/district/activate',
     method: 'PUT',

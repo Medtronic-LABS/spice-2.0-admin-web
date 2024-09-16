@@ -45,8 +45,6 @@ const ResetPassword = (props: Props) => {
   const getUsername = useCallback(() => {
     const params = new URLSearchParams(document.location.search);
     const token = params.get('token') || '';
-    const params = new URLSearchParams(document.location.search);
-    const token = params.get('token') || '';
     dispatch(
       getUserName(
         token,
