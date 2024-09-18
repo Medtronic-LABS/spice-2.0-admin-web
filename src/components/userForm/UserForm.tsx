@@ -1021,9 +1021,9 @@ const UserForm = ({
 
                                 const tenantIds = [
                                   ...(initialEditData[index]?.hfTenantIds || []),
-                                  form.getState().values?.users?.[0]?.healthFacility?.tenantId,
+                                  form.getState().values?.users?.[0]?.healthfacility?.tenantId,
                                   ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
-                                  isHF ? hfTenantId : []
+                                  isHF && hfTenantId
                                 ].filter((v: number) => v);
 
                                 fetchListWithConditions(
