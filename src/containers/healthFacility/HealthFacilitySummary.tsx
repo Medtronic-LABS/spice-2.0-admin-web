@@ -134,7 +134,7 @@ export const formatHFUserData = (
         ? Number(user.healthfacility.tenantId)
         : isSuperAdmin
         ? null
-        : Number(tenantId) || user.tenantId,
+        : user.tenantId || Number(tenantId),
       supervisorId: Number(user.supervisor?.id),
       roleIds,
       villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
@@ -190,7 +190,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: 'Facility ID', value: healthFacility?.postalCode },
       { label: 'Language', value: healthFacility?.language },
       {
-        label: 'Linked Peer Supervisor',
+        label: 'Linked Community Health Assistant',
         value: healthFacility?.peerSupervisors,
         subKey: 'name',
         style: { col: 'col-12', subCol: 'col-3' }
@@ -611,7 +611,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           submitText={submittedData?.isNextClicked ? 'Submit' : 'Next'}
           handleCancel={closeHFEditModal}
           handleFormSubmit={handleHFEditDetailsSubmit}
-          initialValues={{ healthFacility: { ...editHFDetailsModal.data } }}
+          initialValues={{ healthFacility: editHFDetailsModal.data }}
           render={editHFDetailsModalRender}
           size='modal-lg'
           mutators={arrayMutators}

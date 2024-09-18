@@ -47,6 +47,7 @@ const ForgotPassword = (props: IRouteProps) => {
                   <TextInput
                     {...input}
                     label='Email'
+                    data-testid='email-input'
                     errorLabel='email'
                     error={(meta.touched && meta.error) || undefined}
                   />

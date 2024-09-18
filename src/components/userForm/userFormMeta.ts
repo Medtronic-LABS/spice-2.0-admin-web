@@ -10,7 +10,10 @@ const useUserFormMeta = () => {
     []
   );
   const isCHPRole = useMemo(() => ['COMMUNITY_HEALTH_PROMOTER'], []);
-  const peerSupervisorRoles = useMemo(() => ['COMMUNITY_HEALTH_ASSISTANT', 'PEER_SUPERVISOR'], []);
+  const CHRoles = useMemo(
+    () => [APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_ASSISTANT, APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_PROMOTER],
+    []
+  );
   const superAdminRoles = useMemo(() => ['SUPER_ADMIN'], []);
   const hfCreateRoles = useMemo(
     () => [
@@ -27,7 +30,7 @@ const useUserFormMeta = () => {
     []
   );
   const isHFAdminRole = useMemo(() => [HEALTH_FACILITY_ADMIN], [HEALTH_FACILITY_ADMIN]);
-  return { mobileRoles, isCHPRole, adminRoles, peerSupervisorRoles, superAdminRoles, hfCreateRoles, isHFAdminRole };
+  return { mobileRoles, isCHPRole, adminRoles, CHRoles, superAdminRoles, hfCreateRoles, isHFAdminRole };
 };
 
 export default useUserFormMeta;

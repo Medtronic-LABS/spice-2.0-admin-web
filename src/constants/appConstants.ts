@@ -1,5 +1,5 @@
 const APPCONSTANTS = {
-  APP_TYPE: 'spice web',
+  APP_TYPE: 'web',
   HASH_ALGORITM: 'sha512',
   AUTHTOKEN: 'at',
   USER_TENANTID: 'uti',
@@ -24,8 +24,8 @@ const APPCONSTANTS = {
   LAST_NAME_LENGTH: 100,
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
-    ADMIN: 'spice web',
-    CFR: 'cfr web',
+    ADMIN: 'web',
+    CFR: 'cfr',
     INSIGHTS: 'insights'
   },
   ROLES: {
@@ -53,7 +53,9 @@ const APPCONSTANTS = {
     PROVIDER: 'PROVIDER',
     NURSE: 'NURSE',
     PHYSICIAN_PRESCRIBER: 'PHYSICIAN_PRESCRIBER',
-    REPORT_ADMIN: 'REPORT_ADMIN'
+    REPORT_ADMIN: 'REPORT_ADMIN',
+    COMMUNITY_HEALTH_PROMOTER: 'COMMUNITY_HEALTH_PROMOTER',
+    COMMUNITY_HEALTH_ASSISTANT: 'COMMUNITY_HEALTH_ASSISTANT'
   },
   ROUTE_NAMES: {
     REGION: 'region',
@@ -171,8 +173,8 @@ const APPCONSTANTS = {
     customized: 'customized'
   },
   spiceRole: {
-    spice: 'spice web',
-    spiceInsights: 'SPICE INSIGHTS'
+    spice: 'web',
+    spiceInsights: 'cfr'
   },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
@@ -430,6 +432,6 @@ export const SIDE_MENU_FETCHING_HIERARCHY = {
 };
 
 export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
-export const COMMON_INSIGHTS_USERROLE = ['CFR_SITE_USER'];
+export const COMMON_INSIGHTS_USERROLE = ['CFR_HEALTH_FACILITY_USER'];
 
 export default APPCONSTANTS;

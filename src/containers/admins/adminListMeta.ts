@@ -9,7 +9,7 @@ const { chiefdom, district, healthFacility } = NAMING_VARIABLES;
  * @param {IHFUserGet} user - The user object containing first name and last name.
  * @returns {string} The formatted full name of the user.
  */
-const formatName = (user: IHFUserGet): string => `${user.firstName} ${user.lastName}`;
+export const formatName = (user: IHFUserGet): string => `${user.firstName} ${user.lastName}`;
 
 /**
  * Formats the user's roles into a comma-separated string of role display names.
@@ -17,7 +17,7 @@ const formatName = (user: IHFUserGet): string => `${user.firstName} ${user.lastN
  * @param {IHFUserGet} user - The user object containing roles.
  * @returns {string} A comma-separated list of the user's role display names.
  */
-const formatRoles = (user: IHFUserGet): string =>
+export const formatRoles = (user: IHFUserGet): string =>
   `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
 
 /**
@@ -48,7 +48,7 @@ export const formatHealthFacility = (user: IHFUserGet): string => formatOrganiza
  * @param {IHFUserGet} user - The user object containing roles and organizations.
  * @returns {string} A comma-separated list of district names if the user has the DISTRICT_ADMIN role.
  */
-const formatDistrict = (user: IHFUserGet): string => formatOrganizations(user, district);
+export const formatDistrict = (user: IHFUserGet): string => formatOrganizations(user, district);
 
 /**
  * Formats chiefdom names for the user with the CHIEFDOM_ADMIN role.
@@ -56,7 +56,7 @@ const formatDistrict = (user: IHFUserGet): string => formatOrganizations(user, d
  * @param {IHFUserGet} user - The user object containing roles and organizations.
  * @returns {string} A comma-separated list of chiefdom names if the user has the CHIEFDOM_ADMIN role.
  */
-const formatChiefdom = (user: IHFUserGet): string => formatOrganizations(user, chiefdom);
+export const formatChiefdom = (user: IHFUserGet): string => formatOrganizations(user, chiefdom);
 
 export const columnDef = ({
   chiefdomModuleName,

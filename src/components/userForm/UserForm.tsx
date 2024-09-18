@@ -168,7 +168,7 @@ const UserForm = ({
   const [insightsRole, setInsightsRole] = useState<IRoles[]>([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
-  const { mobileRoles, adminRoles, peerSupervisorRoles, superAdminRoles } = userMeta();
+  const { mobileRoles, adminRoles, CHRoles, superAdminRoles } = userMeta();
   const districtList = useSelector(getDistrictListSelector);
   const {
     district: { s: districtSName }
@@ -268,6 +268,8 @@ const UserForm = ({
               .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
               .map((org: any) => org.id)
           : [],
+        selectedRoles: initialEditValue?.role || [],
+        selectedInsightsRole: initialEditValue?.spiceInsightsRole || [],
         suiteAccess: initialEditValue?.suiteAccess?.map((org: any) => ({
           ...org,
           isFixed: APPCONSTANTS.spiceRole.spiceInsights !== org.groupName
@@ -528,13 +530,22 @@ const UserForm = ({
       // role options
       const newRoleOptions = [...roleOptions.current];
       roleOptions.current = newRoleOptions;
-
       // role disable
       const newDisabledRoles = [...disabledRoles.current];
       let validRoles: string[] = [];
       const selectedAllRoles = [...(selectedRoles(index) || [])];
       if (selectedAllRoles.some((ro: IRoles) => ro.name === HEALTH_FACILITY_ADMIN)) {
         validRoles = [HEALTH_FACILITY_ADMIN];
+      } else if (
+        selectedAllRoles.some(
+          (ro: IRoles) =>
+            ro.name === APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_ASSISTANT ||
+            ro.name === APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_PROMOTER
+        )
+      ) {
+        validRoles = (newRoleOptions[index] || [])
+          .filter((newRole) => CHRoles.includes(newRole.name))
+          .map((filteredRole) => filteredRole.name);
       } else if (selectedAllRoles.some((ro: IRoles) => ro.name !== HEALTH_FACILITY_ADMIN)) {
         validRoles = (newRoleOptions[index] || [])
           .filter((newRole) => newRole.name !== HEALTH_FACILITY_ADMIN)
@@ -552,13 +563,13 @@ const UserForm = ({
       isHF,
       isHFCreate,
       mobileRoles,
-      peerSupervisorRoles,
       rolesGrouped,
       selectedRoles,
       superAdminRoles,
       selectedAdmins
     ]
   );
+
   const isCHUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
       // getting CHA user selected status
@@ -669,6 +680,7 @@ const UserForm = ({
 
   const initData = useCallback(() => {
     const [suiteAccess] = getSuiteAccessList(rolesGrouped);
+    roleOptions.current = [rolesGrouped.SPICE];
     if (isEdit) {
       setAutoFetchData(initialEditData);
     } else if (data.length) {
@@ -716,14 +728,19 @@ const UserForm = ({
     const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
       const { name, displayName, suiteAccessName } = roleData;
       const suiteNameLower = suiteAccessName?.toLowerCase() || '';
-
       // Early exits for 'RED_RISK_USER' or null display name
       if (name === 'RED_RISK_USER' || displayName === null) {
         return false;
       }
-
+      if (isHFCreate) {
+        return (
+          suiteNameLower !== APPCONSTANTS.spiceRole.spice ||
+          name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ||
+          name !== APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_PROMOTER
+        );
+      }
       // Health facility conditions
-      if (isHFCreate || isHF) {
+      if (isHF) {
         return suiteNameLower !== APPCONSTANTS.spiceRole.spice || name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN;
       }
 
@@ -879,6 +896,7 @@ const UserForm = ({
           const suiteAccess = getSuiteAccessList(rolesGrouped);
           const {
             selectedRoles: mandatoryRoles = [],
+            selectedInsightsRole: mandatoryInsightsRole = [],
             suiteAccess: formSuiteAccess = [],
             roles: allRoles = [],
             role: spiceRole = [],
@@ -975,7 +993,7 @@ const UserForm = ({
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                                 : null;
                             }}
-                            mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                            mandatoryOptions={mandatoryRoles ? mandatoryRoles : []}
                             disabledOptions={disabledRoles.current[index]}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
@@ -1088,7 +1106,7 @@ const UserForm = ({
                             }}
                             required={true}
                             options={insightsRole}
-                            mandatoryOptions={autoFetched[index] ? mandatoryRoles : []}
+                            mandatoryOptions={mandatoryInsightsRole ? mandatoryInsightsRole : []}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceInsightsRole?.length}
                             onChange={(values: any) => {

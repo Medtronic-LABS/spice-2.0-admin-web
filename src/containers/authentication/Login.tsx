@@ -92,6 +92,7 @@ const Login = (props: any): React.ReactElement => {
         <Form
           onSubmit={onSubmit}
           initialValues={initialFormValues.current}
+          data-testid='login-form'
           render={({ handleSubmit, valid }) => (
             <form onSubmit={handleSubmit}>
               <Field

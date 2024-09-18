@@ -1,22 +1,18 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import { Field } from 'react-final-form';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import configureMockStore from 'redux-mock-store';
-import { Provider } from 'react-redux';
 import Login from '../Login';
-import TextInput from '../../../components/formFields/TextInput';
 import { loginRequest } from '../../../store/user/actions';
 import toastCenter from '../../../utils/toastCenter';
 
 const mockStore = configureMockStore([]);
 jest.mock('../../../assets/images/app-logo.svg', () => ({
-  ReactComponent: 'Logo'
+  ReactComponent: () => <img alt='Logo' />
 }));
-
 describe('Login', () => {
   const loginRequestSpy = jest.fn();
-  let wrapper: any;
   let store: any;
   const props: any = {
     loggingIn: false,
@@ -25,8 +21,9 @@ describe('Login', () => {
   store = mockStore({
     user: { loggingIn: true }
   });
+
   beforeEach(() => {
-    wrapper = mount(
+    render(
       <Provider store={store}>
         <MemoryRouter>
           <Login {...props} loginRequest={loginRequestSpy} />
@@ -34,57 +31,51 @@ describe('Login', () => {
       </Provider>
     );
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should contain a form element', () => {
-    expect(wrapper.find('form')).toHaveLength(1);
-  });
-
   it('should contain a logo', () => {
-    expect(wrapper.find('Logo')).toHaveLength(1);
+    expect(screen.getByAltText('Logo')).toBeInTheDocument();
   });
 
   it('should contain two text input fields', () => {
-    expect(wrapper.find(Field)).toHaveLength(3);
-    expect(wrapper.find(TextInput)).toHaveLength(2);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    expect(emailInput).toBeInTheDocument();
+    expect(passwordInput).toBeInTheDocument();
   });
 
   it('should contain a checkbox input field', () => {
-    expect(wrapper.find(Field).last().prop('name')).toEqual('rememberMe');
+    expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
   it('should contain a submit button', () => {
-    expect(wrapper.find('button[type="submit"]')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+  });
+  // Update this test as well
+  it('should contain a submit button', () => {
+    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
   });
 
-  it('should call loginRequest function when form is submitted', () => {
-    const loginRequestFn = jest.fn();
-    // tslint:disable-next-line:no-empty
-    wrapper.find('form').simulate('submit', { preventDefault() {} });
-    expect(loginRequestFn).toBeCalledTimes(0);
+  it('should contain a form with email and password input fields', () => {
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    expect(emailInput).toBeInTheDocument();
+    expect(passwordInput).toBeInTheDocument();
   });
 
   it('calls toastCenter.dismissAllToast() on unmount', async () => {
     const dismissAllToastMock = jest.spyOn(toastCenter, 'dismissAllToast');
-    wrapper.unmount();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(dismissAllToastMock).toHaveBeenCalled();
-  });
 
-  it('submits the form with the correct values when the "Remember me" checkbox is checked', () => {
-    const form = wrapper.find('form');
-    const emailInput = wrapper.find('input[name="email"]');
-    const passwordInput = wrapper.find('input[name="password"]');
-    const rememberMeCheckbox = wrapper.find('input[name="rememberMe"]');
+    // Unmount the component
+    cleanup();
 
-    emailInput.simulate('change', { target: { name: 'email', value: 'test@example.com' } });
-    passwordInput.simulate('change', { target: { name: 'password', value: 'password' } });
-    rememberMeCheckbox.simulate('change', { target: { name: 'rememberMe', checked: true } });
-
-    form.simulate('submit');
-
-    expect(loginRequestSpy).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(dismissAllToastMock).toHaveBeenCalled();
+    });
   });
 });

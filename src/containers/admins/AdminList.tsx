@@ -271,7 +271,7 @@ const UserList = (): React.ReactElement => {
   };
 
   const roleSpiceList = rolesGrouped?.SPICE?.filter(
-    (data: { suiteAccessName: string }) => data.suiteAccessName === 'spice web'
+    (data: { suiteAccessName: string }) => data.suiteAccessName === APPCONSTANTS.spiceRole.spice
   );
 
   return (
@@ -293,7 +293,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
-              data: [...(rolesGrouped['SPICE INSIGHTS'] || []), ...(roleSpiceList || [])],
+              data: [...(rolesGrouped?.['SPICE INSIGHTS'] || []), ...(roleSpiceList || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }
