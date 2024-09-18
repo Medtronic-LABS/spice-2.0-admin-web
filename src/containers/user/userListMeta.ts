@@ -1,10 +1,15 @@
 import { IHFUserGet, IUserRole } from '../../store/healthFacility/types';
 import { formatHealthFacility } from '../admins/adminListMeta';
+import { NAMING_VARIABLES } from '../../constants/appConstants';
 
 const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
 
-const formatRoles = (user: IHFUserGet) =>
-  `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(',')}`;
+const formatRoles = (user: IHFUserGet) => {
+  return `${(user.roles || [])
+    ?.filter((filteredUserRole: IUserRole) => filteredUserRole.name !== NAMING_VARIABLES.redRisk)
+    ?.map((userRole: IUserRole) => userRole.displayName)
+    .join(',')}`;
+};
 
 export const columnDef = [
   {

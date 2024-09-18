@@ -38,7 +38,7 @@ const useFieldVisibility = (
 
   return useMemo(() => {
     const showTimezone = true;
-    const showCulture = isSiteUser;
+    const showCulture = isSiteUser || selectedAdmins === HEALTH_FACILITY_ADMIN;
     const showRedRisk = isSiteUser && !isHFadminSelected;
 
     const showDistrict =

@@ -203,6 +203,13 @@ const UserList = (): React.ReactElement => {
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
       const [selectedUser] = users;
+      users = users.map((user: any) => {
+        const isHFAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
+        return {
+          ...user,
+          culture: isHFAdmin ? user.culture : null
+        };
+      });
       const userObj = formatHFUserData(users, countryIdValue, tenantId || selectedUser.district?.tenantId);
       const data: IHFUserPost = userObj[0];
       setAdminSubmitLoading(true);

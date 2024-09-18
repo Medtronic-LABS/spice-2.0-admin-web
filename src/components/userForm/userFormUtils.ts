@@ -34,7 +34,7 @@ const useUserFormUtils = () => {
       .map((userRole: any) => ({
         groupName: userRole,
         id: userRole,
-        isFixed: APPCONSTANTS.spiceRole.spiceInsights !== userRole
+        isFixed: APPCONSTANTS.spiceRoleGrouped.spiceInsights !== userRole
       }))
       .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
 

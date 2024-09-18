@@ -78,6 +78,7 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
                 isModel={true}
+                autoSelect={true}
               />
             )}
           />

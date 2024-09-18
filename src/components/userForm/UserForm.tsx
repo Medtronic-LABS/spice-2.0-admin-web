@@ -729,13 +729,12 @@ const UserForm = ({
       const { name, displayName, suiteAccessName } = roleData;
       const suiteNameLower = suiteAccessName?.toLowerCase() || '';
       // Early exits for 'RED_RISK_USER' or null display name
-      if (name === 'RED_RISK_USER' || displayName === null) {
+      if (name === NAMING_VARIABLES.redRisk || displayName === null) {
         return false;
       }
       if (isHFCreate) {
         return (
-          suiteNameLower !== APPCONSTANTS.spiceRole.spice ||
-          name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN ||
+          (suiteNameLower !== APPCONSTANTS.spiceRole.spice || name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) &&
           name !== APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_PROMOTER
         );
       }
@@ -830,7 +829,8 @@ const UserForm = ({
     if (
       [DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) &&
       role !== DISTRICT_ADMIN &&
-      role !== CHIEFDOM_ADMIN
+      role !== CHIEFDOM_ADMIN &&
+      !isProfile
     ) {
       fetchDetails();
     }
@@ -1065,6 +1065,10 @@ const UserForm = ({
                               setSelectedAdmins(values?.name);
                               // fetch HF list based on CHW selection
                               input.onChange(values);
+                              // fetch culture list HF admin
+                              if (values.name === HEALTH_FACILITY_ADMIN && cultureList && !cultureList.length) {
+                                dispatch(fetchCultureListRequest());
+                              }
                             }}
                           />
                         );

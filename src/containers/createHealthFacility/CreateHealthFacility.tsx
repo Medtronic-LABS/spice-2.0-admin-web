@@ -10,7 +10,7 @@ import Loader from '../../components/loader/Loader';
 import UserForm from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import Workflows from '../healthFacility/Workflows';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS, NAMING_VARIABLES } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,7 +22,7 @@ import {
   workflowListSelector,
   workflowLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { roleSelector, countryIdSelector } from '../../store/user/selectors';
+import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 
 interface IMatchParams {
@@ -59,6 +59,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const country = useSelector(countryIdSelector);
   const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
+  const rolesGrouped = useSelector(userRolesSelector);
   const {
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
@@ -137,9 +138,17 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
    */
   const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
     if (submittedData.isNextClicked && countryId) {
+      let postUserData = formatHFUserData(users, countryId, undefined, true);
+      const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
+        (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
+      );
+      postUserData = postUserData.map((user) => ({
+        ...user,
+        roleIds: user.redRisk ? [...new Set([...user.roleIds, getRedRisk.id])] : user.roleIds
+      }));
       const postData = {
         ...formatHealthFacility({ ...healthFacility }, countryId),
-        users: formatHFUserData(users, countryId, undefined, true)
+        users: postUserData
       };
       if (postData.clinicalWorkflowIds.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
@@ -210,7 +219,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                           entityName='healthFacility'
                           data={submittedData.data.users}
                           autoFetchedState={{ autoFetch, setAutoFetchState }}
-                          parentOrgId={chiefdomId ?? selectedchiefdomTenantId}
+                          parentOrgId={selectedchiefdomTenantId || tenantId}
                           ignoreTenantId={''}
                           isSiteUser={true}
                         />

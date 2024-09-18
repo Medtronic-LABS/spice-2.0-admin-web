@@ -72,7 +72,7 @@ const UserList = (): React.ReactElement => {
   const spiceUserRole = rolesGrouped?.SPICE?.filter(
     (data: { suiteAccessName: string; name: string; displayName: string }) =>
       data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
-      (data.name !== 'RED_RISK_USER' || data.displayName !== null)
+      (data.name !== NAMING_VARIABLES.redRisk || data.displayName !== null)
   );
 
   const refreshHFUserList = useCallback(() => {
@@ -147,7 +147,11 @@ const UserList = (): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
-    if ((value.roles || []).some((userRole: IUserRole) => ['CHW'].includes(userRole.name))) {
+    if (
+      (value.roles || []).some((userRole: IUserRole) =>
+        [NAMING_VARIABLES.COMMUNITY_HEALTH_PROMOTER].includes(userRole.name)
+      )
+    ) {
       dispatch(
         fetchUserDetailRequest({
           id: Number(value?.id),
@@ -155,7 +159,9 @@ const UserList = (): React.ReactElement => {
             const postData = { ...user };
             const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
             postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-            postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
+            postData.role =
+              postData.roles.filter((r: IRoles) => r.groupName === 'SPICE' && r.name !== NAMING_VARIABLES.redRisk) ||
+              [];
             postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
             postData.supervisor = {
               ...postData.supervisor,
@@ -173,7 +179,8 @@ const UserList = (): React.ReactElement => {
       const postData = { ...value };
       const allSuiteAccess = value.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
       postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-      postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
+      postData.role =
+        postData.roles.filter((r: IRoles) => r.groupName === 'SPICE' && r.name !== NAMING_VARIABLES.redRisk) || [];
       postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       userForEdit.current = { users: [{ ...postData }] };
       setIsOpenUserModal({ isOpen: true, isEdit: true });
@@ -226,8 +233,11 @@ const UserList = (): React.ReactElement => {
       );
       const userObj = formatHFUserData(users, countryIdValue, tenantId);
       const data: IHFUserPost = userObj[0];
+      const roleIds = data.redRisk
+        ? [...new Set([...data.roleIds, getRedRisk.id])]
+        : data.roleIds?.filter((roleId) => roleId !== getRedRisk.id);
       onSubmitHandler(
-        { ...data, roleIds: data.redRisk ? [...data.roleIds, getRedRisk.id] : data.roleIds },
+        { ...data, roleIds },
         isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
         null,
         siteUserSuccess,

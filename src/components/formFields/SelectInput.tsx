@@ -105,7 +105,7 @@ const SelectInput = ({
 
   // To auto select if only 1 option is available
   useEffect(() => {
-    if (options && options.length === 1 && name && required && autoSelect) {
+    if (options && options.length === 1 && name && (required || autoSelect)) {
       setTimeout(() => {
         change(name, autoSelectValue || options[0]);
       }, 0);

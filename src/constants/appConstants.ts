@@ -176,6 +176,10 @@ const APPCONSTANTS = {
     spice: 'web',
     spiceInsights: 'cfr'
   },
+  spiceRoleGrouped: {
+    spice: 'web',
+    spiceInsights: 'cfr'
+  },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
@@ -421,7 +425,8 @@ export const NAMING_VARIABLES = {
   district: 'district',
   chiefdom: 'chiefdom',
   healthFacility: 'healthfacility',
-  redRisk: 'RED_RISK_USER'
+  redRisk: 'RED_RISK_USER',
+  COMMUNITY_HEALTH_PROMOTER: 'COMMUNITY_HEALTH_PROMOTER'
 };
 
 export const SIDE_MENU_FETCHING_HIERARCHY = {

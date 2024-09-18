@@ -7,9 +7,9 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import UserForm from '../../components/userForm/UserForm';
 import ModalForm from '../../components/modal/ModalForm';
 import Loader from '../../components/loader/Loader';
-import { countryIdSelector, userIdSelector } from '../../store/user/selectors';
+import { countryIdSelector, cultureListSelector, roleSelector, userIdSelector } from '../../store/user/selectors';
 import { IUserRole } from '../../store/healthFacility/types';
-import { fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
+import { fetchCultureListRequest, fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
 import { IEditUserDetail, IRoles } from '../../store/user/types';
@@ -22,7 +22,10 @@ const MyProfile = (): React.ReactElement => {
   const [userDetails, setUserDetails] = useState<IEditUserDetail>();
   const [loading, setLoading] = useState<boolean>(false);
   const userForEdit = useRef({ users: [] as IEditUserDetail[] });
+  const { HEALTH_FACILITY_ADMIN } = APPCONSTANTS.ROLES;
 
+  const role = useSelector(roleSelector);
+  const cultureList = useSelector(cultureListSelector);
   const country = useSelector(countryIdSelector);
   const countryId = Number(country?.id || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID));
   const formatRoles = (user: IEditUserDetail) =>
@@ -46,6 +49,9 @@ const MyProfile = (): React.ReactElement => {
 
   useEffect(() => {
     fetchUser();
+    if (role === HEALTH_FACILITY_ADMIN && cultureList && !cultureList.length) {
+      dispatch(fetchCultureListRequest());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
