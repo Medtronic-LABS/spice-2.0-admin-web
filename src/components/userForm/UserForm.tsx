@@ -66,7 +66,7 @@ import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthF
 import PhoneNumberField from '../formFields/PhoneNumber';
 import useUserFormUtils from './userFormUtils';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
-import { SiteUserForm } from './userConditionalFields/SiteUserForm';
+import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
@@ -202,7 +202,7 @@ const UserForm = ({
     if (!(timezoneList || []).length) {
       dispatch(fetchTimezoneListRequest());
     }
-    if (isSiteUser && cultureList && !cultureList.length) {
+    if (!(cultureList || []).length) {
       dispatch(fetchCultureListRequest());
     }
 
@@ -323,7 +323,7 @@ const UserForm = ({
   const SuperAdminToPeerSuperviserFn = useCallback(
     (roles: IRoles[]) => {
       if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
-        if (healthFacilityList?.length === 0 && !isSiteUser && countryId) {
+        if (healthFacilityList?.length === 0 && countryId) {
           dispatch(
             fetchHFListRequest({
               countryId,
@@ -696,11 +696,13 @@ const UserForm = ({
         setAutoFetchData([initialEditDataForRole]);
       }
     } else {
-      const initialEditDataForRole = {
-        suiteAccess: [suiteAccess]
-      };
-      roleOptions.current = [rolesGrouped.SPICE];
-      setAutoFetchData([initialEditDataForRole]);
+      if (suiteAccess) {
+        const initialEditDataForRole = {
+          suiteAccess: [suiteAccess]
+        };
+        roleOptions.current = [rolesGrouped.SPICE];
+        setAutoFetchData([initialEditDataForRole]);
+      }
     }
   }, [defaultSelectedRole, initialEditData, initialValue, isAdminForm, isEdit, rolesGrouped.SPICE]);
 
@@ -845,7 +847,17 @@ const UserForm = ({
     const existingDistrictId = existingDistrict?.organizations?.filter(
       (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
     );
-    const districtId = role === DISTRICT_ADMIN ? hfTenantId : districtDataId ?? existingDistrictId?.[0]?.id;
+    const { defaultRoleName = '' } = existingDistrict;
+
+    let districtId = null;
+    if (role === DISTRICT_ADMIN) {
+      districtId = hfTenantId;
+    } else if (defaultRoleName === HEALTH_FACILITY_ADMIN) {
+      districtId = null;
+    } else {
+      districtId = districtDataId || existingDistrictId?.[0]?.id;
+    }
+
     if (districtId) {
       dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
     } else if (!isSiteUser && fetchingFor === REGION_ADMIN) {
@@ -872,7 +884,7 @@ const UserForm = ({
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [hfTenantId] });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.getState().values.users?.[0]?.chiefdom?.tenantId, initialEditData]);
+  }, [form.getState().values.users?.[0]?.chiefdom?.tenantId]);
 
   useEffect(() => {
     if (initialEditData && initialEditData.length > 0) {
@@ -885,6 +897,15 @@ const UserForm = ({
       }
     }
   }, [initialEditData, isAdminForm]);
+
+  useEffect(() => {
+    // healthFacility auto populate for insight role and culture input fields
+    const [selectedHf] = form.getState()?.values?.users;
+    if (selectedHf?.role) {
+      setSelectedAdmins(selectedHf?.role?.name);
+      levelBasedInsightsRole(selectedHf?.role?.level);
+    }
+  }, [form.getState()?.values?.users?.[0]?.role?.name]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -902,8 +923,13 @@ const UserForm = ({
             role: spiceRole = [],
             spiceInsightsRole = []
           } = form.getState().values?.users?.[index];
-          const isSPICE = (formSuiteAccess || []).some((v: any) => v?.groupName === 'SPICE');
-          const isSPICEInsights = (formSuiteAccess || []).some((v: any) => v?.groupName === 'SPICE INSIGHTS');
+          const isSPICE = (formSuiteAccess || []).some(
+            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.spice
+          );
+          const isSPICEInsights = (formSuiteAccess || []).some(
+            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights
+          );
+
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -986,7 +1012,7 @@ const UserForm = ({
                             options={getAdminRoles()}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
-                                ...(autoFetched[index] ? mandatoryRoles : []),
+                                ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
                                 ...(disabledRoles.current[index] || [])
                               ];
                               return optionsToBeDisabled.length
@@ -1060,7 +1086,6 @@ const UserForm = ({
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, values]);
                               form.change(`${formName}[${index}].spiceInsightsRole`, []);
-
                               levelBasedInsightsRole(values.level);
                               setSelectedAdmins(values?.name);
                               // fetch HF list based on CHW selection

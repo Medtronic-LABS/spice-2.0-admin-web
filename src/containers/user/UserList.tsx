@@ -233,7 +233,7 @@ const UserList = (): React.ReactElement => {
       );
       const userObj = formatHFUserData(users, countryIdValue, tenantId);
       const data: IHFUserPost = userObj[0];
-      const roleIds = data.redRisk
+      const roleIds = data?.redRisk
         ? [...new Set([...data.roleIds, getRedRisk.id])]
         : data.roleIds?.filter((roleId) => roleId !== getRedRisk.id);
       onSubmitHandler(

@@ -177,8 +177,8 @@ const APPCONSTANTS = {
     spiceInsights: 'cfr'
   },
   spiceRoleGrouped: {
-    spice: 'web',
-    spiceInsights: 'cfr'
+    spice: 'SPICE',
+    spiceInsights: 'SPICE INSIGHTS'
   },
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',

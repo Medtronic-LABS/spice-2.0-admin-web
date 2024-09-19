@@ -230,7 +230,7 @@ export interface IHFUserPost {
   district?: string | number;
   chiefdom?: string;
   village?: string;
-  supervisorId?: number;
+  supervisorId?: number | null;
   villageIds?: number[];
   timezone?: { id: number };
   redRisk?: boolean;
