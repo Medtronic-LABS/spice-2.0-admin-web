@@ -352,24 +352,28 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const emailDisabledFn = (errorMsg: string, index: number, isAutoPopulate = true) => {
+    const newAutoFetched = [...autoFetched];
+    newAutoFetched[index] = false;
+    setAutoFetched(newAutoFetched);
+    setClearEmail(true);
+    if (isAutoPopulate) {
+      form.change(`${formName}[${index}].username`, '');
+      toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
+    }
+  };
+
   const autoPopulateUserData = (user: any, index: number) => {
     const userData = {
       ...user
     };
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
-    const emailDisabledFn = (errorMsg: string) => {
-      const newAutoFetched = [...autoFetched];
-      newAutoFetched[index] = false;
-      setAutoFetched(newAutoFetched);
-      setClearEmail(true);
-      form.change(`${formName}[${index}].username`, '');
-      toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
-    };
+
     if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
-      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE);
+      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE, index);
     } else if (isCHPSelected(userData.role) && isHFCreate) {
-      emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE);
+      emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE, index);
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
       setClearEmail(false);
@@ -545,6 +549,16 @@ const UserForm = ({
       ) {
         validRoles = (newRoleOptions[index] || [])
           .filter((newRole) => CHRoles.includes(newRole.name))
+          .map((filteredRole) => filteredRole.name);
+      } else if (
+        selectedAllRoles.some(
+          (ro: IRoles) =>
+            ro.name !== APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_ASSISTANT ||
+            ro.name !== APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_PROMOTER
+        )
+      ) {
+        validRoles = (newRoleOptions[index] || [])
+          .filter((newRole) => !CHRoles.includes(newRole.name))
           .map((filteredRole) => filteredRole.name);
       } else if (selectedAllRoles.some((ro: IRoles) => ro.name !== HEALTH_FACILITY_ADMIN)) {
         validRoles = (newRoleOptions[index] || [])
@@ -1214,8 +1228,12 @@ const UserForm = ({
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
                     onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
-                    parentOrgId={parentOrgId}
-                    ignoreTenantId={ignoreTenantId}
+                    parentOrgId={
+                      isSiteUser ? form.getState()?.values?.users?.[0]?.healthfacility?.chiefdom?.tenantId : parentOrgId
+                    }
+                    ignoreTenantId={
+                      isSiteUser ? form.getState()?.values?.users?.[0]?.healthfacility?.tenantId : ignoreTenantId
+                    }
                   />
                 </div>
                 <div className='col-sm-6 col-12'>
@@ -1283,14 +1301,18 @@ const UserForm = ({
                             isModel={true}
                             disabled={isProfile || isEdit}
                             onChange={(hf: IHealthFacility) => {
+                              emailDisabledFn('', index, false);
                               const formData = form.getState()?.values?.users?.[index];
-                              form.change(`${formName}?.[${index}]?.supervisor`, null);
+                              const supervisorFieldData = `${formName}[${index}].supervisor`;
+                              const villagesFieldData = `${formName}[${index}].villages`;
+
+                              form.change(supervisorFieldData, null);
                               if (autoFetched[index] && formData?.selectedVillages?.length) {
-                                form.change(`${formName}?.[${index}]?.villages`, [
+                                form.change(villagesFieldData, [
                                   ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
                                 ]);
                               } else {
-                                form.change(`${formName}?.[${index}]?.villages`, []);
+                                form.change(villagesFieldData, []);
                               }
 
                               if (isCHPUser[index]) {

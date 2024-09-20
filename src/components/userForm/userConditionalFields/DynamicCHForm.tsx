@@ -23,31 +23,29 @@ export const DynamicCHForm = ({
     <>
       {isChpUser && !isHFCreate && (
         <>
-          {!isChaUser && (
-            <div className='col-sm-6 col-12'>
-              <Field
-                name={`${name}.supervisor`}
-                type='text'
-                validate={required}
-                render={({ input, meta }) => (
-                  <SelectInput
-                    {...(input as any)}
-                    {...(meta as any)}
-                    label='Community health assistant'
-                    errorLabel='Community health assistant'
-                    labelKey='name'
-                    valueKey='id'
-                    disabled={isProfile}
-                    menuPlacement={'auto'}
-                    options={peerSupervisors[index]}
-                    loadingOptions={peerSupervisorLoading}
-                    error={isError(meta)}
-                    isModel={true}
-                  />
-                )}
-              />
-            </div>
-          )}
+          <div className='col-sm-6 col-12'>
+            <Field
+              name={`${name}.supervisor`}
+              type='text'
+              validate={required}
+              render={({ input, meta }) => (
+                <SelectInput
+                  {...(input as any)}
+                  {...(meta as any)}
+                  label='Community health assistant'
+                  errorLabel='Community health assistant'
+                  labelKey='name'
+                  valueKey='id'
+                  disabled={isProfile}
+                  menuPlacement={'auto'}
+                  options={peerSupervisors[index]}
+                  loadingOptions={peerSupervisorLoading}
+                  error={isError(meta)}
+                  isModel={true}
+                />
+              )}
+            />
+          </div>
           <div className='col-sm-6 col-12'>
             <Field
               name={`${name}.villages`}

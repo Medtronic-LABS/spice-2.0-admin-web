@@ -61,6 +61,7 @@ const EmailField = forwardRef(
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
     const lastOrgId = useRef<string | undefined>(parentOrgId);
+    const lastIgnoreTenantId = useRef<string | undefined>(ignoreTenantId);
     const cfrError = APPCONSTANTS.CFR_ERR_MSG;
     const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
     const duplicationError = APPCONSTANTS.EMAIL_DUPLICATION_ERR_MSG;
@@ -201,12 +202,12 @@ const EmailField = forwardRef(
     );
 
     useEffect(() => {
-      if (lastOrgId.current !== parentOrgId) {
+      if (lastOrgId.current !== parentOrgId || lastIgnoreTenantId.current !== ignoreTenantId) {
         lastOrgId.current = parentOrgId;
+        lastIgnoreTenantId.current = ignoreTenantId;
         validateUser(currentEmail.current, true);
       }
-    }, [parentOrgId, validateUser]);
-
+    }, [parentOrgId, validateUser, ignoreTenantId]);
     return (
       <Field
         name={`${name}.username`}
@@ -239,7 +240,7 @@ const EmailField = forwardRef(
                   ? ''
                   : 'email ID'
               }
-              disabled={isEdit || (isDisabled === undefined ? disabled : isDisabled)}
+              disabled={isEdit || (isDisabled && disabled)}
               error={isNetworkError ? 'Email ID is not validated.' : meta.touched && (meta.error || '')}
               helpertext={
                 isNetworkError ? (
