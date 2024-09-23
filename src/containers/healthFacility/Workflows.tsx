@@ -13,6 +13,7 @@ interface IWorkflowsProps {
   form: FormApi<any, Partial<any>>;
   formName: string;
   submittedData?: any;
+  isHFEdit?: boolean;
 }
 
 /**
@@ -115,7 +116,7 @@ const renderWorkflowByModuleType = (
   );
 };
 
-const Workflows: React.FC<IWorkflowsProps> = ({ form, formName }) => {
+const Workflows: React.FC<IWorkflowsProps> = ({ form, formName, isHFEdit = false }) => {
   const [phq4Selected, setPhq4Selected] = useState(false);
   // Selector hooks
   const rawWorkFlows: IWorkflow[] = useSelector(workflowListSelector);
@@ -196,8 +197,10 @@ const Workflows: React.FC<IWorkflowsProps> = ({ form, formName }) => {
     return () => {
       window.clearInterval(mentalHealthTimeout.current);
       window.clearInterval(pregnancyCheckTimeoutVar);
-      form.change(`${formName}.clinicalWorkflows`, undefined);
-      form.change(`${formName}.customizedWorkflows`, undefined);
+      if (!isHFEdit) {
+        form.change(`${formName}.clinicalWorkflows`, undefined);
+        form.change(`${formName}.customizedWorkflows`, undefined);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workflows]);

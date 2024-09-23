@@ -102,7 +102,7 @@ const WorkflowCustomization = (): React.ReactElement => {
       createWorkflowModule({
         data: { ...account, name: account.name.replace(/\s+/g, ' ').trim(), countryId: regionId || '', tenantId },
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS);
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.WORKFLOW_CREATE_SUCCESS);
           closeWorkflowModal();
           handlePage(1);
         },
@@ -111,9 +111,7 @@ const WorkflowCustomization = (): React.ReactElement => {
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.ERROR,
-              e.message === APPCONSTANTS.ACCOUNT_WORKFLOW_ALREADY_EXISTS
-                ? e.message
-                : APPCONSTANTS.ACCOUNT_WORKFLOW_MODULE_CREATE_FAIL
+              e.message === APPCONSTANTS.WORKFLOW_ALREADY_EXISTS ? e.message : APPCONSTANTS.WORKFLOW_CREATE_FAIL
             )
           );
         }
@@ -131,14 +129,12 @@ const WorkflowCustomization = (): React.ReactElement => {
       updateWorkflowModule({
         data,
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_WORKFLOW_MODULE_UPDATE_SUCCESS);
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.WORKFLOW_UPDATE_SUCCESS);
           getClinicalWorkflow();
           closeWorkflowModal();
         },
         failureCb: (e: any) => {
-          toastCenter.error(
-            ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_WORKFLOW_MODULE_UPDATE_FAIL)
-          );
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.WORKFLOW_UPDATE_FAIL));
         }
       })
     );
@@ -149,7 +145,7 @@ const WorkflowCustomization = (): React.ReactElement => {
       deleteWorkflowModule({
         data: { id, tenantId },
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACCOUNT_WORKFLOW_DELETE_SUCCESS);
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.WORKFLOW_DELETE_SUCCESS);
           handlePage(
             listParams.page > 1 &&
               Math.ceil(clinicalWorkflowsCount / listParams.rowsPerPage) === listParams.page &&
@@ -159,7 +155,7 @@ const WorkflowCustomization = (): React.ReactElement => {
           );
         },
         failureCb: (e: any) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ACCOUNT_WORKFLOW_DELETE_ERROR))
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.WORKFLOW_DELETE_ERROR))
       })
     );
   };
@@ -208,8 +204,8 @@ const WorkflowCustomization = (): React.ReactElement => {
           customIconStyle={{ width: 16 }}
           isDelete={true}
           onDeleteClick={handleWorkflowDelete}
-          confirmationTitle={APPCONSTANTS.ACCOUNT_WORKFLOW_DELETE_CONFIRMATION}
-          deleteTitle={APPCONSTANTS.ACCOUNT_WORKFLOW_DELETE_TITLE}
+          confirmationTitle={APPCONSTANTS.WORKFLOW_DELETE_CONFIRMATION}
+          deleteTitle={APPCONSTANTS.WORKFLOW_DELETE_TITLE}
           page={listParams.page}
           rowsPerPage={listParams.rowsPerPage}
           count={clinicalWorkflowsCount}

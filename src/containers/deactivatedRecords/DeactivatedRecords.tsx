@@ -65,10 +65,19 @@ const DeactivatedRecords = (): React.ReactElement => {
         data: { tenantId: Number(value?.tenantId) },
         successCb: () => {
           fetchDetails();
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ACTIVATE_ACCOUNT_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.ACTIVATE_COUNTY_SUCCESS, districtSName)
+          );
         },
         failureCb: (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.ACCOUNT_ACCOUNT_FAIL));
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.ERROR,
+              formatUserToastMsg(APPCONSTANTS.ACTIVATE_COUNTY_FAIL, districtSName)
+            )
+          );
         }
       })
     );
@@ -122,8 +131,8 @@ const DeactivatedRecords = (): React.ReactElement => {
             count={deactivatedRecordsCount}
             handlePageChange={handlePage}
             onActivateClick={openActivateModal}
-            activateConfirmationTitle={formatUserToastMsg(APPCONSTANTS.ACTIVATE_ACCOUNT_CONFIRMATION, districtSName)}
-            activateTitle={formatUserToastMsg(APPCONSTANTS.ACTIVATE_ACCOUNT_TITLE, districtSName)}
+            activateConfirmationTitle={formatUserToastMsg(APPCONSTANTS.ACTIVATE_COUNTY_CONFIRMATION, districtSName)}
+            activateTitle={formatUserToastMsg(APPCONSTANTS.ACTIVATE_COUNTY_TITLE, districtSName)}
           />
         </DetailCard>
       </div>

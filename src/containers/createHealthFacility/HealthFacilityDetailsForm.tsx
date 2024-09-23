@@ -257,7 +257,7 @@ const HealthFacilityDetailsForm = ({
     <>
       {submittedData?.isNextClicked ? (
         <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
-          <Workflows formName='healthFacility' form={form} />
+          <Workflows formName='healthFacility' form={form} isHFEdit={isEdit} />
         </FormContainer>
       ) : (
         <div className='row gx-1dot25 align-items-end'>
