@@ -558,7 +558,7 @@ const UserForm = ({
         )
       ) {
         validRoles = (newRoleOptions[index] || [])
-          .filter((newRole) => !CHRoles.includes(newRole.name))
+          .filter((newRole) => !CHRoles.includes(newRole.name) && newRole.name !== HEALTH_FACILITY_ADMIN)
           .map((filteredRole) => filteredRole.name);
       } else if (selectedAllRoles.some((ro: IRoles) => ro.name !== HEALTH_FACILITY_ADMIN)) {
         validRoles = (newRoleOptions[index] || [])

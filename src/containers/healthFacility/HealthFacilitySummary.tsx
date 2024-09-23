@@ -80,7 +80,8 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
-    clinicalWorkflowIds: [...hf.clinicalWorkflows, ...hf.customizedWorkflows]
+    customizedWorkflowIds: hf.customizedWorkflows,
+    clinicalWorkflowIds: hf.clinicalWorkflows
   };
   return postData;
 };
@@ -374,7 +375,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       }
       validateLinkedRestrictions(missingIds, Number(healthFacilityData.tenantId), healthFacility, linkedVillagesIds);
     } else {
-      if (postData.clinicalWorkflowIds.length) {
+      if (postData.clinicalWorkflowIds.length || postData.customizedWorkflowIds.length) {
         dispatch(
           updateHFDetailsRequest({
             data: postData,

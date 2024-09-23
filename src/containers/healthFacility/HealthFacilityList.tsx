@@ -217,7 +217,7 @@ const HealthFacilityList = (): React.ReactElement => {
       validateLinkedRestrictions(missingIds, healthFacility.tenantId, healthFacility, linkedVillagesIds);
     } else {
       const postData = formatHealthFacility(healthFacility, countryIdValue);
-      if (postData.clinicalWorkflowIds.length) {
+      if (postData.clinicalWorkflowIds.length || postData.customizedWorkflowIds.length) {
         dispatch(
           updateHFDetailsRequest({
             data: postData,
