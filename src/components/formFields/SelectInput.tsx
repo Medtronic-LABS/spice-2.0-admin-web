@@ -53,6 +53,7 @@ interface ISelectBoxProps {
   name?: string;
   menuPlacement?: string;
   autoSelectValue?: any;
+  isMandatoryAutoPopulate?: boolean;
 }
 
 export const handleChange = (input: any, onChange: (e: any) => void, value: any) => {
@@ -98,6 +99,7 @@ const SelectInput = ({
   autoSelectValue = '',
   optionPropStyles,
   isOptionDisabled,
+  isMandatoryAutoPopulate = false,
   name = '',
   ...rest
 }: ISelectBoxProps): React.ReactElement => {
@@ -105,7 +107,7 @@ const SelectInput = ({
 
   // To auto select if only 1 option is available
   useEffect(() => {
-    if (options && options.length === 1 && name && (required || autoSelect)) {
+    if (options && options.length === 1 && name && (required || isMandatoryAutoPopulate) && autoSelect) {
       setTimeout(() => {
         change(name, autoSelectValue || options[0]);
       }, 0);

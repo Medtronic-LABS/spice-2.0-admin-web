@@ -827,7 +827,7 @@ const UserForm = ({
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchDistrictListRequest({
-        tenantId: String(countryId),
+        tenantId: String(hfTenantId), // url tenantId
         isActive: true,
         failureCb: (e) =>
           toastCenter.error(

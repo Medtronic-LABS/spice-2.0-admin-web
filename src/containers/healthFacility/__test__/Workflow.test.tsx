@@ -68,9 +68,9 @@ const renderWithStore = (store: any, form: FormApi<any, Partial<any>>, formName:
 describe('Workflows Component', () => {
   let store: any;
   const workflows: IWorkflow[] = [
-    { id: 1, name: 'Blood Test', moduleType: APPCONSTANTS.WORKFLOW_MODULE.clinical },
-    { id: 2, name: 'X-Ray', moduleType: APPCONSTANTS.WORKFLOW_MODULE.clinical },
-    { id: 3, name: 'Custom Task', moduleType: APPCONSTANTS.WORKFLOW_MODULE.customized }
+    { id: '1', name: 'Blood Test', moduleType: APPCONSTANTS.WORKFLOW_MODULE.clinical },
+    { id: '2', name: 'X-Ray', moduleType: APPCONSTANTS.WORKFLOW_MODULE.clinical },
+    { id: '3', name: 'Custom Task', moduleType: APPCONSTANTS.WORKFLOW_MODULE.customized }
   ];
 
   beforeEach(() => {

@@ -9,7 +9,6 @@ describe('districtReducer', () => {
     const loadingActions = [
       types.FETCH_DISTRICT_LIST_REQUEST,
       types.FETCH_DISTRICT_DETAIL_REQUEST,
-      types.FETCH_CLINICAL_WORKFLOW_REQUEST,
       types.CREATE_DISTRICT_REQUEST,
       types.UPDATE_DISTRICT_DETAIL_REQUEST,
       types.DELETE_DISTRICT_ADMIN_REQUEST,
@@ -44,7 +43,6 @@ describe('districtReducer', () => {
       types.ACTIVATE_ACCOUNT_FAIL,
       types.DEACTIVATE_DISTRICT_SUCCESS,
       types.DEACTIVATE_DISTRICT_FAIL,
-      types.FETCH_CLINICAL_WORKFLOW_FAILURE,
       types.CREATE_COUNTY_WORKFLOW_MODULE_SUCCESS,
       types.UPDATE_COUNTY_WORKFLOW_MODULE_SUCCESS,
       types.DELETE_COUNTY_WORKFLOW_MODULE_SUCCESS
@@ -432,39 +430,6 @@ describe('districtReducer', () => {
     const action: any = { type: types.CLEAR_DISTRICT_ADMIN };
     const expectedState = { admins: [], total: 0 };
     expect(districtReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle FETCH_CLINICAL_WORKFLOW_SUCCESS', () => {
-    const initialState: any = {
-      clinicalWorkflows: [],
-      clinicalWorkflowsCount: 0,
-      loading: false
-    };
-    const data = {
-      data: [
-        { id: 1, name: 'Workflow 1' },
-        { id: 2, name: 'Workflow 2' }
-      ],
-      total: 2
-    };
-    const action: any = { type: types.FETCH_CLINICAL_WORKFLOW_SUCCESS, payload: data };
-    const state = districtReducer(initialState, action);
-    expect(state.clinicalWorkflows).toEqual(data.data);
-    expect(state.clinicalWorkflowsCount).toEqual(data.total);
-    expect(state.loading).toEqual(false);
-  });
-
-  it('should handle RESET_CLINICAL_WORKFLOW_REQUEST', () => {
-    const initialState: any = {
-      clinicalWorkflows: [],
-      clinicalWorkflowsCount: 0,
-      loading: false
-    };
-    const action: any = { type: types.RESET_CLINICAL_WORKFLOW_REQUEST };
-    const state = districtReducer(initialState, action);
-
-    expect(state.clinicalWorkflows).toEqual([]);
-    expect(state.clinicalWorkflowsCount).toEqual(0);
   });
 
   it('should handle CLEAR_DISTRICT_DETAILS', () => {

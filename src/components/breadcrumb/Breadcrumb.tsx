@@ -168,6 +168,7 @@ const Breadcrumb = (): React.ReactElement => {
         return { ...breadCrumb, route: pathname };
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const showSite = activeRoute.includes(':healthFacilityId');
@@ -303,6 +304,7 @@ const Breadcrumb = (): React.ReactElement => {
       });
       sessionStorageServices.deleteItem('breadCrumbs');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlRouteIdDispatch]);
 
   const prevPathname = useRef(pathname);

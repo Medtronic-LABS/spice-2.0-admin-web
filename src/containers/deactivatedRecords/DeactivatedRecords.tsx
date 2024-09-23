@@ -18,6 +18,7 @@ import { roleSelector, tenantIdSelector } from '../../store/user/selectors';
 import { IDistrict } from '../../store/district/types';
 import { formatDate } from '../../utils/validation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 const DeactivatedRecords = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -121,8 +122,8 @@ const DeactivatedRecords = (): React.ReactElement => {
             count={deactivatedRecordsCount}
             handlePageChange={handlePage}
             onActivateClick={openActivateModal}
-            activateConfirmationTitle={APPCONSTANTS.ACTIVATE_ACCOUNT_CONFIRMATION}
-            activateTitle={APPCONSTANTS.ACTIVATE_ACCOUNT_TITLE}
+            activateConfirmationTitle={formatUserToastMsg(APPCONSTANTS.ACTIVATE_ACCOUNT_CONFIRMATION, districtSName)}
+            activateTitle={formatUserToastMsg(APPCONSTANTS.ACTIVATE_ACCOUNT_TITLE, districtSName)}
           />
         </DetailCard>
       </div>

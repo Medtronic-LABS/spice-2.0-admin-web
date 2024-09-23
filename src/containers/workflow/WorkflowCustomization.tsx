@@ -77,7 +77,8 @@ const WorkflowCustomization = (): React.ReactElement => {
 
   useEffect(() => {
     getClinicalWorkflow();
-  }, [getClinicalWorkflow]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRowEdit = ({ index, id, workflowName }: { index: number; id: string; workflowName: string }) => {
     history.push(

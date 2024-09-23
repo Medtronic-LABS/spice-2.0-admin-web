@@ -1,8 +1,3 @@
-import {
-  IFetchClinicalWorkflowFailure,
-  IFetchClinicalWorkflowSuccess,
-  IFetchClinicalWorkflowSuccessPayload
-} from '../district/types';
 import * as WORKFLOW_TYPES from './actionTypes';
 import {
   IFetchFormMetaRequest,
@@ -33,7 +28,9 @@ import {
   IUpdateWorkflowModuleFail,
   IDeleteWorkflowModule,
   IDeleteWorkflowModuleSuccess,
-  IDeleteWorkflowModuleFail
+  IDeleteWorkflowModuleFail,
+  IFetchClinicalWorkflowFailure,
+  IFetchClinicalWorkflowSuccess
 } from './types';
 
 export const fetchCustomizationFormRequest = ({

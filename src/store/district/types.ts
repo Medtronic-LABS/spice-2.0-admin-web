@@ -393,31 +393,6 @@ export interface IClinicalWorkflow {
   workflow?: string;
 }
 
-export interface IFetchClinicalWorkflowReqPayload {
-  countryId: string;
-  tenantId?: string;
-  limit: number | null;
-  skip: number;
-  searchTerm: string;
-}
-export interface IFetchClinicalWorkflowReq {
-  type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST;
-  data: IFetchClinicalWorkflowReqPayload;
-}
-
-export interface IFetchClinicalWorkflowSuccessPayload {
-  data: IClinicalWorkflow[];
-  total: number;
-}
-export interface IFetchClinicalWorkflowSuccess {
-  type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS;
-  payload: IFetchClinicalWorkflowSuccessPayload;
-}
-
-export interface IFetchClinicalWorkflowFailure {
-  type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE;
-}
-
 export interface IWorkflowModuleReqPayload {
   name?: string;
   viewScreens?: string[];
@@ -465,7 +440,4 @@ export type DistrictActions =
   | IClearDistrictDetail
   | ISetDistrictDetails
   | IClearDistrictList
-  | IClearDistrictAdmin
-  | IFetchClinicalWorkflowReq
-  | IFetchClinicalWorkflowSuccess
-  | IFetchClinicalWorkflowFailure;
+  | IClearDistrictAdmin;

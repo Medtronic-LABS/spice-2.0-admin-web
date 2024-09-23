@@ -168,8 +168,8 @@ const HealthFacilityDetailsForm = ({
 
   // District fetch
   useEffect(() => {
-    dispatch(fetchDistrictListRequest({ tenantId: countryId, isActive: true }));
-  }, [dispatch, countryId]);
+    dispatch(fetchDistrictListRequest({ tenantId, isActive: true }));
+  }, [dispatch, tenantId]);
 
   // Peer Supervisor fetch
   useEffect(() => {
@@ -256,7 +256,7 @@ const HealthFacilityDetailsForm = ({
   return (
     <>
       {submittedData?.isNextClicked ? (
-        <FormContainer label='Clinical Workflows Involved' required={true} icon={SiteDetailsIcon}>
+        <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
           <Workflows formName='healthFacility' form={form} />
         </FormContainer>
       ) : (

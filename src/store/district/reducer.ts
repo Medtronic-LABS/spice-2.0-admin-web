@@ -33,7 +33,6 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
   switch (action.type) {
     case DISTRICT_TYPES.FETCH_DISTRICT_LIST_REQUEST:
     case DISTRICT_TYPES.FETCH_DISTRICT_DETAIL_REQUEST:
-    case DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST:
     case DISTRICT_TYPES.CREATE_DISTRICT_REQUEST:
     case DISTRICT_TYPES.UPDATE_DISTRICT_DETAIL_REQUEST:
     case DISTRICT_TYPES.DELETE_DISTRICT_ADMIN_REQUEST:
@@ -83,7 +82,6 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
     case DISTRICT_TYPES.ACTIVATE_ACCOUNT_FAIL:
     case DISTRICT_TYPES.DEACTIVATE_DISTRICT_SUCCESS:
     case DISTRICT_TYPES.DEACTIVATE_DISTRICT_FAIL:
-    case DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE:
       return {
         ...state,
         loading: false,
@@ -167,13 +165,6 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
       return {
         ...state,
         district: { ...state.district, ...action.data }
-      };
-    case DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS:
-      return {
-        ...state,
-        clinicalWorkflows: action.payload?.data || [],
-        clinicalWorkflowsCount: action.payload?.total,
-        loading: false
       };
     default:
       return {

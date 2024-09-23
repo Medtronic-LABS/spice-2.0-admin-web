@@ -639,9 +639,19 @@ export interface IFetchPeerSupervisorListFailure {
 }
 
 export interface IWorkflow {
-  moduleType: any;
-  id: number;
+  id: string | number;
   name: string;
+  isActive?: boolean;
+  default?: boolean;
+  coreType?: string;
+  workflowId?: string;
+  moduleType?: string;
+  country?: string;
+  tenantId?: string;
+  viewScreens?: string[];
+  workflow?: string;
+  ncdWorkflow?: boolean;
+  workflowName?: string;
 }
 
 export interface IFetchWorkflowListRequest {

@@ -5,7 +5,7 @@ import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS, NAMING_VARIABLES } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
@@ -38,10 +38,11 @@ import {
   healthFacilitySelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { countryIdSelector, emailSelector, roleSelector } from '../../store/user/selectors';
+import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { addResRiskToUserPayload, formatRoles } from '../../utils/commonUtils';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -79,7 +80,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
-    clinicalWorkflowIds: hf.workflows
+    clinicalWorkflowIds: [...hf.clinicalWorkflows, ...hf.customizedWorkflows]
   };
   return postData;
 };
@@ -156,6 +157,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const role = useSelector(roleSelector);
   const email = useSelector(emailSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
+  const rolesGrouped = useSelector(userRolesSelector);
 
   const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false
@@ -169,6 +171,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
+  const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
+    (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
+  );
   const {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
@@ -202,6 +207,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         style: { col: 'col-12', subCol: 'col-3' }
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [healthFacility]
   );
 
@@ -420,7 +426,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId);
+    let userObj = formatHFUserData(users, countryIdValue, tenantId);
+    userObj = addResRiskToUserPayload(userObj, getRedRisk.id);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -454,7 +461,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    const userObj = formatHFUserData(users, countryIdValue, tenantId, true);
+    let userObj = formatHFUserData(users, countryIdValue, tenantId, true);
+    userObj = addResRiskToUserPayload(userObj, getRedRisk.id);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({
@@ -499,9 +507,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const formatName = (user: any) => {
     return `${user.firstName} ${user.lastName}`;
   };
-
-  const formatRoles = (user: IHFUserGet) =>
-    `${(user.roles || []).map((userRole: IRoles) => userRole.displayName).join(',')}`;
 
   const userFormRender = (form?: FormApi<any>) => {
     return (

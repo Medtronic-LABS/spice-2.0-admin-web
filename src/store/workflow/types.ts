@@ -1,4 +1,3 @@
-import { IFetchClinicalWorkflowSuccessPayload } from '../district/types';
 import { ITimezone } from '../user/types';
 import * as ACTION_TYPES from './actionTypes';
 
@@ -231,9 +230,17 @@ export interface IClearFormJSON {
 export interface IClearConsentForm {
   type: typeof ACTION_TYPES.CLEAR_CONSENT_FORM;
 }
+export interface IFetchClinicalWorkflowSuccessPayload {
+  data: IClinicalWorkflow[];
+  total: number;
+}
 export interface IFetchClinicalWorkflowSuccess {
   type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS;
   payload: IFetchClinicalWorkflowSuccessPayload;
+}
+
+export interface IFetchClinicalWorkflowFailure {
+  type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE;
 }
 export interface IAccountOption {
   name: string;

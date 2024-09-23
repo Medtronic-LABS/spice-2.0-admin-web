@@ -16,9 +16,6 @@ import {
   IFetchDistrictOptionsRequest,
   IActivateAccountReq,
   IDistrict,
-  IFetchClinicalWorkflowReq,
-  IClinicalWorkflow,
-  IFetchClinicalWorkflowSuccessPayload,
   IFetchDistrictOptionsPayload
 } from './types';
 import * as districtActions from './actions';
@@ -34,8 +31,7 @@ import {
   DELETE_DISTRICT_ADMIN_REQUEST,
   DEACTIVATE_DISTRICT_REQUEST,
   FETCH_DISTRICT_OPTIONS_REQUEST,
-  ACTIVATE_ACCOUNT_REQUEST,
-  FETCH_CLINICAL_WORKFLOW_REQUEST
+  ACTIVATE_ACCOUNT_REQUEST
 } from './actionTypes';
 import { AppState } from '../rootReducer';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -269,29 +265,6 @@ export function* fetchDistrictOptions(action: IFetchDistrictOptionsRequest): Sag
 }
 
 /*
-  Worker Saga: Fired on FETCH_CLINICAL_WORKFLOW_REQUEST action
-*/
-export function* fetchClinicalWorkflows({ data }: IFetchClinicalWorkflowReq): SagaIterator {
-  try {
-    const { data: worflowsResponse } = yield call(districtService.fetchClinicalWorkflows, data);
-    const { entityList: workflows } = worflowsResponse;
-    const { totalCount: total } = worflowsResponse;
-    const sortedWokflows = workflows.sort((workflowA: IClinicalWorkflow, workflowB: IClinicalWorkflow) =>
-      (workflowA.moduleType || 0) > (workflowB.moduleType || 0) ? 1 : -1
-    );
-    const payload: IFetchClinicalWorkflowSuccessPayload = {
-      data: (sortedWokflows || []) as IClinicalWorkflow[],
-      total
-    };
-    yield put(districtActions.fetchClinicalWorkflowSuccess(payload));
-  } catch (e) {
-    if (e instanceof Error) {
-      yield put(districtActions.fetchClinicalWorkflowFailure());
-    }
-  }
-}
-
-/*
   Starts worker saga on latest dispatched specific action.
 */
 function* districtSaga() {
@@ -306,7 +279,6 @@ function* districtSaga() {
   yield all([takeLatest(ACTIVATE_ACCOUNT_REQUEST, activateAccount)]);
   yield all([takeLatest(DEACTIVATE_DISTRICT_REQUEST, deactivateDistrict)]);
   yield all([takeLatest(FETCH_DISTRICT_OPTIONS_REQUEST, fetchDistrictOptions)]);
-  yield all([takeLatest(FETCH_CLINICAL_WORKFLOW_REQUEST, fetchClinicalWorkflows)]);
 }
 
 export default districtSaga;

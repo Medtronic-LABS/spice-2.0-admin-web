@@ -5,7 +5,6 @@ import {
   IDistrictAdmin,
   IDistrictDeactivate,
   IFetchDistrictList,
-  IFetchClinicalWorkflowReqPayload,
   IFetchDistrictOptionsPayload
 } from '../store/district/types';
 
@@ -121,12 +120,5 @@ export const fetchDistrictAdmins = (data: IFetchDistrictList) =>
   axios({
     method: 'POST',
     url: '/user-service/user/admin-users',
-    data
-  });
-
-export const fetchClinicalWorkflows = (data: IFetchClinicalWorkflowReqPayload) =>
-  axios({
-    method: 'POST',
-    url: '/admin-service/clinical-workflow/list',
     data
   });

@@ -7,7 +7,6 @@ import {
   fetchDistrictDetail,
   fetchDistrictOptions,
   fetchDistrictList,
-  fetchClinicalWorkflows,
   getDashboardDistrict,
   removeDistrictAdmin,
   updateDistrictAdminInfo,
@@ -26,8 +25,6 @@ const districtAdminMockData = MOCK_DATA_CONSTANTS.DISTRICT_ADMIN;
 const defaultRequestMockData = MOCK_DATA_CONSTANTS.DEFAULT_REQUEST_PAYLOAD;
 const searchDistrictAdminRequestMockData = MOCK_DATA_CONSTANTS.SEARCH_DISTRICT_ADMIN_REQUEST_PAYLOAD;
 const districtDetailResponseMockData = MOCK_DATA_CONSTANTS.DISTRICT_DETAIL_RESPONSE_PAYLOAD;
-const fetchClinicalWorkflowsRequestMockData = MOCK_DATA_CONSTANTS.FETCH_CLINICAL_WORKFLOWS_REQUEST_PAYLOAD;
-const fetchClinicalWorkflowsResponseMockData = MOCK_DATA_CONSTANTS.FETCH_CLINICAL_WORKFLOWS_RESPONSE_PAYLOAD;
 const fetchActiveDistrictRequestMockData = MOCK_DATA_CONSTANTS.FETCH_ACTIVE_DISTRICT_LIST_REQUEST_PAYLOAD;
 const fetchInactiveDistrictRequestMockData = MOCK_DATA_CONSTANTS.FETCH_INACTIVE_ACCOUNTS_REQUEST_PAYLOAD;
 const fetchDistrictResponseMockData = MOCK_DATA_CONSTANTS.FETCH_DISTRICT_LIST_RESPONSE_PAYLOAD;
@@ -527,47 +524,5 @@ describe('Fetches District Options: FETCH_DISTRICT_OPTIONS_REQUEST', () => {
     ).toPromise();
     expect(fetchDistrictOptionsSpy).toHaveBeenCalledWith(fetchDistrictOptionsRequestMockData);
     expect(dispatched).toEqual([districtActions.fetchDistrictOptionsFailure()]);
-  });
-});
-
-describe('Fetches Clinical Workflow List: FETCH_CLINICAL_WORKFLOW_REQUEST', () => {
-  it('Fetches list of clinical workflows and dispatches success', async () => {
-    const fetchClinicalWorkflowsSpy = jest.spyOn(districtService, 'fetchClinicalWorkflows').mockImplementation(() =>
-      Promise.resolve({
-        data: { entityList: fetchClinicalWorkflowsResponseMockData, totalCount: 10 }
-      } as AxiosResponse)
-    );
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchClinicalWorkflows,
-      { data: fetchClinicalWorkflowsRequestMockData, type: ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST }
-    ).toPromise();
-    expect(fetchClinicalWorkflowsSpy).toHaveBeenCalledWith(fetchClinicalWorkflowsRequestMockData);
-    expect(dispatched).toEqual([
-      districtActions.fetchClinicalWorkflowSuccess({
-        data: fetchClinicalWorkflowsResponseMockData,
-        total: 10
-      })
-    ]);
-  });
-
-  it('Fails to fetch list of clinical workflows and dispatches failure', async () => {
-    const error = new Error('Failed to fetch clinical workflows');
-    const fetchClinicalWorkflowsSpy = jest
-      .spyOn(districtService, 'fetchClinicalWorkflows')
-      .mockImplementation(() => Promise.reject(error) as any);
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchClinicalWorkflows,
-      { data: fetchClinicalWorkflowsRequestMockData, type: ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST }
-    ).toPromise();
-    expect(fetchClinicalWorkflowsSpy).toHaveBeenCalledWith(fetchClinicalWorkflowsRequestMockData);
-    expect(dispatched).toEqual([districtActions.fetchClinicalWorkflowFailure()]);
   });
 });

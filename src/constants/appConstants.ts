@@ -91,8 +91,8 @@ const APPCONSTANTS = {
   REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
   REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
 
-  ACTIVATE_ACCOUNT_CONFIRMATION: 'Are you sure want to activate the account?',
-  ACTIVATE_ACCOUNT_TITLE: 'Activate Account',
+  ACTIVATE_ACCOUNT_CONFIRMATION: 'Are you sure want to activate the Module_Name?',
+  ACTIVATE_ACCOUNT_TITLE: 'Activate Module_Name',
   ACTIVATE_ACCOUNT_SUCCESS: 'Account activated successfully.',
   ACCOUNT_ACCOUNT_FAIL: 'Unable to activate the account. Please try after sometime.',
   ACCOUNT_WORKFLOW_MODULE_CREATE_SUCCESS: 'Account workflow module created successfully.',
@@ -172,6 +172,14 @@ const APPCONSTANTS = {
     clinical: 'clinical',
     customized: 'customized'
   },
+  WORKFLOW_NAME: {
+    substanceAbuse: 'substanceAbuse',
+    suicideScreener: 'suicideScreener',
+    phq4: 'phq4',
+    pregnancy: 'pregnancy',
+    pregnancyAnc: 'pregnancyAnc'
+  },
+
   spiceRole: {
     spice: 'web',
     spiceInsights: 'cfr'

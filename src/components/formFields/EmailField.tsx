@@ -73,6 +73,7 @@ const EmailField = forwardRef(
           lastCheckedEmail.current = '';
           errorValue.current = '';
           setDisabled(false);
+          currentEmail.current = '';
         }
       }),
       [errorValue, setDisabled]

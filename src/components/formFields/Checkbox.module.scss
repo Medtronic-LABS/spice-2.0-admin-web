@@ -29,11 +29,6 @@
         border: 0.063rem solid $field-focus-border-color !important;
       }
     }
-    &:disabled {
-      &::after {
-        border: none !important;
-      }
-    }
     &::after {
       top: 0;
       left: 0;

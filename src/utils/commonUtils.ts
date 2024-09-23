@@ -1,7 +1,8 @@
 import React from 'react';
 import { saveAs } from 'file-saver';
-import APPCONSTANTS from '../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
 import CryptoJS from 'crypto-js';
+import { IHFUserGet, IUserRole } from '../store/healthFacility/types';
 
 const getEncryptionKey = () => {
   return CryptoJS.PBKDF2(process.env.REACT_APP_CRYPTR_SECRET_KEY as string, APPCONSTANTS.ENCRYPTION.SALT, {
@@ -122,4 +123,20 @@ export const formatUserToastMsg = (
     msg = msg?.replace(regex, replacement);
   });
   return msg;
+};
+
+export const addResRiskToUserPayload = (payload: any, redRiskId: number | null = null) => {
+  return payload.map((user: { redRisk: any; roleIds: any[] }) => ({
+    ...user,
+    roleIds: user.redRisk
+      ? [...new Set([...user.roleIds, redRiskId])]
+      : user.roleIds?.filter((roleId: number) => roleId !== redRiskId)
+  }));
+};
+
+export const formatRoles = (user: IHFUserGet) => {
+  return `${(user.roles || [])
+    ?.filter((filteredUserRole: IUserRole) => filteredUserRole.name !== NAMING_VARIABLES.redRisk)
+    ?.map((userRole: IUserRole) => userRole.displayName)
+    .join(',')}`;
 };

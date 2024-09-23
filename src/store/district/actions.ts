@@ -47,12 +47,7 @@ import {
   IActivateDistrictFail,
   ISetDistrictDetails,
   IClearDistrictList,
-  IClearDistrictAdmin,
-  IFetchClinicalWorkflowReq,
-  IFetchClinicalWorkflowSuccess,
-  IFetchClinicalWorkflowFailure,
-  IFetchClinicalWorkflowReqPayload,
-  IFetchClinicalWorkflowSuccessPayload
+  IClearDistrictAdmin
 } from './types';
 
 export const fetchDistrictListRequest = ({
@@ -322,22 +317,6 @@ export const clearDistrictList = (): IClearDistrictList => ({
 
 export const clearDistrictAdmin = (): IClearDistrictAdmin => ({
   type: DISTRICT_TYPES.CLEAR_DISTRICT_ADMIN
-});
-
-export const fetchClinicalWorkflow = (data: IFetchClinicalWorkflowReqPayload): IFetchClinicalWorkflowReq => ({
-  type: DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST,
-  data
-});
-
-export const fetchClinicalWorkflowSuccess = (
-  payload: IFetchClinicalWorkflowSuccessPayload
-): IFetchClinicalWorkflowSuccess => ({
-  type: DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_SUCCESS,
-  payload
-});
-
-export const fetchClinicalWorkflowFailure = (): IFetchClinicalWorkflowFailure => ({
-  type: DISTRICT_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE
 });
 
 export const resetClinicalWorkflow = () => ({
