@@ -73,7 +73,7 @@ const UserList = (): React.ReactElement => {
           isSiteUsers: false,
           tenantId,
           failureCb: (e: Error) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USERS_LIST_FETCH_ERROR));
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_LIST_FETCH_ERROR));
           }
         })
       ),
@@ -108,11 +108,11 @@ const UserList = (): React.ReactElement => {
             tenantIds: organizations.map((s) => Number(s.id))
           },
           successCb: () => {
-            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DELETE_SUCCESS);
+            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.ADMIN_DELETE_SUCCESS);
             refreshHFUserList();
           },
           failureCb: (e) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DELETE_FAIL));
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL));
           }
         })
       );
@@ -143,7 +143,7 @@ const UserList = (): React.ReactElement => {
             setIsOpenUserModal({ isOpen: true, isEdit: true });
           },
           failureCb: (e) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.USER_DETAIL_FETCH_FAIL));
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DETAIL_FETCH_FAIL));
           }
         })
       );

@@ -24,7 +24,8 @@ export const SiteUserForm = (props: any) => {
     formDetails,
     role,
     isHFAdminSelected,
-    isHFCreate
+    isHFCreate,
+    isEdit
   } = props;
   const { form, formName } = formDetails;
   const isHFSelected =
@@ -109,6 +110,7 @@ export const SiteUserForm = (props: any) => {
                 options={districtDetails.list}
                 loadingOptions={districtDetails.loading}
                 error={isError(meta)}
+                disabled={isEdit} // disable when admin edit
                 isModel={true}
                 onChange={(value: any) => {
                   form.change(`${formName}[0].chiefdom`, undefined);
@@ -137,6 +139,7 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={chiefdomDetails.loading}
                 error={isError(meta)}
                 isModel={true}
+                disabled={isEdit} // disable when admin edit
                 onChange={(value: any) => {
                   form.change(`${formName}[0].healthfacility`, undefined);
                   input.onChange(value);

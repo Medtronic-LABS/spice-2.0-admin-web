@@ -42,7 +42,7 @@ import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } fro
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { addResRiskToUserPayload, formatRoles } from '../../utils/commonUtils';
+import { addRedRiskToUserPayload, formatRoles } from '../../utils/commonUtils';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -428,7 +428,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
     let userObj = formatHFUserData(users, countryIdValue, tenantId);
-    userObj = addResRiskToUserPayload(userObj, getRedRisk.id);
+    userObj = addRedRiskToUserPayload(userObj, getRedRisk.id);
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -463,7 +463,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
     let userObj = formatHFUserData(users, countryIdValue, tenantId, true);
-    userObj = addResRiskToUserPayload(userObj, getRedRisk.id);
+    userObj = addRedRiskToUserPayload(userObj, getRedRisk.id);
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({

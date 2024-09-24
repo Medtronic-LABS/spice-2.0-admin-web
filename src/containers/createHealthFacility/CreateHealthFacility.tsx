@@ -24,6 +24,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { addRedRiskToUserPayload } from '../../utils/commonUtils';
 
 interface IMatchParams {
   regionId?: string;
@@ -142,10 +143,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );
-      postUserData = postUserData.map((user) => ({
-        ...user,
-        roleIds: user.redRisk ? [...new Set([...user.roleIds, getRedRisk.id])] : user.roleIds
-      }));
+      postUserData = addRedRiskToUserPayload(postUserData, getRedRisk.id);
       const postData = {
         ...formatHealthFacility({ ...healthFacility }, countryId),
         users: postUserData

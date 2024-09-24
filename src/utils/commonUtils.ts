@@ -125,7 +125,7 @@ export const formatUserToastMsg = (
   return msg;
 };
 
-export const addResRiskToUserPayload = (payload: any, redRiskId: number | null = null) => {
+export const addRedRiskToUserPayload = (payload: any, redRiskId: number | null = null) => {
   return payload.map((user: { redRisk: any; roleIds: any[] }) => ({
     ...user,
     roleIds: user.redRisk

@@ -109,7 +109,7 @@ const UserForm = ({
   entityName,
   enableAutoPopulate,
   countryId,
-  hfTenantId,
+  hfTenantId, // tenantId from URL
   data = [],
   autoFetchedDataState,
   autoFetchedState,
@@ -846,7 +846,8 @@ const UserForm = ({
       [DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) &&
       role !== DISTRICT_ADMIN &&
       role !== CHIEFDOM_ADMIN &&
-      !isProfile
+      !isProfile &&
+      hfTenantId
     ) {
       fetchDetails();
     }
@@ -1382,6 +1383,7 @@ const UserForm = ({
                   formDetails={{ form, formName, fields }}
                   isHFAdminSelected={isHFAdminSelected}
                   isHFCreate={isHFCreate}
+                  isEdit={isEdit}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>
