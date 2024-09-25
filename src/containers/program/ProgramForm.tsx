@@ -66,8 +66,8 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
-              label='Health Facilities'
-              errorLabel='health Facilities'
+              label='Health Facility'
+              errorLabel='health facility'
               valueKey='id'
               labelKey='name'
               isMulti={true}

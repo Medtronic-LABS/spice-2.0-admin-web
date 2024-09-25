@@ -10,7 +10,8 @@ const sagaMiddleware = createSagaMiddleware();
 // Mount it on the Store
 const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(sagaMiddleware),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(sagaMiddleware),
   devTools: process.env.NODE_ENV === 'development' // Enable Redux DevTools in development mode only
 });
 

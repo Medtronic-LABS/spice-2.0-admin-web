@@ -66,7 +66,8 @@ const WorkflowCustomization = (): React.ReactElement => {
         })
       );
     }
-  }, [dispatch, regionId, listParams, tenantId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, regionId, listParams.page, listParams.rowsPerPage, listParams.rowsPerPage, tenantId]);
 
   useEffect(() => {
     if (clinicalWorkflows.length) {
@@ -78,7 +79,7 @@ const WorkflowCustomization = (): React.ReactElement => {
   useEffect(() => {
     getClinicalWorkflow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [listParams]);
 
   const handleRowEdit = ({ index, id, workflowName }: { index: number; id: string; workflowName: string }) => {
     history.push(
@@ -97,10 +98,10 @@ const WorkflowCustomization = (): React.ReactElement => {
   const closeWorkflowModal = () => {
     setWorkflowModal({ isOpen: false, isEdit: false, data: {} as IClinicalWorkflow });
   };
-  const handleAddWorkflowSubmit = (account: IClinicalWorkflow) => {
+  const handleAddWorkflowSubmit = (workflow: IClinicalWorkflow) => {
     dispatch(
       createWorkflowModule({
-        data: { ...account, name: account.name.replace(/\s+/g, ' ').trim(), countryId: regionId || '', tenantId },
+        data: { ...workflow, name: workflow.name.replace(/\s+/g, ' ').trim(), countryId: regionId || '', tenantId },
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.WORKFLOW_CREATE_SUCCESS);
           closeWorkflowModal();
@@ -123,8 +124,8 @@ const WorkflowCustomization = (): React.ReactElement => {
     setWorkflowModal({ isOpen: true, isEdit: true, data });
   };
 
-  const handleEditWorkflowSubmit = (account: IClinicalWorkflow) => {
-    const data = { id: account.id, viewScreens: account.viewScreens, tenantId };
+  const handleEditWorkflowSubmit = (workflow: IClinicalWorkflow) => {
+    const data = { id: workflow.id, viewScreens: workflow.viewScreens, tenantId };
     dispatch(
       updateWorkflowModule({
         data,
@@ -160,7 +161,7 @@ const WorkflowCustomization = (): React.ReactElement => {
     );
   };
 
-  const formatName = (account: any) => `${account.name.charAt(0).toUpperCase() + account.name.slice(1)}`;
+  const formatName = (workflow: any) => `${workflow.name.charAt(0).toUpperCase() + workflow.name.slice(1)}`;
 
   return (
     <div className='col-12'>

@@ -70,7 +70,9 @@ const DetailCard = ({
   setSelectedRole,
   setSelectedFacility
 }: IDetailCardProps): React.ReactElement => {
-  const buttonClass = `${buttonLabel && onButtonClick ? 'me-1 mt-1' : 'mt-0'} mt-lg-0`;
+  const buttonClass = `${
+    buttonLabel && onButtonClick ? (isFilter ? 'me-lg-0 me-xxl-1 mt-1' : 'me-1 mt-1') : 'mt-0'
+  } mt-lg-0`;
   const searchClass = `${isSearch ? 'mt-1' : ''} mt-lg-0`;
 
   /**
@@ -136,7 +138,7 @@ const DetailCard = ({
         <div
           className={`d-flex justify-content-between  ${
             buttonLabel && onButtonClick ? 'justify-content-lg-end' : ''
-          }  ${isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'} flex-grow-md-0`}
+          }  ${isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'} flex-grow-md-0 ${styles.buttonContainer}`}
         >
           {renderSearchBar()}
           {onFilterData?.map((data: IFilteredData) => data.data && renderFilter(data.isFacility, data))}

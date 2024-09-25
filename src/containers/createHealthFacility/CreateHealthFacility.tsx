@@ -139,7 +139,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
    */
   const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
     if (submittedData.isNextClicked && countryId) {
-      let postUserData = formatHFUserData(users, countryId, undefined, true);
+      let postUserData = formatHFUserData({ userData: users, countryId, isHFCreate: true });
       const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );

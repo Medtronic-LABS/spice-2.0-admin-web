@@ -130,7 +130,7 @@ const HealthFacilityList = (): React.ReactElement => {
       setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
     } else {
       setEditHFDetailsModal({
-        ...editHealthFacilityModal,
+        data: {},
         isOpen: false
       });
       setSubmittedData({ ...submittedData, isNextClicked: false });

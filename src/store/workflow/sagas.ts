@@ -204,8 +204,7 @@ export function* deactivateConsentForm({
 export function* fetchClinicalWorkflows({ data }: IFetchClinicalWorkflowReq): SagaIterator {
   try {
     const { data: worflowsResponse } = yield call(workflowService.fetchClinicalWorkflows, data);
-    const { entityList: workflows } = worflowsResponse;
-    const { totalCount: total } = worflowsResponse;
+    const { entityList: workflows, totalCount: total } = worflowsResponse;
     const sortedWokflows = workflows.sort((workflowA: IClinicalWorkflow, workflowB: IClinicalWorkflow) =>
       (workflowA.moduleType || 0) > (workflowB.moduleType || 0) ? 1 : -1
     );

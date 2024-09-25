@@ -40,6 +40,7 @@ import ResetPasswordFields, { generatePassword } from '../authentication/ResetPa
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
+import { addRedRiskToUserPayload } from '../../utils/commonUtils';
 
 interface IMatchParams {
   tenantId: string;
@@ -91,6 +92,7 @@ const UserList = (): React.ReactElement => {
         }
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dispatch,
     countryIdValue,
@@ -231,13 +233,11 @@ const UserList = (): React.ReactElement => {
       const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );
-      const userObj = formatHFUserData(users, countryIdValue, tenantId);
+      let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId, isUserCreate: true });
+      userObj = addRedRiskToUserPayload(userObj, getRedRisk?.id);
       const data: IHFUserPost = userObj[0];
-      const roleIds = data?.redRisk
-        ? [...new Set([...data.roleIds, getRedRisk.id])]
-        : data.roleIds?.filter((roleId) => roleId !== getRedRisk.id);
       onSubmitHandler(
-        { ...data, roleIds },
+        { ...data },
         isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
         null,
         siteUserSuccess,
@@ -254,7 +254,7 @@ const UserList = (): React.ReactElement => {
         }
       );
     },
-    [isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, siteUserSuccess, tenantId]
+    [rolesGrouped?.SPICE, isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, siteUserSuccess, tenantId]
   );
 
   const userFormRenderer = (form?: FormApi<any>) => {
@@ -315,10 +315,12 @@ const UserList = (): React.ReactElement => {
         failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isSuperUser, countryIdValue]);
 
   useEffect(() => {
     fetchList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

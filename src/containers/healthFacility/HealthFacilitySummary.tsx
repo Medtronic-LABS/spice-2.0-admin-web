@@ -86,12 +86,19 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
   return postData;
 };
 
-export const formatHFUserData = (
-  userData: any[],
-  countryId: number | string,
-  tenantId?: number | string | undefined,
-  isHFCreate = false
-) => {
+export const formatHFUserData = ({
+  userData,
+  countryId,
+  tenantId,
+  isHFCreate = false,
+  isUserCreate = false
+}: {
+  userData: any[];
+  countryId: number | string;
+  tenantId?: number | string | undefined;
+  isHFCreate?: boolean;
+  isUserCreate?: boolean;
+}) => {
   return userData.map((user: any) => {
     let roleIds: number[] = [];
     if (isHFCreate) {
@@ -122,6 +129,16 @@ export const formatHFUserData = (
       roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
     }
     const isSuperAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
+    let payloadTenantId = user.tenantId || Number(tenantId);
+    if (isUserCreate || user.tenantId || user?.healthfacility?.tenantId) {
+      payloadTenantId = Number(user.tenantId || user.healthfacility.tenantId);
+    } else if (isSuperAdmin) {
+      payloadTenantId = null;
+    } else if (user?.chiefdom?.tenantId) {
+      payloadTenantId = Number(user.chiefdom.tenantId);
+    } else if (user?.district?.tenantId) {
+      payloadTenantId = Number(user.district.tenantId);
+    }
     return {
       id: Number(user?.id),
       firstName: user.firstName,
@@ -132,11 +149,7 @@ export const formatHFUserData = (
       culture: user.culture,
       countryCode: user?.countryCode?.phoneNumberCode,
       country: isSuperAdmin ? null : { id: Number(countryId) },
-      tenantId: user?.healthfacility?.tenantId
-        ? Number(user.healthfacility.tenantId)
-        : isSuperAdmin
-        ? null
-        : user.tenantId || Number(tenantId),
+      tenantId: payloadTenantId,
       supervisorId: Number(user.supervisor?.id),
       roleIds,
       villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
@@ -427,7 +440,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    let userObj = formatHFUserData(users, countryIdValue, tenantId);
+    let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId });
     userObj = addRedRiskToUserPayload(userObj, getRedRisk.id);
     const data: IHFUserPost = userObj[0];
     dispatch(
@@ -462,7 +475,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    let userObj = formatHFUserData(users, countryIdValue, tenantId, true);
+    let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId, isHFCreate: true });
     userObj = addRedRiskToUserPayload(userObj, getRedRisk.id);
     const data: IHFUserPost = userObj[0];
     dispatch(

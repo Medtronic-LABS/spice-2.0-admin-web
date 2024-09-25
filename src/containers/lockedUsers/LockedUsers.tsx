@@ -75,7 +75,6 @@ const LockedUsers = (): React.ReactElement => {
       unlockUsersRequest({
         userId: data.id,
         successCb: () => {
-          fetchDetails();
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.UNLOCK_USER_SUCCESS);
         },
         failureCb: (e) => {

@@ -148,6 +148,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
     } else {
       setSelectAllOption(selectAllOptionData);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,9 +195,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   return (
     <>
       {filterData.isShow && (
-        <div className={styles.selectHeader}>
+        <div className={`${styles.selectHeader}`}>
           <div
-            className={`${styles.selectHeader} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1 position-relative`}
+            className={`${styles.selectHeader} ${styles.container} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1 position-relative filter-container`}
             onClick={handleDropdownToggle}
             ref={dropdownContainerRef}
           >
@@ -207,7 +208,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
             )} */}
             <div className='d-flex align-items-center'>
               <FilterListIcon />
-              <span className='text-secondary py-0dot25 px-1'>{filterData.name}</span>
+              <span className={`text-secondary py-0dot25 px-1 filter-placeholder ${styles.placeholder}`}>
+                {filterData.name}
+              </span>
             </div>
             <div className={`text-secondary ${styles.arrow} ${isOpen ? 'open' : ''}`} />
           </div>

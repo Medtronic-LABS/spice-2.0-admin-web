@@ -183,7 +183,7 @@ const HealthFacilityDetailsForm = ({
   // Chiefdom fetch
   useEffect(() => {
     const selectedDistrictId = form.getState().values?.healthFacility?.district?.tenantId;
-    if (selectedDistrictId) {
+    if (selectedDistrictId && !isEdit) {
       dispatch(fetchChiefdomListRequest({ tenantId: selectedDistrictId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,6 +251,7 @@ const HealthFacilityDetailsForm = ({
     return () => {
       dispatch(clearHFFormData());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

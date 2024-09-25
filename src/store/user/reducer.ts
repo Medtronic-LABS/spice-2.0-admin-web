@@ -45,7 +45,7 @@ const initialStateGetter = () =>
     communityList: [],
     isLockedUserLoading: false,
     lockedUsers: [],
-    totalLockedUers: 0
+    totalLockedUsers: 0
   } as unknown as IUserState);
 
 const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {

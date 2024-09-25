@@ -1018,7 +1018,7 @@ const UserForm = ({
                             isShowLabel={true}
                             isSelectAll={true}
                             selectAll={false}
-                            menuPlacement={'bottom'}
+                            menuPlacement={'auto'}
                             isDisabled={isProfile}
                             placeholder=''
                             isModel={true}
@@ -1089,7 +1089,7 @@ const UserForm = ({
                           <SelectInput
                             {...(input as any)}
                             label={'SPICE Role'}
-                            errorLabel='Please select at least one role.'
+                            errorLabel='Please select role.'
                             labelKey='displayName'
                             valueKey='id'
                             options={getAdminRoles()}
@@ -1230,10 +1230,14 @@ const UserForm = ({
                     enableAutoPopulate={enableAutoPopulate}
                     onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
                     parentOrgId={
-                      isSiteUser ? form.getState()?.values?.users?.[0]?.healthfacility?.chiefdom?.tenantId : parentOrgId
+                      isSiteUser && !parentOrgId
+                        ? form.getState()?.values?.users?.[0]?.healthfacility?.chiefdom?.tenantId
+                        : parentOrgId
                     }
                     ignoreTenantId={
-                      isSiteUser ? form.getState()?.values?.users?.[0]?.healthfacility?.tenantId : ignoreTenantId
+                      isSiteUser && !ignoreTenantId
+                        ? form.getState()?.values?.users?.[0]?.healthfacility?.tenantId
+                        : ignoreTenantId
                     }
                   />
                 </div>
@@ -1279,7 +1283,11 @@ const UserForm = ({
                     name={name}
                     formName={formName}
                     index={index}
-                    countryCode={form.getState().values?.users[index]?.countryCode?.phoneNumberCode}
+                    countryCode={
+                      isRegionCreate
+                        ? form.getState().values?.users[index]?.countryCode
+                        : form.getState().values?.users[index]?.countryCode?.phoneNumberCode
+                    }
                   />
                 </div>
                 {!isHFCreate && !isHF && isSiteUser && (

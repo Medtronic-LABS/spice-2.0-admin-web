@@ -406,7 +406,9 @@ const healthFacilityReducer = (
         ...state,
         chiefdomList: [],
         villagesList: [],
+        villagesTotal: 0,
         unlinkedVillagesList: [],
+        unlinkedVillagesTotal: 0,
         villagesFromHFList: { list: [], hfTenantIds: null }
       };
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HF_DROPDOWN_OPTIONS:
