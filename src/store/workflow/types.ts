@@ -56,6 +56,8 @@ export interface IClinicalWorkflow {
   tenantId?: string;
   viewScreens?: string[];
   workflow?: string;
+  ncdWorkflow?: boolean;
+  workflowName?: string;
 }
 
 export interface IAccount {

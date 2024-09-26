@@ -25,6 +25,7 @@ import WorkflowForm from './WorkflowForm';
 import { ReactComponent as CustomizeIcon } from '../../assets/images/account-customize.svg';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import Loader from '../../components/loader/Loader';
+import { IWorkflow } from '../../store/healthFacility/types';
 
 interface IMatchParams {
   regionId?: string;
@@ -48,7 +49,7 @@ const WorkflowCustomization = (): React.ReactElement => {
     isEdit: false,
     data: {} as IClinicalWorkflow
   });
-  const clinicalWorkflows: any = useSelector(getClinicalWorkflowSelector);
+  const clinicalWorkflows: IWorkflow[] = useSelector(getClinicalWorkflowSelector);
   const clinicalWorkflowsCount = useSelector(getClinicalWorkflowsCountSelector);
   const loading: boolean = useSelector(workflowLoadingSelector);
 

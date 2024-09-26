@@ -204,13 +204,18 @@ export function* deactivateConsentForm({
 export function* fetchClinicalWorkflows({ data }: IFetchClinicalWorkflowReq): SagaIterator {
   try {
     const { data: worflowsResponse } = yield call(workflowService.fetchClinicalWorkflows, data);
-    const { entityList: workflows, totalCount: total } = worflowsResponse;
-    const sortedWokflows = workflows.sort((workflowA: IClinicalWorkflow, workflowB: IClinicalWorkflow) =>
-      (workflowA.moduleType || 0) > (workflowB.moduleType || 0) ? 1 : -1
+    const { entityList: workflows } = worflowsResponse;
+    const sortedWokflows: IClinicalWorkflow[] = workflows.sort(
+      (workflowA: IClinicalWorkflow, workflowB: IClinicalWorkflow) =>
+        (workflowA.moduleType || 0) > (workflowB.moduleType || 0) ? 1 : -1
+    );
+    // filter to get only ncdWorkflow for clinical workflows
+    const filteredWorkFlows = sortedWokflows?.filter(({ moduleType, ncdWorkflow }) =>
+      moduleType === 'clinical' ? ncdWorkflow : true
     );
     const payload = {
-      data: (sortedWokflows || []) as IClinicalWorkflow[],
-      total
+      data: (filteredWorkFlows || []) as IClinicalWorkflow[],
+      total: filteredWorkFlows?.length || 0
     };
     yield put(workflowActions.fetchClinicalWorkflowSuccess(payload));
   } catch (e) {

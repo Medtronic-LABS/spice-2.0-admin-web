@@ -639,7 +639,7 @@ export interface IFetchPeerSupervisorListFailure {
 }
 
 export interface IWorkflow {
-  id: string | number;
+  id: string;
   name: string;
   isActive?: boolean;
   default?: boolean;

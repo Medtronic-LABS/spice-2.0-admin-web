@@ -4,7 +4,7 @@ import Checkbox from '../../components/formFields/Checkbox';
 import { convertToCaptilize } from '../../utils/validation';
 import { useSelector } from 'react-redux';
 import { workflowListSelector } from '../../store/healthFacility/selectors';
-import { IWorkflow } from '../../store/healthFacility/types';
+import { IClinicalWorkflow as IWorkflow } from '../../store/workflow/types';
 import { FormApi } from 'final-form';
 import APPCONSTANTS from '../../constants/appConstants';
 
@@ -119,21 +119,11 @@ const renderWorkflowByModuleType = (
 const Workflows: React.FC<IWorkflowsProps> = ({ form, formName, isHFEdit = false }) => {
   const [phq4Selected, setPhq4Selected] = useState(false);
   // Selector hooks
-  const rawWorkFlows: IWorkflow[] = useSelector(workflowListSelector);
-  const [workflows, setWorkflows] = useState<IWorkflow[] | []>([]);
+  const workflows: IWorkflow[] = useSelector(workflowListSelector);
   const {
     WORKFLOW_MODULE: { clinical, customized },
     WORKFLOW_NAME: { phq4, substanceAbuse, suicideScreener }
   } = APPCONSTANTS;
-
-  // useeffect to get only ncdWorkflows
-  useEffect(() => {
-    const filteredWorkFlows = rawWorkFlows?.filter(({ moduleType, ncdWorkflow }) =>
-      moduleType === clinical ? ncdWorkflow : true
-    );
-    setWorkflows(filteredWorkFlows);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawWorkFlows]);
 
   const getHFWorkflowIds = useCallback((hfWorkflows: any[], workflow: IWorkflow, moduleType: string) => {
     if (workflow.moduleType === moduleType) {
