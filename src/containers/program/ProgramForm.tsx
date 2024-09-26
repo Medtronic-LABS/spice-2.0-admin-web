@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import TextInput from '../../components/formFields/TextInput';
 import SelectInput from '../../components/formFields/SelectInput';
 import Checkbox from '../../components/formFields/Checkbox';
-import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
+import { healthFacilityListSelector, healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 import { IProgramFormValues } from '../../store/program/types';
 import { composeValidators, required, minLength, validateEntityName } from '../../utils/validation';
 import { fetchHFDropdownRequest } from '../../store/program/actions';
@@ -13,6 +13,7 @@ import { countryIdSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
 import { siteListDropdownSelector } from '../../store/program/selectors';
+import { fetchHFListRequest } from '../../store/healthFacility/actions';
 
 interface IProgramFormProps {
   form: FormApi<{ program: IProgramFormValues }>;
@@ -28,16 +29,22 @@ interface IProgramFormProps {
 const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const { tenantId, isEdit = false } = props;
   const countryId = useSelector(countryIdSelector);
+  const healthFacilityList = useSelector(healthFacilityListSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const dispatch = useDispatch();
-
-  const hfListDropdown = useSelector(siteListDropdownSelector);
   const hfListLoading = useSelector(healthFacilityLoadingSelector);
   useEffect(() => {
-    if (tenantId !== hfListDropdown.countryId) {
-      dispatch(fetchHFDropdownRequest({ tenantId, countryId: countryIdValue }));
+    if (!healthFacilityList.length) {
+      dispatch(
+        fetchHFListRequest({
+          countryId: countryIdValue,
+          skip: 0,
+          limit: null,
+          tenantIds: [tenantId]
+        })
+      );
     }
-  }, [dispatch, tenantId, hfListDropdown.countryId, countryIdValue, hfListDropdown]);
+  }, [dispatch, tenantId, countryIdValue]);
 
   return (
     <div className='row gx-1dot25'>
@@ -72,7 +79,7 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
               labelKey='name'
               isMulti={true}
               isModel={isEdit}
-              options={hfListDropdown.list}
+              options={healthFacilityList}
               loadingOptions={hfListLoading}
               error={(meta.touched && meta.error) || undefined}
             />

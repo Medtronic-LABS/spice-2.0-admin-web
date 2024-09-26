@@ -129,13 +129,14 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
           <Field
             name={'village'}
             type='text'
-            validate={composeValidators(required, validateEntityName)}
+            validate={composeValidators(required)}
             render={({ input, meta }) => {
               return (
                 <TagInput
                   {...input}
                   label={`Villages`}
                   error={!input.value.length && meta.touched ? 'Please add the village name' : ''}
+                  fromChiefDom={true}
                 />
               );
             }}

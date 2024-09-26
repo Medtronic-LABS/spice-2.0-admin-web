@@ -19,7 +19,8 @@ import APPCONSTANTS, {
   NAME_CONSTANTS,
   COMMON_INSIGHTS_ADMINROLE,
   COMMON_INSIGHTS_USERROLE,
-  SIDE_MENU_FETCHING_HIERARCHY
+  SIDE_MENU_FETCHING_HIERARCHY,
+  CFR_SUITEACCSESS_NAME
 } from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
@@ -270,10 +271,6 @@ const UserForm = ({
           : [],
         selectedRoles: initialEditValue?.role || [],
         selectedInsightsRole: initialEditValue?.spiceInsightsRole || [],
-        suiteAccess: initialEditValue?.suiteAccess?.map((org: any) => ({
-          ...org,
-          isFixed: APPCONSTANTS.spiceRole.spiceInsights !== org.groupName
-        })),
         culture:
           !isCultureListLoading &&
           cultureList?.find(
@@ -340,8 +337,8 @@ const UserForm = ({
     },
     [isSuperAdmin, countryId, dispatch, role, healthFacilityList?.length]
   );
-
   useEffect(() => {
+    levelBasedInsightsRole();
     return () => {
       dispatch(clearSupervisorList());
       dispatch(clearVillageHFList());
@@ -369,7 +366,6 @@ const UserForm = ({
     };
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
-
     if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
       emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE, index);
     } else if (isCHPSelected(userData.role) && isHFCreate) {
@@ -385,7 +381,9 @@ const UserForm = ({
         ...userData.supervisor,
         name: `${userData.supervisor?.firstName || ''} ${userData.supervisor?.lastName || ''}`
       };
-      userData.selectedRoles = [...(userData.roles || [])];
+      userData.selectedRoles = [...(userData?.roles || [])];
+      userData.mandatorySuiteAccess = userData.suiteAccess;
+      const filteredUserRoles = userData?.roles?.filter((data: any) => data.name !== NAMING_VARIABLES.redRisk);
       userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
       if (userData.organizations.length === 1) {
         const { formDataId: id, name } = userData.organizations[0];
@@ -394,10 +392,11 @@ const UserForm = ({
       form.batch(() => {
         form.change(`${formName}[${index}].id`, userData.id || '');
         form.change(`${formName}[${index}].suiteAccess`, userData.suiteAccess || null);
-        form.change(`${formName}[${index}].role`, userData.role || []);
+        form.change(`${formName}[${index}].mandatorySuiteAccess`, userData.mandatorySuiteAccess || '');
+        form.change(`${formName}[${index}].role`, filteredUserRoles || []);
         form.change(`${formName}[${index}].roles`, userData.roles || []);
         form.change(`${formName}[${index}].spiceInsightsRole`, userData.spiceInsightsRole || []);
-        form.change(`${formName}[${index}].selectedRoles`, userData.selectedRoles || []);
+        form.change(`${formName}[${index}].selectedRoles`, userData?.selectedRoles || []);
         form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
         form.change(`${formName}[${index}].lastName`, userData.lastName || '');
         form.change(`${formName}[${index}].gender`, userData.gender || '');
@@ -414,6 +413,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].selectedVillages`, userData.selectedVillages || []);
         form.change(`${formName}[${index}].timezone`, userData.timezone || []);
         form.change(`${formName}[${index}].culture`, userData.culture || []);
+        form.change(`${formName}[${index}].redRisk`, userData.redRisk || []);
       });
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = true;
@@ -424,8 +424,7 @@ const UserForm = ({
       isCHUserSelectedFn(userData.role, index);
       updateRoleOptionsAndDisableRoles(index, userData.roles);
       if (isCHPSelected(userData.roles)) {
-        const tenantIds = [...userData.organizations.map((v: any) => v.id)].filter((v: any) => v);
-
+        const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
         fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'village', index);
         fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'supervisor', index);
       }
@@ -527,7 +526,7 @@ const UserForm = ({
   };
 
   // roles based CHW related utils
-  const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.roles, [form]);
+  const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.role, [form]);
 
   const updateRoleOptionsAndDisableRoles = useCallback(
     (index: number, mandatoryRoleOptions?: IRoles[]) => {
@@ -710,13 +709,7 @@ const UserForm = ({
         setAutoFetchData([initialEditDataForRole]);
       }
     } else {
-      if (suiteAccess) {
-        const initialEditDataForRole = {
-          suiteAccess: [suiteAccess]
-        };
-        roleOptions.current = [rolesGrouped.SPICE];
-        setAutoFetchData([initialEditDataForRole]);
-      }
+      setAutoFetchData(initialValue);
     }
   }, [defaultSelectedRole, initialEditData, initialValue, isAdminForm, isEdit, rolesGrouped.SPICE]);
 
@@ -815,10 +808,15 @@ const UserForm = ({
    */
   const levelBasedInsightsRole = (level?: number) => {
     const filteredRoles = rolesGrouped['SPICE INSIGHTS']?.filter((roleData: any) => {
-      if (isSiteUser && !level) {
-        return roleData.level === level || COMMON_INSIGHTS_USERROLE.includes(roleData.name);
+      const commonRole = roleData.suiteAccessName === CFR_SUITEACCSESS_NAME.quickSight;
+      if (isSiteUser) {
+        return level
+          ? roleData.level === level || commonRole
+          : roleData.suiteAccessName === CFR_SUITEACCSESS_NAME.user || commonRole;
       } else {
-        return roleData.level === level || COMMON_INSIGHTS_ADMINROLE.includes(roleData.name);
+        return level
+          ? roleData.level === level || commonRole
+          : roleData.suiteAccessName === CFR_SUITEACCSESS_NAME.admin || commonRole;
       }
     });
     setInsightsRole(filteredRoles || []);
@@ -875,7 +873,7 @@ const UserForm = ({
 
     if (districtId) {
       dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
-    } else if (!isSiteUser && fetchingFor === REGION_ADMIN) {
+    } else if (!isSiteUser && fetchingFor === REGION_ADMIN && hfTenantId) {
       dispatch(fetchChiefdomListRequest({ tenantId: String(hfTenantId) }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -931,6 +929,7 @@ const UserForm = ({
           // SUITE options
           const suiteAccess = getSuiteAccessList(rolesGrouped);
           const {
+            mandatorySuiteAccess,
             selectedRoles: mandatoryRoles = [],
             selectedInsightsRole: mandatoryInsightsRole = [],
             suiteAccess: formSuiteAccess = [],
@@ -944,7 +943,6 @@ const UserForm = ({
           const isSPICEInsights = (formSuiteAccess || []).some(
             (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights
           );
-
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -964,22 +962,26 @@ const UserForm = ({
                         valueKey='groupName'
                         options={suiteAccess || []}
                         placeholder=''
-                        disabled={isProfile || autoFetched[index]}
-                        isDisabled={isProfile || autoFetched[index]}
+                        disabled={isProfile}
+                        isDisabled={isProfile}
                         loadingOptions={isRolesLoading}
                         isShowLabel={true}
                         error={isError(meta)}
                         isMulti={true}
                         isModel={true}
                         required={true}
-                        isClearable={false}
+                        isClearable={!isAdminForm && !isEdit && !autoFetched[index]}
+                        mandatoryOptions={
+                          isAdminForm
+                            ? [suiteAccess[0]]
+                            : isEdit
+                            ? initialEditData?.[0]?.suiteAccess
+                            : autoFetched[index]
+                            ? mandatorySuiteAccess
+                            : ''
+                        }
                         onChange={(values: OnChangeValue<any, true>, actionMeta: ActionMeta<any>) => {
                           const selectedGroupName = values.map((option: any) => option.groupName) || [];
-                          switch (actionMeta.action) {
-                            case 'clear':
-                              values = suiteAccess.filter((v: { isFixed: boolean }) => v.isFixed);
-                              break;
-                          }
                           if (!selectedGroupName.includes('SPICE INSIGHTS')) {
                             form.change(`${formName}[${index}].spiceInsightsRole`, []);
                             form.change(
@@ -988,6 +990,7 @@ const UserForm = ({
                             );
                           }
                           if (!selectedGroupName.includes('SPICE')) {
+                            form.change(`${formName}[${index}].role`, []);
                             form.change(
                               `${formName}[${index}].roles`,
                               (allRoles || []).filter((v: IRoles) => v.groupName !== 'SPICE')
@@ -1040,6 +1043,7 @@ const UserForm = ({
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
                               //  Store ALL ROLES on each update
+                              form.change(`${formName}[${index}].role`, [...values]);
                               form.change(`${formName}[${index}].roles`, [...spiceInsightsRole, ...values]);
                               // User Modified as Peer Superviser from Super Admin
                               SuperAdminToPeerSuperviserFn(values);

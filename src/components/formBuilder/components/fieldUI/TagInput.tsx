@@ -10,6 +10,7 @@ export interface ITagInputProps {
   error?: string;
   classChange?: string;
   allowOnlyNumbers?: boolean;
+  fromChiefDom?: boolean;
 }
 
 const TagInput = ({
@@ -20,13 +21,19 @@ const TagInput = ({
   error = '',
   classChange = '',
   allowOnlyNumbers = false,
+  fromChiefDom,
   ...props
 }: ITagInputProps) => {
   const [items, setItems] = useState<string[]>(defaultValue || []);
   const [inputValue, setInput] = useState<string>('');
 
   const handleInputChange = (evt: React.BaseSyntheticEvent) => {
-    setInput(evt.target.value);
+    const filteredValue = evt.target.value.replace(/[^a-zA-Z0-9]/g, '');
+    if (fromChiefDom) {
+      setInput(filteredValue);
+    } else {
+      setInput(evt.target.value);
+    }
   };
 
   const handleInputKeyDown = (evt: any) => {

@@ -400,7 +400,13 @@ const APPCONSTANTS = {
     'December'
   ],
   DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType'],
-  CUSTOMIZATION_FORM_CATEGORY: 'Input_form'
+  CUSTOMIZATION_FORM_CATEGORY: 'Input_form',
+  levelBasedAdminRole: {
+    REGION_ADMIN_LEVEL: 10,
+    CHIEFDOM_ADMIN_LEVEL: 20,
+    DISTRICT_ADMIN_LEVEL: 15,
+    HEALTH_FACILITY_ADMIN_LEVEL: 25
+  }
 };
 
 export const NAME_CONSTANTS = {
@@ -461,6 +467,7 @@ export const SIDE_MENU_FETCHING_HIERARCHY = {
   'health-facility': 'CHIEFDOM_ADMIN'
 };
 
+export const CFR_SUITEACCSESS_NAME = { user: 'cfr_user', admin: 'cfr_admin', quickSight: 'cfr_quicksight_admin' };
 export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
 export const COMMON_INSIGHTS_USERROLE = ['CFR_HEALTH_FACILITY_USER'];
 
