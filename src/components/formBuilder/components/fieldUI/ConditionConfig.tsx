@@ -90,6 +90,7 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
         name={`${name}[${index}]${config.name}`}
         customValue={value}
         customError={config.error}
+        isCustomErrorWithMeta={true}
         customParseFn={parseFn}
         inputProps={config}
       />

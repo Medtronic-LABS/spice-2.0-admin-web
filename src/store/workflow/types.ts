@@ -347,4 +347,6 @@ export type WorkflowActions =
   | IDeleteWorkflowModule
   | IDeleteWorkflowModuleSuccess
   | IDeleteWorkflowModuleFail
-  | IResetWorkFlowModule;
+  | IResetWorkFlowModule
+  | IFetchClinicalWorkflowReq
+  | IFetchClinicalWorkflowFailure;

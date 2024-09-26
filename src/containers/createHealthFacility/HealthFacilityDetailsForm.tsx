@@ -27,7 +27,7 @@ import {
   villagesListSelector,
   villagesLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   clearHFFormData,
   clearSupervisorList,
@@ -62,7 +62,7 @@ interface IAddUserFormProps {
   modalRef?: any;
   isEdit?: boolean;
   data?: any;
-  submittedData?: any;
+  isNextClicked?: boolean;
 }
 
 interface IMatchParams {
@@ -82,7 +82,7 @@ const HealthFacilityDetailsForm = ({
   formName,
   isEdit = false,
   data = {},
-  submittedData
+  isNextClicked
 }: IAddUserFormProps): React.ReactElement => {
   const dispatch = useDispatch();
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
@@ -110,6 +110,13 @@ const HealthFacilityDetailsForm = ({
   } = NAME_CONSTANTS;
 
   const chiefdom = useSelector(getChiefdomDetailSelector);
+  const [workflowEditedData, setWorkFlowEditedData] = useState<{
+    customizedWorkflows: number[];
+    clinicalWorkflows: number[];
+  }>({
+    clinicalWorkflows: form?.getState()?.values?.healthFacility?.clinicalWorkflows || [],
+    customizedWorkflows: form?.getState()?.values?.healthFacility?.customizedWorkflows || []
+  });
   useEffect(() => {
     if (!isEdit && chiefdomId && Number(chiefdom?.id) !== Number(chiefdomId)) {
       dispatch(
@@ -256,9 +263,15 @@ const HealthFacilityDetailsForm = ({
 
   return (
     <>
-      {submittedData?.isNextClicked ? (
+      {isNextClicked ? (
         <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
-          <Workflows formName='healthFacility' form={form} isHFEdit={isEdit} />
+          <Workflows
+            formName='healthFacility'
+            form={form}
+            isHFEdit={isEdit}
+            workflowEditedData={workflowEditedData}
+            setWorkFlowEditedData={setWorkFlowEditedData}
+          />
         </FormContainer>
       ) : (
         <div className='row gx-1dot25 align-items-end'>

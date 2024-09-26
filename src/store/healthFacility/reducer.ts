@@ -338,6 +338,11 @@ const healthFacilityReducer = (
         ...state,
         clinicalWorkflowLoading: false
       };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_HF_WORKFLOW_LIST:
+      return {
+        ...state,
+        clinicalWorkflowList: []
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST:
       return {
         ...state,

@@ -302,7 +302,7 @@ const MedicationForm = ({
         <Field
           name={`${name}.codeDetails.code`}
           type='text'
-          parse={(value) => value.replace(/[^0-9a-zA-Z/, ]/g, '')}
+          parse={(value) => value.replace(/[^0-9a-zA-Z-_/, ]/g, '')}
           validate={composeValidators(required)}
           render={({ input, meta }) => (
             <TextInput

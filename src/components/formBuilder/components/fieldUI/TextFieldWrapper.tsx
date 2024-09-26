@@ -18,7 +18,8 @@ const TextFieldWrapper = ({
   register,
   obj,
   onlyAsterisk,
-  capitalize = false
+  capitalize = false,
+  isCustomErrorWithMeta
 }: any) => {
   const parseFn = customParseFn ? customParseFn : (val: any) => val;
   const value = customValue ? customValue : null;
@@ -54,7 +55,7 @@ const TextFieldWrapper = ({
               error={
                 (meta.error && formError && meta.error) ||
                 (meta.data?.customError && meta.data?.customError.toString()) ||
-                (meta.error && customError && customError.toString()) ||
+                ((isCustomErrorWithMeta ? meta.error : true) && customError && customError.toString()) ||
                 (meta.error && inputProps.error && inputProps.error + ' ' + inputProps?.label?.toLowerCase()) ||
                 (meta.error &&
                   inputProps.type === 'number' &&

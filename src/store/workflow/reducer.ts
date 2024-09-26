@@ -30,6 +30,8 @@ const workflowReducer = (state = initialState, action = {} as WorkflowActions): 
     case WORKFLOW_TYPES.DEACTIVATE_CONSENT_FORM_REQUEST:
     case WORKFLOW_TYPES.FETCH_FORM_META_REQUEST:
     case WORKFLOW_TYPES.CUSTOMIZE_FORM_REQUEST:
+    case WORKFLOW_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST:
+    case WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST:
       return {
         ...state,
         loading: true
@@ -46,6 +48,9 @@ const workflowReducer = (state = initialState, action = {} as WorkflowActions): 
     case WORKFLOW_TYPES.FETCH_FORM_META_FAILURE:
     case WORKFLOW_TYPES.FETCH_CUSTOMIZATION_FORM_FAILURE:
     case WORKFLOW_TYPES.FETCH_CONSENT_FORM_FAILURE:
+    case WORKFLOW_TYPES.FETCH_CLINICAL_WORKFLOW_FAILURE:
+    case WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_SUCCESS:
+    case WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_FAILURE:
       return {
         ...state,
         loading: false

@@ -92,7 +92,8 @@ import {
   IValidateLinkedRestrictionsFailure,
   IObjectData,
   IFetchVillagesListUserLinked,
-  IClearHFFormData
+  IClearHFFormData,
+  IClearHFWorkflowList
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -491,6 +492,10 @@ export const fetchVillagesListSuccess = (payload: IFetchVillagespayload): IFetch
 export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailure => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF,
   error
+});
+
+export const clearHFWorkflowList = (): IClearHFWorkflowList => ({
+  type: HF_TYPES.CLEAR_HF_WORKFLOW_LIST
 });
 
 // UNLINKED VILLAGES LIST

@@ -249,6 +249,11 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         ...state,
         cultureListLoading: true
       };
+    case USERTYPES.REMOVE_TOKEN:
+      return {
+        ...state,
+        token: ''
+      };
     case USERTYPES.RESET_STORE:
     case USERTYPES.FETCH_TIMEZONE_LIST_REQUEST:
     case USERTYPES.FETCH_TIMEZONE_LIST_FAILURE:

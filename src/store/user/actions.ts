@@ -55,7 +55,8 @@ import {
   ILoginSuccessPayload,
   IGroupRoles,
   IFetchCommunityListPayload,
-  IFetchCommunityList
+  IFetchCommunityList,
+  IRemoveToken
 } from './types';
 
 export const loginRequest = ({
@@ -95,6 +96,10 @@ export const logoutSuccess = (): ILogoutSuccess => ({
 
 export const logoutFailure = (): ILogoutFailure => ({
   type: USER_TYPES.LOGOUT_FAILURE
+});
+
+export const removeToken = (): IRemoveToken => ({
+  type: USER_TYPES.REMOVE_TOKEN
 });
 
 export const addUserTenantID = (payload: string): IAddUserTenantId => ({

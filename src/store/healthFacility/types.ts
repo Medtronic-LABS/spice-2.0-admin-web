@@ -86,6 +86,8 @@ export interface IHealthFacility {
   peerSupervisors?: IPeerSupervisor[];
   linkedVillages: IVillages[];
   clinicalWorkflows: IClinicalWorkflows[];
+  customizedWorkflows?: IClinicalWorkflows[];
+  defaultTrueWorkflows?: IClinicalWorkflows[];
 }
 
 export interface IObjectData {
@@ -559,6 +561,10 @@ export interface IFetchVillagesListFailure {
   error: Error;
 }
 
+export interface IClearHFWorkflowList {
+  type: typeof ACTION_TYPES.CLEAR_HF_WORKFLOW_LIST;
+}
+
 interface IVillagesRequestPayload {
   countryId: number;
   districtId: number;
@@ -823,4 +829,5 @@ export type HealthFacilityActions =
   | IValidateLinkedRestrictionsSuccess
   | IFetchHFUserListClear
   | IValidateLinkedRestrictionsFailure
-  | IClearHFFormData;
+  | IClearHFFormData
+  | IClearHFWorkflowList;

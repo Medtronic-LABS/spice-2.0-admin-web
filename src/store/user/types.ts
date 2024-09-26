@@ -146,6 +146,10 @@ export interface ILogoutFailure {
   type: typeof USER_TYPES.LOGOUT_FAILURE;
 }
 
+export interface IRemoveToken {
+  type: typeof USER_TYPES.REMOVE_TOKEN;
+}
+
 export interface IFetchLoggedInUserRequest {
   type: typeof USER_TYPES.FETCH_LOGGED_IN_USER_REQUEST;
 }
@@ -820,4 +824,5 @@ export type UserActions =
   | IFetchLockedUsersPayload
   | IFetchCountryListSuccessPayload
   | ILoginSuccessPayload
-  | IGroupRoles;
+  | IGroupRoles
+  | IRemoveToken;

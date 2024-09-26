@@ -9,7 +9,8 @@ import {
   ILoginRequest,
   IUnlockUsersRequest,
   IUpdateUserRequest,
-  IUser
+  IUser,
+  roleType
 } from './types';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -22,9 +23,10 @@ import { IActionProps } from '../../typings/global';
 import { error, success } from '../../utils/toastCenter';
 import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
+import ERRORS from '../../constants/errors';
 
-// export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
-//   roles.length && rolesArray.find((role) => roles.includes(role));
+export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
+  roles.length && rolesArray.find((role) => roles.includes(role));
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -46,7 +48,7 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
           firstName,
           lastName,
           id: userId,
-          roles,
+          roles: allRoles,
           tenantId,
           country,
           organizations,
@@ -56,14 +58,31 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     } = yield call(userService.fetchLoggedInUser);
     sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
     sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
+    sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, country?.id);
+    const roles = allRoles.map((role: any) => role.name);
+    const filteredAdminRole: roleType | any = checkRoles(Object.values(APPCONSTANTS.ROLES), roles);
+    if (!filteredAdminRole) {
+      const filteredAllRoles: roleType | any = checkRoles(APPCONSTANTS.SITE_ROLE_NAMES, roles);
+      if (!!filteredAllRoles) {
+        yield call(logout);
+        throw new Error(ERRORS.UNAUTHORIZED.message);
+      } else {
+        sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
+        sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
+        yield put(userActions.removeToken());
+        yield put(userActions.removeUserTenantID());
+        throw new Error(APPCONSTANTS.LOGIN_GENERAL_ERROR);
+      }
+    }
     updateRememberMe(username, password, rememberMe);
+    const roleData = allRoles.find(({ name }: { name: string }) => name === filteredAdminRole);
     const payload: IUser = {
       email,
       firstName,
       lastName,
       userId,
-      role: roles[0].name,
-      roleDetail: roles[0],
+      role: roleData.name,
+      roleDetail: roleData,
       tenantId,
       country,
       suiteAccess,
@@ -132,7 +151,7 @@ export function* fetchLoggedInUser(): SagaIterator {
           firstName,
           lastName,
           id: userId,
-          roles,
+          roles: allRoles,
           tenantId,
           country,
           organizations,
@@ -140,13 +159,32 @@ export function* fetchLoggedInUser(): SagaIterator {
         }
       }
     } = yield call(userService.fetchLoggedInUser);
+    if (tenantId) {
+      sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
+    }
+    if (country?.tenantId) {
+      sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
+    }
+    const roles = allRoles.map((role: any) => role.name);
+    const filteredAdminRole: roleType | any = checkRoles(Object.values(APPCONSTANTS.ROLES), roles);
+    if (!filteredAdminRole) {
+      const filteredAllRoles: roleType | any = checkRoles(APPCONSTANTS.SITE_ROLE_NAMES, roles);
+      if (!filteredAllRoles) {
+        sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
+        sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
+        yield put(userActions.removeToken());
+        yield put(userActions.removeUserTenantID());
+        throw new Error(APPCONSTANTS.LOGIN_GENERAL_ERROR);
+      }
+    }
+    const roleData = allRoles.find(({ name }: { name: string }) => name === filteredAdminRole);
     const payload: IUser = {
       email,
       firstName,
       lastName,
       userId,
-      role: roles[0].name,
-      roleDetail: roles[0],
+      role: roleData.name,
+      roleDetail: roleData,
       tenantId,
       formDataId: organizations[0]?.formDataId,
       country,

@@ -14,6 +14,17 @@ interface IWorkflowsProps {
   formName: string;
   submittedData?: any;
   isHFEdit?: boolean;
+  workflowEditedData?: {
+    customizedWorkflows: number[];
+    clinicalWorkflows: number[];
+  };
+  setWorkFlowEditedData?: ({
+    customizedWorkflows,
+    clinicalWorkflows
+  }: {
+    customizedWorkflows: number[];
+    clinicalWorkflows: number[];
+  }) => void;
 }
 
 /**
@@ -95,7 +106,7 @@ const renderWorkflowByModuleType = (
                               disabled={workflow.default || checkPhq4Condition(workflow)}
                               readOnly={moduleType === clinical && checkPhq4Condition(workflow)}
                               onClick={() => onClickWorkflow(workflow)}
-                              checked={input.checked}
+                              checked={input.checked || workflow.default}
                             />
                           );
                         }}
@@ -116,7 +127,16 @@ const renderWorkflowByModuleType = (
   );
 };
 
-const Workflows: React.FC<IWorkflowsProps> = ({ form, formName, isHFEdit = false }) => {
+const Workflows: React.FC<IWorkflowsProps> = ({
+  form,
+  formName,
+  isHFEdit = false,
+  workflowEditedData = {
+    customizedWorkflows: [],
+    clinicalWorkflows: []
+  },
+  setWorkFlowEditedData
+}) => {
   const [phq4Selected, setPhq4Selected] = useState(false);
   // Selector hooks
   const workflows: IWorkflow[] = useSelector(workflowListSelector);
@@ -129,8 +149,10 @@ const Workflows: React.FC<IWorkflowsProps> = ({ form, formName, isHFEdit = false
     if (workflow.moduleType === moduleType) {
       if (hfWorkflows.length) {
         return workflow.id;
-      } else if (workflow?.default) {
-        return workflow.id;
+      } else {
+        if (workflow?.default) {
+          return workflow.id;
+        }
       }
     }
     return null;
@@ -164,19 +186,26 @@ const Workflows: React.FC<IWorkflowsProps> = ({ form, formName, isHFEdit = false
   useEffect(() => {
     if (workflows.length) {
       form.initialize((data: any) => {
-        const hfClinicalWorkflows = data?.healthFacility?.clinicalWorkflows || [];
-        const hfCustomizedWorkflows = data?.healthFacility?.customizedWorkflows || [];
+        const hfClinicalWorkflows = data?.healthFacility?.rawClinicalWorkflows || [];
+        const hfCustomizedWorkflows = data?.healthFacility?.rawCustomizedWorkflows || [];
         const clinicalWorkflow = hfClinicalWorkflows.length ? hfClinicalWorkflows : workflows;
-        const newClinicalWorkflow = (newWorkflow: IWorkflow[], moduleType: string) =>
-          newWorkflow
+        const newClinicalWorkflow = (newWorkflow: IWorkflow[], moduleType: string) => {
+          return newWorkflow
             .map((workflow: IWorkflow) => getHFWorkflowIds(hfClinicalWorkflows, workflow, moduleType))
             .filter(Boolean);
+        };
         const newData = {
           ...data,
           healthFacility: {
             ...data?.healthFacility,
-            clinicalWorkflows: newClinicalWorkflow(clinicalWorkflow, clinical),
-            customizedWorkflows: newClinicalWorkflow(hfCustomizedWorkflows, customized)
+            clinicalWorkflows:
+              isHFEdit && workflowEditedData && workflowEditedData?.clinicalWorkflows
+                ? workflowEditedData.clinicalWorkflows
+                : newClinicalWorkflow(clinicalWorkflow, clinical),
+            customizedWorkflows:
+              isHFEdit && workflowEditedData && workflowEditedData?.customizedWorkflows
+                ? workflowEditedData.customizedWorkflows
+                : newClinicalWorkflow(hfCustomizedWorkflows, customized)
           }
         };
         mentalHealthSelection();
@@ -187,9 +216,11 @@ const Workflows: React.FC<IWorkflowsProps> = ({ form, formName, isHFEdit = false
     return () => {
       window.clearInterval(mentalHealthTimeout.current);
       window.clearInterval(pregnancyCheckTimeoutVar);
-      if (!isHFEdit) {
-        form.change(`${formName}.clinicalWorkflows`, undefined);
-        form.change(`${formName}.customizedWorkflows`, undefined);
+      if (isHFEdit && setWorkFlowEditedData) {
+        setWorkFlowEditedData({
+          clinicalWorkflows: form.getState().values.healthFacility?.clinicalWorkflows,
+          customizedWorkflows: form.getState().values.healthFacility?.customizedWorkflows
+        });
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

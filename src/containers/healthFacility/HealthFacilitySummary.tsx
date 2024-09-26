@@ -13,6 +13,7 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import UserForm from '../../components/userForm/UserForm';
 import {
+  clearHFWorkflowList,
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
@@ -36,7 +37,8 @@ import {
 import {
   healthFacilityLoadingSelector,
   healthFacilitySelector,
-  userDetailLoadingSelector
+  userDetailLoadingSelector,
+  workflowListSelector
 } from '../../store/healthFacility/selectors';
 import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
@@ -58,6 +60,7 @@ interface ISummaryUsersState {
 interface IModalState {
   data?: any;
   isOpen: boolean;
+  isNextClicked: boolean;
 }
 
 export const formatHealthFacility = (hf: any, countryId: number | string) => {
@@ -80,7 +83,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
     tenantId: hf.tenantId,
     linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
     linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
-    customizedWorkflowIds: hf.customizedWorkflows,
+    customizedWorkflowIds: hf.customizedWorkflows || [],
     clinicalWorkflowIds: hf.clinicalWorkflows
   };
   return postData;
@@ -146,7 +149,7 @@ export const formatHFUserData = ({
       gender: user.gender,
       username: user.username,
       phoneNumber: user.phoneNumber,
-      culture: user.culture,
+      culture: user.culture || {},
       countryCode: user?.countryCode?.phoneNumberCode,
       country: isSuperAdmin ? null : { id: Number(countryId) },
       tenantId: payloadTenantId,
@@ -172,11 +175,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const email = useSelector(emailSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const rolesGrouped = useSelector(userRolesSelector);
+  const workflows = useSelector(workflowListSelector);
 
   const [editHFDetailsModal, setEditHFDetailsModal] = useState<IModalState>({
-    isOpen: false
+    isOpen: false,
+    isNextClicked: false
   });
-  const [submittedData, setSubmittedData] = useState({ data: {}, isNextClicked: false });
   const [hfUsers, setHFUsers] = useState<ISummaryUsersState>({
     loading: false
   });
@@ -291,13 +295,17 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const openHFEditModal = () => {
     if (healthFacility) {
       setEditHFDetailsModal({
+        ...editHFDetailsModal,
         isOpen: true,
         data: {
           ...healthFacility,
           type: { id: healthFacility.type, name: healthFacility.type },
           city: { id: healthFacility.cityName, name: healthFacility.cityName },
           language: { id: healthFacility.language, name: healthFacility.language },
-          workflows: healthFacility.clinicalWorkflows.map((wfIds: any) => wfIds.id)
+          rawClinicalWorkflows: healthFacility.clinicalWorkflows,
+          rawCustomizedWorkflows: healthFacility?.customizedWorkflows,
+          clinicalWorkflows: healthFacility.clinicalWorkflows.map((wfIds: any) => wfIds.id),
+          customizedWorkflows: healthFacility?.customizedWorkflows?.map((wfIds: any) => wfIds.id)
         } as IHealthFacilityForm
       });
     } else {
@@ -306,49 +314,52 @@ const HealthFacilitySummary = (): React.ReactElement => {
   };
 
   const closeHFEditModal = (isFromCloseBtn?: boolean) => {
-    if (submittedData.isNextClicked && !isFromCloseBtn) {
-      setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
+    if (editHFDetailsModal.isNextClicked && !isFromCloseBtn) {
+      setEditHFDetailsModal({ ...editHFDetailsModal, isNextClicked: !editHFDetailsModal.isNextClicked });
     } else {
       setEditHFDetailsModal({
-        isOpen: false
+        isOpen: false,
+        isNextClicked: false
       });
-      setSubmittedData({ ...submittedData, isNextClicked: false });
+      dispatch(clearHFWorkflowList());
     }
   };
 
-  const editHFDetailsModalRender = (form: any, ref: HTMLDivElement | null | undefined) => {
+  const editHFDetailsModalRender = (form: any) => {
     return (
       <HealthFacilityDetailsForm
         formName='healthFacility'
         form={form}
-        modalRef={ref}
         isEdit={true}
         data={{ ...editHFDetailsModal.data }}
-        submittedData={{ ...submittedData }}
+        isNextClicked={editHFDetailsModal.isNextClicked}
       />
     );
   };
-  const fetchWorkflowList = (healthFacilityParams: any) =>
-    dispatch(
-      fetchWorkflowListRequest({
-        countryId: Number(countryIdValue),
-        successCb: (flows) => {
-          setSubmittedData({
-            data: {
-              healthFacility: {
-                ...healthFacilityParams,
-                workflows: healthFacilityParams.clinicalWorkflows.map((v: any) => v.id)
-              }
-            },
-            isNextClicked: true
-          });
-        },
-        failureCb: (error) =>
-          toastCenter.error(
-            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
-          )
-      })
-    );
+  const fetchWorkflowList = (healthFacilityParams: any) => {
+    if (!workflows.length) {
+      dispatch(
+        fetchWorkflowListRequest({
+          countryId: Number(countryIdValue),
+          successCb: (flows) => {
+            setEditHFDetailsModal({
+              ...editHFDetailsModal,
+              isNextClicked: true
+            });
+          },
+          failureCb: (error) =>
+            toastCenter.error(
+              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
+            )
+        })
+      );
+    } else {
+      setEditHFDetailsModal({
+        ...editHFDetailsModal,
+        isNextClicked: true
+      });
+    }
+  };
 
   const validateLinkedRestrictions = (
     missingIds: number[],
@@ -375,7 +386,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
 
   const handleHFEditDetailsSubmit = ({ healthFacility: healthFacilityData }: { healthFacility: IHealthFacility }) => {
     const postData = formatHealthFacility(healthFacilityData, countryIdValue);
-    if (!submittedData.isNextClicked) {
+    if (!editHFDetailsModal.isNextClicked) {
       const peerSupervisors = healthFacilityData?.peerSupervisors ?? [];
       const linkedVillages = healthFacilityData?.linkedVillages ?? [];
       const peerIdsSet = peerSupervisors?.map((obj: any) => obj.id);
@@ -388,7 +399,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       }
       validateLinkedRestrictions(missingIds, Number(healthFacilityData.tenantId), healthFacility, linkedVillagesIds);
     } else {
-      if (postData.clinicalWorkflowIds.length || postData.customizedWorkflowIds.length) {
+      if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(
           updateHFDetailsRequest({
             data: postData,
@@ -407,7 +418,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS);
     refreshHFDetails();
     refreshHFUserList();
-    closeHFEditModal();
+    closeHFEditModal(true);
   };
 
   const handleEditUserClick = useCallback(
@@ -626,8 +637,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
         <ModalForm
           show={editHFDetailsModal.isOpen}
           title={`Edit ${healthFacilitySName}`}
-          cancelText={submittedData?.isNextClicked ? 'Back' : 'Cancel'}
-          submitText={submittedData?.isNextClicked ? 'Submit' : 'Next'}
+          cancelText={editHFDetailsModal?.isNextClicked ? 'Back' : 'Cancel'}
+          submitText={editHFDetailsModal?.isNextClicked ? 'Submit' : 'Next'}
           handleCancel={closeHFEditModal}
           handleFormSubmit={handleHFEditDetailsSubmit}
           initialValues={{ healthFacility: editHFDetailsModal.data }}

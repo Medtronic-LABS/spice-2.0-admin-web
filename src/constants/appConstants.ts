@@ -25,7 +25,7 @@ const APPCONSTANTS = {
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
     ADMIN: 'web',
-    CFR: 'cfr',
+    CFR: 'cfr_quicksight_admin',
     INSIGHTS: 'insights'
   },
   ROLES: {
@@ -57,6 +57,22 @@ const APPCONSTANTS = {
     COMMUNITY_HEALTH_PROMOTER: 'COMMUNITY_HEALTH_PROMOTER',
     COMMUNITY_HEALTH_ASSISTANT: 'COMMUNITY_HEALTH_ASSISTANT'
   },
+  SITE_ROLE_NAMES: [
+    'HRIO',
+    'LAB_TECHNICIAN',
+    'NURSE',
+    'RED_RISK_USER',
+    'HEALTH_COACH',
+    'JOB_USER',
+    'PROVIDER',
+    'COMMUNITY_HEALTH_PROMOTER',
+    'NUTRITIONIST',
+    'PHYSICIAN_PRESCRIBER',
+    'PHARMACIST',
+    'COUNSELOR',
+    'HEALTH_SCREENER',
+    'COMMUNITY_HEALTH_ASSISTANT'
+  ],
   ROUTE_NAMES: {
     REGION: 'region',
     DISTRICT: 'district',
@@ -166,7 +182,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
-  WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select a clinical workflow',
+  WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select workflow',
   CUSTOMIZED_WORKFLOW: 'Customized Workflow',
   CLINICAL_WORKFLOW: 'Clinical Workflow',
   WORKFLOW_MODULE: {

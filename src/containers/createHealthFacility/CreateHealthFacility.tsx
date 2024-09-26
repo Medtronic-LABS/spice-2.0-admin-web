@@ -15,13 +15,9 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility, formatHFUserData } from '../healthFacility/HealthFacilitySummary';
-import { IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
+import { IClinicalWorkflows, IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import {
-  healthFacilityLoadingSelector,
-  workflowListSelector,
-  workflowLoadingSelector
-} from '../../store/healthFacility/selectors';
+import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { addRedRiskToUserPayload } from '../../utils/commonUtils';
@@ -42,7 +38,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const dispatch = useDispatch();
   let formInstance: FormApi<any>;
   const history = useHistory();
-  const workflows = useSelector(workflowListSelector);
   const isWorkflowLoading = useSelector(workflowLoadingSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const [submittedData, setSubmittedData] = useState({
@@ -139,41 +134,52 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
    */
   const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
     if (submittedData.isNextClicked && countryId) {
+      // adding default clinicalworkflows explicitly to payload, since it's not getting added by default
+      let clinicalWFs: IClinicalWorkflows[] = [];
+      if (healthFacility.clinicalWorkflows?.length) {
+        if (healthFacility.defaultTrueWorkflows?.length) {
+          clinicalWFs = [...healthFacility.clinicalWorkflows, ...healthFacility.defaultTrueWorkflows];
+        } else {
+          clinicalWFs = healthFacility.clinicalWorkflows;
+        }
+      } else if (healthFacility.defaultTrueWorkflows?.length) {
+        clinicalWFs = healthFacility.defaultTrueWorkflows;
+      }
       let postUserData = formatHFUserData({ userData: users, countryId, isHFCreate: true });
       const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );
       postUserData = addRedRiskToUserPayload(postUserData, getRedRisk.id);
       const postData = {
-        ...formatHealthFacility({ ...healthFacility }, countryId),
+        ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId),
         users: postUserData
       };
-      if (postData.clinicalWorkflowIds.length || postData.customizedWorkflowIds.length) {
+      if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
       }
     } else {
-      if (!workflows.length) {
-        dispatch(
-          fetchWorkflowListRequest({
-            countryId,
-            successCb: (flows) => {
-              setSubmittedData({
-                data: { healthFacility: { ...healthFacility, workflows: flows.map((v: any) => v.id) }, users },
-                isNextClicked: true
-              });
-            },
-            failureCb: (error) =>
-              toastCenter.error(
-                ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
-              )
-          })
-        );
-      } else {
-        setSubmittedData({
-          data: { healthFacility: { ...healthFacility, workflows: workflows.map((v: any) => v.id) }, users },
-          isNextClicked: true
-        });
-      }
+      dispatch(
+        fetchWorkflowListRequest({
+          countryId,
+          successCb: (flows) => {
+            setSubmittedData({
+              data: {
+                healthFacility: {
+                  ...healthFacility,
+                  workflows: flows.map((v: any) => v.id),
+                  defaultTrueWorkflows: flows.filter((flow) => flow.default)?.map((f) => f.id)
+                },
+                users
+              },
+              isNextClicked: true
+            });
+          },
+          failureCb: (error) =>
+            toastCenter.error(
+              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
+            )
+        })
+      );
     }
   };
 
