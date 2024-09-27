@@ -33,6 +33,7 @@ import { IHFUserPost } from '../../store/healthFacility/types';
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
 export interface IAdminEditFormValues {
+  spiceInsightsRole: IRoles[];
   suiteAccess: Array<{ groupName: string; id: string }>;
   id: string;
   firstName: string;
@@ -107,12 +108,15 @@ const ChiefdomSummary = () => {
 
   const handleEditChiefdomAdminClick = useCallback(
     (chiefdomAdmin: IAdminEditFormValues) => {
-      chiefdomAdmin.role = chiefdomAdmin.roles;
       const allSuiteAccess = chiefdomAdmin.roles.map((r: IRoles) => ({
         groupName: r.groupName,
         id: r.groupName
       }));
       chiefdomAdmin.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
+      chiefdomAdmin.role =
+        chiefdomAdmin.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spice) || [];
+      chiefdomAdmin.spiceInsightsRole =
+        chiefdomAdmin.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights) || [];
       setIsChiefdomAdminEdit(true);
       chiefdomAdminForEdit.current = { users: [chiefdomAdmin] };
       setShowChiefdomAdminModal(true);
@@ -127,6 +131,7 @@ const ChiefdomSummary = () => {
           tenantId,
           id: chiefdomId,
           searchTerm: search,
+          countryId: Number(ChiefdomDetail?.countryId) || null,
           failureCb: (e) =>
             toastCenter.error(
               ...getErrorToastArgs(
@@ -138,7 +143,7 @@ const ChiefdomSummary = () => {
         })
       );
     },
-    [chiefdomId, dispatch, searchTerm, tenantId]
+    [ChiefdomDetail?.countryId, chiefdomId, chiefdomSName, dispatch, searchTerm, tenantId]
   );
 
   const handleAddChiefdomAdminClick = useCallback(() => {
@@ -158,9 +163,10 @@ const ChiefdomSummary = () => {
       id,
       username,
       countryCode,
-      role = []
+      roles
     } = users[0];
-    const [roleId] = role;
+    const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
+    const roleIds = flattenMap(roles)?.map((role: any) => role?.id);
     dispatch(
       updateAdminRequest({
         data: {
@@ -171,7 +177,7 @@ const ChiefdomSummary = () => {
           username: email || username,
           timezone: { id: Number(timezone?.id) },
           phoneNumber,
-          roleIds: [roleId?.id],
+          roleIds,
           countryCode: countryCode.phoneNumberCode,
           country: { id: countryIdValue },
           tenantId: Number(tenantId)
@@ -199,7 +205,7 @@ const ChiefdomSummary = () => {
     users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, countryCode, username, roles, role = [] }]
   }: typeof chiefdomAdminForEdit.current) => {
     const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
-    const roleIds = flattenMap(roles)?.map((data: any) => data?.id);
+    const roleIds = flattenMap(roles)?.map((roleList: any) => roleList?.id);
     const payload: IHFUserPost = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -210,7 +216,7 @@ const ChiefdomSummary = () => {
       countryCode: countryCode?.phoneNumberCode,
       country: { id: countryIdValue },
       tenantId: Number(ChiefdomDetail.tenantId),
-      roleIds: roleIds
+      roleIds
     };
     if (id) {
       payload.id = Number(id);

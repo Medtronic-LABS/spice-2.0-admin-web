@@ -184,7 +184,7 @@ const MultiSelect = (props: any) => {
   const multiSelectStyles = {
     multiValueRemove: (base: CSSObjectWithLabel, removeProps: any) => {
       if (props.mandatoryOptions) {
-        const newOptions = props.mandatoryOptions.map((v: any) => v.id);
+        const newOptions = props.mandatoryOptions.map((v: any) => v?.id);
         return newOptions.includes(removeProps.data.id) ? { ...base, display: 'none' } : base;
       } else if (props.optionsDisabled) {
         return { ...base, display: 'none' };

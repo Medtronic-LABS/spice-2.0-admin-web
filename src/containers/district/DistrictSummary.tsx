@@ -72,6 +72,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
           tenantId,
           id: districtId,
           searchTerm: search,
+          countryId: district?.countryId,
           failureCb: (e: Error) =>
             toastCenter.error(
               ...getErrorToastArgs(
@@ -136,7 +137,9 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       ...values,
       suiteAccess: [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()],
       country: { phoneNumberCode: values.countryCode },
-      role: values.roles
+      role: values.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spice) || [],
+      spiceInsightsRole:
+        values.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights) || []
     };
 
     setIsOpenAdminModal(true);
@@ -192,7 +195,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       username: admin.email,
       countryCode: admin.countryCode.phoneNumberCode,
       country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
-      roleIds: roleIds,
+      roleIds,
       timezone: { id: Number(admin.timezone.id) },
       tenantId: Number(tenantId)
     };

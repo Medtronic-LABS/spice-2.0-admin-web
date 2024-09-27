@@ -93,7 +93,6 @@ const Breadcrumb = (): React.ReactElement => {
   const healthFacility = useSelector(healthFacilitySelector);
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
-  const { CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
   const {
     district: { s: districtSName },
@@ -383,16 +382,13 @@ const Breadcrumb = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const redirectBasedOnUser = useCallback(
-    (currentUserRole: string, userRoles: string[]) => {
-      if (userRoles.includes(CFR) || userRoles.includes(INSIGHTS)) {
-        return PROTECTED_ROUTES.landingPage;
-      } else {
-        return HOME_PAGE_BY_ROLE[currentUserRole];
-      }
-    },
-    [CFR, INSIGHTS]
-  );
+  const redirectBasedOnUser = useCallback((currentUserRole: string, suiteAccess: string[]) => {
+    if (suiteAccess.length > 1) {
+      return PROTECTED_ROUTES.landingPage;
+    } else {
+      return HOME_PAGE_BY_ROLE[currentUserRole];
+    }
+  }, []);
 
   return (
     <div className={`${styles.breadcrumb} d-flex align-items-center`}>

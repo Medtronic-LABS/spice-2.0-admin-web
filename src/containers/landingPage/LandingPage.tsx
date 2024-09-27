@@ -65,8 +65,8 @@ const LandingPage = (): React.ReactElement => {
   );
 
   useEffect(() => {
-    const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite: ISpiceSuite) =>
-      userSuiteAccess.includes(suite.suiteAccessName)
+    const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suit) =>
+      userSuiteAccess.some((access: string | string[]) => suit.suiteAccessName && access.includes(suit.suiteAccessName))
     );
     if (authorisedSuites.length === 1) {
       const { hasDomain, domainUrl } = authorisedSuites[0];

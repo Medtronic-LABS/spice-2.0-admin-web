@@ -123,6 +123,7 @@ export interface IFetchChiefdomDetailReqPayload {
   tenantId: string;
   id: string;
   searchTerm?: string;
+  countryId?: number | null;
   successCb?: () => void;
   failureCb?: (error: Error) => void;
 }
@@ -283,6 +284,7 @@ export interface IFetchChiefdomAdminsRequest {
   searchTerm?: string;
   roleNames: string[];
   tenantId: string;
+  countryId?: number;
 }
 
 export interface IClearChiefdomDetail {

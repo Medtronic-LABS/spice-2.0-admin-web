@@ -25,8 +25,12 @@ const APPCONSTANTS = {
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
     ADMIN: 'web',
-    CFR: 'cfr_quicksight_admin',
+    CFR: 'cfr',
     INSIGHTS: 'insights'
+  },
+  SPICE_ROLE_SUITE_ACCESS: {
+    mob: 'mob',
+    web: 'web'
   },
   ROLES: {
     SUPER_USER: 'SUPER_USER',
@@ -205,6 +209,9 @@ const APPCONSTANTS = {
     spice: 'SPICE',
     spiceInsights: 'SPICE INSIGHTS'
   },
+  filterSpiceCommonRoles: ['cfr_quicksight_admin'],
+  filterSpiceAdminRoles: ['cfr_admin'],
+  filterSpiceUserRoles: ['cfr_user'],
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',

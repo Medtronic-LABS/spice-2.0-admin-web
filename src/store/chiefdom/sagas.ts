@@ -52,7 +52,7 @@ export function* fetchChiefdomDashboardList({
   Worker Saga: Fired on FETCH_CHIEFDOM_DETAIL_REQUEST action
 */
 export function* fetchChiefdomDetail(action: IFetchChiefdomDetailReq): SagaIterator {
-  const { tenantId, id, successCb, failureCb, searchTerm } = action.payload;
+  const { tenantId, id, successCb, failureCb, searchTerm, countryId } = action.payload;
   try {
     if (searchTerm) {
       const {
@@ -60,6 +60,7 @@ export function* fetchChiefdomDetail(action: IFetchChiefdomDetailReq): SagaItera
       } = yield call(fetchChiefdomAdmins, {
         tenantId,
         searchTerm,
+        ...(countryId && { countryId }),
         roleNames: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN]
       });
       yield put(operatinUnitActions.searchUserSuccess(userResponse || []));

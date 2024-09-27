@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import arrayMutators from 'final-form-arrays';
@@ -69,12 +69,7 @@ const UserList = (): React.ReactElement => {
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const [selectedFacility, setSelectedFacility] = useState<string[]>();
   const [selectedRole, setSelectedRole] = useState<string[]>();
-
-  const spiceUserRole = rolesGrouped?.SPICE?.filter(
-    (data: { suiteAccessName: string; name: string; displayName: string }) =>
-      data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
-      (data.name !== NAMING_VARIABLES.redRisk || data.displayName !== null)
-  );
+  const { filterSpiceCommonRoles, filterSpiceUserRoles } = APPCONSTANTS;
 
   const refreshHFUserList = useCallback(() => {
     return dispatch(
@@ -322,7 +317,21 @@ const UserList = (): React.ReactElement => {
     fetchList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const spiceUserRole = useMemo(() => {
+    return rolesGrouped?.SPICE?.filter(
+      (data: { suiteAccessName: string; name: string; displayName: string }) =>
+        data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
+        (data.name !== NAMING_VARIABLES.redRisk || data.displayName !== null)
+    );
+  }, [rolesGrouped]);
 
+  const roleCFRList = useMemo(() => {
+    return (rolesGrouped?.['SPICE INSIGHTS'] || [])?.filter(
+      (data: { suiteAccessName: string }) =>
+        filterSpiceCommonRoles.includes(data.suiteAccessName) || filterSpiceUserRoles.includes(data.suiteAccessName)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rolesGrouped]);
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
@@ -352,7 +361,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Role',
               isFacility: false,
               isSearchable: false,
-              data: spiceUserRole,
+              data: [...(spiceUserRole || []), ...(roleCFRList || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }

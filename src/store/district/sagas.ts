@@ -95,7 +95,7 @@ export function* createDistrict({ data, successCb, failureCb }: ICreateDistrictR
   Worker Saga: Fired on FETCH_DISTRICT_DETAIL_REQUEST action
 */
 export function* fetchDistrictDetail(action: IFetchDistrictDetailReq): SagaIterator {
-  const { tenantId, id, successCb, failureCb, searchTerm } = action.payload;
+  const { tenantId, id, successCb, failureCb, searchTerm, countryId } = action.payload;
   try {
     if (searchTerm) {
       const {
@@ -103,6 +103,7 @@ export function* fetchDistrictDetail(action: IFetchDistrictDetailReq): SagaItera
       } = yield call(fetchDistrictAdminsApi as any, {
         tenantId,
         searchTerm,
+        ...(countryId && { countryId }),
         roleNames: [APPCONSTANTS.ROLES.DISTRICT_ADMIN]
       });
       yield put(districtActions.searchUserSuccess(entityList || []));

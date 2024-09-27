@@ -270,9 +270,10 @@ const UserForm = ({
               .map((org: any) => org.id)
           : [],
         role: (initialEditValue?.role || [])?.filter(
-          (data: { name: string; displayName: string | null }) =>
-            data.name !== NAMING_VARIABLES.redRisk && data.displayName !== null
+          (editedValue: { name: string; displayName: string | null }) =>
+            editedValue?.name !== NAMING_VARIABLES.redRisk && editedValue?.displayName !== null
         ),
+        mandatorySuiteAccess: initialEditValue?.suiteAccess,
         selectedRoles: initialEditValue?.role || [],
         selectedInsightsRole: initialEditValue?.spiceInsightsRole || [],
         culture:
@@ -387,7 +388,11 @@ const UserForm = ({
       };
       userData.selectedRoles = [...(userData?.roles || [])];
       userData.mandatorySuiteAccess = userData.suiteAccess;
-      const filteredUserRoles = userData?.roles?.filter((data: any) => data.name !== NAMING_VARIABLES.redRisk);
+      const filteredUserRoles = userData?.roles?.filter((roleToFilter: any) =>
+        roleToFilter.name !== NAMING_VARIABLES.redRisk && isSiteUser
+          ? roleToFilter?.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob
+          : roleToFilter?.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.web
+      );
       userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
       if (userData.organizations.length === 1) {
         const { formDataId: id, name } = userData.organizations[0];
@@ -400,6 +405,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].role`, filteredUserRoles || []);
         form.change(`${formName}[${index}].roles`, userData.roles || []);
         form.change(`${formName}[${index}].spiceInsightsRole`, userData.spiceInsightsRole || []);
+        form.change(`${formName}[${index}].selectedInsightsRole`, userData.spiceInsightsRole || []);
         form.change(`${formName}[${index}].selectedRoles`, userData?.selectedRoles || []);
         form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
         form.change(`${formName}[${index}].lastName`, userData.lastName || '');
@@ -976,13 +982,7 @@ const UserForm = ({
                         required={true}
                         isClearable={!isAdminForm && !isEdit && !autoFetched[index]}
                         mandatoryOptions={
-                          isAdminForm
-                            ? [suiteAccess[0]]
-                            : isEdit
-                            ? initialEditData?.[0]?.suiteAccess
-                            : autoFetched[index]
-                            ? mandatorySuiteAccess
-                            : ''
+                          isAdminForm ? (isEdit ? mandatorySuiteAccess : [suiteAccess[0]]) : mandatorySuiteAccess || ''
                         }
                         onChange={(values: OnChangeValue<any, true>, actionMeta: ActionMeta<any>) => {
                           const selectedGroupName = values.map((option: any) => option.groupName) || [];
@@ -1149,8 +1149,9 @@ const UserForm = ({
                             isMulti={true}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
-                                ...(autoFetched[index] ? mandatoryRoles : []),
-                                ...(disabledRoles.current[index] || [])
+                                ...(autoFetched[index] ? mandatoryInsightsRole : []),
+                                ...(disabledRoles.current[index] || []),
+                                ...(mandatoryInsightsRole || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)

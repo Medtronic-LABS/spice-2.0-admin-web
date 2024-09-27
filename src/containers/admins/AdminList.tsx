@@ -58,6 +58,7 @@ const UserList = (): React.ReactElement => {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
   } = NAME_CONSTANTS;
+  const { filterSpiceCommonRoles, filterSpiceAdminRoles } = APPCONSTANTS;
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [adminSubmitLoading, setAdminSubmitLoading] = useState<boolean>(false);
 
@@ -280,8 +281,13 @@ const UserList = (): React.ReactElement => {
     );
   };
 
-  const roleSpiceList = rolesGrouped?.SPICE?.filter(
+  const roleSpiceList = (rolesGrouped?.SPICE || [])?.filter(
     (data: { suiteAccessName: string }) => data.suiteAccessName === APPCONSTANTS.spiceRole.spice
+  );
+
+  const roleCFRList = (rolesGrouped?.['SPICE INSIGHTS'] || [])?.filter(
+    (data: { suiteAccessName: string }) =>
+      filterSpiceCommonRoles.includes(data.suiteAccessName) || filterSpiceAdminRoles.includes(data.suiteAccessName)
   );
 
   return (
@@ -303,7 +309,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
-              data: [...(rolesGrouped?.['SPICE INSIGHTS'] || []), ...(roleSpiceList || [])],
+              data: [...roleSpiceList, ...roleCFRList],
               isShow: true,
               filterCount: selectedRole?.length
             }

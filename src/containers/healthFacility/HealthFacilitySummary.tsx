@@ -116,13 +116,14 @@ export const formatHFUserData = ({
       let spiceInsightsIds: number[] = [];
       let spiceId: number[] = [];
       if (user.role) {
-        spiceId = Array.isArray(user.roles)
-          ? (user.roles || [])
-              .map((id: any) => {
-                return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-              })
-              .flat()
-          : [user.role.id];
+        spiceId =
+          Array.isArray(user.roles) && user.role.length
+            ? (user.roles || [])
+                .map((id: any) => {
+                  return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+                })
+                .flat()
+            : [user.role.id];
       }
       if (user.roles) {
         spiceInsightsIds = user.roles
@@ -151,7 +152,7 @@ export const formatHFUserData = ({
       gender: user.gender,
       username: user.username,
       phoneNumber: user.phoneNumber,
-      culture: user.culture || {},
+      culture: user?.culture || null,
       countryCode: user?.countryCode?.phoneNumberCode,
       country: isSuperAdmin ? null : { id: Number(countryId) },
       tenantId: payloadTenantId,

@@ -15,6 +15,7 @@ export interface IDistrict {
     tenantId?: string;
     id?: string;
   };
+  countryId?: number;
 }
 export interface IDistrictDetail {
   id: string;
@@ -39,6 +40,7 @@ export interface IFetchDistrictList {
   limit?: number | null;
   searchTerm?: string;
   roleNames: string[];
+  countryId?: number;
 }
 export interface IDistrictState {
   district: IDistrict;
@@ -171,6 +173,7 @@ export interface IFetchDistrictDetailReqPayload {
   tenantId: number | string;
   id: number | string;
   searchTerm?: string;
+  countryId?: number;
   successCb?: (data: IDistrictDetail) => void;
   failureCb?: (error: Error) => void;
 }
