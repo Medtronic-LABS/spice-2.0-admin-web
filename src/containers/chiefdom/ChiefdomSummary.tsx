@@ -196,9 +196,10 @@ const ChiefdomSummary = () => {
     );
   };
   const handleChiefdomAdminCreate = ({
-    users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, countryCode, username, role = [] }]
+    users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, countryCode, username, roles, role = [] }]
   }: typeof chiefdomAdminForEdit.current) => {
-    const [roleId] = role;
+    const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
+    const roleIds = flattenMap(roles)?.map((data: any) => data?.id);
     const payload: IHFUserPost = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -209,7 +210,7 @@ const ChiefdomSummary = () => {
       countryCode: countryCode?.phoneNumberCode,
       country: { id: countryIdValue },
       tenantId: Number(ChiefdomDetail.tenantId),
-      roleIds: [roleId?.id]
+      roleIds: roleIds
     };
     if (id) {
       payload.id = Number(id);

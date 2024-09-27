@@ -58,7 +58,8 @@ const useFieldVisibility = (
       role !== HEALTH_FACILITY_ADMIN &&
       (fetchingFor === SUPER_ADMIN || fetchingFor === REGION_ADMIN);
 
-    const showHealthFacility = !isSiteUser && !isAdminForm && selectedAdmins === HEALTH_FACILITY_ADMIN;
+    const showHealthFacility =
+      !isSiteUser && !isAdminForm && selectedAdmins === HEALTH_FACILITY_ADMIN && fetchingFor !== CHIEFDOM_ADMIN;
 
     return {
       showTimezone,

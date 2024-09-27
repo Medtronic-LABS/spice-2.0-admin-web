@@ -233,7 +233,7 @@ const UserList = (): React.ReactElement => {
       const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
         (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
       );
-      let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId, isUserCreate: true });
+      let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId, fromUserForm: true });
       userObj = addRedRiskToUserPayload(userObj, getRedRisk?.id);
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(

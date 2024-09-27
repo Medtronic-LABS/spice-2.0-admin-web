@@ -269,6 +269,10 @@ const UserForm = ({
               .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
               .map((org: any) => org.id)
           : [],
+        role: (initialEditValue?.role || [])?.filter(
+          (data: { name: string; displayName: string | null }) =>
+            data.name !== NAMING_VARIABLES.redRisk && data.displayName !== null
+        ),
         selectedRoles: initialEditValue?.role || [],
         selectedInsightsRole: initialEditValue?.spiceInsightsRole || [],
         culture:
@@ -526,7 +530,7 @@ const UserForm = ({
   };
 
   // roles based CHW related utils
-  const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.role, [form]);
+  const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.roles, [form]);
 
   const updateRoleOptionsAndDisableRoles = useCallback(
     (index: number, mandatoryRoleOptions?: IRoles[]) => {

@@ -94,13 +94,13 @@ export const formatHFUserData = ({
   countryId,
   tenantId,
   isHFCreate = false,
-  isUserCreate = false
+  fromUserForm = false
 }: {
   userData: any[];
   countryId: number | string;
   tenantId?: number | string | undefined;
   isHFCreate?: boolean;
-  isUserCreate?: boolean;
+  fromUserForm?: boolean;
 }) => {
   return userData.map((user: any) => {
     let roleIds: number[] = [];
@@ -133,8 +133,10 @@ export const formatHFUserData = ({
     }
     const isSuperAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
     let payloadTenantId = user.tenantId || Number(tenantId);
-    if (isUserCreate || user.tenantId || user?.healthfacility?.tenantId) {
-      payloadTenantId = Number(user.tenantId || user.healthfacility.tenantId);
+    if (fromUserForm && user?.tenantId) {
+      payloadTenantId = Number(user.tenantId);
+    } else if (user?.healthfacility?.tenantId) {
+      payloadTenantId = Number(user?.healthfacility?.tenantId);
     } else if (isSuperAdmin) {
       payloadTenantId = null;
     } else if (user?.chiefdom?.tenantId) {
