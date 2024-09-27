@@ -374,7 +374,7 @@ const UserForm = ({
     if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
       emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE, index);
     } else if (isCHPSelected(userData.role) && isHFCreate) {
-      emailDisabledFn(APPCONSTANTS.CHW_USER_EXCEPTION_HF_CREATE, index);
+      emailDisabledFn(APPCONSTANTS.CHP_USER_EXCEPTION_HF_CREATE, index);
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
       setClearEmail(false);
@@ -388,10 +388,11 @@ const UserForm = ({
       };
       userData.selectedRoles = [...(userData?.roles || [])];
       userData.mandatorySuiteAccess = userData.suiteAccess;
-      const filteredUserRoles = userData?.roles?.filter((roleToFilter: any) =>
-        roleToFilter.name !== NAMING_VARIABLES.redRisk && isSiteUser
-          ? roleToFilter?.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob
-          : roleToFilter?.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.web
+      const filteredUserRoles = userData?.roles?.filter(
+        (roleToFilter: any) =>
+          (roleToFilter.name !== NAMING_VARIABLES.redRisk &&
+            roleToFilter?.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob) ||
+          roleToFilter?.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.web
       );
       userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
       if (userData.organizations.length === 1) {

@@ -6,7 +6,7 @@ export const uploadFile = (file: any) => {
   data.append('file', file);
   return axios({
     method: 'POST',
-    url: '/admin-service/region/upload-file',
+    url: '/admin-service/region-details/upload-file',
     data,
     headers: { 'Content-Type': 'multipart/form-data' }
   });
@@ -14,7 +14,7 @@ export const uploadFile = (file: any) => {
 export const downloadFile = (countryId: number) => {
   return axios({
     method: 'POST',
-    url: '/admin-service/region/download-file',
+    url: '/admin-service/region-details/download-file',
     responseType: 'blob',
     data: {
       countryId

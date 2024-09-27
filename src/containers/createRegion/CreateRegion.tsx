@@ -56,7 +56,7 @@ const CreateRegion: React.FC = () => {
           let insightsIds: number[] = [];
           if (user.roles) {
             insightsIds = user.roles
-              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
               ?.map((role: IRoles) => role.id);
           }
           return {

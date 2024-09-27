@@ -77,7 +77,7 @@ const CreateDistrict: React.FC = () => {
           let insightIds: number[] = [];
           if (user.roles) {
             insightIds = user.roles
-              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
               ?.map((role: IRoles) => role.id);
           }
           return {

@@ -94,7 +94,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, districtId, tenantId]
+    [dispatch, districtId, tenantId, district?.countryId]
   );
 
   const editDeactivateModalRender = (form: any) => {

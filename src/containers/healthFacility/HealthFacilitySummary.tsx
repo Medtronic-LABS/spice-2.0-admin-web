@@ -117,7 +117,7 @@ export const formatHFUserData = ({
       let spiceId: number[] = [];
       if (user.role) {
         spiceId =
-          Array.isArray(user.roles) && user.role.length
+          Array.isArray(user.roles) && user.roles.length
             ? (user.roles || [])
                 .map((id: any) => {
                   return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
@@ -127,7 +127,7 @@ export const formatHFUserData = ({
       }
       if (user.roles) {
         spiceInsightsIds = user.roles
-          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
           ?.map((role: IRoles) => role.id);
       }
       roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];

@@ -111,7 +111,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
         let insightIds: number[] = [];
         if (user.roles) {
           insightIds = user.roles
-            ?.filter((userRole: IRoles) => userRole.groupName === APPCONSTANTS.spiceRole.spiceInsights)
+            ?.filter((userRole: IRoles) => userRole.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
             ?.map((insightRole: IRoles) => insightRole.id);
         }
         return {
