@@ -77,8 +77,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
     {
       path: PROTECTED_ROUTES.landingPage,
       exact: true,
-      component: LandingPage,
-      authorisedRoles: Object.values(APPCONSTANTS.ROLES)
+      component: LandingPage
     },
     {
       path: PROTECTED_ROUTES.profile,
@@ -390,7 +389,7 @@ export const AppRoutes = () => {
     <AppLayout>
       <Switch>
         {protectedRoutes.map((route: IProtectedRoute, index: number) =>
-          route.authorisedRoles?.includes(role) ? (
+          route.authorisedRoles?.includes(role) || route.path === PROTECTED_ROUTES.landingPage ? (
             <Route
               path={route.path}
               exact={route.exact}

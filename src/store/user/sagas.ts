@@ -9,8 +9,7 @@ import {
   ILoginRequest,
   IUnlockUsersRequest,
   IUpdateUserRequest,
-  IUser,
-  roleType
+  IUser
 } from './types';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -23,10 +22,6 @@ import { IActionProps } from '../../typings/global';
 import { error, success } from '../../utils/toastCenter';
 import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
-import ERRORS from '../../constants/errors';
-
-export const checkRoles = (rolesArray: string[] = [], roles: string[] = []) =>
-  roles.length && rolesArray.find((role) => roles.includes(role));
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -59,30 +54,18 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
     sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
     sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, country?.id);
-    const roles = allRoles.map((role: any) => role.name);
-    const filteredAdminRole: roleType | any = checkRoles(Object.values(APPCONSTANTS.ROLES), roles);
-    if (!filteredAdminRole) {
-      const filteredAllRoles: roleType | any = checkRoles(APPCONSTANTS.SITE_ROLE_NAMES, roles);
-      if (!!filteredAllRoles) {
-        yield call(logout);
-        throw new Error(ERRORS.UNAUTHORIZED.message);
-      } else {
-        sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
-        sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-        yield put(userActions.removeToken());
-        yield put(userActions.removeUserTenantID());
-        throw new Error(APPCONSTANTS.LOGIN_GENERAL_ERROR);
-      }
-    }
+    const { ADMIN } = APPCONSTANTS.SUITE_ACCESS;
+    const spiceAdminRole = allRoles?.find(
+      ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
+    );
     updateRememberMe(username, password, rememberMe);
-    const roleData = allRoles.find(({ name }: { name: string }) => name === filteredAdminRole);
     const payload: IUser = {
       email,
       firstName,
       lastName,
       userId,
-      role: roleData.name,
-      roleDetail: roleData,
+      role: spiceAdminRole?.name || allRoles[0]?.name || '',
+      roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
       country,
       suiteAccess,
@@ -165,26 +148,17 @@ export function* fetchLoggedInUser(): SagaIterator {
     if (country?.tenantId) {
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
     }
-    const roles = allRoles.map((role: any) => role.name);
-    const filteredAdminRole: roleType | any = checkRoles(Object.values(APPCONSTANTS.ROLES), roles);
-    if (!filteredAdminRole) {
-      const filteredAllRoles: roleType | any = checkRoles(APPCONSTANTS.SITE_ROLE_NAMES, roles);
-      if (!filteredAllRoles) {
-        sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
-        sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
-        yield put(userActions.removeToken());
-        yield put(userActions.removeUserTenantID());
-        throw new Error(APPCONSTANTS.LOGIN_GENERAL_ERROR);
-      }
-    }
-    const roleData = allRoles.find(({ name }: { name: string }) => name === filteredAdminRole);
+    const { ADMIN } = APPCONSTANTS.SUITE_ACCESS;
+    const spiceAdminRole = allRoles?.find(
+      ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
+    );
     const payload: IUser = {
       email,
       firstName,
       lastName,
       userId,
-      role: roleData.name,
-      roleDetail: roleData,
+      role: spiceAdminRole?.name || allRoles[0]?.name || '',
+      roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
       formDataId: organizations[0]?.formDataId,
       country,
