@@ -195,7 +195,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       username: admin.email,
       countryCode: admin.countryCode.phoneNumberCode,
       country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
-      roleIds,
+      roleIds: [admin?.role?.[0]?.id, ...(roleIds || [])],
       timezone: { id: Number(admin.timezone.id) },
       tenantId: Number(tenantId)
     };

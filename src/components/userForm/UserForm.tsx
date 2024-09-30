@@ -1167,7 +1167,7 @@ const UserForm = ({
                               if (spiceRole.length) {
                                 form.change(`${formName}[${index}].roles`, [...[spiceRole], ...values]);
                               } else {
-                                form.change(`${formName}[${index}].roles`, [...values]);
+                                form.change(`${formName}[${index}].roles`, [...([spiceRole] || []), ...values]);
                               }
                               input.onChange(values);
                             }}

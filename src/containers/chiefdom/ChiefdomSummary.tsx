@@ -163,7 +163,8 @@ const ChiefdomSummary = () => {
       id,
       username,
       countryCode,
-      roles
+      roles,
+      role = []
     } = users[0];
     const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
     const roleIds = flattenMap(roles)?.map((role: any) => role?.id);
@@ -177,7 +178,7 @@ const ChiefdomSummary = () => {
           username: email || username,
           timezone: { id: Number(timezone?.id) },
           phoneNumber,
-          roleIds,
+          roleIds: [role?.[0]?.id, ...(roleIds || [])],
           countryCode: countryCode.phoneNumberCode,
           country: { id: countryIdValue },
           tenantId: Number(tenantId)
@@ -216,7 +217,7 @@ const ChiefdomSummary = () => {
       countryCode: countryCode?.phoneNumberCode,
       country: { id: countryIdValue },
       tenantId: Number(ChiefdomDetail.tenantId),
-      roleIds
+      roleIds: [role?.[0]?.id, ...(roleIds || [])]
     };
     if (id) {
       payload.id = Number(id);
