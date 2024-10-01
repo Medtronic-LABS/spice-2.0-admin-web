@@ -167,7 +167,7 @@ const ChiefdomSummary = () => {
       role = []
     } = users[0];
     const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
-    const roleIds = flattenMap(roles)?.map((role: any) => role?.id);
+    const roleIds = flattenMap(roles)?.map((r: any) => r?.id);
     dispatch(
       updateAdminRequest({
         data: {

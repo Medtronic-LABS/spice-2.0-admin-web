@@ -8,11 +8,9 @@ import Checkbox from '../../components/formFields/Checkbox';
 import { healthFacilityListSelector, healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 import { IProgramFormValues } from '../../store/program/types';
 import { composeValidators, required, minLength, validateEntityName } from '../../utils/validation';
-import { fetchHFDropdownRequest } from '../../store/program/actions';
 import { countryIdSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
-import { siteListDropdownSelector } from '../../store/program/selectors';
 import { fetchHFListRequest } from '../../store/healthFacility/actions';
 
 interface IProgramFormProps {
@@ -34,16 +32,14 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const dispatch = useDispatch();
   const hfListLoading = useSelector(healthFacilityLoadingSelector);
   useEffect(() => {
-    if (!healthFacilityList.length) {
-      dispatch(
-        fetchHFListRequest({
-          countryId: countryIdValue,
-          skip: 0,
-          limit: null,
-          tenantIds: [tenantId]
-        })
-      );
-    }
+    dispatch(
+      fetchHFListRequest({
+        countryId: countryIdValue,
+        skip: 0,
+        limit: null,
+        tenantIds: [tenantId]
+      })
+    );
   }, [dispatch, tenantId, countryIdValue]);
 
   return (

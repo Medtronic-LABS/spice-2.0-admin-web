@@ -40,7 +40,7 @@ import {
   userDetailLoadingSelector,
   workflowListSelector
 } from '../../store/healthFacility/selectors';
-import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -175,7 +175,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const role = useSelector(roleSelector);
-  const email = useSelector(emailSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const workflows = useSelector(workflowListSelector);
@@ -188,6 +187,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     loading: false
   });
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
+  const { HEALTH_FACILITY_ADMIN } = APPCONSTANTS.ROLES;
 
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
@@ -555,6 +555,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
+  const isHideActionIcons = (rowData: any) =>
+    role === HEALTH_FACILITY_ADMIN &&
+    (rowData?.defaultRoleName === HEALTH_FACILITY_ADMIN ||
+      rowData.roles?.some((r: { name: string }) => r?.name === HEALTH_FACILITY_ADMIN));
+
   return (
     <>
       {(loading || hfUserDetailLoading) && <Loader />}
@@ -631,8 +636,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
               confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
               deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
               actionFormatter={{
-                hideEditIcon: (rowData: any) => rowData.username === email,
-                hideDeleteIcon: (rowData: any) => rowData.username === email
+                hideEditIcon: (rowData: any) => isHideActionIcons(rowData),
+                hideDeleteIcon: (rowData: any) => isHideActionIcons(rowData)
               }}
             />
           </DetailCard>
