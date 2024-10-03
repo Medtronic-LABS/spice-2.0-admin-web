@@ -28,7 +28,7 @@ const TagInput = ({
   const [inputValue, setInput] = useState<string>('');
 
   const handleInputChange = (evt: React.BaseSyntheticEvent) => {
-    const filteredValue = evt.target.value.replace(/[^a-zA-Z0-9]/g, '');
+    const filteredValue = evt.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
     if (fromChiefDom) {
       setInput(filteredValue);
     } else {

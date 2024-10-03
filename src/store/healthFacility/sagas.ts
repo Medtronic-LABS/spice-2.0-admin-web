@@ -25,8 +25,7 @@ import {
   IFetchHFDashboardListRequest,
   IFetchUnlinkedVillagesRequest,
   IPeerSupervisorValidation,
-  IFetchVillagesListUserLinked,
-  IWorkflow
+  IFetchVillagesListUserLinked
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -520,13 +519,8 @@ export function* fetchWorkflowListSagaRequest({
     const {
       data: { entityList: list }
     } = yield call(hfService.fetchWorkflowList as any, { countryId });
-
-    // filter to get only ncdWorkflow for clinical workflows
-    const filteredWorkFlows = list?.filter((workflow: IWorkflow) =>
-      workflow.moduleType === 'clinical' ? workflow.ncdWorkflow : true
-    );
-    successCb?.(filteredWorkFlows);
-    yield put(fetchWorkflowListSuccess({ list: filteredWorkFlows }));
+    successCb?.(list);
+    yield put(fetchWorkflowListSuccess({ list }));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);

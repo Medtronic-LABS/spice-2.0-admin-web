@@ -67,8 +67,7 @@ const WorkflowCustomization = (): React.ReactElement => {
         })
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, regionId, listParams.page, listParams.rowsPerPage, listParams.rowsPerPage, tenantId]);
+  }, [dispatch, regionId, listParams.page, listParams.rowsPerPage, tenantId, listParams.searchTerm]);
 
   useEffect(() => {
     if (clinicalWorkflows.length) {

@@ -194,13 +194,16 @@ const Workflows: React.FC<IWorkflowsProps> = ({
             .map((workflow: IWorkflow) => getHFWorkflowIds(hfClinicalWorkflows, workflow, moduleType))
             .filter(Boolean);
         };
+        const defaultWorkflows =
+          workflows?.filter((workflow) => workflow.moduleType === clinical && workflow.default)?.map((wf) => wf.id) ||
+          [];
         const newData = {
           ...data,
           healthFacility: {
             ...data?.healthFacility,
             clinicalWorkflows:
               isHFEdit && workflowEditedData && workflowEditedData?.clinicalWorkflows
-                ? workflowEditedData.clinicalWorkflows
+                ? [...workflowEditedData.clinicalWorkflows, ...defaultWorkflows]
                 : newClinicalWorkflow(clinicalWorkflow, clinical),
             customizedWorkflows:
               isHFEdit && workflowEditedData && workflowEditedData?.customizedWorkflows

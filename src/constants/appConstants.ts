@@ -116,7 +116,7 @@ const APPCONSTANTS = {
   ACTIVATE_COUNTY_SUCCESS: 'Module_Name activated successfully.',
   ACTIVATE_COUNTY_FAIL: 'Unable to activate the module_name. Please try after sometime.',
   // WORKFLOW
-  WORKFLOW_CREATE_SUCCESS: 'Workflow module created successfully.',
+  WORKFLOW_CREATE_SUCCESS: 'Workflow created successfully.',
   WORKFLOW_CREATE_FAIL: 'Unable to create workflow. Please try after sometime.',
   WORKFLOW_UPDATE_SUCCESS: 'Workflow updated successfully.',
   WORKFLOW_UPDATE_FAIL: 'Unable to update workflow. Please try after sometime.',
