@@ -146,7 +146,7 @@ export const formatHFUserData = ({
       payloadTenantId = Number(user.district.tenantId);
     }
     return {
-      id: Number(user?.id),
+      ...(user?.id && { id: Number(user?.id) }),
       firstName: user.firstName,
       lastName: user.lastName,
       gender: user.gender,

@@ -205,6 +205,8 @@ const UserList = (): React.ReactElement => {
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
+    fetchList(); // get list of HF for filter dropdown, while submitting the edited user
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpenUserModal.isEdit, refreshHFUserList]);
 
   const onSubmitHandler = useCallback(

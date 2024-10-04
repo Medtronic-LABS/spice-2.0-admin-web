@@ -75,7 +75,7 @@ const ChiefdomSummary = () => {
     dispatch(
       updateChiefdomReq({
         payload: {
-          name,
+          name: name.trim(),
           countryId: countryIdValue,
           districtId: Number(district?.id),
           id,

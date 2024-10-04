@@ -424,7 +424,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].selectedVillages`, userData.selectedVillages || []);
         form.change(`${formName}[${index}].timezone`, userData.timezone || []);
         form.change(`${formName}[${index}].culture`, userData.culture || []);
-        form.change(`${formName}[${index}].redRisk`, userData.redRisk || []);
+        form.change(`${formName}[${index}].redRisk`, userData.redRisk || false);
       });
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = true;

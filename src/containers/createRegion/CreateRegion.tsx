@@ -52,6 +52,7 @@ const CreateRegion: React.FC = () => {
     ({ region, users }: IRegionFormValues) => {
       const data = {
         ...region,
+        name: region.name?.trim(),
         users: users.map((user: any) => {
           let insightsIds: number[] = [];
           if (user.roles) {
