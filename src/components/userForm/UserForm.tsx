@@ -576,11 +576,28 @@ const UserForm = ({
       } else {
         validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
       }
-      newDisabledRoles[index] = [...(newRoleOptions[index] || [])].filter((r: IRoles) => !validRoles.includes(r.name));
+      newDisabledRoles[index] = [...(newRoleOptions[index] || [])].filter((r: IRoles) => {
+        const isValidRole = !validRoles.includes(r.name);
+        const isNotRedRiskOrHasDisplayName = r.name !== NAMING_VARIABLES.redRisk || r.displayName !== null;
+        const isNotHealthFacilityAdmin = !(isHF || isHFCreate) ? r.name !== HEALTH_FACILITY_ADMIN : true;
+
+        return isValidRole && isNotRedRiskOrHasDisplayName && isNotHealthFacilityAdmin;
+      });
+
       disabledRoles.current = newDisabledRoles;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [adminRoles, isCHPSelected, isHFCreate, mobileRoles, rolesGrouped, selectedRoles, superAdminRoles, selectedAdmins]
+    [
+      adminRoles,
+      isCHPSelected,
+      isHF,
+      isHFCreate,
+      mobileRoles,
+      rolesGrouped,
+      selectedRoles,
+      superAdminRoles,
+      selectedAdmins
+    ]
   );
 
   const isCHUserSelectedFn = useCallback(
@@ -1223,6 +1240,9 @@ const UserForm = ({
                     entityName={entityName}
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
+                    isHF={isHF}
+                    isHFCreate={isHFCreate}
+                    isSiteUser={isSiteUser}
                     onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
                     parentOrgId={
                       isSiteUser && !parentOrgId

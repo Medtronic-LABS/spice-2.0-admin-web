@@ -25,7 +25,10 @@ const EmailField = forwardRef(
       enableAutoPopulate,
       onFindExistingUser,
       parentOrgId,
-      ignoreTenantId
+      ignoreTenantId,
+      isHF = false,
+      isHFCreate = false,
+      isSiteUser = false
     }: {
       isEdit: boolean | undefined;
       name: string;
@@ -39,6 +42,9 @@ const EmailField = forwardRef(
       onFindExistingUser?: (user: any) => void;
       parentOrgId?: string;
       ignoreTenantId?: string;
+      isHF: boolean;
+      isHFCreate: boolean;
+      isSiteUser: boolean;
     },
     ref
   ) => {
@@ -65,7 +71,7 @@ const EmailField = forwardRef(
     const cfrError = APPCONSTANTS.CFR_ERR_MSG;
     const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
     const duplicationError = APPCONSTANTS.EMAIL_DUPLICATION_ERR_MSG;
-    const siteAdminError = APPCONSTANTS.SITE_ADMIN_PERMISSION_ERR_MSG;
+    const siteAdminError = APPCONSTANTS.HEALTH_FACILITY_ADMIN_PERMISSION_ERR_MSG;
     useImperativeHandle(
       ref,
       () => ({
@@ -155,7 +161,8 @@ const EmailField = forwardRef(
             return;
           }
           setLoading(true);
-          await fetchUserByEmail(email, parentOrgId, ignoreTenantId).then((res) => {
+          const isAdminFetched = !(isHF || isHFCreate) && isSiteUser;
+          await fetchUserByEmail(email, parentOrgId, ignoreTenantId, isAdminFetched).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });

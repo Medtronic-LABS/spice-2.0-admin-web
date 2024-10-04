@@ -345,7 +345,7 @@ const APPCONSTANTS = {
   FORGOT_USER_FAILURE_ERR_MSG: 'Unable to submit the request. Please try after sometime.',
   EMAIL_ALREADY_EXISTS_ERR_MSG: 'Email ID already exists',
   CFR_ERR_MSG: 'Email ID already exists in CFR role',
-  SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',
+  HEALTH_FACILITY_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add health facility admin',
   EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG: 'Email ID already exists in different organization',
   EMAIL_DUPLICATION_ERR_MSG: `Multiple users can't have same`,
   PHONE_NUMBER_ALREADY_EXISTS_ERR_MSG: 'Phone number already exists',
