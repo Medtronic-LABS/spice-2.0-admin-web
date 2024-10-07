@@ -32,7 +32,7 @@ export const DynamicCHForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label='Community health assistant'
+                  label='Community Health Assistant'
                   errorLabel='Community health assistant'
                   labelKey='name'
                   valueKey='id'

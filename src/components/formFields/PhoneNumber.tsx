@@ -154,7 +154,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
             }}
             lowerCase={true}
             showLoader={loading}
-            label='Phone number'
+            label='Phone Number'
             errorLabel={
               alreadyExistError === meta.error || isNetworkError || !meta.error || meta.error === ' '
                 ? ''
