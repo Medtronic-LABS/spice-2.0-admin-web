@@ -88,19 +88,19 @@ const Region = (): React.ReactElement => {
         failureCb: (e) =>
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_FETCH_ERROR)),
         successCb: (regionList) => {
-          const { regions: allRegions } = regionList;
-          // if there is only one region then redirect to region summary
-          if (allRegions.length === 1) {
-            const { id, tenantId, name } = allRegions[0];
-            if (id && tenantId && name) {
-              onDashboardExit({ id: String(id), tenantId: String(tenantId), name });
-              push({
-                pathname: PROTECTED_ROUTES.regionSummary
-                  .replace(':regionId', String(id))
-                  .replace(':tenantId', String(tenantId))
-              });
-            }
-          }
+          // const { regions: allRegions } = regionList;
+          // // if there is only one region then redirect to region summary
+          // if (allRegions.length === 1) {
+          //   const { id, tenantId, name } = allRegions[0];
+          //   if (id && tenantId && name) {
+          //     onDashboardExit({ id: String(id), tenantId: String(tenantId), name });
+          //     push({
+          //       pathname: PROTECTED_ROUTES.regionSummary
+          //         .replace(':regionId', String(id))
+          //         .replace(':tenantId', String(tenantId))
+          //     });
+          //   }
+          // }
         }
       })
     );
