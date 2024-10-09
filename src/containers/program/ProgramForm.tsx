@@ -11,7 +11,7 @@ import { composeValidators, required, minLength, validateEntityName } from '../.
 import { countryIdSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
-import { fetchHFListRequest } from '../../store/healthFacility/actions';
+import { clearHFList, fetchHFListRequest } from '../../store/healthFacility/actions';
 
 interface IProgramFormProps {
   form: FormApi<{ program: IProgramFormValues }>;
@@ -41,6 +41,13 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
       })
     );
   }, [dispatch, tenantId, countryIdValue]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearHFList());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className='row gx-1dot25'>

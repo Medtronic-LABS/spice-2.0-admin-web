@@ -27,10 +27,13 @@ const CreateProgram = (props: IRouteProps): React.ReactElement => {
 
   const onSubmit = (values: { program: IProgramFormValues }) => {
     const { program } = values;
+    const selectedHealthFacilities = Array.isArray(program.healthFacilities)
+      ? program.healthFacilities
+      : [program.healthFacilities];
     const data = {
       name: program.name.trim(),
       tenantId,
-      healthFacilities: program.healthFacilities.map((healthFacility: { id: any }) => healthFacility.id),
+      healthFacilities: selectedHealthFacilities?.map((healthFacility: { id: any }) => healthFacility.id),
       country: { id: regionId }
     } as unknown as ICreateProgramReqPayload;
     dispatch(createProgram({ data, successCb: onCreateSuccess, failureCb: onCreateFail }));
