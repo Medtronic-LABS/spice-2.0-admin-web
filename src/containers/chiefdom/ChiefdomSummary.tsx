@@ -205,6 +205,7 @@ const ChiefdomSummary = () => {
   const handleChiefdomAdminCreate = ({
     users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, countryCode, username, roles, role = [] }]
   }: typeof chiefdomAdminForEdit.current) => {
+    const selectedRole = Array.isArray(role) ? role : [role];
     const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
     const roleIds = flattenMap(roles)?.map((roleList: any) => roleList?.id);
     const payload: IHFUserPost = {
@@ -217,7 +218,7 @@ const ChiefdomSummary = () => {
       countryCode: countryCode?.phoneNumberCode,
       country: { id: countryIdValue },
       tenantId: Number(ChiefdomDetail.tenantId),
-      roleIds: [role?.[0]?.id, ...(roleIds || [])]
+      roleIds: [selectedRole?.[0]?.id, ...(roleIds || [])]
     };
     if (id) {
       payload.id = Number(id);

@@ -80,6 +80,7 @@ const CreateDistrict: React.FC = () => {
               ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
               ?.map((role: IRoles) => role.id);
           }
+          const selectedRole = Array.isArray(user?.role) ? user?.role : [user?.role];
           return {
             ...user,
             firstName: user.firstName.trim(),
@@ -89,7 +90,7 @@ const CreateDistrict: React.FC = () => {
             username: user.email,
             countryCode: user?.countryCode?.phoneNumberCode,
             country: { id: regionId },
-            roleIds: [user.role[0].id, ...insightIds],
+            roleIds: [selectedRole?.[0].id, ...insightIds],
             timezone: { id: Number(user.timezone.id) }
           };
         }),

@@ -187,6 +187,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     const admin: any = users[0];
     const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
     const roleIds = flattenMap(admin?.roles)?.map((data: any) => data?.id);
+    const selectedRole = Array.isArray(admin?.role) ? admin?.role : [admin?.role];
     const payload = {
       firstName: admin.firstName.trim(),
       lastName: admin.lastName.trim(),
@@ -195,7 +196,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       username: admin.email,
       countryCode: admin.countryCode.phoneNumberCode,
       country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
-      roleIds: [admin?.role?.[0]?.id, ...(roleIds || [])],
+      roleIds: [selectedRole?.[0]?.id, ...(roleIds || [])],
       timezone: { id: Number(admin.timezone.id) },
       tenantId: Number(tenantId)
     };

@@ -114,6 +114,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
             ?.filter((userRole: IRoles) => userRole.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
             ?.map((insightRole: IRoles) => insightRole.id);
         }
+        const selectedRole = Array.isArray(user.role) ? user.role : [user.role];
         return {
           ...user,
           firstName: user.firstName.trim(),
@@ -123,7 +124,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
           phoneNumber: user.phoneNumber,
           countryCode: user?.countryCode?.phoneNumberCode || user.country.phoneNumberCode,
           country: { id: countryIdValue },
-          roleIds: [user.role[0].id, ...insightIds],
+          roleIds: [selectedRole?.[0]?.id, ...insightIds],
           timezone: { id: Number(user.timezone?.id) }
         };
       }),
