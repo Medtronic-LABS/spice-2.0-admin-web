@@ -1093,6 +1093,13 @@ const UserForm = ({
                                   index
                                 );
                               }
+
+                              // Other than chp role village must be clear
+                              if (!isCHPSelected(values)) {
+                                form.batch(() => {
+                                  form.change(`${formName}[${index}].villages`, {});
+                                });
+                              }
                               input.onChange(values);
                             }}
                           />

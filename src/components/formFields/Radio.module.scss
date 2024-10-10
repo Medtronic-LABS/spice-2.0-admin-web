@@ -9,7 +9,6 @@ $radio-color: var(--medium-blue-60);
   font-size: 0.875rem;
   color: $field-label-color;
   background-color: $field-border-color;
-  
   &:not(:last-child) {
     margin-right: 1.5rem;
   }
