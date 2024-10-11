@@ -1,10 +1,19 @@
 import * as ACTION_TYPES from './actionTypes';
 
+interface IRouteItem {
+  name: string;
+  order: number;
+  displayName: string;
+  route: string;
+}
+
+interface IDynamicSideMenu {
+  [key: string]: IRouteItem[];
+}
 export interface ICommanState {
   loading: boolean;
   sideMenu: {
-    list: ISideMenu[];
-    fetchedFor: string;
+    list: IDynamicSideMenu;
   };
   error: string | null | Error;
 }
@@ -17,11 +26,7 @@ export interface IFetchSideMenuPayload {
 }
 
 export interface IFetchSideMenuResponse {
-  list: ISideMenu[];
-  routeIds: {
-    id: string;
-    tenantId: string;
-  };
+  list: any;
 }
 
 export interface ISideMenu {
@@ -29,11 +34,6 @@ export interface ISideMenu {
   displayName: string;
   name: string;
   order: number;
-}
-
-export interface ISetSideMenuPayload {
-  list: ISideMenu[];
-  fetchedFor?: string;
 }
 
 /*
@@ -55,18 +55,8 @@ export interface IFetchSideMenuFailure {
   error: Error;
 }
 
-export interface ISetSideMenu {
-  type: typeof ACTION_TYPES.SET_SIDEMENU;
-  payload: ISetSideMenuPayload;
-}
-
 export interface IClearSideMenu {
   type: typeof ACTION_TYPES.CLEAR_SIDEMENU;
 }
 
-export type CommonActions =
-  | IFetchSideMenuRequest
-  | IFetchSideMenuSuccess
-  | IFetchSideMenuFailure
-  | ISetSideMenu
-  | IClearSideMenu;
+export type CommonActions = IFetchSideMenuRequest | IFetchSideMenuSuccess | IFetchSideMenuFailure | IClearSideMenu;

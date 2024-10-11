@@ -2,24 +2,20 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import * as commonService from '../../services/commomAPI';
 import { IFetchSideMenuRequest } from './types';
-import { fetchSideMenuFailure } from './actions';
+import { fetchSideMenuFailure, fetchSideMenuSuccess } from './actions';
 import { FETCH_SIDEMENU_REQUEST } from './actionTypes';
 
 /*
   Worker Saga: Fired on FETCH_SIDEMENU_REQUEST action
 */
 export function* fetchSideMenu(action: IFetchSideMenuRequest): SagaIterator {
-  const { countryId, roleName, successCb, failureCb } = action.payload;
+  const { countryId, roleName, failureCb } = action.payload;
   try {
     const response = yield call(commonService.getSideMenu, {
       countryId,
       roleName
     });
-    const payload = {
-      list: response.data.entity.menus,
-      roleName
-    };
-    successCb?.(payload);
+    yield put(fetchSideMenuSuccess({ list: response.data.entity.menus?.[0] }));
   } catch (e: any) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -32,8 +28,8 @@ export function* fetchSideMenu(action: IFetchSideMenuRequest): SagaIterator {
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
-function* regionSaga() {
+function* commonSaga() {
   yield all([takeLatest(FETCH_SIDEMENU_REQUEST, fetchSideMenu)]);
 }
 
-export default regionSaga;
+export default commonSaga;

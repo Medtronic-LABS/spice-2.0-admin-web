@@ -100,7 +100,6 @@ export interface IDistrictPayload {
     firstName: string;
     lastName: string;
     username: string;
-    email: string;
     phoneNumber: string;
     gender: string;
     timezone: object;

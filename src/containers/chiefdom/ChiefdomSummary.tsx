@@ -22,14 +22,13 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { roleSelector } from '../../store/user/selectors';
 
 import { IRoles, ITimezone } from '../../store/user/types';
-import { formatUserToastMsg } from '../../utils/commonUtils';
+import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
 import {
   createHFUserRequest as createAdminRequest,
   deleteHFUserRequest as deleteAdminRequest,
   updateHFUserRequest as updateAdminRequest
 } from '../../store/healthFacility/actions';
-import { IHFUserPost } from '../../store/healthFacility/types';
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
 export interface IAdminEditFormValues {
@@ -153,36 +152,17 @@ const ChiefdomSummary = () => {
   }, [chiefdomAdminForEdit]);
 
   const handleChiefdomAdminEdit = ({ users }: { users: IAdminEditFormValues[] }) => {
-    const {
-      firstName,
-      lastName,
-      timezone,
-      gender,
-      username: email,
-      phoneNumber,
-      id,
-      username,
-      countryCode,
-      roles,
-      role = []
-    } = users[0];
-    const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
-    const roleIds = flattenMap(roles)?.map((r: any) => r?.id);
+    const userObj = getAdminPayload({
+      userFormData: users,
+      countryId: countryIdValue,
+      tenantId: Number(tenantId),
+      isFromList: false,
+      isFromSummaryOrProfilePage: true
+    });
+    const payload = userObj[0];
     dispatch(
       updateAdminRequest({
-        data: {
-          id: Number(id),
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          gender,
-          username: email || username,
-          timezone: { id: Number(timezone?.id) },
-          phoneNumber,
-          roleIds: [role?.[0]?.id, ...(roleIds || [])],
-          countryCode: countryCode.phoneNumberCode,
-          country: { id: countryIdValue },
-          tenantId: Number(tenantId)
-        },
+        data: payload,
         successCb: () => {
           getChiefdomDetails(searchTerm);
           setShowChiefdomAdminModal(false);
@@ -202,27 +182,15 @@ const ChiefdomSummary = () => {
       })
     );
   };
-  const handleChiefdomAdminCreate = ({
-    users: [{ firstName, lastName, phoneNumber, timezone, gender, email, id, countryCode, username, roles, role = [] }]
-  }: typeof chiefdomAdminForEdit.current) => {
-    const selectedRole = Array.isArray(role) ? role : [role];
-    const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
-    const roleIds = flattenMap(roles)?.map((roleList: any) => roleList?.id);
-    const payload: IHFUserPost = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      gender,
-      username: email || username,
-      timezone: { id: Number(timezone?.id) },
-      phoneNumber,
-      countryCode: countryCode?.phoneNumberCode,
-      country: { id: countryIdValue },
+  const handleChiefdomAdminCreate = ({ users }: { users: IAdminEditFormValues[] }) => {
+    const userObj = getAdminPayload({
+      userFormData: users,
+      countryId: countryIdValue,
       tenantId: Number(ChiefdomDetail.tenantId),
-      roleIds: [selectedRole?.[0]?.id, ...(roleIds || [])]
-    };
-    if (id) {
-      payload.id = Number(id);
-    }
+      isFromList: false,
+      isFromSummaryOrProfilePage: true
+    });
+    const payload = userObj[0];
     dispatch(
       createAdminRequest({
         data: payload,

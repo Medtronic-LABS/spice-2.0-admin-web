@@ -25,7 +25,7 @@ import {
   deleteHFUserRequest as deleteAdminRequest,
   updateHFUserRequest as updateAdminRequest
 } from '../../store/healthFacility/actions';
-import { formatUserToastMsg } from '../../utils/commonUtils';
+import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
 import { IRoles } from '../../store/user/types';
 
@@ -184,22 +184,15 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   };
 
   const handleAdminSubmit = ({ users }: { users: IUserFormValues[] }) => {
-    const admin: any = users[0];
-    const flattenMap = (arr: any) => arr?.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
-    const roleIds = flattenMap(admin?.roles)?.map((data: any) => data?.id);
-    const selectedRole = Array.isArray(admin?.role) ? admin?.role : [admin?.role];
-    const payload = {
-      firstName: admin.firstName.trim(),
-      lastName: admin.lastName.trim(),
-      gender: admin.gender,
-      phoneNumber: admin.phoneNumber,
-      username: admin.email,
-      countryCode: admin.countryCode.phoneNumberCode,
-      country: { id: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) },
-      roleIds: [selectedRole?.[0]?.id, ...(roleIds || [])],
-      timezone: { id: Number(admin.timezone.id) },
-      tenantId: Number(tenantId)
-    };
+    const userObj = getAdminPayload({
+      userFormData: users,
+      countryId: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID),
+      tenantId: Number(tenantId),
+      isFromList: false,
+      isFromSummaryOrProfilePage: true
+    });
+    const payload = userObj[0];
+
     if (isAdd) {
       dispatch(
         createAdminRequest({
@@ -228,8 +221,6 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       dispatch(
         updateAdminRequest({
           data: {
-            ...(admin as IDistrictAdmin),
-            id: admin.id,
             ...payload
           },
           successCb: () => {

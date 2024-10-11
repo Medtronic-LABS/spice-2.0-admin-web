@@ -467,11 +467,18 @@ export const NAMING_VARIABLES = {
   COMMUNITY_HEALTH_PROMOTER: 'COMMUNITY_HEALTH_PROMOTER'
 };
 
-export const SIDE_MENU_FETCHING_HIERARCHY = {
+export const ADMIN_BASED_ON_URL = {
   region: 'SUPER_ADMIN',
   district: 'REGION_ADMIN',
   chiefdom: 'DISTRICT_ADMIN',
   'health-facility': 'CHIEFDOM_ADMIN'
+};
+
+export const SIDE_MENU_FETCHING_HIERARCHY = {
+  region: 'BY_REGION',
+  district: 'BY_DISTRICT',
+  chiefdom: 'BY_CHIEFDOM',
+  'health-facility': 'BY_HEALTH_FACILITY'
 };
 
 export const CFR_SUITEACCSESS_NAME = { user: 'cfr_user', admin: 'cfr_admin', quickSight: 'cfr_quicksight_admin' };

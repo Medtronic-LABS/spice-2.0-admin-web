@@ -14,6 +14,7 @@ import toastCenter from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
 import { IEditUserDetail, IRoles } from '../../store/user/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { getAdminPayload } from '../../utils/commonUtils';
 
 const MyProfile = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -109,20 +110,13 @@ const MyProfile = (): React.ReactElement => {
     setShowEditModal(true);
   }, []);
 
-  const handleEdit = ({ users: [user] }: { users: IEditUserDetail[] }) => {
-    const [roleId] = user?.roles;
-    const payload = {
-      id: user.id,
-      firstName: user.firstName.trim(),
-      lastName: user.lastName.trim(),
-      gender: user.gender,
-      phoneNumber: user.phoneNumber,
-      username: user.email,
-      countryCode: user?.countryCode?.phoneNumberCode,
-      country: { id: countryId },
-      roleIds: [roleId?.id],
-      timezone: { id: Number(user.timezone.id) }
-    };
+  const handleEdit = ({ users }: { users: IEditUserDetail[] }) => {
+    const userObj = getAdminPayload({
+      userFormData: users,
+      countryId,
+      isFromSummaryOrProfilePage: true
+    });
+    const payload = userObj[0];
     setLoading(true);
     dispatch(
       updateUserRequest({

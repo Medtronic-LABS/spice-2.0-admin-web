@@ -3,6 +3,7 @@ import { saveAs } from 'file-saver';
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
 import CryptoJS from 'crypto-js';
 import { IHFUserGet, IUserRole } from '../store/healthFacility/types';
+import { IRoles, IUserPayload } from '../store/user/types';
 
 const getEncryptionKey = () => {
   return CryptoJS.PBKDF2(process.env.REACT_APP_CRYPTR_SECRET_KEY as string, APPCONSTANTS.ENCRYPTION.SALT, {
@@ -125,18 +126,221 @@ export const formatUserToastMsg = (
   return msg;
 };
 
-export const addRedRiskToUserPayload = (payload: any, redRiskId: number | null = null) => {
-  return payload.map((user: { redRisk: any; roleIds: any[] }) => ({
-    ...user,
-    roleIds: user.redRisk
-      ? [...new Set([...user.roleIds, redRiskId])]
-      : user.roleIds?.filter((roleId: number) => roleId !== redRiskId)
-  }));
-};
-
 export const formatRoles = (user: IHFUserGet) => {
   return `${(user.roles || [])
     ?.filter((filteredUserRole: IUserRole) => filteredUserRole.name !== NAMING_VARIABLES.redRisk)
     ?.map((userRole: IUserRole) => userRole.displayName)
     .join(',')}`;
+};
+
+export const getAdminPayload = ({
+  userFormData,
+  countryId,
+  tenantId,
+  isFromList = false,
+  isFromSummaryOrProfilePage = false
+}: {
+  userFormData: any[];
+  countryId?: number | string;
+  tenantId?: number | string | undefined;
+  isFromList?: boolean;
+  isFromSummaryOrProfilePage?: boolean;
+}) => {
+  const payload = userFormData.map((user: any) => {
+    let roleIds: number[] = [];
+    // for role, roles, roleIds
+    let spiceInsightsIds: number[] = [];
+    let spiceId: number[] = [];
+    // add role in spiceId
+    if (!isFromList) {
+      // if not from admin list
+      spiceId = [Array.isArray(user?.role) ? user.role[0]?.id : user?.role?.id];
+    } else if (user.role) {
+      spiceId =
+        Array.isArray(user.roles) && user.roles.length
+          ? (user.roles || [])
+              .map((id: any) => {
+                return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+              })
+              .flat()
+          : [user.role.id];
+    }
+    // add roles in spiceInsightIds
+    if (user.roles) {
+      spiceInsightsIds = user.roles
+        ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
+        ?.map((role: IRoles) => role.id);
+    }
+    roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
+
+    const userPayload: any = {
+      firstName: user.firstName.trim(),
+      lastName: user.lastName.trim(),
+      gender: user.gender,
+      username: user.username,
+      phoneNumber: user.phoneNumber,
+      // for create region countryCode will be come as free text
+      countryCode: user?.countryCode?.phoneNumberCode || user?.countryCode,
+      roleIds,
+      timezone: user?.timezone
+    };
+
+    const hasRole = (roleName: string) => user?.roles?.some((role: { name: string }) => role.name === roleName);
+
+    const isSuperAdmin = hasRole(APPCONSTANTS.ROLES.SUPER_ADMIN);
+    const isHFAdmin = hasRole(APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
+    const isChiefdomAdmin = hasRole(APPCONSTANTS.ROLES.CHIEFDOM_ADMIN);
+    const isDistrictAdmin = hasRole(APPCONSTANTS.ROLES.DISTRICT_ADMIN);
+    const isRegionAdmin = hasRole(APPCONSTANTS.ROLES.REGION_ADMIN);
+
+    // for tenantId
+    let payloadTenantId = user.tenantId || Number(tenantId); // By default add user tenantId or tenentId from URL
+    if (isSuperAdmin) {
+      // if superadmin then send null
+      payloadTenantId = null;
+    } else if (user.tenantId) {
+      // send existing tenantId while edit
+      payloadTenantId = Number(user.tenantId);
+    } else if (isRegionAdmin && tenantId) {
+      // if region admin then send tenantId from URL
+      payloadTenantId = Number(tenantId);
+    } else if (isDistrictAdmin && user?.district?.tenantId) {
+      // if district admin then send district tenantId
+      payloadTenantId = Number(user.district.tenantId);
+    } else if (isChiefdomAdmin && user?.chiefdom?.tenantId) {
+      // if chiefdom admin then send chiefdom tenantId
+      payloadTenantId = Number(user.chiefdom.tenantId);
+    } else if (isHFAdmin && user?.healthfacility?.tenantId) {
+      // if hf admin then send hf tenentId
+      payloadTenantId = Number(user?.healthfacility?.tenantId);
+    }
+    if (payloadTenantId) {
+      userPayload.tenantId = payloadTenantId;
+    }
+    // add district only for HF, chiefdom, district except from summary page
+    if ((isHFAdmin || isChiefdomAdmin || isDistrictAdmin) && user?.district && !isFromSummaryOrProfilePage) {
+      userPayload.district = user?.district;
+    }
+    // add chiefdom only for hf and chiefdom admins except from summary page
+    if ((isHFAdmin || isChiefdomAdmin) && user?.chiefdom && !isFromSummaryOrProfilePage) {
+      userPayload.chiefdom = user?.chiefdom;
+    }
+    // add id for edit
+    if (user?.id) {
+      userPayload.id = Number(user.id);
+    }
+    // add country if not superAdmin
+    if (!isSuperAdmin && countryId) {
+      userPayload.country = { id: Number(countryId) };
+    }
+    // add culture for hf admin
+    if (isHFAdmin && user?.culture) {
+      userPayload.culture = user.culture;
+    }
+    return userPayload;
+  });
+  return payload;
+};
+
+export const getUserPayload = ({
+  userFormData,
+  countryId,
+  tenantId,
+  isHFCreate = false,
+  spiceRolesGroup = []
+}: {
+  userFormData: any[];
+  countryId: number | string;
+  tenantId?: number | string | undefined;
+  isHFCreate?: boolean;
+  spiceRolesGroup?: Array<{ name: string; id: number }>;
+}) => {
+  const payload = userFormData.map((user: any) => {
+    let roleIds: number[] = [];
+    // for role, roles, roleIds
+    if (isHFCreate) {
+      roleIds = Array.isArray(user.roles)
+        ? (user.roles || [])
+            .map((id: any) => {
+              return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+            })
+            .flat()
+        : [user.role.id];
+    } else {
+      let spiceInsightsIds: number[] = [];
+      let spiceId: number[] = [];
+      // add role in spiceId
+      if (user.role) {
+        spiceId =
+          Array.isArray(user.roles) && user.roles.length
+            ? (user.roles || [])
+                .map((id: any) => {
+                  return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
+                })
+                .flat()
+            : [user.role.id];
+      }
+      // add roles in spiceInsightIds
+      if (user.roles) {
+        spiceInsightsIds = user.roles
+          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
+          ?.map((role: IRoles) => role.id);
+      }
+      roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
+    }
+    const isHFAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
+
+    // add or remove redrisk roleId from roleIds array
+    const redRiskData = spiceRolesGroup?.find(
+      (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
+    );
+    if (redRiskData?.id) {
+      roleIds =
+        user?.redRisk && !isHFAdmin
+          ? [...new Set([...roleIds, redRiskData?.id])]
+          : roleIds?.filter((roleId: number) => roleId !== redRiskData?.id);
+    }
+    // for tenantId
+    let payloadTenantId = Number(user?.tenantId || tenantId); // By default add user tenantId or tenentId from URL
+    if (user?.tenantId) {
+      // if user has it's own tenantId(while edit) then send that tenentId
+      payloadTenantId = user.tenantId;
+    } else if (user?.healthfacility?.tenantId) {
+      // if hf admin create or user create then send assigned hf tenantId
+      payloadTenantId = Number(user?.healthfacility?.tenantId);
+    } else if (tenantId) {
+      // send URL tenantId from summary page
+      payloadTenantId = Number(tenantId);
+    }
+
+    const userPayload: IUserPayload = {
+      firstName: user.firstName.trim(),
+      lastName: user.lastName.trim(),
+      gender: user.gender,
+      username: user.username,
+      phoneNumber: user.phoneNumber,
+      culture: user?.culture || null,
+      countryCode: user?.countryCode?.phoneNumberCode || null,
+      country: { id: Number(countryId) },
+      tenantId: payloadTenantId,
+      supervisorId: Number(user.supervisor?.id) || null,
+      roleIds,
+      villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
+      village: user?.village,
+      timezone: user?.timezone,
+      district: user?.district,
+      chiefdom: user?.chiefdom
+    };
+    // add id for edit
+    if (user?.id) {
+      userPayload.id = Number(user.id);
+    }
+    // add redrisk if not hf admin
+    if (!isHFAdmin) {
+      userPayload.redRisk = user?.redRisk;
+    }
+
+    return userPayload;
+  });
+  return payload;
 };

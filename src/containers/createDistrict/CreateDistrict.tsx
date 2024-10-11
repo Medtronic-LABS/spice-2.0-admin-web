@@ -19,8 +19,7 @@ import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { countryIdSelector } from '../../store/user/selectors';
-import { formatUserToastMsg } from '../../utils/commonUtils';
-import { IRoles } from '../../store/user/types';
+import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
 
 export interface IDistrictFormValues {
   district: {
@@ -70,30 +69,9 @@ const CreateDistrict: React.FC = () => {
 
   const onSubmit = useCallback(
     ({ district, users }: IDistrictFormValues) => {
-      const districtUsers = [...users] as any;
       const data = {
         name: district.name.trim(),
-        users: districtUsers.map((user: any) => {
-          let insightIds: number[] = [];
-          if (user.roles) {
-            insightIds = user.roles
-              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
-              ?.map((role: IRoles) => role.id);
-          }
-          const selectedRole = Array.isArray(user?.role) ? user?.role : [user?.role];
-          return {
-            ...user,
-            firstName: user.firstName.trim(),
-            lastName: user.lastName.trim(),
-            gender: user.gender,
-            phoneNumber: user.phoneNumber,
-            username: user.email,
-            countryCode: user?.countryCode?.phoneNumberCode,
-            country: { id: regionId },
-            roleIds: [selectedRole?.[0].id, ...insightIds],
-            timezone: { id: Number(user.timezone.id) }
-          };
-        }),
+        users: getAdminPayload({ userFormData: users, isFromList: false, countryId: regionId }),
         countryId: Number(regionId),
         parentOrganizationId: Number(tenantId),
         tenantId: Number(tenantId)

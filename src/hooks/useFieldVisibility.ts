@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import APPCONSTANTS, { SIDE_MENU_FETCHING_HIERARCHY } from '../constants/appConstants';
+import APPCONSTANTS, { ADMIN_BASED_ON_URL } from '../constants/appConstants';
 import { NavLink, matchPath, useLocation } from 'react-router-dom';
 import { REGION_ADMIN, SUPER_ADMIN, SUPER_USER } from '../routes';
 
@@ -33,7 +33,7 @@ const useFieldVisibility = (
   if (role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
     fetchingFor = role;
   } else {
-    fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+    fetchingFor = ADMIN_BASED_ON_URL[currentModule];
   }
 
   return useMemo(() => {

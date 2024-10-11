@@ -31,10 +31,10 @@ import {
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IRoles } from '../../store/user/types';
-import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import { getAdminPayload } from '../../utils/commonUtils';
 
 interface IMatchParams {
   tenantId: string;
@@ -203,15 +203,8 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      users = users.map((user: any) => {
-        const isHFAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
-        return {
-          ...user,
-          culture: isHFAdmin ? user.culture : null
-        };
-      });
-      const userObj = formatHFUserData({
-        userData: users,
+      const userObj = getAdminPayload({
+        userFormData: users,
         countryId: countryIdValue,
         tenantId
       });

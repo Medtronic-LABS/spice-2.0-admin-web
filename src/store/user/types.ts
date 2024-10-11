@@ -754,6 +754,27 @@ export interface IUnlockUsersRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IUserPayload {
+  id?: number;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  username: string;
+  phoneNumber: string;
+  culture?: string;
+  countryCode?: string;
+  country?: any;
+  tenantId?: number;
+  supervisorId?: number | null;
+  roleIds: number[];
+  villageIds?: number[];
+  village?: string;
+  timezone: { id: number; name?: string };
+  district?: string;
+  chiefdom?: string;
+  redRisk?: boolean;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess

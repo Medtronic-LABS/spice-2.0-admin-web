@@ -17,9 +17,8 @@ import { IDistrictOption } from '../../store/district/types';
 import { Tools } from 'final-form';
 import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { roleSelector } from '../../store/user/selectors';
-import { formatUserToastMsg } from '../../utils/commonUtils';
+import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
-import { IRoles } from '../../store/user/types';
 
 export interface IChiefdomFormValues {
   chiefdom: {
@@ -107,33 +106,12 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
       ...chiefdom,
       name: chiefdom.name.trim(),
       villages: village.map((e: string) => ({ name: e })),
-      users: users.map((user: any) => {
-        let insightIds: number[] = [];
-        if (user.roles) {
-          insightIds = user.roles
-            ?.filter((userRole: IRoles) => userRole.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
-            ?.map((insightRole: IRoles) => insightRole.id);
-        }
-        const selectedRole = Array.isArray(user.role) ? user.role : [user.role];
-        return {
-          ...user,
-          firstName: user.firstName.trim(),
-          lastName: user.lastName.trim(),
-          gender: user.gender,
-          username: user.email,
-          phoneNumber: user.phoneNumber,
-          countryCode: user?.countryCode?.phoneNumberCode || user.country.phoneNumberCode,
-          country: { id: countryIdValue },
-          roleIds: [selectedRole?.[0]?.id, ...insightIds],
-          timezone: { id: Number(user.timezone?.id) }
-        };
-      }),
+      users: getAdminPayload({ userFormData: users, isFromList: false, countryId: countryIdValue }),
       countryId: countryIdValue,
       districtId: Number(district?.id) || Number(districtId),
       parentOrganizationId: districtId ? Number(tenantId) : Number(district?.tenantId),
       tenantId: (districtId ? tenantId : district?.tenantId) as string
     };
-
     dispatch(
       createChiefdomRequest({
         payload,

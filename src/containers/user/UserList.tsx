@@ -35,12 +35,11 @@ import {
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IRoles } from '../../store/user/types';
-import { formatHFUserData } from '../healthFacility/HealthFacilitySummary';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
-import { addRedRiskToUserPayload } from '../../utils/commonUtils';
+import { getUserPayload } from '../../utils/commonUtils';
 
 interface IMatchParams {
   tenantId: string;
@@ -227,11 +226,12 @@ const UserList = (): React.ReactElement => {
    */
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
-      const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
-        (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
-      );
-      let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId, fromUserForm: true });
-      userObj = addRedRiskToUserPayload(userObj, getRedRisk?.id);
+      const userObj = getUserPayload({
+        userFormData: users,
+        countryId: countryIdValue,
+        tenantId,
+        spiceRolesGroup: rolesGrouped?.SPICE
+      });
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
         { ...data },

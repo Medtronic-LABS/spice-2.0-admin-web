@@ -5,7 +5,7 @@ import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS, { NAME_CONSTANTS, NAMING_VARIABLES } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
@@ -44,7 +44,7 @@ import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { addRedRiskToUserPayload, formatRoles } from '../../utils/commonUtils';
+import { formatRoles, getUserPayload } from '../../utils/commonUtils';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -89,7 +89,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
   return postData;
 };
 
-export const formatHFUserData = ({
+const formatHFUserData = ({
   userData,
   countryId,
   tenantId,
@@ -192,9 +192,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
-  const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
-    (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
-  );
   const {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
@@ -454,8 +451,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   const handleEditUserSubmit = ({ users }: { users: any[] }) => {
-    let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId });
-    userObj = addRedRiskToUserPayload(userObj, getRedRisk.id);
+    const userObj = getUserPayload({
+      userFormData: users,
+      countryId: countryIdValue,
+      tenantId,
+      spiceRolesGroup: rolesGrouped?.SPICE
+    });
     const data: IHFUserPost = userObj[0];
     dispatch(
       updateHFUserRequest({
@@ -489,8 +490,13 @@ const HealthFacilitySummary = (): React.ReactElement => {
   }, [hfUserForEdit]);
 
   const handleAddUserSubmit = ({ users }: { users: any[] }) => {
-    let userObj = formatHFUserData({ userData: users, countryId: countryIdValue, tenantId, isHFCreate: true });
-    userObj = addRedRiskToUserPayload(userObj, getRedRisk.id);
+    const userObj = getUserPayload({
+      userFormData: users,
+      countryId: countryIdValue,
+      tenantId,
+      isHFCreate: true,
+      spiceRolesGroup: rolesGrouped?.SPICE
+    });
     const data: IHFUserPost = userObj[0];
     dispatch(
       createHFUserRequest({

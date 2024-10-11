@@ -234,7 +234,7 @@ export interface IHFUserPost {
   village?: string;
   supervisorId?: number | null;
   villageIds?: number[];
-  timezone?: { id: number };
+  timezone?: { id: number; name?: string };
   redRisk?: boolean;
 }
 

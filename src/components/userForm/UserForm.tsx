@@ -19,7 +19,7 @@ import APPCONSTANTS, {
   NAME_CONSTANTS,
   COMMON_INSIGHTS_ADMINROLE,
   COMMON_INSIGHTS_USERROLE,
-  SIDE_MENU_FETCHING_HIERARCHY,
+  ADMIN_BASED_ON_URL,
   CFR_SUITEACCSESS_NAME
 } from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';
@@ -135,7 +135,7 @@ const UserForm = ({
   if (role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
     fetchingFor = role;
   } else {
-    fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+    fetchingFor = ADMIN_BASED_ON_URL[currentModule];
   }
   const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange, getSuiteAccessList, isHFAdminSelected } =
     useUserFormUtils();
@@ -774,12 +774,12 @@ const UserForm = ({
       }
 
       // District level condition
-      const isDistrictLevel = fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.district;
+      const isDistrictLevel = fetchingFor === ADMIN_BASED_ON_URL.district;
       const isChiefdomOrHealthFacility =
-        fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
+        fetchingFor === ADMIN_BASED_ON_URL.chiefdom &&
         (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
       const isHealthFacility =
-        fetchingFor === SIDE_MENU_FETCHING_HIERARCHY['health-facility'] &&
+        fetchingFor === ADMIN_BASED_ON_URL['health-facility'] &&
         (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
 
       if (isDistrictLevel) {
@@ -793,7 +793,7 @@ const UserForm = ({
       if (isChiefdomOrHealthFacility) {
         return (
           suiteNameLower === APPCONSTANTS.spiceRole.spice &&
-          name !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
+          name !== ADMIN_BASED_ON_URL.chiefdom &&
           name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
           name !== APPCONSTANTS.ROLES.SUPER_ADMIN
         );
@@ -802,10 +802,10 @@ const UserForm = ({
       if (isHealthFacility) {
         return (
           suiteNameLower === APPCONSTANTS.spiceRole.spice &&
-          name !== SIDE_MENU_FETCHING_HIERARCHY.chiefdom &&
+          name !== ADMIN_BASED_ON_URL.chiefdom &&
           name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
           name !== APPCONSTANTS.ROLES.SUPER_ADMIN &&
-          name !== SIDE_MENU_FETCHING_HIERARCHY['health-facility']
+          name !== ADMIN_BASED_ON_URL['health-facility']
         );
       }
 
@@ -904,11 +904,7 @@ const UserForm = ({
     const chiefdomId = role === CHIEFDOM_ADMIN ? hfTenantId : chiefdomData?.tenantId ?? existingchiefdomDataId?.[0]?.id;
     if (chiefdomId) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [chiefdomId] });
-    } else if (
-      !isSiteUser &&
-      healthFacilityList.length === 0 &&
-      fetchingFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom
-    ) {
+    } else if (!isSiteUser && healthFacilityList.length === 0 && fetchingFor === ADMIN_BASED_ON_URL.chiefdom) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [hfTenantId] });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

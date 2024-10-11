@@ -10,17 +10,17 @@ import Loader from '../../components/loader/Loader';
 import UserForm from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import Workflows from '../healthFacility/Workflows';
-import APPCONSTANTS, { NAME_CONSTANTS, NAMING_VARIABLES } from '../../constants/appConstants';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { formatHealthFacility, formatHFUserData } from '../healthFacility/HealthFacilitySummary';
+import { formatHealthFacility } from '../healthFacility/HealthFacilitySummary';
 import { IClinicalWorkflows, IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { addRedRiskToUserPayload } from '../../utils/commonUtils';
+import { getUserPayload } from '../../utils/commonUtils';
 
 interface IMatchParams {
   regionId?: string;
@@ -145,11 +145,12 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       } else if (healthFacility.defaultTrueWorkflows?.length) {
         clinicalWFs = healthFacility.defaultTrueWorkflows;
       }
-      let postUserData = formatHFUserData({ userData: users, countryId, isHFCreate: true });
-      const [getRedRisk] = (rolesGrouped?.SPICE || [])?.filter(
-        (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
-      );
-      postUserData = addRedRiskToUserPayload(postUserData, getRedRisk.id);
+      const postUserData = getUserPayload({
+        userFormData: users,
+        countryId,
+        isHFCreate: true,
+        spiceRolesGroup: rolesGrouped?.SPICE
+      });
       const postData = {
         ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId),
         users: postUserData

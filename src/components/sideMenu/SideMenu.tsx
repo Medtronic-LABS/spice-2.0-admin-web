@@ -1,9 +1,9 @@
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { NavLink, matchPath, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SIDE_MENU_MAPPER, routesWithSideMenu } from '../../constants/route';
+import { routesWithSideMenu } from '../../constants/route';
 import styles from './SideMenu.module.scss';
-import { fetchSideMenuRequest, setSideMenu } from '../../store/common/actions';
+import { fetchSideMenuRequest } from '../../store/common/actions';
 import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
 import { loadingSelector as userLoadingSelector } from '../../store/user/selectors';
 import { getLoadingSelector as regionLoadingSelector } from '../../store/region/selectors';
@@ -20,14 +20,15 @@ import { districtLoadingSelector } from '../../store/district/selectors';
 import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { programLoadingSelector } from '../../store/program/selectors';
 
+type RouteModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
 interface ISideMenuProps {
   className?: string;
 }
-type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
 
 const SideMenu = memo(({ className }: ISideMenuProps) => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const [fetchedSideMenu, setFetchedSideMenu] = useState<ISideMenu[]>([]);
 
   const regionLoading = useSelector(regionLoadingSelector);
   const districtLoading = useSelector(districtLoadingSelector);
@@ -71,88 +72,68 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const countryIdValue = Number(countryId?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
 
-  const { list: sideMenuList, fetchedFor } = useSelector(getSideMenuSelector);
-  const currentModule: ModuleNames = pathname.split('/')[1];
+  const { list } = useSelector(getSideMenuSelector);
+  const currentModule: RouteModuleNames = pathname.split('/')[1];
   const { route: currentRoute } =
     routesWithSideMenu.find(({ route }) => matchPath(pathname, { path: route, exact: true })) || {};
   const { regionId, districtId, chiefdomId, healthFacilityId, tenantId } = matchPath(pathname, {
     path: currentRoute,
     exact: true
   })?.params as any;
-  let fetchingFor: string;
-  if (role === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) {
-    fetchingFor = role;
-  } else {
-    fetchingFor = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
-  }
 
   const fetchSideMenu = useCallback(
     () =>
       dispatch(
         fetchSideMenuRequest({
           countryId: regionId || countryIdValue || null,
-          roleName: fetchingFor,
-          successCb: (payload: any) => {
-            const { list: rawSideMenu, roleName: menuFetchedFor } = payload;
-
-            const sideMenuWithRoute = [...rawSideMenu]?.map((menu: ISideMenu) => {
-              menu = { ...menu };
-              const menuName = menu.name;
-              const routeObj = Object.entries(SIDE_MENU_MAPPER).find(([key]) => key === menuName);
-              menu.route = routeObj?.[1];
-              return menu;
-            });
-
-            let choosenRoutes: ISideMenu[] = [...sideMenuWithRoute];
-            const pathParams: Array<[string, string]> = [];
-            if (menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY.region) {
-              pathParams.push([':regionId', regionId], [':tenantId', tenantId]);
-            }
-            if (menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY.district) {
-              pathParams.push([':districtId', districtId], [':tenantId', tenantId]);
-            }
-            if (menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY.chiefdom) {
-              pathParams.push([':chiefdomId', chiefdomId], [':tenantId', tenantId]);
-            }
-            if (
-              menuFetchedFor === SIDE_MENU_FETCHING_HIERARCHY['health-facility'] ||
-              menuFetchedFor === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN
-            ) {
-              pathParams.push([':healthFacilityId', healthFacilityId], [':tenantId', tenantId]);
-            }
-            choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
-              menu = { ...menu };
-              pathParams.forEach(([paramName, paramValue]) => {
-                menu.route = menu?.route?.replace(paramName, paramValue);
-              });
-              return menu;
-            });
-            dispatch(
-              setSideMenu({
-                list: choosenRoutes,
-                fetchedFor: menuFetchedFor
-              })
-            );
-          },
+          roleName: role,
           failureCb: () => {
             toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_SIDEMENU_ERROR);
           }
         })
       ),
-    [chiefdomId, countryIdValue, dispatch, districtId, fetchingFor, healthFacilityId, regionId, tenantId]
+    [countryIdValue, dispatch, regionId, role]
+  );
+
+  const formatMenuItems = useCallback(
+    (rawMenu: ISideMenu[]) => {
+      let choosenRoutes: ISideMenu[] = [...rawMenu];
+      const routeVariableValues = {
+        ':regionId': regionId,
+        ':districtId': districtId,
+        ':chiefdomId': chiefdomId,
+        ':healthFacilityId': healthFacilityId,
+        ':tenantId': tenantId
+      };
+
+      choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
+        menu = { ...menu };
+        if (menu?.route) {
+          Object.entries(routeVariableValues).forEach(([key, value]) => {
+            menu.route = menu?.route?.replace(key, value);
+          });
+        }
+        return menu;
+      });
+      setFetchedSideMenu(choosenRoutes);
+    },
+    [chiefdomId, districtId, healthFacilityId, regionId, tenantId]
   );
 
   useEffect(() => {
-    if (!sideMenuList.length || fetchingFor !== fetchedFor) {
+    if (!Object.keys(list).length) {
       fetchSideMenu();
+    } else {
+      const menuBy = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+      formatMenuItems([...list[menuBy]]);
     }
-  }, [dispatch, fetchSideMenu, fetchedFor, fetchingFor, sideMenuList.length]);
+  }, [fetchSideMenu, formatMenuItems, list, currentModule]);
 
   return (
     <>
       {getLoading() && <Loader />}
       <div className={`${styles.sideMenu} py-0dot25 ${className}`}>
-        {[...sideMenuList]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
+        {[...fetchedSideMenu]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
           const isActive = matchPath(pathname, { exact: true, path: rest.route });
           return (
             <NavLink

@@ -16,8 +16,8 @@ import RegionFormIcon from '../../assets/images/info-grey.svg';
 import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
-import { IRoles } from '../../store/user/types';
 import { fetchCountryListRequest } from '../../store/healthFacility/actions';
+import { getAdminPayload } from '../../utils/commonUtils';
 
 export interface IRegionFormValues {
   region: {
@@ -53,27 +53,8 @@ const CreateRegion: React.FC = () => {
       const data = {
         ...region,
         name: region.name?.trim(),
-        users: users.map((user: any) => {
-          let insightsIds: number[] = [];
-          if (user.roles) {
-            insightsIds = user.roles
-              ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
-              ?.map((role: IRoles) => role.id);
-          }
-          return {
-            ...user,
-            firstName: user.firstName.trim(),
-            lastName: user.lastName.trim(),
-            username: user.email,
-            gender: user.gender,
-            phoneNumber: user.phoneNumber,
-            countryCode: user.countryCode,
-            timezone: { id: Number(user.timezone.id) },
-            roleIds: [user.role[0].id, ...insightsIds]
-          };
-        })
+        users: getAdminPayload({ userFormData: users, isFromList: false })
       };
-
       dispatch(
         createRegionRequest({
           data,
