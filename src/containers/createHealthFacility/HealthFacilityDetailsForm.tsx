@@ -180,12 +180,12 @@ const HealthFacilityDetailsForm = ({
 
   // Peer Supervisor fetch
   useEffect(() => {
-    const selectedTenantId = form.getState().values?.healthFacility?.district?.tenantId;
+    const selectedTenantId = form.getState().values?.healthFacility?.chiefdom?.tenantId;
     if (selectedTenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.tenantId]);
+  }, [dispatch, countryId, form.getState().values?.healthFacility?.chiefdom?.tenantId]);
 
   // Chiefdom fetch
   useEffect(() => {

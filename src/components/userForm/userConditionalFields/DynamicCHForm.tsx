@@ -88,13 +88,13 @@ export const DynamicCHForm = ({
       {isChaUser && (
         <div className='col-sm-6 col-12'>
           <Field
-            name={`${name}.comunityUnit`}
+            name={`${name}.communityUnit`}
             type='text'
             render={({ input, meta }) => (
               <SelectInput
                 {...(input as any)}
-                label='Comunity Unit'
-                errorLabel='comunityUnit'
+                label='Community Unit'
+                errorLabel='community unit'
                 required={false}
                 labelKey='name'
                 valueKey='id'
