@@ -63,6 +63,16 @@ interface IModalState {
   isNextClicked: boolean;
 }
 
+/**
+ * Constructs a payload for health facility data.
+ * This function formats the health facility object by extracting necessary fields
+ * and organizing them into the structure expected by the API.
+ *
+ * @param {Object} hf - The health facility data object.
+ * @param {number | string} countryId - The country ID associated with the health facility.
+ *
+ * @returns {Object} - The formatted health facility data payload.
+ */
 export const formatHealthFacility = (hf: any, countryId: number | string) => {
   const postData = {
     id: hf.id,
@@ -89,84 +99,6 @@ export const formatHealthFacility = (hf: any, countryId: number | string) => {
   return postData;
 };
 
-const formatHFUserData = ({
-  userData,
-  countryId,
-  tenantId,
-  isHFCreate = false,
-  fromUserForm = false
-}: {
-  userData: any[];
-  countryId: number | string;
-  tenantId?: number | string | undefined;
-  isHFCreate?: boolean;
-  fromUserForm?: boolean;
-}) => {
-  return userData.map((user: any) => {
-    let roleIds: number[] = [];
-    if (isHFCreate) {
-      roleIds = Array.isArray(user.roles)
-        ? (user.roles || [])
-            .map((id: any) => {
-              return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-            })
-            .flat()
-        : [user.role.id];
-    } else {
-      let spiceInsightsIds: number[] = [];
-      let spiceId: number[] = [];
-      if (user.role) {
-        spiceId =
-          Array.isArray(user.roles) && user.roles.length
-            ? (user.roles || [])
-                .map((id: any) => {
-                  return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-                })
-                .flat()
-            : [user.role.id];
-      }
-      if (user.roles) {
-        spiceInsightsIds = user.roles
-          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
-          ?.map((role: IRoles) => role.id);
-      }
-      roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
-    }
-    const isSuperAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.SUPER_ADMIN);
-    let payloadTenantId = user.tenantId || Number(tenantId);
-    if (fromUserForm && user?.tenantId) {
-      payloadTenantId = Number(user.tenantId);
-    } else if (user?.healthfacility?.tenantId) {
-      payloadTenantId = Number(user?.healthfacility?.tenantId);
-    } else if (isSuperAdmin) {
-      payloadTenantId = null;
-    } else if (user?.chiefdom?.tenantId) {
-      payloadTenantId = Number(user.chiefdom.tenantId);
-    } else if (user?.district?.tenantId) {
-      payloadTenantId = Number(user.district.tenantId);
-    }
-    return {
-      ...(user?.id && { id: Number(user?.id) }),
-      firstName: user.firstName,
-      lastName: user.lastName,
-      gender: user.gender,
-      username: user.username,
-      phoneNumber: user.phoneNumber,
-      culture: user?.culture || null,
-      countryCode: user?.countryCode?.phoneNumberCode,
-      country: isSuperAdmin ? null : { id: Number(countryId) },
-      tenantId: payloadTenantId,
-      supervisorId: Number(user.supervisor?.id),
-      roleIds,
-      villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
-      village: user?.village,
-      timezone: user?.timezone,
-      district: user?.district,
-      chiefdom: user?.chiefdom,
-      redRisk: user?.redRisk
-    };
-  });
-};
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { healthFacilityId, tenantId } = useParams<IMatchParams>();
@@ -261,13 +193,20 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const fetchFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, errorMessage));
 
-  const refreshHFUserList = () => {
+  /**
+   * Refreshes the list of health facility (HF) users by fetching data based on the current list parameters.
+   * It sets the loading state, dispatches a request to fetch the HF users, and handles success or failure accordingly.
+   *
+   * @returns {void}
+   */
+  const refreshHFUserList = (): void => {
     setHFUsers((prevState) => ({ ...prevState, loading: true }));
+    // Dispatch a request to fetch the list of HF users
     dispatch(
       fetchHFUserListRequest({
         countryId: countryIdValue,
         tenantIds: [tenantId],
-        roleNames: [],
+        roleNames: [], // Fetch users with any role
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
@@ -283,7 +222,15 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
-  const turnOffUsersTableLoading = (data: IHFUserGet[] | any[] = [], total = 0) => {
+  /**
+   * Updates the user table state by turning off the loading indicator and setting the data and total count.
+   *
+   * @param {IHFUserGet[] | any[]} [data=[]] - The user data to display in the table. Defaults to an empty array.
+   * @param {number} [total=0] - The total number of users. Defaults to 0.
+   *
+   * @returns {void}
+   */
+  const turnOffUsersTableLoading = (data: IHFUserGet[] | [] = [], total: number = 0): void => {
     setHFUsers((prevState) => ({
       ...prevState,
       data,
@@ -336,7 +283,14 @@ const HealthFacilitySummary = (): React.ReactElement => {
       />
     );
   };
-  const fetchWorkflowList = (healthFacilityParams: any) => {
+
+  /**
+   * Fetches the workflow list for the health facility. If workflows are not yet loaded, it dispatches a request to
+   * fetch the workflows. If workflows are already available, it skips the fetch and proceeds with the next step.
+   *
+   * @returns {void}
+   */
+  const fetchWorkflowList = (): void => {
     if (!workflows.length) {
       dispatch(
         fetchWorkflowListRequest({
@@ -361,6 +315,17 @@ const HealthFacilitySummary = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Validates linked restrictions for a health facility, checking missing supervisors and linked village IDs.
+   * If validation succeeds, it fetches the workflow list for the health facility.
+   *
+   * @param {number[]} missingIds - The IDs of supervisors that are missing or need to be validated.
+   * @param {number} hfTenantId - The tenant ID of the health facility.
+   * @param {any} healthFacilityParams - Parameters related to the health facility.
+   * @param {number[]} linkedVillageIds - The IDs of the villages linked to the health facility.
+   *
+   * @returns {void}
+   */
   const validateLinkedRestrictions = (
     missingIds: number[],
     hfTenantId: number,
@@ -374,7 +339,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         healthFacilityId: healthFacility.id,
         linkedVillageIds,
         successCb: () => {
-          fetchWorkflowList(healthFacilityParams);
+          fetchWorkflowList();
         },
         failureCb: (error) =>
           toastCenter.error(
@@ -384,6 +349,16 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles the submission of health facility (HF) details.
+   * If the next button hasn't been clicked, it validates the linked restrictions (supervisors and villages),
+   * otherwise, it updates the health facility details.
+   *
+   * @param {Object} formData - The submitted form data.
+   * @param {IHealthFacility} formData.healthFacility - The health facility details from the form.
+   *
+   * @returns {void}
+   */
   const handleHFEditDetailsSubmit = ({ healthFacility: healthFacilityData }: { healthFacility: IHealthFacility }) => {
     const postData = formatHealthFacility(healthFacilityData, countryIdValue);
     if (!editHFDetailsModal.isNextClicked) {
@@ -450,7 +425,16 @@ const HealthFacilitySummary = (): React.ReactElement => {
     [dispatch]
   );
 
-  const handleEditUserSubmit = ({ users }: { users: any[] }) => {
+  /**
+   * Handles the submission of health facility (HF) user details for editing.
+   * It processes the user data, formats it into the required payload, and dispatches a request to update the user.
+   *
+   * @param {Object} formData - The submitted form data.
+   * @param {IHFUserPost[]} formData.users - An array of user objects from the form.
+   *
+   * @returns {void}
+   */
+  const handleEditUserSubmit = ({ users }: { users: IHFUserPost[] }) => {
     const userObj = getUserPayload({
       userFormData: users,
       countryId: countryIdValue,
@@ -461,7 +445,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     dispatch(
       updateHFUserRequest({
         data,
-        successCb: siteUserSuccess,
+        successCb: healthfacilityUserSuccess,
         failureCb: (e) => {
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR);
         }
@@ -469,15 +453,24 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
-  const siteUserSuccess = () => {
+  /**
+   * Handles the success response after creating or updating a health facility (HF) user.
+   *
+   * @returns {void}
+   */
+  const healthfacilityUserSuccess = (): void => {
+    // Determine the success message based on whether it's an edit or create action
     const successMessage = isHFUserEdit
       ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS
       : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS;
+
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
+
     if (isHFUserEdit) {
       refreshHFUserList();
       refreshHFDetails();
     } else {
+      // If creating a new user, reset the search
       handleSearch('');
     }
     setHFUserModal(false);
@@ -489,7 +482,16 @@ const HealthFacilitySummary = (): React.ReactElement => {
     setHFUserModal(true);
   }, [hfUserForEdit]);
 
-  const handleAddUserSubmit = ({ users }: { users: any[] }) => {
+  /**
+   * Handles the submission of user details for adding a new health facility (HF) user.
+   * It processes the user data, formats it into the required payload, and dispatches a request to create the user.
+   *
+   * @param {Object} formData - The submitted form data.
+   * @param {IHFUserPost[]} formData.users - An array of user objects from the form.
+   *
+   * @returns {void}
+   */
+  const handleAddUserSubmit = ({ users }: { users: IHFUserPost[] }): void => {
     const userObj = getUserPayload({
       userFormData: users,
       countryId: countryIdValue,
@@ -501,7 +503,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     dispatch(
       createHFUserRequest({
         data,
-        successCb: siteUserSuccess,
+        successCb: healthfacilityUserSuccess,
         failureCb: (e: Error) => {
           setHFUserModal(false);
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR);
@@ -530,15 +532,28 @@ const HealthFacilitySummary = (): React.ReactElement => {
   };
 
   /**
-   * Formats the phone number with country code
-   * @param user
-   * @returns
+   * Formats a user's phone number by combining the country code and phone number for hf summary.
+   *
+   * @param {Object} user - The user object containing phone information.
+   * @param {string} user.countryCode - The country code of the user's phone number.
+   * @param {string} user.phoneNumber - The user's phone number.
+   *
+   * @returns {string} - The formatted phone number string in the format: "+ {countryCode} {phoneNumber}".
    */
-  const formatPhone = (user: any) => {
+  const formatPhone = (user: { countryCode: string; phoneNumber: string }): string => {
     return `${user.countryCode && '+ ' + user.countryCode} ${user.phoneNumber}`;
   };
 
-  const formatName = (user: any) => {
+  /**
+   * Formats a user's full name by combining the first name and last name for summary details.
+   *
+   * @param {Object} user - The user object containing name information.
+   * @param {string} user.firstName - The user's first name.
+   * @param {string} user.lastName - The user's last name.
+   *
+   * @returns {string} - The formatted full name string in the format: "{firstName} {lastName}".
+   */
+  const formatName = (user: { firstName: string; lastName: string }): string => {
     return `${user.firstName} ${user.lastName}`;
   };
 
@@ -583,7 +598,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   <div className='fs-0dot875 charcoal-grey-text'>{label}</div>
                   {Array.isArray(value) ? (
                     <ol className='row'>
-                      {([...value] || []).map((data: IPeerSupervisor | IVillages) => (
+                      {[...value].map((data: IPeerSupervisor | IVillages) => (
                         <li
                           key={subKey && (data as any)[subKey] ? (data as any)[subKey] : JSON.stringify(data)}
                           className={`${style?.subCol ? style?.subCol : 'col-3'}`}

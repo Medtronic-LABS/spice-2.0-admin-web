@@ -5,6 +5,7 @@ import RegionForm from '../RegionForm';
 describe('RegionForm', () => {
   const renderComponent = () => {
     return render(
+      /* tslint:disable-next-line:no-empty */
       <Form onSubmit={() => {}}>
         {({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>

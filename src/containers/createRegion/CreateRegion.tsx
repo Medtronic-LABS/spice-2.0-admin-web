@@ -32,6 +32,14 @@ const CreateRegion: React.FC = () => {
   const dispatch = useDispatch();
   const loading = useSelector((state: AppState) => state.region.loading);
 
+  /**
+   * Resets form fields whose keys include the specified substring.
+   *
+   * @param {Object} utils - Utility functions for managing the form state.
+   * @param {Function} utils.resetFieldState - Function to reset the state of a specific field.
+   *
+   * @returns {void}
+   */
   const resetFields = useCallback(([subStrOfKey]: [string], state: any, utils: Tools<IRegionFormValues>) => {
     try {
       Object.keys(state.fields).forEach((key: string) => {
@@ -48,6 +56,16 @@ const CreateRegion: React.FC = () => {
     history.push(PROTECTED_ROUTES.regionDashboard);
   }, [history]);
 
+  /**
+   * Handle submission of the region form.
+   *
+   * @param {Object} formValues - The form values to submit.
+   * @param {Object} formValues.region - The region information entered in the form.
+   * @param {string} formValues.region.name - The name of the region, which will be trimmed.
+   * @param {Array} formValues.users - List of users associated with the region.
+   *
+   * @returns {void}
+   */
   const onSubmit = useCallback(
     ({ region, users }: IRegionFormValues) => {
       const data = {

@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import APPCONSTANTS from '../../constants/appConstants';
 import styles from './Header.module.scss';
 import IconProfile from '../../assets/images/icon-profile.svg';
+import IconGlobal from '../../assets/images/icon-global.svg';
 import IconDeactivated from '../../assets/images/icon-deactivated.svg';
 import LockedUserIcon from '../../assets/images/user-lock.svg';
 import IconLegal from '../../assets/images/icon-legal.svg';
@@ -10,11 +11,17 @@ import PasswordChangeIcon from '../../assets/images/reset-password.svg';
 import ResetPasswordFields, { generatePassword } from '../../containers/authentication/ResetPasswordFields';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeOwnPassword } from '../../store/user/actions';
-import { emailSelector, getUserSuiteAccessSelector, userIdSelector } from '../../store/user/selectors';
+import {
+  emailSelector,
+  formDataIdSelector,
+  getUserSuiteAccessSelector,
+  tenantIdSelector,
+  userIdSelector
+} from '../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
-import { SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
+import { CHIEFDOM_ADMIN, DISTRICT_ADMIN, REGION_ADMIN, SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
 
 interface IUserMenuItem {
   label: string;
@@ -31,10 +38,30 @@ const UserMenu = ({ role }: any) => {
   const email = useSelector(emailSelector);
   const userId = useSelector(userIdSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
+  const formDataId = useSelector(formDataIdSelector);
+  const tenantId = useSelector(tenantIdSelector);
   const [passwordModal, setPasswordModal] = useState(false);
   const [submitEnable, setSubmitEnabled] = useState(false);
   const menus = userSuiteAccess.includes(SUITE_ACCESS.ADMIN)
     ? [
+        {
+          label: 'County Details',
+          icon: IconGlobal,
+          route: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', tenantId),
+          roles: [DISTRICT_ADMIN]
+        },
+        {
+          label: 'Sub-County Details',
+          icon: IconGlobal,
+          route: PROTECTED_ROUTES.chiefdomSummary.replace(':chiefdomId', formDataId).replace(':tenantId', tenantId),
+          roles: [CHIEFDOM_ADMIN]
+        },
+        {
+          label: 'Region Details',
+          icon: IconGlobal,
+          route: PROTECTED_ROUTES.region.replace(':regionId', formDataId).replace(':tenantId', tenantId),
+          roles: [REGION_ADMIN]
+        },
         {
           label: 'Deactivated Records',
           icon: IconDeactivated,

@@ -35,6 +35,7 @@ const ModalViewer = React.memo(
               </div>
             </div>
             {/* wrapping inside Form to handle childcomponents to use useForm hook. see selectInput.tsx */}
+            {/* tslint:disable-next-line:no-empty */}
             {renderInsideForm ? <Form onSubmit={() => {}} render={() => children} /> : children}
           </div>
         </div>

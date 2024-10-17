@@ -179,6 +179,7 @@ const RegionFormCustomization = () => {
           <div className='d-flex justify-content-end my-1'>
             <div className={`pe-1 ${styles.cultureDropdown}`}>
               <Form
+                /* tslint:disable-next-line:no-empty */
                 onSubmit={() => {}}
                 render={() => (
                   <SelectInput

@@ -13,7 +13,7 @@ interface IDynamicSideMenu {
 export interface ICommanState {
   loading: boolean;
   sideMenu: {
-    list: IDynamicSideMenu;
+    list: IDynamicSideMenu | [];
   };
   error: string | null | Error;
 }

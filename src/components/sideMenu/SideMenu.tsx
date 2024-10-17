@@ -72,7 +72,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const countryIdValue = Number(countryId?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const role = useSelector(roleSelector);
 
-  const { list } = useSelector(getSideMenuSelector);
+  const { list }: { list: any } = useSelector(getSideMenuSelector);
   const currentModule: RouteModuleNames = pathname.split('/')[1];
   const { route: currentRoute } =
     routesWithSideMenu.find(({ route }) => matchPath(pathname, { path: route, exact: true })) || {};
@@ -124,10 +124,15 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
     if (!Object.keys(list).length) {
       fetchSideMenu();
     } else {
-      const menuBy = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+      let menuBy;
+      if (currentModule === APPCONSTANTS.ROUTE_NAMES.REGION && role === APPCONSTANTS.ALL_ROLES.REGION_ADMIN) {
+        menuBy = APPCONSTANTS.BY_REGION_DETAILS;
+      } else {
+        menuBy = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
+      }
       formatMenuItems([...list[menuBy]]);
     }
-  }, [fetchSideMenu, formatMenuItems, list, currentModule]);
+  }, [fetchSideMenu, formatMenuItems, list, currentModule, role]);
 
   return (
     <>

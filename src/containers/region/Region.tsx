@@ -28,27 +28,39 @@ import arrayMutators from 'final-form-arrays';
 import { fileDownload } from '../../utils/commonUtils';
 import { useParams } from 'react-router-dom';
 import { IMatchParams } from '../../store/region/types';
+import { roleSelector } from '../../store/user/selectors';
 
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const { regionId, tenantId } = useParams<IMatchParams>();
   const regionDetails = useSelector(getRegionDetailsSelector);
+  const role = useSelector(roleSelector);
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
+
+  // 's' stands for singular title
   const {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
   } = NAME_CONSTANTS;
 
+  // Check if the current user role is Region Admin to set read-only access
+  const isReadOnly = role === APPCONSTANTS.ROLES.REGION_ADMIN;
+
+  /**
+   * Handles the file download process when the download button is clicked.
+   * Dispatches an action to download the file.
+   */
   const onDownloadClick = () => {
     dispatch(
       downloadFileRequest({
         countryId: Number(regionId),
         successCb: (data) => {
           const filename = regionDetails.name;
+          // Initiating file download with appropriate file type (Excel sheet)
           fileDownload(data, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_DOWNLOAD_SUCCESS);
         },
@@ -59,14 +71,21 @@ const Region = (): React.ReactElement => {
     );
   };
 
-  const onSubmit = (file: any) =>
+  /**
+   * Handles file upload submission by dispatching the upload action.
+   * On success, fetches the updated region details and displays a success toast.
+   * On failure, displays an error toast.
+   *
+   * @param {FILE} file - The file to be uploaded.
+   */
+  const onSubmit = (file: File) =>
     dispatch(
       uploadFileRequest({
         file,
         successCb: (_) => {
-          fetchRegionDetails();
+          fetchRegionDetails(); // Fetch updated region details after successful upload
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_UPLOAD_SUCCESS);
-          setUploadClicked(false);
+          setUploadClicked(false); // Reset upload button state
         },
         failureCb: (e) => {
           toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.REGION_UPLOAD_FAILURE);
@@ -74,6 +93,9 @@ const Region = (): React.ReactElement => {
       })
     );
 
+  /**
+   * Fetches the details of the current region using the regionId.
+   */
   const fetchRegionDetails = useCallback(() => {
     if (regionId) {
       dispatch(
@@ -90,12 +112,19 @@ const Region = (): React.ReactElement => {
     }
   }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]);
 
+  /**
+   * Fetches the region details whenever the regionId changes or the pagination/search params change.
+   */
   useEffect(() => {
     if (regionId) {
       fetchRegionDetails();
     }
   }, [dispatch, fetchRegionDetails, listParams, regionId]);
 
+  /**
+   * Fetches country details associated with the current region.
+   * Dispatches the fetch request based on regionId and tenantId.
+   */
   const getCountryDetails = useCallback(() => {
     dispatch(
       fetchCountryDetailReq({
@@ -131,9 +160,9 @@ const Region = (): React.ReactElement => {
           <div className='col-12'>
             <DetailCard
               buttonIcon={DownloadIcon}
-              buttonLabel='Download'
+              buttonLabel={isReadOnly ? undefined : 'Download'}
               buttonCustomClass={styles.regionDetailIcons}
-              customLabel='Upload'
+              customLabel={isReadOnly ? undefined : 'Upload'}
               customButtonIcon={UploadIcon}
               onCustomClick={() => setUploadClicked(true)}
               header='Region'

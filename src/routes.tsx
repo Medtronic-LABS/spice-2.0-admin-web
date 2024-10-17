@@ -107,7 +107,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.region,
       exact: true,
       component: Region,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.createRegion,
@@ -137,7 +137,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.districtSummary,
       exact: true,
       component: DistrictSummary,
-      authorisedRoles: SU_SA_RA
+      authorisedRoles: SU_SA_RA_DA
     },
     {
       path: PROTECTED_ROUTES.chiefdomDashboard,
@@ -149,7 +149,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.chiefdomSummary,
       exact: true,
       component: ChiefdomSummary,
-      authorisedRoles: SU_SA_RA_DA
+      authorisedRoles: SU_SA_RA_DA_CDA
     },
     {
       path: PROTECTED_ROUTES.chiefdomByRegion,
@@ -299,37 +299,37 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.createMedication,
       exact: true,
       component: AddMedication,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.medicationByRegion,
       exact: false,
       component: MedicationList,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.labTestByRegion,
       exact: false,
       component: LabTestList,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.customizeLabTest,
       exact: true,
       component: LabTestCustomizationLayout,
-      authorisedRoles: SU_SA_HFA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.programByRegion,
       exact: true,
       component: ProgramList,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.createProgramByRegion,
       exact: true,
       component: ProgramForm,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.workflowByRegion,
