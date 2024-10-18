@@ -130,7 +130,6 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         ...state,
         userTenantId: action.payload
       };
-    case USERTYPES.CHANGE_PASSWORD_REQUEST:
     case USERTYPES.CHANGE_OWN_PASSWORD_REQUEST:
     case USERTYPES.USER_FORGOT_PASSWORD_REQUEST:
       return {
@@ -152,7 +151,6 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         isResetPasswordLoading: false
       };
     case USERTYPES.CHANGE_PASSWORD_FAILURE:
-    case USERTYPES.CHANGE_PASSWORD_SUCCESS:
     case USERTYPES.CHANGE_OWN_PASSWORD_FAILURE:
     case USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS:
     case USERTYPES.USER_FORGOT_PASSWORD_SUCCESS:

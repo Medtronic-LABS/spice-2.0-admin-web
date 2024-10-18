@@ -20,14 +20,14 @@ const PROGRAM_MOCK_DATA = {
   PROGRAM_CREATE_REQUEST_PAYLOAD: {
     name: 'Test',
     tenantId: '207',
-    sites: [255],
-    country: '2'
+    healthFacility: [255],
+    country: { id: '2' }
   },
   PROGRAM_UPDATE_REQUEST_PAYLOAD: {
     id: '2',
     tenantId: '207',
-    deletedSites: ['224'],
-    sites: [255],
+    deletedHealthFacilities: ['224'],
+    healthFacilities: [255],
     active: true
   },
   PROGRAM_TI_ID_PAYLOAD: MEDICATION_MOCK_DATA.MEDICATION_TI_ID,
@@ -38,13 +38,13 @@ const PROGRAM_MOCK_DATA = {
       id: '2'
     },
     tenantId: '207',
-    sites: [
+    healthFacilities: [
       {
         id: '45',
         name: 'ST. FRANCIS TURIANI HOSPITAL'
       }
     ],
-    deletedSites: ['3'],
+    deletedHealthFacilities: ['3'],
     active: true
   }
 };

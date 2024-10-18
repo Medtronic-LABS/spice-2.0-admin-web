@@ -23,13 +23,6 @@ export const fetchLabtestCustomization = ({ name, countryId }: { name: any; coun
     }
   });
 
-export const fetchLabTestbyId = (data: { tenantId: string; id: string }) =>
-  axios({
-    method: 'POST',
-    url: '/admin-service/labtest/details',
-    data
-  });
-
 export const addLabTestCustomization = (data: ILabTest) =>
   axios({
     method: 'POST',

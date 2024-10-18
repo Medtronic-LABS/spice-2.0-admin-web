@@ -19,10 +19,9 @@ describe('Common Reducer', () => {
 
   it('should handle fetch region detail request: SET_SIDEMENU', () => {
     const payload = {
-      list: [MOCK_DATA_CONSTANTS.MOCK_SIDEMENU],
-      fetchedFor: 'BY_REGION'
+      list: MOCK_DATA_CONSTANTS.MOCK_SIDEMENU
     };
-    const action: any = { type: COMMON_TYPES.SET_SIDEMENU, payload };
+    const action: any = { type: COMMON_TYPES.FETCH_SIDEMENU_SUCCESS, payload };
     const expectedState = {
       ...mainInitialState,
       loading: false,

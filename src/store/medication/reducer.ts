@@ -1,7 +1,7 @@
 import { IMedicationState, MedicationActions } from './types';
 import * as MEDICATION_TYPES from './actionTypes';
 
-const initialState: IMedicationState = {
+export const initialState: IMedicationState = {
   loading: false,
   classificationsLoading: false,
   brandsLoading: false,

@@ -14,7 +14,9 @@ describe('Fetch Sidemenu', () => {
     const fetchSideMenuSpy = jest.spyOn(commonService, 'getSideMenu').mockImplementation(() =>
       Promise.resolve({
         data: {
-          entity: fetchSideMenuResponse
+          entity: {
+            menus: fetchSideMenuResponse
+          }
         }
       } as AxiosResponse)
     );
@@ -30,9 +32,11 @@ describe('Fetch Sidemenu', () => {
       }
     ).toPromise();
     expect(fetchSideMenuSpy).toHaveBeenCalledWith(fetchSideMenuRequestPayload);
+    expect(dispatched).toEqual([commonActions.fetchSideMenuSuccess({ list: fetchSideMenuResponse[0] })]);
   });
 
-  it('Fetch sidemenu and dispatches failure: FETCH_SIDEMENU_FAILURE', async () => {
+  it('Fetch sidemenu and dispatches failure and instances of error: FETCH_SIDEMENU_FAILURE', async () => {
+    const failureCb = jest.fn();
     const error = new Error('Failed to fetch sidemenu');
     const fetchSideMenuSpy = jest.spyOn(commonService, 'getSideMenu').mockImplementation(() => Promise.reject(error));
     const dispatched: any = [];
@@ -43,10 +47,30 @@ describe('Fetch Sidemenu', () => {
       fetchSideMenu,
       {
         type: ACTION_TYPES.FETCH_SIDEMENU_REQUEST,
-        payload: fetchSideMenuRequestPayload
+        payload: { ...fetchSideMenuRequestPayload, failureCb }
       }
     ).toPromise();
     expect(fetchSideMenuSpy).toHaveBeenCalledWith(fetchSideMenuRequestPayload);
+    expect(failureCb).toHaveBeenCalledWith(error);
     expect(dispatched).toEqual([commonActions.fetchSideMenuFailure(error)]);
+  });
+
+  it('Fetch sidemenu and dispatches failure: FETCH_SIDEMENU_FAILURE', async () => {
+    const error = 'Failed to fetch sidemenu';
+    const failureCb = jest.fn();
+    const fetchSideMenuSpy = jest.spyOn(commonService, 'getSideMenu').mockImplementation(() => Promise.reject(error));
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchSideMenu,
+      {
+        type: ACTION_TYPES.FETCH_SIDEMENU_REQUEST,
+        payload: { ...fetchSideMenuRequestPayload, failureCb }
+      }
+    ).toPromise();
+    expect(fetchSideMenuSpy).toHaveBeenCalledWith(fetchSideMenuRequestPayload);
+    expect(failureCb).not.toHaveBeenCalledWith(error);
   });
 });

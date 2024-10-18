@@ -18,7 +18,6 @@ import {
   IFetchSiteDropdownRequest
 } from './types';
 import * as programActions from './actions';
-import { getHFForDropdown } from '../../services/programAPI';
 import { fetchSiteDropdownFailure, fetchSiteDropdownSuccess } from '../program/actions';
 
 /*
@@ -119,8 +118,8 @@ export function* updateProgramDetailsRequest({ data, successCb, failureCb }: IUp
 export function* fetchSitesForDropdown({ tenantId, countryId = '' }: IFetchSiteDropdownRequest): SagaIterator {
   try {
     const {
-      data: { entityList: siteList, totalCount }
-    } = yield call(getHFForDropdown as any, { tenantId });
+      data: { entityList: siteList }
+    } = yield call(programService.getHFForDropdown as any, { tenantId });
     const payload = { list: siteList || [], countryId: countryId || '' };
     yield put(fetchSiteDropdownSuccess(payload));
   } catch (e) {

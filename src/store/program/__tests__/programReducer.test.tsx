@@ -1,22 +1,8 @@
 import programReducer from '../reducer';
 import * as PROGRAM_ACTION_TYPES from '../actionTypes';
+import { initialState } from '../reducer';
 
 describe('Program Reducer', () => {
-  const initialState = {
-    loading: false,
-    total: 0,
-    programList: [],
-    program: {
-      id: '',
-      name: '',
-      sites: [],
-      country: { id: '' },
-      tenantId: '',
-      deletedSites: [],
-      active: false
-    },
-    error: null
-  };
   it('should handle fetch program list request', () => {
     const action: any = { type: PROGRAM_ACTION_TYPES.FETCH_PROGRAM_LIST_REQUEST };
     const expectedState = {
@@ -238,6 +224,61 @@ describe('Program Reducer', () => {
         active: true
       },
       loading: false
+    };
+    const newState = programReducer(initialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+  it('should handle fetch HF dropdown success', () => {
+    const action: any = {
+      type: PROGRAM_ACTION_TYPES.FETCH_HF_DROPDOWN_SUCCESS,
+      payload: [
+        { id: '1', name: 'HF 1' },
+        { id: '2', name: 'HF 2' }
+      ]
+    };
+    const expectedState = {
+      ...initialState,
+      hfDropdownLoading: false,
+      hfDropdownOptions: [
+        { id: '1', name: 'HF 1' },
+        { id: '2', name: 'HF 2' }
+      ]
+    };
+    const newState = programReducer(initialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+  it('should handle fetch HF dropdown request', () => {
+    const action: any = {
+      type: PROGRAM_ACTION_TYPES.FETCH_HF_DROPDOWN_REQUEST
+    };
+    const expectedState = {
+      ...initialState,
+      siteDropdownLoading: true
+    };
+    const newState = programReducer(initialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+  it('should handle fetch HF dropdown failure', () => {
+    const action: any = {
+      type: PROGRAM_ACTION_TYPES.FETCH_HF_DROPDOWN_FAILURE,
+      error: 'Failed to fetch HF dropdown'
+    };
+    const expectedState = {
+      ...initialState,
+      siteDropdownLoading: false,
+      error: 'Failed to fetch HF dropdown'
+    };
+    const newState = programReducer(initialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+  it('should handle clear HF dropdown options', () => {
+    const action: any = {
+      type: PROGRAM_ACTION_TYPES.CLEAR_HF_DROPDOWN_OPTIONS
+    };
+    const expectedState = {
+      ...initialState,
+      siteDropdownLoading: false,
+      siteDropdownOptions: { list: [], regionTenantId: '' }
     };
     const newState = programReducer(initialState, action);
     expect(newState).toEqual(expectedState);

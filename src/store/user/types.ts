@@ -512,10 +512,6 @@ export interface IResetPasswordFail {
   error: any;
 }
 
-export interface IChangePasswordSuccess {
-  type: typeof USER_TYPES.CHANGE_PASSWORD_SUCCESS;
-}
-
 export interface IChangePasswordFail {
   type: typeof USER_TYPES.CHANGE_PASSWORD_FAILURE;
   error: any;

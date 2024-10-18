@@ -402,10 +402,6 @@ describe('chiefdomReducer', () => {
         id: '1',
         name: 'Chiefdom 1',
         tenantId: 'tenant1',
-        account: {
-          id: 'district1',
-          name: 'District 1'
-        },
         district: {
           id: 'district1',
           name: 'District 1'
@@ -428,13 +424,9 @@ describe('chiefdomReducer', () => {
         id: '1',
         name: 'Updated Chiefdom',
         tenantId: 'tenant1',
-        account: {
-          id: 'district1',
-          name: 'Updated District'
-        },
         district: {
           id: 'district1',
-          name: 'District 1'
+          name: 'Updated District'
         }
       }
     };

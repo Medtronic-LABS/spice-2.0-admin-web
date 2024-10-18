@@ -257,18 +257,6 @@ describe('userReducer', () => {
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
-  it('should handle CHANGE_PASSWORD_REQUEST', () => {
-    const initialState: any = {
-      loading: false
-    };
-    const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_REQUEST
-    };
-    const expectedState = {
-      loading: true
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
 
   it('should handle CHANGE_OWN_PASSWORD_REQUEST', () => {
     const initialState: any = {
@@ -276,19 +264,6 @@ describe('userReducer', () => {
     };
     const action: any = {
       type: USERTYPES.CHANGE_OWN_PASSWORD_REQUEST
-    };
-    const expectedState = {
-      loading: true
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle FETCH_USER_BY_ID_REQUEST', () => {
-    const initialState: any = {
-      loading: false
-    };
-    const action: any = {
-      type: USERTYPES.FETCH_USER_BY_ID_REQUEST
     };
     const expectedState = {
       loading: true
@@ -393,18 +368,6 @@ describe('userReducer', () => {
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
-  it('should handle CHANGE_PASSWORD_SUCCESS', () => {
-    const initialState: any = {
-      loading: true
-    };
-    const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_SUCCESS
-    };
-    const expectedState = {
-      loading: false
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
   it('should handle CHANGE_OWN_PASSWORD_FAILURE', () => {
     const initialState: any = {
       loading: true
@@ -423,18 +386,6 @@ describe('userReducer', () => {
     };
     const action: any = {
       type: USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS
-    };
-    const expectedState = {
-      loading: false
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
-  it('should handle FETCH_USER_BY_ID_FAILURE', () => {
-    const initialState: any = {
-      loading: true
-    };
-    const action: any = {
-      type: USERTYPES.FETCH_USER_BY_ID_FAILURE
     };
     const expectedState = {
       loading: false
@@ -553,13 +504,13 @@ describe('userReducer', () => {
   });
   it('should handle FETCH_LOCKED_USERS_REQUEST', () => {
     const initialState: any = {
-      loading: false
+      isLockedUserLoading: false
     };
     const action: any = {
       type: USERTYPES.FETCH_LOCKED_USERS_REQUEST
     };
     const expectedState = {
-      loading: true
+      isLockedUserLoading: true
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
@@ -578,7 +529,7 @@ describe('userReducer', () => {
 
   it('should handle FETCH_LOCKED_USERS_SUCCESS', () => {
     const initialState: any = {
-      loading: true,
+      isLockedUserLoading: true,
       lockedUsers: [],
       totalLockedUsers: 0
     };
@@ -590,7 +541,7 @@ describe('userReducer', () => {
       }
     };
     const expectedState = {
-      loading: false,
+      isLockedUserLoading: false,
       lockedUsers: ['user 1'],
       totalLockedUsers: 1
     };
@@ -808,7 +759,6 @@ describe('userReducer', () => {
   });
   it('should handle FETCH_USER_BY_ID_SUCCESS with existing userId', () => {
     const initialState: any = {
-      loading: true,
       user: {
         userId: 1
       }
@@ -820,14 +770,12 @@ describe('userReducer', () => {
       }
     };
     const expectedState = {
-      user: { userId: 1 },
-      loading: false
+      user: { userId: 1 }
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
   it('should handle FETCH_USER_BY_ID_SUCCESS without existing userId', () => {
     const initialState: any = {
-      loading: true,
       user: {
         userId: 1
       }
@@ -841,8 +789,17 @@ describe('userReducer', () => {
     const expectedState = {
       user: {
         userId: 1
-      },
-      loading: false
+      }
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+  it('should handle REMOVE_TOKEN', () => {
+    const initialState: any = {};
+    const action: any = {
+      type: USERTYPES.REMOVE_TOKEN
+    };
+    const expectedState = {
+      token: ''
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });

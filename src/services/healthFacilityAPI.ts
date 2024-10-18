@@ -140,12 +140,6 @@ export const fetchUnlinkedVillagesAPI = (
     method: 'POST',
     data: { countryId, districtId, chiefdomId, healthFacilityId }
   });
-export const listCities = (countryId: number, searchTerm: string) =>
-  axios({
-    url: '/admin-service/villages-list',
-    method: 'POST',
-    data: { countryId, searchTerm }
-  });
 
 export const fetchVillagesListfromHF = (tenantIds: number[], userId: number) =>
   axios({

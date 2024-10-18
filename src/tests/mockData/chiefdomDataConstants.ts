@@ -43,10 +43,11 @@ const MOCK_DATA_CONSTANTS = {
     id: '2',
     name: 'Chiefdom Two',
     tenantId: '4',
-    account: { id: '1', name: 'Account One', tenantId: '7' },
-    district: { id: '1', name: 'Account One' },
+    district: { id: '1', name: 'District One', tenantId: '1' },
     countryId: '1',
-    districtName: 'Account One',
+    districtId: '1',
+    districtName: 'District One',
+    districtTenantId: '1',
     users: [
       {
         id: '2',
@@ -72,7 +73,7 @@ const MOCK_DATA_CONSTANTS = {
   UPDATE_CHIEFDOM_REQUEST_PAYLOAD: {
     id: '2',
     name: 'Chiefdom Two',
-    account: { id: 2 },
+    district: { id: 2 },
     countryId: 5,
     tenantId: '7',
     districtId: 2
@@ -109,15 +110,15 @@ const MOCK_DATA_CONSTANTS = {
       name: 'Chiefdom One',
       email: 'chiefdom@email.com',
       district: '5',
-      account: { name: 'Account One' },
-      districtName: 'Account One'
+      account: { name: 'District One' },
+      districtName: 'District One'
     }
   ],
 
   CREATE_CHIEFDOM_REQUEST_PAYLOAD: {
     id: '2',
     name: 'Chiefdom Two',
-    account: { id: 2 },
+    district: { id: 2 },
     countryId: 6,
     districtId: 2,
     parentOrganizationId: 9,
@@ -165,7 +166,7 @@ const MOCK_DATA_CONSTANTS = {
         }
       }
     ],
-    account: {
+    district: {
       id: 15,
       name: 'St. Annes Medical Center',
       tenantId: 248
@@ -184,8 +185,7 @@ const MOCK_DATA_CONSTANTS = {
         tenantId: '2',
         name: 'Chiefdom One',
         email: 'chiefdom@email.com',
-        district: '5',
-        account: { name: 'Account One' }
+        district: '5'
       }
     ],
     limit: null

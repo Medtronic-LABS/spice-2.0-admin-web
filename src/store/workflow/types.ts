@@ -303,11 +303,6 @@ export interface IDeleteWorkflowModuleSuccess {
   type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_SUCCESS;
 }
 
-export interface IDeleteWorkflowModuleReqPayload {
-  id: string;
-  tenantId: string;
-}
-
 export interface IDeleteWorkflowModuleFail {
   type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_FAILURE;
   error: Error;

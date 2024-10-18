@@ -26,8 +26,7 @@ const MOCK_DATA_CONSTANTS = {
   MOCK_LOGIN_REQUEST: {
     username: 'testuser@test.com',
     password: 'Spice123',
-    rememberMe: false,
-    countryId: 1
+    rememberMe: false
   },
   MOCK_TOKEN: '4',
   MOCK_USER_TENANT_ID: '3',
@@ -88,14 +87,6 @@ const MOCK_DATA_CONSTANTS = {
         SPICE: [
           {
             id: 2,
-            name: 'SUPER_USER',
-            level: 1,
-            suiteAccessName: 'admin',
-            displayName: 'Super user',
-            groupName: 'SPICE'
-          },
-          {
-            id: 2,
             name: 'HEALTH_FACILITY_ADMIN',
             level: 1,
             suiteAccessName: 'admin',
@@ -111,42 +102,38 @@ const MOCK_DATA_CONSTANTS = {
   NO_PERMISSION_ROLE: [{ name: 'HRIO' }],
   INVALID_ROLE: [{ name: 'TEACHER' }],
 
-  // RESET_PASSWORD_REQUEST_MOCK_DATA: {
-  //   email: 'test@email.com',
-  //   password: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   token: '4',
-  //   successCB: () => null,
-  //   failureCb: () => null
-  // },
-  // CHANGE_PASSWORD_REQUEST_MOCK_DATA: {
-  //   user: 'test@email.com',
-  //   password: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   successCB: () => null,
-  //   failureCb: () => null
-  // },
-  // UPDATE_PASSWORD_REQUEST_MOCK_DATA: {
-  //   user: 'test@email.com',
-  //   oldPassword: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   newPassword: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   successCB: () => null,
-  //   failureCb: () => null
-  // },
-  // GET_USERNAME_RESPONSE_MOCK_DATA: {
-  //   username: 'test@email.com',
-  //   isPasswordSet: true
-  // },
-  // GET_USERNAME_REQUEST_MOCK_DATA: {
-  //   token: '4',
-  //   successCB: () => null
-  // },
-  // CREATE_PASSWORD_REQUEST_MOCK_DATA: {
-  //   data: {
-  //     email: 'test@email.com',
-  //     password: process.env.REACT_APP_PASSWORD_HASH_KEY
-  //   },
-  //   id: '3',
-  //   successCB: () => null
-  // },
+  RESET_PASSWORD_REQUEST_MOCK_DATA: {
+    email: 'test@email.com',
+    password: process.env.REACT_APP_PASSWORD_HASH_KEY,
+    token: '4',
+    successCB: () => null,
+    failureCb: () => null
+  },
+  CHANGE_PASSWORD_REQUEST_MOCK_DATA: {
+    userId: 1,
+    password: 'Spice123'
+  },
+  UPDATE_PASSWORD_REQUEST_MOCK_DATA: {
+    userId: 1,
+    oldPassword: 'Spice123',
+    newPassword: 'Spice1234'
+  },
+  GET_USERNAME_RESPONSE_MOCK_DATA: {
+    username: 'test@email.com',
+    isPasswordSet: true
+  },
+  GET_USERNAME_REQUEST_MOCK_DATA: {
+    token: '4',
+    successCB: () => null
+  },
+  CREATE_PASSWORD_REQUEST_MOCK_DATA: {
+    data: {
+      email: 'test@email.com',
+      password: process.env.REACT_APP_PASSWORD_HASH_KEY
+    },
+    id: '3',
+    successCB: () => null
+  },
   FETCH_TIMEZONE_RESPONSE_PAYLOAD: {
     id: '+5',
     description: 'GMT'
@@ -159,7 +146,10 @@ const MOCK_DATA_CONSTANTS = {
     email: 'test@email.com',
     firstName: 'Test',
     lastName: 'Name',
-    tenantId: '3'
+    tenantId: '3',
+    roleDetail: 'SUPER_USER',
+    country: '1',
+    suiteAccess: ['web']
   },
   FETCH_USER_BACKEND_RESPONSE: {
     id: '2',
@@ -182,8 +172,6 @@ const MOCK_DATA_CONSTANTS = {
     id: '2',
     firstName: 'Test',
     lastName: 'Name',
-    username: 'test@email.com',
-    email: 'test@email.com',
     gender: 'Male',
     phoneNumber: '1234567890',
     timezone: {
@@ -194,7 +182,7 @@ const MOCK_DATA_CONSTANTS = {
     redRisk: false,
     isUpdated: false,
     roleName: 'HRIO',
-    countryCode: '91',
+    countryCode: { id: '1', phoneNumberCode: '91' },
     country: {
       id: '2',
       countryCode: '91',
@@ -243,7 +231,16 @@ const MOCK_DATA_CONSTANTS = {
       active: true,
       deleted: false
     }
-  ]
+  ],
+  COMMUNITY_UNIT_RESPONSE: {
+    entityList: [
+      {
+        id: '1',
+        name: 'unit 1'
+      }
+    ],
+    totalCount: 1
+  }
 };
 
 export default MOCK_DATA_CONSTANTS;

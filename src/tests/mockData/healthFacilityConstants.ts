@@ -7,7 +7,7 @@ const HF_LIST_FETCH_PAYLOAD = {
 
 const CLINICAL_WORKFLOWS = [
   {
-    id: 8,
+    id: '8',
     createdBy: null,
     updatedBy: null,
     createdAt: '"2024-05-08T11:23:48+00:00',

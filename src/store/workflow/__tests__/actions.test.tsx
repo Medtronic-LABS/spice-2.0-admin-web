@@ -31,32 +31,26 @@ import {
   resetClinicalWorkflow
 } from '../actions';
 import * as WORKFLOW_TYPES from '../actionTypes';
+import { FormType } from '../types';
 
 describe('Action Creators tests', () => {
   it('fetchCustomizationFormRequest should create an action to request customization form', () => {
-    const action = fetchCustomizationFormRequest({
-      tenantId: 'tenant1',
-      countryId: 'country1',
-      countyId: 'county1',
+    const apiData = {
+      tenantId: '1',
+      countryId: '1',
+      districtId: '1',
       formType: 'type1',
       category: 'category1',
       cultureId: 1,
       clinicalWorkflowId: 'workflow1',
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = fetchCustomizationFormRequest(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.FETCH_CUSTOMIZATION_FORM_REQUEST,
-      tenantId: 'tenant1',
-      countryId: 'country1',
-      countyId: 'county1',
-      formType: 'type1',
-      category: 'category1',
-      cultureId: 1,
-      clinicalWorkflowId: 'workflow1',
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -79,17 +73,16 @@ describe('Action Creators tests', () => {
   });
 
   it('createWorkflowModule should create an action to create a workflow module', () => {
-    const action = createWorkflowModule({
-      data: { module: 'newModule' },
+    const apiData = {
+      data: { name: 'newModule', tenantId: '1' },
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = createWorkflowModule(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.CREATE_WORKFLOW_MODULE_REQUEST,
-      data: { module: 'newModule' },
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -102,46 +95,35 @@ describe('Action Creators tests', () => {
   });
 
   it('fetchFormMetaSuccess should create an action for successful fetch of form meta', () => {
-    const payload = { someMetaData: 'data' };
-    const action = fetchFormMetaSuccess({ formType: 'type1', payload });
+    const apiData = { formType: 'Screening' as FormType, payload: { someMetaData: 'data' } };
+    const action = fetchFormMetaSuccess(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.FETCH_FORM_META_SUCCESS,
-      formType: 'type1',
-      payload
+      ...apiData
     });
   });
 
   it('customizeFormRequest should create an action to request form customization', () => {
-    const action = customizeFormRequest({
-      formType: 'type1',
+    const apiData = {
+      formType: 'Screening' as FormType,
       formId: 'form1',
       category: 'category1',
       payload: { field: 'value' },
-      tenantId: 'tenant1',
-      countryId: 'country1',
-      countyId: 'county1',
+      tenantId: '1',
+      countryId: '1',
+      districtId: '1',
       workflowId: 'workflow1',
       cultureId: 1,
       clinicalWorkflowId: 'workflow1',
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = customizeFormRequest(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.CUSTOMIZE_FORM_REQUEST,
-      formType: 'type1',
-      formId: 'form1',
-      category: 'category1',
-      payload: { field: 'value' },
-      tenantId: 'tenant1',
-      countryId: 'country1',
-      countyId: 'county1',
-      workflowId: 'workflow1',
-      cultureId: 1,
-      clinicalWorkflowId: 'workflow1',
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -155,7 +137,7 @@ describe('Action Creators tests', () => {
     });
   });
   it('fetchClinicalWorkflow should create an action to fetch clinical workflow', () => {
-    const data = { someField: 'value' }; // Example payload
+    const data = { countryId: '1', limit: null, skip: 1, searchTerm: '' }; // Example payload
     const action = fetchClinicalWorkflow(data);
 
     expect(action).toEqual({
@@ -165,32 +147,30 @@ describe('Action Creators tests', () => {
   });
 
   it('updateWorkflowModule should create an action to update  workflow module', () => {
-    const action = updateWorkflowModule({
-      data: { module: 'updatedModule' },
+    const apiData = {
+      data: { name: 'updatedModule', tenantId: '1' },
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = updateWorkflowModule(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST,
-      data: { module: 'updatedModule' },
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
   it('deleteWorkflowModule should create an action to delete  workflow module', () => {
-    const action = deleteWorkflowModule({
-      data: { moduleId: 'module123' },
+    const apiData = {
+      data: { id: '1', tenantId: '1' },
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = deleteWorkflowModule(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.DELETE_WORKFLOW_MODULE_REQUEST,
-      data: { moduleId: 'module123' },
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -235,17 +215,16 @@ describe('Action Creators tests', () => {
   });
 
   it('fetchFormMetaRequest should create an action to request form meta', () => {
-    const action = fetchFormMetaRequest({
-      formType: 'type1',
+    const apiData = {
+      formType: 'Screening' as FormType,
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = fetchFormMetaRequest(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.FETCH_FORM_META_REQUEST,
-      formType: 'type1',
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -266,23 +245,19 @@ describe('Action Creators tests', () => {
   });
 
   it('deactivateConsentRequest should create an action to request deactivation of consent', () => {
-    const action = deactivateConsentRequest({
-      formType: 'type1',
+    const apiData = {
+      formType: 'Screening' as FormType,
       formId: 'form123',
       category: 'category1',
       tenantId: 'tenant1',
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = deactivateConsentRequest(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.DEACTIVATE_CONSENT_FORM_REQUEST,
-      formType: 'type1',
-      formId: 'form123',
-      category: 'category1',
-      tenantId: 'tenant1',
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -311,17 +286,16 @@ describe('Action Creators tests', () => {
   });
 
   it('createWorkflowModule should create an action to create a workflow module', () => {
-    const action = createWorkflowModule({
-      data: { module: 'newModule' },
+    const apiData = {
+      data: { name: 'newModule', tenantId: '1' },
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = createWorkflowModule(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.CREATE_WORKFLOW_MODULE_REQUEST,
-      data: { module: 'newModule' },
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -344,17 +318,16 @@ describe('Action Creators tests', () => {
   });
 
   it('updateWorkflowModule should create an action to update a workflow module', () => {
-    const action = updateWorkflowModule({
-      data: { module: 'updatedModule' },
+    const apiData = {
+      data: { name: 'newModule', tenantId: '1' },
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = updateWorkflowModule(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST,
-      data: { module: 'updatedModule' },
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -377,17 +350,16 @@ describe('Action Creators tests', () => {
   });
 
   it('deleteWorkflowModule should create an action to delete a workflow module', () => {
-    const action = deleteWorkflowModule({
-      data: { moduleId: 'module123' },
+    const apiData = {
+      data: { id: '1', tenantId: '1' },
       successCb: jest.fn(),
       failureCb: jest.fn()
-    });
+    };
+    const action = deleteWorkflowModule(apiData);
 
     expect(action).toEqual({
       type: WORKFLOW_TYPES.DELETE_WORKFLOW_MODULE_REQUEST,
-      data: { moduleId: 'module123' },
-      successCb: expect.any(Function),
-      failureCb: expect.any(Function)
+      ...apiData
     });
   });
 
@@ -417,7 +389,7 @@ describe('Action Creators tests', () => {
   });
 
   it('clearFormMeta should create an action to clear form meta', () => {
-    const formType = 'type1'; // Example form type
+    const formType = 'Screening'; // Example form type
     const action = clearFormMeta(formType);
 
     expect(action).toEqual({

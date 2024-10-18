@@ -2,7 +2,7 @@ import * as WORKFLOW_TYPES from './actionTypes';
 
 import { WorkflowActions, IWorkflowState } from './types';
 
-const initialState: IWorkflowState = {
+export const initialState: IWorkflowState = {
   formJSON: null,
   consentForm: null,
   formMeta: null,

@@ -2,7 +2,7 @@ import * as PROGRAM_ACTION_TYPES from './actionTypes';
 
 import { ProgramActions, IProgramState } from './types';
 
-const initialState: IProgramState = {
+export const initialState: IProgramState = {
   loading: false,
   total: 0,
   programList: [],

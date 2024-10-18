@@ -2,7 +2,7 @@ import * as ACTION_TYPES from './actionTypes';
 
 import { LabtestActions, ILabtestState, ILabTest } from './types';
 
-const initialState: ILabtestState = {
+export const initialState: ILabtestState = {
   labTests: [],
   total: 0,
   loading: false,

@@ -926,4 +926,14 @@ describe('healthFacilityReducer', () => {
     };
     expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
   });
+  it('should handle CLEAR_HF_WORKFLOW_LIST', () => {
+    const action: any = {
+      type: actionTypes.CLEAR_HF_WORKFLOW_LIST
+    };
+    const expectedState = {
+      ...initialState,
+      clinicalWorkflowList: []
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
 });

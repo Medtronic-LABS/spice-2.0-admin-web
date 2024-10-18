@@ -6,6 +6,10 @@ import healthFacilityReducer from '../healthFacility/reducer';
 import medicationReducer from '../medication/reducer';
 import labtestReducer from '../labTest/reducer';
 import workflowReducer from '../workflow/reducer';
+import districtReducer from '../district/reducer';
+import chiefdomReducer from '../chiefdom/reducer';
+import programReducer from '../program/reducer';
+import commonReducer from '../common/reducer';
 
 describe('rootReducer', () => {
   it('should combine all reducers correctly', () => {
@@ -15,7 +19,11 @@ describe('rootReducer', () => {
       healthFacility: healthFacilityReducer,
       medication: medicationReducer,
       labtest: labtestReducer,
-      workflow: workflowReducer
+      workflow: workflowReducer,
+      district: districtReducer,
+      chiefdom: chiefdomReducer,
+      program: programReducer,
+      common: commonReducer
     });
 
     const initialState = {
@@ -24,7 +32,11 @@ describe('rootReducer', () => {
       healthFacility: {},
       medication: {},
       labtest: {},
-      workflow: {}
+      workflow: {},
+      district: {},
+      chiefdom: {},
+      program: {},
+      common: {}
     };
 
     const action = { type: 'SOME_ACTION' };
@@ -42,7 +54,11 @@ describe('rootReducer', () => {
       healthFacility: healthFacilityReducer,
       medication: medicationReducer,
       labtest: labtestReducer,
-      workflow: workflowReducer
+      workflow: workflowReducer,
+      district: districtReducer,
+      chiefdom: chiefdomReducer,
+      program: programReducer,
+      common: commonReducer
     });
 
     const initialState = {
@@ -51,7 +67,11 @@ describe('rootReducer', () => {
       healthFacility: {},
       medication: {},
       labtest: {},
-      workflow: {}
+      workflow: {},
+      district: {},
+      chiefdom: {},
+      program: {},
+      common: {}
     };
 
     const resetAction = { type: 'RESET_STORE' };

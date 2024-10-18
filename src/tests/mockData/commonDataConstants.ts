@@ -5,9 +5,13 @@ const MOCK_DATA_CONSTANTS = {
   },
   MOCK_SIDEMENU: [
     {
-      displayName: 'Region',
-      name: 'REGION',
-      order: 1
+      BY_REGION: [
+        {
+          displayName: 'Region',
+          name: 'REGION',
+          order: 1
+        }
+      ]
     }
   ]
 };
