@@ -48,7 +48,15 @@ const AddMedication = (props: Props) => {
   );
 
   /**
-   * This function checks for duplicate data validation with existing form values and existing values in database
+   * Checks for duplicate data validation with existing form values and existing values in database
+   * @param {Object} params - The parameters object
+   * @param {Array} params.fields - The form fields array
+   * @param {number} params.index - The index of the current field
+   * @param {boolean} params.isFirstChild - Whether this is the first child in the form
+   * @param {Object} params.initialValue - The initial value of the field
+   * @param {boolean} params.isUpdate - Whether this is an update operation
+   * @param {boolean} params.isSubmitted - Whether the form has been submitted
+   * @param {Function} params.submitCb - Callback function to be called on successful validation
    */
   const checkDuplicateValidation = ({
     fields,
@@ -102,19 +110,22 @@ const AddMedication = (props: Props) => {
         name: currentRecord?.name,
         dosageFormId: currentRecord?.dosage_form.id,
         dosageFormName: currentRecord?.dosage_form.name,
+        category: {
+          id: currentRecord?.category?.id,
+          name: currentRecord?.category?.name
+        },
         tenantId
       };
       dispatch(
         validateMedication({
           data: postData,
           successCb: () => {
-            // no duplicates found in the database
+            // no duplicates found
             if (!isUpdate && !isSubmitted) {
               fields.push({ ...initialValue });
             }
             setPreviousFieldValue(fields.value[index], index);
             setInternalFormState({ isValueChanged: false, isValid: true }, index);
-            // if submitted and no duplicates found then the below callback
             submitCb?.();
           },
           failureCb: (e) => {
@@ -125,6 +136,12 @@ const AddMedication = (props: Props) => {
     }
   };
 
+  /**
+   * Resets fields in the form state based on a substring key
+   * @param {string[]} subStrOfKey - Substring to match field keys
+   * @param {Object} state - The current form state
+   * @param {Object} utils - Form utility functions
+   */
   const resetFields = ([subStrOfKey]: [string], state: any, utils: Tools<IMedicationFormValues>) => {
     try {
       Object.keys(state.fields).forEach((key: string) => {
@@ -139,8 +156,11 @@ const AddMedication = (props: Props) => {
 
   /**
    * Sets the new field row value or Removes the specific field row values by index
+   * @param {IMedicationDataFormValues | null} value - The new value to set
+   * @param {number} index - The index of the field to update
+   * @param {boolean} isRemove - Whether to remove the field
    */
-  const setPreviousFieldValue = (value: IMedicationDataFormValues | null, index: number, isRemove = false) => {
+  const setPreviousFieldValue = (value: IMedicationDataFormValues | null, index: number, isRemove: boolean = false) => {
     const newFieldValues = [...previousFieldValue];
     if (isRemove) {
       newFieldValues.splice(index, 1);
@@ -152,11 +172,14 @@ const AddMedication = (props: Props) => {
 
   /**
    * Sets the new form state for value changes and validation or Removes the specific state by index
+   * @param {{ isValueChanged: boolean; isValid: boolean } | null} value - The new state to set
+   * @param {number} index - The index of the state to update
+   * @param {boolean} isRemove - Whether to remove the state
    */
   const setInternalFormState = (
     value: { isValueChanged: boolean; isValid: boolean } | null,
     index: number,
-    isRemove = false
+    isRemove: boolean = false
   ) => {
     const valueUpdates = [...internalFormState];
     if (isRemove) {
@@ -175,6 +198,9 @@ const AddMedication = (props: Props) => {
     goBackToMedication();
   };
 
+  /**
+   * Navigates back to the medication list page
+   */
   const goBackToMedication = () => {
     const url = PROTECTED_ROUTES.medicationByRegion;
     const { regionId, tenantId } = props.match.params;
@@ -182,6 +208,10 @@ const AddMedication = (props: Props) => {
     props.history.push(medicationURL);
   };
 
+  /**
+   * Handles form submission
+   * @param {IMedicationFormValues} formValues - The form values to submit
+   */
   const onSubmit = ({ medication: medicationValues }: IMedicationFormValues) => {
     const medication = medicationValues.map((medicationData: IMedicationDataFormValues) => ({
       ...medicationData,
@@ -211,6 +241,10 @@ const AddMedication = (props: Props) => {
     });
   };
 
+  /**
+   * Saves medication data to the database
+   * @param {IMedicationDataFormValues[]} medication - The medication data to save
+   */
   const saveMedication = (medication: IMedicationDataFormValues[]) => {
     const { regionId } = props.match.params;
     const data = medication.map((medicationData: IMedicationDataFormValues) => ({
@@ -225,7 +259,11 @@ const AddMedication = (props: Props) => {
         url: medicationData?.codeDetails?.url
       },
       dosageFormId: medicationData.dosage_form.id,
-      dosageFormName: medicationData.dosage_form.name
+      dosageFormName: medicationData.dosage_form.name,
+      category: {
+        id: medicationData?.category?.id,
+        name: medicationData?.category?.name
+      }
     }));
 
     dispatch(

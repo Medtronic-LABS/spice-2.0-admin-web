@@ -35,6 +35,29 @@ interface IMatchParams {
   siteId?: string;
 }
 
+/**
+ * Interface for modal state
+ */
+interface IModalState {
+  data?: IProgramDetails;
+  isOpen: boolean;
+}
+
+/**
+ * Interface for route parameters
+ */
+interface IMatchParams {
+  regionId?: string;
+  tenantId: string;
+  OUId?: string;
+  accountId?: string;
+  siteId?: string;
+}
+
+/**
+ * ProgramList component for displaying and managing programs
+ * @returns {React.ReactElement} The rendered component
+ */
 const ProgramList = (): React.ReactElement => {
   const { regionId, tenantId } = useParams<IMatchParams>();
   const history = useHistory();
@@ -58,8 +81,7 @@ const ProgramList = (): React.ReactElement => {
   }, [dispatch]);
 
   /**
-   * to load Program List data.
-   * @param program List
+   * Fetches the program list based on current parameters
    */
   const fetchList = useCallback(() => {
     const query = {
@@ -83,14 +105,26 @@ const ProgramList = (): React.ReactElement => {
     fetchList();
   }, [dispatch, listParams, tenantId, fetchList]);
 
+  /**
+   * Handles the failure of API requests
+   * @param {Error} e - The error object
+   * @param {string} errorMessage - The error message to display
+   */
   const requestFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, errorMessage));
 
+  /**
+   * Opens the create program page
+   */
   const openCreateProgram = () => {
     const url = (regionId && PROTECTED_ROUTES.createProgramByRegion) as string;
     history.push(url.replace(':tenantId', tenantId).replace(/(:regionId)/, regionId as string));
   };
 
+  /**
+   * Opens the edit dialogue for a program
+   * @param {IProgramList} data - The program data to edit
+   */
   const openEditDialogue = (data: IProgramList) => {
     dispatch(
       fetchProgramDetailsRequest({
@@ -103,6 +137,10 @@ const ProgramList = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Opens the program edit modal
+   * @param {IProgramDetails} programDetails - The details of the program to edit
+   */
   const openProgramEditModal = (programDetails: IProgramDetails) => {
     if (programDetails) {
       setEditProgramDetailsModal({
@@ -116,6 +154,10 @@ const ProgramList = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Handles the submission of program edits
+   * @param {{ program: IProgramDetails }} param0 - The edited program details
+   */
   const handleProgramEditSubmit = ({ program }: { program: IProgramDetails }) => {
     const existingHFData = editProgramDetailsModal.data?.healthFacilities.map((site) => site.id) || [];
     const newHFData = program.healthFacilities.map((healthFacility) => healthFacility.id);
@@ -132,16 +174,17 @@ const ProgramList = (): React.ReactElement => {
   };
 
   /**
-   * To get the program deleted HealthFacility.
-   * @param oldHealthFacility List
-   * @param newHealthFacility List
-   * @param deletedHealthFacility List
+   * Determines which health facilities have been deleted
+   * @param {string[]} oldHealthFacility - List of old health facility IDs
+   * @param {string[]} newHealthFacility - List of new health facility IDs
+   * @param {string[]} deletedHealthFacility - List of previously deleted health facility IDs
+   * @returns {string[]} List of deleted health facility IDs
    */
   const getDeletedSites = (
     oldHealthFacility: string[],
     newHealthFacility: string[],
     deletedHealthFacility: string[]
-  ) => {
+  ): string[] => {
     const oldHealthFacilityObj: { [key: string]: boolean } = {};
     const deletedHealthFacilitySObj: { [key: string]: boolean } = {};
     oldHealthFacility.forEach((site) => (oldHealthFacilityObj[site] = true));
@@ -156,15 +199,25 @@ const ProgramList = (): React.ReactElement => {
     return [...Object.keys(deletedHealthFacilitySObj), ...Object.keys(oldHealthFacilityObj)];
   };
 
+  /**
+   * Callback for successful program update
+   */
   const onUpdateSuccess = () => {
     fetchList();
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PROGRAM_UPDATE_SUCCESS);
     closeProgramEditModal();
   };
 
-  const onUpdateFail = (e: Error) =>
-    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PROGRAM_UPDATE_ERROR));
+  /**
+   * Callback for failed program update
+   * @param {Error} error - The error object
+   */
+  const onUpdateFail = (error: Error) =>
+    toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.PROGRAM_UPDATE_ERROR));
 
+  /**
+   * Closes the program edit modal
+   */
   const closeProgramEditModal = () => {
     setEditProgramDetailsModal({
       isOpen: false,
@@ -172,7 +225,12 @@ const ProgramList = (): React.ReactElement => {
     });
   };
 
-  const editProgramModalRender = (form: any) => {
+  /**
+   * Renders the edit program form
+   * @param {any} form - The form object
+   * @returns {React.ReactElement} The rendered form
+   */
+  const editProgramModalRender = (form: any): React.ReactElement => {
     if (editProgramDetailsModal.data) {
       return <ProgramForm isEdit={true} tenantId={tenantId} form={form} />;
     } else {
@@ -182,7 +240,8 @@ const ProgramList = (): React.ReactElement => {
   };
 
   /**
-   * To delete program
+   * Handles program deletion
+   * @param {{ data: IProgramList; index: number; pageNo: number }} param0
    */
   const handleProgramDelete = useCallback(
     ({ data: { id }, pageNo }: { data: IProgramList; index: number; pageNo: number }) => {

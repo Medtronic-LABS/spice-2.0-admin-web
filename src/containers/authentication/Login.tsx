@@ -21,7 +21,11 @@ interface ILoginForm {
   password: string;
   rememberMe: boolean;
 }
-
+/**
+ * Login component
+ * @param {any} props - The props
+ * @returns {React.ReactElement} The rendered Login component
+ */
 const Login = (props: any): React.ReactElement => {
   const dispatch = useDispatch();
   const username = localStorageServices.getItem(APPCONSTANTS.USERNAME);
@@ -47,6 +51,10 @@ const Login = (props: any): React.ReactElement => {
     };
   }, [password, username]);
 
+  /**
+   * Handles the form submission
+   * @param {Object} param0 - The form data
+   */
   const onSubmit = ({
     email,
     password: newPassword,
@@ -74,6 +82,9 @@ const Login = (props: any): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles the click event to toggle password visibility
+   */
   const setShowPasswordHandle = () => {
     setShowPassword(!isShowPassword);
   };

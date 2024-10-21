@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
-import APPCONSTANTS from '../../constants/appConstants';
 
 const useUserFormUtils = () => {
   const { mobileRoles, isCHPRole, isHFAdminRole } = UserFormMeta();
@@ -29,6 +28,11 @@ const useUserFormUtils = () => {
     }
   };
 
+  /**
+   * Generates a list of suite access options based on the provided roles grouped by user role.
+   * @param {any} rolesGrouped - The roles grouped by user role
+   * @returns {Array} An array of suite access options
+   */
   const getSuiteAccessList = (rolesGrouped: any) =>
     Object.keys(rolesGrouped || {})
       .map((userRole: any) => ({

@@ -10,7 +10,13 @@ interface IAnchorProps {
   className: string;
 }
 
-const Anchor: React.FC<IAnchorProps> = ({ content, onClick, className }) => (
+/**
+ * Anchor component
+ * Renders an anchor element
+ * @param {IAnchorProps} props - Component props
+ * @returns {React.ReactElement} The rendered Anchor component
+ */
+const Anchor: React.FC<IAnchorProps> = ({ content, onClick, className }: IAnchorProps): React.ReactElement => (
   <li role='presentation' className={className} onClick={onClick}>
     <div className={styles.paginationButton}>{content}</div>
   </li>
@@ -31,6 +37,13 @@ interface IPaginationState {
   currentPage: number;
 }
 
+/**
+ *
+ * @param {number} totalItems - The total number of items
+ * @param {number} pageSize - The page size
+ * @param {number} currentPage - The current page
+ * @returns {IPaginationState} The pager
+ */
 const getPager = (totalItems: number, pageSize: number, currentPage: number = 1) => {
   const paginationRange = APPCONSTANTS.PAGINATION_RANGE;
   const pages: Array<number | string> = [];
@@ -63,6 +76,14 @@ const getPager = (totalItems: number, pageSize: number, currentPage: number = 1)
   return { pages };
 };
 
+/**
+ * Calculates the page number
+ * @param {number} i - The index
+ * @param {number} currentPage - The current page
+ * @param {number} paginationRange - The pagination range
+ * @param {number} totalPages - The total number of pages
+ * @returns {number} The page number
+ */
 const calculatePageNumber = (i: number, currentPage: number, paginationRange: number, totalPages: number): number => {
   const halfWay = Math.ceil(APPCONSTANTS.PAGINATION_RANGE / 2);
   if (i === paginationRange) {
@@ -82,6 +103,11 @@ const calculatePageNumber = (i: number, currentPage: number, paginationRange: nu
   }
 };
 
+/**
+ * Pagination component
+ * @param {IPaginationProps} props - Component props
+ * @returns {React.ReactElement} The rendered Pagination component
+ */
 const Pagination: React.FC<IPaginationProps> = ({
   length,
   total,
@@ -96,6 +122,9 @@ const Pagination: React.FC<IPaginationProps> = ({
     currentPage: initialPage
   });
 
+  /**
+   * Updates the state from props
+   */
   const updateStateFromProps = useCallback(() => {
     const totalPages = Math.ceil(total / length);
     if (state.totalPages !== totalPages || state.currentPage !== propCurrentPage) {
@@ -108,10 +137,17 @@ const Pagination: React.FC<IPaginationProps> = ({
     }
   }, [total, length, state, propCurrentPage]);
 
+  /**
+   * Updates the state from props
+   */
   useEffect(() => {
     updateStateFromProps();
   }, [updateStateFromProps]);
 
+  /**
+   * Sets the page
+   * @param {number} newPage - The new page
+   */
   const setPage = (newPage: number) => {
     if (newPage < 1 || newPage > state.totalPages || newPage === state.currentPage) {
       return;
@@ -125,7 +161,13 @@ const Pagination: React.FC<IPaginationProps> = ({
     onChangePage(newPage, length);
   };
 
-  const renderAnchor = (page: string | number, index: number) => {
+  /**
+   * Renders the anchor
+   * @param {string | number} page - The page
+   * @param {number} index - The index
+   * @returns {React.ReactElement} The rendered anchor
+   */
+  const renderAnchor = (page: string | number, index: number): React.ReactElement => {
     const { currentPage } = state;
     if (page === '...') {
       return (
@@ -152,7 +194,7 @@ const Pagination: React.FC<IPaginationProps> = ({
    * Render Pagination Anchors
    * @returns {any[]}
    */
-  const renderAnchors = () => state.pages.map(renderAnchor);
+  const renderAnchors = (): any[] => state.pages.map(renderAnchor);
 
   const handleRowsPerPageChange = (selectedOption: { value: number }) => {
     onChangeRowsPerPage(selectedOption.value);

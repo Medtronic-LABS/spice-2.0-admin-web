@@ -20,6 +20,9 @@ import {
 } from '../../store/labTest/actions';
 import { labTestJSONLoadingSelector } from '../../store/labTest/selectors';
 
+/**
+ * Interface for route parameters
+ */
 interface IMatchParams {
   regionId: string;
   tenantId: string;
@@ -28,6 +31,10 @@ interface IMatchParams {
   testId: string;
 }
 
+/**
+ * LabTestCustomizationLayout component for customizing lab test forms
+ * @returns {React.ReactElement} The rendered component
+ */
 const LabTestCustomizationLayout = () => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -61,10 +68,12 @@ const LabTestCustomizationLayout = () => {
     setEditGroupedFieldsOrder
   } = useFormCustomization();
 
+  // Fetch unit list on component mount
   useEffect(() => {
     dispatch(fetchUnitListRequest());
   }, [dispatch]);
 
+  // Fetch lab test customization data on component mount
   useEffect(() => {
     dispatch(
       fetchLabTestCustomizationRequest({
@@ -91,10 +100,17 @@ const LabTestCustomizationLayout = () => {
     // eslint-disable-next-line
   }, [dispatch, testName, regionId, tenantId]);
 
+  /**
+   * Handles cancellation and navigation back
+   */
   const onCancel = () => {
     history.push(PROTECTED_ROUTES.labTestByRegion.replace(':tenantId', tenantId).replace(':regionId', regionId));
   };
 
+  /**
+   * Handles form submission
+   * @param {any} dataParams - The form data
+   */
   const onSubmit = (dataParams: any) => {
     const newData: any = Object.values(dataParams)[0];
     if ((Object.values(newData) || []).filter((v: any) => v.isMandatory).length < 2) {
@@ -148,6 +164,11 @@ const LabTestCustomizationLayout = () => {
   const accordianRef = useRef<any>([]);
   const newlyAddedIdsRef = useRef<any>([]);
 
+  /**
+   * Adds a default family to the form
+   * @param {string} familyName - The name of the family to add
+   * @param {string} [formID] - Optional form ID
+   */
   const handleAddDefaultFamily = (familyName: string, formID?: any) => {
     const formValues: any = {};
     const id = formID || camelCase(familyName) + Date.now();
@@ -174,6 +195,8 @@ const LabTestCustomizationLayout = () => {
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));
     setFormData(formValues);
   };
+
+  // Ensure 'TestedOn' field is in hashFieldIdsWithFieldName
   useEffect(() => {
     if ('TestedOn' in hashFieldIdsWithFieldName) {
       return;

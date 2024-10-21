@@ -260,6 +260,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Closes the health facility edit modal
+   * @param {boolean} [isFromCloseBtn] - Flag indicating if the close button was clicked
+   */
   const closeHFEditModal = (isFromCloseBtn?: boolean) => {
     if (editHFDetailsModal.isNextClicked && !isFromCloseBtn) {
       setEditHFDetailsModal({ ...editHFDetailsModal, isNextClicked: !editHFDetailsModal.isNextClicked });
@@ -272,7 +276,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
     }
   };
 
-  const editHFDetailsModalRender = (form: any) => {
+  /**
+   * Renders the health facility details form
+   * @param {any} form - The form data
+   * @returns {React.ReactElement} The rendered health facility details form
+   */
+  const editHFDetailsModalRender = (form: any): React.ReactElement => {
     return (
       <HealthFacilityDetailsForm
         formName='healthFacility'
@@ -389,6 +398,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Handles the success response after updating health facility details
+   */
   const hfUpdateSuccess = () => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS);
     refreshHFDetails();
@@ -396,6 +408,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
     closeHFEditModal(true);
   };
 
+  /**
+   * Handles the click event to edit a health facility user
+   * @param {any} user - The user data
+   */
   const handleEditUserClick = useCallback(
     (user: any) => {
       dispatch(
@@ -476,6 +492,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
     setHFUserModal(false);
   };
 
+  /**
+   * Handles the click event to add a health facility user
+   */
   const handleAddUserClick = useCallback(() => {
     setIsHFUserEdit(false);
     hfUserForEdit.current = { users: [] };
@@ -512,6 +531,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles the click event to delete a health facility user
+   * @param {Object} param0 - The delete parameters
+   */
   const handleUserDelete = ({ data: { id } }: { data: { id: number } }) => {
     dispatch(
       deleteHFUserRequest({
@@ -576,7 +599,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
     );
   };
 
-  const isHideActionIcons = (rowData: any) =>
+  /**
+   * Checks if the action icons should be hidden for a given row data
+   * @param {any} rowData - The row data
+   * @returns {boolean} - True if the action icons should be hidden, false otherwise
+   */
+  const isHideActionIcons = (rowData: any): boolean =>
     role === HEALTH_FACILITY_ADMIN &&
     (rowData?.defaultRoleName === HEALTH_FACILITY_ADMIN ||
       rowData.roles?.some((r: { name: string }) => r?.name === HEALTH_FACILITY_ADMIN));

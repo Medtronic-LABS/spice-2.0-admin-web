@@ -20,7 +20,8 @@ import {
   IDeleteMedicationSuccess,
   IDeleteMedicationFailure,
   IValidateMedication,
-  IFetchBrandReq
+  IFetchBrandReq,
+  IFetchCategorySuccessPayload
 } from './types';
 
 export const fetchMedicationListReq = ({
@@ -95,6 +96,19 @@ export const fetchDosageForms = () => ({
 export const fetchDosageFormsSuccess = (payload: IFetchDosageFormSuccessPayload) => ({
   type: MEDICATION_TYPES.FETCH_MEDICATION_DOSAGE_FORM_SUCCESS,
   payload
+});
+
+export const fetchCategoryForms = () => ({
+  type: MEDICATION_TYPES.FETCH_CATEGORY_FORM
+});
+
+export const fetchCategoryFormsSuccess = (payload: IFetchCategorySuccessPayload) => ({
+  type: MEDICATION_TYPES.FETCH_CATEGORY_FORM_SUCCESS,
+  payload
+});
+
+export const fetchCategoryFormsFailure = () => ({
+  type: MEDICATION_TYPES.FETCH_CATEGORY_FORM_FAILURE
 });
 
 export const fetchDosageFormsFailure = () => ({

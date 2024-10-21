@@ -19,12 +19,22 @@ interface IMatchParams {
 
 interface IRouteProps extends RouteComponentProps<IMatchParams> {}
 
+/**
+ * CreateProgram component for creating a new program
+ * @param {IRouteProps} props - The route props containing match params
+ * @returns {React.ReactElement} The rendered component
+ */
 const CreateProgram = (props: IRouteProps): React.ReactElement => {
   const { regionId, tenantId } = props.match.params;
   const history = useHistory();
   const dispatch = useDispatch();
   const loading = useSelector(programLoadingSelector);
 
+  /**
+   * Handles form submission
+   * @param {Object} values - The form values
+   * @param {IProgramFormValues} values.program
+   */
   const onSubmit = (values: { program: IProgramFormValues }) => {
     const { program } = values;
     const selectedHealthFacilities = Array.isArray(program.healthFacilities)
@@ -33,20 +43,31 @@ const CreateProgram = (props: IRouteProps): React.ReactElement => {
     const data = {
       name: program.name.trim(),
       tenantId,
+      // Convert healthFacilities data to an array of IDs
       healthFacilities: selectedHealthFacilities?.map((healthFacility: { id: any }) => healthFacility.id),
       country: { id: regionId }
     } as unknown as ICreateProgramReqPayload;
     dispatch(createProgram({ data, successCb: onCreateSuccess, failureCb: onCreateFail }));
   };
 
+  /**
+   * Callback function for successful program creation
+   */
   const onCreateSuccess = () => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PROGRAM_CREATION_SUCCESS);
     onCancel();
   };
 
-  const onCreateFail = (e: Error) =>
-    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PROGRAM_CREATION_ERROR));
+  /**
+   * Callback function for failed program creation
+   * @param {Error} error - The error object
+   */
+  const onCreateFail = (error: Error) =>
+    toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.PROGRAM_CREATION_ERROR));
 
+  /**
+   * Handles cancellation and navigation back to the program list
+   */
   const onCancel = () => {
     const url = (regionId && PROTECTED_ROUTES.programByRegion) as string;
     history.push(url.replace(':tenantId', tenantId).replace(/(:regionId)/, regionId as string));

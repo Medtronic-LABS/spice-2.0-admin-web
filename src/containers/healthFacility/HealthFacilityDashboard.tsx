@@ -23,7 +23,12 @@ import styles from './HealthFacility.module.scss';
 import { clearHFSummary, fetchHFDashboardListRequest, setHFSummary } from '../../store/healthFacility/actions';
 import { clearSideMenu } from '../../store/common/actions';
 
-const HealthFacilityDashboard = () => {
+/**
+ * HealthFacilityDashboard component
+ * Displays a dashboard of health facilities details list with search functionality
+ * @returns {React.ReactElement} The rendered HealthFacilityDashboard component
+ */
+const HealthFacilityDashboard = (): React.ReactElement => {
   const dispatch = useDispatch();
   const hfDashboardList = useSelector(hfDashboardListSelector);
   const hfCount = useSelector(healthFacilityListTotalSelector);
@@ -38,6 +43,14 @@ const HealthFacilityDashboard = () => {
     healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
   } = NAME_CONSTANTS;
 
+  /**
+   * Fetches health facility dashboard details
+   * @param {number} skip - Number of items to skip
+   * @param {number | null} limit - Number of items to fetch
+   * @param {string} [searchString] - Search string for filtering results
+   * @param {boolean} [isLoadMore] - Flag indicating if this is a load more request
+   * @param {Function} [successCb] - Callback function to be called on successful fetch
+   */
   const fetchDetails = useCallback(
     (
       skip: number,
@@ -76,32 +89,41 @@ const HealthFacilityDashboard = () => {
   });
 
   /**
-   * To clear sidemenu
+   * Clears sidemenu on component mount
    */
   useEffect(() => {
     dispatch(clearSideMenu());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * Fetches initial health facility data on component mount
+   */
   useEffect(() => {
     fetchDetails(0, APPCONSTANTS.HF_PER_PAGE);
   }, [dispatch, fetchDetails]);
 
+  /**
+   * Handles search functionality
+   * @param {string} search - Search string
+   */
   const onSearch = useCallback(
     (search: string) => {
       searchText.current = search;
       fetchDetails(0, APPCONSTANTS.HF_PER_PAGE, search, false, resetPage);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [fetchDetails, resetPage]
   );
 
+  /**
+   * Parses health facility data for SummaryCard components
+   * @returns {ISummaryCardProps[]} Array of parsed data for SummaryCard components
+   */
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
       hfDashboardList.map(({ name, id, type, tenantId }: IHFDashboard) => ({
         title: name,
         subTitle: type,
-        // To remove HF Detail cache in store
         setBreadcrumbDetails: () => {
           dispatch(clearHFSummary());
           dispatch(setHFSummary({ name, id, tenantId }));

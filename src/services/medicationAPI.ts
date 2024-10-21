@@ -31,7 +31,7 @@ export const getMedicationDosageForm = () =>
 export const getMedicationCategory = () =>
   axios({
     method: 'GET',
-    url: 'spice-service/category/list'
+    url: '/admin-service/category/list'
   });
 
 export const createMedication = (data: IMedicationPayload) =>

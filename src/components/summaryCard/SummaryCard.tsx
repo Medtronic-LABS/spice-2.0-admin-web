@@ -31,6 +31,11 @@ export interface ISummaryCardProps {
   setBreadcrumbDetails: () => void;
 }
 
+/**
+ * SummaryCard component displays a summary of information with navigation capabilities.
+ * @param {ISummaryCardProps} props - The component props
+ * @returns {JSX.Element} The rendered SummaryCard component
+ */
 const SummaryCard = ({
   data,
   subTitle = '',
@@ -45,6 +50,10 @@ const SummaryCard = ({
 }: ISummaryCardProps) => {
   const history = useHistory();
 
+  /**
+   * Handles the hover effect on the navigation link.
+   * @param {React.MouseEvent<HTMLDivElement>} e - The mouse event
+   */
   const handleLinkHover = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     // this classname is added only after mouse enters the element
     // this is to prevent the animation to be shown during component mount
@@ -55,6 +64,9 @@ const SummaryCard = ({
     }
   }, []);
 
+  /**
+   * Handles navigation to the detail route.
+   */
   const handleNavigation = () => {
     sessionStorageServices.setItem(APPCONSTANTS.ID, tenantId);
     sessionStorageServices.setItem(APPCONSTANTS.FORM_ID, formId);

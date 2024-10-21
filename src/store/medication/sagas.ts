@@ -14,6 +14,7 @@ import {
   createMedicationSuccess,
   deleteMedicationFail,
   deleteMedicationSuccess,
+  fetchCategoryFormsSuccess,
   fetchClassificationsFailure,
   fetchClassificationsSuccess,
   fetchDosageFormsFailure,
@@ -26,6 +27,7 @@ import {
 import {
   CREATE_MEDICATION_REQUEST,
   DELETE_MEDICATION_REQUEST,
+  FETCH_CATEGORY_FORM,
   FETCH_MEDICATIONS_LIST_REQUEST,
   FETCH_MEDICATION_CLASSIFICATIONS_REQUEST,
   FETCH_MEDICATION_DOSAGE_FORM,
@@ -82,6 +84,19 @@ export function* fetchMedicationDosageForms(): SagaIterator {
     } = yield call(medicationService.getMedicationDosageForm as any);
     const payload = { dosageForms };
     yield put(fetchDosageFormsSuccess(payload));
+  } catch {
+    yield put(fetchDosageFormsFailure());
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_CATEGORY_FORM action
+*/
+export function* fetchCategoryForms(): SagaIterator {
+  try {
+    const { data } = yield call(medicationService.getMedicationCategory as any);
+    const payload = { categoryList: data || [] };
+    yield put(fetchCategoryFormsSuccess(payload));
   } catch {
     yield put(fetchDosageFormsFailure());
   }
@@ -161,6 +176,7 @@ function* medicationSaga() {
   yield all([takeLatest(FETCH_MEDICATIONS_LIST_REQUEST, fetchMedicationList)]);
   yield all([takeLatest(FETCH_MEDICATION_CLASSIFICATIONS_REQUEST, fetchMedicationClassifications)]);
   yield all([takeLatest(FETCH_MEDICATION_DOSAGE_FORM, fetchMedicationDosageForms)]);
+  yield all([takeLatest(FETCH_CATEGORY_FORM, fetchCategoryForms)]);
   yield all([takeLatest(CREATE_MEDICATION_REQUEST, createMedication)]);
   yield all([takeLatest(UPDATE_MEDICATION_REQUEST, updateMedication)]);
   yield all([takeLatest(DELETE_MEDICATION_REQUEST, deleteMedication)]);

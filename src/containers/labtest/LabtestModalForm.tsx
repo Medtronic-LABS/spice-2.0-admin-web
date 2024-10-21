@@ -4,10 +4,26 @@ import TextInput from '../../components/formFields/TextInput';
 import { composeValidators, containsOnlyLettersAndNumbers, minLength, required } from '../../utils/validation';
 import { FormApi } from 'final-form';
 
-const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: FormApi | undefined }) => {
+/**
+ * Interface for LabtestModalForm props
+ */
+interface ILabtestModalFormProps {
+  /** Flag indicating if the form is in edit mode */
+  isEdit: boolean;
+  /** Form API instance */
+  form: FormApi | undefined;
+}
+
+/**
+ * LabtestModalForm component for rendering the lab test form fields
+ * @param {ILabtestModalFormProps} props - The component props
+ * @returns {React.ReactElement} The rendered form fields
+ */
+const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): React.ReactElement => {
   return (
     <>
       <div className='row gx-1dot25'>
+        {/* Lab Test Name field */}
         <div className='col-12 col-lg-6'>
           <Field
             name='testName'
@@ -24,6 +40,7 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
             )}
           />
         </div>
+        {/* Code field */}
         <div className='col-12 col-lg-6'>
           <Field
             name='codeDetails.code'
@@ -34,6 +51,7 @@ const LabtestModalForm = ({ isEdit = false, form }: { isEdit: boolean; form: For
             )}
           />
         </div>
+        {/* URL field */}
         <div className='col-12 col-lg-6'>
           <Field
             name='codeDetails.url'

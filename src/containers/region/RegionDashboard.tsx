@@ -85,23 +85,7 @@ const Region = (): React.ReactElement => {
       fetchRegionsRequest({
         skip: 0,
         limit: APPCONSTANTS.REGIONS_PER_PAGE,
-        failureCb: (e) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_FETCH_ERROR)),
-        successCb: (regionList) => {
-          // const { regions: allRegions } = regionList;
-          // // if there is only one region then redirect to region summary
-          // if (allRegions.length === 1) {
-          //   const { id, tenantId, name } = allRegions[0];
-          //   if (id && tenantId && name) {
-          //     onDashboardExit({ id: String(id), tenantId: String(tenantId), name });
-          //     push({
-          //       pathname: PROTECTED_ROUTES.regionSummary
-          //         .replace(':regionId', String(id))
-          //         .replace(':tenantId', String(tenantId))
-          //     });
-          //   }
-          // }
-        }
+        failureCb: (e) => toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_FETCH_ERROR))
       })
     );
     if (clinicalWorkflows.length) {
@@ -140,7 +124,9 @@ const Region = (): React.ReactElement => {
     },
     [dispatch]
   );
-
+  /**
+   * Handles search functionality
+   */
   const searchText = useRef<string>('');
   const onSearch = useCallback(
     (search: string) => {
@@ -159,6 +145,9 @@ const Region = (): React.ReactElement => {
     [dispatch, resetPage]
   );
 
+  /**
+   * Parses the region data for summary cards
+   */
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
       regions.map(({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId }: any) => ({

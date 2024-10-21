@@ -27,6 +27,11 @@ interface IStateProps {
 
 type Props = IRouteProps & IStateProps;
 
+/**
+ * ResetPassword component
+ * @param {Props} props - The props
+ * @returns {React.ReactElement} The rendered ResetPassword component
+ */
 const ResetPassword = (props: Props) => {
   const dispatch = useDispatch();
   const isResetPasswordLoading = useSelector(resetPasswordLoadingSelector);
@@ -38,10 +43,16 @@ const ResetPassword = (props: Props) => {
     isShowConfirmPassword: false
   });
 
+  /**
+   * Handles the click event to navigate back to the login page
+   */
   const backToLogin = useCallback(() => {
     props.history.push({ pathname: PUBLIC_ROUTES.login });
   }, [props.history]);
 
+  /**
+   * Fetches the username based on the token
+   */
   const getUsername = useCallback(() => {
     const params = new URLSearchParams(document.location.search);
     const token = params.get('token') || '';
@@ -60,10 +71,17 @@ const ResetPassword = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * Fetches the username on component mount
+   */
   useEffect(() => {
     getUsername();
   }, [getUsername]);
 
+  /**
+   * Handles the form submission
+   * @param {Object} values - The form values
+   */
   const onSubmitForm = (values: any) => {
     if (passwordState.isTokenValid) {
       const password = generatePassword(values.newPassword);
@@ -81,8 +99,15 @@ const ResetPassword = (props: Props) => {
     }
   };
 
+  /**
+   * Destructures the email from props
+   */
   const { email } = props;
 
+  /**
+   * Renders the ResetPassword component
+   * @returns {React.ReactElement} The rendered ResetPassword component
+   */
   return isResetPasswordLoading ? (
     <Loader />
   ) : passwordState.isTokenValid ? (

@@ -25,6 +25,12 @@ interface ISideMenuProps {
   className?: string;
 }
 
+/**
+ * SideMenu component
+ * Renders the side menu
+ * @param {ISideMenuProps} props - Component props
+ * @returns {React.ReactElement} The rendered SideMenu component
+ */
 const SideMenu = memo(({ className }: ISideMenuProps) => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -81,6 +87,9 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
     exact: true
   })?.params as any;
 
+  /**
+   * Fetches the side menu
+   */
   const fetchSideMenu = useCallback(
     () =>
       dispatch(
@@ -94,7 +103,11 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       ),
     [countryIdValue, dispatch, regionId, role]
   );
-
+  /**
+   * Formats the menu items
+   * @param {ISideMenu[]} rawMenu - The raw menu items
+   * @returns {ISideMenu[]} The formatted menu items
+   */
   const formatMenuItems = useCallback(
     (rawMenu: ISideMenu[]) => {
       let choosenRoutes: ISideMenu[] = [...rawMenu];
@@ -120,6 +133,9 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
     [chiefdomId, districtId, healthFacilityId, regionId, tenantId]
   );
 
+  /**
+   * Fetches the side menu and formats the menu items
+   */
   useEffect(() => {
     if (!Object.keys(list).length) {
       fetchSideMenu();

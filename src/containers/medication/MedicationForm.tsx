@@ -18,13 +18,15 @@ import { useParams } from 'react-router';
 import CustomTooltip from '../../components/tooltip';
 import Loader from '../../components/loader/Loader';
 import {
+  getCategoryLoadingSelector,
   getClassificationsLoadingSelector,
   getDosageFormsLoadingSelector,
+  getMedicationCategorySelector,
   getMedicationClassificationsSelector,
   getMedicationDosageFormsSelector,
   getMedicationLoadingSelector
 } from '../../store/medication/selectors';
-import { fetchClassifications, fetchDosageForms } from '../../store/medication/actions';
+import { fetchCategoryForms, fetchClassifications, fetchDosageForms } from '../../store/medication/actions';
 import { IList } from '../../store/medication/types';
 
 export interface IMedicationDataFormValues {
@@ -34,6 +36,7 @@ export interface IMedicationDataFormValues {
   classification: IList;
   codeDetails: ICodeDetails;
   dosage_form: IList;
+  category: IList;
   country: string | IList;
 }
 
@@ -69,7 +72,7 @@ interface IMedicationFormProps {
 
 /**
  * Form for medication creation
- * @param param0
+ * @param {IMedicationFormProps} props - The component props
  * @returns {React.ReactElement}
  */
 const MedicationForm = ({
@@ -89,9 +92,11 @@ const MedicationForm = ({
   const dispatch = useDispatch();
   const classificationOptions = useSelector(getMedicationClassificationsSelector);
   const dosageFormOptions = useSelector(getMedicationDosageFormsSelector);
+  const categoryList = useSelector(getMedicationCategorySelector);
   const isLoading = useSelector(getMedicationLoadingSelector);
   const isClassificationsLoading = useSelector(getClassificationsLoadingSelector);
   const isDosageFormsLoading = useSelector(getDosageFormsLoadingSelector);
+  const isCategoryFormOptionsLoading = useSelector(getCategoryLoadingSelector);
 
   const initialValue = useMemo<Array<Partial<IMedicationDataFormValues>>>(
     () => [
@@ -108,15 +113,20 @@ const MedicationForm = ({
    */
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialEditData = useMemo<Array<Partial<IMedicationDataFormValues>>>(() => [{ ...initialEditValue }], []);
-
   useEffect(() => {
     dispatch(fetchClassifications({ countryId: Number(countryId) }));
     if (dosageFormOptions && !dosageFormOptions.length) {
       dispatch(fetchDosageForms());
     }
+    dispatch(fetchCategoryForms());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, dosageFormOptions && dosageFormOptions.length]);
 
+  /**
+   * Resets the brand field when classification changes
+   * @param {any} fields - The form fields
+   * @param {number} index - The index of the current field
+   */
   const resetBrandField = useCallback(
     (fields: any, index: number) => {
       form.mutators?.resetFields?.(`${formName}[${index}].brand`);
@@ -125,6 +135,11 @@ const MedicationForm = ({
     [form]
   );
 
+  /**
+   * Sets brand options in the state
+   * @param {IList[]} brands - The list of brands
+   * @param {number} index - The index of the current field
+   */
   const setBrandOptionsToState = useCallback(
     (brands: IList[], index = 0) => {
       const brandValues = [...brandOptions];
@@ -135,7 +150,9 @@ const MedicationForm = ({
   );
 
   /**
-   * Detects the existing field value changes and updates the internal form state accordingly
+   * Detects changes in existing field values and updates internal form state
+   * @param {any} value - The new field value
+   * @param {number} index - The index of the current field
    */
   const detectFieldChange = useCallback(
     (value: any, index: number) => {
@@ -149,11 +166,17 @@ const MedicationForm = ({
     [previousFieldValue, setInternalFormState]
   );
 
-  // checks if current row has any form validation errors
+  /**
+   * Checks if the current row has any form validation errors
+   * @param {number} index - The index of the current field
+   * @returns {boolean}
+   */
   const checkIfFieldValid = (index: number) => form.getState().errors?.medication?.[index] === undefined;
 
   /**
    * Removes the current row by index
+   * @param {any} fields - The form fields
+   * @param {number} index - The index of the field to remove
    */
   const onRemoveFormRow = useCallback(
     (fields: any, index: number) => {
@@ -165,7 +188,9 @@ const MedicationForm = ({
   );
 
   /**
-   * Reverts the changes made on the existing field values
+   * Reverts changes made on existing field values
+   * @param {any} fields - The form fields
+   * @param {number} index - The index of the field to reset
    */
   const onResetEditChanges = useCallback(
     (fields: any, index: number) => {
@@ -176,6 +201,13 @@ const MedicationForm = ({
     [form.mutators, previousFieldValue, setInternalFormState]
   );
 
+  /**
+   * Handles adding another medication row
+   * @param {boolean} addNewRowEnabled - Whether adding a new row is enabled
+   * @param {any} fields - The form fields
+   * @param {number} index - The index of the current field
+   * @param {boolean} isFirstChild - Whether this is the first child in the form
+   */
   const handleAddAnotherMedication = (addNewRowEnabled: boolean, fields: any, index: number, isFirstChild: boolean) => {
     if (addNewRowEnabled && checkDuplicateValidation) {
       checkDuplicateValidation({
@@ -188,7 +220,20 @@ const MedicationForm = ({
     }
   };
 
-  const renderActionIcons = (fields: any, index: number, isFirstChild: boolean, isLastChild: boolean) => {
+  /**
+   * Renders action icons for each medication row
+   * @param {any} fields - The form fields
+   * @param {number} index - The index of the current field
+   * @param {boolean} isFirstChild - Whether this is the first child in the form
+   * @param {boolean} isLastChild - Whether this is the last child in the form
+   * @returns {React.ReactNode}
+   */
+  const renderActionIcons = (
+    fields: any,
+    index: number,
+    isFirstChild: boolean,
+    isLastChild: boolean
+  ): React.ReactNode => {
     const isFieldValueChanged = internalFormState?.[index] && internalFormState[index]?.isValueChanged;
     const addNewRowEnabled = form.getState().valid && !isFieldValueChanged;
     return (
@@ -268,9 +313,15 @@ const MedicationForm = ({
     );
   };
 
-  const renderMedicationName = (name: any, index: number) => {
+  /**
+   * Renders the Medication Name input field
+   * @param {string} name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Medication Name input field
+   */
+  const renderMedicationName = (name: string, index: number): React.ReactNode => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.name`}
           type='text'
@@ -296,9 +347,15 @@ const MedicationForm = ({
     );
   };
 
-  const renderCode = (name: any, index: number) => {
+  /**
+   * Renders the Code input field for medication
+   * @param {string} name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Code input field
+   */
+  const renderCode = (name: string, index: number): React.ReactNode => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.codeDetails.code`}
           type='text'
@@ -323,9 +380,15 @@ const MedicationForm = ({
     );
   };
 
-  const renderUrl = (name: any, index: number) => {
+  /**
+   * Renders the URL input field for medication
+   * @param {string} name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered URL input field
+   */
+  const renderUrl = (name: string, index: number): React.ReactNode => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.codeDetails.url`}
           type='text'
@@ -349,9 +412,16 @@ const MedicationForm = ({
     );
   };
 
-  const renderClassification = (name: any, fields: any, index: number) => {
+  /**
+   * Renders the Classification select input field for medication
+   * @param {string} name
+   * @param {any} fields - The form fields object
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Classification select input field
+   */
+  const renderClassification = (name: string, fields: any, index: number): React.ReactNode => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.classification`}
           type='text'
@@ -381,9 +451,15 @@ const MedicationForm = ({
     );
   };
 
-  const renderBrand = (name: any, index: number) => {
+  /**
+   * Renders the Brand select input field for medication
+   * @param {string} name - The base name for the field, used to construct the full field name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Brand select input field
+   */
+  const renderBrand = (name: string, index: number): React.ReactNode => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.brand`}
           type='text'
@@ -407,9 +483,15 @@ const MedicationForm = ({
     );
   };
 
-  const renderDosageForm = (name: any, index: number) => {
+  /**
+   * Renders the Dosage Form select input field
+   * @param {string} name - The base name for the field, used to construct the full field name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Dosage Form select input field
+   */
+  const renderDosageForm = (name: string, index: number): React.ReactNode => {
     return (
-      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-4'}`}>
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
           name={`${name}.dosage_form`}
           type='text'
@@ -433,6 +515,41 @@ const MedicationForm = ({
     );
   };
 
+  /**
+   * Renders the Category Form select input field
+   * @param {string} name - The base name for the field, used to construct the full field name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Category Form select input field
+   */
+  const renderCategoryForm = (name: string, index: number): React.ReactNode => {
+    return (
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
+        <Field
+          name={`${name}.category`}
+          type='text'
+          validate={required}
+          render={(props) => (
+            <SelectInput
+              {...(props as any)}
+              label='Category'
+              errorLabel='category'
+              labelKey='name'
+              valueKey='id'
+              options={categoryList}
+              loadingOptions={isCategoryFormOptionsLoading}
+              error={(props.meta.touched && props.meta.error) || undefined}
+              onChange={(value) => detectFieldChange(value, index)}
+              isModel={initialEditValue ? true : false}
+            />
+          )}
+        />
+      </div>
+    );
+  };
+
+  /**
+   * Effect hook to set brand options when classification options or initial edit data change
+   */
   useEffect(() => {
     if (classificationOptions && classificationOptions.length && initialEditData[0]?.id) {
       if (initialEditData[0]?.classification?.id) {
@@ -473,6 +590,7 @@ const MedicationForm = ({
                     {renderClassification(name, fields, index)}
                     {renderBrand(name, index)}
                     {renderDosageForm(name, index)}
+                    {renderCategoryForm(name, index)}
                   </div>
                   {renderActionIcons(fields, index, isFirstChild, isLastChild)}
                 </div>

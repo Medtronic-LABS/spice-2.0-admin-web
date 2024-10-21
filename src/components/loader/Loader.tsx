@@ -13,6 +13,12 @@ interface IStateProps {
   isBackgroundTransparent?: boolean;
 }
 
+/**
+ * Loader component
+ * Renders a loader with a logo animation
+ * @param {IStateProps} props - Component props
+ * @returns {React.ReactElement} The rendered Loader component
+ */
 const Loader = ({
   isFullScreen = true,
   className = '',
@@ -20,6 +26,9 @@ const Loader = ({
   isBackgroundTransparent = true,
   callBack = (x: boolean) => x
 }: IStateProps) => {
+  /**
+   * Loads the logo animation
+   */
   useEffect(() => {
     const instance = lottie.loadAnimation({
       container: document.querySelector('#mdt-logo') as Element,
@@ -30,6 +39,10 @@ const Loader = ({
     });
     return () => instance.destroy();
   }, []);
+
+  /**
+   * Handles the progressive incrementor hook
+   */
   const count = useProgressiveIncrementorHook({ displayProgress: isProgressVisible, callBack });
   return (
     <div

@@ -1,23 +1,60 @@
 import { Link } from 'react-router-dom';
-
+import { useDispatch, useSelector } from 'react-redux';
 import { ReactComponent as NavBarLogo } from '../../assets/images/nav-bar-logo.svg';
 import LogoutIcon from '../../assets/images/power-switch.svg';
 import CaretDownIcon from '../../assets/images/caret-down-grey.svg';
 import UserMenu from './UserMenu';
-
 import styles from './Header.module.scss';
 import { logoutRequest } from '../../store/user/actions';
-import { useDispatch, useSelector } from 'react-redux';
 import { firstNameSelector, lastNameSelector, roleDetailSelector, roleSelector } from '../../store/user/selectors';
 import { ROLE_LABELS } from '../../constants/appConstants';
 
-export default function Header() {
+/**
+ * Header component
+ * Renders the application header with user information and navigation menu
+ * @returns {React.ReactElement} The rendered Header component
+ */
+export default function Header(): React.ReactElement {
   const dispatch = useDispatch();
+
+  /**
+   * User's first name
+   * @type {string}
+   */
   const firstName: string = useSelector(firstNameSelector) || '';
+
+  /**
+   * User's last name
+   * @type {string}
+   */
   const lastName: string = useSelector(lastNameSelector) || '';
+
+  /**
+   * User's role
+   * @type {string}
+   */
   const role = useSelector(roleSelector);
+
+  /**
+   * User's role details
+   * @type {Object}
+   */
   const roleDetail = useSelector(roleDetailSelector);
+
+  /**
+   * Display name for the user's role
+   * @type {string}
+   */
   const roleDisplayName = roleDetail?.displayName;
+
+  /**
+   * Handles the logout action
+   * Dispatches the logout request
+   */
+  const handleLogout = () => {
+    dispatch(logoutRequest());
+  };
+
   return (
     <div>
       <nav
@@ -53,7 +90,7 @@ export default function Header() {
             <li>
               <div
                 className={`dropdown-item px-0dot875 py-0dot75 pointer d-flex align-items-center ${styles.navbarDropdownItem}`}
-                onClick={() => dispatch(logoutRequest())}
+                onClick={handleLogout}
               >
                 <div className={`${styles.iconWrapper} me-0dot75 d-flex align-items-center justify-content-center`}>
                   <img data-testid='logoutIcon' src={LogoutIcon} alt='' width={16} height={16} />

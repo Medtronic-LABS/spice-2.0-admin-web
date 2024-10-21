@@ -13,6 +13,11 @@ interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const PaginationInput = ({ maxNumber, className, onChange, onPagination, ...otherProps }: IInputProps) => {
   const [error, setError] = useState(false);
   const [value, setValue] = useState('');
+
+  /**
+   * Handles the key press event
+   * @param {React.KeyboardEvent<HTMLInputElement>} e - The keyboard event
+   */
   const onKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter' && Number(value) && !error) {
@@ -23,6 +28,10 @@ const PaginationInput = ({ maxNumber, className, onChange, onPagination, ...othe
     [onPagination, value, error]
   );
 
+  /**
+   * Handles the change event
+   * @param {React.ChangeEvent<HTMLInputElement>} event - The change event
+   */
   const onChangeEvent = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value: nxtValue } = event.target;

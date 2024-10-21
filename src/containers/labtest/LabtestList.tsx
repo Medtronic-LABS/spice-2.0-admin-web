@@ -38,6 +38,22 @@ interface IModalState {
 export interface ILabTestsEditFormValues {
   labTest: ILabTest;
 }
+
+interface ICodeDetails {
+  code: string;
+  url: string;
+}
+
+export interface IRouteDataForCustomizLabTest {
+  id?: any; // if create new customize lab test id will be null
+  uniqueName: string;
+  testName: string;
+  formInput: string; // JSON string, will need to be parsed if used as an object
+  countryId: number;
+  tenantId: string;
+  codeDetails: ICodeDetails;
+}
+
 interface IMatchProps extends RouteComponentProps<IMatchParams> {}
 
 /**
@@ -59,6 +75,9 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
 
   const { regionId, tenantId } = useParams<IMatchParams>();
 
+  /**
+   * Fetches lab test details
+   */
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchLabtestsRequest({
@@ -78,10 +97,17 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     fetchDetails();
   }, [dispatch, fetchDetails, props.match.params.tenantId]);
 
+  /**
+   * Opens the add lab test modal
+   */
   const openAddLabTest = () => {
     setLabTestModalState({ isOpen: true, isEdit: false, isNextClicked: false });
   };
 
+  /**
+   * Handles lab test deletion
+   * @param {{ data: ILabTest }} param0 - Object containing lab test data
+   */
   const handleLabTestDelete = ({ data }: { data: ILabTest }) => {
     dispatch(
       deleteLabtestRequest({
@@ -96,11 +122,19 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
+  /**
+   * Opens the edit lab test modal
+   * @param {any} data - The lab test data to edit
+   */
   const handleEdit = (data: any) => {
     setLabTestModalState({ isOpen: true, isEdit: true, data, isNextClicked: false });
   };
 
-  const routeToLabtestCustomizationPage = (data: any) => {
+  /**
+   * Routes to the lab test customization page
+   * @param {any} data - The lab test data
+   */
+  const routeToLabtestCustomizationPage = (data: IRouteDataForCustomizLabTest) => {
     props.history.push(
       PROTECTED_ROUTES.customizeLabTest
         .replace(':tenantId', tenantId)
@@ -112,6 +146,11 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles the next button click in the lab test modal
+   * @param {any} data - The lab test data
+   * @param {boolean} customizeClicked - Whether the customize button was clicked
+   */
   const onNextClicked = (data: any, customizeClicked?: boolean) => {
     if (!customizeClicked) {
       setLabTestModalState({ ...labTestModalState, isNextClicked: true });
@@ -138,6 +177,10 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     }
   };
 
+  /**
+   * Handles the submission of lab test edits
+   * @param {any} dataParams - The edited lab test data
+   */
   const handleEditLabTestSubmit = (dataParams: any) => {
     let formInput = JSON.parse(dataParams.formInput || '');
     const formLayout = (formInput?.formLayout || []).map((item: any) => {
@@ -180,10 +223,18 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     );
   };
 
+  /**
+   * Closes the lab test modal
+   */
   const closeLabTestModal = () => {
     setLabTestModalState({ isOpen: false, isEdit: false, data: {}, isNextClicked: false });
   };
 
+  /**
+   * Formats the updated date for display
+   * @param {ILabTest} data - The lab test data
+   * @returns {string} The formatted date string
+   */
   const formatUpdatedAt = (data: ILabTest) => {
     if (data?.updatedAt) {
       return formatDate(data.updatedAt, { month: 'short', format: 'YYYY-MM-DD' });

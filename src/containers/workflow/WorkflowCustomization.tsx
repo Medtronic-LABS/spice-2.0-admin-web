@@ -27,18 +27,28 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import Loader from '../../components/loader/Loader';
 import { IWorkflow } from '../../store/healthFacility/types';
 
+/**
+ * Interface for route parameters
+ */
 interface IMatchParams {
   regionId?: string;
   tenantId: string;
   form: string;
 }
 
+/**
+ * Interface for modal state
+ */
 interface IModalState {
   isOpen: boolean;
   isEdit: boolean;
   data?: IClinicalWorkflow;
 }
 
+/**
+ * WorkflowCustomization component for managing clinical workflows
+ * @returns {React.ReactElement} The rendered component
+ */
 const WorkflowCustomization = (): React.ReactElement => {
   const { WORKFLOW_MODULE } = APPCONSTANTS;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -55,6 +65,9 @@ const WorkflowCustomization = (): React.ReactElement => {
 
   const { regionId, tenantId } = useParams<IMatchParams>();
 
+  /**
+   * Fetches clinical workflows
+   */
   const getClinicalWorkflow = useCallback(() => {
     if (regionId) {
       dispatch(
@@ -81,6 +94,13 @@ const WorkflowCustomization = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listParams]);
 
+  /**
+   * Handles row edit action
+   * @param {Object} params - Edit parameters
+   * @param {number} params.index - Index of the edited row
+   * @param {string} params.id - ID of the edited workflow
+   * @param {string} params.workflowName - Name of the edited workflow
+   */
   const handleRowEdit = ({ index, id, workflowName }: { index: number; id: string; workflowName: string }) => {
     history.push(
       PROTECTED_ROUTES.workflowCustomization
@@ -92,12 +112,24 @@ const WorkflowCustomization = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Opens the add workflow modal
+   */
   const addWorkFlow = () => {
     setWorkflowModal({ isOpen: true, isEdit: false });
   };
+
+  /**
+   * Closes the workflow modal
+   */
   const closeWorkflowModal = () => {
     setWorkflowModal({ isOpen: false, isEdit: false, data: {} as IClinicalWorkflow });
   };
+
+  /**
+   * Handles the submission of a new workflow
+   * @param {IClinicalWorkflow} workflow - The new workflow data
+   */
   const handleAddWorkflowSubmit = (workflow: IClinicalWorkflow) => {
     dispatch(
       createWorkflowModule({
@@ -120,10 +152,18 @@ const WorkflowCustomization = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Opens the edit workflow modal
+   * @param {IClinicalWorkflow} data - The workflow data to edit
+   */
   const handleWorkflowEditOpen = (data: IClinicalWorkflow) => {
     setWorkflowModal({ isOpen: true, isEdit: true, data });
   };
 
+  /**
+   * Handles the submission of workflow edits
+   * @param {IClinicalWorkflow} workflow - The edited workflow data
+   */
   const handleEditWorkflowSubmit = (workflow: IClinicalWorkflow) => {
     const data = { id: workflow.id, viewScreens: workflow.viewScreens, tenantId };
     dispatch(
@@ -141,6 +181,13 @@ const WorkflowCustomization = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles workflow deletion
+   * @param {Object} params - Delete parameters
+   * @param {Object} params.data - The workflow data to delete
+   * @param {string} params.data.id - ID of the workflow to delete
+   * @param {string} params.data.tenant_id - Tenant ID of the workflow
+   */
   const handleWorkflowDelete = ({ data: { id, tenant_id } }: any) => {
     dispatch(
       deleteWorkflowModule({
@@ -161,7 +208,12 @@ const WorkflowCustomization = (): React.ReactElement => {
     );
   };
 
-  const formatName = (workflow: any) => `${workflow.name.charAt(0).toUpperCase() + workflow.name.slice(1)}`;
+  /**
+   * Formats the workflow name for display
+   * @param {Object} workflow - The workflow object
+   * @returns {string} The formatted workflow name
+   */
+  const formatName = (workflow: any): string => `${workflow.name.charAt(0).toUpperCase() + workflow.name.slice(1)}`;
 
   return (
     <div className='col-12'>

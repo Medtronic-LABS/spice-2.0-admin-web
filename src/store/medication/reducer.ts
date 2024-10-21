@@ -11,7 +11,9 @@ export const initialState: IMedicationState = {
   list: [],
   classifications: [],
   brands: [],
-  dosageForms: []
+  dosageForms: [],
+  categoryList: [],
+  categoryLoading: false
 };
 
 const medicationReducer = (state = initialState, action = {} as MedicationActions): IMedicationState => {
@@ -55,6 +57,11 @@ const medicationReducer = (state = initialState, action = {} as MedicationAction
         ...state,
         dosageFormsLoading: false
       };
+    case MEDICATION_TYPES.FETCH_CATEGORY_FORM_FAILURE:
+      return {
+        ...state,
+        categoryLoading: false
+      };
     case MEDICATION_TYPES.CREATE_MEDICATION_SUCCESS:
     case MEDICATION_TYPES.UPDATE_MEDICATION_SUCCESS:
     case MEDICATION_TYPES.DELETE_MEDICATION_SUCCESS:
@@ -80,6 +87,11 @@ const medicationReducer = (state = initialState, action = {} as MedicationAction
         ...state,
         dosageFormsLoading: true
       };
+    case MEDICATION_TYPES.FETCH_CATEGORY_FORM:
+      return {
+        ...state,
+        categoryLoading: true
+      };
     case MEDICATION_TYPES.FETCH_MEDICATION_CLASSIFICATIONS_SUCCESS:
       return {
         ...state,
@@ -102,6 +114,12 @@ const medicationReducer = (state = initialState, action = {} as MedicationAction
         ...state,
         dosageForms: action.payload.dosageForms,
         dosageFormsLoading: false
+      };
+    case MEDICATION_TYPES.FETCH_CATEGORY_FORM_SUCCESS:
+      return {
+        ...state,
+        categoryList: action.payload.categoryList,
+        categoryLoading: false
       };
     default:
       return { ...state };

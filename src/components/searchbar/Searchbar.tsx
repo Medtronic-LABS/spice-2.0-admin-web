@@ -11,8 +11,8 @@ interface ISearchbarProps {
 
 /**
  * Search bar component that triggers search on onChange
- * @param param0
- * @returns {React.ReactElement}
+ * @param {ISearchbarProps} props - The component props
+ * @returns {React.ReactElement} The rendered Searchbar component
  */
 const Searchbar = ({ placeholder, onSearch, isOutlined = true }: ISearchbarProps): React.ReactElement => {
   const [searchText, setSearchText] = useState('');

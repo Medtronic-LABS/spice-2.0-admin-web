@@ -33,12 +33,18 @@ import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility
 import { formatHealthFacility } from './HealthFacilitySummary';
 import sessionStorageServices from '../../global/sessionStorageServices';
 
+/**
+ * Interface for modal state
+ */
 interface IModalState {
   data?: any;
   isOpen: boolean;
   isNextClicked: boolean;
 }
 
+/**
+ * Interface for route parameters
+ */
 interface IMatchParams {
   regionId?: string;
   tenantId: string;
@@ -46,6 +52,10 @@ interface IMatchParams {
   chiefdomId?: string;
 }
 
+/**
+ * HealthFacilityList component for displaying health facilities list
+ * @returns {React.ReactElement} The rendered component
+ */
 const HealthFacilityList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -73,8 +83,7 @@ const HealthFacilityList = (): React.ReactElement => {
   });
 
   /**
-   * to load Health Facility List data.
-   * @param healthFacility List
+   * Fetches the health facility list
    */
   const fetchList = useCallback(() => {
     dispatch(
@@ -95,9 +104,18 @@ const HealthFacilityList = (): React.ReactElement => {
     fetchList();
   }, [listParams, dispatch, fetchList]);
 
+  /**
+   * Handles request failures
+   * @param {Error} e - The error object
+   * @param {string} errorMessage - The error message to display
+   */
   const requestFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, errorMessage));
 
+  /**
+   * Opens the edit dialogue for a health facility
+   * @param {any} data - The health facility data
+   */
   const openEditDialogue = (data: any) => {
     dispatch(
       fetchHFSummaryRequest({
@@ -111,6 +129,10 @@ const HealthFacilityList = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Opens the health facility edit modal
+   * @param {IHealthFacility} hfDetails - The health facility details
+   */
   const openHFEditModal = (hfDetails: IHealthFacility) => {
     if (hfDetails) {
       setEditHFDetailsModal({
@@ -132,6 +154,10 @@ const HealthFacilityList = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Closes the health facility edit modal
+   * @param {boolean} [isFromCloseBtn] - Indicates if the close action is from the close button
+   */
   const closeHealthFacilityEditModal = (isFromCloseBtn?: boolean) => {
     if (editHealthFacilityModal.isNextClicked && !isFromCloseBtn) {
       setEditHFDetailsModal({
@@ -149,6 +175,11 @@ const HealthFacilityList = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Renders the health facility details form
+   * @param {any} form - The form object
+   * @returns {React.ReactElement} The rendered form
+   */
   const editHealthFacilityDetailsModalRender = (form: any) => {
     return (
       <HealthFacilityDetailsForm
@@ -169,7 +200,8 @@ const HealthFacilityList = (): React.ReactElement => {
   const fetchFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, errorMessage));
 
-  const fetchWorkflowList = (healthFacility: any) => {
+  // Fetches the workflow list
+  const fetchWorkflowList = () => {
     if (!workflows.length) {
       dispatch(
         fetchWorkflowListRequest({
@@ -194,6 +226,13 @@ const HealthFacilityList = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Validates linked restrictions
+   * @param {number[]} missingIds - The missing IDs
+   * @param {number} hfTenantId - The health facility tenant ID
+   * @param {any} healthFacility - The health facility data
+   * @param {number[]} linkedVillageIds - The linked village IDs
+   */
   const validateLinkedRestrictions = (
     missingIds: number[],
     hfTenantId: number,
@@ -207,7 +246,7 @@ const HealthFacilityList = (): React.ReactElement => {
         healthFacilityId: healthFacility.id,
         linkedVillageIds,
         successCb: () => {
-          fetchWorkflowList(healthFacility);
+          fetchWorkflowList();
         },
         failureCb: (error) =>
           toastCenter.error(
@@ -217,6 +256,10 @@ const HealthFacilityList = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles the submission of health facility details
+   * @param {any} healthFacility - The health facility data
+   */
   const handleHealthFacilityDetailsSubmit = ({ healthFacility }: any) => {
     if (!editHealthFacilityModal.isNextClicked) {
       const peerIdsSet = new Set((healthFacility.peerSupervisors || []).map((obj: any) => obj.id));
@@ -248,6 +291,10 @@ const HealthFacilityList = (): React.ReactElement => {
       }
     }
   };
+
+  /**
+   * Opens the create health facility form
+   */
   const openCreateHealthFacility = () => {
     const url = ((regionId && PROTECTED_ROUTES.createHealthFacilityByRegion) ||
       (districtId && PROTECTED_ROUTES.createHealthFacilityByDistrict) ||
@@ -259,12 +306,21 @@ const HealthFacilityList = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles the row click event
+   * @param {any} data - The row data
+   */
   const handleRowClick = (data: any) => {
     history.push(
       PROTECTED_ROUTES.healthFacilitySummary.replace(':healthFacilityId', data.id).replace(':tenantId', data.tenantId)
     );
   };
 
+  /**
+   * Handles the health facility delete event
+   * @param {Object} param0 - The delete parameters
+   * @param {Object} param0.data - The health facility data
+   */
   const handleHFDelete = useCallback(
     ({ data: { id, tenantId: hfTenantId } }: { data: { id: number; tenantId: number } }) => {
       dispatch(

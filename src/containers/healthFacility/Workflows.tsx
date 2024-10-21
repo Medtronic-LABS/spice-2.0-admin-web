@@ -43,13 +43,23 @@ const renderWorkflowByModuleType = (
     WORKFLOW_MODULE: { clinical },
     WORKFLOW_NAME: { phq4, pregnancy, pregnancyAnc, substanceAbuse, suicideScreener }
   } = APPCONSTANTS;
+  /**
+   * Filters the clinical workflows without PHQ-4
+   */
   const clinicalWorkflowsWOphq4 = clinicalWorkflows.filter(
     (v) => ![substanceAbuse, suicideScreener, phq4].includes(v?.workflowName || '')
   );
+  /**
+   * Filters the clinical workflows with PHQ-4
+   */
   const clinicalWorkflowsWphq4 = clinicalWorkflows
     .filter((v) => [substanceAbuse, suicideScreener, phq4].includes(v?.workflowName || ''))
     .sort((a: any, b: any) => a?.id - b?.id);
 
+  /**
+   * Handles the workflow click event
+   * @param {any} selectedValue - The selected workflow value
+   */
   const onClickWorkflow = (selectedValue: any) => {
     pregnancyCheckTimeout = setTimeout(() => {
       const isPregnancy = selectedValue?.workflowName === pregnancy;
@@ -145,6 +155,13 @@ const Workflows: React.FC<IWorkflowsProps> = ({
     WORKFLOW_NAME: { phq4, substanceAbuse, suicideScreener }
   } = APPCONSTANTS;
 
+  /**
+   * Gets the HF workflow IDs
+   * @param {any[]} hfWorkflows - The HF workflow data
+   * @param {IWorkflow} workflow - The workflow data
+   * @param {string} moduleType - The module type
+   * @returns {number | null} The workflow ID or null
+   */
   const getHFWorkflowIds = useCallback((hfWorkflows: any[], workflow: IWorkflow, moduleType: string) => {
     if (workflow.moduleType === moduleType) {
       if (hfWorkflows.length) {
@@ -160,6 +177,10 @@ const Workflows: React.FC<IWorkflowsProps> = ({
 
   const mentalHealthTimeout = useRef<any>(null);
   const pregnancyCheckTimeout = useRef<any>(null);
+
+  /**
+   * Handles the mental health selection
+   */
 
   const mentalHealthSelection = () => {
     mentalHealthTimeout.current = setTimeout(() => {
@@ -183,6 +204,9 @@ const Workflows: React.FC<IWorkflowsProps> = ({
     }, 0);
   };
 
+  /**
+   * Initializes the form values
+   */
   useEffect(() => {
     if (workflows.length) {
       form.initialize((data: any) => {

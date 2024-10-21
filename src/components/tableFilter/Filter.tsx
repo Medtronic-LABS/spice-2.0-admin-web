@@ -48,10 +48,8 @@ const TableFilter: React.FC<ITableFilterProps> = ({
 
   /**
    * Handles the change of selected options.
-   * @param {Object} opt - The option object.
-   * @param {string} opt.name - The name of the selected option.
+   * @param {IOption} option - The selected option object.
    */
-
   const handleSelectChange = (option: IOption) => {
     if (isFacility) {
       if (option.name === selectAllLabel) {
@@ -89,7 +87,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
       }
     }
 
-    // Update the selected options state for UI purposes
+    // Update the selected options state
     if (option.name === selectAllLabel) {
       if (isAllSelected.current) {
         isAllSelected.current = false;
@@ -120,8 +118,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
 
   /**
    * Debounces a function call.
-   * @param func The function to be debounced.
-   * @param wait The debounce wait time in milliseconds.
+   * @param {Function} func - The function to be debounced.
+   * @param {number} wait - The debounce wait time in milliseconds.
+   * @returns {Function} A debounced version of the input function.
    */
   const debounce = <T extends unknown[]>(func: (...args: T) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
@@ -132,7 +131,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   };
 
   /**
-   * Toggles the dropdown open/close.
+   * Toggles the dropdown open/close state.
    */
   const handleDropdownToggle = () => {
     setIsOpen(!isOpen);
@@ -140,7 +139,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   };
 
   /**
-   * Hide select all option when user type in search input
+   * Effect hook to hide or show the "Select All" option based on search term.
    */
   useEffect(() => {
     if (searchTerm.length) {
@@ -151,6 +150,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
+  /**
+   * Handles changes in the search input with debounce.
+   */
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSearchChange = useCallback(
     debounce((inputValue: string) => {
@@ -161,7 +163,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
 
   /**
    * Handles click outside the dropdown to close it.
-   * @param event The MouseEvent object.
+   * @param {MouseEvent} event - The mouse event object.
    */
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -175,6 +177,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
     }
   };
 
+  /**
+   * Effect hook to add and remove click outside event listener.
+   */
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -182,16 +187,20 @@ const TableFilter: React.FC<ITableFilterProps> = ({
     };
   }, []);
 
+  /**
+   * Filters options based on the search term.
+   */
   const filteredOptions = filterData?.data.filter((option) => {
     return option?.name?.toLowerCase().includes(searchTerm?.toLowerCase());
   });
 
   /**
    * Formats health facility data into a string.
-   * @param user The health facility user data.
-   * @returns A formatted string of health facility names.
+   * @param {IHFUserGet} user - The health facility user data.
+   * @returns {string} A formatted string of health facility names.
    */
-  const formatHealthFacility = (user: IHFUserGet) => `${(user.organizations || []).map((org) => org.name).join(', ')}`;
+  const formatHealthFacility = (user: IHFUserGet): string =>
+    `${(user.organizations || []).map((org) => org.name).join(', ')}`;
   return (
     <>
       {filterData.isShow && (

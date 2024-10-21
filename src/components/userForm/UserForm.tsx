@@ -17,8 +17,6 @@ import SelectInput from '../formFields/SelectInput';
 import APPCONSTANTS, {
   NAMING_VARIABLES,
   NAME_CONSTANTS,
-  COMMON_INSIGHTS_ADMINROLE,
-  COMMON_INSIGHTS_USERROLE,
   ADMIN_BASED_ON_URL,
   CFR_SUITEACCSESS_NAME
 } from '../../constants/appConstants';
@@ -89,9 +87,6 @@ export interface IUserFormValues {
   isHF?: boolean;
 }
 
-interface ISideMenuProps {
-  className?: string;
-}
 type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
 
 /**
@@ -168,7 +163,6 @@ const UserForm = ({
   const [clearEmail, setClearEmail] = useState(false);
   const [insightsRole, setInsightsRole] = useState<IRoles[]>([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [showHealthFacilityInput, setShowHealthFacilityInput] = useState(false);
   const { mobileRoles, adminRoles, CHRoles, superAdminRoles } = userMeta();
   const districtList = useSelector(getDistrictListSelector);
   const {
@@ -260,6 +254,17 @@ const UserForm = ({
 
   const isFormInvalid = form?.getState()?.errors?.[formName]?.length;
 
+  /**
+   * Creates the initial edit data for the user form.
+   *
+   * @param initialEditValue - The initial values for editing a user
+   * @param isEdit - Boolean flag indicating if the form is in edit mode
+   * @param isCultureListLoading - Boolean flag indicating if the culture list is loading
+   * @param cultureList - List of available cultures
+   * @param districtList - List of available districts
+   * @param chiefdomList - List of available chiefdoms
+   * @returns An array containing the initial edit data object
+   */
   const initialEditData = useMemo<Array<Partial<any>>>(
     () => [
       {
@@ -296,13 +301,25 @@ const UserForm = ({
         countryCode: { phoneNumberCode: initialEditValue?.countryCode, id: initialEditValue?.countryCode }
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [cultureList, initialEditValue, districtList, chiefdomList, isCultureListLoading, isEdit]
   );
 
+  /**
+   * Resets the admin form fields to their initial state.
+   *
+   * @param {any} fields - The fields object from react-final-form-arrays
+   * @param {number} index - The index of the form to reset
+   */
   const resetAdminForm = useCallback(
     (fields: any, index: number) => {
+      // Reset the form fields using the form mutator
       form.mutators?.resetFields?.(`${formName}[${index}]`);
+
+      // Update the fields with the initial values
       fields.update(index, { ...initialValue[0] });
+
+      // Handle special cases for admin form or health facility creation
       if ((isAdminForm && defaultSelectedRole) || isHFCreate) {
         const [suiteAccess] = getSuiteAccessList(rolesGrouped);
         fields.update(index, {
@@ -314,14 +331,23 @@ const UserForm = ({
           suiteAccess: defaultSelectedRole ? [suiteAccess] : []
         });
       }
+
+      // Reset disabled roles
       disabledRoles.current = [];
+
+      // Update auto-fetched state
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = false;
       setAutoFetched(newAutoFetched);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [form, initialValue, isAdminForm, defaultSelectedRole, autoFetched, rolesGrouped.SPICE]
   );
 
+  /**
+   * Handles the logic for super admin to peer supervisor conversion.
+   * @param {IRoles[]} roles - The roles of the user
+   */
   const SuperAdminToPeerSuperviserFn = useCallback(
     (roles: IRoles[]) => {
       if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
@@ -335,9 +361,6 @@ const UserForm = ({
             })
           );
         }
-        setShowHealthFacilityInput(true);
-      } else {
-        setShowHealthFacilityInput(false);
       }
     },
     [isSuperAdmin, countryId, dispatch, role, healthFacilityList?.length]
@@ -354,7 +377,13 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const emailDisabledFn = (errorMsg: string, index: number, isAutoPopulate = true) => {
+  /**
+   * Handles the logic for disabling email input and displaying error toast.
+   * @param {string} errorMsg - The error message to display
+   * @param {number} index - The index of the form to reset
+   * @param {boolean} isAutoPopulate - Whether to automatically populate the form
+   */
+  const emailDisabledFn = (errorMsg: string, index: number, isAutoPopulate: boolean = true) => {
     const newAutoFetched = [...autoFetched];
     newAutoFetched[index] = false;
     setAutoFetched(newAutoFetched);
@@ -365,6 +394,11 @@ const UserForm = ({
     }
   };
 
+  /**
+   * Automatically populates user data into the form fields.
+   * @param {any} user - The user data to populate
+   * @param {number} index - The index of the form to populate
+   */
   const autoPopulateUserData = (user: any, index: number) => {
     const userData = {
       ...user
@@ -447,6 +481,10 @@ const UserForm = ({
       dispatch(fetchCountryListRequest());
     }
   }, [countryList.length, dispatch]);
+
+  /**
+   * Fetches user roles if necessary.
+   */
   useEffect(() => {
     if (!rolesGrouped?.hasOwnProperty('SPICE') && !isProfile && (countryId || isRegionCreate)) {
       dispatch(
@@ -458,8 +496,20 @@ const UserForm = ({
     }
   }, [countryId, dispatch, isProfile, rolesGrouped, isRegionCreate]);
 
-  const isError = (meta: any) => (meta.touched && meta.error) || undefined;
+  /**
+   * Checks if there is an error in the form field.
+   * @param {any} meta - The meta object from react-final-form
+   * @returns {any} The error or undefined if there is no error
+   */
+  const isError = (meta: any): any => (meta.touched && meta.error) || undefined;
 
+  /**
+   * Handles the display of the "Add Another" icon.
+   * @param {boolean} isLastChild - Whether the current item is the last child
+   * @param {any} fields - The fields object from react-final-form-arrays
+   * @param {number} index - The index of the form
+   * @returns {React.ReactElement} The rendered "Add Another" icon
+   */
   const handleShowAddIcon = (isLastChild: boolean, fields: any, index: number) => {
     return (
       isLastChild && (
@@ -491,6 +541,12 @@ const UserForm = ({
     );
   };
 
+  /**
+   * Handles the display of the "Remove User" icon.
+   * @param {any} fields - The fields object from react-final-form-arrays
+   * @param {number} index - The index of the form
+   * @returns {React.ReactElement} The rendered "Remove User" icon
+   */
   const handleShowRemoveIcon = (fields: any, index: number) => {
     return (
       Number(fields?.length) > 1 && (
@@ -511,6 +567,14 @@ const UserForm = ({
     );
   };
 
+  /**
+   * Renders the action buttons for the user form.
+   * @param {any} fields - The fields object from react-final-form-arrays
+   * @param {number} index - The index of the form
+   * @param {boolean} isLastChild - Whether the current item is the last child
+   * @param {any} emailFieldRef - The ref object for the email field
+   * @returns {React.ReactElement} The rendered action buttons
+   */
   const actionButtons = (fields: any, index: number, isLastChild: boolean, emailFieldRef: any) =>
     !disableOptions && (
       <div className={`col-12 d-flex justify-content-between mt-0dot5 ${isLastChild ? '' : 'mb-2'}`}>
@@ -539,6 +603,11 @@ const UserForm = ({
   // roles based CHW related utils
   const selectedRoles = useCallback((index: number) => form.getState().values?.users?.[index]?.roles, [form]);
 
+  /**
+   * Updates the role options and disables roles based on the selected roles.
+   * @param {number} index - The index of the form
+   * @param {IRoles[]} mandatoryRoleOptions - The mandatory role options
+   */
   const updateRoleOptionsAndDisableRoles = useCallback(
     (index: number, mandatoryRoleOptions?: IRoles[]) => {
       // role options
@@ -600,6 +669,11 @@ const UserForm = ({
     ]
   );
 
+  /**
+   * Handles the selection of CHA and CHP users.
+   * @param {IRoles[]} roles - The roles of the user
+   * @param {number} index - The index of the form
+   */
   const isCHUserSelectedFn = useCallback(
     (roles: IRoles[], index: number) => {
       // getting CHA user selected status
@@ -654,6 +728,7 @@ const UserForm = ({
         );
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [countryId, dispatch, healthFacilityList, villages]
   );
 
@@ -674,6 +749,10 @@ const UserForm = ({
     }
   };
 
+  /**
+   * Fetches the health facility list based on the provided values.
+   * @param {IRoles} values - The values object containing tenantIds
+   */
   const chiefdomBasedHfList = useCallback(
     (values: IRoles) => {
       if (countryId) {
@@ -691,6 +770,9 @@ const UserForm = ({
     [countryId, dispatch, role]
   );
 
+  /**
+   * Effect hook to fetch village and supervisor lists based on the initial edit data.
+   */
   useEffect(() => {
     if (isEdit && !isProfile) {
       const tenantIds = [...initialEditData[0].hfTenantIds].filter((v: number) => v);
@@ -700,6 +782,9 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFetchData]);
 
+  /**
+   * Effect hook to handle CH user selection.
+   */
   useEffect(() => {
     if (isEdit) {
       if (isSiteUser) {
@@ -708,6 +793,9 @@ const UserForm = ({
     }
   }, [form, isCHUserSelectedFn, isEdit, isProfile, selectedRoles, isSiteUser]);
 
+  /**
+   * Initializes the data for the user form.
+   */
   const initData = useCallback(() => {
     const [suiteAccess] = getSuiteAccessList(rolesGrouped);
     roleOptions.current = [rolesGrouped.SPICE];
@@ -728,8 +816,12 @@ const UserForm = ({
     } else {
       setAutoFetchData(initialValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedRole, initialEditData, initialValue, isAdminForm, isEdit, rolesGrouped.SPICE]);
 
+  /**
+   * Effect hook to initialize the data for the user form.
+   */
   useEffect(() => {
     initData();
   }, [initData]);
@@ -838,6 +930,9 @@ const UserForm = ({
     setInsightsRole(filteredRoles || []);
   };
 
+  /**
+   * Fetches district details based on the health facility tenant ID.
+   */
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchDistrictListRequest({
@@ -853,8 +948,12 @@ const UserForm = ({
           )
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryId, dispatch]);
 
+  /**
+   * Effect hook to fetch district details based on the selected admins.
+   */
   useEffect(() => {
     if (
       [DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN].includes(selectedAdmins) &&
@@ -869,6 +968,9 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, fetchDetails, selectedAdmins]);
 
+  /**
+   * Effect hook to set the district ID based on the selected admins.
+   */
   useEffect(() => {
     const districtDataId = form.getState().values.users?.[0]?.district?.tenantId;
     const [existingDistrict] = initialEditData;
@@ -894,6 +996,9 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, form.getState().values.users?.[0]?.district?.tenantId]);
 
+  /**
+   * Effect hook to fetch chiefdom details based on the selected admins.
+   */
   useEffect(() => {
     const chiefdomData = form.getState().values.users?.[0]?.chiefdom;
     const [existingDistrict] = initialEditData;
@@ -920,6 +1025,7 @@ const UserForm = ({
         levelBasedInsightsRole(levels);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialEditData, isAdminForm]);
 
   useEffect(() => {
@@ -929,6 +1035,7 @@ const UserForm = ({
       setSelectedAdmins(selectedHf?.role?.name);
       levelBasedInsightsRole(selectedHf?.role?.level);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getState()?.values?.users?.[0]?.role?.name]);
 
   return (
@@ -1172,7 +1279,7 @@ const UserForm = ({
                               if (spiceRole.length) {
                                 form.change(`${formName}[${index}].roles`, [...[spiceRole], ...values]);
                               } else {
-                                form.change(`${formName}[${index}].roles`, [...([spiceRole] || []), ...values]);
+                                form.change(`${formName}[${index}].roles`, [...[spiceRole], ...values]);
                               }
                               input.onChange(values);
                             }}

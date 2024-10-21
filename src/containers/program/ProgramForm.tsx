@@ -13,6 +13,9 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
 import { clearHFList, fetchHFListRequest } from '../../store/healthFacility/actions';
 
+/**
+ * Interface for ProgramForm props
+ */
 interface IProgramFormProps {
   form: FormApi<{ program: IProgramFormValues }>;
   tenantId: string;
@@ -20,9 +23,9 @@ interface IProgramFormProps {
 }
 
 /**
- * Form for Program Form
- * @param param0
- * @returns {React.ReactElement}
+ * Form component for Program creation and editing
+ * @param {IProgramFormProps} props - The component props
+ * @returns {React.ReactElement} The rendered form
  */
 const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const { tenantId, isEdit = false } = props;
@@ -31,6 +34,8 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const dispatch = useDispatch();
   const hfListLoading = useSelector(healthFacilityLoadingSelector);
+
+  // Fetch health facility list on component mount
   useEffect(() => {
     dispatch(
       fetchHFListRequest({
@@ -51,6 +56,7 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
 
   return (
     <div className='row gx-1dot25'>
+      {/* Program Name Field */}
       <div className='col-12 col-md-6'>
         <Field
           name='program.name'
@@ -68,6 +74,7 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
           )}
         />
       </div>
+      {/* Health Facility Field */}
       <div className='col-lg-6 col-6'>
         <Field
           name='program.healthFacilities'
@@ -89,6 +96,7 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
           )}
         />
       </div>
+      {/* Status Checkbox (only for edit mode) */}
       {isEdit && (
         <div className='col-6'>
           <Field

@@ -16,7 +16,14 @@ export interface IOption {
   label: string;
 }
 
-const convertOptionType = (labelKey: string | string[], valueKey: string | string[], options: any) =>
+/**
+ * Converts options to the specified type
+ * @param {string | string[]} labelKey - The key for the label
+ * @param {string | string[]} valueKey - The key for the value
+ * @param {any} options - The options to convert
+ * @returns {any[]} The converted options
+ */
+const convertOptionType = (labelKey: string | string[], valueKey: string | string[], options: any): any[] =>
   labelKey && valueKey
     ? (options || []).map((option: any) => {
         return {
@@ -27,7 +34,13 @@ const convertOptionType = (labelKey: string | string[], valueKey: string | strin
       })
     : options;
 
-const MultiSelect = (props: any) => {
+/**
+ * MultiSelect component
+ * Renders a multi-select dropdown
+ * @param {any} props - Component props
+ * @returns {React.ReactElement} The rendered MultiSelect component
+ */
+const MultiSelect = (props: any): React.ReactElement => {
   const { change } = useForm();
   const newProps = {
     ...props,
@@ -38,14 +51,30 @@ const MultiSelect = (props: any) => {
   const isAllSelected = useRef<boolean>(false);
   const selectAllLabel = useRef<string>('Select all');
   const allOption = { value: '*', label: selectAllLabel.current };
-  const filterOptions = (filters: IOption[] = [], input: string) =>
+
+  /**
+   * Filters options based on the input
+   * @param {IOption[]} filters - The options to filter
+   * @param {string} input - The input to filter by
+   * @returns {IOption[]} The filtered options
+   */
+  const filterOptions = (filters: IOption[] = [], input: string): IOption[] =>
     filters &&
     filters
       ?.filter(({ label }: IOption) => label?.toLowerCase().includes(input?.toLowerCase()))
       .sort((a: any, b: any) => a.value - b.value);
 
-  const comparator = (v1: IOption, v2: IOption) => (v1.value as number) - (v2.value as number);
+  /**
+   * Compares two options based on their values
+   * @param {IOption} v1 - The first option
+   * @param {IOption} v2 - The second option
+   * @returns {number} The comparison result
+   */
+  const comparator = (v1: IOption, v2: IOption): number => (v1.value as number) - (v2.value as number);
 
+  /**
+   * Filters the options based on the input
+   */
   const filteredOptions = filterOptions(newProps.options, selectInput);
   const filteredSelectedOptions = filterOptions(
     newProps?.value.filter((o: any) => filteredOptions.some((f) => f.value === o.id)),
@@ -62,7 +91,12 @@ const MultiSelect = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.name, props.options, props.required]);
 
-  const multiOption = (multiSelectprops: any) => {
+  /**
+   * Renders the multi-select option
+   * @param {any} multiSelectprops - The props for the multi-select option
+   * @returns {React.ReactElement} The rendered multi-select option
+   */
+  const multiOption = (multiSelectprops: any): React.ReactElement => {
     const isChecked = !(newProps.disabledOptions || []).some((v: any) => v.id === multiSelectprops.value);
     const isDisabled = !![...(newProps.disabledOptions || [])].some((v: any) => v.id === multiSelectprops.value);
     return (
@@ -96,7 +130,12 @@ const MultiSelect = (props: any) => {
     );
   };
 
-  const multiSelectInput = ({ selectProps, children, ...inputProps }: any) => (
+  /**
+   * Renders the multi-select input
+   * @param {any} selectProps - The props for the multi-select input
+   * @returns {React.ReactElement} The rendered multi-select input
+   */
+  const multiSelectInput = ({ selectProps, children, ...inputProps }: any): React.ReactElement => (
     <>
       {selectInput.length === 0 ? (
         <components.Input autoFocus={selectProps.menuIsOpen} {...inputProps}>
@@ -112,6 +151,11 @@ const MultiSelect = (props: any) => {
     </>
   );
 
+  /**
+   * Handles the input change
+   * @param {string} inputValue - The input value
+   * @param {any} event - The event object
+   */
   const onInputChange = (inputValue: string, event: { action: InputAction }) => {
     if (event.action === 'set-value') {
       setSelectInput('');
@@ -122,18 +166,32 @@ const MultiSelect = (props: any) => {
     }
   };
 
+  /**
+   * Handles the key down event
+   * @param {React.KeyboardEvent<HTMLElement>} e - The keyboard event
+   */
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if ((e.key === ' ' || e.key === 'Enter' || e.key === 'Space') && !selectInput) {
       e.preventDefault();
     }
   };
 
-  const filteredFinalOptions = (options: any) =>
+  /**
+   * Filters the final options
+   * @param {any} options - The options to filter
+   * @returns {any[]} The filtered options
+   */
+  const filteredFinalOptions = (options: any): any[] =>
     [...options].filter((opt) =>
       (newProps.disabledOptions || []).length
         ? !newProps.disabledOptions.some((dOptions: any) => dOptions.id === opt.value)
         : true
     );
+  /**
+   * Handles the change event
+   * @param {IOption[]} selected - The selected options
+   * @param {any} actionMeta - The action meta
+   */
   const handleChange = (selected: IOption[], actionMeta: any) => {
     if (
       selected.length > 0 &&
@@ -174,13 +232,22 @@ const MultiSelect = (props: any) => {
     }
   };
 
-  const customFilterOption = ({ value, label }: IOption, input: string) => {
+  /**
+   * Custom filter option
+   * @param {IOption} value - The value of the option
+   * @param {string} input - The input to filter by
+   * @returns {boolean} Whether the option matches the input
+   */
+  const customFilterOption = ({ value, label }: IOption, input: string): boolean => {
     return (
       (value !== '*' && label.toLowerCase().includes(input.toLowerCase())) ||
       (newProps.selectAll !== false && value === '*' && filteredFinalOptions(filteredOptions)?.length > 0)
     );
   };
 
+  /**
+   * Multi-select styles
+   */
   const multiSelectStyles = {
     multiValueRemove: (base: CSSObjectWithLabel, removeProps: any) => {
       if (props.mandatoryOptions) {
@@ -225,6 +292,9 @@ const MultiSelect = (props: any) => {
     }
   };
 
+  /**
+   * Renders the multi-select component
+   */
   if (newProps.isSelectAll && newProps.options.length !== 0) {
     const newFilteredOptionsLength = (newProps.disabledOptions || []).length
       ? filteredOptions.length - newProps.disabledOptions.length

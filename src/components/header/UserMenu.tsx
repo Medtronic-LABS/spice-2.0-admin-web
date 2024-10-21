@@ -23,16 +23,30 @@ import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
 import { CHIEFDOM_ADMIN, DISTRICT_ADMIN, REGION_ADMIN, SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
 
+/**
+ * Interface for user menu item
+ */
 interface IUserMenuItem {
+  /** Label for the menu item */
   label: string;
+  /** Icon for the menu item */
   icon: string;
+  /** Route for the menu item */
   route: string;
+  /** Roles that can access this menu item */
   roles: string[];
 }
 
 const { ROLES, SUITE_ACCESS } = APPCONSTANTS;
 
-const UserMenu = ({ role }: any) => {
+/**
+ * UserMenu component
+ * Renders the user menu with various options based on user role and permissions
+ * @param {Object} props - Component props
+ * @param {string} props.role - User's role
+ * @returns {React.ReactElement} The rendered UserMenu component
+ */
+const UserMenu = ({ role }: { role: string }): React.ReactElement => {
   const dispatch = useDispatch();
   const location = useLocation();
   const email = useSelector(emailSelector);
@@ -42,7 +56,12 @@ const UserMenu = ({ role }: any) => {
   const tenantId = useSelector(tenantIdSelector);
   const [passwordModal, setPasswordModal] = useState(false);
   const [submitEnable, setSubmitEnabled] = useState(false);
-  const menus = userSuiteAccess.includes(SUITE_ACCESS.ADMIN)
+
+  /**
+   * Generates the menu items based on user's suite access
+   * @type {IUserMenuItem[]}
+   */
+  const menus: IUserMenuItem[] = userSuiteAccess.includes(SUITE_ACCESS.ADMIN)
     ? [
         {
           label: 'County Details',
@@ -95,8 +114,18 @@ const UserMenu = ({ role }: any) => {
       ]
     : [];
 
+  /**
+   * Filters the menu items based on user's role
+   * @type {IUserMenuItem[]}
+   */
   const permittedMenus = menus.filter(({ roles }) => roles?.includes(role));
-  const handleClick = (modalcheck: any, event: any) => {
+
+  /**
+   * Handles click on menu items
+   * @param {Object} modalcheck - The clicked menu item
+   * @param {Event} event - The click event
+   */
+  const handleClick = (modalcheck: { label: string; route?: string }, event: React.MouseEvent) => {
     if (modalcheck.label === 'Change Password') {
       setPasswordModal(true);
     } else {
@@ -105,11 +134,20 @@ const UserMenu = ({ role }: any) => {
     event.preventDefault();
   };
 
+  /**
+   * Handles modal cancellation
+   */
   const onModalCancel = () => {
     setPasswordModal(false);
   };
 
-  const handleFormSubmit = (data: any) => {
+  /**
+   * Handles form submission for password change
+   * @param {Object} data - Form data
+   * @param {string} data.oldPassword - Old password
+   * @param {string} data.newPassword - New password
+   */
+  const handleFormSubmit = (data: { oldPassword: string; newPassword: string }) => {
     const oldPassword = generatePassword(data.oldPassword);
     const newPassword = generatePassword(data.newPassword);
     dispatch(
@@ -127,6 +165,7 @@ const UserMenu = ({ role }: any) => {
       })
     );
   };
+
   return (
     <>
       {permittedMenus.map(({ label, icon, route }: IUserMenuItem, key) => (

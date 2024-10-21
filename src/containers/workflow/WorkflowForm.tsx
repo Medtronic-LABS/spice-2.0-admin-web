@@ -12,9 +12,9 @@ const viewScreens = [
 ];
 
 /**
- * Form for Account workflow Details
- * @param param0
- * @returns {React.ReactElement}
+ * WorkflowForm component for rendering the workflow form fields
+ * @param {WorkflowFormProps} props - The component props
+ * @returns {React.ReactElement} The rendered form fields
  */
 const workflowForm = ({ isEdit = false, form }: { isEdit: boolean; form: FormApi | undefined }): React.ReactElement => {
   const viewScreenError = required(form?.getState()?.values.viewScreens);

@@ -16,6 +16,12 @@ interface IModalProps {
   renderInsideForm?: boolean;
 }
 
+/**
+ * ModalViewer component
+ * Renders a modal for viewing content
+ * @param {IModalProps} props - Component props
+ * @returns {React.ReactElement | null} The rendered ModalViewer component or null if not shown
+ */
 const ModalViewer = React.memo(
   ({ children, show, handleCancel, title, size, renderInsideForm = false }: IModalProps) => {
     if (!show) {

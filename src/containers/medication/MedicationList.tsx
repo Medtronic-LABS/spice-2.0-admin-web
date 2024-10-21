@@ -19,27 +19,31 @@ import { deleteMedication, fetchMedicationListReq, updateMedication } from '../.
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
 /**
- * Shows the medication list
- * Provides search feature in medication
- * Provides edit feature for medication list
- * @returns {React.ReactElement}
+ * MedicationList component
+ * Shows the medication list, provides search feature, and edit functionality
+ * @returns {React.ReactElement} The rendered MedicationList component
  */
 const MedicationList = (): React.ReactElement => {
+  // Custom hook for table pagination
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
+
+  // State for controlling the medication edit modal
   const [isOpenMedicationModal, setOpenMedicationModal] = useState(false);
   const [medicationInitialValues, setMedicationInitialValues] = useState({});
 
   const dispatch = useDispatch();
+
+  // Selectors for medication data from Redux store
   const medicationList = useSelector(getMedicationListSelector);
   const loading = useSelector(getMedicationLoadingSelector);
   const listCount = useSelector(getMedicationListCountSelector);
 
+  // Get route parameters
   const { regionId, tenantId }: { regionId: string; tenantId: string } = useParams();
   const history = useHistory();
 
   /**
-   * to load medication data.
-   * @param medication
+   * Fetches the medication list
    */
   const fetchList = useCallback(() => {
     dispatch(
@@ -54,12 +58,13 @@ const MedicationList = (): React.ReactElement => {
     );
   }, [dispatch, regionId, listParams]);
 
+  // Fetch medication list when component mounts or when dependencies change
   useEffect(() => {
     fetchList();
   }, [dispatch, fetchList, regionId, listParams]);
 
   /**
-   * Handler for add medication button click.
+   * Handles the "Add Medication" button click
    */
   const handleAddMedication = () => {
     const url = PROTECTED_ROUTES.createMedication;
@@ -67,12 +72,17 @@ const MedicationList = (): React.ReactElement => {
     history.push(createMedicationURL);
   };
 
+  /**
+   * Handles medication deletion
+   * @param {Object} values - The values object containing data and index of the medication to delete
+   */
   const handleMedicationDelete = (values: { data: any; index: number }) => {
     dispatch(
       deleteMedication({
         data: { id: values?.data?.id, tenantId },
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.MEDICATION_DELETE_SUCCESS);
+          // Update page if necessary after deletion
           handlePage(
             listParams.page > 1 &&
               Math.ceil(listCount / listParams.rowsPerPage) === listParams.page &&
@@ -87,8 +97,13 @@ const MedicationList = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Opens the edit modal for a medication
+   * @param {any} value - The medication data to edit
+   */
   const openEditModal = (value: any) => {
     setOpenMedicationModal(true);
+    // Prepare the edit value object
     const editValue = {
       ...value,
       name: value?.name,
@@ -102,7 +117,7 @@ const MedicationList = (): React.ReactElement => {
   };
 
   /**
-   * Handler for edit medication form cancel.
+   * Handles the cancellation of medication edit
    */
   const handleEditCancelClick = () => {
     setOpenMedicationModal(false);
@@ -110,8 +125,8 @@ const MedicationList = (): React.ReactElement => {
   };
 
   /**
-   * Handler for edit medication form submit.
-   * @param medication
+   * Handles the submission of edited medication data
+   * @param {Object} param0 - Object containing the edited medication data
    */
   const handleMedicationEditSubmit = ({ medication }: { medication: IMedicationDataFormValues[] }) => {
     const data = JSON.parse(JSON.stringify(medication[0]));
@@ -119,6 +134,7 @@ const MedicationList = (): React.ReactElement => {
       code: data?.codeDetails?.code,
       url: data?.codeDetails?.url
     };
+    // Prepare the post data for updating medication
     const postData = {
       countryId: Number(data?.countryId),
       classificationId: data?.classification.id,
@@ -127,6 +143,10 @@ const MedicationList = (): React.ReactElement => {
       brandName: data?.brand.name,
       dosageFormId: data?.dosage_form.id,
       dosageFormName: data?.dosage_form.name,
+      category: {
+        id: data?.category?.id,
+        name: data?.category?.name
+      },
       name: data?.name,
       id: data?.id,
       codeDetails
@@ -145,7 +165,12 @@ const MedicationList = (): React.ReactElement => {
     );
   };
 
-  const editModalRender = (form: any) => {
+  /**
+   * Renders the edit modal content
+   * @param {any} form - The form object
+   * @returns {React.ReactElement} The rendered MedicationForm component
+   */
+  const editModalRender = (form: any): React.ReactElement => {
     return <MedicationForm form={form} initialEditValue={medicationInitialValues} disableOptions={true} />;
   };
 

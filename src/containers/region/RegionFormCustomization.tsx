@@ -25,13 +25,20 @@ import { cultureListLoadingSelector, cultureListSelector } from '../../store/use
 import styles from '../../components/formBuilder/styles/FormBuilder.module.scss';
 import { Form } from 'react-final-form';
 
+/**
+ * Interface for route parameters
+ */
 interface IMatchParams {
   regionId: string;
   tenantId: string;
   form: string;
 }
 
-const RegionFormCustomization = () => {
+/**
+ * RegionFormCustomization component for customizing region-specific forms
+ * @returns {React.ReactElement} The rendered component
+ */
+const RegionFormCustomization = (): React.ReactElement => {
   const dispatch = useDispatch();
 
   const history = useHistory();
@@ -72,6 +79,10 @@ const RegionFormCustomization = () => {
     setEditGroupedFieldsOrder
   } = useFormCustomization(true);
 
+  /**
+   * Fetches the customization form
+   * @param {number} cultureId - The culture ID
+   */
   const fetchCustomizationForm = useCallback(
     (cultureId: number) =>
       dispatch(
@@ -130,10 +141,17 @@ const RegionFormCustomization = () => {
     // eslint-disable-next-line
   }, [dispatch, form, regionId, tenantId]);
 
+  /**
+   * Handles cancellation and navigation back
+   */
   const onCancel = () => {
     history.push(PROTECTED_ROUTES.customizationByRegion.replace(':tenantId', tenantId).replace(':regionId', regionId));
   };
 
+  /**
+   * Handles form submission
+   * @param {any} data - The form data
+   */
   const onSubmit = (data: any) => {
     const formatData = [...presentableJson(data, getSortedData(data))];
     const newData = JSON.stringify({
@@ -165,6 +183,12 @@ const RegionFormCustomization = () => {
     );
   };
 
+  /**
+   * Handles culture change
+   * @param {Object} param0 - The selected culture object
+   * @param {string} param0.name - The name of the selected culture
+   * @param {number} param0.id - The ID of the selected culture
+   */
   const onChange = ({ name, id }: { name: string; id: number }) => {
     if (currentCulture?.id !== id) {
       setCulture({ name, id });

@@ -28,6 +28,10 @@ const ReorderItem = ({ itemId, initOrder, children, removeBorderClass, isRemoveI
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initItem, itemId, removeItem]);
 
+  /**
+   * Calculates the top position of the item
+   * @returns {number} The top position of the item
+   */
   const top = useMemo(
     () =>
       Object.keys(order)
@@ -36,6 +40,10 @@ const ReorderItem = ({ itemId, initOrder, children, removeBorderClass, isRemoveI
     [order, itemId, height, spaceBetweenItemsInPx]
   );
 
+  /**
+   * Handles the drag start event
+   * @param {React.DragEvent<HTMLDivElement>} e - The drag event
+   */
   const onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     topWhenDragStart.current = top;
     e.dataTransfer.setDragImage(new Image(), 0, 0); // to remove the default ghost image when an element is dragged
@@ -49,6 +57,10 @@ const ReorderItem = ({ itemId, initOrder, children, removeBorderClass, isRemoveI
     setDragging(false);
   };
 
+  /**
+   * Handles the drag event
+   * @param {React.DragEvent<HTMLDivElement>} e - The drag event
+   */
   const onDrag = (e: React.DragEvent<HTMLDivElement>) => {
     const { pageY: nxtPageY } = e;
     const dragOffset = nxtPageY - (dragCheckPoint.current as number);
@@ -68,6 +80,10 @@ const ReorderItem = ({ itemId, initOrder, children, removeBorderClass, isRemoveI
     }
   };
 
+  /**
+   * The style of the reorder item
+   * @type {CSSProperties}
+   */
   const reorderItemStyle = {
     left: dragging ? '-3px' : 0,
     top: dragging

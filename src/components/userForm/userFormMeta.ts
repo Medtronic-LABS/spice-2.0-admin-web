@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
 
+/**
+ * Custom hook to provide metadata for the user form.
+ * @returns {Object} An object containing various metadata values.
+ */
 const useUserFormMeta = () => {
   const { SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const mobileRoles = useMemo(() => ['COMMUNITY_HEALTH_ASSISTANT'], []);

@@ -13,13 +13,25 @@ interface IRouteProps {
   history: History;
 }
 
+/**
+ * ForgotPassword component
+ * @param {IRouteProps} props - The props
+ * @returns {React.ReactElement} The rendered ForgotPassword component
+ */
 const ForgotPassword = (props: IRouteProps) => {
   const dispatch = useDispatch();
 
+  /**
+   * Handles the click event to navigate back to the login page
+   */
   const backToLogin = () => {
     props.history.push({ pathname: '/' });
   };
 
+  /**
+   * Handles the form submission
+   * @param {Object} values - The form values
+   */
   const onSubmitForm = (values: any) => {
     dispatch(
       forgotPasswordRequest({
@@ -28,6 +40,11 @@ const ForgotPassword = (props: IRouteProps) => {
       })
     );
   };
+
+  /**
+   * Renders the ForgotPassword component
+   * @returns {React.ReactElement} The rendered ForgotPassword component
+   */
   return (
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>

@@ -19,6 +19,10 @@ export interface IMedicationList {
   classificationName: string;
   dosageFormId: string;
   dosageFormName: string;
+  category: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface IMedicationState {
@@ -26,11 +30,13 @@ export interface IMedicationState {
   classificationsLoading: boolean;
   brandsLoading: boolean;
   dosageFormsLoading: boolean;
+  categoryLoading: boolean;
   total: number;
   list: IMedicationList[];
   classifications: IClassification[];
   brands: IList[];
   dosageForms: IList[];
+  categoryList: IList[];
   error: string | null | Error;
 }
 
@@ -105,8 +111,17 @@ export interface IFetchDosageFormSuccessPayload {
   dosageForms: IList[];
 }
 
+export interface IFetchCategorySuccessPayload {
+  categoryList: IList[];
+}
+
 export interface IFetchDosageFormReq {
   type: typeof ACTION_TYPES.FETCH_MEDICATION_DOSAGE_FORM;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchCategoryFormReq {
+  type: typeof ACTION_TYPES.FETCH_CATEGORY_FORM;
   failureCb?: (error: Error) => void;
 }
 
@@ -119,6 +134,15 @@ export interface IFetchDosageFormFailure {
   type: typeof ACTION_TYPES.FETCH_MEDICATION_DOSAGE_FORM_FAILURE;
 }
 
+export interface IFetchCategoryFormSuccess {
+  type: typeof ACTION_TYPES.FETCH_CATEGORY_FORM_SUCCESS;
+  payload: IFetchCategorySuccessPayload;
+}
+
+export interface IFetchCategoryFormFailure {
+  type: typeof ACTION_TYPES.FETCH_CATEGORY_FORM_FAILURE;
+}
+
 export interface IMedicationPayload {
   name: string;
   countryId: number;
@@ -129,6 +153,7 @@ export interface IMedicationPayload {
   brandName: string;
   dosageFormId: string;
   dosageFormName: string;
+  category: IList;
   id?: string;
 }
 
@@ -215,8 +240,12 @@ export type MedicationActions =
   | IFetchBrandFailure
   | IRemoveBrands
   | IFetchDosageFormReq
+  | IFetchCategoryFormReq
   | IFetchDosageFormSuccess
   | IFetchDosageFormFailure
+  | IFetchCategoryFormFailure
+  | IFetchCategoryFormFailure
+  | IFetchCategoryFormSuccess
   | ICreateMedicationRequest
   | ICreateMedicationSuccess
   | ICreateMedicationFailure

@@ -4,6 +4,9 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 
+/**
+ * Interface for route parameters
+ */
 interface IMatchParams {
   regionId?: string;
   tenantId: string;
@@ -15,6 +18,11 @@ export const FormTypes = {
   Assessment: 'assessment'
 };
 
+/**
+ * Finds the current form type based on the index
+ * @param {number} index - The index of the form type
+ * @returns {string} The form type
+ */
 export const findCurrentFormType = (index: number) => {
   switch (index) {
     case 0:
@@ -28,10 +36,19 @@ export const findCurrentFormType = (index: number) => {
   }
 };
 
+/**
+ * RegionCustomization component for managing region-specific customizations
+ * @returns {React.ReactElement} The rendered component
+ */
 const RegionCustomization = (): React.ReactElement => {
   const history = useHistory();
   const { regionId, tenantId } = useParams<IMatchParams>();
 
+  /**
+   * Handles row edit action
+   * @param {Object} param0 - The row edit parameters
+   * @param {number} param0.index - The index of the edited row
+   */
   const handleRowEdit = ({ index }: { index: number }) => {
     const formType = findCurrentFormType(index);
     history.push(
