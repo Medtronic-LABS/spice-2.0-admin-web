@@ -24,6 +24,9 @@ import styles from './District.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { clearSideMenu } from '../../store/common/actions';
 
+/**
+ * District Dashboard component
+ */
 const DistrictDashboard = () => {
   const dispatch = useDispatch();
   const regionId = useSelector(formDataIdSelector);
@@ -39,6 +42,23 @@ const DistrictDashboard = () => {
     chiefdom: { s: chiefdomSName }
   } = NAME_CONSTANTS;
 
+  /**
+   * Custom hook for handling load-more pagination.
+   *
+   * @param {Object} options - The options for configuring pagination
+   * @param {number} options.total - The total number of items available for pagination
+   * @param {number} options.itemsPerPage - The number of items to load per page
+   * @param {Function} options.onLoadMore - Callback function to be called when loading more items
+   * @param {Object} options.onLoadMore.params - The parameters passed to the onLoadMore callback
+   * @param {number} options.onLoadMore.params.skip - The number of items to skip
+   * @param {number} options.onLoadMore.params.limit - The number of items to load in the current page
+   * @param {Function} options.onLoadMore.params.onFail - Callback function to handle failure during the data fetch
+   *
+   * @returns {Object} - Returns an object containing `isLastPage`, `loadMore`, and `resetPage`
+   * @returns {boolean} isLastPage - Indicates if the current page is the last page of the pagination
+   * @returns {Function} loadMore - Function to trigger loading the next page of items
+   * @returns {Function} resetPage - Function to reset the pagination to the first page
+   */
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: count,
     itemsPerPage: APPCONSTANTS.DISTRICT_PER_PAGE,
@@ -65,6 +85,7 @@ const DistrictDashboard = () => {
 
   /**
    * To clear cache and set current District name
+   * @param {Partial<IDistrictDetail>}: partialDistrictDetail - District detail for summary page redirection
    */
   const onDashboardExit = useCallback(
     (partialDistrictDetail: Partial<IDistrictDetail>) => {
@@ -84,6 +105,9 @@ const DistrictDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * Fetch district list for dashboard when component mounts
+   */
   useEffect(() => {
     dispatch(
       fetchDistrictDashboardList({
@@ -99,9 +123,15 @@ const DistrictDashboard = () => {
           )
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const searchText = useRef<string>('');
+
+  /**
+   * Handler function for search bar input
+   * @param {string} searchTerm
+   */
   const onSearch = useCallback(
     (searchTerm: string) => {
       searchText.current = searchTerm;
@@ -122,9 +152,23 @@ const DistrictDashboard = () => {
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, resetPage]
   );
 
+  /**
+   * useMemo hook to parse district data and create summary card properties.
+   *
+   * @param {Array<IDashboardDistrict>} districtList - The list of districts from the dashboard.
+   * @param {number} districtList[].healthFacilityCount - The number of health facilities in the district.
+   * @param {number} districtList[].chiefdomCount - The number of chiefdoms in the district.
+   * @param {string} districtList[].name - The name of the district.
+   * @param {string | number} districtList[].tenantId - The tenant ID of the district.
+   * @param {string | number} districtList[].id - The form data ID of the district.
+   * @param {Function} onDashboardExit - Callback function to be executed when exiting the dashboard.
+   *
+   * @returns {ISummaryCardProps[]} - An array of parsed data to be used for summary card properties.
+   */
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
       districtList?.map(
@@ -162,6 +206,9 @@ const DistrictDashboard = () => {
   const noDistrictAvailable = !(searchText.current || parsedData.length);
   const noSearchRecordsAvailable = Boolean(searchText.current && !parsedData.length);
 
+  /**
+   * Handler function for create district button click
+   */
   const navigateToCreateDistrict = () => {
     push(PROTECTED_ROUTES.createDistrictByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId));
   };

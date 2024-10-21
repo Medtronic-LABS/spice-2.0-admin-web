@@ -12,6 +12,10 @@ export interface IScaleIndicatorFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the scale indicator fields based on the provided configuration.
+ * @returns {IScaleIndicatorFields} The empty data for the scale indicator fields
+ */
 const getEmptyData = (): IScaleIndicatorFields => ({
   id: new Date().getTime().toString() + 'ScaleIndicator',
   viewType: 'ScaleIndicator',
@@ -46,6 +50,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEditable: {}
 };
 
+/**
+ * Retrieves the JSON data for the scale indicator fields based on the provided configuration.
+ * @param {any} json - The JSON data for the scale indicator fields
+ * @returns {IFieldViewType} The JSON data for the scale indicator fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   if (json.inputType === 0) {

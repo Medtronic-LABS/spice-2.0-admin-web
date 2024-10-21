@@ -8,6 +8,10 @@ export interface ICardViewFields {
   familyOrder?: number;
 }
 
+/**
+ * Retrieves the empty data for the card view fields based on the provided configuration.
+ * @returns {ICardViewFields} The empty data for the card view fields
+ */
 const getEmptyData = (): ICardViewFields => ({
   id: new Date().getTime().toString() + 'CardView',
   viewType: 'CardView',
@@ -19,6 +23,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   title: {}
 };
 
+/**
+ * Retrieves the JSON data for the card view fields based on the provided configuration.
+ * @param {any} json - The JSON data for the card view fields
+ * @returns {IFieldViewType} The JSON data for the card view fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   return json;
 };

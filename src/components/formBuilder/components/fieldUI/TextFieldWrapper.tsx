@@ -4,6 +4,10 @@ import TextInput from '../../../../components/formFields/TextInput';
 import { composeValidators, formValidators } from '../../../../utils/validation';
 import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
 
+/**
+ * Renders the text field wrapper component based on the provided configuration.
+ * @param {any} props - The props for the TextFieldWrapper component
+ */
 const TextFieldWrapper = ({
   name,
   inputProps,

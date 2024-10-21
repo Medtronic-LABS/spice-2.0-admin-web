@@ -13,6 +13,10 @@ export interface ICheckBoxFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the checkbox fields based on the provided configuration.
+ * @returns {ICheckBoxFields} The empty data for the checkbox fields
+ */
 const getEmptyData = (): ICheckBoxFields => ({
   id: new Date().getTime().toString() + 'CheckBox',
   viewType: 'CheckBox',
@@ -47,6 +51,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   unitMeasurement: {}
 };
 
+/**
+ * Retrieves the JSON data for the checkbox fields based on the provided configuration.
+ * @param {any} json - The JSON data for the checkbox fields
+ * @returns {IFieldViewType} The JSON data for the checkbox fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   json.condition = json.condition?.filter((val: any) => !!val);

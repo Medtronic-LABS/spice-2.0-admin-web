@@ -16,6 +16,11 @@ export interface IProps {
   setSelectedFormType?: React.Dispatch<React.SetStateAction<{ name: string; id: number }>>;
 }
 
+/**
+ * ConsentForm component for displaying and managing consent forms
+ * @param {IProps} props - The component props
+ * @returns {JSX.Element} The rendered ConsentForm component
+ */
 const ConsentForm = ({
   title,
   handleClose,
@@ -30,6 +35,12 @@ const ConsentForm = ({
   const [isFormTypeSelected, setIsFormTypeSelected] = useState(false);
   const formTypeLabel = 'Form Type';
 
+  /**
+   * Handles the change event for the form type selection
+   * @param {Object} data - The selected form type data
+   * @param {string} data.name - The name of the selected form type
+   * @param {number} data.id - The id of the selected form type
+   */
   const onChange = (data: { name: string; id: number }) => {
     if (setSelectedFormType) {
       setSelectedFormType(data);

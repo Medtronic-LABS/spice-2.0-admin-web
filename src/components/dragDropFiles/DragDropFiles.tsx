@@ -9,13 +9,25 @@ interface IProps {
   onUploadSubmit: (file: any) => void;
 }
 
+/**
+ * DragDropFiles component for uploading files
+ * @param {IProps} props - The component props
+ */
 const DragDropFiles = (props: IProps) => {
   const [file, setFile] = useState(null);
 
+  /**
+   * Handles the drag over event
+   * @param {any} event - The event object
+   */
   const handleDragOver = (event: any) => {
     event.preventDefault();
   };
 
+  /**
+   * Handles the drop event
+   * @param {any} event - The event object
+   */
   const handleDrop = (event: any) => {
     event.preventDefault();
     if (acceptableFileFormat.includes(event.dataTransfer.files[0].type)) {
@@ -26,6 +38,10 @@ const DragDropFiles = (props: IProps) => {
     }
   };
 
+  /**
+   * Handles the file upload
+   * @param {any} event - The event object
+   */
   const uploadHandler = (event: any) => {
     if (acceptableFileFormat.includes(event.target.files[0].type)) {
       setFile(event.target.files[0]);

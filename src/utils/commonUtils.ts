@@ -5,6 +5,10 @@ import CryptoJS from 'crypto-js';
 import { IHFUserGet, IUserRole } from '../store/healthFacility/types';
 import { IRoles, IUserPayload } from '../store/user/types';
 
+/**
+ * Generates an encryption key using PBKDF2.
+ * @return {CryptoJS.lib.WordArray} The generated encryption key
+ */
 const getEncryptionKey = () => {
   return CryptoJS.PBKDF2(process.env.REACT_APP_CRYPTR_SECRET_KEY as string, APPCONSTANTS.ENCRYPTION.SALT, {
     keySize: APPCONSTANTS.ENCRYPTION.KEYLEN / 32,
@@ -12,12 +16,22 @@ const getEncryptionKey = () => {
   });
 };
 
+/**
+ * Decrypts the given password.
+ * @param {string} password - The encrypted password to decrypt
+ * @return {string} The decrypted password
+ */
 export const decryptData = (password: string) => {
   const key = getEncryptionKey();
   const iv = CryptoJS.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
   return CryptoJS.AES.decrypt(password, CryptoJS.enc.Utf8.parse(key as any), { iv }).toString(CryptoJS.enc.Utf8);
 };
 
+/**
+ * Encrypts the given value.
+ * @param {string} value - The value to encrypt
+ * @return {string} The encrypted value
+ */
 export const encryptData = (value: string) => {
   const key = getEncryptionKey();
   const iv = CryptoJS.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
@@ -25,10 +39,10 @@ export const encryptData = (value: string) => {
 };
 
 /**
- * Appends zero before given number if number of digitd is less that minimumIntegerDigits
- * @param num
- * @param minimumIntegerDigits
- * @returns {string}
+ * Appends zero before given number if number of digits is less than minimumIntegerDigits.
+ * @param {number} num - The number to format
+ * @param {number} minimumIntegerDigits - The minimum number of digits
+ * @return {string} The formatted number as a string
  */
 export const appendZeroBefore = (num: number, minimumIntegerDigits: number): string =>
   (Number(num) || 0).toLocaleString('en-US', {
@@ -37,10 +51,10 @@ export const appendZeroBefore = (num: number, minimumIntegerDigits: number): str
   });
 
 /**
- * Resets all the fields whose name contains given substring,
- * @param param0
- * @param state
- * @param utils
+ * Resets all the fields whose name contains given substring.
+ * @param {[string]} [subStrOfKey] - Substring to match in field names
+ * @param {any} state - The current state object
+ * @param {any} utils - Utility object containing resetFieldState method
  */
 export const resetFields = ([subStrOfKey]: [string], state: any, utils: any) => {
   try {
@@ -55,8 +69,8 @@ export const resetFields = ([subStrOfKey]: [string], state: any, utils: any) => 
 };
 
 /**
- * A utility function to stop the event from propogating up on DOM
- * @param e
+ * A utility function to stop the event from propagating up the DOM.
+ * @param {React.BaseSyntheticEvent} e - The event to stop
  */
 export const stopPropogation = (e: React.BaseSyntheticEvent) => {
   try {
@@ -66,11 +80,22 @@ export const stopPropogation = (e: React.BaseSyntheticEvent) => {
   }
 };
 
+/**
+ * Initiates a file download.
+ * @param {any} data - The file data
+ * @param {string} fileName - The name of the file
+ * @param {string} fileType - The MIME type of the file
+ * @param {string} [fileExtension] - Optional file extension
+ */
 export const fileDownload = async (data: any, fileName: string, fileType: string, fileExtension?: string) => {
   const blob = new Blob([data], { type: fileType });
   return saveAs(blob, fileName + (fileExtension ? fileExtension : ''), { autoBom: false });
 };
 
+/**
+ * Converts a date to YYYY-MM-DD format.
+ * @param {Date | string} date - The date to convert
+ */
 export const convertDate = (date: Date | string) => {
   function pad(s: any) {
     return s < 10 ? '0' + s : s;
@@ -79,6 +104,11 @@ export const convertDate = (date: Date | string) => {
   return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join('-');
 };
 
+/**
+ * Formats a date string according to the specified format.
+ * @param {string} date - The date string to format
+ * @param {string} [format='YYY-MM-DD'] - The desired output format
+ */
 export const formatDate = (date: string, format: string = 'YYY-MM-DD') => {
   const dateArray = date.split(/\D/);
   let d = '';
@@ -96,6 +126,10 @@ export const formatDate = (date: string, format: string = 'YYY-MM-DD') => {
   return format.replace('YYYY', y).replace('MM', m).replace('DD', d);
 };
 
+/**
+ * Formats a country code by adding a '+' prefix.
+ * @param {string} value - The country code to format
+ */
 export const formatCountryCode = (value: string) => (value ? `+${value}` : '');
 
 /**
@@ -126,6 +160,10 @@ export const formatUserToastMsg = (
   return msg;
 };
 
+/**
+ * Formats the roles of a user into a comma-separated string.
+ * @param {IHFUserGet} user - The user object containing roles
+ */
 export const formatRoles = (user: IHFUserGet) => {
   return `${(user.roles || [])
     ?.filter((filteredUserRole: IUserRole) => filteredUserRole.name !== NAMING_VARIABLES.redRisk)
@@ -133,6 +171,16 @@ export const formatRoles = (user: IHFUserGet) => {
     .join(',')}`;
 };
 
+/**
+ * Generates an admin payload from user form data.
+ * @param {Object} params - The parameters for generating the payload
+ * @param {any[]} params.userFormData - Array of user form data
+ * @param {number | string} [params.countryId] - The country ID
+ * @param {number | string} [params.tenantId] - The tenant ID
+ * @param {boolean} [params.isFromList=false] - Flag indicating if the request is from a list
+ * @param {boolean} [params.isFromSummaryOrProfilePage=false]
+ * Flag indicating if the request is from a summary or profile page
+ */
 export const getAdminPayload = ({
   userFormData,
   countryId,
@@ -242,6 +290,15 @@ export const getAdminPayload = ({
   return payload;
 };
 
+/**
+ * Generates a user payload from user form data.
+ * @param {Object} params - The parameters for generating the payload
+ * @param {any[]} params.userFormData - Array of user form data
+ * @param {number | string} params.countryId - The country ID
+ * @param {number | string} [params.tenantId] - The tenant ID
+ * @param {boolean} [params.isHFCreate=false] - Flag indicating if it's a health facility creation
+ * @param {Array<{ name: string; id: number }>} [params.spiceRolesGroup=[]] - Array of spice role groups
+ */
 export const getUserPayload = ({
   userFormData,
   countryId,

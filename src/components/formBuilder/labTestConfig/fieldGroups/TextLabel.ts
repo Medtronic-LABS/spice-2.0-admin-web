@@ -15,6 +15,10 @@ export interface ITextLabelFields extends IBaseFields {
   isDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the text label fields based on the provided configuration.
+ * @returns {ITextLabelFields} The empty data for the text label fields
+ */
 const getEmptyData = (): ITextLabelFields => ({
   id: new Date().getTime().toString() + 'TextLabel',
   viewType: 'TextLabel',
@@ -36,6 +40,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEditable: {}
 };
 
+/**
+ * Retrieves the JSON data for the text label fields based on the provided configuration.
+ * @param {any} json - The JSON data for the text label fields
+ * @returns {IFieldViewType} The JSON data for the text label fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   return json;

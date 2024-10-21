@@ -21,7 +21,7 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 import { countryIdSelector } from '../../store/user/selectors';
 import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
 
-export interface IDistrictFormValues {
+interface IDistrictFormValues {
   district: {
     name: string;
     maxNoOfUsers?: number;
@@ -30,6 +30,11 @@ export interface IDistrictFormValues {
   };
   users: IUserFormValues[];
 }
+
+/**
+ * CreateDistrict Component
+ * @returns {React.FC} - A React functional component for creating a district.
+ */
 
 const CreateDistrict: React.FC = () => {
   const history = useHistory();
@@ -43,6 +48,13 @@ const CreateDistrict: React.FC = () => {
     district: { s: districtSName }
   } = NAME_CONSTANTS;
 
+  /**
+   * Resets the state of form fields that contain a specified substring in their key.
+   *
+   * @param {string} subStrOfKey - The substring to match in field keys.
+   * @param {object} state - The current state of the form, containing field data.
+   * @param {Tools<IChiefdomFormValues>} utils - Utility functions for managing form state.
+   */
   const resetFields = useCallback(([subStrOfKey]: [string], state: any, utils: Tools<IDistrictFormValues>) => {
     try {
       Object.keys(state.fields).forEach((key: string) => {
@@ -55,6 +67,10 @@ const CreateDistrict: React.FC = () => {
     }
   }, []);
 
+  /**
+   * function for form submit navigation
+   * @callback
+   */
   const handleNavigation = useCallback(() => {
     let redirectTo: string;
     if (countryId) {
@@ -67,6 +83,11 @@ const CreateDistrict: React.FC = () => {
     history.push(redirectTo);
   }, [countryId, history]);
 
+  /**
+   * function for submitting the create district form
+   * @param {IDistrictFormValues.district} district- user entered ditrict form values
+   * @param {IDistrictFormValues.users} users- user entered form values for district admin.
+   */
   const onSubmit = useCallback(
     ({ district, users }: IDistrictFormValues) => {
       const data = {
@@ -97,6 +118,7 @@ const CreateDistrict: React.FC = () => {
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, handleNavigation, regionId, tenantId]
   );
 
@@ -115,7 +137,7 @@ const CreateDistrict: React.FC = () => {
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
                   <FormContainer label={`${districtSName} Details`} icon={DistrictFormIcon}>
-                    <DistrictForm form={formInstance.current} />
+                    <DistrictForm />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>

@@ -9,6 +9,17 @@ interface IAccordianProps {
   onToggle?: () => void;
 }
 
+/**
+ * Accordian component for displaying collapsible content.
+ * @param {IAccordianProps} props - The props for the Accordian component.
+ * @param {React.ReactElement[] | React.ReactElement | string} props.header
+ * The content to display in the accordion header.
+ * @param {React.ReactElement[] | React.ReactElement | string} props.body
+ * The content to display in the accordion body.
+ * @param {boolean} [props.collapsed] - Whether the accordion is collapsed (controlled).
+ * @param {boolean} [props.defaultCollapsed] - The default collapsed state (uncontrolled).
+ * @param {() => void} [props.onToggle] - Callback function to be called when the accordion is toggled.
+ */
 const Accordian = ({ header, body, collapsed, defaultCollapsed, onToggle: onToggleProps }: IAccordianProps) => {
   const [show, setShow] = useState(defaultCollapsed || collapsed || false);
   useLayoutEffect(() => {
@@ -16,6 +27,9 @@ const Accordian = ({ header, body, collapsed, defaultCollapsed, onToggle: onTogg
       setShow(collapsed);
     }
   }, [collapsed, show]);
+  /**
+   * Handles the toggle action for the accordion.
+   */
   const handleToggle = () => {
     if (typeof collapsed !== 'boolean') {
       setShow((prev) => !prev);

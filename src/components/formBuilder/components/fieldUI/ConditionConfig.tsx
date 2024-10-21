@@ -15,6 +15,10 @@ const enabledOptions = [
   { label: 'False', key: false }
 ];
 
+/**
+ * Renders the select input component based on the provided configuration.
+ * @param {any} props - The props for the SelectInputComponent component
+ */
 const SelectInputComponent = ({
   name,
   fieldName,
@@ -75,6 +79,10 @@ const SelectInputComponent = ({
   );
 };
 
+/**
+ * Renders the text input component based on the provided configuration.
+ * @param {any} props - The props for the TextInputComponent component
+ */
 const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
   let parseFn = (parseValue: any) => parseValue;
   const value = item[fieldName] || null;
@@ -98,6 +106,10 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
   );
 };
 
+/**
+ * Renders the condition fields component based on the provided configuration.
+ * @param {any} props - The props for the ConditionFieldsComponent component
+ */
 const ConditionFieldsComponent = ({
   item,
   name,
@@ -157,6 +169,10 @@ const ConditionFieldsComponent = ({
   );
 };
 
+/**
+ * Renders the condition config component based on the provided configuration.
+ * @param {any} props - The props for the ConditionConfig component
+ */
 const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, newlyAddedIds }: any) => {
   const conditionFieldConfigs: any = {
     lengthGreaterThan: {
@@ -231,6 +247,9 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
 
   const initialValue = obj.viewType === 'EditText' ? editTextConditionInitialValue : otherConditionInitialValue;
 
+  /**
+   * Handles the addition of a new condition based on the provided configuration.
+   */
   const onAddNewCondition = () => {
     form.mutators.setValue(`${name}`, [initialValue]);
   };

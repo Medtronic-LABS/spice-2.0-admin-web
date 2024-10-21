@@ -31,7 +31,7 @@ import {
 } from '../../store/healthFacility/actions';
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
-export interface IAdminEditFormValues {
+interface IAdminEditFormValues {
   spiceInsightsRole: IRoles[];
   suiteAccess: Array<{ groupName: string; id: string }>;
   id: string;
@@ -48,6 +48,9 @@ export interface IAdminEditFormValues {
   role?: IRoles[];
 }
 
+/**
+ * Component for diaplaying chiefdom summary page
+ */
 const ChiefdomSummary = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -67,9 +70,22 @@ const ChiefdomSummary = () => {
 
   // Edit Chiefdom
   const [showChiefdomEditModal, setShowChiefdomEditModal] = useState(false);
+  /**
+   * Handler function for open chiefdom edit modal
+   */
   const openChiefdomEditModal = useCallback(() => {
     setShowChiefdomEditModal(true);
   }, []);
+
+  /**
+   * Handles the editing of a chiefdom's details.
+   *
+   * @param {Object} chiefdomDetail - The details of the chiefdom being edited.
+   * @param {string} chiefdomDetail.name - The name of the chiefdom.
+   * @param {Object} chiefdomDetail.district - The district to which the chiefdom belongs.
+   * @param {string} chiefdomDetail.id - The ID of the chiefdom.
+   * @param {string} chiefdomDetail.tenantId - The tenant ID of the chiefdom.
+   */
   const handleChiefdomEdit = ({ name, district, id, tenantId: tenantIdFromEdit }: IChiefdomDetail) => {
     dispatch(
       updateChiefdomReq({
@@ -105,6 +121,10 @@ const ChiefdomSummary = () => {
   const [isChiefdomAdminEdit, setIsChiefdomAdminEdit] = useState(false);
   const chiefdomAdminForEdit = useRef<{ users: IAdminEditFormValues[] }>({ users: [] });
 
+  /**
+   * Handler for chiefdom admin edit button click
+   * @param {IAdminEditFormValues} chiefdomAdmin - Chiefdom admin data
+   */
   const handleEditChiefdomAdminClick = useCallback(
     (chiefdomAdmin: IAdminEditFormValues) => {
       const allSuiteAccess = chiefdomAdmin.roles.map((r: IRoles) => ({
@@ -123,6 +143,10 @@ const ChiefdomSummary = () => {
     [chiefdomAdminForEdit]
   );
 
+  /**
+   * Function to get chiefdom detail
+   * @param {string} search
+   */
   const getChiefdomDetails = useCallback(
     (search: string = searchTerm) => {
       dispatch(
@@ -145,12 +169,19 @@ const ChiefdomSummary = () => {
     [ChiefdomDetail?.countryId, chiefdomId, chiefdomSName, dispatch, searchTerm, tenantId]
   );
 
+  /**
+   * Handler function for add chiefdom admin button click
+   */
   const handleAddChiefdomAdminClick = useCallback(() => {
     setIsChiefdomAdminEdit(false);
     chiefdomAdminForEdit.current = { users: [] };
     setShowChiefdomAdminModal(true);
   }, [chiefdomAdminForEdit]);
 
+  /**
+   * Handler function for chiefdom admin edit
+   * @param {IAdminEditFormValues[]} users - user form value as an array
+   */
   const handleChiefdomAdminEdit = ({ users }: { users: IAdminEditFormValues[] }) => {
     const userObj = getAdminPayload({
       userFormData: users,
@@ -182,6 +213,11 @@ const ChiefdomSummary = () => {
       })
     );
   };
+
+  /**
+   * Handler function for chiefdom admin create
+   * @param {IAdminEditFormValues[]} users - user form value as an array
+   */
   const handleChiefdomAdminCreate = ({ users }: { users: IAdminEditFormValues[] }) => {
     const userObj = getAdminPayload({
       userFormData: users,
@@ -214,6 +250,11 @@ const ChiefdomSummary = () => {
     );
   };
 
+  /**
+   * Handler function for chiefdom admin delete
+   * @param {IChiefdomAdmin} data - Admin to delete
+   * @param {number} data.id - id value of admin to delete
+   */
   const handleChiefdomAdminDelete = ({ data: { id } }: { data: IChiefdomAdmin }) => {
     dispatch(
       deleteAdminRequest({
@@ -237,10 +278,18 @@ const ChiefdomSummary = () => {
     );
   };
 
+  /**
+   * useEffect for get the chiefdom details
+   */
   useEffect(() => {
     getChiefdomDetails();
-  }, [getChiefdomDetails]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  /**
+   * Handler function for search
+   * @param {string} search - search value
+   */
   const handleSearch = useCallback((search: string) => {
     setSearchTerm(search);
   }, []);
@@ -250,10 +299,19 @@ const ChiefdomSummary = () => {
       { label: `${chiefdomSName} Name`, value: ChiefdomDetail.name },
       { label: districtSName, value: ChiefdomDetail.districtName }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [ChiefdomDetail]
   );
 
+  /**
+   * Handler function for format name
+   * @param {IChiefdomAdmin} user - Admin data
+   */
   const formatName = (user: IChiefdomAdmin) => `${user.firstName} ${user.lastName}`;
+  /**
+   * Handler function for format phone
+   * @param {IChiefdomAdmin} user - Admin data
+   */
   const formatPhone = (user: IChiefdomAdmin) => {
     return `${user.countryCode ? '+ ' + user.countryCode : ''} ${user.phoneNumber}`;
   };
@@ -265,6 +323,10 @@ const ChiefdomSummary = () => {
     { id: 5, name: 'phoneNumber', label: 'CONTACT NUMBER', cellFormatter: formatPhone }
   ];
 
+  /**
+   * Renders the UserForm inside an edit modal
+   * @param {any} form - The form API instance used to manage the form's state and submissions.
+   */
   const renderChiefdomAdminForm = useCallback(
     (form: any) => (
       <UserForm
@@ -278,6 +340,7 @@ const ChiefdomSummary = () => {
         enableAutoPopulate={true}
       />
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isChiefdomAdminEdit]
   );
 

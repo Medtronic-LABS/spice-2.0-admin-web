@@ -65,8 +65,7 @@ const ChiefdomList = (): React.ReactElement => {
   } = NAME_CONSTANTS;
 
   /**
-   * to load Chiefdom List data.
-   * @param Chiefdom List
+   * To load Chiefdom List data.
    */
   const fetchList = useCallback(() => {
     dispatch(
@@ -85,8 +84,12 @@ const ChiefdomList = (): React.ReactElement => {
           )
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, tenantId, listParams]);
 
+  /**
+   * useEffect hook to invoke fetchList function when dependencies change
+   */
   useEffect(() => {
     fetchList();
   }, [dispatch, fetchList, listParams]);
@@ -150,6 +153,7 @@ const ChiefdomList = (): React.ReactElement => {
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch]
   );
 

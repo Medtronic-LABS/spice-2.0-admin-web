@@ -16,6 +16,10 @@ export interface IBPInputFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the BP input fields based on the provided configuration.
+ * @returns {IBPInputFields} The empty data for the BP input fields
+ */
 const getEmptyData = (): IBPInputFields => ({
   id: new Date().getTime().toString() + 'BPInput',
   viewType: 'BP',
@@ -58,6 +62,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   unitMeasurement: {}
 };
 
+/**
+ * Retrieves the JSON data for the BP input fields based on the provided configuration.
+ * @param {any} json - The JSON data for the BP input fields
+ * @returns {IFieldViewType} The JSON data for the BP input fields
+ */
 export const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   if (json.minValue) {

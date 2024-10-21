@@ -15,7 +15,7 @@ import Loader from '../../components/loader/Loader';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
-export interface ISpiceSuite {
+interface ISpiceSuite {
   id: number;
   name: string;
   icon: any;
@@ -25,6 +25,11 @@ export interface ISpiceSuite {
   disabled?: boolean;
 }
 
+/**
+ * LandingPage component that displays available suites based on user access
+ * @returns {React.ReactElement} The rendered LandingPage component
+ */
+
 const LandingPage = (): React.ReactElement => {
   const history = useHistory();
   const role = useSelector(roleSelector);
@@ -32,6 +37,9 @@ const LandingPage = (): React.ReactElement => {
 
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
+  /**
+   * Memoized value to spiceSuites with dependency on role
+   */
   const spiceSuites: ISpiceSuite[] = useMemo(
     () => [
       {
@@ -64,6 +72,9 @@ const LandingPage = (): React.ReactElement => {
     [role]
   );
 
+  /**
+   * Filters and sets authorized suites, redirects if only one suite is available
+   */
   useEffect(() => {
     const authorisedSuites: ISpiceSuite[] = spiceSuites.filter((suite) =>
       userSuiteAccess?.some(
@@ -77,6 +88,11 @@ const LandingPage = (): React.ReactElement => {
     setSuites(authorisedSuites);
   }, [history, userSuiteAccess, spiceSuites]);
 
+  /**
+   * Renders the content of a suite card
+   * @param {ISpiceSuite} data - The suite data to render
+   * @returns {React.ReactNode} The rendered card content
+   */
   const renderCardContent = (data: ISpiceSuite) => {
     const { name, icon: IconComponent } = data;
     return (

@@ -3,6 +3,10 @@ import { composeValidators, formValidators } from '../../../../utils/validation'
 import DatePickerComponent from '../../../datePicker/DatePicker';
 import { convertDate } from '../../../../utils/commonUtils';
 
+/**
+ * Renders the date picker wrapper component based on the provided configuration.
+ * @param {any} props - The props for the DatePickerWrapper component
+ */
 const DatePickerWrapper = ({
   name,
   inputProps,

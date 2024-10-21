@@ -18,14 +18,10 @@ interface IDropdownProps {
 
 /**
  * A component for dropdown, with a button as trigger
- * @param param0
- * @returns {React.ReactElement}
+ * @param props - Props for the Dropdown component.
+ * @returns React.ReactElement
  */
-const Dropdown = ({
-  label,
-  menuItems,
-  className = ''
-}: IDropdownProps): React.ReactElement => {
+const Dropdown = ({ label, menuItems, className = '' }: IDropdownProps): React.ReactElement => {
   const dropdownTogglerId = useRef<string>(new Date().getTime().toString());
 
   return (
@@ -46,10 +42,7 @@ const Dropdown = ({
         {menuItems.map(({ menuText, route, onClick, menuClass = '' }, i) => (
           <li key={`${menuText}${i}`} onClick={onClick} className={menuClass}>
             {route ? (
-              <Link
-                className='dropdown-item d-flex align-items-center'
-                to={route}
-              >
+              <Link className='dropdown-item d-flex align-items-center' to={route}>
                 {menuText}
               </Link>
             ) : (

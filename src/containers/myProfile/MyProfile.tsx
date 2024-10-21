@@ -16,6 +16,10 @@ import { IEditUserDetail, IRoles } from '../../store/user/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getAdminPayload } from '../../utils/commonUtils';
 
+/**
+ * MyProfile component for displaying and editing user profile information.
+ * @return {React.ReactElement} The rendered MyProfile component
+ */
 const MyProfile = (): React.ReactElement => {
   const dispatch = useDispatch();
   const userId = useSelector(userIdSelector);
@@ -29,9 +33,16 @@ const MyProfile = (): React.ReactElement => {
   const cultureList = useSelector(cultureListSelector);
   const country = useSelector(countryIdSelector);
   const countryId = Number(country?.id || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID));
+  /**
+   * Formats the roles of a user into a comma-separated string.
+   * @param {IEditUserDetail} user - The user object containing roles
+   */
   const formatRoles = (user: IEditUserDetail) =>
     `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
 
+  /**
+   * Fetches user details by ID.
+   */
   const fetchUser = useCallback(
     () =>
       dispatch(
@@ -56,6 +67,10 @@ const MyProfile = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * Prepares label data for display in the profile card.
+   * @return {Array} An array of label-value pairs for profile information
+   */
   const lableData = useMemo(() => {
     const data = [
       { label: 'Name', value: userDetails ? `${userDetails.firstName} ${userDetails.lastName}` : null },
@@ -106,10 +121,18 @@ const MyProfile = (): React.ReactElement => {
     }
   }, [userDetails]);
 
+  /**
+   * Handles the click event for editing the profile.
+   */
   const handleEditClick = useCallback(() => {
     setShowEditModal(true);
   }, []);
 
+  /**
+   * Handles the submission of edited user data.
+   * @param {Object} param - Object containing the users array
+   * @param {IEditUserDetail[]} param.users - Array of edited user details
+   */
   const handleEdit = ({ users }: { users: IEditUserDetail[] }) => {
     const userObj = getAdminPayload({
       userFormData: users,
@@ -132,6 +155,9 @@ const MyProfile = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Handles successful edit operation.
+   */
   const editSuccess = () => {
     setLoading(false);
     setShowEditModal(false);

@@ -7,6 +7,15 @@ import { baseFieldMeta as regionBaseFieldMeta } from '../customizationConfig/Bas
 import { IComponentConfig as ICustomizationComponentConfig } from '../types/CustomizationComponentConfig';
 import { getConfigByViewType as getCustomizationConfigViewType } from '../utils/CustomizationFieldUtils';
 
+/**
+ * Renders a group of fields based on the provided configuration.
+ * @param {any} props - The props for the RenderFieldGroups component
+ * @param {any} props.obj - The object containing the fields to render
+ * @param {string} props.name - The name of the form
+ * @param {any} props.form - The form object
+ * @param {any} props.unAddedFields - The unadded fields
+ * @param {any} props.targetIds - The target ids
+ */
 const RenderFieldGroups = ({
   obj,
   name,

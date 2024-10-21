@@ -16,6 +16,10 @@ import {
 } from '../../store/user/selectors';
 import { ILockedUsers } from '../../store/user/types';
 
+/**
+ * LockedUsers component for displaying and managing locked user accounts.
+ * @return {React.ReactElement} The rendered LockedUsers component
+ */
 const LockedUsers = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const dispatch = useDispatch();
@@ -26,6 +30,9 @@ const LockedUsers = (): React.ReactElement => {
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
 
+  /**
+   * Fetches locked users details based on current list parameters.
+   */
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchLockedUsersRequest({
@@ -54,6 +61,10 @@ const LockedUsers = (): React.ReactElement => {
     fetchDetails();
   }, [dispatch, fetchDetails, listParams]);
 
+  /**
+   * Defines the column configuration for the locked users table.
+   * @return {Array} An array of column definition objects
+   */
   const columnDefs = useMemo(
     () => [
       {
@@ -70,6 +81,11 @@ const LockedUsers = (): React.ReactElement => {
     ],
     []
   );
+
+  /**
+   * Handles the unlock user action.
+   * @param {any} data - The user data object
+   */
   const onCustomClicked = (data: any) => {
     dispatch(
       unlockUsersRequest({

@@ -20,6 +20,10 @@ import { formatDate } from '../../utils/validation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 
+/**
+ * DeactivatedRecords component for displaying and managing deactivated district records.
+ * @return {React.ReactElement} The rendered DeactivatedRecords component
+ */
 const DeactivatedRecords = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const dispatch = useDispatch();
@@ -33,6 +37,9 @@ const DeactivatedRecords = (): React.ReactElement => {
     district: { s: districtSName, p: districtPName }
   } = NAME_CONSTANTS;
 
+  /**
+   * Fetches deactivated district details based on current list parameters.
+   */
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchDistrictListRequest({
@@ -56,8 +63,8 @@ const DeactivatedRecords = (): React.ReactElement => {
   }, [dispatch, fetchDetails, listParams]);
 
   /**
-   * Handler to open activate modal
-   * @param values
+   * Handler to open activate modal and process district activation.
+   * @param {IDistrict} value - The district to be activated
    */
   const openActivateModal = (value: IDistrict) => {
     dispatch(
@@ -83,6 +90,10 @@ const DeactivatedRecords = (): React.ReactElement => {
     );
   };
 
+  /**
+   * Defines the column configuration for the deactivated records table.
+   * @return {Array} An array of column definition objects
+   */
   const columnDefs = useMemo(
     () => [
       {

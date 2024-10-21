@@ -13,6 +13,10 @@ export interface ITagInputProps {
   fromChiefDom?: boolean;
 }
 
+/**
+ * Renders the tag input component based on the provided configuration.
+ * @param {ITagInputProps} props - The props for the TagInput component
+ */
 const TagInput = ({
   defaultValue = [],
   onChange,
@@ -36,6 +40,9 @@ const TagInput = ({
     }
   };
 
+  /**
+   * Handles the key down event for the tag input based on the provided configuration.
+   */
   const handleInputKeyDown = (evt: any) => {
     if (evt.keyCode === 13) {
       const value = (evt.target.value || '').trim();
@@ -68,6 +75,9 @@ const TagInput = ({
     }
   };
 
+  /**
+   * Handles the removal of an item from the tag input based on the provided configuration.
+   */
   const handleRemoveItem = (index: number) => {
     let updatedItems = [] as any[];
     setItems((prevItems: string[]) => {

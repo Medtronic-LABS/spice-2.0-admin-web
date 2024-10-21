@@ -18,6 +18,10 @@ export interface IEditTextFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the edit text fields based on the provided configuration.
+ * @returns {IEditTextFields} The empty data for the edit text fields
+ */
 const getEmptyData = (): IEditTextFields => ({
   id: new Date().getTime().toString() + 'EditText',
   viewType: 'EditText',
@@ -61,6 +65,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEditable: {}
 };
 
+/**
+ * Retrieves the JSON data for the edit text fields based on the provided configuration.
+ * @param {any} json - The JSON data for the edit text fields
+ * @returns {IFieldViewType} The JSON data for the edit text fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   if (json.id && !unitMeasurementFields.includes(json.id)) {
     delete json.unitMeasurement;

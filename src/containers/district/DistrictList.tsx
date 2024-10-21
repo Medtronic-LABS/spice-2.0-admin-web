@@ -72,6 +72,9 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
     district: { s: districtSName }
   } = NAME_CONSTANTS;
 
+  /**
+   * fetch district list API
+   */
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchDistrictListRequest({
@@ -90,13 +93,18 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
           )
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, tenantId, listParams]);
 
+  /**
+   * useEffect hook to invoke fetchDetails function when dependencies change
+   */
   useEffect(() => {
     fetchDetails();
   }, [dispatch, fetchDetails, tenantId, listParams]);
 
   /**
+   * When component mount reset workflow cache in store
    * To remove District List and Consent form cache in store
    */
   useEffect(() => {
@@ -110,12 +118,20 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openAddModal = () => {
+  /**
+   * Navigate to create district page
+   * @callback
+   */
+  const navigateToCreateDistrict = () => {
     props.history.push(
       PROTECTED_ROUTES.createDistrictByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId)
     );
   };
 
+  /**
+   * Row click handler
+   * @param {Partial<IDistrict>} data - District data
+   */
   const handleRowClick = (data: Partial<IDistrict>) => {
     dispatch(clearDistrictDetails());
     dispatch(setDistrictDetails(data));
@@ -128,12 +144,18 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
 
   /**
    * Handle for modal cancel
+   * @callback
    */
   const handleCancelClick = () => {
     setOpenDistrictModal(false);
     setOpenDeactivateModal(false);
   };
 
+  /**
+   * Hadle district edit click
+   * @param {IDistrictDetail} value - District details
+   * @callback
+   */
   const openDistrictEditModal = (value: IDistrictDetail) => {
     districtToBeEdited.current = value;
     setOpenDistrictModal(true);
@@ -141,7 +163,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
 
   /**
    * Handler for district edit form submit.
-   * @param values
+   * @param {IDistrictDetail} values - District details
    */
   const handleDistrictFormSubmit = (values?: IDistrictDetail) => {
     const data = JSON.parse(JSON.stringify(values));
@@ -172,10 +194,18 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
     );
   };
 
+  /**
+   * Handler for deactivate district click event
+   * @callback
+   */
   const showDeactivateModal = () => {
     setOpenDeactivateModal(true);
   };
 
+  /**
+   * Handler for deactivate district
+   * @param {IDistrictDeactivateFormValues} values - Deactivate district form values
+   */
   const handleDeactivate = (values: IDistrictDeactivateFormValues) => {
     const status = values.status.value;
     const { reason } = values;
@@ -205,19 +235,29 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
     );
   };
 
+  /**
+   * Handler for edit button click
+   * @param {any} form - Form object for edit district form
+   */
   const editModalRender = (form: any) => {
-    return isOpenDeactivateModal ? (
-      <Deactivation formName={districtSName.toLowerCase()} />
-    ) : (
-      <DistrictForm form={form} />
-    );
+    return isOpenDeactivateModal ? <Deactivation formName={districtSName.toLowerCase()} /> : <DistrictForm />;
   };
 
+  /**
+   * Handler for open consent form
+   * @param {object} data - The data object containing the name and index for the consent form
+   * @param {string} data.name - The name associated with the consent form
+   * @param {number} data.index - The index of the item that requires the consent form
+   */
   const handleConsentFormOpen = (data: { name: string; index: number }) => {
     consentFormConfig.current = { ...data, regionId: regionId || '' };
     setOpenConsentForm(true);
   };
 
+  /**
+   * Handler for close consent form
+   * @callback
+   */
   const handleConsentFormClose = () => {
     setOpenConsentForm(false);
     consentFormConfig.current = {};
@@ -233,7 +273,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
             header={districtSName}
             isSearch={true}
             onSearch={handleSearch}
-            onButtonClick={openAddModal}
+            onButtonClick={navigateToCreateDistrict}
           >
             <CustomTable
               rowData={districtList}

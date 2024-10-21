@@ -14,6 +14,10 @@ export interface ICollapsibleViewFields extends IBaseFields {
   targetViews: Array<{ name: string; id: string }>;
 }
 
+/**
+ * Retrieves the empty data for the collapsible view fields based on the provided configuration.
+ * @returns {ICollapsibleViewFields} The empty data for the collapsible view fields
+ */
 const getEmptyData = (): ICollapsibleViewFields => ({
   id: new Date().getTime().toString() + 'CollapsibleView',
   viewType: 'CollapsibleView',
@@ -48,6 +52,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   unitMeasurement: {}
 };
 
+/**
+ * Retrieves the JSON data for the collapsible view fields based on the provided configuration.
+ * @param {any} json - The JSON data for the collapsible view fields
+ * @returns {IFieldViewType} The JSON data for the collapsible view fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   json.condition = json.condition?.filter((val: any) => !!val);

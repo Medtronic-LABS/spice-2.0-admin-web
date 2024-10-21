@@ -14,6 +14,10 @@ interface IQuestionnaireProps {
   disabled?: boolean;
 }
 
+/**
+ * Renders the questionnaire component based on the provided configuration.
+ * @param {IQuestionnaireProps} props - The props for the Questionnaire component
+ */
 const Questionnaire = ({ onChange, defaultValue = [], label, required = true, disabled }: IQuestionnaireProps) => {
   const [value, setValue] = useState<any[]>(defaultValue);
   const keys = useRef(defaultValue.map((...[, index]) => index));
@@ -29,6 +33,9 @@ const Questionnaire = ({ onChange, defaultValue = [], label, required = true, di
     onChange?.(nxtValue);
   };
 
+  /**
+   * Handles the change in the sub-questions based on the provided configuration.
+   */
   const handleSubQuestionsChange = (options: any, inputIndex: number) => {
     const nxtValue = [...value];
     nxtValue[inputIndex].optionsList = options;
@@ -36,6 +43,9 @@ const Questionnaire = ({ onChange, defaultValue = [], label, required = true, di
     onChange?.(nxtValue);
   };
 
+  /**
+   * Handles the deletion of a question based on the provided configuration.
+   */
   const handleDelete = (inputIndex: number) => {
     keys.current = keys.current.filter((key) => key !== inputIndex);
     const nxtValue = value.filter((index) => index !== inputIndex);
@@ -43,6 +53,9 @@ const Questionnaire = ({ onChange, defaultValue = [], label, required = true, di
     onChange?.(nxtValue);
   };
 
+  /**
+   * Handles the addition of a new question based on the provided configuration.
+   */
   const handleAdd = () => {
     keys.current.push(Number(keys.current.length) + 1);
     setValue([...value, { optionsList: [] }]);

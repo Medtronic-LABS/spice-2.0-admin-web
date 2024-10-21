@@ -3,6 +3,10 @@ import { useRef } from 'react';
 import APPCONSTANTS from '../../../../constants/appConstants';
 import { ReorderModel } from './ReorderModel';
 
+/**
+ * Renders the reorder view component based on the provided configuration.
+ * @param {any} props - The props for the ReorderView component
+ */
 const ReorderView = ({
   formRef,
   isFamilyOrderModelOpen,
@@ -13,10 +17,16 @@ const ReorderView = ({
 }: any) => {
   /**************family order change handlers **************/
   const familyOrderRef = useRef<{ [k: string]: number }>({});
+  /**
+   * Handles the cancellation of the family order based on the provided configuration.
+   */
   const onCancelFamilyOrder = () => {
     familyOrderRef.current = {};
     setFamilyOrderModelOpen(false);
   };
+  /**
+   * Handles the submission of the family order based on the provided configuration.
+   */
   const onSubmitFamilyOrder = () => {
     const finalFormState = { ...formRef.current.getState() };
     const formValues = cloneDeep(finalFormState.values);
@@ -39,12 +49,18 @@ const ReorderView = ({
 
   /************** grouped field order change handlers **************/
   const groupedFieldsOrderRef = useRef<{ [k: string]: number }>({});
+  /**
+   * Handles the cancellation of the grouped fields order based on the provided configuration.
+   */
   const onCancelGroupedFieldsOrder = () => {
     setEditGroupedFieldsOrder({
       isOpen: false,
       familyName: ''
     });
   };
+  /**
+   * Handles the submission of the grouped fields order based on the provided configuration.
+   */
   const onSubmitGroupedFieldsOrder = () => {
     const finalFormState = { ...formRef.current.getState() };
     const formValues = cloneDeep(finalFormState.values);

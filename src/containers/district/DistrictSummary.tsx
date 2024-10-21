@@ -14,7 +14,7 @@ import Deactivation from '../../components/deactivate/Deactivation';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
 import DistrictConsentForm from './DistrictConsentForm';
-import { IDistrictAdmin, IDistrictDetail, IDistrictDeactivateFormValues } from '../../store/district/types';
+import { IDistrictAdmin, IDistrictDetail, IDistrictDeactivateFormValues, IDistrict } from '../../store/district/types';
 import arrayMutators from 'final-form-arrays';
 import IconLegal from '../../assets/images/icon-legal.svg';
 import { districtLoadingSelector, districtSelector } from '../../store/district/selectors';
@@ -34,6 +34,16 @@ interface IMatchParams {
   tenantId: string;
 }
 
+/**
+ * Component for displaying the district summary page.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.match - The match object containing route parameters.
+ * @param {IMatchParams} props.match.params - The route parameters passed to the component.
+ * @param {string} props.match.params.districtId - The ID of the district from the route.
+ * @param {string} props.match.params.tenantId - The tenant ID from the route.
+ *
+ */
 const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -60,11 +70,18 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     district: { s: districtSName }
   } = NAME_CONSTANTS;
 
+  /**
+   * useEffect for to get district detail
+   */
   useEffect(() => {
     getDistrictDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * Function to get district detail
+   * @param {string}: search
+   */
   const getDistrictDetail = useCallback(
     (search?: string) => {
       dispatch(
@@ -97,36 +114,60 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     [dispatch, districtId, tenantId, district?.countryId]
   );
 
+  /**
+   * Handler for edit button click
+   * @param {any} form - Form object for edit district form
+   */
   const editDeactivateModalRender = (form: any) => {
-    return isOpenDeactivateModal ? (
-      <Deactivation formName={districtSName.toLowerCase()} />
-    ) : (
-      <DistrictForm form={form} />
-    );
+    return isOpenDeactivateModal ? <Deactivation formName={districtSName.toLowerCase()} /> : <DistrictForm />;
   };
 
-  const handleConsentFormOpen = (data: any) => {
+  /**
+   * Handler function for open consent form
+   * @param {IDistrict} data - District data for consent form
+   */
+
+  const handleConsentFormOpen = (data: IDistrict) => {
     setSelectedDistrict({ ...data, regionId: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID) });
     setOpenConsentForm(true);
   };
 
+  /**
+   * Handler function for consent form close
+   */
   const handleConsentFormClose = () => {
     setSelectedDistrict({});
     setOpenConsentForm(false);
   };
 
+  /**
+   * Handler function for search text
+   * @param {string} search - search text
+   */
   const handleSearch = (search: string) => {
     getDistrictDetail(search);
   };
 
+  /**
+   * Function for format name
+   * @param {IDistrictAdmin} user - Admin data
+   */
   const formatName = (user: IDistrictAdmin) => {
     return `${user.firstName} ${user.lastName}`;
   };
 
+  /**
+   * Function for format phonenumber
+   * @param {IDistrictAdmin} user - Admin data
+   */
   const formatPhone = (user: IDistrictAdmin) => {
     return user.countryCode ? '+ ' + user.countryCode + ' ' + user.phoneNumber : user.phoneNumber;
   };
 
+  /**
+   * Handler function for district admin edit button click
+   * @param {IDistrictAdmin} values - District admin data
+   */
   const openEditModal = (values: IDistrictAdmin) => {
     const allSuiteAccess = values.roles.map((r: IRoles) => ({
       groupName: r.groupName,
@@ -147,10 +188,17 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     setIsAdd(false);
   };
 
+  /**
+   * Handler function for district edit button click
+   */
   const openDistrictEditModal = () => {
     setIsOpenDistrictModal(true);
   };
 
+  /**
+   * Handler for district edit form
+   * @param {IDistrictDetail} values - district details
+   */
   const handleDistrictFormSubmit = (values: IDistrictDetail) => {
     const data = JSON.parse(JSON.stringify(values));
     data.district.countryId = countryId || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
@@ -183,6 +231,10 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     );
   };
 
+  /**
+   * Description
+   * @param {IUserFormValues[]} users - user data from user form as an array
+   */
   const handleAdminSubmit = ({ users }: { users: IUserFormValues[] }) => {
     const userObj = getAdminPayload({
       userFormData: users,
@@ -244,6 +296,9 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     }
   };
 
+  /**
+   * Handler function for close edit modal for both district and admin
+   */
   const handleCancelClick = () => {
     setIsOpenAdminModal(false);
     setIsOpenDistrictModal(false);
@@ -251,12 +306,19 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     setIsOpenDeactivateModal(false);
   };
 
+  /**
+   * Handler function admin add modal for open
+   */
   const openAddModal = () => {
     setIsOpenAdminModal(true);
     setIsAdd(true);
     setAdminInitialValues({} as IDistrictAdmin);
   };
 
+  /**
+   * Renders the UserForm inside an edit modal
+   * @param {any} form - The form API instance used to manage the form's state and submissions.
+   */
   const editModalRender = (form: any) => {
     return (
       <UserForm
@@ -272,6 +334,12 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     );
   };
 
+  /**
+   * Handler for admin delete button click
+   * @param {object} values - Admin values
+   * @param {IDistrictDetail} values.data - District Detail value
+   * @param {number} values.index - Index value from the table
+   */
   const handleAdminDeleteClick = (values: { data: IDistrictDetail; index: number }) => {
     dispatch(
       deleteAdminRequest({
@@ -295,10 +363,16 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     );
   };
 
+  /**
+   * Handler for open deactivate modal for district
+   */
   const showDeactivateModal = () => {
     setIsOpenDeactivateModal(true);
   };
 
+  /**
+   * Handler for handle navigation once deactivated the district
+   */
   const handleNavigation = () => {
     let redirectTo: string;
     if (role === APPCONSTANTS.ROLES.REGION_ADMIN) {
@@ -311,6 +385,10 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     history.push(redirectTo);
   };
 
+  /**
+   * Handler for deactivate district
+   * @param {IDistrictDeactivateFormValues} values - deactivate form field values
+   */
   const handleDeactivate = (values: IDistrictDeactivateFormValues) => {
     const status = values.status.value;
     const { reason } = values;
@@ -337,6 +415,9 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
     );
   };
 
+  /**
+   * Global function to show all fields in summary page
+   */
   const getSummaryDetails = () => {
     const { name } = district;
     return [{ label: `${districtSName} Name`, value: name }];

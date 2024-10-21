@@ -43,8 +43,8 @@ interface IFilteredData {
 }
 
 /**
- * The component for card detail with searchbar and button.
- * @param param0 - Props for the DetailCard component.
+ * The component for card detail with searchbar, filter, and buttons.
+ * @param props - Props for the DetailCard component.
  * @returns React.ReactElement
  */
 const DetailCard = ({

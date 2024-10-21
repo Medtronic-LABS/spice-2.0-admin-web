@@ -1,4 +1,3 @@
-import { FormApi } from 'final-form';
 import React from 'react';
 import { Field } from 'react-final-form';
 
@@ -7,10 +6,9 @@ import { required, composeValidators, validateEntityName } from '../../utils/val
 import { NAME_CONSTANTS } from '../../constants/appConstants';
 
 /**
- * Renders the fields for district form
- * @returns {React.ReactElement}
+ * District Form component
  */
-const DistrictForm = ({ form }: { form: FormApi<any> }): React.ReactElement => {
+const DistrictForm = (): React.ReactElement => {
   const {
     district: { s: districtSName }
   } = NAME_CONSTANTS;

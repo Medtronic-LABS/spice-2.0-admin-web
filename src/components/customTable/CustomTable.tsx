@@ -66,6 +66,10 @@ export interface IColumns {
   align?: 'center' | 'left';
 }
 
+/**
+ * CustomTable component for displaying data in a table format with various features
+ * @param {ICustomTableProps} props - The component props
+ */
 const CustomTable: React.FC<ICustomTableProps> = (props) => {
   const {
     handlePageChange,
@@ -108,6 +112,12 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
   const currentDeleteObj = useRef<any>({});
   const currentActivateObj = useRef<any>({});
 
+  /**
+   * Handles page change and scrolls to top of table
+   * @param {number} pageNo - The new page number
+   * @param {number} rowsPerPageValue - The number of rows per page
+   */
+
   const handlePageChangeWrapper = (pageNo: number, rowsPerPageValue: number) => {
     if (tableRef.current) {
       tableRef.current.scrollTo(0, 0);
@@ -117,6 +127,13 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     }
   };
 
+  /**
+   * Handles delete action for a row
+   * @param {React.MouseEvent<HTMLSpanElement, MouseEvent>} e - The click event
+   * @param {IAnyObject} rowDataValue - The data of the clicked row
+   * @param {number} rowIndex - The index of the clicked row
+   * @param {number} [pageNo] - The current page number
+   */
   const handleDelete = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
     rowDataValue: IAnyObject,
@@ -134,6 +151,12 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     setActivateClicked(false);
   };
 
+  /**
+   * Handles edit action for a row
+   * @param {React.MouseEvent<HTMLSpanElement, MouseEvent>} e - The click event
+   * @param {any} rowDataValue - The data of the clicked row
+   * @param {number} rowIndex - The index of the clicked row
+   */
   const handleEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, rowDataValue: any, rowIndex: number) => {
     e.stopPropagation();
     if (onRowEdit) {
@@ -141,11 +164,18 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     }
   };
 
+  /**
+   * Handles custom icon click action for a row
+   * @param {React.MouseEvent<HTMLSpanElement, MouseEvent>} e - The click event
+   * @param {any} rowDataValue - The data of the clicked row
+   * @param {number} rowIndex - The index of the clicked row
+   * @param {boolean} [isPopupNeededProp=false] - Whether a popup is needed
+   */
   const handleCustomIconClick = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
     rowDataValue: any,
     rowIndex: number,
-    isPopupNeededProp = false
+    isPopupNeededProp: boolean = false
   ) => {
     e.stopPropagation();
     if (onCustomConfirmed && !isPopupNeededProp) {
@@ -157,6 +187,12 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     }
   };
 
+  /**
+   * Handles activate action for a row
+   * @param {React.MouseEvent<HTMLSpanElement, MouseEvent>} e - The click event
+   * @param {any} rowDataValue - The data of the clicked row
+   * @param {number} rowIndex - The index of the clicked row
+   */
   const handleActivate = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, rowDataValue: any, rowIndex: number) => {
     e.stopPropagation();
     currentActivateObj.current = { ...rowDataValue, index: rowIndex };
@@ -165,6 +201,9 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     setActivateClicked(true);
   };
 
+  /**
+   * Closes the confirmation dialog
+   */
   const handleConfirmationClose = () => {
     currentDeleteObj.current = {};
     setOpenDialog(false);
@@ -172,11 +211,17 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     setActivateClicked(false);
   };
 
+  /**
+   * Closes the custom confirmation dialog
+   */
   const handleCustomConfirmationClose = () => {
     setCustomIconClicked(false);
     setSelectedData({});
   };
 
+  /**
+   * Handles custom confirmation action
+   */
   const handleCustomConfirmed = () => {
     if (onCustomConfirmed) {
       onCustomConfirmed(selectedData);
@@ -184,6 +229,9 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     handleCustomConfirmationClose();
   };
 
+  /**
+   * Handles confirmation success action
+   */
   const handleConfirmationSuccess = () => {
     setOpenDialog(false);
     if (deleteClicked && onDeleteClick) {
@@ -195,6 +243,10 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     setActivateClicked(false);
   };
 
+  /**
+   * Handles change in rows per page
+   * @param {number} rowsPerPageValue - The new number of rows per page
+   */
   const handleChangeRowsPerPage = (rowsPerPageValue: number) => {
     if (tableRef.current) {
       tableRef.current.scrollTo(0, 0);
@@ -204,24 +256,43 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     }
   };
 
+  /**
+   * Navigates to detail view of a row
+   * @param {IAnyObject} rowDataValue - The data of the clicked row
+   */
   const navigateToDetail = (rowDataValue: IAnyObject) => {
     if (handleRowClick) {
       handleRowClick(rowDataValue);
     }
   };
 
+  /**
+   * Checks if any action is enabled
+   * @returns {boolean} True if any action is enabled, false otherwise
+   */
   const isAction = () => {
     return isEdit || isDelete || isActivate || isCustom;
   };
 
+  /**
+   * Gets the total number of columns including actions
+   * @param {boolean} actions - Whether actions are enabled
+   */
   const getActionsLength = (actions: boolean) => {
     return actions ? columnsDef.length + 1 : columnsDef.length;
   };
 
+  /**
+   * Determines if bottom padding should be applied
+   */
   const handleApplyBorderBottom = () => {
     return count && count > 10 ? 'pb-1' : '';
   };
 
+  /**
+   * Renders column headers
+   * @param {IColumns[]} columnsDefProp - The column definitions
+   */
   const handleShowColumnHeaders = (columnsDefProp: IColumns[]) => {
     return (
       columnsDefProp &&
@@ -233,6 +304,10 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Renders action header if actions are enabled
+   * @param {boolean} actions - Whether actions are enabled
+   */
   const handleShowActionHeader = (actions: boolean) => {
     return (
       actions && (
@@ -243,16 +318,28 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Determines the row style
+   * @param {boolean} isLastChild - Whether the row is the last child
+   */
   const handleRowStyle = (isLastChild: boolean) => {
     return `${showRowHover || handleRowClick ? styles.showRowHover : ''} ${
       count && count < (rowsPerPage || 10) && isLastChild ? '' : styles.showDivider
     }`;
   };
 
+  /**
+   * Determines if cursor should be pointer
+   */
   const handleCursorPointerStyle = () => {
     return handleRowClick || isRowEdit ? 'pointer' : '';
   };
 
+  /**
+   * Renders edit icon if conditions are met
+   * @param {IAnyObject} rowDataValue - The data of the row
+   * @param {number} rowIndex - The index of the row
+   */
   const handleShowEditIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isEdit &&
@@ -267,6 +354,11 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Renders activate icon if conditions are met
+   * @param {IAnyObject} rowDataValue - The data of the row
+   * @param {number} rowIndex - The index of the row
+   */
   const handleShowActivateIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isActivate && (
@@ -279,6 +371,11 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Renders custom icon if conditions are met
+   * @param {IAnyObject} rowDataValue - The data of the row
+   * @param {number} rowIndex - The index of the row
+   */
   const handleShowCustomIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return isCustom &&
       (!actionFormatter?.hideCustomIcon ||
@@ -296,6 +393,11 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Renders delete icon if conditions are met
+   * @param {IAnyObject} rowDataValue - The data of the row
+   * @param {number} rowIndex - The index of the row
+   */
   const handleShowDeleteIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isDelete &&
@@ -314,6 +416,9 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Renders pagination component if conditions are met
+   */
   const handleShowPagination = () => {
     return page && rowsPerPage && count && count > APPCONSTANTS.ROWS_PER_PAGE_OF_TABLE ? (
       <div className={styles.paginationWrapper}>
@@ -329,6 +434,9 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     ) : null;
   };
 
+  /**
+   * Renders activate confirmation popup if conditions are met
+   */
   const handleActivateConfirmationPopup = () => {
     return (
       (confirmationTitle || activateConfirmationTitle) && (
@@ -347,6 +455,9 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     );
   };
 
+  /**
+   * Renders custom popup if conditions are met
+   */
   const handleCustomPopup = () => {
     return (
       (customConfirmationTitle || customPopupTitle) && (

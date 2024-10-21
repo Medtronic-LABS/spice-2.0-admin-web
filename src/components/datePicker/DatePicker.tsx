@@ -19,6 +19,11 @@ interface IDatePickerProps {
   onChange?: (date: any) => void;
 }
 
+/**
+ * DatePickerComponent for selecting dates with custom styling and functionality
+ * @param {IDatePickerProps} props - The component props
+ * @returns {React.ReactElement} The DatePickerComponent
+ */
 const DatePickerComponent = ({
   label,
   isShowLabel = false,
@@ -29,12 +34,22 @@ const DatePickerComponent = ({
   todayButton,
   onChange
 }: IDatePickerProps): React.ReactElement => {
+  /**
+   * Formats the input value to a date string
+   */
   const dateValue = value ? formatDate(typeof value === 'string' ? value : '', 'YYYY-MM-DD') : '';
   const [dateInput, setDate] = useState<Date | null>(dateValue ? new Date(dateValue) : null);
 
+  /**
+   * Array of years for the year dropdown
+   */
   const years = range(1990, getYear(new Date()) + 11, 1);
   const months = APPCONSTANTS.MONTHS;
 
+  /**
+   * Handles date selection
+   * @param {Date} newDate - The newly selected date
+   */
   const handleDateSelect = (newDate: any) => {
     if (newDate) {
       setDate(newDate);

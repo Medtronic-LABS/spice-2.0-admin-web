@@ -11,6 +11,10 @@ import APPCONSTANTS from '../../../../constants/appConstants';
 import { composeValidators, convertToCaptilize, required, convertToSubString } from '../../../../utils/validation';
 import styles from '../../styles/FormBuilder.module.scss';
 import { IFieldViewType as IViewType } from '../../types/ComponentConfig';
+/**
+ * Renders the reorder model component based on the provided configuration.
+ * @param {any} props - The props for the ReorderModel component
+ */
 export const ReorderModel = ({
   initialValue,
   orderRef,
@@ -33,6 +37,9 @@ export const ReorderModel = ({
   let formattedValue: any = null;
 
   if (!familyName) {
+    /**
+     * Sorts and groups the form values by family based on the provided configuration.
+     */
     const sortAndgroupByFamily = () => {
       const formValues = cloneDeep(initialValue.values);
       const groupedFamily: Array<{ [x: string]: any }> = [];
@@ -57,6 +64,9 @@ export const ReorderModel = ({
     formattedValue = Object.values(currentFamilyGroup).sort((a: any, b: any) => a.orderId - b.orderId);
   }
 
+  /**
+   * Checks for duplicate names in the form fields based on the provided configuration.
+   */
   const checkDuplication = (value: any, values: any, i: number) => {
     let duplicateIndex: number | undefined;
     if (
@@ -72,10 +82,16 @@ export const ReorderModel = ({
     }
   };
 
+  /**
+   * Initializes the form reference and the id references based on the provided configuration.
+   */
   const formRef = useRef<FormApi<any>>();
   const idRefs = useRef<string[]>(
     (() => (formattedValue ? formattedValue.map((item: any) => item.id as string) : []))()
   );
+  /**
+   * Handles the reordering of the form fields based on the provided configuration.
+   */
   const onReorder = (order: { [itemId: string]: number }) => {
     orderRef.current = { ...order };
     idRefs.current.forEach((itemId: string, i: number) => {

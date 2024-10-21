@@ -2,6 +2,10 @@ import { IHFUserGet } from '../../store/healthFacility/types';
 import { formatHealthFacility } from '../admins/adminListMeta';
 import { formatRoles } from '../../utils/commonUtils';
 
+/**
+ * Function to format user name
+ * @param {IHFUserGet} user - user data
+ */
 const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
 
 export const columnDef = [

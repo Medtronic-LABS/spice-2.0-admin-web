@@ -8,6 +8,10 @@ export interface ITimeViewFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the time view fields based on the provided configuration.
+ * @returns {ITimeViewFields} The empty data for the time view fields
+ */
 const getEmptyData = (): ITimeViewFields => ({
   id: new Date().getTime().toString() + 'TimeView',
   viewType: 'TimeView',
@@ -33,6 +37,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   unitMeasurement: {}
 };
 
+/**
+ * Retrieves the JSON data for the time view fields based on the provided configuration.
+ * @param {any} json - The JSON data for the time view fields
+ * @returns {IFieldViewType} The JSON data for the time view fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   return json;

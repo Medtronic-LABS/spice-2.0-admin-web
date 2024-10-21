@@ -20,6 +20,15 @@ const routesWithoutBreadcrumb = [
   PROTECTED_ROUTES.healthFacilityDashboard,
   PROTECTED_ROUTES.landingPage
 ];
+
+/**
+ * Renders the header component with breadcrumb and menu toggle.
+ * @param {boolean} isBCDisabled - Whether the breadcrumb is disabled.
+ * @param {boolean} menuTogglable - Whether the menu is togglable.
+ * @param {boolean} sideMenuDisabled - Whether the side menu is disabled.
+ * @param {string} styleVisible - CSS class for visibility.
+ * @param {Function} setIsMenuVisible - Function to set menu visibility.
+ */
 const header = (
   isBCDisabled: boolean,
   menuTogglable: boolean,
@@ -49,9 +58,18 @@ const header = (
   );
 };
 
+/**
+ * Main AppLayout component that wraps the application content.
+ * @param {IAppLayout} props - The props for the AppLayout component.
+ * @param {string | React.ReactElement | React.ReactElement[]} props.children - The child components to render.
+ */
 export const AppLayout = ({ children }: IAppLayout) => {
   const role = useSelector(roleSelector);
   const { pathname } = useLocation();
+  /**
+   * Determines if the side menu should be disabled based on the current route and user role.
+   * @returns {boolean} True if the side menu should be disabled, false otherwise.
+   */
   const isSideMenuDisabled = useMemo(
     () =>
       !Boolean(
@@ -62,6 +80,10 @@ export const AppLayout = ({ children }: IAppLayout) => {
       ),
     [pathname, role]
   );
+  /**
+   * Determines if the breadcrumb should be disabled based on the current route.
+   * @returns {boolean} True if the breadcrumb should be disabled, false otherwise.
+   */
   const isBreadcrumbDisabled = useMemo(
     () => Boolean(routesWithoutBreadcrumb.find((route) => matchPath(pathname, { path: route, exact: true }))),
     [pathname]
@@ -73,6 +95,9 @@ export const AppLayout = ({ children }: IAppLayout) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isMenuTogglable, setIsMenuTogglable] = useState(window.innerWidth <= menuEnabledResolution);
 
+  /**
+   * Handles window resize events to toggle menu visibility.
+   */
   useEffect(() => {
     function onResize() {
       const nxtIsMenuTogglable = window.innerWidth <= 1100;
@@ -84,6 +109,9 @@ export const AppLayout = ({ children }: IAppLayout) => {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [isMenuTogglable]);
+  /**
+   * Closes the menu when clicking outside of it.
+   */
   useEffect(() => {
     function closeMenuOnBlur() {
       setIsMenuVisible(false);

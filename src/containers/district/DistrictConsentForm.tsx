@@ -58,6 +58,10 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
     [formId, consentFormConfig, selectedFormType.name]
   );
 
+  /**
+   * useEffect for fetch the customization form content
+   * check if selected value id not equals -1.
+   */
   useEffect(() => {
     if (selectedFormType.id !== -1) {
       dispatch(
@@ -76,6 +80,10 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFormType]);
 
+  /**
+   * Handler function for submit consent form
+   * @param {string} data - consent form content
+   */
   const submitConsentForm = (data: any) => {
     if (data && removeEditorContentIfAddedHTMLPlugins(data)) {
       dispatch(
@@ -106,14 +114,23 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
     }
   };
 
+  /**
+   * Handler function for deactivate consent form
+   */
   const handleDeactivate = () => {
     setDeactivatePopupOpen(true);
   };
 
+  /**
+   * Handler function for cancel button for deactivate modal
+   */
   const deactivatePopupCancel = () => {
     setDeactivatePopupOpen(false);
   };
 
+  /**
+   * Handler function for deactivate modal submit
+   */
   const deactivateSubmit = () => {
     if (formId) {
       dispatch(

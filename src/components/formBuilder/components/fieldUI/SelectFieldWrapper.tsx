@@ -2,6 +2,10 @@ import { Field } from 'react-final-form';
 import SelectInput, { ISelectFormOptions } from '../../../../components/formFields/SelectInput';
 import { composeValidators, formValidators } from '../../../../utils/validation';
 
+/**
+ * Renders the select field wrapper component based on the provided configuration.
+ * @param {any} props - The props for the SelectFieldWrapper component
+ */
 const SelectFieldWrapper = ({
   form,
   isMulti,

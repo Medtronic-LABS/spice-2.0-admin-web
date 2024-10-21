@@ -16,6 +16,10 @@ interface ITextInputArray {
   };
 }
 
+/**
+ * Renders the text input array component based on the provided configuration.
+ * @param {ITextInputArray} props - The props for the TextInputArray component
+ */
 const TextInputArray = ({ onChange, defaultValue = [], label, required = true, disabled, obj }: ITextInputArray) => {
   const [value, setValue] = useState<string[]>(defaultValue);
   const keys = useRef(defaultValue.map((...[, index]) => index));
@@ -23,6 +27,9 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
   const isRegionCustomizeForm = Boolean(
     matchPath(pathname, { path: PROTECTED_ROUTES.accordianViewRegionCustomizationForm, exact: true })
   );
+  /**
+   * Handles the change in the text input array based on the provided configuration.
+   */
   const handleChange = (e: any, inputIndex: number) => {
     const nxtValue = [...value];
     e.target.innerText = e.target.innerText.trim() !== '' ? e.target.innerText : '';
@@ -31,6 +38,9 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
     onChange?.(nxtValue.filter((val) => !!val.trim()));
   };
 
+  /**
+   * Handles the deletion of an item from the text input array based on the provided configuration.
+   */
   const handleDelete = (inputIndex: number) => {
     keys.current = keys.current.filter((key) => key !== inputIndex);
     const nxtValue = value.filter((_, index) => index !== inputIndex);
@@ -38,11 +48,17 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
     onChange?.(nxtValue.filter((val) => !!val.trim()));
   };
 
+  /**
+   * Handles the addition of a new item to the text input array based on the provided configuration.
+   */
   const handleAdd = () => {
     keys.current.push(Number(keys.current[keys.current.length - 1] || 0) + 1);
     setValue([...value, '']);
   };
 
+  /**
+   * Renders the list items for the text input array based on the provided configuration.
+   */
   const renderListItems = () =>
     value?.map((txt, i) => (
       <Fragment key={keys.current[i]}>

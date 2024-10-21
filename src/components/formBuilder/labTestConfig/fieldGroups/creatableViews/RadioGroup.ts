@@ -12,6 +12,10 @@ export interface IRadioGroupFields extends IBaseFields {
   isDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the radio group fields based on the provided configuration.
+ * @returns {IRadioGroupFields} The empty data for the radio group fields
+ */
 const getEmptyData = (): IRadioGroupFields => ({
   id: new Date().getTime().toString() + 'RadioGroup',
   viewType: 'RadioGroup',
@@ -39,6 +43,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEditable: {}
 };
 
+/**
+ * Retrieves the JSON data for the radio group fields based on the provided configuration.
+ * @param {any} json - The JSON data for the radio group fields
+ * @returns {IFieldViewType} The JSON data for the radio group fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   return json;

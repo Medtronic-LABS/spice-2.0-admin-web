@@ -48,6 +48,10 @@ export interface IFormValues {
   jsonForm: IViewType[];
 }
 
+/**
+ * Adds a new field to the form.
+ * @param {object} props - The props for the addNewFieldFn function
+ */
 export const addNewFieldFn = ({
   family,
   view,
@@ -105,6 +109,10 @@ export const addNewFieldFn = ({
   }, 0);
 };
 
+/**
+ * Renders the header for the accordian view.
+ * @param {object} props - The props for the AccordianHeader component
+ */
 const AccordianHeader = ({
   collapsedGroup,
   familyName,
@@ -115,6 +123,9 @@ const AccordianHeader = ({
   isWorkFlowCustomization,
   isShow
 }: any) => {
+  /**
+   * Gets the createable views based on the provided configuration.
+   */
   const getCreateableViews = () => {
     if (isWorkFlowCustomization) {
       return [...workflowCreatableViews];
@@ -179,6 +190,10 @@ const AccordianHeader = ({
   );
 };
 
+/**
+ * Renders the body of the accordian view.
+ * @param {object} props - The props for the AccordianBody component
+ */
 const AccordianBody = ({
   currentFamilyGroup,
   newlyAddedIds,
@@ -196,6 +211,9 @@ const AccordianBody = ({
   isCustomizationForm,
   isWorkFlowCustomization
 }: any) => {
+  /**
+   * Gets the delete icon condition based on the provided configuration.
+   */
   const getDeleteIconCondition = (fieldGroupName: any, isNew: any) => {
     if (!isCustomizationForm || isWorkFlowCustomization) {
       if (isWorkFlowCustomization && (isNew || currentFamilyGroup[fieldGroupName]?.isNotDefault)) {
@@ -265,6 +283,10 @@ const AccordianBody = ({
   );
 };
 
+/**
+ * Renders the footer of the accordian view.
+ * @param {object} props - The props for the AccordianFooter component
+ */
 const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, _presentableJson }: any) => {
   return (
     <>
@@ -296,6 +318,10 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
   );
 };
 
+/**
+ * Renders the accordian view.
+ * @param {object} props - The props for the AccordianView component
+ */
 const AccordianView = ({
   formRef,
   formMeta,
@@ -324,6 +350,9 @@ const AccordianView = ({
   const fieldGroupRef = useRef<any>([]);
   const newlyAddedIds = newlyAddedIdsRef;
 
+  /**
+   * Gets the unadded fields based on the provided configuration.
+   */
   const unAddedFields = useMemo(
     () =>
       allowedFields
@@ -332,7 +361,9 @@ const AccordianView = ({
     [allowedFields, addedFields]
   );
 
-  // return field which has error
+  /**
+   * Gets the final form error based on the provided configuration.
+   */
   const getFinalFormError = (errors: any, values: any) => {
     let errorField: any = null;
     let newErrors = { ...errors };
@@ -365,6 +396,9 @@ const AccordianView = ({
     return errorField;
   };
 
+  /**
+   * Toggles the accordian view based on the provided configuration.
+   */
   const onToggle = (key: keyof typeof collapsedGroup) => {
     const finalFormState = formRef.current.getState();
     const prev = { ...collapsedGroup };
@@ -385,6 +419,9 @@ const AccordianView = ({
     }, 0);
   };
 
+  /**
+   * Handles the deletion of a field based on the provided configuration.
+   */
   const handleDeleteField = (familyName: string, fieldGroupName: string) => {
     const finalFormState = { ...formRef.current.getState() };
     const formValues = cloneDeep(finalFormState.values);
@@ -434,6 +471,9 @@ const AccordianView = ({
     setFormMeta(formValues);
   };
 
+  /**
+   * Handles the addition of a new field based on the provided configuration.
+   */
   const handleAddNewField = (family: string, view: string) => {
     addNewFieldFn({
       family,
@@ -449,6 +489,9 @@ const AccordianView = ({
     });
   };
 
+  /**
+   * Handles the update of the field name based on the provided configuration.
+   */
   const handleUpdateFieldName = (
     familyName: string,
     currentFieldID: string,
@@ -509,6 +552,9 @@ const AccordianView = ({
     }
   };
 
+  /**
+   * Handles the form submission based on the provided configuration.
+   */
   const handleFormSubmit = (event: any) => {
     const finalFormState = formRef.current.getState();
     event.preventDefault();
@@ -535,6 +581,9 @@ const AccordianView = ({
     changeValue(state, fieldName, () => value);
   };
 
+  /**
+   * Sets the error for the field based on the provided configuration.
+   */
   const setError = ([fieldName, error]: any, state: any) => {
     if (error !== undefined) {
       const { fields } = state;

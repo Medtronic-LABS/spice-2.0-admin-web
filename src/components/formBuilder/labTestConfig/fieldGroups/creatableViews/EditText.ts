@@ -23,6 +23,10 @@ export interface IEditTextFields extends IBaseFields {
   ranges?: any[];
 }
 
+/**
+ * Retrieves the empty data for the edit text fields based on the provided configuration.
+ * @returns {IEditTextFields} The empty data for the edit text fields
+ */
 const getEmptyData = (): IEditTextFields => ({
   id: new Date().getTime().toString() + 'EditText',
   viewType: 'EditText',
@@ -65,6 +69,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEditable: {}
 };
 
+/**
+ * Retrieves the JSON data for the edit text fields based on the provided configuration.
+ * @param {any} json - The JSON data for the edit text fields
+ * @returns {IFieldViewType} The JSON data for the edit text fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   if (json.inputType === 0) {
     delete json.inputType;

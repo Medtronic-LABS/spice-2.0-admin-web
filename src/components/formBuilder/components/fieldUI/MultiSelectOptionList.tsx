@@ -18,6 +18,10 @@ interface IMultiSelectOptionListProps {
   label?: string;
 }
 
+/**
+ * Renders the multi-select option list component based on the provided configuration.
+ * @param {any} props - The props for the MultiSelectOptionList component
+ */
 const MultiSelectOptionList: React.FC<IMultiSelectOptionListProps> = ({
   field,
   name,
@@ -33,13 +37,18 @@ const MultiSelectOptionList: React.FC<IMultiSelectOptionListProps> = ({
     label: item.label
   }));
 
+  /**
+   * Handles the change in the selected values based on the provided configuration.
+   */
   const handleChange = (selectedOptions: any, actionMeta: ActionMeta<IOption>) => {
     const updatedSelectedValues = selectedOptions as IOption[];
     setSelectedValues(updatedSelectedValues);
     form.mutators.setValue(name, updatedSelectedValues);
   };
 
-  // Remove selected values that are no longer present in targetIds
+  /**
+   * Removes the selected values that are no longer present in targetIds based on the provided configuration.
+   */
   useEffect(() => {
     setSelectedValues((prevSelectedValues) => {
       return prevSelectedValues.filter((selectedValue: any) =>

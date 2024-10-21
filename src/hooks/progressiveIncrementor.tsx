@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 
+/**
+ * Custom hook for progressive incrementation of a timer value.
+ * @param {Object} props - The hook properties
+ * @param {boolean} props.displayProgress - Whether to display and start the progress
+ * @param {function} props.callBack - Callback function to be called when timer completes
+ */
 export const useProgressiveIncrementorHook = (props: { displayProgress: boolean; callBack: (x: boolean) => void }) => {
   const previousTimeStamp = useRef<number>(0);
   const tick = useRef<number>(0);
@@ -12,6 +18,10 @@ export const useProgressiveIncrementorHook = (props: { displayProgress: boolean;
     currentStop: Number(process.env.REACT_APP_ORG_SUCCESS_DELAY_TIME)
   };
 
+  /**
+   * Timer function to handle the animation frame updates.
+   * @param {number} timestamp - The current timestamp
+   */
   function timer(timestamp: number) {
     if (previousTimeStamp.current === 0) {
       previousTimeStamp.current = timestamp;
@@ -20,6 +30,9 @@ export const useProgressiveIncrementorHook = (props: { displayProgress: boolean;
     const seconds = timerConfig.frequency;
     tick.current = timestamp - previousTimeStamp.current;
 
+    /**
+     * Trigger function to update the timer value.
+     */
     function trigger() {
       const stopAtByFrequency = timerConfig.stopAt / timerConfig.frequency;
       setTimerVal((prev) => prev + 100 / stopAtByFrequency);
@@ -34,6 +47,9 @@ export const useProgressiveIncrementorHook = (props: { displayProgress: boolean;
       props.callBack(true);
     }
   }
+  /**
+   * Effect to start the timer when displayProgress is true.
+   */
   useEffect(() => {
     let reqFrameInitiator: number;
     if (props.displayProgress) {

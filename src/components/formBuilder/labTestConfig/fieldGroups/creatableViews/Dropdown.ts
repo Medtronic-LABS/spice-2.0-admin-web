@@ -13,6 +13,10 @@ export interface IDropdownFields extends IBaseFields {
   isResult?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the dropdown fields based on the provided configuration.
+ * @returns {IDropdownFields} The empty data for the dropdown fields
+ */
 const getEmptyData = (): IDropdownFields => ({
   id: new Date().getTime().toString() + 'Spinner',
   viewType: 'Spinner',
@@ -41,6 +45,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   resource: {}
 };
 
+/**
+ * Retrieves the JSON data for the dropdown fields based on the provided configuration.
+ * @param {any} json - The JSON data for the dropdown fields
+ * @returns {IFieldViewType} The JSON data for the dropdown fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   return json;

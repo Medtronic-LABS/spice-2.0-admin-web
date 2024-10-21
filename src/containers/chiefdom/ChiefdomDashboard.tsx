@@ -30,6 +30,9 @@ import styles from './Chiefdom.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { clearSideMenu } from '../../store/common/actions';
 
+/**
+ * Chiefdom Dashboard component
+ */
 const ChiefdomDashboard = () => {
   const dispatch = useDispatch();
   const chiefdomDashboardList = useSelector(chiefdomDashboardListSelector);
@@ -43,6 +46,23 @@ const ChiefdomDashboard = () => {
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
 
+  /**
+   * Custom hook for handling load-more pagination.
+   *
+   * @param {Object} options - The options for configuring pagination
+   * @param {number} options.total - The total number of items available for pagination
+   * @param {number} options.itemsPerPage - The number of items to load per page
+   * @param {Function} options.onLoadMore - Callback function to be called when loading more items
+   * @param {Object} options.onLoadMore.params - The parameters passed to the onLoadMore callback
+   * @param {number} options.onLoadMore.params.skip - The number of items to skip
+   * @param {number} options.onLoadMore.params.limit - The number of items to load in the current page
+   * @param {Function} options.onLoadMore.params.onFail - Callback function to handle failure during the data fetch
+   *
+   * @returns {Object} - Returns an object containing `isLastPage`, `loadMore`, and `resetPage`
+   * @returns {boolean} isLastPage - Indicates if the current page is the last page of the pagination
+   * @returns {Function} loadMore - Function to trigger loading the next page of items
+   * @returns {Function} resetPage - Function to reset the pagination to the first page
+   */
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: chiefdomCount,
     itemsPerPage: APPCONSTANTS.CHIEFDOM_PER_PAGE,
@@ -66,6 +86,10 @@ const ChiefdomDashboard = () => {
       );
     }
   });
+
+  /**
+   * useEffect for fetching chiefdom list for dashboard
+   */
 
   useEffect(() => {
     dispatch(
@@ -106,6 +130,10 @@ const ChiefdomDashboard = () => {
   );
 
   const searchText = useRef<string>('');
+  /**
+   * Handler function for search bar input
+   * @param {string} searchTerm
+   */
   const onSearch = useCallback(
     (search: string) => {
       searchText.current = search;
@@ -130,6 +158,17 @@ const ChiefdomDashboard = () => {
     [dispatch, resetPage]
   );
 
+  /**
+   * useMemo hook to parse chiefdom dashboard data and map it to ISummaryCardProps[] format.
+   *
+   * @param {IChiefdomSummary[]} chiefdomDashboardList - The list of chiefdom summaries with details for each chiefdom.
+   * @param {Function} onDashboardExit - Callback function to be invoked when exiting the dashboard.
+   * @param {Object} chiefdomDetail - The current chiefdom details object.
+   * @param {string | number} chiefdomDetail.id - The ID of the currently selected chiefdom.
+   * @param {Function} dispatch - The dispatch function to trigger Redux actions.
+   *
+   * @returns {ISummaryCardProps[]} - Returns an array of summary card props with title, routes, and data.
+   */
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
       chiefdomDashboardList?.map(({ healthFacilityCount, name, id, tenantId }: IChiefdomSummary) => ({

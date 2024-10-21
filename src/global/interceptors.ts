@@ -7,6 +7,13 @@ import sessionStorageServices from './sessionStorageServices';
 import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/actions';
 import { PUBLIC_ROUTES } from '../constants/route';
 
+/**
+ * Handles the response status and throws appropriate errors.
+ * @param {AxiosResponse} response - The axios response object
+ * @param {any} store - The Redux store
+ * @return {AxiosResponse} The original response if status is OK
+ * @throws {ApiError} Throws an ApiError with appropriate message and status code
+ */
 const responseStatusReturn = (response: AxiosResponse, store: any) => {
   const { status } = response;
   if (status > 205 && status !== 201) {
@@ -55,6 +62,10 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
   }
 };
 
+/**
+ * Sets up axios interceptors for request and response handling.
+ * @param {any} store - The Redux store
+ */
 export const setupInterceptors = (store: any) => {
   axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
   axios.defaults.headers.post['Content-Type'] = 'application/json';

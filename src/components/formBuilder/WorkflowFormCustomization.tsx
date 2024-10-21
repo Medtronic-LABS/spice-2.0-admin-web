@@ -22,6 +22,9 @@ interface IMatchParams {
   workflowId: string;
 }
 
+/**
+ * Renders the workflow form customization component.
+ */
 const WorkflowFormCustomization = () => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -56,6 +59,9 @@ const WorkflowFormCustomization = () => {
     setEditGroupedFieldsOrder
   } = useFormCustomization();
 
+  /**
+   * Fetches the customization form data and handles the response.
+   */
   useEffect(() => {
     dispatch(
       fetchCustomizationFormRequest({
@@ -85,10 +91,17 @@ const WorkflowFormCustomization = () => {
     // eslint-disable-next-line
   }, [dispatch, formType, regionId, tenantId]);
 
+  /**
+   * Handles the cancel action.
+   */
   const onCancel = () => {
     history.push(PROTECTED_ROUTES.workflowByRegion.replace(':tenantId', tenantId).replace(':regionId', regionId));
   };
 
+  /**
+   * Handles the submit action.
+   * @param {any} data - The data to submit
+   */
   const onSubmit = (data: any) => {
     const formatData = presentableJson(data);
     const newData = JSON.stringify({
@@ -128,6 +141,11 @@ const WorkflowFormCustomization = () => {
     );
   };
 
+  /**
+   * Handles the addition of a default family.
+   * @param {string} familyName - The name of the family to add
+   * @param {any} formJSON - The form JSON to add the family to
+   */
   const handleAddDefaultFamily = (familyName: string, formJSON?: any) => {
     const formValues: any = {};
     const id = formJSON || camelCase(familyName) + Date.now();

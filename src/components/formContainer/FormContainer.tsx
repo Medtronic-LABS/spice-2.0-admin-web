@@ -11,8 +11,8 @@ interface IFormWrapperProps {
 
 /**
  * Wraps the children in a box with labelled header
- * @param param0
- * @returns {React.ReactElement}
+ * @param props - Props for the FormContainer component.
+ * @returns React.ReactElement
  */
 const FormContainer = ({ label, icon, children, required = false }: IFormWrapperProps): React.ReactElement => {
   return (

@@ -12,6 +12,10 @@ export interface ISingleSelectionFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the single selection fields based on the provided configuration.
+ * @returns {ISingleSelectionFields} The empty data for the single selection fields
+ */
 const getEmptyData = (): ISingleSelectionFields => ({
   id: new Date().getTime().toString() + 'SingleSelectionView',
   viewType: 'SingleSelectionView',
@@ -44,6 +48,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isEnrollment: {}
 };
 
+/**
+ * Retrieves the JSON data for the single selection fields based on the provided configuration.
+ * @param {any} json - The JSON data for the single selection fields
+ * @returns {IFieldViewType} The JSON data for the single selection fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   json.condition = json.condition?.filter((val: any) => !!val);

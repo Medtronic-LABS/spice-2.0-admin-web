@@ -48,6 +48,10 @@ interface IMatchParams {
   chiefdomId: string;
 }
 
+/**
+ * Component for User List
+ * @returns {React.ReactElement}
+ */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId } = useParams<IMatchParams>();
@@ -69,7 +73,11 @@ const UserList = (): React.ReactElement => {
   const [selectedFacility, setSelectedFacility] = useState<string[]>();
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const { filterSpiceCommonRoles, filterSpiceUserRoles } = APPCONSTANTS;
+  const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
 
+  /**
+   * useCallback hook to refresh the user list.
+   */
   const refreshHFUserList = useCallback(() => {
     return dispatch(
       fetchHFUserListRequest({
@@ -98,6 +106,9 @@ const UserList = (): React.ReactElement => {
     selectedFacility
   ]);
 
+  /**
+   * useEffect for refrech the list whenever filter gets changed
+   */
   useEffect(() => {
     refreshHFUserList();
     return () => {
@@ -106,6 +117,9 @@ const UserList = (): React.ReactElement => {
     };
   }, [dispatch, refreshHFUserList, selectedFacility, selectedRole]);
 
+  /**
+   * useEffect for fetch roles whenever countryId or rolesGrouped gets changed
+   */
   useEffect(() => {
     if (!rolesGrouped?.hasOwnProperty('SPICE')) {
       dispatch(
@@ -117,6 +131,12 @@ const UserList = (): React.ReactElement => {
     }
   }, [countryIdValue, dispatch, rolesGrouped]);
 
+  /**
+   * Handler function for user delete
+   * @param {object} data
+   * @param {number} data.id - User id for user to delete
+   * @param {any[]} data.organizations - user organization for user to delete
+   */
   const handleUserDelete = useCallback(
     ({ data: { id, organizations = [] } }: { data: { id: number; organizations: any[] } }) => {
       dispatch(
@@ -183,6 +203,9 @@ const UserList = (): React.ReactElement => {
     }
   };
 
+  /**
+   * Handler for add user button click
+   */
   const handleAddUserClick = () => {
     userForEdit.current = { users: [] as IHFUserGet[] };
     setIsOpenUserModal({ isOpen: true, isEdit: false });
@@ -197,6 +220,9 @@ const UserList = (): React.ReactElement => {
     fetchList(); // get list of HF for filter dropdown, while closing the modal
   };
 
+  /**
+   * Handler function for success callback for add user and edit user
+   */
   const siteUserSuccess = useCallback(() => {
     const successMessage = isOpenUserModal.isEdit
       ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
@@ -208,15 +234,16 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpenUserModal.isEdit, refreshHFUserList]);
 
+  /**
+   * Common submit handler for user add and edit
+   * @param {IHFUserPost} data - API Payload data
+   * @param {any} actionFn - redux action function
+   * @param {any} successCB - callback for api success
+   * @param {any} failureCB - callback for api failure
+   */
   const onSubmitHandler = useCallback(
-    (
-      data: IHFUserPost,
-      actionFn: any,
-      options: any,
-      successCB: (data: any) => void,
-      failureCB: (error: any) => void
-    ) => {
-      dispatch(actionFn({ data, ...options, successCb: successCB, failureCb: failureCB }));
+    (data: IHFUserPost, actionFn: any, successCB: (data: any) => void, failureCB: (error: any) => void) => {
+      dispatch(actionFn({ data, successCb: successCB, failureCb: failureCB }));
     },
     [dispatch]
   );
@@ -236,7 +263,6 @@ const UserList = (): React.ReactElement => {
       onSubmitHandler(
         { ...data },
         isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
-        null,
         siteUserSuccess,
         (e) => {
           toastCenter.error(
@@ -254,6 +280,10 @@ const UserList = (): React.ReactElement => {
     [rolesGrouped?.SPICE, isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, siteUserSuccess, tenantId]
   );
 
+  /**
+   * Renders the UserForm inside an edit modal
+   * @param {any} form - The form API instance used to manage the form's state and submissions.
+   */
   const userFormRenderer = (form?: FormApi<any>) => {
     return (
       <UserForm
@@ -273,34 +303,49 @@ const UserList = (): React.ReactElement => {
   const [openModal, setOpenModal] = useState({ isOpen: false, userData: {} as IHFUserGet });
   const [submitEnable, setSubmitEnabled] = useState(false);
 
+  /**
+   * Handler function for close modal
+   */
   const onModalCancel = () => {
     setOpenModal({ isOpen: false, userData: {} as IHFUserGet });
   };
 
+  /**
+   * Handler function for change password button click
+   * @param {IHFUserGet} userData - user data values
+   */
   const handleChangePassword = (userData: IHFUserGet) => {
     setOpenModal({ isOpen: true, userData });
   };
 
-  const handleFormSubmit = (data: any) => {
+  /**
+   * Submit handler for change password modal
+   * @param {object} data - change password modal form value
+   * @param {string} data.newPassword - new password value
+   */
+  const handleResetPasswordSubmit = (data: { newPassword: string }) => {
+    setChangePasswordLoading(true);
     const password = generatePassword(data.newPassword);
     dispatch(
       changePassword({
         userId: Number(openModal.userData?.id),
         password,
         successCB: () => {
+          setChangePasswordLoading(false);
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_CHANGE_SUCCESS);
           onModalCancel();
         },
         failureCb: (e) => {
+          setChangePasswordLoading(false);
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED));
         }
       })
     );
   };
 
-  const requestFailure = (e: Error, errorMessage: string) =>
-    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, errorMessage));
-
+  /**
+   * Function to fetch list
+   */
   const fetchList = useCallback(() => {
     dispatch(
       fetchHFListRequest({
@@ -309,16 +354,26 @@ const UserList = (): React.ReactElement => {
         limit: null,
         userBased: !isSuperUser,
         tenantIds: [tenantId],
-        failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
+        failureCb: (e: Error) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR));
+        }
       })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isSuperUser, countryIdValue]);
 
+  /**
+   * useEffect to invoke fetchlist function when component mounts
+   */
   useEffect(() => {
     fetchList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /**
+   * Memoized value to filter SPICE user roles based on certain conditions for filter dropdown
+   * Remove redrisk from role list
+   */
   const spiceUserRole = useMemo(() => {
     return rolesGrouped?.SPICE?.filter(
       (data: { suiteAccessName: string; name: string; displayName: string }) =>
@@ -327,6 +382,10 @@ const UserList = (): React.ReactElement => {
     );
   }, [rolesGrouped]);
 
+  /**
+   * Memoized value to filter SPICE INSIGHTS user roles based on certain conditions for filter dropdown
+   * filter only spice common roles and spice user roles
+   */
   const roleCFRList = useMemo(() => {
     return (rolesGrouped?.['SPICE INSIGHTS'] || [])?.filter(
       (data: { suiteAccessName: string }) =>
@@ -336,7 +395,7 @@ const UserList = (): React.ReactElement => {
   }, [rolesGrouped]);
   return (
     <>
-      {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
+      {(hfUserLoading || hfUserDetailLoading || loading || changePasswordLoading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add User'
@@ -411,7 +470,7 @@ const UserList = (): React.ReactElement => {
           cancelText={'Cancel'}
           submitText={'Submit'}
           handleCancel={onModalCancel}
-          handleFormSubmit={handleFormSubmit}
+          handleFormSubmit={handleResetPasswordSubmit}
           size={'modal-md'}
           submitDisabled={!submitEnable}
         >

@@ -9,6 +9,10 @@ export interface IMentalHealthViewFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the mental health view fields based on the provided configuration.
+ * @returns {IMentalHealthViewFields} The empty data for the mental health view fields
+ */
 const getEmptyData = (): IMentalHealthViewFields => ({
   id: new Date().getTime().toString() + 'MentalHealthView',
   viewType: 'MentalHealthView',
@@ -34,6 +38,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   unitMeasurement: {}
 };
 
+/**
+ * Retrieves the JSON data for the mental health view fields based on the provided configuration.
+ * @param {any} json - The JSON data for the mental health view fields
+ * @returns {IFieldViewType} The JSON data for the mental health view fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   return json;

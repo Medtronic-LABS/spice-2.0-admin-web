@@ -45,6 +45,11 @@ export const isEditableFields = [
   'otherInsurance'
 ];
 
+/**
+ * Retrieves the configuration for the provided view type.
+ * @param {string} viewType - The view type to retrieve the configuration for
+ * @returns {IComponentConfig} The configuration for the provided view type
+ */
 export const getConfigByViewType = (viewType: string): IComponentConfig => {
   switch (viewType) {
     case 'BP':
@@ -88,6 +93,11 @@ export const getConfigByViewType = (viewType: string): IComponentConfig => {
   }
 };
 
+/**
+ * Switches the input types related fields based on the provided field value.
+ * @param {number} fieldValue - The field value to switch the input types related fields for
+ * @param {any} obj - The object to switch the input types related fields for
+ */
 export const inputTypesSwitch = (fieldValue: number, obj: any) => {
   const inputTypeRelatedFields: any = {
     minValue: false,

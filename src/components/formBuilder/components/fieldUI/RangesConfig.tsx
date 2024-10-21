@@ -10,6 +10,10 @@ import TextFieldWrapper from './TextFieldWrapper';
 import { filterUnitsandGender, IUnit } from '../../utils/FieldUtils';
 import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
 
+/**
+ * Renders the select input component based on the provided configuration.
+ * @param {any} props - The props for the SelectInputComponent component
+ */
 const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index }: any) => {
   let options: any = config?.options || [];
   let parseFn = (val: any) => val;
@@ -62,6 +66,10 @@ const SelectInputComponent = ({ form, name, fieldName, item, obj, config, index 
   );
 };
 
+/**
+ * Renders the text input component based on the provided configuration.
+ * @param {any} props - The props for the TextInputComponent component
+ */
 const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
   let parseFn = (parseValue: any) => parseValue;
   const value = item[fieldName] || null;
@@ -82,6 +90,10 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
   );
 };
 
+/**
+ * Renders the ranges fields component based on the provided configuration.
+ * @param {any} props - The props for the RangesFieldsComponent component
+ */
 const RangesFieldsComponent = ({ form, item, name, obj, index, rangesFieldConfigs }: any) => {
   useEffect(() => {
     const unitExists = (obj.unitList || []).find((unit: any) => item.unitType === unit.name);
@@ -135,6 +147,10 @@ const RangesFieldsComponent = ({ form, item, name, obj, index, rangesFieldConfig
     });
 };
 
+/**
+ * Renders the ranges config component based on the provided configuration.
+ * @param {any} props - The props for the RangesConfig component
+ */
 const RangesConfig = ({ name, obj, field, form }: any) => {
   const rangesFieldConfigs: any = {
     unitType: {
@@ -206,6 +222,9 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
     displayRange: ''
   };
 
+  /**
+   * Handles the addition of a new range based on the provided configuration.
+   */
   const onAddNewRange = () => {
     form.mutators.setValue(`${name}`, [initialValue]);
   };

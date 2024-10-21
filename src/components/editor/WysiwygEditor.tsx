@@ -1,14 +1,14 @@
 import JoditEditor from 'jodit-react';
 import { TOOLBAR_BUTTONS } from './ToolBarButtons';
 
-export interface IExtraButton {
+interface IExtraButton {
   name: string;
   exec: (editor: any) => void;
   icon?: string;
   tooltip?: string;
 }
 
-export interface ITextEditorConfigs {
+interface ITextEditorConfigs {
   disabled?: boolean;
   readonly?: boolean;
   placeholder?: string;
@@ -18,12 +18,20 @@ export interface ITextEditorConfigs {
   toolbarButtonSize?: 'small' | 'tiny' | 'xsmall' | 'middle' | 'large';
 }
 
-export interface ITextEditorProps {
+interface ITextEditorProps {
   editorContent: any;
   setEditorContent: any;
   editorConfig?: ITextEditorConfigs;
 }
 
+/**
+ * TextEditor component for rendering a WYSIWYG editor using Jodit.
+ *
+ * @param {ITextEditorProps} props - The props for the TextEditor component
+ * @param {any} props.editorContent - The current content of the editor
+ * @param {function} props.setEditorContent - Function to update the editor content
+ * @param {ITextEditorConfigs} props.editorConfig - Optional configuration for the editor
+ */
 const TextEditor = ({ editorContent, setEditorContent, editorConfig }: ITextEditorProps) => {
   const basicEditorConfig = {
     toolbarSticky: true,

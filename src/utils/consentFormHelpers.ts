@@ -1,3 +1,7 @@
+/**
+ * Removes editor-specific content from HTML string if added by HTML plugins.
+ * @param {string} htmlString - The HTML string to process
+ */
 export const removeEditorContentIfAddedHTMLPlugins = (htmlString: string) => {
   const htmlObject = new DOMParser().parseFromString(htmlString, 'text/html');
   const body = htmlObject.getElementsByTagName('body')[0];
@@ -20,6 +24,11 @@ export const removeEditorContentIfAddedHTMLPlugins = (htmlString: string) => {
     : JSON.stringify(htmlConvertedToString);
 };
 
+/**
+ * Gets the opened consent form name based on the complete form name and form type.
+ * @param {string} completeFormName - The complete name of the form
+ * @param {string} [formType='Region'] - The type of the form (default is 'Region')
+ */
 export const getOpenedConsentFormName = (completeFormName: string, formType: string = 'Region') => {
   if (formType === 'Account') {
     return completeFormName;

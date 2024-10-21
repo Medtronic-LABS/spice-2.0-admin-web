@@ -16,6 +16,11 @@ import { useParams } from 'react-router-dom';
 interface IMatchParams {
   form: string;
 }
+
+/**
+ * Customization hook for form fields.
+ * @param {boolean} isRegionFormCustomization - Whether the form is a region form customization
+ */
 const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   const [formData, setFormData] = useState<any>({});
   const { form: formType } = useParams<IMatchParams>();
@@ -39,6 +44,10 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
   const hashFieldIdsWithTitle = hashFieldIdsWithTitleRef.current;
   const [hashFieldIdsWithFieldName, sethashFieldIdsWithFieldName] = useState<any>({});
 
+  /**
+   * Resets the collapsed calculation for the provided keys.
+   * @param {string[]} keys - The keys to reset the collapsed calculation for
+   */
   const resetCollapsedCalculation = (keys: string[]) => {
     const res: { [k: string]: boolean } = {};
     keys.forEach((key: string, index: number) => {
@@ -65,6 +74,11 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
       });
     }
   };
+
+  /**
+   * Retrieves the target IDs for the account based on the provided view.
+   * @param {any} view - The view to retrieve the target IDs for
+   */
   const getTargetIdsForAccount = (view: any) => {
     if (
       (!view.isNeededDefault ||
@@ -115,6 +129,10 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
     return res;
   };
 
+  /**
+   * Retrieves the sorted data based on the provided data.
+   * @param {any} data - The data to sort
+   */
   const getSortedData = (data: any) =>
     Object.entries(data)
       .sort(([val1, obj1]: [any, any], [val2, obj2]: [any, any]) =>
@@ -124,6 +142,11 @@ const useFormCustomization = (isRegionFormCustomization?: boolean) => {
       )
       .map(([val1]: [any, any]) => val1);
 
+  /**
+   * Retrieves the presentable JSON based on the provided values and sorted family.
+   * @param {any} values - The values to present
+   * @param {string[]} sortedFamily - The sorted family to present
+   */
   const presentableJson = (values: any, sortedFamily: string[] = []) => {
     let data: any = [];
     (sortedFamily.length ? sortedFamily : Object.keys(values)).forEach((familyName) => {

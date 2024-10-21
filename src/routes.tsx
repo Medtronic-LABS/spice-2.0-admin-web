@@ -72,6 +72,9 @@ export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
 export const CDA_HFA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
 export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 
+/**
+ * Protected routes configuration.
+ */
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
     {
@@ -346,6 +349,9 @@ const protectedRoutes: IProtectedRoute[] = (() => {
   ];
 })();
 
+/**
+ * Public routes configuration.
+ */
 const publicRoutes = [
   {
     path: PUBLIC_ROUTES.login,
@@ -363,6 +369,9 @@ const publicRoutes = [
     component: ResetPassword
   }
 ];
+/**
+ * AppRoutes component that handles routing for the application.
+ */
 export const AppRoutes = () => {
   const intializaing = useSelector(initializingSelector);
   const loggingIn = useSelector(getIsLoggingInSelector);
@@ -375,6 +384,9 @@ export const AppRoutes = () => {
   const params = new URLSearchParams(document.location.search);
   const url = useRef(params.get('next') || '');
 
+  /**
+   * Redirects to the next URL if the user is logged in.
+   */
   useEffect(() => {
     if (isLoggedIn && url.current) {
       goToUrl(url.current);

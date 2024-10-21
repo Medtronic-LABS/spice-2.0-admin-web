@@ -8,6 +8,10 @@ export interface IHeightFields extends IBaseFields {
   isNotDefault?: boolean;
 }
 
+/**
+ * Retrieves the empty data for the height fields based on the provided configuration.
+ * @returns {IHeightFields} The empty data for the height fields
+ */
 const getEmptyData = (): IHeightFields => ({
   id: new Date().getTime().toString() + 'Height',
   viewType: 'Height',
@@ -37,6 +41,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   unitMeasurement: {}
 };
 
+/**
+ * Retrieves the JSON data for the height fields based on the provided configuration.
+ * @param {any} json - The JSON data for the height fields
+ * @returns {IFieldViewType} The JSON data for the height fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   json.condition = json.condition?.filter((val: any) => !!val);

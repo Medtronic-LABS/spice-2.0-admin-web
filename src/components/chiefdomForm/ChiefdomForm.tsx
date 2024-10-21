@@ -52,6 +52,10 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
   const showDistrictField = ROLES.SUPER_ADMIN === role || ROLES.SUPER_USER === role || ROLES.REGION_ADMIN === role;
+
+  /**
+   * Fetches district details when necessary conditions are met
+   */
   useEffect(() => {
     if (showDistrictField && !isEdit && districtId && district?.id !== districtId) {
       dispatch(
@@ -63,6 +67,9 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
     }
   }, [district?.id, districtId, dispatch, isEdit, showDistrictField, tenantId]);
 
+  /**
+   * Auto-selects the district in the form when conditions are met
+   */
   useEffect(() => {
     if (!isEdit && districtId) {
       const { values: formValues = {} } = form?.getState?.() || {};

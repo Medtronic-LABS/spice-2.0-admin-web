@@ -27,6 +27,15 @@ const filterByGetMetaViewTypes: { [K: string]: string[] } = {
   RadioGroup: ['checkbox', 'radio']
 };
 
+/**
+ * Gets the components by field name based on the provided configuration.
+ * @param {string} fieldName - The name of the field
+ * @param {any} obj - The object containing the field configuration
+ * @param {boolean} [isNew] - Whether the field is new
+ * @param {boolean} [isFieldNameChangable] - Whether the field name is changable
+ * @param {boolean} [isCustomizationForm] - Whether the form is a customization form
+ * @param {boolean} [isWorkFlowCustomization] - Whether the form is a workflow customization form
+ */
 const getComponentsByFieldName = (
   fieldName: string,
   obj: any,
@@ -98,6 +107,10 @@ interface IComponentProps {
   isCustomizationForm?: boolean;
 }
 
+/**
+ * Renders a checkbox component.
+ * @param {IComponentProps} props - The props for the CheckboxComponent
+ */
 export const CheckboxComponent = ({
   form,
   name,
@@ -115,6 +128,9 @@ export const CheckboxComponent = ({
     [fieldName, obj]
   );
 
+  /**
+   * Handles the disable future date logic
+   */
   useEffect(() => {
     if (obj?.disableFutureDate) {
       // For old records
@@ -125,6 +141,9 @@ export const CheckboxComponent = ({
     }
   }, [obj?.disableFutureDate, obj.minDays, form, name]);
 
+  /**
+   * Checks the checkbox change
+   */
   useEffect(() => {
     checkBoxChange(obj?.isResult);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,6 +183,10 @@ export const CheckboxComponent = ({
   );
 };
 
+/**
+ * Renders a select input component.
+ * @param {IComponentProps} props - The props for the SelectInputValues component
+ */
 export const SelectInputValues = ({
   name,
   fieldName,
@@ -256,6 +279,14 @@ export const SelectInputValues = ({
   );
 };
 
+/**
+ * Custom options list for the select input
+ * @param {string} fieldName - The name of the field
+ * @param {any} obj - The object containing the field configuration
+ * @param {any[]} [newlyAddedIds] - The newly added ids
+ * @param {any[]} [unAddedFields] - The unadded fields
+ * @param {any} [handleUpdateFieldName] - The function to handle the update field name
+ */
 const customOptionsList = (
   fieldName: string,
   obj: any,
@@ -273,6 +304,9 @@ const customOptionsList = (
       ? filterByGetMetaViewTypes[obj?.viewType].includes(type)
       : !([].concat(...(Object.values(filterByGetMetaViewTypes) as any[])) as any[]).includes(type)
   );
+  /**
+   * Custom parse function for the select input
+   */
   const customParseFn = (val: any) => {
     if (val?.label && val?.label !== obj[fieldName] && handleUpdateFieldName) {
       handleUpdateFieldName(obj.family, obj.id, val.key, val.label);
@@ -283,6 +317,10 @@ const customOptionsList = (
   return { customOptions, customParseFn, customValue };
 };
 
+/**
+ * Renders a text field component.
+ * @param {IComponentProps} props - The props for the TextFieldComponent
+ */
 export const TextFieldComponent = ({
   form,
   name,
@@ -296,9 +334,18 @@ export const TextFieldComponent = ({
   isFieldNameChangable,
   isCustomizationForm
 }: IComponentProps) => {
+  /**
+   * Parse function for the text field
+   */
   let parseFn = (value: any) => value;
   let capitalize = false;
+  /**
+   * Custom on blur function for the text field
+   */
   let customOnBlurFn = (value: any) => value;
+  /**
+   * Filters the duplicates for the field name
+   */
   const filterDuplicates = () => {
     const otherFieldNames: any = [];
     Object.entries(hashFieldIdsWithFieldName).forEach(([key, value]) => {
@@ -308,6 +355,9 @@ export const TextFieldComponent = ({
     });
     return otherFieldNames;
   };
+  /**
+   * Filters the duplicates for the field title
+   */
   const filterTitleDuplicates = () => {
     const otherTitles: any = [];
     Object.entries(hashFieldIdsWithTitle).forEach(([key, value]) => {
@@ -317,6 +367,9 @@ export const TextFieldComponent = ({
     });
     return otherTitles;
   };
+  /**
+   * Error reference for the text field
+   */
   const errorRef = useRef('');
   if (fieldName === 'fieldName' || fieldName === 'title') {
     if (isFieldNameChangable) {
@@ -418,11 +471,17 @@ export const TextFieldComponent = ({
     parseFn = (value: any) => (value > 0 ? value : null);
   }
 
+  /**
+   * Gets the asterisk for the text field
+   */
   const getAsterisk = () => {
     const codeValue = form.getFieldState(`${name}.code`)?.value;
     const urlValue = form.getFieldState(`${name}.url`)?.value;
     return codeValue || urlValue;
   };
+  /**
+   * Gets the asterisk error for the text field
+   */
   const getAsteriskError = (field: string, props?: any) => {
     const codeValue = form.getFieldState(`${name}.code`)?.value;
     const urlValue = form.getFieldState(`${name}.url`)?.value;
@@ -458,6 +517,10 @@ export const TextFieldComponent = ({
   );
 };
 
+/**
+ * Renders the fields based on the provided configuration.
+ * @param {any} props - The props for the RenderFields component
+ */
 const RenderFields = ({
   obj,
   name,

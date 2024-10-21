@@ -12,6 +12,10 @@ export interface IDatePickerFields extends IBaseFields {
   maxDays?: number | null;
 }
 
+/**
+ * Retrieves the empty data for the date picker fields based on the provided configuration.
+ * @returns {IDatePickerFields} The empty data for the date picker fields
+ */
 const getEmptyData = (): IDatePickerFields => ({
   id: new Date().getTime().toString() + 'DatePicker',
   viewType: 'DatePicker',
@@ -36,6 +40,11 @@ const customizableFieldMeta: IBaseFieldMeta = {
   maxDays: {}
 };
 
+/**
+ * Retrieves the JSON data for the date picker fields based on the provided configuration.
+ * @param {any} json - The JSON data for the date picker fields
+ * @returns {IFieldViewType} The JSON data for the date picker fields
+ */
 const getJSON = (json: any): IFieldViewType => {
   json.fieldName = json.fieldName?.label ? json.fieldName.label : json.fieldName;
   return json;

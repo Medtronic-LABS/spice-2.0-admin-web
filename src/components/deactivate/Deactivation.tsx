@@ -12,6 +12,10 @@ interface IDeactivationProps extends React.InputHTMLAttributes<HTMLInputElement>
   errorLabel?: string;
 }
 
+/**
+ * Deactivation component for user deactivation
+ * @param {IDeactivationProps} formName - The name of the form
+ */
 const Deactivation = ({ formName }: IDeactivationProps) => {
   return (
     <div className='row gx-1dot25'>
