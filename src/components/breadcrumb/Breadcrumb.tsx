@@ -74,7 +74,7 @@ const healthFacilityRoutes = [
 ];
 
 const dashboardRoutes = [
-  PROTECTED_ROUTES.regionDashboard,
+  // PROTECTED_ROUTES.regionDashboard,
   PROTECTED_ROUTES.districtDashboard,
   PROTECTED_ROUTES.chiefdomDashboard,
   PROTECTED_ROUTES.healthFacilityDashboard
@@ -123,6 +123,7 @@ const Breadcrumb = (): React.ReactElement => {
       appendParent: true
     },
     { route: PROTECTED_ROUTES.profile, label: 'Settings' },
+    { route: PROTECTED_ROUTES.regionDashboard, label: 'Dashboard' },
     { route: PROTECTED_ROUTES.superAdmin, label: 'Super Admin' },
     { route: PROTECTED_ROUTES.deactivatedRecords, label: 'Deactivated Records' },
     { route: PROTECTED_ROUTES.lockedUsers, label: 'Locked Users' },

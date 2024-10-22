@@ -10,6 +10,7 @@ const userInitialStateGetter = (): IUser => ({
   lastName: '',
   userId: '',
   role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+  appTypes: [],
   roleDetail: {},
   tenantId: '',
   formDataId: '',
@@ -20,35 +21,35 @@ const userInitialStateGetter = (): IUser => ({
 
 // This should be function instead of object,
 // so that the isLoggedIn will be recomputed when RESET_STATE action is dispatched
-const initialStateGetter = () =>
-  ({
-    defaultRole: [],
-    token: '',
-    isLoggedIn: false,
-    loggingIn: false,
-    loggingOut: false,
-    user: userInitialStateGetter(),
-    userRoles: {},
-    isRolesLoading: false,
-    isResetPasswordLoading: false,
-    error: null,
-    loading: false,
-    cultureListLoading: false,
-    initializing: false,
-    isPasswordSet: false,
-    email: '',
-    errorMessage: '',
-    showLoader: false,
-    userTenantId: '',
-    timezoneList: [],
-    cultureList: [],
-    communityList: [],
-    isLockedUserLoading: false,
-    lockedUsers: [],
-    totalLockedUsers: 0
-  } as unknown as IUserState);
+const initialStateGetter = {
+  defaultRole: [],
+  token: '',
+  isLoggedIn: false,
+  loggingIn: false,
+  loggingOut: false,
+  user: userInitialStateGetter(),
+  userRoles: {},
+  isRolesLoading: false,
+  isResetPasswordLoading: false,
+  error: null,
+  loading: false,
+  cultureListLoading: false,
+  initializing: false,
+  isPasswordSet: false,
+  email: '',
+  errorMessage: '',
+  countryList: [],
+  showLoader: false,
+  userTenantId: '',
+  timezoneList: [],
+  cultureList: [],
+  communityList: [],
+  isLockedUserLoading: false,
+  lockedUsers: [],
+  totalLockedUsers: 0
+};
 
-const userReducer = (state: IUserState = initialStateGetter(), action = {} as any) => {
+const userReducer = (state: IUserState = initialStateGetter, action = {} as any) => {
   switch (action.type) {
     case USERTYPES.LOGIN_REQUEST:
       return {
@@ -101,6 +102,14 @@ const userReducer = (state: IUserState = initialStateGetter(), action = {} as an
         ...state,
         initializing: false,
         isLoggedIn: false
+      };
+    case USERTYPES.SET_APP_TYPE:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          appTypes: action.payload
+        }
       };
     case USERTYPES.FETCH_USER_ROLES_REQUEST:
       return {

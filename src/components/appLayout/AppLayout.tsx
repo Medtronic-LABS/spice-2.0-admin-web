@@ -1,13 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { matchPath, useLocation } from 'react-router-dom';
 import { PROTECTED_ROUTES, routesWithSideMenu } from '../../constants/route';
-import { initializingSelector, roleSelector } from '../../store/user/selectors';
+import { getAppTypeSelector, initializingSelector, roleSelector } from '../../store/user/selectors';
 import { stopPropogation } from '../../utils/commonUtils';
 import Breadcrumb from '../breadcrumb/Breadcrumb';
+import BreadcrumbCommunity from '../../components_com/breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 import SideMenu from '../sideMenu/SideMenu';
+import SideMenuCommunity from '../../components_com/sideMenu/SideMenu';
 import styles from './AppLayout.module.scss';
+import { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
+import localStorageService from '../../global/localStorageServices';
 
 interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
@@ -34,27 +38,28 @@ const header = (
   menuTogglable: boolean,
   sideMenuDisabled: boolean,
   styleVisible: any,
-  setIsMenuVisible: any
+  setIsMenuVisible: any,
+  BreadcrumbFC: () => React.ReactElement<any>
 ) => {
-  return (
-    !isBCDisabled && (
-      <header className={`${styles.header} mb-1dot375 d-flex align-items-center`}>
-        {menuTogglable && !sideMenuDisabled && (
-          <div
-            className={`me-0dot5 ${styles.menuIcon} ${styleVisible}`}
-            onClick={(e) => {
-              stopPropogation(e);
-              setIsMenuVisible((prevState: any) => !prevState);
-            }}
-          >
-            <div />
-            <div />
-            <div />
-          </div>
-        )}
-        <Breadcrumb />
-      </header>
-    )
+  return !isBCDisabled ? (
+    <header className={`${styles.header} mb-1dot375 d-flex align-items-center`}>
+      {menuTogglable && !sideMenuDisabled && (
+        <div
+          className={`me-0dot5 ${styles.menuIcon} ${styleVisible}`}
+          onClick={(e) => {
+            stopPropogation(e);
+            setIsMenuVisible((prevState: any) => !prevState);
+          }}
+        >
+          <div />
+          <div />
+          <div />
+        </div>
+      )}
+      {BreadcrumbFC ? BreadcrumbFC() : <></>}
+    </header>
+  ) : (
+    <></>
   );
 };
 
@@ -70,6 +75,7 @@ export const AppLayout = ({ children }: IAppLayout) => {
    * Determines if the side menu should be disabled based on the current route and user role.
    * @returns {boolean} True if the side menu should be disabled, false otherwise.
    */
+  const appTypes = useSelector(getAppTypeSelector);
   const isSideMenuDisabled = useMemo(
     () =>
       !Boolean(
@@ -84,10 +90,26 @@ export const AppLayout = ({ children }: IAppLayout) => {
    * Determines if the breadcrumb should be disabled based on the current route.
    * @returns {boolean} True if the breadcrumb should be disabled, false otherwise.
    */
+
+  const isSideMenuDisabledForCommunity = useMemo(
+    () =>
+      !Boolean(
+        routesWithSideMenu.find(
+          ({ route, childRoutes, disabledRoles }) =>
+            [...(childRoutes || []), route]
+              .filter((v) => v)
+              .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
+            !disabledRoles?.includes(role)
+        )
+      ),
+    [pathname, role]
+  );
+
   const isBreadcrumbDisabled = useMemo(
     () => Boolean(routesWithoutBreadcrumb.find((route) => matchPath(pathname, { path: route, exact: true }))),
     [pathname]
   );
+
   const initializingApp = useSelector(initializingSelector);
 
   // menu toggling in low resolution device
@@ -122,8 +144,19 @@ export const AppLayout = ({ children }: IAppLayout) => {
     }
   }, [isMenuTogglable, isMenuVisible]);
 
+  const sessionStoreEvent = useCallback(() => {
+    localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(appTypes)}`);
+  }, [appTypes]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', sessionStoreEvent);
+    return () => {
+      window.removeEventListener('beforeunload', sessionStoreEvent);
+    };
+  }, [sessionStoreEvent]);
+
   const pyChange = isBreadcrumbDisabled ? '' : 'py-1dot875';
-  const pxForSideMenu = isSideMenuDisabled ? '' : 'px-3dot125';
+  const pxForSideMenu = isSideMenuDisabled || isSideMenuDisabledForCommunity ? '' : 'px-3dot125';
   const isStyleVisible = isMenuVisible ? styles.visible : '';
   const isSideMenuWidth = isSideMenuDisabled ? 'w-100' : '';
 
@@ -131,11 +164,31 @@ export const AppLayout = ({ children }: IAppLayout) => {
     <div className={`position-relative ${pyChange} ${styles.layout} ${pxForSideMenu} d-flex justify-content-center`}>
       {!initializingApp && (
         <div className={`px-md-3 px-1  ${styles.contentCenter}`}>
-          {header(isBreadcrumbDisabled, isMenuTogglable, isSideMenuDisabled, isStyleVisible, setIsMenuVisible)}
+          {Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
+            ? header(
+                isBreadcrumbDisabled,
+                isMenuTogglable,
+                isSideMenuDisabledForCommunity,
+                isStyleVisible,
+                setIsMenuVisible,
+                () => <BreadcrumbCommunity />
+              )
+            : header(
+                isBreadcrumbDisabled,
+                isMenuTogglable,
+                isSideMenuDisabled,
+                isStyleVisible,
+                setIsMenuVisible,
+                () => <Breadcrumb />
+              )}
           <div className={`row gx-1dot25 ${styles.body}`}>
             {!isSideMenuDisabled && (
               <div className={`col-auto ${styles.sidemenu} ${isMenuTogglable && styles.togglable} ${isStyleVisible}`}>
-                <SideMenu className={styles.customSidemenuClass} />
+                {Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY ? (
+                  <SideMenuCommunity className={styles.customSidemenuClass} />
+                ) : (
+                  <SideMenu className={styles.customSidemenuClass} />
+                )}
               </div>
             )}
             <div className={`col ${isSideMenuWidth}`}>

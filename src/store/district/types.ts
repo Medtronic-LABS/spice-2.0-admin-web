@@ -41,6 +41,7 @@ export interface IFetchDistrictList {
   searchTerm?: string;
   roleNames: string[];
   countryId?: number;
+  appTypes?: string[];
 }
 export interface IDistrictState {
   district: IDistrict;

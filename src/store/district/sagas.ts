@@ -104,7 +104,8 @@ export function* fetchDistrictDetail(action: IFetchDistrictDetailReq): SagaItera
         tenantId,
         searchTerm,
         ...(countryId && { countryId }),
-        roleNames: [APPCONSTANTS.ROLES.DISTRICT_ADMIN]
+        roleNames: [APPCONSTANTS.ROLES.DISTRICT_ADMIN],
+        appTypes: yield select((state: AppState) => state.user?.user?.appTypes)
       });
       yield put(districtActions.searchUserSuccess(entityList || []));
     } else {

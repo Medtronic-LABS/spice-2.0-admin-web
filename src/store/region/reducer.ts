@@ -12,6 +12,7 @@ export const initialState: IRegionState = {
     tenantId: '',
     name: '',
     list: [],
+    appTypes: [],
     total: 0
   },
   isClientRegistryEnabled: undefined,

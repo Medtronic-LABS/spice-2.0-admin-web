@@ -36,6 +36,7 @@ export const updateUser = (payload: IUpdateUserDetail) =>
 
 export const fetchUserByEmail = (
   email: string,
+  tenantId?: number | undefined,
   parentOrganizationId?: string,
   ignoreTenantId?: string,
   isSiteUsers?: boolean
@@ -47,11 +48,12 @@ export const fetchUserByEmail = (
       email,
       parentOrganizationId,
       ignoreTenantId,
-      isSiteUsers
+      isSiteUsers,
+      tenantId
     }
   });
 
-export const validatePhoneNumber = (phoneNumber: string, id: number | null, countryCode: string) =>
+export const validatePhoneNumber = (phoneNumber: string, id: number | null, countryCode: string | undefined) =>
   axios({
     method: 'POST',
     url: '/user-service/user/validate-phonenumber',

@@ -1,17 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
+import { roleSelector, getUserSuiteAccessSelector, userDataSelector } from '../../store/user/selectors';
 import { useHistory } from 'react-router';
-import { HOME_PAGE_BY_ROLE } from '../../constants/route';
+import { HOME_PAGE_BY_ROLE, COMMUNITY_HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
 import { ReactComponent as ReportingPortalLogo } from '../../assets/images/reports.svg';
 import { ReactComponent as InsightsLogo } from '../../assets/images/insights.svg';
 
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
 import { goToUrl } from '../../utils/routeUtil';
 import Loader from '../../components/loader/Loader';
+import localStorageServices from '../../global/localStorageServices';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -34,6 +35,9 @@ const LandingPage = (): React.ReactElement => {
   const history = useHistory();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
+  const userData = useSelector(userDataSelector);
+  const { id: regionId = null, tenantId = null } = userData?.country || { id: null, tenantId: null };
+  const appTypes = localStorageServices.getItem('appTypes');
 
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
@@ -48,7 +52,12 @@ const LandingPage = (): React.ReactElement => {
         icon: AdminPortalLogo,
         hasDomain: false,
         suiteAccessName: ADMIN,
-        domainUrl: HOME_PAGE_BY_ROLE[role],
+        domainUrl:
+          Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
+            ? COMMUNITY_HOME_PAGE_BY_ROLE[role]
+                ?.replace(':regionId', regionId?.toString())
+                .replace(':tenantId', tenantId?.toString()) || ''
+            : HOME_PAGE_BY_ROLE[role],
         disabled: false
       },
       {
@@ -69,7 +78,7 @@ const LandingPage = (): React.ReactElement => {
         domainUrl: undefined
       }
     ],
-    [role]
+    [appTypes, regionId, role, tenantId]
   );
 
   /**

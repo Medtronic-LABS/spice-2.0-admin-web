@@ -6,6 +6,7 @@ interface IRegion {
   id: string | number;
   tenantId: string | number;
   name: string;
+  appTypes: string[];
   districtCount: number;
   chiefdomCount: number;
   healthFacilityCount: number;
@@ -67,6 +68,7 @@ export interface IFetchRegionAdmins {
   skip?: number;
   limit?: number | null;
   searchTerm?: string;
+  appTypes?: string[];
 }
 
 export interface ICreateRegionRequestPayload {
@@ -161,6 +163,7 @@ export interface IRegionDetail {
   id: string;
   tenantId: string;
   name: string;
+  appTypes: string[];
   list: IRegionDetailList[] | [];
   total: number;
 }

@@ -39,6 +39,6 @@ class LocalStorageService implements ILocalStorage {
   }
 }
 
-const localStorageExport = new LocalStorageService();
+const localStorageService = new LocalStorageService();
 
-export default localStorageExport;
+export default localStorageService;

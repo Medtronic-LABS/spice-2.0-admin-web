@@ -162,7 +162,7 @@ const EmailField = forwardRef(
           }
           setLoading(true);
           const isAdminFetched = !(isHF || isHFCreate) && isSiteUser;
-          await fetchUserByEmail(email, parentOrgId, ignoreTenantId, isAdminFetched).then((res) => {
+          await fetchUserByEmail(email, undefined, parentOrgId, ignoreTenantId, isAdminFetched).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });
@@ -196,6 +196,7 @@ const EmailField = forwardRef(
           }
         }
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
         parentOrgId,
         ignoreTenantId,

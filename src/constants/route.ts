@@ -17,6 +17,19 @@ export const PROTECTED_ROUTES = {
   lockedUsers: '/locked-users',
   legalTerms: '#',
 
+  // SL
+  regionCommunity: '/region/:regionId/:tenantId/community',
+  healthFacilityBySuperAdmin: '/region/:regionId/healthFacility/list',
+  healthFacilityByAdmin: '/healthFacility/list',
+  healthFacilitySummaryCom: '/healthFacility/:healthFacilityId/:hfTenantId',
+  createHealthFacility: '/region/:regionId/healthFacility/create',
+  usersBySuperAdmin: '/region/:regionId/users/list',
+  usersByAdmin: '/users/list',
+  medicationByRegionCom: '/region/:regionId/medication/list',
+  createMedicationCom: '/region/:regionId/medication/create',
+  labtestListCom: '/region/:regionId/:tenantId/lab-test/list',
+  customizeLabTestCom: '/region/:regionId/:tenantId/:labTestName/lab-test/:identifier/:testId/community',
+
   regionDashboard: '/region',
   createRegion: '/region/create',
   region: '/region/:regionId/:tenantId',
@@ -37,6 +50,7 @@ export const PROTECTED_ROUTES = {
   chiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom',
   chiefdomSummary: '/chiefdom/:chiefdomId/:tenantId',
 
+  // AF
   healthFacilityDashboard: '/health-facility',
   healthFacilitySummary: '/health-facility/:healthFacilityId/:tenantId',
   healthFacilityByRegion: '/region/:regionId/:tenantId/health-facility',
@@ -95,11 +109,20 @@ export const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.labTestByRegion },
   { route: PROTECTED_ROUTES.medicationByRegion },
   { route: PROTECTED_ROUTES.programByRegion },
-  { route: PROTECTED_ROUTES.workflowByRegion }
+  { route: PROTECTED_ROUTES.workflowByRegion },
+
+  // SL
+  { route: PROTECTED_ROUTES.regionCommunity },
+  { route: PROTECTED_ROUTES.healthFacilityByAdmin },
+  { route: PROTECTED_ROUTES.usersBySuperAdmin },
+  { route: PROTECTED_ROUTES.usersByAdmin },
+  { route: PROTECTED_ROUTES.medicationByRegionCom },
+  { route: PROTECTED_ROUTES.labTestByRegion },
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummaryCom] }
 ];
 
 export const SIDE_MENU_MAPPER = {
-  REGION: PROTECTED_ROUTES.region,
+  REGION: PROTECTED_ROUTES.regionCommunity,
   REGION_CUSTOMIZATION: PROTECTED_ROUTES.customizationByRegion,
   DISTRICT_BY_REGION: PROTECTED_ROUTES.districtByRegion,
   CHIEFDOM_BY_REGION: PROTECTED_ROUTES.chiefdomByRegion,
@@ -151,4 +174,10 @@ export const HOME_PAGE_BY_ROLE = {
   [APPCONSTANTS.ROLES.DISTRICT_ADMIN]: PROTECTED_ROUTES.chiefdomDashboard,
   [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN]: PROTECTED_ROUTES.healthFacilityDashboard,
   [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: PROTECTED_ROUTES.healthFacilityDashboard
+};
+
+export const COMMUNITY_HOME_PAGE_BY_ROLE = {
+  [APPCONSTANTS.ROLES.SUPER_USER]: PROTECTED_ROUTES.region,
+  [APPCONSTANTS.ROLES.SUPER_ADMIN]: PROTECTED_ROUTES.region,
+  [APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN]: PROTECTED_ROUTES.healthFacilityByAdmin
 };

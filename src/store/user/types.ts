@@ -61,7 +61,9 @@ export interface IUser {
   tenantId: string;
   formDataId: string;
   country: any;
+  countryId: any;
   suiteAccess: string[];
+  appTypes: string[];
   organizations?: IOrganizations[] | [];
 }
 
@@ -344,17 +346,6 @@ export interface IGetUserNameFail {
   error: any;
 }
 
-export interface IUser {
-  userId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: roleType;
-  tenantId: string;
-  formDataId: string;
-  countryId: any;
-}
-
 export interface IUserDetail {
   id?: string;
   firstName: string;
@@ -411,7 +402,7 @@ export interface IUserState {
   defaultRole: string[];
   userRoles: IGroupRoles;
   isRolesLoading: boolean;
-  communityList: [];
+  communityList: any[];
   islockedUsersLoading?: boolean;
 }
 
@@ -770,6 +761,22 @@ export interface IUserPayload {
   chiefdom?: string;
   redRisk?: boolean;
 }
+export interface ISetAppType {
+  type: typeof USER_TYPES.SET_APP_TYPE;
+  payload: string[];
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface ISetAppTypeSuccess {
+  type: typeof USER_TYPES.SET_APP_TYPE_SUCCESS;
+  payload: string[];
+}
+
+export interface ISetAppTypeFailure {
+  type: typeof USER_TYPES.SET_APP_TYPE_FAILURE;
+  error: Error;
+}
 
 export type UserActions =
   | ILoginRequest
@@ -842,4 +849,7 @@ export type UserActions =
   | IFetchCountryListSuccessPayload
   | ILoginSuccessPayload
   | IGroupRoles
-  | IRemoveToken;
+  | IRemoveToken
+  | ISetAppType
+  | ISetAppTypeSuccess
+  | ISetAppTypeFailure;

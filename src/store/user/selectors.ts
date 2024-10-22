@@ -5,6 +5,7 @@ import { AppState } from '../rootReducer';
 const getIsLoggedIn = (state: AppState) => state.user.isLoggedIn;
 const getIsLoggingIn = (state: AppState) => state.user.loggingIn;
 const getIsLoggingOut = (state: AppState) => state.user.loggingOut;
+const getAppType = (state: AppState) => state.user.user?.appTypes;
 const getUserData = (state: AppState) => state.user.user;
 const getFirstName = (state: AppState) => state.user.user?.firstName;
 const getLastName = (state: AppState) => state.user.user?.lastName;
@@ -35,6 +36,7 @@ const getLockedUsersLoading = (state: AppState) => state.user.islockedUsersLoadi
 export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
 export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
 export const getIsLoggingOutSelector = createSelector(getIsLoggingOut, (loggingOut) => loggingOut);
+export const getAppTypeSelector = createSelector(getAppType, (appTypes) => appTypes);
 export const firstNameSelector = createSelector(getFirstName, (firstName) => firstName);
 export const lastNameSelector = createSelector(getLastName, (lastName) => lastName);
 export const emailSelector = createSelector(getEmail, (email) => email);

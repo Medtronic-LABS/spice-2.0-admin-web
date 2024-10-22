@@ -18,6 +18,7 @@ import APPCONSTANTS, {
   NAMING_VARIABLES,
   NAME_CONSTANTS,
   ADMIN_BASED_ON_URL,
+  SIDE_MENU_FETCHING_HIERARCHY,
   CFR_SUITEACCSESS_NAME
 } from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';

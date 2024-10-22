@@ -451,6 +451,7 @@ export interface IFetchHFUserListRequest {
   roleNames?: string[];
   isSiteUsers?: boolean | null;
   tenantIds?: string[];
+  appTypes?: string[];
   successCb?: (data: IHFUserGet[], total: number) => void;
   failureCb?: (error: Error) => void;
 }

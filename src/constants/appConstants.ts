@@ -24,13 +24,23 @@ const APPCONSTANTS = {
   LAST_NAME_LENGTH: 100,
   FAMILY_NAME_LENGTH: 100,
   SUITE_ACCESS: {
-    ADMIN: 'web',
+    ADMIN: 'admin',
     CFR: 'cfr',
     INSIGHTS: 'insights'
   },
   SPICE_ROLE_SUITE_ACCESS: {
     mob: 'mob',
     web: 'web'
+  },
+  COMMUNITY_ROLES: {
+    SUPER_USER: 'SUPER_USER',
+    SUPER_ADMIN: 'SUPER_ADMIN',
+    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
+    PEER_SUPERVISOR: 'PEER_SUPERVISOR',
+    REPORT_ADMIN: 'REPORT_ADMIN',
+    FACILITY_REPORT_ADMIN: 'FACILITY_REPORT_ADMIN',
+    SPICE_INSIGHTS_USER: 'SPICE_INSIGHTS_USER',
+    SPICE_INSIGHTS_DEVELOPER: 'SPICE_INSIGHTS_DEVELOPER'
   },
   ROLES: {
     SUPER_USER: 'SUPER_USER',
@@ -480,6 +490,13 @@ export const SIDE_MENU_FETCHING_HIERARCHY = {
   district: 'BY_DISTRICT',
   chiefdom: 'BY_CHIEFDOM',
   'health-facility': 'BY_HEALTH_FACILITY'
+};
+
+export const APP_TYPE_NAME = 'appTypes';
+
+export const APP_TYPE = {
+  COMMUNITY: 'COMMUNITY',
+  NON_COMMUNITY: 'NON_COMMUNITY'
 };
 
 export const CFR_SUITEACCSESS_NAME = { user: 'cfr_user', admin: 'cfr_admin', quickSight: 'cfr_quicksight_admin' };

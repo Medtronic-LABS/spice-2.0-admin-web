@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import styles from './Header.module.scss';
 import IconProfile from '../../assets/images/icon-profile.svg';
 import IconGlobal from '../../assets/images/icon-global.svg';
@@ -14,8 +14,9 @@ import { changeOwnPassword } from '../../store/user/actions';
 import {
   emailSelector,
   formDataIdSelector,
-  getUserSuiteAccessSelector,
   tenantIdSelector,
+  getAppTypeSelector,
+  getUserSuiteAccessSelector,
   userIdSelector
 } from '../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
@@ -57,61 +58,69 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
   const [passwordModal, setPasswordModal] = useState(false);
   const [submitEnable, setSubmitEnabled] = useState(false);
 
+  const appTypes = useSelector(getAppTypeSelector);
+
+  const nonCommunityUserMenus = [
+    {
+      label: 'County Details',
+      icon: IconGlobal,
+      route: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', tenantId),
+      roles: [DISTRICT_ADMIN]
+    },
+    {
+      label: 'Sub-County Details',
+      icon: IconGlobal,
+      route: PROTECTED_ROUTES.chiefdomSummary.replace(':chiefdomId', formDataId).replace(':tenantId', tenantId),
+      roles: [CHIEFDOM_ADMIN]
+    },
+    {
+      label: 'Region Details',
+      icon: IconGlobal,
+      route: PROTECTED_ROUTES.region.replace(':regionId', formDataId).replace(':tenantId', tenantId),
+      roles: [REGION_ADMIN]
+    },
+    {
+      label: 'Deactivated Records',
+      icon: IconDeactivated,
+      route: PROTECTED_ROUTES.deactivatedRecords,
+      roles: SU_SA_RA
+    },
+    {
+      label: 'Locked Users',
+      icon: LockedUserIcon,
+      route: PROTECTED_ROUTES.lockedUsers,
+      roles: SU_SA_RA_DA_CDA_HFA
+    },
+    {
+      label: 'Legal Terms',
+      icon: IconLegal,
+      route: PROTECTED_ROUTES.legalTerms,
+      roles: SU_SA_RA_DA
+    }
+  ];
+  const commonUsermenus = [
+    {
+      label: 'My Profile',
+      icon: IconProfile,
+      route: PROTECTED_ROUTES.profile,
+      roles: Object.values(ROLES)
+    },
+    {
+      label: 'Change Password',
+      icon: PasswordChangeIcon,
+      route: location.pathname,
+      roles: Object.values(ROLES)
+    }
+  ];
+
   /**
    * Generates the menu items based on user's suite access
    * @type {IUserMenuItem[]}
    */
   const menus: IUserMenuItem[] = userSuiteAccess.includes(SUITE_ACCESS.ADMIN)
-    ? [
-        {
-          label: 'County Details',
-          icon: IconGlobal,
-          route: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', tenantId),
-          roles: [DISTRICT_ADMIN]
-        },
-        {
-          label: 'Sub-County Details',
-          icon: IconGlobal,
-          route: PROTECTED_ROUTES.chiefdomSummary.replace(':chiefdomId', formDataId).replace(':tenantId', tenantId),
-          roles: [CHIEFDOM_ADMIN]
-        },
-        {
-          label: 'Region Details',
-          icon: IconGlobal,
-          route: PROTECTED_ROUTES.region.replace(':regionId', formDataId).replace(':tenantId', tenantId),
-          roles: [REGION_ADMIN]
-        },
-        {
-          label: 'Deactivated Records',
-          icon: IconDeactivated,
-          route: PROTECTED_ROUTES.deactivatedRecords,
-          roles: SU_SA_RA
-        },
-        {
-          label: 'Locked Users',
-          icon: LockedUserIcon,
-          route: PROTECTED_ROUTES.lockedUsers,
-          roles: SU_SA_RA_DA_CDA_HFA
-        },
-        {
-          label: 'Legal Terms',
-          icon: IconLegal,
-          route: PROTECTED_ROUTES.legalTerms,
-          roles: SU_SA_RA_DA
-        },
-        {
-          label: 'My Profile',
-          icon: IconProfile,
-          route: PROTECTED_ROUTES.profile,
-          roles: Object.values(ROLES)
-        },
-        {
-          label: 'Change Password',
-          icon: PasswordChangeIcon,
-          route: location.pathname,
-          roles: Object.values(ROLES)
-        }
-      ]
+    ? (Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY) || !appTypes.length
+      ? [...commonUsermenus]
+      : [...nonCommunityUserMenus, ...commonUsermenus]
     : [];
 
   /**

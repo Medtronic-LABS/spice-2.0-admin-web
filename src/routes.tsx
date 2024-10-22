@@ -52,6 +52,15 @@ import ProgramForm from './containers/program/CreateProgram';
 import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
 import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
+import RegionCom from './container_com/region/Region';
+import HealthFacilitySummaryCom from './container_com/healthFacility/HealthFacilitySummary';
+import HealthFacilityListCom from './container_com/healthFacility/HealthFacilityList';
+import CreateHealthFacilityCom from './container_com/healthFacility/CreateHealthFacility';
+import UserListCom from './container_com/user/UserList';
+import AddMedicationCom from './container_com/medication/AddMedication';
+import MedicationListCom from './container_com/medication/MedicationList';
+import LabTestCustomizationLayoutCom from './container_com/labtest/LabTestCustomizationLayout';
+import LabTestListCom from './container_com/labtest/LabtestList';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -64,6 +73,8 @@ interface IProtectedRoute extends IRoute {
 
 export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } =
   APPCONSTANTS.ROLES;
+export const { REPORT_ADMIN, SPICE_INSIGHTS_DEVELOPER, SPICE_INSIGHTS_USER, FACILITY_REPORT_ADMIN } =
+  APPCONSTANTS.COMMUNITY_ROLES;
 export const SU_SA = [SUPER_ADMIN, SUPER_USER];
 export const SU_SA_RA = [...SU_SA, REGION_ADMIN];
 export const SU_SA_RA_DA = [...SU_SA_RA, DISTRICT_ADMIN];
@@ -71,12 +82,89 @@ export const SU_SA_HFA = [...SU_SA, HEALTH_FACILITY_ADMIN];
 export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
 export const CDA_HFA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
 export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
+export const A = [HEALTH_FACILITY_ADMIN];
+
+const communityRoutes = [
+  {
+    path: PROTECTED_ROUTES.regionCommunity,
+    exact: true,
+    component: RegionCom,
+    authorisedRoles: SU_SA
+  },
+  {
+    path: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
+    exact: true,
+    component: HealthFacilityListCom,
+    authorisedRoles: SU_SA
+  },
+  {
+    path: PROTECTED_ROUTES.healthFacilitySummaryCom,
+    exact: true,
+    component: HealthFacilitySummaryCom,
+    authorisedRoles: SU_SA_HFA
+  },
+  {
+    path: PROTECTED_ROUTES.createHealthFacility,
+    exact: true,
+    component: CreateHealthFacilityCom,
+    authorisedRoles: SU_SA
+  },
+  {
+    path: PROTECTED_ROUTES.healthFacilityByAdmin,
+    exact: true,
+    component: HealthFacilityListCom,
+    authorisedRoles: A
+  },
+  {
+    path: PROTECTED_ROUTES.usersBySuperAdmin,
+    exact: true,
+    component: UserListCom,
+    authorisedRoles: SU_SA
+  },
+  {
+    path: PROTECTED_ROUTES.usersByAdmin,
+    exact: true,
+    component: UserListCom,
+    authorisedRoles: A
+  },
+  {
+    path: PROTECTED_ROUTES.createMedicationCom,
+    exact: true,
+    component: AddMedicationCom,
+    authorisedRoles: SU_SA
+  },
+  {
+    path: PROTECTED_ROUTES.medicationByRegionCom,
+    exact: false,
+    component: MedicationListCom,
+    authorisedRoles: SU_SA
+  },
+  {
+    path: PROTECTED_ROUTES.labtestListCom,
+    exact: false,
+    component: LabTestListCom,
+    authorisedRoles: SU_SA
+  },
+  // {
+  //   path: PROTECTED_ROUTES.profile,
+  //   exact: true,
+  //   component: MyProfile,
+  //   authorisedRoles: SU_SA_A
+  // },
+  {
+    path: PROTECTED_ROUTES.customizeLabTestCom,
+    exact: true,
+    component: LabTestCustomizationLayoutCom,
+    authorisedRoles: SU_SA_HFA
+  }
+];
 
 /**
  * Protected routes configuration.
  */
 const protectedRoutes: IProtectedRoute[] = (() => {
   return [
+    ...communityRoutes,
     {
       path: PROTECTED_ROUTES.landingPage,
       exact: true,

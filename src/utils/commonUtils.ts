@@ -5,6 +5,18 @@ import CryptoJS from 'crypto-js';
 import { IHFUserGet, IUserRole } from '../store/healthFacility/types';
 import { IRoles, IUserPayload } from '../store/user/types';
 
+export const jsonParse = (value: any) => {
+  if (value) {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      return null;
+    }
+  } else {
+    return null;
+  }
+};
+
 /**
  * Generates an encryption key using PBKDF2.
  * @return {CryptoJS.lib.WordArray} The generated encryption key

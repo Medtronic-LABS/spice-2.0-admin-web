@@ -11,7 +11,7 @@ import {
   IUpdateUserRequest,
   IUser
 } from './types';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import localStorageServices from '../../global/localStorageServices';
 import { encryptData } from '../../utils/commonUtils';
@@ -22,6 +22,7 @@ import { IActionProps } from '../../typings/global';
 import { error, success } from '../../utils/toastCenter';
 import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
+import localStorageService from '../../global/localStorageServices';
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -44,6 +45,7 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
           lastName,
           id: userId,
           roles: allRoles,
+          appTypes = [],
           tenantId,
           country,
           organizations,
@@ -59,6 +61,7 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
     );
     updateRememberMe(username, password, rememberMe);
+    const oldAppTypes = yield select((state: AppState) => state.user.user.appTypes);
     const payload: IUser = {
       email,
       firstName,
@@ -67,6 +70,7 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       role: spiceAdminRole?.name || allRoles[0]?.name || '',
       roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
+      appTypes: appTypes || oldAppTypes,
       country,
       suiteAccess,
       formDataId: organizations[0]?.formDataId,
@@ -135,6 +139,7 @@ export function* fetchLoggedInUser(): SagaIterator {
           lastName,
           id: userId,
           roles: allRoles,
+          appTypes,
           tenantId,
           country,
           organizations,
@@ -152,6 +157,7 @@ export function* fetchLoggedInUser(): SagaIterator {
     const spiceAdminRole = allRoles?.find(
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
     );
+    const oldAppTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const payload: IUser = {
       email,
       firstName,
@@ -161,11 +167,15 @@ export function* fetchLoggedInUser(): SagaIterator {
       roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
       formDataId: organizations[0]?.formDataId,
+      appTypes: appTypes || oldAppTypes,
       country,
       suiteAccess,
       countryId: undefined,
       organizations
     };
+    if ((appTypes || []).length) {
+      localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(appTypes)}`);
+    }
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {
     sessionStorageServices.clearAllItem();
@@ -185,12 +195,32 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
       data: { entity: userRoles }
     } = yield call(userService.fetchUserRoles, countryId);
     const role = yield select((state: AppState) => state.user.user.role);
-    const updatedUserRoles = {
+    const appTypes = localStorageServices.getItem('appTypes');
+    // const appTypes = yield select(
+    //   (state: AppState) => state.user.user.appTypes
+    // );
+    let updatedUserRoles = {
       ...userRoles,
       SPICE: [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
         ? userRoles?.SPICE
         : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
     };
+    if (appTypes && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY) {
+      updatedUserRoles = {
+        ...{ ...updatedUserRoles },
+        SPICE: [APPCONSTANTS.COMMUNITY_ROLES.SUPER_ADMIN, APPCONSTANTS.COMMUNITY_ROLES.SUPER_USER].includes(role)
+          ? userRoles.SPICE
+          : userRoles.SPICE.filter((r: IUserRole) => r.name !== APPCONSTANTS.COMMUNITY_ROLES.SUPER_ADMIN),
+        REPORTS: [APPCONSTANTS.COMMUNITY_ROLES.SUPER_ADMIN, APPCONSTANTS.COMMUNITY_ROLES.SUPER_USER].includes(role)
+          ? userRoles.REPORTS
+          : userRoles.REPORTS.filter((r: IUserRole) => r.name !== APPCONSTANTS.COMMUNITY_ROLES.REPORT_ADMIN),
+        INSIGHTS: [APPCONSTANTS.COMMUNITY_ROLES.SUPER_USER].includes(role)
+          ? userRoles.INSIGHTS
+          : userRoles.INSIGHTS.filter(
+              (r: IUserRole) => r.name !== APPCONSTANTS.COMMUNITY_ROLES.SPICE_INSIGHTS_DEVELOPER
+            )
+      };
+    }
     successCb?.(updatedUserRoles);
     yield put(userActions.fetchUserRolesActionSuccess(updatedUserRoles));
   } catch (e: any) {

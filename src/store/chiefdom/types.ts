@@ -285,6 +285,7 @@ export interface IFetchChiefdomAdminsRequest {
   roleNames: string[];
   tenantId: string;
   countryId?: number;
+  appTypes?: string[];
 }
 
 export interface IClearChiefdomDetail {

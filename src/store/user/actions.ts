@@ -56,7 +56,10 @@ import {
   IGroupRoles,
   IFetchCommunityListPayload,
   IFetchCommunityList,
-  IRemoveToken
+  IRemoveToken,
+  ISetAppType,
+  ISetAppTypeSuccess,
+  ISetAppTypeFailure
 } from './types';
 
 export const loginRequest = ({
@@ -482,4 +485,17 @@ export const unlockUsersSuccess = (): IUnlockUsersSuccess => ({
 
 export const unlockUsersFailure = (): IUnlockUsersFailure => ({
   type: USER_TYPES.UNLOCK_USERS_FAILURE
+});
+
+export const setAppType = (appTypes: string[]): ISetAppType => ({
+  type: USER_TYPES.SET_APP_TYPE,
+  payload: appTypes
+});
+export const setAppTypeSuccess = (appTypes: string[]): ISetAppTypeSuccess => ({
+  type: USER_TYPES.SET_APP_TYPE_SUCCESS,
+  payload: appTypes
+});
+export const setAppTypeFailure = (error: Error): ISetAppTypeFailure => ({
+  type: USER_TYPES.SET_APP_TYPE_FAILURE,
+  error
 });

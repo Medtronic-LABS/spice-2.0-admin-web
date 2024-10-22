@@ -61,7 +61,8 @@ export function* fetchChiefdomDetail(action: IFetchChiefdomDetailReq): SagaItera
         tenantId,
         searchTerm,
         ...(countryId && { countryId }),
-        roleNames: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN]
+        roleNames: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN],
+        appTypes: yield select((state: AppState) => state.user?.user?.appTypes)
       });
       yield put(operatinUnitActions.searchUserSuccess(userResponse || []));
     } else {

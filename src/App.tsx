@@ -13,16 +13,19 @@ import { getIsLoggedInSelector } from './store/user/selectors';
 const App = () => {
   const loggedIn = useSelector(getIsLoggedInSelector);
   const { pathname } = useLocation();
+  const gaTrackId = process.env.REACT_APP_GA_TRACKING_ID;
 
   useEffect(() => {
-    ReactGa.initialize(process.env.REACT_APP_GA_TRACKING_ID as string);
+    if (gaTrackId) {
+      ReactGa.initialize(process.env.REACT_APP_GA_TRACKING_ID as string);
 
-    /**
-     * to report the page view
-     * pathname is the current url location pathname
-     */
-    ReactGa.send({ hitType: 'pageview', page: pathname });
-  }, [pathname]);
+      /**
+       * to report the page view
+       * pathname is the current url location pathname
+       */
+      ReactGa.send({ hitType: 'pageview', page: pathname });
+    }
+  }, [gaTrackId, pathname]);
 
   return (
     <div className='app-container'>

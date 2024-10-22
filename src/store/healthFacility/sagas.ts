@@ -275,7 +275,8 @@ export function* fetchHFUserList({
       searchTerm,
       roleNames,
       isSiteUsers,
-      tenantIds
+      tenantIds,
+      appTypes: yield select((state: AppState) => state.user?.user?.appTypes)
     });
     const payload = { users: hfUsers || [], total, limit };
     yield put(fetchHFUserListSuccess(payload));
