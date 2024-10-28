@@ -8,6 +8,7 @@ const MOCK_DATA_CONSTANTS = {
       BY_REGION: [
         {
           displayName: 'Region',
+          route: '/region/:regionId/:tenantId',
           name: 'REGION',
           order: 1
         }

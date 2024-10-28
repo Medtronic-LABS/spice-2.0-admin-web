@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
 import styles from './Header.module.scss';
 import IconProfile from '../../assets/images/icon-profile.svg';
 import IconGlobal from '../../assets/images/icon-global.svg';
@@ -60,15 +60,20 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
 
   const appTypes = useSelector(getAppTypeSelector);
 
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = NAME_CONSTANTS;
+
   const nonCommunityUserMenus = [
     {
-      label: 'County Details',
+      label: `${districtSName} Details`,
       icon: IconGlobal,
       route: PROTECTED_ROUTES.districtSummary.replace(':districtId', formDataId).replace(':tenantId', tenantId),
       roles: [DISTRICT_ADMIN]
     },
     {
-      label: 'Sub-County Details',
+      label: `${chiefdomSName} Details`,
       icon: IconGlobal,
       route: PROTECTED_ROUTES.chiefdomSummary.replace(':chiefdomId', formDataId).replace(':tenantId', tenantId),
       roles: [CHIEFDOM_ADMIN]
@@ -168,7 +173,7 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_CHANGE_SUCCESS);
           onModalCancel();
         },
-        failureCb: (e) => {
+        failureCB: (e) => {
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED));
         }
       })

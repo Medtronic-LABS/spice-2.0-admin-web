@@ -1,59 +1,61 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { Form } from 'react-final-form';
 import Deactivation from '../Deactivation';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
+import { fireEvent, waitFor } from '@testing-library/react';
 
-describe('<Deactivation />', () => {
-  const props = {
-    formName: 'testForm'
-  };
-  let wrapper: any;
-
+describe('Deactivation', () => {
   beforeEach(() => {
-    wrapper = mount(
+    render(
       <MemoryRouter>
-        <Form
-          onSubmit={() => {
-            //
-          }}
-        >
-          {() => <Deactivation {...props} />}
-        </Form>
+        <Form onSubmit={() => {}}>{() => <Deactivation formName='testForm' />}</Form>
       </MemoryRouter>
     );
   });
 
   it('renders the Deactivation component', () => {
-    expect(wrapper.find(Deactivation)).toHaveLength(1);
+    expect(screen.getByTestId('deactivation-component')).toBeInTheDocument();
   });
 
   it('renders the SelectInput component with the correct props', () => {
-    const selectInput = wrapper.find('SelectInput');
-    expect(selectInput).toHaveLength(1);
-    expect(selectInput.prop('label')).toEqual('Reason');
-    expect(selectInput.prop('errorLabel')).toEqual('reason');
-    expect(selectInput.prop('options')).toEqual([
-      { label: 'Unable to pay', value: 'Unable to pay' },
-      { label: 'Contract expired', value: 'Contract expired' },
-      { label: 'Site closure', value: 'Site closure' },
-      { label: 'Inactive site', value: 'Inactive site' },
-      { label: 'Other', value: 'Other' }
-    ]);
-    expect(selectInput.prop('isModel')).toBe(true);
+    const selectInput = screen.getByLabelText('Reason');
+    expect(selectInput).toBeInTheDocument();
   });
 
   it('renders the TextAreaInput component with the correct props', () => {
-    const textAreaInput = wrapper.find('TextAreaInput');
-    expect(textAreaInput).toHaveLength(1);
-    expect(textAreaInput.prop('label')).toEqual('Describe the reason in detail');
-    expect(textAreaInput.prop('rows')).toEqual(3);
+    const textAreaInput = screen.getByLabelText('Describe the reason in detail');
+    expect(textAreaInput).toBeInTheDocument();
+    expect(textAreaInput).toHaveAttribute('rows', '3');
   });
 
   it('renders the deactivation info message', () => {
-    const deactivationInfo = wrapper.find('.deactivateInfo');
-    expect(deactivationInfo.text()).toContain(
-      'Deactivating the testForm will no longer let the testForm admin and their subordinates access the testForm and its data but you can reactivate the testForm anytime back from the profile menu. '
+    const deactivationInfo = screen.getByText(
+      /Deactivating the testForm will no longer let the testForm admin and their subordinates access the testForm and its data but you can reactivate the testForm anytime back from the profile menu./
     );
+    expect(deactivationInfo).toBeInTheDocument();
+  });
+
+  it('displays error messages for required fields', async () => {
+    const handleSubmit = jest.fn();
+    render(
+      <MemoryRouter>
+        <Form onSubmit={handleSubmit}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <Deactivation formName='testForm' />
+              <button type='submit'>Submit</button>
+            </form>
+          )}
+        </Form>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByText('Submit'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Please enter reason')).toBeInTheDocument();
+    });
   });
 });

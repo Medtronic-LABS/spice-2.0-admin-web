@@ -215,6 +215,7 @@ const Pagination: React.FC<IPaginationProps> = ({
         <span className='d-none d-lg-flex pr-4 me-1'>Rows per page</span>
         <div className={styles.selectEl}>
           <Select
+            aria-label='Rows per page'
             menuPlacement='top'
             className='pagination-select me-1 w-100'
             classNamePrefix='select-field'

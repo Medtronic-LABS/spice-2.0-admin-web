@@ -3,7 +3,8 @@ import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import LockedUsers from '../LockedUsers';
-
+import APPCONSTANTS from '../../../constants/appConstants';
+import { FETCH_LOCKED_USERS_REQUEST, UNLOCK_USERS_REQUEST } from '../../../store/user/actionTypes';
 const mockStore = configureStore([]);
 
 const mockChildComponent = jest.fn();
@@ -12,6 +13,8 @@ jest.mock('../../../components/customTable/CustomTable', () => (props: any) => {
   return <div>child component</div>;
 });
 
+const { ROLES } = APPCONSTANTS;
+
 describe('LockedUsers', () => {
   const mockLockedUsersList = [
     {
@@ -19,6 +22,10 @@ describe('LockedUsers', () => {
       firstName: 'John',
       lastName: 'Doe',
       username: 'johndoe@example.com'
+    },
+    {
+      id: '2',
+      username: 'janedoe@example.com'
     }
   ];
   const store = mockStore({
@@ -26,7 +33,7 @@ describe('LockedUsers', () => {
       lockedUsers: mockLockedUsersList,
       totalLockedUsers: 1,
       user: {
-        role: 'REGION_ADMIN',
+        role: ROLES.REGION_ADMIN,
         tenantId: 1
       }
     }
@@ -46,7 +53,8 @@ describe('LockedUsers', () => {
     );
     expect(screen.getByText('Locked Users')).toBeInTheDocument();
   });
-  it('should call fetchDetails functions', async () => {
+
+  it('should call fetchDetails functions for region admin', async () => {
     render(
       <Provider store={store}>
         <Router>
@@ -55,13 +63,62 @@ describe('LockedUsers', () => {
       </Provider>
     );
     const actions = store.getActions();
-    const mockFetchDetailsType = actions.find((action) => action.type === 'FETCH_LOCKED_USERS_REQUEST');
+    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_LOCKED_USERS_REQUEST);
     mockFetchDetailsType.failureCb({ message: 'error' });
     const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
     waitFor(() => {
       expect(failureCbSpy).toHaveBeenCalled();
     });
   });
+
+  it('should call fetchDetails functions for super admin', async () => {
+    const store = mockStore({
+      user: {
+        lockedUsers: mockLockedUsersList,
+        totalLockedUsers: 1,
+        user: { role: ROLES.SUPER_ADMIN }
+      }
+    });
+    render(
+      <Provider store={store}>
+        <Router>
+          <LockedUsers />
+        </Router>
+      </Provider>
+    );
+    const actions = store.getActions();
+    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_LOCKED_USERS_REQUEST);
+    mockFetchDetailsType.failureCb({ message: 'error' });
+    const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
+    waitFor(() => {
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+  });
+
+  it('should call fetchDetails functions for super user', async () => {
+    const store = mockStore({
+      user: {
+        lockedUsers: mockLockedUsersList,
+        totalLockedUsers: 1,
+        user: { role: ROLES.SUPER_USER }
+      }
+    });
+    render(
+      <Provider store={store}>
+        <Router>
+          <LockedUsers />
+        </Router>
+      </Provider>
+    );
+    const actions = store.getActions();
+    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_LOCKED_USERS_REQUEST);
+    mockFetchDetailsType.failureCb({ message: 'error' });
+    const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
+    waitFor(() => {
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+  });
+
   it('Should handle onCustomConfirmed', () => {
     render(
       <Provider store={store}>
@@ -78,7 +135,7 @@ describe('LockedUsers', () => {
       expect(mockLockedUsers.onCustomConfirmed).toHaveBeenCalledWith({ id: 1 });
     });
     const actions = store.getActions();
-    const mockUnLockUsersType = actions.find((action) => action.type === 'UNLOCK_USERS_REQUEST');
+    const mockUnLockUsersType = actions.find((action) => action.type === UNLOCK_USERS_REQUEST);
     mockUnLockUsersType.successCb('Success', 'User unlocked successfully');
     mockUnLockUsersType.failureCb({ message: 'error' });
 
@@ -103,6 +160,7 @@ describe('LockedUsers', () => {
     const tableUpdated = mockLockedUsers.columnsDef[0];
     tableUpdated.cellFormatter({ firstName: '', lastName: '' });
   });
+
   it('should unmount without errors', () => {
     const { unmount } = render(
       <Provider store={store}>

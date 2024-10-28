@@ -153,7 +153,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   return (
     <>
       {getLoading() && <Loader />}
-      <div className={`${styles.sideMenu} py-0dot25 ${className}`}>
+      <div className={`${styles.sideMenu} py-0dot25 ${className}`} data-testid='side-menu-component'>
         {[...fetchedSideMenu]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
           const isActive = matchPath(pathname, { exact: true, path: rest.route });
           return (

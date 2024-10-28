@@ -241,7 +241,7 @@ export const changeOwnPassword = (data: {
   oldPassword: string;
   newPassword: string;
   successCB: () => void;
-  failureCb?: (error: Error) => void;
+  failureCB?: (error: Error) => void;
 }): IChangeOwnPasswordReq => ({
   type: USER_TYPES.CHANGE_OWN_PASSWORD_REQUEST,
   data

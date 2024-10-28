@@ -1,109 +1,453 @@
 import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { mount } from 'enzyme';
+import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import createSagaMiddleware from 'redux-saga';
 import MyProfile from '../MyProfile';
-import { fetchUserByIdReq } from '../../../store/user/actions';
-import { act } from 'react-dom/test-utils';
+import APPCONSTANTS from '../../../constants/appConstants';
+import {
+  FETCH_CULTURE_LIST_REQUEST,
+  FETCH_USER_BY_ID_REQUEST,
+  UPDATE_USER_REQUEST
+} from '../../../store/user/actionTypes';
+import toastCenter from '../../../utils/toastCenter';
+import { HF_SUMMARY } from '../../../tests/mockData/healthFacilityConstants';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/chiefdomDataConstants';
+import { getAdminPayload } from '../../../utils/commonUtils';
+import '@testing-library/jest-dom/extend-expect';
 
-// Create the mock store with saga middleware
+const { ROLES } = APPCONSTANTS;
+
+const MockUserForm = jest.fn(() => <div data-testid='user-form'>User Form</div>);
+
+jest.mock('../../../components/modal/ModalForm', () =>
+  jest.fn(({ show, handleCancel, handleFormSubmit }) =>
+    show ? (
+      <div data-testid='modal-form'>
+        <button onClick={handleCancel}>Cancel</button>
+        <button onClick={handleFormSubmit}>Submit</button>
+        <MockUserForm />
+      </div>
+    ) : null
+  )
+);
+
+jest.mock('../../../components/userForm/UserForm', () => jest.fn(() => <div data-testid='user-form'>User Form</div>));
+
+jest.mock('../../../components/loader/Loader', () => () => <div data-testid='loader' />);
+
+jest.mock('../../../utils/toastCenter', () => ({
+  success: jest.fn(),
+  error: jest.fn()
+}));
+
+jest.mock('../../../utils/commonUtils', () => ({
+  getAdminPayload: jest.fn()
+}));
+
 const sagaMiddleware = createSagaMiddleware();
+
 const mockStore = configureStore([sagaMiddleware]);
 
-describe('MyProfile', () => {
-  let store: any;
-  let component: any;
+const { FETCH_CHIEFDOM_LIST_RESPONSE_PAYLOAD } = MOCK_DATA_CONSTANTS;
 
-  beforeEach(() => {
-    // Initialize mock store with state that matches the expected structure
-    const initialState = {
-      user: {
-        user: {
-          role: 'SUPER_ADMIN',
-          userId: '123',
-          userData: {
-            country: {
-              id: '1',
-              countryCode: '+1',
-              phoneNumberCode: '+1'
-            }
-          }
-        }
-      },
-      healthFacility: {
-        healthFacilityList: [],
-        countryList: [],
-        peerSupervisorList: { list: [], hfTenantIds: null },
-        villagesFromHFList: { list: [], hfTenantIds: null }
-      }
-    };
-    store = mockStore(initialState);
-    // Render the MyProfile component with the mock store
-    component = mount(
-      <Provider store={store}>
-        <MyProfile />
-      </Provider>
-    );
-  });
-
-  it('should dispatch fetchUserByIdReq action on mount', () => {
-    // Check if the fetchUserByIdReq action was dispatched
-    const actions = store.getActions();
-    expect(actions).toContainEqual(
-      fetchUserByIdReq({
-        payload: { id: '123' },
-        successCb: expect.any(Function),
-        failureCb: expect.any(Function)
-      })
-    );
-  });
-
-  it('should show edit modal when edit button is clicked', () => {
-    // Simulate the edit button click
-    act(() => {
-      component.find('DetailCard').prop('onButtonClick')();
-    });
-    component.update();
-    // Check if the edit modal is now shown
-    expect(component.find('Memo()').prop('show')).toBe(true);
-  });
-
-  it('should dispatch updateUserRequest action on form submit', () => {
-    // Prepare the form data to submit
-    const formData = {
-      users: [
+const initialState = {
+  user: {
+    user: {
+      role: ROLES.SUPER_ADMIN,
+      userId: '123',
+      cultureList: [
         {
-          id: '123',
-          gender: 'Male',
-          firstName: 'John',
-          lastName: 'Doe',
-          countryCode: '+1',
-          phoneNumber: '1234567890',
-          country: { phoneNumberCode: '+1' }
+          id: 1,
+          createdBy: 1,
+          updatedBy: 1,
+          createdAt: '2024-07-30T11:01:22+05:30',
+          updatedAt: '2024-07-30T11:01:22+05:30',
+          name: 'English - India',
+          code: 'en_IN',
+          active: true
         }
       ]
-    };
-    // Simulate form submission
-    act(() => {
-      component.find('Memo()').prop('handleFormSubmit')(formData);
-    });
-    // Check if the updateUserRequest action was dispatched
-    const actions = store.getActions();
-    expect(actions[1]).toEqual(
-      expect.objectContaining({
-        type: 'UPDATE_USER_REQUEST',
-        payload: {
-          id: '123',
-          gender: 'Male',
-          firstName: 'John',
-          lastName: 'Doe',
-          countryCode: '+1',
-          phoneNumber: '1234567890'
-        },
-        successCb: expect.any(Function),
-        failureCb: expect.any(Function)
-      })
+    }
+  },
+  healthFacility: {
+    healthFacility: [HF_SUMMARY]
+  },
+  chiefdom: {
+    chiefdomList: [FETCH_CHIEFDOM_LIST_RESPONSE_PAYLOAD]
+  }
+};
+describe('MyProfile', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should render MyProfile component', () => {
+    const store = mockStore(initialState);
+    const { getByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
     );
+    expect(getByText('My Profile')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('should dispatch FETCH_USER_BY_ID_REQUEST action on mount', () => {
+    const store = mockStore(initialState);
+
+    const { unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+    const actions = store.getActions();
+    const fetchUserAction = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+    expect(fetchUserAction).toBeTruthy();
+    unmount();
+  });
+
+  it('should dispatch FETCH_CULTURE_LIST_REQUEST action on mount for HF admin', () => {
+    const store = mockStore({
+      ...initialState,
+      user: {
+        ...initialState.user,
+        user: { ...initialState.user.user, role: ROLES.HEALTH_FACILITY_ADMIN },
+        cultureList: []
+      }
+    });
+    const { unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+    const actions = store.getActions();
+    const fetchCultureAction = actions.find((action) => action.type === FETCH_CULTURE_LIST_REQUEST);
+    expect(fetchCultureAction).toBeTruthy();
+    unmount();
+  });
+
+  it('should open edit modal when "Edit My Profile" button is clicked', async () => {
+    const store = mockStore(initialState);
+
+    const { getByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    fireEvent.click(getByText('Edit My Profile'));
+
+    expect(getByText('Cancel')).toBeInTheDocument();
+    expect(getByText('Submit')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('should close modal when cancel is clicked', async () => {
+    const store = mockStore(initialState);
+
+    const { getByText, queryByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    fireEvent.click(getByText('Edit My Profile'));
+
+    fireEvent.click(getByText('Cancel'));
+
+    await waitFor(() => {
+      expect(queryByText('Submit')).not.toBeInTheDocument();
+    });
+    unmount();
+  });
+
+  it('should show error toast when fetchUserByIdReq fails', async () => {
+    const store = mockStore(initialState);
+
+    const { unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const actions = store.getActions();
+    const fetchUserAction = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+    fetchUserAction.failureCb();
+
+    await waitFor(() => {
+      expect(toastCenter.error).toHaveBeenCalledWith(APPCONSTANTS.OOPS, APPCONSTANTS.PROFILE_DETAIL_ERROR);
+    });
+    unmount();
+  });
+  it('should set user details when fetchUserByIdReq is successful', async () => {
+    const store = mockStore(initialState);
+
+    const mockUserDetails = {
+      id: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      roles: [{ name: ROLES.SUPER_ADMIN, displayName: 'Super Admin' }]
+    };
+
+    const useStateSpy = jest.spyOn(React, 'useState');
+    const setUserDetailsMock = jest.fn();
+    useStateSpy.mockImplementation(() => [undefined, setUserDetailsMock]);
+
+    const { unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const actions = store.getActions();
+    const fetchUserAction = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+
+    fetchUserAction.successCb(mockUserDetails);
+
+    await waitFor(() => {
+      expect(setUserDetailsMock).toHaveBeenCalledWith(mockUserDetails);
+    });
+
+    useStateSpy.mockRestore();
+    unmount();
+  });
+
+  it('should set user details when fetchUserByIdReq is successful with multiple roles', async () => {
+    const store = mockStore(initialState);
+
+    const mockUserDetails = {
+      id: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      roles: [
+        { name: ROLES.HEALTH_FACILITY_ADMIN, displayName: 'Health Facility Admin' },
+        { name: 'CHW', displayName: 'CHW' }
+      ],
+      countryCode: '91',
+      phoneNumber: '1234567890'
+    };
+
+    const useStateSpy = jest.spyOn(React, 'useState');
+    const setUserDetailsMock = jest.fn();
+    useStateSpy.mockImplementation(() => [useStateSpy, setUserDetailsMock]);
+
+    const { unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const actions = store.getActions();
+    const fetchUserAction = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+
+    fetchUserAction.successCb(mockUserDetails);
+
+    await waitFor(() => {
+      expect(setUserDetailsMock).toHaveBeenCalledWith(mockUserDetails);
+    });
+
+    useStateSpy.mockRestore();
+    unmount();
+  });
+
+  it('should dispatch updateUserRequest when handleEdit is called', async () => {
+    const store = mockStore(initialState);
+
+    const mockPayload = [{ id: '123', firstName: 'John', lastName: 'Doe' }];
+
+    (getAdminPayload as jest.Mock).mockReturnValue([mockPayload]);
+
+    const { getByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    fireEvent.click(getByText('Edit My Profile'));
+
+    fireEvent.click(getByText('Submit'));
+
+    expect(getAdminPayload).toHaveBeenCalled();
+
+    await waitFor(() => {
+      const actions = store.getActions();
+      const updateUserAction = actions.find((action) => action.type === UPDATE_USER_REQUEST);
+      expect(updateUserAction).toBeTruthy();
+      expect(updateUserAction.payload).toEqual(mockPayload);
+      expect(updateUserAction.successCb).toBeDefined();
+      expect(updateUserAction.failureCb).toBeDefined();
+    });
+
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
+
+    const actions = store.getActions();
+    const updateUserAction = actions.find((action) => action.type === UPDATE_USER_REQUEST);
+    updateUserAction.successCb();
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+      expect(screen.queryByText('Submit')).not.toBeInTheDocument();
+      expect(toastCenter.success).toHaveBeenCalledWith(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS);
+    });
+
+    const fetchUserAction = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+    expect(fetchUserAction).toBeTruthy();
+
+    updateUserAction.failureCb();
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+      expect(toastCenter.error).toHaveBeenCalledWith(APPCONSTANTS.ERROR, APPCONSTANTS.USER_DETAILS_UPDATE_ERROR);
+    });
+    unmount();
+  });
+
+  test('should set user details on success', async () => {
+    const store = mockStore(initialState);
+    const { getByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const mockUserDetails = {
+      id: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      roles: [
+        { id: 9, groupName: 'SPICE', name: 'SUPER_ADMIN', suiteAccessName: 'web', displayName: 'Super Admin' },
+        {
+          id: 17,
+          groupName: 'SPICE INSIGHTS',
+          displayName: 'Quicksight Spice Admin',
+          name: 'CFR_QUICKSIGHT_SPICE_ADMIN',
+          suiteAccessName: 'cfr_quicksight_admin'
+        },
+        { id: 3, groupName: 'SPICE', suiteAccessName: 'mob', name: 'CHW', displayName: 'CHW' }
+      ],
+      countryCode: {
+        phoneNumberCode: '+11'
+      }
+    };
+    const actions = store.getActions();
+    const mockGetUserType = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+    mockGetUserType.successCb(mockUserDetails);
+    mockGetUserType.failureCb({ message: 'error' });
+
+    const successCbSpy = jest.spyOn(mockGetUserType, 'successCb');
+    const failureCbSpy = jest.spyOn(mockGetUserType, 'failureCb');
+    waitFor(() => {
+      expect(successCbSpy).toHaveBeenCalled();
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(getByText('John Doe')).toBeInTheDocument();
+    });
+    unmount();
+  });
+
+  test('should set user details on success for CHW', async () => {
+    const store = mockStore(initialState);
+    const { getByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const mockUserDetails = {
+      id: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      roles: [{ id: 3, groupName: 'SPICE', suiteAccessName: 'mob', name: 'CHW', displayName: 'CHW' }],
+      villages: [{ id: 1, name: 'Village 1' }],
+      supervisor: {
+        firstName: 'Jane',
+        lastName: 'Smith'
+      },
+      countryCode: {
+        phoneNumberCode: '+11'
+      }
+    };
+    const actions = store.getActions();
+    const mockGetUserType = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+    mockGetUserType.successCb(mockUserDetails);
+    mockGetUserType.failureCb({ message: 'error' });
+
+    const successCbSpy = jest.spyOn(mockGetUserType, 'successCb');
+    const failureCbSpy = jest.spyOn(mockGetUserType, 'failureCb');
+    waitFor(() => {
+      expect(successCbSpy).toHaveBeenCalled();
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(getByText('John Doe')).toBeInTheDocument();
+      expect(getByText('Village 1')).toBeInTheDocument();
+    });
+    unmount();
+  });
+
+  test('should Handle empty roles', async () => {
+    const store = mockStore(initialState);
+    const { getByText, unmount } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <MyProfile />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const mockUserDetails = {
+      id: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      villages: [{ id: 1, name: 'Village 1' }],
+      supervisor: {
+        firstName: 'Jane',
+        lastName: 'Smith'
+      },
+      countryCode: {
+        phoneNumberCode: '+11'
+      },
+      phoneNumber: '1234567890'
+    };
+    const actions = store.getActions();
+    const mockGetUserType = actions.find((action) => action.type === FETCH_USER_BY_ID_REQUEST);
+    mockGetUserType.successCb(mockUserDetails);
+    mockGetUserType.failureCb({ message: 'error' });
+
+    const successCbSpy = jest.spyOn(mockGetUserType, 'successCb');
+    const failureCbSpy = jest.spyOn(mockGetUserType, 'failureCb');
+    waitFor(() => {
+      expect(successCbSpy).toHaveBeenCalled();
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(getByText('John Doe')).toBeInTheDocument();
+    });
+    unmount();
   });
 });

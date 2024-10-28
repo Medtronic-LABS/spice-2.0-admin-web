@@ -2,10 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
 import { AppRoutes } from '../routes';
 import APPCONSTANTS from '../constants/appConstants';
 import { PROTECTED_ROUTES, PUBLIC_ROUTES } from '../constants/route';
+import { goToUrl } from '../utils/routeUtil';
 
 // Mocking the utility functions
 jest.mock('../utils/routeUtil', () => ({
@@ -29,28 +29,31 @@ jest.mock('../../../assets/images/insights.svg', () => ({
   ReactComponent: () => <div>InsightsLogo</div>
 }));
 
-const mockStore = configureStore([thunk]);
+jest.mock('../components/loader/Loader', () => () => <div data-testid='loader'>Loader</div>);
 
+const mockStore = configureStore();
+
+const initialState = {
+  user: {
+    isLoggedIn: false,
+    loggingIn: false,
+    role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+    user: {
+      firstName: 'Super',
+      lastName: 'Admin',
+      email: 'test@example.com',
+      userId: '123'
+    }
+  }
+};
 describe('AppRoutes', () => {
-  let store: any;
-
+  const store = mockStore(initialState);
   beforeEach(() => {
-    store = mockStore({
-      user: {
-        isLoggedIn: false,
-        role: APPCONSTANTS.ROLES.SUPER_ADMIN,
-        user: {
-          country: {
-            id: 1,
-            tenantId: 123
-          }
-        }
-      }
-    });
+    jest.clearAllMocks();
   });
 
   it('should render public routes when not logged in', () => {
-    const { container } = render(
+    render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[PUBLIC_ROUTES.login]}>
           <AppRoutes />
@@ -63,22 +66,16 @@ describe('AppRoutes', () => {
   });
 
   it('should render protected routes when logged in', () => {
-    const store1 = mockStore({
+    const localStore = mockStore({
       user: {
+        ...initialState.user,
         isLoggedIn: true,
-        role: APPCONSTANTS.ROLES.SUPER_ADMIN,
-        user: {
-          country: {
-            id: 1,
-            tenantId: 1
-          }
-        },
         suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR]
       }
     });
 
-    const { container } = render(
-      <Provider store={store1}>
+    render(
+      <Provider store={localStore}>
         <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
           <AppRoutes />
         </MemoryRouter>
@@ -102,5 +99,57 @@ describe('AppRoutes', () => {
     );
 
     expect(screen.getByText('Login')).toBeInTheDocument();
+  });
+
+  it('should render loader when initializing', () => {
+    const localStore = mockStore({
+      user: {
+        ...initialState.user,
+        isLoggedIn: false,
+        loggingIn: true
+      }
+    });
+    const { getByTestId } = render(
+      <Provider store={localStore}>
+        <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </Provider>
+    );
+    expect(getByTestId('loader')).toBeInTheDocument();
+  });
+
+  it('should redirect to the next URL when logged in and next parameter is present', async () => {
+    const nextUrl = '/dashboard';
+    // Mock the URLSearchParams
+    const mockURLSearchParams = jest.fn(() => ({
+      get: jest.fn().mockReturnValue(nextUrl)
+    }));
+    global.URLSearchParams = mockURLSearchParams as any;
+
+    const store = mockStore({
+      user: {
+        ...initialState.user,
+        isLoggedIn: true,
+        loggingIn: false,
+        loggingOut: false,
+        loading: false,
+        initializing: false
+      }
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[`${PUBLIC_ROUTES.login}?next=${nextUrl}`]}>
+          <AppRoutes />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(goToUrl).toHaveBeenCalledWith(nextUrl);
+    });
+
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
   });
 });

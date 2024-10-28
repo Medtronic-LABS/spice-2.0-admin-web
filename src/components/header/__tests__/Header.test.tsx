@@ -1,83 +1,160 @@
-import { mount } from 'enzyme';
+import { render, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import configureMockStore from 'redux-mock-store';
-import { MemoryRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import configureStore from 'redux-mock-store';
 import Header from '../Header';
-import styles from './Header.module.scss';
-import LogoutIcon from '../../../assets/images/power-switch.svg';
-
-const mockStore = configureMockStore();
+import '@testing-library/jest-dom/extend-expect';
+import APPCONSTANTS, { ROLE_LABELS } from '../../../constants/appConstants';
+import { LOGOUT_REQUEST } from '../../../store/user/actionTypes';
 
 jest.mock('../../../assets/images/nav-bar-logo.svg', () => ({
   ReactComponent: 'NavBarLogo'
 }));
 
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useState: jest.fn().mockReturnValue([true, jest.fn()])
-}));
-const store = mockStore({
-  user: {
-    user: {
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'admin'
-    }
-  }
+const mockStore = configureStore();
+const { ROLES, SUITE_ACCESS } = APPCONSTANTS;
+
+const mockChildComponent = jest.fn();
+jest.mock('../UserMenu', () => (props: any) => {
+  mockChildComponent(props);
+  return <div data-testid='usemenu'>Mock UserMenu</div>;
 });
-const wrapper = mount(
-  <Provider store={store}>
-    <MemoryRouter>
-      <Header />
-    </MemoryRouter>
-  </Provider>
-);
+
 describe('Header component', () => {
-  it('should render the Link', () => {
-    const link = wrapper.find('Link');
-    expect(link).toHaveLength(1);
+  let store = mockStore({
+    user: {
+      user: {
+        firstName: 'Super',
+        lastName: 'Admin',
+        email: 'test@example.com',
+        userId: '123',
+        role: ROLES.SUPER_ADMIN,
+        suiteAccess: [SUITE_ACCESS.ADMIN],
+        roleDetail: {
+          id: 9,
+          name: ROLES.SUPER_ADMIN,
+          displayName: 'Super Admin',
+          suiteAccessName: 'web'
+        },
+        formDataId: '456',
+        tenantId: '789'
+      }
+    }
+  });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  test('render header without error', () => {
+    const { getByRole } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    expect(getByRole('navigation')).toBeInTheDocument();
+    expect(getByRole('link')).toBeInTheDocument();
   });
 
-  it('should render the logo', () => {
-    const logo = wrapper.find('NavBarLogo');
-    expect(logo.exists()).toBe(true);
-  });
-  it('should display the name', () => {
-    const initials = wrapper.find(`.${styles.name}`);
-    expect(initials.exists()).toBe(true);
-    expect(initials).toHaveLength(19);
+  test('render usermenu without error', () => {
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    expect(getByTestId('usemenu')).toBeInTheDocument();
   });
 
-  it('should display the user name', () => {
-    const name = wrapper.find(`.${styles.userOptions}`);
-    expect(name.exists()).toBe(true);
-    expect(name).toHaveLength(19);
+  test('check header name of the loggedin user', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    expect(getByText('Super Admin', { selector: '.text-capitalize' })).toBeInTheDocument();
   });
 
-  it('should display the user logo', () => {
-    const name = wrapper.find(`.${styles.userLogo}`);
-    expect(name.exists()).toBe(true);
-    expect(name).toHaveLength(19);
+  test('check header name of the loggedin user if firstname and lastname is not present', () => {
+    const localStore = mockStore({
+      user: {
+        user: {
+          ...(store.getState() as any).user.user,
+          firstName: '',
+          lastName: ''
+        }
+      }
+    });
+    const { getByText } = render(
+      <Provider store={localStore}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    expect(getByText('Settings', { selector: '.text-capitalize' })).toBeInTheDocument();
   });
 
-  it('should display the user role', () => {
-    const initials = wrapper.find(`.${styles.userLogo}`).first().text();
-    expect(initials).toEqual('JDJohn DoeLogout');
+  test('check role name of the loggedin user', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+    expect(getByText('Super Admin', { selector: '.subtle-small-text' })).toBeInTheDocument();
   });
 
-  it('should render the Logout icon', () => {
-    const icon = wrapper.find('img[data-testid="logoutIcon"]');
-    expect(icon.exists()).toBe(true);
+  test('check role name of the loggedin user if displayName is not present', () => {
+    store = mockStore({
+      user: {
+        user: {
+          ...(store.getState() as any).user.user,
+          roleDetail: { ...(store.getState() as any).user.user.roleDetail, displayName: '' }
+        }
+      }
+    });
+    const { getByText } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+    const roleName = ROLE_LABELS[ROLES.SUPER_ADMIN];
+    expect(getByText(roleName, { selector: '.subtle-small-text' })).toBeInTheDocument();
   });
 
-  it('should display the text "Logout"', () => {
-    const text = wrapper.find('.dropdown-item').text();
-    expect(text).toBe('Logout');
+  test('check logout is present', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+    expect(getByText('Logout')).toBeInTheDocument();
   });
 
-  it('should dispatch the logoutRequest action when clicked', () => {
-    wrapper.find('.dropdown-item').simulate('click');
+  test('check dispatch logout event on logout click', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
+    );
+    fireEvent.click(getByText('Logout'));
     const actions = store.getActions();
-    expect(actions).toEqual([{ type: 'LOGOUT_REQUEST' }]);
+    const logoutRequestType = actions.find((action) => action.type === LOGOUT_REQUEST);
+    expect(logoutRequestType).toBeDefined();
   });
 });

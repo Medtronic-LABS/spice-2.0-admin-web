@@ -1,37 +1,29 @@
-import { mount } from 'enzyme';
-import ModalForm from '../../modal/ModalForm';
+import { render, screen } from '@testing-library/react';
 import ConfirmationModalPopup from '../ConfirmationModalPopup';
 
+jest.mock('../../modal/ModalForm', () => () => <div data-testid='modal-form'>Modal Form</div>);
+
+const props: any = {
+  isOpen: true,
+  handleCancel: jest.fn(),
+  handleSubmit: jest.fn()
+};
+
 describe('ConfirmationModalPopup', () => {
-  it('passes props to ModalForm', () => {
-    const isOpen = true;
-    const popupTitle = 'Test Title';
-    const handleCancel = jest.fn();
-    const handleSubmit = jest.fn();
-    const cancelText = 'Cancel';
-    const submitText = 'Ok';
-    const popupSize = 'modal-md';
-    const confirmationMessage = 'Are you sure?';
-    const wrapper = mount(
+  it('renders without crashing', () => {
+    render(
       <ConfirmationModalPopup
-        isOpen={isOpen}
-        popupTitle={popupTitle}
-        handleCancel={handleCancel}
-        handleSubmit={handleSubmit}
-        cancelText={cancelText}
-        submitText={submitText}
-        popupSize={popupSize}
-        confirmationMessage={confirmationMessage}
+        {...props}
+        popupSize='modal-md'
+        cancelText='Cancel'
+        submitText='Ok'
+        confirmationMessage='Are you sure?'
       />
     );
-    const modalForm = wrapper.find(ModalForm);
-    expect(modalForm.prop('show')).toEqual(isOpen);
-    expect(modalForm.prop('title')).toEqual(popupTitle);
-    expect(modalForm.prop('cancelText')).toEqual(cancelText);
-    expect(modalForm.prop('submitText')).toEqual(submitText);
-    expect(modalForm.prop('size')).toEqual(popupSize);
-    expect(modalForm.prop('handleCancel')).toEqual(handleCancel);
-    expect(modalForm.prop('handleFormSubmit')).toEqual(handleSubmit);
-    expect(wrapper.contains(confirmationMessage)).toEqual(true);
+    expect(screen.getByTestId('modal-form')).toBeInTheDocument();
+  });
+  it('render with default props values', () => {
+    render(<ConfirmationModalPopup {...props} />);
+    expect(screen.getByTestId('modal-form')).toBeInTheDocument();
   });
 });

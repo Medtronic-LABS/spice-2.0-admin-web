@@ -13,7 +13,7 @@ const TextAreaInput = ({ label, isShowLabel = true, error = '', errorLabel = '',
     <div className={`${styles.textInput} ${error ? styles.danger : ''}`}>
       {isShowLabel && <label htmlFor={props.name}>{label}</label>}
       <br />
-      <textarea {...props} className='w-100' maxLength={300} />
+      <textarea {...props} className='w-100' maxLength={300} aria-label={label} />
       <div className={styles.error}>
         {error} {error && errorLabel}
       </div>

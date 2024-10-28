@@ -1,10 +1,10 @@
-import { mount } from 'enzyme';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
-import configureMockStore from 'redux-mock-store';
+import { BrowserRouter } from 'react-router-dom';
+import configureStore from 'redux-mock-store';
 import App from './App';
 
-const mockStore = configureMockStore();
+const mockStore = configureStore();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
@@ -22,30 +22,45 @@ jest.mock('./assets/images/app-logo.svg', () => ({
   ReactComponent: 'Logo'
 }));
 
+jest.mock('./components/header/Header', () => () => <div data-testid='header'>Mock Header</div>);
+
 describe('App Component', () => {
-  beforeEach(() => {
+  beforeAll(() => {
     process.env.REACT_APP_GA_TRACKING_ID = 'G-12345ABCDE';
   });
 
-  afterEach(() => {
-    delete process.env.REACT_APP_GA_TRACKING_ID;
-  });
-  const initialState = {
+  const store = mockStore({
     user: {
-      loggingIn: false,
-      loggedIn: true
+      isLoggedIn: true
     }
-  };
-  const store = mockStore(initialState);
+  });
 
-  it('should render without errors', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <Router>
-          <App />
-        </Router>
-      </Provider>
-    );
-    expect(wrapper.length).toBe(1);
+  describe('App', () => {
+    test('should render header without errors', () => {
+      const { getByTestId } = render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </Provider>
+      );
+      expect(getByTestId('header')).toBeInTheDocument();
+    });
+
+    test('should not render header if not logged in', () => {
+      const store = mockStore({
+        user: {
+          isLoggedIn: false
+        }
+      });
+      const { queryByTestId } = render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </Provider>
+      );
+      expect(queryByTestId('header')).not.toBeInTheDocument();
+    });
   });
 });

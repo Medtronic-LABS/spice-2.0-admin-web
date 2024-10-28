@@ -7,6 +7,10 @@ import { IDistrict, IDistrictAdmin, IAdminEditFormValues } from '../../../store/
 import { initialState } from '../../../store/district/reducer';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../../constants/appConstants';
+import { formatUserToastMsg } from '../../../utils/commonUtils';
+import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
+import { ACTIVATE_ACCOUNT_REQUEST, FETCH_DISTRICT_LIST_REQUEST } from '../../../store/district/actionTypes';
 
 const mockStore = configureStore([]);
 jest.mock('../../../constants/appConstants', () => ({
@@ -21,11 +25,21 @@ jest.mock('../../../constants/appConstants', () => ({
   ACTIVATE_ACCOUNT_CONFIRMATION: undefined
 }));
 
+jest.mock('../../../utils/toastCenter', () => ({
+  success: jest.fn(),
+  error: jest.fn(),
+  getErrorToastArgs: jest.fn(() => [])
+}));
+
 const mockChildComponent = jest.fn();
 jest.mock('../../../components/customTable/CustomTable', () => (props: any) => {
   mockChildComponent(props);
   return <div>child component</div>;
 });
+
+const {
+  district: { s: districtSName, p: districtPName }
+} = NAME_CONSTANTS;
 
 describe('DeactivatedRecords component', () => {
   const store = mockStore({
@@ -42,6 +56,9 @@ describe('DeactivatedRecords component', () => {
     }
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should render without errors', () => {
     const { getByText } = render(
       <Provider store={store}>
@@ -50,7 +67,32 @@ describe('DeactivatedRecords component', () => {
         </Router>
       </Provider>
     );
-    expect(getByText('Deactivated Account')).toBeInTheDocument();
+    expect(getByText(`Deactivated ${districtPName}`)).toBeInTheDocument();
+  });
+
+  it('should render without errors for single district and super admin', () => {
+    const localStore = mockStore({
+      district: {
+        ...initialState,
+        districtList: [ACCOUNT_MOCK_DATA_CONSTANTS.FETCH_DISTRICT_LIST_RESPONSE_PAYLOAD],
+        total: 1
+      },
+      user: {
+        user: {
+          role: 'SUPER_ADMIN',
+          tenantId: 1
+        }
+      }
+    });
+
+    const { getByText } = render(
+      <Provider store={localStore}>
+        <Router>
+          <DeactivatedRecords />
+        </Router>
+      </Provider>
+    );
+    expect(getByText(`Deactivated ${districtSName}`)).toBeInTheDocument();
   });
 
   it('should call fetchDetails functions', async () => {
@@ -63,7 +105,7 @@ describe('DeactivatedRecords component', () => {
     );
 
     const actions = store.getActions();
-    const mockFetchDetailsType = actions.find((action) => action.type === 'FETCH_ACCOUNTS_REQUEST');
+    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_DISTRICT_LIST_REQUEST);
     mockFetchDetailsType.failureCb({ message: 'error' });
     const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
     waitFor(() => {
@@ -80,6 +122,8 @@ describe('DeactivatedRecords component', () => {
       </Provider>
     );
 
+    const fetchDetails = jest.fn();
+
     // Access the props passed to the mock component
     const mockDeactivateRecords: any = mockChildComponent.mock.calls[0][0];
     mockDeactivateRecords.onActivateClick();
@@ -89,9 +133,32 @@ describe('DeactivatedRecords component', () => {
     });
 
     const actions = store.getActions();
-    const mockDeactivateRecordsType = actions.find((action) => action.type === 'ACTIVATE_DISTRICT_REQUEST');
-    mockDeactivateRecordsType.successCb('Success', 'Account activated successfully');
-    mockDeactivateRecordsType.failureCb({ message: 'error' });
+    const mockDeactivateRecordsType = actions.find((action) => action.type === ACTIVATE_ACCOUNT_REQUEST);
+
+    mockDeactivateRecordsType.successCb(() => {
+      expect(fetchDetails).toHaveBeenCalled();
+      const actions = store.getActions();
+      const mockFetchDetailsType = actions.find((action) => action.type === FETCH_DISTRICT_LIST_REQUEST);
+      mockFetchDetailsType.failureCb({ message: 'error' });
+      const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
+      waitFor(() => {
+        expect(failureCbSpy).toHaveBeenCalled();
+      });
+      expect(toastCenter.success).toHaveBeenCalledWith(
+        APPCONSTANTS.SUCCESS,
+        formatUserToastMsg(APPCONSTANTS.ACTIVATE_COUNTY_SUCCESS, districtSName)
+      );
+    });
+
+    mockDeactivateRecordsType.failureCb((error: Error) => {
+      expect(toastCenter.error).toHaveBeenCalledWith(
+        ...getErrorToastArgs(
+          error,
+          APPCONSTANTS.ERROR,
+          formatUserToastMsg(APPCONSTANTS.ACTIVATE_COUNTY_FAIL, districtSName)
+        )
+      );
+    });
 
     const successCbSpy = jest.spyOn(mockDeactivateRecordsType, 'successCb');
     const failureCbSpy = jest.spyOn(mockDeactivateRecordsType, 'failureCb');

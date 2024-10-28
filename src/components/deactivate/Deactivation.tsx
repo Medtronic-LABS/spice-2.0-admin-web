@@ -18,7 +18,7 @@ interface IDeactivationProps extends React.InputHTMLAttributes<HTMLInputElement>
  */
 const Deactivation = ({ formName }: IDeactivationProps) => {
   return (
-    <div className='row gx-1dot25'>
+    <div className='row gx-1dot25' data-testid='deactivation-component'>
       <div className='col-sm-6 col-12'>
         <Field
           name='status'

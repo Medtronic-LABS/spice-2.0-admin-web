@@ -345,7 +345,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
       isEdit &&
       (!actionFormatter?.hideEditIcon ||
         (actionFormatter?.hideEditIcon && !actionFormatter?.hideEditIcon(rowDataValue))) && (
-        <div className={styles.editIcon} onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}>
+        <div className={styles.editIcon} data-testid='edit-icon' onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}>
           <CustomTooltip title={'Edit'}>
             <EditIcon aria-labelledby={'edit-icon'} />
           </CustomTooltip>
@@ -362,7 +362,11 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
   const handleShowActivateIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       isActivate && (
-        <div className={styles.activateIcon} onClick={(e) => handleActivate(e, rowDataValue, rowIndex)}>
+        <div
+          className={styles.activateIcon}
+          data-testid='activate-icon'
+          onClick={(e) => handleActivate(e, rowDataValue, rowIndex)}
+        >
           <CustomTooltip title={'Activate'}>
             <ActivateIcon aria-labelledby={'activate-icon'} />
           </CustomTooltip>
@@ -382,6 +386,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
         (actionFormatter?.hideCustomIcon && !actionFormatter?.hideCustomIcon(rowDataValue))) ? (
       <div
         className={rowDataValue.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
+        data-testid='custom-icon'
         onClick={(e) => handleCustomIconClick(e, rowDataValue, rowIndex, isPopupNeeded)}
       >
         <CustomTooltip title={customTitle}>

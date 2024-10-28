@@ -280,7 +280,7 @@ export function* changePassword(action: IActionProps) {
   Worker Saga: Fired on UPDATE_PASSWORD_REQUEST action
 */
 export function* updatePassword(action: IActionProps) {
-  const { userId, oldPassword, newPassword, successCB, failureCb } = action.data;
+  const { userId, oldPassword, newPassword, successCB, failureCB } = action.data;
   try {
     yield call(userService.updatePassword, {
       userId,
@@ -290,7 +290,7 @@ export function* updatePassword(action: IActionProps) {
     yield put(userActions.changeOwnPasswordSuccess());
     successCB();
   } catch (e: any) {
-    failureCb?.(e);
+    failureCB?.(e);
     yield put(userActions.changeOwnPasswordFail(e));
   }
 }

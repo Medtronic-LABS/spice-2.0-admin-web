@@ -196,6 +196,7 @@ const SelectInput = ({
         getOptionValue={getOptionValue}
         isDisabled={disabled}
         isOptionDisabled={isOptionDisabled}
+        aria-label={label}
       />
       {!showOnlyDropdown && (
         <div className={styles.error}>
