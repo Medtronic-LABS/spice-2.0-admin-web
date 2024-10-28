@@ -47,6 +47,7 @@ export interface IFetchRegionsSuccessPayload {
 export interface IRegionPayload {
   name: string;
   countryCode: string;
+  appTypes: string[];
   users: Array<{
     firstName: string;
     lastName: string;

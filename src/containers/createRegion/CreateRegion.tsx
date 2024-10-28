@@ -23,6 +23,7 @@ export interface IRegionFormValues {
   region: {
     name: string;
     countryCode: string;
+    appTypes: string[];
   };
   users: IUserFormValues[];
 }

@@ -1,5 +1,5 @@
 import { FormApi, Tools } from 'final-form';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
 import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
@@ -17,10 +17,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility } from '../healthFacility/HealthFacilitySummary';
 import { IClinicalWorkflows, IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
+import {
+  healthFacilityLoadingSelector,
+  workflowListSelector,
+  workflowLoadingSelector
+} from '../../store/healthFacility/selectors';
 import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getUserPayload } from '../../utils/commonUtils';
+import { filterAndExtractAppTypes } from '../../container_com/healthFacility/CreateHealthFacility';
 
 interface IMatchParams {
   regionId?: string;
@@ -36,16 +41,19 @@ interface IRouteProps extends RouteComponentProps<IMatchParams> {}
  */
 const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const dispatch = useDispatch();
-  let formInstance: FormApi<any>;
+  const formInstance = useRef({} as FormApi<any>);
   const history = useHistory();
+  const workflows = useSelector(workflowListSelector);
   const isWorkflowLoading = useSelector(workflowLoadingSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const [submittedData, setSubmittedData] = useState({
     data: {
-      healthFacility: {},
-      users: [] as IHFUserGet[]
+      healthFacility: {} as any,
+      users: [] as IHFUserGet[],
+      appTypes: [] as string[]
     },
-    isNextClicked: false
+    isSubmitClicked: false,
+    pageNumber: 1
   });
 
   const [autoFetch, setAutoFetchState] = useState([] as any[]);
@@ -61,7 +69,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   } = NAME_CONSTANTS;
 
   useEffect(() => {
-    formInstance?.subscribe(
+    formInstance.current?.subscribe(
       (formState) => {
         const nextchiefdomTenantId = formState?.values?.healthFacility?.chiefdom?.tenantId || '';
         if (nextchiefdomTenantId !== selectedchiefdomTenantId) {
@@ -73,6 +81,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const PAGENUMBER = { DETAILS: 1, WORKFLOW: 2, USER: 3, SUBMIT: 4 };
+
   useEffect(() => {
     dispatch(clearAllDependentData());
   }, [dispatch]);
@@ -81,14 +91,17 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
    * Handler for form cancel
    */
   const onCancel = () => {
-    if (submittedData.isNextClicked) {
-      setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
-    } else {
+    if (submittedData.pageNumber === PAGENUMBER.DETAILS) {
       onGotoList();
+    } else {
+      setSubmittedData({
+        ...submittedData,
+        pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
+      });
     }
   };
 
-  const onGotoList = () => {
+  const onGotoList = useCallback(() => {
     const url = ((regionId && PROTECTED_ROUTES.healthFacilityByRegion) ||
       (districtId && PROTECTED_ROUTES.healthFacilityByDistrict) ||
       (chiefdomId && role === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN && PROTECTED_ROUTES.healthFacilityDashboard) ||
@@ -98,7 +111,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         .replace(':tenantId', tenantId)
         .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
     );
-  };
+  }, [chiefdomId, districtId, history, regionId, role, tenantId]);
 
   /**
    * Resets all the fields whose name contains given substring,
@@ -118,22 +131,103 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     }
   };
 
-  const onCreateSuccess = () => {
+  const onCreateSuccess = useCallback(() => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS);
-    setSubmittedData({ ...submittedData, isNextClicked: !submittedData.isNextClicked });
-    formInstance.change('healthFacility', {});
+    setSubmittedData({
+      ...submittedData,
+      isSubmitClicked: false,
+      pageNumber: submittedData.pageNumber <= 3 ? submittedData.pageNumber + 1 : PAGENUMBER.DETAILS
+    });
+    formInstance.current.change('healthFacility', {});
     onGotoList();
-  };
+  }, [PAGENUMBER.DETAILS, onGotoList, submittedData]);
 
-  const onCreateFailure = (e: Error) =>
-    toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR));
+  const onCreateFailure = useCallback(
+    (e: Error) => {
+      setSubmittedData({
+        ...submittedData,
+        isSubmitClicked: false,
+        pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
+      });
+      toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR));
+    },
+    [PAGENUMBER.DETAILS, submittedData]
+  );
 
   /**
-   * Handler for form submition action
-   * @param values
+   * Handler for form submission action which changes the page number
+   * @param {Object} values - The form values submitted
+   * @param {Object} values.healthFacility - The health facility data
+   * @param {Array} values.healthFacility.workflows - Selected workflows for the health facility
+   * @param {Array} values.users - User data associated with the health facility
+   * @returns {void}
+   *
+   * This function is called when the form is submitted. It processes the form data,
+   * extracts relevant information, and updates the component's state to move to the next page.
+   * It also filters and extracts app types based on the selected workflows.
    */
-  const onSubmit = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
-    if (submittedData.isNextClicked && countryId) {
+  const onSubmitClicked = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
+    const selectedWorkflows = healthFacility?.workflows || [];
+    const selectedAppTypes = filterAndExtractAppTypes(workflows, selectedWorkflows) || [];
+    setSubmittedData({
+      data: {
+        healthFacility: {
+          ...healthFacility,
+          workflows: selectedWorkflows,
+          defaultTrueWorkflows: healthFacility.defaultTrueWorkflows || []
+        },
+        users,
+        appTypes: selectedAppTypes
+      },
+      isSubmitClicked: true,
+      pageNumber: submittedData.pageNumber + 1
+    });
+  };
+
+  useEffect(() => {
+    if (!submittedData.isSubmitClicked) {
+      return;
+    }
+
+    const { healthFacility, users } = submittedData.data;
+
+    const handleWorkflowPage = () => {
+      dispatch(
+        fetchWorkflowListRequest({
+          countryId,
+          successCb: (flows) => {
+            setSubmittedData((prev) => ({
+              ...prev,
+              data: {
+                ...prev.data,
+                healthFacility: {
+                  ...healthFacility,
+                  workflows: flows.map((v: any) => v?.id),
+                  defaultTrueWorkflows: flows.filter((flow) => flow.default)?.map((f) => f?.id)
+                },
+                users
+              },
+              isSubmitClicked: false
+            }));
+          },
+          failureCb: (error) => {
+            setSubmittedData((prev) => ({
+              ...prev,
+              isSubmitClicked: false,
+              pageNumber: Math.max(prev.pageNumber - 1, PAGENUMBER.DETAILS)
+            }));
+            toastCenter.error(
+              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
+            );
+          }
+        })
+      );
+    };
+
+    const handleSubmitPage = () => {
+      if (!regionId) {
+        return;
+      }
       // adding default clinicalworkflows explicitly to payload, since it's not getting added by default
       let clinicalWFs: IClinicalWorkflows[] = [];
       if (healthFacility.clinicalWorkflows?.length) {
@@ -158,88 +252,129 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
       }
-    } else {
-      dispatch(
-        fetchWorkflowListRequest({
-          countryId,
-          successCb: (flows) => {
-            setSubmittedData({
-              data: {
-                healthFacility: {
-                  ...healthFacility,
-                  workflows: flows.map((v: any) => v.id),
-                  defaultTrueWorkflows: flows.filter((flow) => flow.default)?.map((f) => f.id)
-                },
-                users
-              },
-              isNextClicked: true
-            });
-          },
-          failureCb: (error) =>
-            toastCenter.error(
-              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
-            )
-        })
-      );
+
+      if (postData.clinicalWorkflowIds.length) {
+        dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
+      }
+    };
+
+    switch (submittedData.pageNumber) {
+      case PAGENUMBER.WORKFLOW:
+        handleWorkflowPage();
+        break;
+      case PAGENUMBER.SUBMIT:
+        handleSubmitPage();
+        break;
+      case PAGENUMBER.USER:
+      case PAGENUMBER.DETAILS:
+      default:
+        setSubmittedData((prev) => ({ ...prev, isSubmitClicked: false }));
+        break;
     }
-  };
+  }, [
+    PAGENUMBER.DETAILS,
+    PAGENUMBER.SUBMIT,
+    PAGENUMBER.USER,
+    PAGENUMBER.WORKFLOW,
+    countryId,
+    dispatch,
+    onCreateFailure,
+    onCreateSuccess,
+    regionId,
+    rolesGrouped?.SPICE,
+    submittedData,
+    workflows
+  ]);
+
+  /**
+   * Renders the appropriate form component based on the current page number
+   * @param pageNumber - The current page number
+   * @param form - The form API instance
+   * @returns JSX.Element - The rendered form component
+   */
+  const renderByPage = useCallback(
+    (pageNumber: number, form: FormApi<any, Partial<any>>) => {
+      switch (pageNumber) {
+        case PAGENUMBER.DETAILS:
+          return (
+            <div className='col-lg-6 col-12'>
+              <FormContainer label={`${healthFacilitySName} Details`} icon={SiteDetailsIcon}>
+                <HealthFacilityDetailsForm
+                  formName='healthFacility'
+                  form={formInstance.current}
+                  data={submittedData.data?.healthFacility}
+                />
+              </FormContainer>
+            </div>
+          );
+        case PAGENUMBER.WORKFLOW:
+          return (
+            <FormContainer label='Clinical Workflows Involved' required={true} icon={SiteDetailsIcon}>
+              <Workflows formName='healthFacility' form={form} />
+            </FormContainer>
+          );
+
+        case PAGENUMBER.SUBMIT:
+        case PAGENUMBER.USER:
+        default:
+          return (
+            <div className='col-lg-6 col-12'>
+              <FormContainer label='Add User' icon={SiteAddUserIcon}>
+                <UserForm
+                  countryId={countryId}
+                  form={form}
+                  enableAutoPopulate={true}
+                  isHF={true}
+                  isHFCreate={true}
+                  entityName='healthFacility'
+                  data={submittedData.data?.users}
+                  autoFetchedState={{ autoFetch, setAutoFetchState }}
+                  parentOrgId={selectedchiefdomTenantId || tenantId}
+                  ignoreTenantId={''}
+                  isSiteUser={true}
+                  appTypes={submittedData.data?.appTypes || []}
+                />
+              </FormContainer>
+            </div>
+          );
+      }
+    },
+    [
+      PAGENUMBER.DETAILS,
+      PAGENUMBER.WORKFLOW,
+      PAGENUMBER.SUBMIT,
+      PAGENUMBER.USER,
+      healthFacilitySName,
+      submittedData.data?.healthFacility,
+      submittedData.data?.users,
+      submittedData.data?.appTypes,
+      countryId,
+      autoFetch,
+      selectedchiefdomTenantId,
+      tenantId
+    ]
+  );
 
   return (
     <>
       <Form
-        onSubmit={onSubmit}
+        onSubmit={onSubmitClicked}
         initialValues={{ ...submittedData.data }}
         mutators={{
           ...arrayMutators,
           resetFields
         }}
         render={({ handleSubmit, form }: FormRenderProps<any>) => {
-          formInstance = form;
+          formInstance.current = form;
           return (
             <form onSubmit={handleSubmit} data-testid='create-site-form'>
-              <div className='row g-1dot25'>
-                {submittedData.isNextClicked ? (
-                  <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
-                    <Workflows formName='healthFacility' form={form} />
-                  </FormContainer>
-                ) : (
-                  <>
-                    <div className='col-lg-6 col-12'>
-                      <FormContainer label={`${healthFacilitySName} Details`} icon={SiteDetailsIcon}>
-                        <HealthFacilityDetailsForm
-                          formName='healthFacility'
-                          form={formInstance}
-                          data={{ ...submittedData.data.healthFacility }}
-                        />
-                      </FormContainer>
-                    </div>
-                    <div className='col-lg-6 col-12'>
-                      <FormContainer label={`Add User`} icon={SiteAddUserIcon}>
-                        <UserForm
-                          countryId={countryId}
-                          form={form}
-                          enableAutoPopulate={true}
-                          isHF={true}
-                          isHFCreate={true}
-                          entityName='healthFacility'
-                          data={submittedData.data.users}
-                          autoFetchedState={{ autoFetch, setAutoFetchState }}
-                          parentOrgId={selectedchiefdomTenantId || tenantId}
-                          ignoreTenantId={''}
-                          isSiteUser={true}
-                        />
-                        <></>
-                      </FormContainer>
-                    </div>
-                  </>
-                )}
-              </div>
+              <div className='row g-1dot25'>{renderByPage(submittedData.pageNumber, form)}</div>
               <div className='col-12 mt-1dot25 d-flex'>
                 <button type='button' className='btn secondary-btn me-0dot625 px-1dot125 ms-auto' onClick={onCancel}>
-                  {submittedData.isNextClicked ? 'Back' : 'Cancel'}
+                  {submittedData.pageNumber === PAGENUMBER.DETAILS ? 'Cancel' : 'Back'}
                 </button>
                 <button type='submit' className='btn primary-btn px-1dot75'>
-                  {submittedData.isNextClicked ? 'Submit' : 'Next'}
+                  {[PAGENUMBER.USER, PAGENUMBER.SUBMIT].includes(submittedData.pageNumber) ? 'Submit' : 'Next'}
                 </button>
               </div>
               {(loading || isWorkflowLoading) && <Loader isFullScreen={true} className='translate-x-minus50' />}

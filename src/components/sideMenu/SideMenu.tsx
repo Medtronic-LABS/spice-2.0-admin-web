@@ -146,7 +146,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       } else {
         menuBy = SIDE_MENU_FETCHING_HIERARCHY[currentModule];
       }
-      formatMenuItems([...list[menuBy]]);
+      formatMenuItems([...(list[menuBy] || [])]);
     }
   }, [fetchSideMenu, formatMenuItems, list, currentModule, role]);
 

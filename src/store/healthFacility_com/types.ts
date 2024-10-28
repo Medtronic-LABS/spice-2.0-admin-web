@@ -58,7 +58,9 @@ export interface IHealthFacility {
   tenantId: number;
   peerSupervisors?: IPeerSupervisor[];
   linkedVillages: IVillages[];
+  workflows?: number[];
   clinicalWorkflows: IClinicalWorkflows[];
+  customizedWorkflows?: IClinicalWorkflows[];
 }
 
 export interface IObjectData {
@@ -104,6 +106,7 @@ export interface IClinicalWorkflows {
   name: string;
   moduleType: string;
   workflowName: string;
+  appTypes: string[];
 }
 
 export interface IFetchHFListSuccessPayload {
@@ -171,6 +174,7 @@ export interface IUserRole {
   name: string;
   displayName?: string;
   groupName?: string;
+  appTypes: string[];
 }
 
 export interface IHFUserPost {
@@ -558,8 +562,10 @@ export interface IFetchPeerSupervisorListFailure {
 }
 
 export interface IWorkflow {
-  id: number;
+  default: boolean;
+  id: number | string;
   name: string;
+  appTypes: string[];
 }
 
 export interface IFetchWorkflowListRequest {

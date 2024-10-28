@@ -20,6 +20,7 @@ export interface IUserFormProps {
   isDropdownDisable?: boolean;
   entityName?: string;
   enableAutoPopulate?: boolean;
+  appTypes?: string[];
   data?: any[];
   countryId?: number;
   hfTenantId?: number;
@@ -193,6 +194,7 @@ export interface IRoles {
   displayName?: string;
   groupName?: string;
   tenantIds?: any[];
+  appTypes: string[];
 }
 
 export interface IGroupRoles {

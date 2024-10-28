@@ -11,7 +11,7 @@ import {
   IUpdateUserRequest,
   IUser
 } from './types';
-import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import localStorageServices from '../../global/localStorageServices';
 import { encryptData } from '../../utils/commonUtils';
@@ -70,13 +70,16 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       role: spiceAdminRole?.name || allRoles[0]?.name || '',
       roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
-      appTypes: appTypes || oldAppTypes,
+      appTypes: appTypes || country?.appTypes || oldAppTypes,
       country,
       suiteAccess,
       formDataId: organizations[0]?.formDataId,
       countryId: undefined,
       organizations
     };
+    if ((payload.appTypes || []).length) {
+      localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(payload.appTypes)}`);
+    }
     successCb?.(payload);
     yield put(userActions.loginSuccess(payload));
   } catch (e: any) {
@@ -167,14 +170,14 @@ export function* fetchLoggedInUser(): SagaIterator {
       roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
       formDataId: organizations[0]?.formDataId,
-      appTypes: appTypes || oldAppTypes,
+      appTypes: appTypes || country?.appTypes || oldAppTypes,
       country,
       suiteAccess,
       countryId: undefined,
       organizations
     };
-    if ((appTypes || []).length) {
-      localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(appTypes)}`);
+    if ((payload.appTypes || []).length) {
+      localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(payload.appTypes)}`);
     }
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {
@@ -195,31 +198,23 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
       data: { entity: userRoles }
     } = yield call(userService.fetchUserRoles, countryId);
     const role = yield select((state: AppState) => state.user.user.role);
-    const appTypes = localStorageServices.getItem('appTypes');
-    // const appTypes = yield select(
-    //   (state: AppState) => state.user.user.appTypes
-    // );
-    let updatedUserRoles = {
+    const { SUPER_ADMIN, SUPER_USER } = APPCONSTANTS.ROLES;
+    const { REPORT_ADMIN, SPICE_INSIGHTS_DEVELOPER } = APPCONSTANTS.COMMUNITY_ROLES;
+    const updatedUserRoles = {
       ...userRoles,
-      SPICE: [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role)
+      SPICE: [SUPER_ADMIN, SUPER_USER].includes(role)
         ? userRoles?.SPICE
-        : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== APPCONSTANTS.ROLES.SUPER_ADMIN)
+        : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== SUPER_ADMIN)
     };
-    if (appTypes && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY) {
-      updatedUserRoles = {
-        ...{ ...updatedUserRoles },
-        SPICE: [APPCONSTANTS.COMMUNITY_ROLES.SUPER_ADMIN, APPCONSTANTS.COMMUNITY_ROLES.SUPER_USER].includes(role)
-          ? userRoles.SPICE
-          : userRoles.SPICE.filter((r: IUserRole) => r.name !== APPCONSTANTS.COMMUNITY_ROLES.SUPER_ADMIN),
-        REPORTS: [APPCONSTANTS.COMMUNITY_ROLES.SUPER_ADMIN, APPCONSTANTS.COMMUNITY_ROLES.SUPER_USER].includes(role)
-          ? userRoles.REPORTS
-          : userRoles.REPORTS.filter((r: IUserRole) => r.name !== APPCONSTANTS.COMMUNITY_ROLES.REPORT_ADMIN),
-        INSIGHTS: [APPCONSTANTS.COMMUNITY_ROLES.SUPER_USER].includes(role)
-          ? userRoles.INSIGHTS
-          : userRoles.INSIGHTS.filter(
-              (r: IUserRole) => r.name !== APPCONSTANTS.COMMUNITY_ROLES.SPICE_INSIGHTS_DEVELOPER
-            )
-      };
+    if ((updatedUserRoles.REPORTS || []).length) {
+      updatedUserRoles.REPORTS = [SUPER_ADMIN, SUPER_USER].includes(role)
+        ? userRoles.REPORTS
+        : userRoles.REPORTS.filter((r: IUserRole) => r.name !== REPORT_ADMIN);
+    }
+    if ((updatedUserRoles.INSIGHTS || []).length) {
+      updatedUserRoles.INSIGHTS = [SUPER_USER].includes(role)
+        ? userRoles.INSIGHTS
+        : userRoles.INSIGHTS.filter((r: IUserRole) => r.name !== SPICE_INSIGHTS_DEVELOPER);
     }
     successCb?.(updatedUserRoles);
     yield put(userActions.fetchUserRolesActionSuccess(updatedUserRoles));

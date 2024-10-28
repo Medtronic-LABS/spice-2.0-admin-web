@@ -99,7 +99,7 @@ const HealthFacilityDetailsForm = ({
   const languages = useSelector(cultureListSelector);
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
-  const countryId = Number(regionId || regionData.id);
+  const countryId = Number(regionId || regionData?.id);
 
   // Culture list fetch
   useEffect(() => {

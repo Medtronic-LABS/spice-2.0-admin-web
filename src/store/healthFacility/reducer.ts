@@ -29,6 +29,7 @@ export const initialState: IHealthFacilityState = {
     peerSupervisors: [],
     linkedVillages: [],
     clinicalWorkflows: [],
+    workflows: [],
     district: {} as IDistrict
   },
   hfTypes: [],

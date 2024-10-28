@@ -22,7 +22,8 @@ import {
   IFetchVillagesListFromHFRequest,
   IFetchUserDetailRequest,
   IDeleteHFRequest,
-  IFetchUnlinkedVillagesRequest
+  IFetchUnlinkedVillagesRequest,
+  IWorkflow
 } from './types';
 import {
   fetchHFListSuccess,
@@ -518,8 +519,20 @@ export function* fetchWorkflowListSagaRequest({
     const {
       data: { entityList: list }
     } = yield call(hfService.fetchWorkflowList as any, { countryId });
-    successCb?.(list);
-    yield put(fetchWorkflowListSuccess({ list }));
+
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
+    let filteredWorkflows = [];
+    // Current workflow filter based on appTypes
+    if (appTypes && appTypes.length === 1) {
+      filteredWorkflows = list.filter((workflow: IWorkflow) => {
+        const workflowAppTypes = workflow.appTypes;
+        return workflowAppTypes.includes(appTypes[0]);
+      });
+    } else {
+      filteredWorkflows = list;
+    }
+    successCb?.(filteredWorkflows);
+    yield put(fetchWorkflowListSuccess({ list: filteredWorkflows }));
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);

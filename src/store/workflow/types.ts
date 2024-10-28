@@ -9,7 +9,7 @@ export interface IWorkflowModuleReqPayload {
   viewScreens?: string[];
   countryId?: string;
   tenantId: string;
-  id?: string;
+  id?: string | number;
 }
 export interface ICreateWorkflowModule {
   type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
@@ -40,7 +40,7 @@ export interface IAccountAdmin extends Omit<IAdminEditFormValues, 'timezone'> {
   timezone: string;
 }
 export interface IClinicalWorkflow {
-  id: string;
+  id: string | number;
   name: string;
   isActive?: boolean;
   default?: boolean;
@@ -91,7 +91,7 @@ export interface IWorkflowModuleReqPayload {
   viewScreens?: string[];
   countryId?: string;
   tenantId: string;
-  id?: string;
+  id?: string | number;
 }
 export interface IFetchClinicalWorkflowReq {
   type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST;

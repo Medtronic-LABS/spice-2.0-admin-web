@@ -54,7 +54,7 @@ export const SiteUserForm = (props: any) => {
               errorLabel='timezone'
               labelKey='description'
               valueKey='id'
-              options={timezoneList}
+              options={timezoneList || []}
               loadingOptions={isTmezoneListLoading}
               error={isError(meta)}
               isModel={true}
@@ -75,7 +75,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
-                options={cultureList}
+                options={cultureList || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
                 isModel={true}

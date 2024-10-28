@@ -22,7 +22,6 @@ const appTypes = jsonParse(storedData) || [];
 if (!!appTypes && appTypes.length) {
   store.dispatch(setAppType(appTypes));
 }
-// localStorageExport.deleteItem(APP_TYPE_NAME);
 
 // Create root and render the app using React 18 API
 const container = document.getElementById('root');

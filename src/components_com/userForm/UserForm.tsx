@@ -12,7 +12,7 @@ import SelectInput from '../formFields/SelectInput';
 import APPCONSTANTS from '../../constants/appConstantsCom';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
-import { IRoles, IUser } from '../../store/user/types';
+import { IGroupRoles, IRoles, IUser } from '../../store/user/types';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
 import { isUserRolesLoading, roleSelector, userRolesSelector } from '../../store/user/selectors';
@@ -63,6 +63,7 @@ interface IUserFormProps {
   isDropdownDisable?: boolean;
   entityName?: string;
   enableAutoPopulate?: boolean;
+  appTypes?: string[];
   data?: any[];
   countryId: number;
   hfTenantId?: number;
@@ -80,6 +81,36 @@ interface IUserFormProps {
 
   roleOptionsState?: React.MutableRefObject<IRoles[][]>;
 }
+
+export const filterRolesByAppTypeFn = (data: IGroupRoles, appType: string) => {
+  const filteredData: { [key: string]: any[] } = {};
+
+  // Iterate over each group in the data
+  for (const group in data) {
+    if (true) {
+      if (data.hasOwnProperty(group)) {
+        const filteredRoles = data[group].filter((role: IRoles) => (role.appTypes || []).includes(appType));
+        // If there are any roles left after filtering, add them to the filteredData
+        if (filteredRoles.length > 0) {
+          filteredData[group] = filteredRoles;
+        }
+      }
+    }
+  }
+  return filteredData;
+};
+
+// Filter roles and get appTypes without duplicates
+export const roleBasedAppTypes = (newRoles: IRoles[] = []) => {
+  return newRoles.reduce<string[]>((acc, roleVal) => {
+    (roleVal.appTypes || []).forEach((newAppType: string) => {
+      if (!acc.includes(newAppType)) {
+        acc.push(newAppType);
+      }
+    });
+    return acc;
+  }, []);
+};
 
 export const formUserData = (values: any) => {
   const allSuiteAccess =
@@ -135,6 +166,7 @@ const UserForm = ({
   enableAutoPopulate,
   countryId,
   hfTenantId,
+  appTypes,
   data = [],
   autoFetchedDataState,
   autoFetchedState,
@@ -160,6 +192,7 @@ const UserForm = ({
   const isCountryListLoading = useSelector(countryLoadingSelector);
   const [peerSupervisors, setPeerSupervisors] = useState([[...peerSupervisorList.list]] as IPeerSupervisor[][]);
   const [villages, setVillages] = useState([[...villagesList.list]] as IVillages[][]);
+  const [newHFList, setNewHFList] = useState(healthFacilityList);
 
   const [autoFetchData, setAutoFetchData] = useState(autoFetchedDataState?.autoFetchData || ([] as any[]));
   const [isCHWUser, setUserAsCHW] = useState(chwState?.isCHWUser || [false]);
@@ -168,6 +201,7 @@ const UserForm = ({
   const [autoFetched, setAutoFetched] = useState<boolean[]>(autoFetchedState?.autoFetch || ([] as boolean[]));
   const fetchedData = useRef([] as any[]);
   const [clearEmail, setClearEmail] = useState(false);
+  const [appTypeBasedRoles, setAppTypeRoles] = useState(rolesGrouped);
 
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -190,6 +224,12 @@ const UserForm = ({
     ],
     []
   );
+
+  useEffect(() => {
+    setAppTypeRoles(
+      appTypes && appTypes.length === 1 ? filterRolesByAppTypeFn(rolesGrouped, appTypes[0]) : rolesGrouped
+    );
+  }, [appTypes, rolesGrouped]);
 
   useEffect(() => {
     return () => {
@@ -282,6 +322,11 @@ const UserForm = ({
         const { formDataId: id, name, id: tenantId } = userData.organizations[0];
         userData.healthFacility = { id, name, tenantId };
       }
+      if (showHealthFacilityFn(index)) {
+        const fullRoles = form.getState().values[`${formName}[${index}].roles`];
+        const selectedAppTypes = roleBasedAppTypes(fullRoles);
+        filterHFByAppTypes(selectedAppTypes);
+      }
       form.batch(() => {
         form.change(`${formName}[${index}].id`, userData.id || '');
         form.change(`${formName}[${index}].suiteAccess`, userData.suiteAccess || null);
@@ -333,8 +378,8 @@ const UserForm = ({
 
   useEffect(() => {
     if (
-      (!rolesGrouped?.hasOwnProperty('SPICE') ||
-        (rolesGrouped?.hasOwnProperty('SPICE') && !rolesGrouped.SPICE.length)) &&
+      (!appTypeBasedRoles?.hasOwnProperty('SPICE') ||
+        (appTypeBasedRoles?.hasOwnProperty('SPICE') && !appTypeBasedRoles.SPICE.length)) &&
       !isProfile
     ) {
       dispatch(
@@ -344,7 +389,7 @@ const UserForm = ({
         })
       );
     }
-  }, [countryId, dispatch, isProfile, rolesGrouped]);
+  }, [countryId, dispatch, isProfile, appTypeBasedRoles]);
 
   const isError = (meta: any) => (meta.touched && meta.error) || undefined;
 
@@ -424,16 +469,16 @@ const UserForm = ({
     []
   );
   const superAdminRoles = useMemo(() => ['SUPER_ADMIN', 'SUPER_USER'], []);
-  const reportAdminRole = useMemo(() => ['REPORT_ADMIN'], []);
+  // const reportAdminRole = useMemo(() => ['REPORT_ADMIN'], []);
   const facilityReportAdminRole = useMemo(() => ['FACILITY_REPORT_ADMIN'], []);
   const nonHFCreateRoles = useMemo(() => ['SUPER_ADMIN', 'SUPER_USER', 'CHW'], []);
 
   const hfCreateRoles = useMemo(
     () =>
-      ((Object.values(rolesGrouped) || []).flat() as IRoles[])
+      ((Object.values(appTypeBasedRoles) || []).flat() as IRoles[])
         .filter((r: IRoles) => !nonHFCreateRoles.includes(r.name))
         .map((filteredRole) => filteredRole.name),
-    [nonHFCreateRoles, rolesGrouped]
+    [appTypeBasedRoles, nonHFCreateRoles]
   );
 
   const allHFNeededRoles = useMemo(
@@ -466,15 +511,15 @@ const UserForm = ({
       // role options
       const newRoleOptions = [...(roleOptions.current || [])];
       if (isHFCreate && (mandatoryRoleOptions ? !isCHWSelected(mandatoryRoleOptions) : true)) {
-        newRoleOptions[index] = (rolesGrouped?.SPICE || [])
+        newRoleOptions[index] = (appTypeBasedRoles?.SPICE || [])
           .filter((r: IRoles) => hfCreateRoles.includes(r.name))
           .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
       } else if (isHF) {
-        newRoleOptions[index] = (rolesGrouped?.SPICE || [])
+        newRoleOptions[index] = (appTypeBasedRoles?.SPICE || [])
           .filter((r: IRoles) => !['SUPER_ADMIN', 'SUPER_USER'].includes(r.name))
           .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
       } else {
-        newRoleOptions[index] = (rolesGrouped?.SPICE || []).sort((a: any, b: any) =>
+        newRoleOptions[index] = (appTypeBasedRoles?.SPICE || []).sort((a: any, b: any) =>
           a.displayName > b.displayName ? 1 : -1
         );
       }
@@ -483,20 +528,22 @@ const UserForm = ({
       // role disable
       const newDisabledRoles = [...disabledRoles.current];
       let validRoles: string[] = [];
-      const selectedAllRoles = [...(selectedRoles(index) || [])];
-      if (selectedAllRoles.some((ro: IRoles) => chwPeerRoles.includes(ro.name))) {
-        validRoles = chwPeerRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => adminRoles.includes(ro.name))) {
-        validRoles = adminRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
-        validRoles = superAdminRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => reportAdminRole.includes(ro.name))) {
-        validRoles = superAdminRoles;
-      } else if (selectedAllRoles.some((ro: IRoles) => facilityReportAdminRole.includes(ro.name))) {
-        validRoles = [...adminRoles, ...chwPeerRoles];
-      } else {
-        validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
-      }
+      // validation logic not finalized
+      // const selectedAllRoles = [...(selectedRoles(index) || [])];
+      // if (selectedAllRoles.some((ro: IRoles) => chwPeerRoles.includes(ro.name))) {
+      //   validRoles = chwPeerRoles;
+      // } else if (selectedAllRoles.some((ro: IRoles) => adminRoles.includes(ro.name))) {
+      //   validRoles = adminRoles;
+      // } else if (selectedAllRoles.some((ro: IRoles) => superAdminRoles.includes(ro.name))) {
+      //   validRoles = superAdminRoles;
+      // } else if (selectedAllRoles.some((ro: IRoles) => reportAdminRole.includes(ro.name))) {
+      //   validRoles = superAdminRoles;
+      // } else if (selectedAllRoles.some((ro: IRoles) => facilityReportAdminRole.includes(ro.name))) {
+      //   validRoles = [...adminRoles, ...chwPeerRoles];
+      // } else {
+      //   validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
+      // }
+      validRoles = (newRoleOptions[index] || []).map((rr: IRoles) => rr.name) || [];
       newDisabledRoles[index] = [...(newRoleOptions[index] || [])].filter((r: IRoles) => !validRoles.includes(r.name));
       disabledRoles.current = newDisabledRoles;
     },
@@ -508,7 +555,7 @@ const UserForm = ({
       isHF,
       isHFCreate,
       onlyCHWRoles,
-      rolesGrouped,
+      appTypeBasedRoles,
       selectedRoles,
       superAdminRoles
     ]
@@ -729,10 +776,10 @@ const UserForm = ({
 
   const reportRoleOptions = useCallback(() => {
     if (isHF) {
-      return (rolesGrouped.REPORTS || []).filter((v: IRoles) => v.name !== REPORT_ADMIN) || [];
+      return (appTypeBasedRoles.REPORTS || []).filter((v: IRoles) => v.name !== REPORT_ADMIN) || [];
     }
-    return rolesGrouped.REPORTS || [];
-  }, [isHF, rolesGrouped.REPORTS]);
+    return appTypeBasedRoles.REPORTS || [];
+  }, [appTypeBasedRoles.REPORTS, isHF]);
 
   const getReportRoles = useCallback(
     (
@@ -778,7 +825,7 @@ const UserForm = ({
   const getInsightRoles = useCallback(
     (index: number) => {
       const { insightRoles: formInsightRoles = [] } = form.getState().values?.users?.[index] || {};
-      const filteredRoles = (rolesGrouped.INSIGHTS || []).filter((inRole: IRoles) =>
+      const filteredRoles = (appTypeBasedRoles.INSIGHTS || []).filter((inRole: IRoles) =>
         formInsightRoles.some((r: any) => r.name !== inRole.name)
       );
       const newDisabledInsightRoles = [...disabledInsightRoles.current];
@@ -786,7 +833,7 @@ const UserForm = ({
       disabledInsightRoles.current = newDisabledInsightRoles;
       return filteredRoles;
     },
-    [form, rolesGrouped.INSIGHTS]
+    [appTypeBasedRoles.INSIGHTS, form]
   );
 
   const showSupervisorVillageFn = (index: number) => {
@@ -798,6 +845,17 @@ const UserForm = ({
     return isCHWUser[index];
   };
 
+  // Function to filter health facilities by selected appTypes
+  const filterHFByAppTypes = (selectedAppTypes: string[] = []) => {
+    const filteredHFList = healthFacilityList.filter((hf) => {
+      // Check if any clinical workflow's appTypes includes all the selectedAppTypes
+      return [...(hf.clinicalWorkflows || []), ...(hf.customizedWorkflows || [])].some((workflow) => {
+        return selectedAppTypes.some((type) => (workflow.appTypes || []).includes(type));
+      });
+    });
+    setNewHFList(filteredHFList);
+  };
+
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
@@ -806,7 +864,7 @@ const UserForm = ({
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
 
           // SUITE options
-          const suiteAccess = Object.keys(rolesGrouped || {})
+          const suiteAccess = Object.keys(appTypeBasedRoles || {})
             .map((userRole: any) => ({ groupName: userRole, id: userRole }))
             .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
           const {
@@ -939,6 +997,11 @@ const UserForm = ({
                               // CHW User selection
                               isCHWUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index);
+                              if (showHealthFacilityFn(index)) {
+                                const fullRoles = form.getState().values[formName][index].roles;
+                                const selectedAppTypes = roleBasedAppTypes(fullRoles);
+                                filterHFByAppTypes(selectedAppTypes);
+                              }
                               // fetch HF list based on CHW selection
                               if (!isCHWSelected(spiceRole) && isCHWSelected(values)) {
                                 if (!isEdit && !autoFetched[index]) {
@@ -1065,7 +1128,7 @@ const UserForm = ({
                             isModel={true}
                             isMulti={true}
                             isClearable={false}
-                            options={rolesGrouped.INSIGHTS || []}
+                            options={appTypeBasedRoles.INSIGHTS || []}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(mandatoryInsightRoles || []),
@@ -1206,7 +1269,7 @@ const UserForm = ({
                             errorLabel='assigned health facility'
                             labelKey='name'
                             valueKey='id'
-                            options={healthFacilityList}
+                            options={newHFList}
                             loadingOptions={hfLoading}
                             error={isError(meta)}
                             isModel={true}

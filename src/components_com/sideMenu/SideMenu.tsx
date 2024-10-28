@@ -47,6 +47,7 @@ const superAdminRoutes: ISideMenuItem[] = [
     disabled: false
   }
 ];
+
 const adminRoutes: ISideMenuItem[] = [
   {
     label: 'Health Facility',
@@ -82,7 +83,6 @@ const SideMenuCommunity = ({ className }: ISideMenuProps) => {
           ) || [];
       }
       const allParams: any[] = [...childParams, params].filter((param) => param);
-
       return {
         regionId: allParams?.[0]?.regionId || regionData?.id,
         tenantId: allParams?.[0]?.tenantId || regionData?.tenantId,

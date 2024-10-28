@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { roleSelector, getUserSuiteAccessSelector, userDataSelector } from '../../store/user/selectors';
+import { roleSelector, getUserSuiteAccessSelector, getAppTypeSelector } from '../../store/user/selectors';
 import { useHistory } from 'react-router';
 import { HOME_PAGE_BY_ROLE, COMMUNITY_HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
@@ -12,7 +12,7 @@ import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
 import { goToUrl } from '../../utils/routeUtil';
 import Loader from '../../components/loader/Loader';
-import localStorageServices from '../../global/localStorageServices';
+import { getRegionDetailSelector } from '../../store/region_com/selectors';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -35,9 +35,9 @@ const LandingPage = (): React.ReactElement => {
   const history = useHistory();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
-  const userData = useSelector(userDataSelector);
-  const { id: regionId = null, tenantId = null } = userData?.country || { id: null, tenantId: null };
-  const appTypes = localStorageServices.getItem('appTypes');
+  const userData = useSelector(getRegionDetailSelector);
+  const { id: regionId = null, tenantId = null } = userData || { id: null, tenantId: null };
+  const appTypes = useSelector(getAppTypeSelector);
 
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
@@ -55,8 +55,8 @@ const LandingPage = (): React.ReactElement => {
         domainUrl:
           Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
             ? COMMUNITY_HOME_PAGE_BY_ROLE[role]
-                ?.replace(':regionId', regionId?.toString())
-                .replace(':tenantId', tenantId?.toString()) || ''
+                ?.replace(':regionId', regionId?.toString() || '')
+                .replace(':tenantId', tenantId?.toString() || '') || ''
             : HOME_PAGE_BY_ROLE[role],
         disabled: false
       },

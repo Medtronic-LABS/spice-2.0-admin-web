@@ -30,7 +30,7 @@ const APPCONSTANTS = {
   },
   SPICE_ROLE_SUITE_ACCESS: {
     mob: 'mob',
-    web: 'web'
+    admin: 'admin'
   },
   COMMUNITY_ROLES: {
     SUPER_USER: 'SUPER_USER',
@@ -212,7 +212,7 @@ const APPCONSTANTS = {
   },
 
   spiceRole: {
-    spice: 'web',
+    spice: 'admin',
     spiceInsights: 'cfr'
   },
   spiceRoleGrouped: {
