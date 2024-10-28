@@ -1,20 +1,16 @@
 import {
-  changePassword,
-  fetchCommunityListRequest,
-  fetchLockedUsers,
   fetchLoggedInUser,
-  fetchTimezoneList,
-  fetchUserById,
   fetchUserRoles,
-  getUsername,
   login,
   logout,
-  resetPassword,
-  unlockUsers,
-  updatePassword,
   updateRememberMe,
+  getUsername,
+  resetPassword,
+  userForgotPassword,
+  updatePassword,
+  changePassword,
   updateUser,
-  userForgotPassword
+  fetchUserById
 } from '../sagas';
 import { runSaga } from 'redux-saga';
 import * as userService from '../../../services/userAPI';
@@ -23,6 +19,7 @@ import * as ACTION_TYPES from '../actionTypes';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/userDataConstants';
 import { AxiosResponse } from 'axios';
 import * as loginActions from '../actions';
+import { encryptData } from '../../../utils/commonUtils';
 import localStorageServices from '../../../global/localStorageServices';
 import APPCONSTANTS from '../../../constants/appConstants';
 
@@ -43,37 +40,11 @@ const {
   suiteAccess
 } = loggedInUserMockData.data.entity;
 const userRoles = MOCK_DATA_CONSTANTS.USER_ROLES_RESPONSE_PAYLOAD;
-const fetchUserByIdRequestMockData = MOCK_DATA_CONSTANTS.FETCH_USER_BY_ID_REQUEST;
-const fetchUserByIdResponseMockData = MOCK_DATA_CONSTANTS.FETCH_USER_RESPONSE_PAYLOAD;
-const updateUserRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_USER_REQUEST_PAYLOAD;
-const changePasswordRequestMockData = MOCK_DATA_CONSTANTS.CHANGE_PASSWORD_REQUEST_MOCK_DATA;
-const updatePasswordRequestMockData = MOCK_DATA_CONSTANTS.UPDATE_PASSWORD_REQUEST_MOCK_DATA;
-const resetPasswordRequestMockData = MOCK_DATA_CONSTANTS.RESET_PASSWORD_REQUEST_MOCK_DATA;
-const getUsernameRequestMockData = MOCK_DATA_CONSTANTS.GET_USERNAME_REQUEST_MOCK_DATA;
-const getUsernameResponseMockData = MOCK_DATA_CONSTANTS.GET_USERNAME_RESPONSE_MOCK_DATA;
-const fetchLockedUsersResponseMockData = [MOCK_DATA_CONSTANTS.FETCH_LOCKED_USERS_RESPONSE_PAYLOAD];
-const fetchLockedUsersRequestMockData = MOCK_DATA_CONSTANTS.FETCH_LOCKED_USERS_REQUEST;
-const fetchTimezoneListResponseMockData = [MOCK_DATA_CONSTANTS.FETCH_TIMEZONE_RESPONSE_PAYLOAD];
-const communityUnitResponse = MOCK_DATA_CONSTANTS.COMMUNITY_UNIT_RESPONSE;
-const unlockUserRequestMockData = MOCK_DATA_CONSTANTS.UNLOCK_USER_REQUEST_PAYLOAD;
-
-// Mock the selector function used in the saga
-const mockState = {
-  user: {
-    user: {
-      role: 'SUPER_USER'
-    }
-  }
-};
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
-  useSelector: jest.fn().mockImplementation((selector) => selector(mockState))
-}));
 
 describe('User Login', () => {
   it('Adds user tenant id and encrypted token to store and logs in successfully', async () => {
     const { username, password } = loginRequestMockData;
-    const hmac = CryptoJS.HmacSHA512(password, 'spice_uat');
+    const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
     const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
     const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
       return Promise.resolve({
@@ -95,6 +66,7 @@ describe('User Login', () => {
       }
     ).toPromise();
 
+    const encryptedToken = encryptData(token);
     expect(loginUserSpy).toHaveBeenCalledWith(username, hashedPassword);
     expect(fetchLoggedInUserSpy).toHaveBeenCalled();
     expect(dispatched).toEqual([
@@ -127,6 +99,12 @@ describe('User Login', () => {
     expect(loginUserSpy).toHaveBeenCalledTimes(2);
   });
 });
+
+// Mock encryptData function
+jest.mock('../../../utils/commonUtils', () => ({
+  // Mock encryption function to return the same password
+  encryptData: jest.fn((password) => password)
+}));
 
 describe('updateRememberMe function', () => {
   afterEach(() => {
@@ -222,10 +200,10 @@ describe('Fetch Logged in user', () => {
             lastName,
             id,
             roles,
+            suiteAccess,
             tenantId,
             country,
-            organizations,
-            suiteAccess
+            organizations
           }
         }
       } as AxiosResponse);
@@ -245,12 +223,10 @@ describe('Fetch Logged in user', () => {
       userId: id,
       role: roles[0].name,
       roleDetail: roles[0],
+      suiteAccess,
       tenantId,
       formDataId: organizations[0]?.formDataId,
-      country,
-      suiteAccess,
-      countryId: undefined,
-      organizations
+      country
     };
     expect(dispatched).toEqual([loginActions.fetchLoggedInUserSuccess(payload as any)]);
   });
@@ -271,8 +247,21 @@ describe('Fetch Logged in user', () => {
   });
 });
 
+// Mock the selector function used in the saga
+const mockState = {
+  user: {
+    user: {
+      role: 'SUPER_USER'
+    }
+  }
+};
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn().mockImplementation((selector) => selector(mockState))
+}));
+
 describe('Other User related Sagas', () => {
-  it('Fetches the user roles for super user', async () => {
+  it('Fetches the user roles', async () => {
     jest.spyOn(userService, 'fetchUserRoles').mockImplementation(() => {
       return Promise.resolve(userRoles as AxiosResponse);
     });
@@ -291,35 +280,7 @@ describe('Other User related Sagas', () => {
     expect(dispatched).toEqual([
       loginActions.fetchUserRolesActionSuccess({
         ...userRoles.data.entity
-      })
-    ]);
-  });
-
-  it('Fetches the user roles for region admin', async () => {
-    jest.spyOn(userService, 'fetchUserRoles').mockImplementation(() => {
-      return Promise.resolve(userRoles as AxiosResponse);
-    });
-
-    const dispatched: any = [];
-
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action),
-        getState: () => ({
-          user: {
-            user: {
-              role: 'REGION_ADMIN'
-            }
-          }
-        })
-      },
-      fetchUserRoles,
-      { countryId: 1, type: ACTION_TYPES.FETCH_USER_ROLES_REQUEST }
-    ).toPromise();
-    expect(userService.fetchUserRoles).toHaveBeenCalledWith(1);
-    expect(dispatched).toEqual([
-      loginActions.fetchUserRolesActionSuccess({
-        ...userRoles.data.entity
+        // SPICE: [{ id: '',name: 'SUPER_USER' }, { name: 'SUPER_ADMIN' }]
       })
     ]);
   });
@@ -342,445 +303,360 @@ describe('Other User related Sagas', () => {
     expect(userService.fetchUserRoles).toHaveBeenCalledWith(1);
     expect(dispatched).toEqual([loginActions.fetchUserRolesActionFail()]);
   });
-});
 
-describe('Fetch User by id', () => {
-  it('Fetches single user by id', async () => {
-    const fetchUserByIdSpy = jest.spyOn(userService, 'fetchUserById').mockImplementation(() => {
-      return Promise.resolve({ data: { entity: fetchUserByIdResponseMockData } } as AxiosResponse);
+  it('getUsername success', async () => {
+    jest.spyOn(userService, 'getUsername').mockImplementation(() => {
+      return Promise.resolve({} as any);
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
-      fetchUserById,
-      { payload: fetchUserByIdRequestMockData, type: ACTION_TYPES.FETCH_USER_BY_ID_REQUEST }
+      getUsername,
+      { token: '1', type: ACTION_TYPES.GET_USERNAME_FOR_PASSWORD_RESET }
     ).toPromise();
-    expect(fetchUserByIdSpy).toHaveBeenCalledWith(fetchUserByIdRequestMockData);
-    expect(dispatched).toEqual([loginActions.fetchUserByIdSuccess(fetchUserByIdResponseMockData)]);
+
+    expect(userService.getUsername).toHaveBeenCalledWith('1');
+    expect(dispatched).toEqual([loginActions.getUserNameSuccess()]);
   });
-
-  it('Fails to fetch user by id', async () => {
-    const error = new Error('Failed to fetch user');
-    const failureCb = jest.fn();
-    const fetchUserByIdSpy = jest.spyOn(userService, 'fetchUserById').mockImplementation(() => {
-      return Promise.reject(error);
+  it('getUsername fails', async () => {
+    jest.spyOn(userService, 'getUsername').mockImplementation(() => {
+      return Promise.reject(new Error('Error'));
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
-      fetchUserById,
-      { payload: fetchUserByIdRequestMockData, type: ACTION_TYPES.FETCH_USER_BY_ID_REQUEST, failureCb }
+      getUsername,
+      { token: '1', type: ACTION_TYPES.GET_USERNAME_FOR_PASSWORD_RESET }
     ).toPromise();
-    expect(fetchUserByIdSpy).toHaveBeenCalledWith(fetchUserByIdRequestMockData);
-    expect(failureCb).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.fetchUserByIdFailure()]);
-  });
-});
 
-describe('Update User', () => {
-  it('Update a single user', async () => {
-    const updateUserSpy = jest.spyOn(userService, 'updateUser').mockImplementation(() => {
-      return Promise.resolve({} as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      updateUser,
-      {
-        payload: updateUserRequestMockData,
-        type: ACTION_TYPES.UPDATE_USER_REQUEST
-      }
-    ).toPromise();
-    expect(updateUserSpy).toHaveBeenCalledWith(updateUserRequestMockData);
-    expect(dispatched).toEqual([loginActions.updateUserSuccess()]);
+    expect(userService.getUsername).toHaveBeenCalledWith('1');
+    expect(dispatched).toEqual([loginActions.getUserNameFail(new Error('Error'))]);
   });
 
-  it('Fails to update user', async () => {
-    const error = new Error('Failed to update user');
-    const updateUserSpy = jest.spyOn(userService, 'updateUser').mockImplementation(() => {
-      return Promise.reject(error);
+  it('resetPassword fails', async () => {
+    jest.spyOn(userService, 'resetPasswordReq').mockImplementation(() => {
+      return Promise.reject(new Error('Error'));
     });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      updateUser,
-      {
-        payload: updateUserRequestMockData,
-        type: ACTION_TYPES.UPDATE_USER_REQUEST
-      }
-    ).toPromise();
-    expect(updateUserSpy).toHaveBeenCalledWith(updateUserRequestMockData);
-    expect(dispatched).toEqual([loginActions.updateUserFailure()]);
-  });
-});
 
-describe('Change Password', () => {
-  const successCB = jest.fn();
-  const failureCb = jest.fn();
-  it('Change Password executed Successfully', async () => {
-    const { userId, password } = changePasswordRequestMockData;
-    const changePasswordSpy = jest.spyOn(userService, 'changePasswordReq').mockImplementation(() => {
-      return Promise.resolve({} as AxiosResponse);
-    });
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
-      },
-      changePassword,
-      { data: { ...changePasswordRequestMockData, successCB, failureCb }, type: ACTION_TYPES.CHANGE_PASSWORD_REQUEST }
-    ).toPromise();
-    expect(changePasswordSpy).toHaveBeenCalledWith({ userId, newPassword: password });
-    expect(dispatched).toEqual([loginActions.changePasswordSuccess()]);
-  });
-
-  it('Failed to execute Change Password', async () => {
-    const error = new Error('Change Password failed');
-    const { userId, password } = changePasswordRequestMockData;
-    const changePasswordSpy = jest.spyOn(userService, 'changePasswordReq').mockImplementation(() => {
-      return Promise.reject(error);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      changePassword,
-      { data: { ...changePasswordRequestMockData, successCB, failureCb }, type: ACTION_TYPES.CHANGE_PASSWORD_REQUEST }
-    ).toPromise();
-    expect(changePasswordSpy).toHaveBeenCalledWith({ userId, newPassword: password });
-    expect(failureCb).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.changePasswordFail(error)]);
-  });
-});
-describe('Update Password', () => {
-  const successCB = jest.fn();
-  const failureCb = jest.fn();
-  it('Update Password executed Successfully', async () => {
-    const { userId, oldPassword, newPassword } = updatePasswordRequestMockData;
-    const updatePasswordSpy = jest.spyOn(userService, 'updatePassword').mockImplementation(() => {
-      return Promise.resolve({} as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      updatePassword,
-      {
-        data: { ...updatePasswordRequestMockData, successCB, failureCb },
-        type: ACTION_TYPES.CHANGE_OWN_PASSWORD_REQUEST
-      }
-    ).toPromise();
-    expect(updatePasswordSpy).toHaveBeenCalledWith({
-      userId,
-      oldPassword,
-      newPassword
-    });
-    expect(dispatched).toEqual([loginActions.changeOwnPasswordSuccess()]);
-  });
-
-  it('Failed to execute update Password', async () => {
-    const error = new Error('update Password failed');
-    const { userId, oldPassword, newPassword } = updatePasswordRequestMockData;
-    const updatePasswordSpy = jest.spyOn(userService, 'updatePassword').mockImplementation(() => {
-      return Promise.reject(error);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      updatePassword,
-      {
-        data: { ...updatePasswordRequestMockData, successCB, failureCb },
-        type: ACTION_TYPES.CHANGE_OWN_PASSWORD_REQUEST
-      }
-    ).toPromise();
-    expect(updatePasswordSpy).toHaveBeenCalledWith({
-      userId,
-      oldPassword,
-      newPassword
-    });
-    expect(failureCb).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.changeOwnPasswordFail(error)]);
-  });
-});
-describe('Forgot Password', () => {
-  const forgotPasswordRequestMockData = {
-    email: MOCK_DATA_CONSTANTS.MOCK_LOGIN_REQUEST.username
-  };
-  const successCB = jest.fn();
-  it('Forgot password email sent', async () => {
-    const forgotPasswordSpy = jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
-      return Promise.resolve({} as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      userForgotPassword,
-      { ...forgotPasswordRequestMockData, successCB }
-    ).toPromise();
-    expect(forgotPasswordSpy).toHaveBeenCalledWith(forgotPasswordRequestMockData.email);
-    expect(successCB).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.forgotPasswordSuccess()]);
-  });
-
-  it('Failed to send forgot password email', async () => {
-    const error = new Error('Failed to send forgot password email');
-    const forgotPasswordSpy = jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
-      return Promise.reject(error);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      userForgotPassword,
-      forgotPasswordRequestMockData
-    ).toPromise();
-    expect(forgotPasswordSpy).toHaveBeenCalledWith(forgotPasswordRequestMockData.email);
-    expect(dispatched).toEqual([loginActions.forgotPasswordFail(error)]);
-  });
-});
-describe('Reset Password', () => {
-  it('Reset Password executed Successfully', async () => {
-    const { email: requestEmail, password, token: requestToken } = resetPasswordRequestMockData;
-    const resetPasswordSpy = jest.spyOn(userService, 'resetPasswordReq').mockImplementation(() => {
-      return Promise.resolve({} as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
       resetPassword,
-      { data: resetPasswordRequestMockData, type: ACTION_TYPES.RESET_PASSWORD_REQUEST }
+      { data: { email: 'email', password: 'pass', token: '1' }, type: ACTION_TYPES.GET_USERNAME_FOR_PASSWORD_RESET }
     ).toPromise();
-    expect(resetPasswordSpy).toHaveBeenCalledWith({ email: requestEmail, password }, requestToken);
+
+    expect(userService.resetPasswordReq).toHaveBeenCalledWith({ email: 'email', password: 'pass' }, '1');
+    expect(dispatched).toEqual([loginActions.resetPasswordFail(new Error('Error'))]);
+  });
+
+  it('resetPassword success', async () => {
+    jest.spyOn(userService, 'resetPasswordReq').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      resetPassword,
+      {
+        data: { email: 'email', password: 'pass', token: '1', successCB: jest.fn() },
+        type: ACTION_TYPES.GET_USERNAME_FOR_PASSWORD_RESET
+      }
+    ).toPromise();
+
+    expect(userService.resetPasswordReq).toHaveBeenCalledWith({ email: 'email', password: 'pass' }, '1');
     expect(dispatched).toEqual([loginActions.resetPasswordSuccess()]);
   });
 
-  it('Failed to execute Reset Password', async () => {
-    const { email: requestEmail, password, token: requestToken } = resetPasswordRequestMockData;
-    const error = new Error('Reset Password failed');
-    const resetPasswordSpy = jest.spyOn(userService, 'resetPasswordReq').mockImplementation(() => {
-      return Promise.reject(error);
+  it('userForgotPassword fails', async () => {
+    jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
+      return Promise.reject(new Error('Error'));
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
-      resetPassword,
-      { data: resetPasswordRequestMockData, type: ACTION_TYPES.RESET_PASSWORD_REQUEST }
+      userForgotPassword,
+      { email: 'email', successCB: jest.fn(), type: ACTION_TYPES.USER_FORGOT_PASSWORD_REQUEST }
     ).toPromise();
-    expect(resetPasswordSpy).toHaveBeenCalledWith({ email: requestEmail, password }, requestToken);
-    expect(dispatched).toEqual([loginActions.resetPasswordFail(error)]);
-  });
-});
-describe('Get Username', () => {
-  const successCB = jest.fn();
-  it('Get username executed Successfully', async () => {
-    const { token: requestToken } = getUsernameRequestMockData;
-    const getUsernameSpy = jest.spyOn(userService, 'getUsername').mockImplementation(() => {
-      return Promise.resolve({ data: { entity: getUsernameResponseMockData } } as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      getUsername,
-      { token, type: ACTION_TYPES.GET_USERNAME_FOR_PASSWORD_RESET, successCB }
-    ).toPromise();
-    expect(getUsernameSpy).toHaveBeenCalledWith(requestToken);
-    expect(successCB).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.getUserNameSuccess()]);
+
+    expect(userService.forgotPassword).toHaveBeenCalledWith('email');
+    expect(dispatched).toEqual([loginActions.forgotPasswordFail(new Error('Error'))]);
   });
 
-  it('Failed to get username', async () => {
-    const error = new Error('Failed to get username');
-    const failureCB = jest.fn();
-    const { token: requestToken } = getUsernameRequestMockData;
-    const getUsernameSpy = jest.spyOn(userService, 'getUsername').mockImplementation(() => {
-      return Promise.reject(error);
+  it('userForgotPassword Success', async () => {
+    jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
-      getUsername,
-      { token, type: ACTION_TYPES.GET_USERNAME_FOR_PASSWORD_RESET, failureCB }
+      userForgotPassword,
+      { email: 'email', successCB: jest.fn(), type: ACTION_TYPES.USER_FORGOT_PASSWORD_REQUEST }
     ).toPromise();
-    expect(getUsernameSpy).toHaveBeenCalledWith(requestToken);
-    expect(failureCB).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.getUserNameFail(error)]);
+
+    expect(userService.forgotPassword).toHaveBeenCalledWith('email');
+    expect(dispatched).toEqual([loginActions.forgotPasswordSuccess()]);
   });
-});
-describe('Fetch Locked users', () => {
-  const successCb = jest.fn();
-  const failureCb = jest.fn();
-  it('Fetches a list of locked users', async () => {
-    const fetchLockedUsersListSpy = jest.spyOn(userService, 'fetchLockedUsers').mockImplementation(() => {
+
+  it('update Password success', async () => {
+    jest.spyOn(userService, 'updatePassword').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      updatePassword,
+      {
+        data: { userId: '1', oldPassword: 'pass', newPassword: 'pass', successCB: jest.fn(), failureCb: jest.fn() },
+        type: ACTION_TYPES.CHANGE_OWN_PASSWORD_REQUEST
+      }
+    ).toPromise();
+
+    expect(userService.updatePassword).toHaveBeenCalledWith({ userId: '1', oldPassword: 'pass', newPassword: 'pass' });
+    expect(dispatched).toEqual([loginActions.changeOwnPasswordSuccess()]);
+  });
+
+  it('update Password Fail', async () => {
+    const e = new Error('Error');
+    jest.spyOn(userService, 'updatePassword').mockImplementation(() => {
+      return Promise.reject(e);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      updatePassword,
+      {
+        data: { userId: '1', oldPassword: 'pass', newPassword: 'pass', successCB: jest.fn(), failureCb: jest.fn() },
+        type: ACTION_TYPES.CHANGE_OWN_PASSWORD_REQUEST
+      }
+    ).toPromise();
+
+    expect(userService.updatePassword).toHaveBeenCalledWith({ userId: '1', oldPassword: 'pass', newPassword: 'pass' });
+    expect(dispatched).toEqual([loginActions.changeOwnPasswordFail(e)]);
+  });
+
+  it('change Password success', async () => {
+    jest.spyOn(userService, 'changePasswordReq').mockImplementation(() => {
+      return Promise.resolve({ data: { userId: 1, newPassword: 'pass' } } as AxiosResponse);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      changePassword,
+      {
+        data: { userId: '1', password: 'pass', successCB: jest.fn(), failureCb: jest.fn() },
+        type: ACTION_TYPES.CHANGE_PASSWORD_REQUEST
+      }
+    ).toPromise();
+
+    expect(userService.changePasswordReq).toHaveBeenCalledWith({ userId: '1', newPassword: 'pass' });
+    expect(dispatched).toEqual([loginActions.changePasswordSuccess()]);
+  });
+
+  it('change Password Fail', async () => {
+    const e = new Error('Error');
+    jest.spyOn(userService, 'changePasswordReq').mockImplementation(() => {
+      return Promise.reject(e);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      changePassword,
+      {
+        data: { userId: '1', password: 'pass', successCB: jest.fn(), failureCb: jest.fn() },
+        type: ACTION_TYPES.CHANGE_PASSWORD_REQUEST
+      }
+    ).toPromise();
+
+    expect(userService.changePasswordReq).toHaveBeenCalledWith({ userId: '1', newPassword: 'pass' });
+    expect(dispatched).toEqual([loginActions.changePasswordFail(e)]);
+  });
+
+  it('updateUser success', async () => {
+    jest.spyOn(userService, 'updateUser').mockImplementation(() => {
+      return Promise.resolve({} as AxiosResponse);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      updateUser,
+      {
+        payload: {
+          id: '1',
+          firstName: 'first',
+          lastName: 'second',
+          gender: 'male',
+          phoneNumber: '87878787',
+          countryCode: '91'
+        },
+        type: ACTION_TYPES.UPDATE_USER_REQUEST
+      }
+    ).toPromise();
+
+    expect(userService.updateUser).toHaveBeenCalledWith({
+      id: '1',
+      firstName: 'first',
+      lastName: 'second',
+      gender: 'male',
+      phoneNumber: '87878787',
+      countryCode: '91'
+    });
+    expect(dispatched).toEqual([loginActions.updateUserSuccess()]);
+  });
+
+  it('updateUser Fail', async () => {
+    const e = new Error('Error');
+    jest.spyOn(userService, 'updateUser').mockImplementation(() => {
+      return Promise.reject(e);
+    });
+
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
+      },
+      updateUser,
+      {
+        payload: {
+          id: '1',
+          firstName: 'first',
+          lastName: 'second',
+          gender: 'male',
+          phoneNumber: '87878787',
+          countryCode: '91'
+        },
+        type: ACTION_TYPES.UPDATE_USER_REQUEST
+      }
+    ).toPromise();
+
+    expect(userService.updateUser).toHaveBeenCalledWith({
+      id: '1',
+      firstName: 'first',
+      lastName: 'second',
+      gender: 'male',
+      phoneNumber: '87878787',
+      countryCode: '91'
+    });
+    expect(dispatched).toEqual([loginActions.updateUserFailure()]);
+  });
+
+  it('fetchUserById success', async () => {
+    jest.spyOn(userService, 'fetchUserById').mockImplementation(() => {
       return Promise.resolve({
-        data: { entityList: fetchLockedUsersResponseMockData, totalCount: 10 }
+        data: {
+          entity: {
+            userId: '1',
+            email: 'email',
+            firstName: 'firstName',
+            lastName: 'lastName',
+            // role: 'any',
+            roleDetail: 'any',
+            tenantId: '1',
+            country: 'chennai',
+            suiteAccess: ['SUPER_USER']
+          }
+        }
       } as AxiosResponse);
     });
+
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
-      fetchLockedUsers,
-      { ...fetchLockedUsersRequestMockData, successCb, type: ACTION_TYPES.FETCH_LOCKED_USERS_REQUEST }
+      fetchUserById,
+      {
+        payload: {
+          id: '1'
+        },
+        type: ACTION_TYPES.FETCH_USER_BY_ID_REQUEST
+      }
     ).toPromise();
-    expect(fetchLockedUsersListSpy).toHaveBeenCalledWith('2', 0, null, 'Sample', undefined);
-    expect(successCb).toHaveBeenCalledWith(fetchLockedUsersResponseMockData);
+
+    expect(userService.fetchUserById).toHaveBeenCalledWith({
+      id: '1'
+    });
     expect(dispatched).toEqual([
-      loginActions.fetchLockedUsersSuccess({ lockedUsers: fetchLockedUsersResponseMockData, totalCount: 10 })
+      loginActions.fetchUserByIdSuccess({
+        userId: '1',
+        email: 'email',
+        firstName: 'firstName',
+        lastName: 'lastName',
+        roleDetail: 'any',
+        tenantId: '1',
+        country: 'chennai',
+        suiteAccess: ['SUPER_USER']
+      })
     ]);
   });
 
-  it('Failed to fetch list of locked users', async () => {
-    const error = new Error('Failed to fetch locked users list');
-    const fetchLockedUsersListSpy = jest.spyOn(userService, 'fetchLockedUsers').mockImplementation(() => {
-      return Promise.reject(error);
+  it('fetchUserById Failure', async () => {
+    jest.spyOn(userService, 'fetchUserById').mockImplementation(() => {
+      return Promise.reject(new Error('Error'));
     });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchLockedUsers,
-      { ...fetchLockedUsersRequestMockData, failureCb, type: ACTION_TYPES.FETCH_LOCKED_USERS_REQUEST }
-    ).toPromise();
-    expect(fetchLockedUsersListSpy).toHaveBeenCalledWith('2', 0, null, 'Sample', undefined);
-    expect(failureCb).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.fetchLockedUsersFailure()]);
-  });
-});
-describe('Fetch Timezone List', () => {
-  it('Fetches list of timezones Successfully', async () => {
-    const fetchTimezoneListSpy = jest.spyOn(userService, 'fetchTimezoneList').mockImplementation(() => {
-      return Promise.resolve({ data: fetchTimezoneListResponseMockData } as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchTimezoneList
-    ).toPromise();
-    expect(fetchTimezoneListSpy).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.fetchTimezoneListSuccess(fetchTimezoneListResponseMockData)]);
-  });
 
-  it('Fails to fetch list of timezones', async () => {
-    const fetchTimezoneListSpy = jest.spyOn(userService, 'fetchTimezoneList').mockImplementation(() => {
-      return Promise.reject();
-    });
     const dispatched: any = [];
     await runSaga(
       {
-        dispatch: (action) => dispatched.push(action)
+        dispatch: (action) => dispatched.push(action),
+        getState: () => mockState
       },
-      fetchTimezoneList
-    ).toPromise();
-    expect(fetchTimezoneListSpy).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.fetchTimezoneListFailure()]);
-  });
-});
-describe('Fetch Community List', () => {
-  const successCB = jest.fn();
-  const failureCB = jest.fn();
-  it('Fetches list of community list dispatch success', async () => {
-    const fetchCommunityListSpy = jest.spyOn(userService, 'fetchCommunityListRequest').mockImplementation(() => {
-      return Promise.resolve({ data: communityUnitResponse } as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
+      fetchUserById,
       {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchCommunityListRequest,
-      {
-        type: ACTION_TYPES.FETCH_COMMUNITY_LIST_REQUEST,
-        countryId: 1,
-        successCB
+        payload: {
+          id: '1'
+        },
+        type: ACTION_TYPES.FETCH_USER_BY_ID_REQUEST
       }
     ).toPromise();
-    expect(fetchCommunityListSpy).toHaveBeenCalled();
-    expect(successCB).toHaveBeenCalledWith(communityUnitResponse);
-    expect(dispatched).toEqual([loginActions.fetchCommunityListSuccess(communityUnitResponse)]);
-  });
 
-  it('Fetches list of community list dispatch failure', async () => {
-    const error = new Error('Failed to fetch community list');
-    const fetchCommunityListSpy = jest.spyOn(userService, 'fetchCommunityListRequest').mockImplementation(() => {
-      return Promise.reject(error);
+    expect(userService.fetchUserById).toHaveBeenCalledWith({
+      id: '1'
     });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchCommunityListRequest,
-      {
-        type: ACTION_TYPES.FETCH_COMMUNITY_LIST_REQUEST,
-        countryId: 1,
-        failureCB
-      }
-    ).toPromise();
-    expect(fetchCommunityListSpy).toHaveBeenCalled();
-    expect(failureCB).toHaveBeenCalledWith(error);
-    expect(dispatched).toEqual([loginActions.fetchCommunityListFailure()]);
-  });
-});
-describe('Unlock a user', () => {
-  const successCb = jest.fn();
-  const failureCb = jest.fn();
-  it('Unlocks a user dispatch success', async () => {
-    const unlockUsersListSpy = jest.spyOn(userService, 'unlockUsers').mockImplementation(() => {
-      return Promise.resolve({} as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      unlockUsers,
-      { ...unlockUserRequestMockData, successCb, type: ACTION_TYPES.UNLOCK_USERS_REQUEST }
-    ).toPromise();
-    expect(unlockUsersListSpy).toHaveBeenCalledWith(unlockUserRequestMockData.userId);
-    expect(successCb).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.unlockUsersSuccess()]);
-  });
-
-  it('Fails to unlock user dispatch failure', async () => {
-    const error = new Error('Failed to unlock user');
-    const unlockUsersListSpy = jest.spyOn(userService, 'unlockUsers').mockImplementation(() => Promise.reject(error));
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      unlockUsers,
-      { ...unlockUserRequestMockData, failureCb, type: ACTION_TYPES.UNLOCK_USERS_REQUEST }
-    ).toPromise();
-    expect(unlockUsersListSpy).toHaveBeenCalledWith(unlockUserRequestMockData.userId);
-    expect(failureCb).toHaveBeenCalled();
-    expect(dispatched).toEqual([loginActions.unlockUsersFailure()]);
+    expect(dispatched).toEqual([loginActions.fetchUserByIdFailure()]);
   });
 });

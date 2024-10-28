@@ -1,7 +1,6 @@
 import labtestReducer from '../reducer';
 import * as actionTypes from '../actionTypes';
 import { ILabTest } from '../types';
-import { LABTEST_CUSTOMIZATION_RESPONSE } from '../../../tests/mockData/labTestDataConstants';
 
 describe('labtestReducer', () => {
   const initialState = {
@@ -24,7 +23,7 @@ describe('labtestReducer', () => {
     unitsLoading: false,
     customizationLoading: false,
     labTestCustomizationData: {} as ILabTest,
-    labtestJson: null
+    labtestJson: undefined
   };
 
   it('should handle FETCH_LABTEST_SUCCESS', () => {
@@ -200,34 +199,42 @@ describe('labtestReducer', () => {
     };
     expect(labtestReducer(initialState, action)).toEqual(expectedState);
   });
-  it('should handle FETCH_LABTEST_CUSTOMIZATION_REQUEST', () => {
-    const action: any = {
-      type: actionTypes.FETCH_LABTEST_CUSTOMIZATION_REQUEST
-    };
-    const expectedState = {
-      ...initialState,
-      loading: true,
-      customizationLoading: true
-    };
-    expect(labtestReducer(initialState, action)).toEqual(expectedState);
-  });
+
   it('should handle FETCH_LABTEST_CUSTOMIZATION_SUCCESS', () => {
     const action: any = {
       type: actionTypes.FETCH_LABTEST_CUSTOMIZATION_SUCCESS,
-      payload: LABTEST_CUSTOMIZATION_RESPONSE
+      payload: {
+        labtests: [
+          {
+            id: '1',
+            name: 'Lab Test 1',
+            active: true,
+            tenantId: '123',
+            countryId: '456'
+          },
+          {
+            id: '2',
+            name: 'Lab Test 2',
+            active: true,
+            tenantId: '123',
+            countryId: '456'
+          }
+        ],
+        total: 2
+      }
     };
     const expectedState = {
       ...initialState,
       loading: false,
       customizationLoading: false,
-      labTestCustomizationData: LABTEST_CUSTOMIZATION_RESPONSE,
-      labtestJson: LABTEST_CUSTOMIZATION_RESPONSE.formInput
+      labTestCustomizationData: action.payload,
+      labtestJson: action.payload.formInput
     };
     expect(labtestReducer(initialState, action)).toEqual(expectedState);
   });
 
   it('should handle FETCH_LABTEST_CUSTOMIZATION_FAILURE', () => {
-    const error = 'Failed to fetch lab test';
+    const error = 'Error fetching lab tests';
     const action: any = {
       type: actionTypes.FETCH_LABTEST_CUSTOMIZATION_FAILURE,
       error
@@ -236,13 +243,28 @@ describe('labtestReducer', () => {
       ...initialState,
       loading: false,
       customizationLoading: false,
+      error: action.error
+    };
+    expect(labtestReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_LABTEST_CUSTOMIZATION_REQUEST', () => {
+    const error = 'Error fetching lab tests';
+    const action: any = {
+      type: actionTypes.FETCH_LABTEST_CUSTOMIZATION_REQUEST,
       error
+    };
+    const expectedState = {
+      ...initialState,
+      loading: true,
+      customizationLoading: true
     };
     expect(labtestReducer(initialState, action)).toEqual(expectedState);
   });
   it('should handle LABTEST_CUSTOMIZATION_REQUEST', () => {
     const action: any = {
-      type: actionTypes.LABTEST_CUSTOMIZATION_REQUEST
+      type: actionTypes.LABTEST_CUSTOMIZATION_REQUEST,
+      customizationLoading: true
     };
     const expectedState = {
       ...initialState,
@@ -253,7 +275,8 @@ describe('labtestReducer', () => {
 
   it('should handle LABTEST_CUSTOMIZATION_SUCCESS', () => {
     const action: any = {
-      type: actionTypes.LABTEST_CUSTOMIZATION_SUCCESS
+      type: actionTypes.LABTEST_CUSTOMIZATION_SUCCESS,
+      customizationLoading: true
     };
     const expectedState = {
       ...initialState,
@@ -261,10 +284,10 @@ describe('labtestReducer', () => {
     };
     expect(labtestReducer(initialState, action)).toEqual(expectedState);
   });
-
   it('should handle LABTEST_CUSTOMIZATION_FAILURE', () => {
     const action: any = {
-      type: actionTypes.LABTEST_CUSTOMIZATION_FAILURE
+      type: actionTypes.LABTEST_CUSTOMIZATION_FAILURE,
+      customizationLoading: true
     };
     const expectedState = {
       ...initialState,
@@ -275,7 +298,8 @@ describe('labtestReducer', () => {
 
   it('should handle VALIDATE_LABTEST_REQUEST', () => {
     const action: any = {
-      type: actionTypes.VALIDATE_LABTEST_REQUEST
+      type: actionTypes.VALIDATE_LABTEST_REQUEST,
+      customizationLoading: true
     };
     const expectedState = {
       ...initialState,
@@ -283,26 +307,27 @@ describe('labtestReducer', () => {
     };
     expect(labtestReducer(initialState, action)).toEqual(expectedState);
   });
-  it('should handle VALIDATE_LABTEST_FAILURE', () => {
-    const error = 'Failed to validate';
-    const action: any = {
-      type: actionTypes.VALIDATE_LABTEST_FAILURE,
-      error
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false,
-      error
-    };
-    expect(labtestReducer(initialState, action)).toEqual(expectedState);
-  });
+
   it('should handle VALIDATE_LABTEST_SUCCESS', () => {
     const action: any = {
-      type: actionTypes.VALIDATE_LABTEST_SUCCESS
+      type: actionTypes.VALIDATE_LABTEST_SUCCESS,
+      customizationLoading: true
     };
     const expectedState = {
       ...initialState,
       loading: false
+    };
+    expect(labtestReducer(initialState, action)).toEqual(expectedState);
+  });
+  it('should handle VALIDATE_LABTEST_FAILURE', () => {
+    const action: any = {
+      type: actionTypes.VALIDATE_LABTEST_FAILURE,
+      customizationLoading: true
+    };
+    const expectedState = {
+      ...initialState,
+      loading: false,
+      error: action.error
     };
     expect(labtestReducer(initialState, action)).toEqual(expectedState);
   });

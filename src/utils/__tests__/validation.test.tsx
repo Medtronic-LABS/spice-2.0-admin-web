@@ -28,8 +28,12 @@ import {
   normalizePhone,
   validateCheckbox,
   formatDate,
-  formValidators
+  formValidators,
+  normalizeFloatingNumber,
+  validateLatitude,
+  validateLongitude
 } from '../validation';
+
 
 describe('Validation Test cases', () => {
   describe('isEmpty', () => {
@@ -58,6 +62,7 @@ describe('Validation Test cases', () => {
       expect(required('value')).toBeUndefined();
       expect(required(['item'])).toBeUndefined();
     });
+  
   });
 
   describe('validateEmail', () => {
@@ -566,3 +571,90 @@ describe('Validation Test cases', () => {
     });
   });
 });
+
+
+
+describe('normalizeFloatingNumber', () => {
+  it('should return undefined for empty input', () => {
+    expect(normalizeFloatingNumber('')).toBeUndefined();
+    expect(normalizeFloatingNumber(null)).toBeUndefined();
+    expect(normalizeFloatingNumber(undefined)).toBeUndefined();
+  });
+
+  it('should normalize valid floating numbers', () => {
+    expect(normalizeFloatingNumber('123.45')).toBe('123.45');
+    expect(normalizeFloatingNumber('   678.90  ')).toBe('678.90');
+    expect(normalizeFloatingNumber('-123.45')).toBe('-123.45');
+    expect(normalizeFloatingNumber('0.99')).toBe('0.99');
+    expect(normalizeFloatingNumber('.5')).toBe('.5'); // Consider how you want to handle leading zeros
+  });
+
+  it('should remove non-numeric characters', () => {
+    expect(normalizeFloatingNumber('123.45abc')).toBe('123.45');
+    expect(normalizeFloatingNumber('abc123.45')).toBe('123.45');
+    expect(normalizeFloatingNumber('$123.45')).toBe('123.45');
+    expect(normalizeFloatingNumber('123.45$')).toBe('123.45');
+  })
+
+});
+
+
+
+describe('validateLatitude', () => {
+  test('should return undefined for empty or undefined values', () => {
+    expect(validateLatitude(undefined)).toBeUndefined();
+    expect(validateLatitude(null)).toBeUndefined();
+    expect(validateLatitude('')).toBeUndefined();
+  });
+
+  test('should return an empty string for valid latitude values', () => {
+    expect(validateLatitude('90')).toBe('');
+    expect(validateLatitude('-90')).toBe('');
+    expect(validateLatitude('45.1234567')).toBe('');
+    expect(validateLatitude('0')).toBe('');
+    expect(validateLatitude('+45.0')).toBe('');
+  });
+
+  test('should return an error message for invalid latitude values', () => {
+    expect(validateLatitude('91')).toBe('Please enter a valid');
+    expect(validateLatitude('-91')).toBe('Please enter a valid');
+    expect(validateLatitude('100')).toBe('Please enter a valid');
+    expect(validateLatitude('45.12345678')).toBe('Please enter a valid'); // More than 7 decimal places
+    expect(validateLatitude('abc')).toBe('Please enter a valid'); // Non-numeric input
+    expect(validateLatitude('45.')).toBe('Please enter a valid'); // Incomplete number
+  });
+});
+
+
+
+describe('validateLongitude', () => {
+  test('should return undefined for empty or undefined values', () => {
+    expect(validateLongitude(undefined)).toBeUndefined();
+    expect(validateLongitude(null)).toBeUndefined();
+    expect(validateLongitude('')).toBeUndefined();
+  });
+
+  test('should return an empty string for valid longitude values', () => {
+    expect(validateLongitude('180')).toBe('');
+    expect(validateLongitude('-180')).toBe('');
+    expect(validateLongitude('45.1234567')).toBe('');
+    expect(validateLongitude('0')).toBe('');
+    expect(validateLongitude('+45.0')).toBe('');
+    expect(validateLongitude('179.9999999')).toBe(''); // Valid with 7 decimal places
+  });
+
+  test('should return an error message for invalid longitude values', () => {
+    expect(validateLongitude('181')).toBe('Please enter a valid');
+    expect(validateLongitude('-181')).toBe('Please enter a valid');
+    expect(validateLongitude('200')).toBe('Please enter a valid');
+    expect(validateLongitude('45.12345678')).toBe('Please enter a valid'); // More than 7 decimal places
+    expect(validateLongitude('abc')).toBe('Please enter a valid'); // Non-numeric input
+    expect(validateLongitude('45.')).toBe('Please enter a valid'); // Incomplete number
+  });
+  test('should return an empty string for empty email input', () => {
+    expect(validateEmail('')).toBe('');
+  });
+});
+
+
+

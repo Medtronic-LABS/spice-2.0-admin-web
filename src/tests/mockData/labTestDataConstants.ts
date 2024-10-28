@@ -1,44 +1,118 @@
-export const LABTEST_FETCH_PAYLOAD = {
-  skip: 0,
-  limit: 10,
-  searchTerm: '',
-  countryId: '1'
-};
+import { ILabTest } from '../../store/labTest/types';
 
-export const LABTEST_FETCH_RESPONSE = {
-  labtests: [
-    {
-      id: 1,
-      testName: 'Lab Test 1',
-      uniqueName: 'Lab Test 1',
-      tenantId: 1,
-      countryId: 1,
-      formInput: 'Test'
+const MOCK_LABTEST_DETAIL = {
+  DETAIL: {
+    id: '',
+    testName: '',
+    uniqueName: '',
+    tenantId: null,
+    countryId: '',
+    formInput: '',
+    updatedAt: '',
+    displayOrder: 1,
+    codeDetails: {
+      code: 'code',
+      url: 'http://cwl.com'
     }
-  ],
-  total: 1
-};
-
-export const LABTEST_CUSTOMIZATION_RESPONSE = {
-  id: 1,
-  uniqueName: 'bloodTest1725880882391',
-  testName: 'Blood test',
-  formInput:
-    '{"time":1725881172525,"formLayout":[{"id":"bloodTest1725880882485","viewType":"CardView","title":"Blood test","familyOrder":0},{"id":"TestedOn","viewType":"DatePicker","title":"Tested On","fieldName":"TestedOn","family":"bloodTest1725880882485","isMandatory":true,"isEnabled":true,"visibility":"visible","isDefault":false,"disableFutureDate":true,"minDays":"2","maxDays":null,"isDeletable":false,"orderId":1},{"id":"TestOne","viewType":"DatePicker","title":"TestOne","fieldName":"TestOne","family":"bloodTest1725880882485","isMandatory":true,"isEnabled":true,"visibility":"visible","isDefault":false,"disableFutureDate":false,"minDays":"2","maxDays":"5","orderId":2},{"id":"TestTwo","viewType":"DatePicker","title":"TestTwo","fieldName":"TestTwo","family":"bloodTest1725880882485","isMandatory":true,"isEnabled":true,"visibility":"visible","isDefault":false,"disableFutureDate":false,"minDays":"2","maxDays":"5","orderId":3}]}',
-  countryId: 2,
-  tenantId: null,
-  codeDetails: {
-    code: '556',
-    url: 'URL'
   }
 };
 
-export const LABTEST_CUSTOMIZATION_PAYLOAD = {
-  name: 'Blood test',
-  countryId: '1'
+const MOCK_DATA_CONSTANTS = {
+  INITIAL_STATE: {
+    labTests: [
+      {
+        id: '',
+        testName: '',
+        uniqueName: '',
+        tenantId: null,
+        countryId: '',
+        formInput: '',
+        updatedAt: '',
+        displayOrder: 1
+      }
+    ],
+    total: 0,
+    loading: false,
+    error: null,
+    units: [],
+    unitsLoading: false,
+    customizationLoading: false,
+    labTestCustomizationData: {} as ILabTest,
+    labtestJson: null
+  },
+  //   FETCH_LAB_TEST_REQUEST_PAYLOAD: {
+  //     labtests: [MOCK_LABTEST_DETAIL.DETAIL],
+  //     total: 10
+
+  //   },
+  FETCH_LAB_TEST_REQUEST_PAYLOAD: {
+    countryId: 1,
+    limit: 10,
+    skip: 0,
+    searchTerm: ''
+  },
+  FETCH_LAB_TEST_RESPONSE_PAYLOAD: {
+    labtests: [MOCK_LABTEST_DETAIL.DETAIL],
+    total: 10
+  },
+  FETCH_LAB_TEST_CUSTOMIZATION_REQUEST: {
+    id: '',
+    testName: '',
+    codeDetails: {
+      code: '',
+      url: ''
+    },
+    uniqueName: '',
+    tenantId: '',
+    countryId: '',
+    formInput: '{"key": "value"}',
+    updatedAt: '',
+    displayOrder: 1
+  },
+  FETCH_LAB_TEST_CUSTOMIZATION_UPDATE_REQUEST: {
+    id: '1',
+    testName: '',
+    codeDetails: {
+      code: '',
+      url: ''
+    },
+    uniqueName: '',
+    tenantId: '',
+    countryId: '',
+    formInput: '{"key": "value"}',
+    updatedAt: '',
+    displayOrder: 1
+  },
+
+  FETCH_LAB_TEST_CUSTOMIZATION_UPDATE_RESPONSE: {
+    id: '1',
+    testName: '',
+    codeDetails: {
+      code: '',
+      url: ''
+    },
+    uniqueName: '',
+    tenantId: '',
+    countryId: '',
+    formInput: { key: 'value' },
+    updatedAt: '',
+    displayOrder: 1
+  },
+
+  FETCH_LAB_TEST_CUSTOMIZATION_RESPONSE: {
+    id: '',
+    testName: '',
+    codeDetails: {
+      code: '',
+      url: ''
+    },
+    uniqueName: '',
+    tenantId: '',
+    countryId: '',
+    formInput: { key: 'value' },
+    updatedAt: '',
+    displayOrder: 1
+  }
 };
 
-export const UNIT_LIST_RESPONSE = {
-  id: '1',
-  unit: '1'
-};
+export default MOCK_DATA_CONSTANTS;

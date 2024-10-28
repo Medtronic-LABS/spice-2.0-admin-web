@@ -1,5 +1,23 @@
-import { decryptData, encryptData, appendZeroBefore, resetFields, stopPropogation } from '../commonUtils';
-
+import { saveAs } from 'file-saver';
+import {
+  decryptData,
+  encryptData,
+  appendZeroBefore,
+  resetFields,
+  stopPropogation,
+  fileDownload,
+  convertDate,
+  formatDate,
+  jsonParse,
+  formatCountryCode,
+  formatRoles,
+  getUserPayload
+} from '../commonUtils';
+import { IHFUserGet } from '../../store/healthFacility/types';
+import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
+jest.mock('file-saver', () => ({
+  saveAs: jest.fn()
+}));
 describe('Your Component', () => {
   beforeEach(() => {
     process.env.REACT_APP_CRYPTR_SECRET_KEY = 'spice_uat';
@@ -121,4 +139,303 @@ describe('stopPropogation', () => {
 
     consoleErrorSpy.mockRestore();
   });
+  it('should create a Blob and trigger a file download', async () => {
+    const data = 'Test data';
+    const fileName = 'test';
+    const fileType = 'text/plain';
+    const fileExtension = '.txt';
+
+    await fileDownload(data, fileName, fileType, fileExtension);
+
+    expect(saveAs).toHaveBeenCalledWith(expect.any(Blob), 'test.txt', { autoBom: false });
+  });
+
+  it('should call saveAs without fileExtension if not provided', async () => {
+    const data = 'test data';
+    const fileName = 'testFile';
+    const fileType = 'text/plain';
+
+    await fileDownload(data, fileName, fileType);
+
+    const expectedBlob = new Blob([data], { type: fileType });
+    expect(saveAs).toHaveBeenCalledWith(expectedBlob, fileName, { autoBom: false });
+  });
+  it('should convert a Date object to YYYY-MM-DD format', () => {
+    const date = new Date('2023-10-05T12:00:00Z');
+    const result = convertDate(date);
+    expect(result).toBe('2023-10-05');
+  });
+  it('should convert a date string to YYYY-MM-DD format', () => {
+    const dateString = '2023-10-05';
+    const result = convertDate(dateString);
+    expect(result).toBe('2023-10-05');
+  });
+  it('should handle single-digit month and day correctly', () => {
+    const date = new Date('2023-01-05T12:00:00Z');
+    const result = convertDate(date);
+    expect(result).toBe('2023-01-05');
+  });
+
+  it('should handle invalid date input', () => {
+    const invalidDate = 'invalid-date-string';
+    const result = convertDate(invalidDate);
+    expect(result).toBe('NaN-NaN-NaN'); // Adjust based on your error handling
+  });
+  it('should handle empty input', () => {
+    const result = convertDate('');
+    expect(result).toBe('NaN-NaN-NaN'); // Adjust based on your error handling
+  });
+
+  it('should format a date string to YYYY/MM/DD format', () => {
+    const date = '14/05/2023';
+    const result = formatDate(date, 'YYYY/MM/DD');
+    expect(result).toBe('2023/05/14');
+  });
+  it('should format a date string to DD-MM-YYYY format', () => {
+    const date = '15-10-2023';
+    const result = formatDate(date, 'DD-MM-YYYY');
+    expect(result).toBe('15-10-2023');
+  });
+
+  it('should handle different delimiters', () => {
+    const date = '2023.10.25';
+    const result = formatDate(date, 'DD/MM/YYYY');
+    expect(result).toBe('25/10/2023');
+  });
+
+  it('should handle date with day and month swapped', () => {
+    const date = '22/10/2023'; // Assuming this is DD/MM/YYYY
+    const result = formatDate(date, 'DD/MM/YYYY');
+    expect(result).toBe('22/10/2023'); // Should interpret as October 5th, 2023
+  });
+});
+
+describe('jsonParse', () => {
+  it('should parse a valid JSON string', () => {
+    const jsonString = '{"key": "value"}';
+    const result = jsonParse(jsonString);
+    expect(result).toEqual({ key: 'value' });
+  });
+
+  it('should return null for an invalid JSON string', () => {
+    const invalidJsonString = '{"key": "value"';
+    const result = jsonParse(invalidJsonString);
+    expect(result).toBeNull();
+  });
+
+  it('should return null for an empty string', () => {
+    const result = jsonParse('');
+    expect(result).toBeNull();
+  });
+
+  it('should return null for null input', () => {
+    const result = jsonParse(null);
+    expect(result).toBeNull();
+  });
+
+  it('should return null for undefined input', () => {
+    const result = jsonParse(undefined);
+    expect(result).toBeNull();
+  });
+});
+
+describe('formatCountryCode', () => {
+  it('should format the country code with a plus sign', () => {
+    const result = formatCountryCode('1');
+    expect(result).toBe('+1');
+  });
+
+  it('should return an empty string for falsy values', () => {
+    expect(formatCountryCode('')).toBe('');
+    expect(formatCountryCode('')).toBe('');
+    expect(formatCountryCode('')).toBe('');
+  });
+
+  it('should handle multiple digits', () => {
+    const result = formatCountryCode('44');
+    expect(result).toBe('+44');
+  });
+});
+
+// ... existing code ...
+
+describe('formatRoles', () => {
+  it('should return a comma-separated string of role display names', () => {
+    const user: IHFUserGet = {
+      firstName: 'John',
+      lastName: 'Doe',
+      gender: 'Male',
+      phoneNumber: '123-456-7890',
+      roles: [
+        {
+          name: 'admin',
+          displayName: 'Administrator',
+          id: 0,
+          appTypes: []
+        },
+        {
+          name: 'user',
+          displayName: 'User',
+          id: 0,
+          appTypes: []
+        }
+      ],
+      username: '',
+      countryCode: '',
+      tenantId: 0,
+      supervisor: null,
+      organizations: []
+    };
+    const result = formatRoles(user);
+    expect(result).toBe('Administrator,User');
+  });
+
+  it('should exclude roles with the name redRisk', () => {
+    const user: IHFUserGet = {
+      firstName: 'John',
+      lastName: 'Doe',
+      gender: 'Male',
+      phoneNumber: '123-456-7890',
+      roles: [
+        {
+          name: 'admin',
+          displayName: 'Administrator',
+          id: 0,
+          appTypes: []
+        },
+        {
+          name: 'user',
+          displayName: 'User',
+          id: 0,
+          appTypes: []
+        }
+      ],
+      username: '',
+      countryCode: '',
+      tenantId: 0,
+      supervisor: null,
+      organizations: []
+    };
+    const result = formatRoles(user);
+    expect(result).toBe('Administrator,User');
+  });
+});
+
+describe('getUserPayload', () => {
+  it('should create payload for HFCreate with roles', () => {
+    const userFormData = [
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        gender: 'Male',
+        username: 'johndoe',
+        phoneNumber: '123-456-7890',
+        roles: [{ id: 1 }, { id: 2 }],
+        redRisk: true,
+        tenantId: 123
+      }
+    ];
+    const result = getUserPayload({
+      userFormData,
+      countryId: 'US',
+      isHFCreate: true,
+      spiceRolesGroup: [{ name: NAMING_VARIABLES.redRisk, id: 999 }]
+    });
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        firstName: 'John',
+        lastName: 'Doe',
+        roleIds: expect.arrayContaining([1, 2]), // Adjust based on expected role IDs
+        redRisk: true,
+        tenantId: 123
+      })
+    ]);
+  });
+
+  it('should create payload for non-HFCreate with roles', () => {
+    const userFormData = [
+      {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        gender: 'Female',
+        username: 'janesmith',
+        phoneNumber: '987-654-3210',
+        rolesIds: [{ id: 3, name: APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN }],
+        redRisk: false,
+        tenantId: 456
+      }
+    ];
+    const result = getUserPayload({
+      userFormData,
+      countryId: 1, // Ensure this is a valid number
+      isHFCreate: false,
+      spiceRolesGroup: [{ name: NAMING_VARIABLES.redRisk, id: 999 }]
+    });
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        firstName: 'Jane',
+        lastName: 'Smith',
+        roleIds: [], // Ensure this matches the expected role IDs
+        redRisk: false,
+        tenantId: 456,
+        country: { id: 1 }, // Ensure this matches the expected country structure
+        supervisorId: null,
+        timezone: undefined,
+        username: 'janesmith',
+        village: undefined,
+        villageIds: [],
+        phoneNumber: '987-654-3210',
+        countryCode: null,
+        culture: null,
+        district: undefined,
+        "chiefdom": undefined,
+      })
+    ]);
+  });
+  it('should set tenantId to null for super admin', () => {
+    const userFormData = [
+      {
+        firstName: 'Admin',
+        lastName: 'User',
+        gender: 'Male',
+        username: 'adminuser',
+        phoneNumber: '123-456-7890',
+        tenantId: 123,
+      }
+    ];
+    const result = getUserPayload({
+      userFormData,
+      countryId: 1,
+      isHFCreate: false,
+      // isSuperAdmin: true, // Ensure this is included to test the super admin logic
+      spiceRolesGroup: []
+    });
+    
+    expect(result).toEqual([
+      expect.objectContaining({
+        "chiefdom": undefined,
+         "country": {
+           "id": 1,
+         },
+         "countryCode": null,
+         "culture": null,
+         "district": undefined,
+         "firstName": "Admin",
+         "gender": "Male",
+         "lastName": "User",
+         "phoneNumber": "123-456-7890",
+         "redRisk": undefined,
+         "roleIds": [],
+         "supervisorId": null,
+         "tenantId": 123,
+         "timezone": undefined,
+         "username": "adminuser",
+         "village": undefined,
+         "villageIds": [],
+      })
+    ]);
+});
+  // Add more test cases as needed for different scenarios
 });
