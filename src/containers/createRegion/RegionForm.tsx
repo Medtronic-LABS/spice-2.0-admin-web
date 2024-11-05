@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Field, useForm } from 'react-final-form';
 
 import TextInput from '../../components/formFields/TextInput';
@@ -27,6 +27,24 @@ const RegionForm = (): React.ReactElement => {
   const form = useForm();
   const appTypesError = required(form?.getState()?.values.region?.appTypes);
   const appTypesTouched = form?.getState()?.touched?.['region.appTypes'];
+
+  useEffect(() => {
+    if (
+      !form.getState()?.values?.region?.phoneNumberCode?.length ||
+      form?.getState()?.errors?.region?.phoneNumberCode
+    ) {
+      form.getState()?.values?.users?.forEach((user: any, index: number) => {
+        form.change(`users[${index}].countryCode`, undefined);
+      });
+    } else {
+      const regionCountryCode = form.getState()?.values?.region?.phoneNumberCode;
+      form.getState()?.values?.users?.forEach((user: any, index: number) => {
+        form.change(`users[${index}].countryCode`, regionCountryCode);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.getState()?.values?.region?.phoneNumberCode]);
+
   return (
     <div className='row gx-1dot25'>
       <div className='col-sm-6 col-12'>

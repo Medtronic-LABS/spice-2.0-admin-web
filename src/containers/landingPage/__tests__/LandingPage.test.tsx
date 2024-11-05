@@ -1,6 +1,6 @@
 // LandingPage.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Router } from 'react-router-dom';
+import { MemoryRouter, Router, BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import '@testing-library/jest-dom/extend-expect';
@@ -28,8 +28,23 @@ jest.mock('../../../utils/routeUtil', () => ({
   goToUrl: jest.fn()
 }));
 
+const mockStore = configureStore();
+const initialState = {
+  user: {
+    user: {
+      role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+      suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR],
+      appTypes: [APP_TYPE.COMMUNITY]
+    }
+  },
+  regionCom: {
+    detail: {
+      id: 1,
+      tenantId: 1
+    }
+  }
+};
 describe('LandingPage', () => {
-  const mockStore = configureStore();
   let store: any;
 
   beforeAll(() => {
@@ -37,32 +52,27 @@ describe('LandingPage', () => {
   });
 
   beforeEach(() => {
-    store = mockStore({
-      user: {
-        user: {
-          role: APPCONSTANTS.ROLES.SUPER_ADMIN,
-          suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR]
-        }
-      }
-    });
+    store = mockStore(initialState);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should render the LandingPage component correctly', async () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
+  it('should render the LandingPage component correctly with region details', async () => {
+    const localStore = mockStore(initialState);
+    const { getByText, unmount } = render(
+      <Provider store={localStore}>
+        <BrowserRouter>
           <LandingPage />
-        </MemoryRouter>
+        </BrowserRouter>
       </Provider>
     );
     await waitFor(() => {
-      expect(screen.getByText('Admin')).toBeInTheDocument();
-      expect(screen.getByText('Reports')).toBeInTheDocument();
+      expect(getByText('Admin')).toBeInTheDocument();
+      expect(getByText('Reports')).toBeInTheDocument();
     });
+    unmount();
   });
 
   it('should open a new tab for suites with domain', async () => {
@@ -82,9 +92,12 @@ describe('LandingPage', () => {
     const localStore = mockStore({
       user: {
         user: {
-          ...(store.getState() as any).user.user,
+          ...initialState.user.user,
           suiteAccess: [APPCONSTANTS.SUITE_ACCESS.CFR]
         }
+      },
+      regionCom: {
+        ...initialState.regionCom
       }
     });
     render(
@@ -103,9 +116,12 @@ describe('LandingPage', () => {
     const localStore = mockStore({
       user: {
         user: {
-          ...(store.getState() as any).user.user,
+          ...initialState.user.user,
           suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN]
         }
+      },
+      regionCom: {
+        ...initialState.regionCom
       }
     });
     render(
@@ -123,10 +139,13 @@ describe('LandingPage', () => {
     const localStore = mockStore({
       user: {
         user: {
-          ...(store.getState() as any).user.user,
+          ...initialState.user.user,
           suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR],
           appTypes: [APP_TYPE.COMMUNITY]
         }
+      },
+      regionCom: {
+        ...initialState.regionCom
       }
     });
     render(

@@ -556,6 +556,13 @@ const UserForm = ({
                     const [suiteAccess] = getSuiteAccessList(appTypeBasedRoles);
                     dataToPush.suiteAccess = [suiteAccess];
                   }
+                  if (
+                    isRegionCreate &&
+                    !form?.getState()?.errors?.region?.phoneNumberCode &&
+                    form.getState()?.values?.region?.phoneNumberCode?.length
+                  ) {
+                    dataToPush.countryCode = form.getState()?.values?.region?.phoneNumberCode;
+                  }
                   fields.push(dataToPush);
                 }
           }
@@ -1419,7 +1426,13 @@ const UserForm = ({
                       parse={convertToNumber}
                       format={(value: string) => formatCountryCode(value)}
                       render={({ input, meta }) => (
-                        <TextInput {...input} label='Country Code' errorLabel='country code' error={isError(meta)} />
+                        <TextInput
+                          {...input}
+                          disabled // country code will get autopopulated from region form
+                          label='Country Code'
+                          errorLabel='country code'
+                          error={isError(meta)}
+                        />
                       )}
                     />
                   ) : (

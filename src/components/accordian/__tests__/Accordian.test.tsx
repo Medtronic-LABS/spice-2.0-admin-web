@@ -1,11 +1,7 @@
-import { shallow } from 'enzyme';
 import { render, fireEvent } from '@testing-library/react';
 import Accordian from '../Accordian';
 
 describe('Accordian component', () => {
-  beforeEach(() => {
-    shallow(<Accordian header={<h2>Header</h2>} body={<p>Body content</p>} />);
-  });
   it('renders header and body contents', () => {
     const header = 'Header Content';
     const body = 'Body Content';
@@ -36,10 +32,10 @@ describe('Accordian component', () => {
     expect(accordionBody.classList.contains('show')).toBe(false);
   });
 
-  it('handles `collapsed` prop correctly', () => {
+  it('handles collapsed prop correctly', () => {
     const header = 'Header Content';
     const body = 'Body Content';
-    const { getByText } = render(<Accordian header={header} body={body} collapsed={true} />);
+    const { getByText } = render(<Accordian header={header} body={body} collapsed={true} defaultCollapsed={false} />);
     const accordionHeader = getByText(header);
     const accordionBody = getByText(body);
 
@@ -49,6 +45,25 @@ describe('Accordian component', () => {
 
     // Click to expand
     fireEvent.click(accordionHeader);
+    expect(accordionHeader.classList.contains('collapsed')).toBe(true);
+    expect(accordionBody.classList.contains('show')).toBe(false);
+  });
+
+  it('updates collapsed state when collapsed prop changes', () => {
+    const header = 'Header Content';
+    const body = 'Body Content';
+    const { getByText, rerender } = render(<Accordian header={header} body={body} collapsed={false} />);
+    const accordionHeader = getByText(header);
+    const accordionBody = getByText(body);
+
+    // Initial state: expanded
+    expect(accordionHeader.classList.contains('collapsed')).toBe(false);
+    expect(accordionBody.classList.contains('show')).toBe(false);
+
+    // Re-render with collapsed=true
+    rerender(<Accordian header={header} body={body} collapsed={true} />);
+
+    // Should now be collapsed
     expect(accordionHeader.classList.contains('collapsed')).toBe(true);
     expect(accordionBody.classList.contains('show')).toBe(false);
   });

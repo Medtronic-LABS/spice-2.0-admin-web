@@ -17,7 +17,7 @@ interface IAnchorProps {
  * @returns {React.ReactElement} The rendered Anchor component
  */
 const Anchor: React.FC<IAnchorProps> = ({ content, onClick, className }: IAnchorProps): React.ReactElement => (
-  <li role='presentation' className={className} onClick={onClick}>
+  <li role='presentation' data-testid='anchor' className={className} onClick={onClick}>
     <div className={styles.paginationButton}>{content}</div>
   </li>
 );

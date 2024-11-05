@@ -17,7 +17,8 @@ const columnsDef: any = [
 
 const rowData: any = [
   { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
-  { name: 'Jane Doe', email: 'jane.doe@example.com', isCustomIconInvisible: true } // don't add id to test key value become rowIndex
+  // don't add id to test key value become rowIndex
+  { name: 'Jane Doe', email: 'jane.doe@example.com', isCustomIconInvisible: true }
 ];
 
 const props = {

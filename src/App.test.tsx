@@ -47,14 +47,26 @@ describe('App Component', () => {
       expect(getByTestId('header')).toBeInTheDocument();
     });
 
+    test('should render header without errors with no ga tracking id', () => {
+      process.env.REACT_APP_GA_TRACKING_ID = '';
+      const { getByTestId } = render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </Provider>
+      );
+      expect(getByTestId('header')).toBeInTheDocument();
+    });
+
     test('should not render header if not logged in', () => {
-      const store = mockStore({
+      const localStore = mockStore({
         user: {
           isLoggedIn: false
         }
       });
       const { queryByTestId } = render(
-        <Provider store={store}>
+        <Provider store={localStore}>
           <BrowserRouter>
             <App />
           </BrowserRouter>

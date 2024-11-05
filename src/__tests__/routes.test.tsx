@@ -127,7 +127,7 @@ describe('AppRoutes', () => {
     }));
     global.URLSearchParams = mockURLSearchParams as any;
 
-    const store = mockStore({
+    const localStore = mockStore({
       user: {
         ...initialState.user,
         isLoggedIn: true,
@@ -139,7 +139,7 @@ describe('AppRoutes', () => {
     });
 
     render(
-      <Provider store={store}>
+      <Provider store={localStore}>
         <MemoryRouter initialEntries={[`${PUBLIC_ROUTES.login}?next=${nextUrl}`]}>
           <AppRoutes />
         </MemoryRouter>

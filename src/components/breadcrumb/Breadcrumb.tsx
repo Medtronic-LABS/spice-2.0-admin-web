@@ -175,12 +175,12 @@ const Breadcrumb = (): React.ReactElement => {
   const showOU =
     (role !== APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || chiefdomRoutes.includes(activeRoute)) &&
     (showSite || activeRoute.includes(':chiefdomId'));
-  const showAccount =
+  const showDistrict =
     (role !== APPCONSTANTS.ROLES.DISTRICT_ADMIN || districtRoutes.includes(activeRoute)) &&
     (showOU || activeRoute.includes(':districtId'));
   const showRegion =
     (role !== APPCONSTANTS.ROLES.REGION_ADMIN || regionRoutes.includes(activeRoute)) &&
-    (showAccount || activeRoute.includes(':regionId'));
+    (showDistrict || activeRoute.includes(':regionId'));
 
   const sections: ISection[] = useMemo(() => {
     const result = [];
@@ -196,7 +196,7 @@ const Breadcrumb = (): React.ReactElement => {
         route: PROTECTED_ROUTES.regionSummary.replace(':regionId', region.id).replace(':tenantId', region.tenantId)
       });
     }
-    if (district?.name && showAccount) {
+    if (district?.name && showDistrict) {
       result.push({
         label: district.name,
         route: PROTECTED_ROUTES.districtSummary
@@ -241,7 +241,7 @@ const Breadcrumb = (): React.ReactElement => {
     district.name,
     district.id,
     district.tenantId,
-    showAccount,
+    showDistrict,
     chiefdom.name,
     chiefdom.id,
     chiefdom.tenantId,
@@ -308,7 +308,7 @@ const Breadcrumb = (): React.ReactElement => {
   }, [urlRouteIdDispatch]);
 
   const prevPathname = useRef(pathname);
-  // Clearing the region/account/ou/site data in reducer, to prevent showing wrong data in breadcrumb
+  // Clearing the region/district/ou/site data in reducer, to prevent showing wrong data in breadcrumb
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       const prevRoute = {
@@ -318,7 +318,7 @@ const Breadcrumb = (): React.ReactElement => {
         isOURoute: Boolean(
           chiefdomRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
         ),
-        isAccountRoute: Boolean(
+        isDistrictRoute: Boolean(
           districtRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
         ),
         isRegionRoute: Boolean(
@@ -333,7 +333,7 @@ const Breadcrumb = (): React.ReactElement => {
           healthFacilityRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
         ),
         isOURoute: Boolean(chiefdomRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))),
-        isAccountRoute: Boolean(
+        isDistrictRoute: Boolean(
           districtRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
         ),
         isRegionRoute: Boolean(
@@ -351,10 +351,10 @@ const Breadcrumb = (): React.ReactElement => {
         dispatch(clearChiefdomDetail());
       }
       if (
-        (prevRoute.isOURoute || prevRoute.isSiteRoute || prevRoute.isAccountRoute) &&
+        (prevRoute.isOURoute || prevRoute.isSiteRoute || prevRoute.isDistrictRoute) &&
         !currRoute.isOURoute &&
         !currRoute.isSiteRoute &&
-        !currRoute.isAccountRoute
+        !currRoute.isDistrictRoute
       ) {
         dispatch(clearDistrictDetails());
       }
@@ -398,7 +398,7 @@ const Breadcrumb = (): React.ReactElement => {
         onClick={clearData}
         to={redirectBasedOnUser(role, userSuiteAccess)}
       >
-        <HomeIcon className='d-inline-block' aria-labelledby='Home' />
+        <HomeIcon className='d-inline-block' aria-labelledby='Home' aria-label='Home' />
       </Link>
       <div>
         {sections.map(({ label, route }, i) => (
@@ -409,6 +409,7 @@ const Breadcrumb = (): React.ReactElement => {
               activeClassName={`fs-1dot5 fw-bold no-pointer-events ${styles.active}`}
               className={`align-baseline ${styles.breadcrumbLink}`}
               isActive={() => i === sections.length - 1}
+              data-testid={label}
             >
               {label}
             </NavLink>
