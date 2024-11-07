@@ -6,13 +6,13 @@ import { camelCase } from 'lodash';
 import { formJSONSelector, getFormMetaSelector, loadingSelector } from '../../store/workflow/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import Loader from '../loader/Loader';
-import AccordianView from './components/accordian/AccordianView';
+import Loader from '../../components/loader/Loader';
+import AccordianView from '../../components/formBuilder/components/accordian/AccordianView';
 import { clearFormJSON, customizeFormRequest, fetchCustomizationFormRequest } from '../../store/workflow/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import ReorderView from './components/reorder/ReorderView';
-import { getConfigByViewType } from './utils/FieldUtils';
-import useFormCustomization from './hooks/useFormCustomization';
+import ReorderView from '../../components/formBuilder/components/reorder/ReorderView';
+import { getConfigByViewType } from '../../components/formBuilder/utils/FieldUtils';
+import useFormCustomization from '../../components/formBuilder/hooks/useFormCustomization';
 
 interface IMatchParams {
   regionId: string;
@@ -162,8 +162,9 @@ const WorkflowFormCustomization = () => {
   };
   const accordianRef = useRef<any>([]);
   const newlyAddedIdsRef = useRef<any>([]);
+  console.log('formData--->', formData);
   return (
-    <>
+    <div data-testid='workflow-form-customization'>
       {formData && !loading ? (
         <>
           <AccordianView
@@ -202,7 +203,7 @@ const WorkflowFormCustomization = () => {
         </>
       ) : null}
       {loading && <Loader />}
-    </>
+    </div>
   );
 };
 

@@ -43,6 +43,7 @@ const header = (
     <header className={`${styles.header} mb-1dot375 d-flex align-items-center`}>
       {menuTogglable && !sideMenuDisabled && (
         <div
+          data-testid='menu-icon'
           className={`me-0dot5 ${styles.menuIcon} ${styleVisible}`}
           onClick={(e) => {
             stopPropogation(e);
@@ -165,7 +166,10 @@ export const AppLayout = ({ children }: IAppLayout) => {
           ))}
           <div className={`row gx-1dot25 ${styles.body}`}>
             {!isSideMenuDisabled && (
-              <div className={`col-auto ${styles.sidemenu} ${isMenuTogglable && styles.togglable} ${isStyleVisible}`}>
+              <div
+                data-testid='side-menu'
+                className={`col-auto ${styles.sidemenu} ${isMenuTogglable && styles.togglable} ${isStyleVisible}`}
+              >
                 <SideMenu className={styles.customSidemenuClass} />
               </div>
             )}

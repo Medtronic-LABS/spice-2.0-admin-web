@@ -10,7 +10,7 @@ import { formatDate } from '../../utils/commonUtils';
 
 interface IDatePickerProps {
   label: string;
-  isShowLabel: boolean;
+  isShowLabel?: boolean;
   todayButton?: boolean;
   required?: boolean;
   value?: Date | string | null;

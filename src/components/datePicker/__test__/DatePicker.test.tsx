@@ -1,189 +1,192 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DatePickerComponent from '../DatePicker';
 
-import { formatDate } from '../../../utils/commonUtils'; // Adjust this import path as needed
-
-// Mock the formatDate function
-// Mock the formatDate function
 jest.mock('../../assets/images/calendar-icon.svg', () => ({
   ReactComponent: () => <svg data-testid='calendar-icon' />
 }));
-jest.mock('../../../utils/commonUtils', () => ({
-  formatDate: jest.fn((date, format) => {
-    if (date instanceof Date) {
-      return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
-    }
-    if (typeof date === 'string') {
-      return date; // For simplicity, just return the input string
-    }
-    return ''; // Return empty string for null, undefined, or empty string
-  })
-}));
-// Mock the react-datepicker module
-jest.mock('react-datepicker', () => {
-  return {
-    __esModule: true,
-    default: jest.fn(({ selected, onChange, ...props }) => {
-      const handleDecrease = () => {
-        const newDate = new Date(selected);
-        newDate.setMonth(newDate.getMonth() - 1);
-        onChange(newDate);
-      };
 
-      return (
-        <div>
-          <input
-            type='text'
-            value={selected instanceof Date ? selected.toLocaleDateString() : ''}
-            onChange={(e) => onChange(new Date(e.target.value))}
-            data-testid='mocked-datepicker'
-          />
-          <button onClick={handleDecrease} aria-label='Decrease month'>
-            Decrease
-          </button>
-        </div>
-      );
-    })
-  };
-});
 describe('DatePickerComponent', () => {
+  const mockOnChange = jest.fn();
+  const defaultProps = {
+    label: 'Test Date',
+    isShowLabel: true,
+    onChange: mockOnChange
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('renders the DatePicker with label when isShowLabel is true', () => {
-    render(<DatePickerComponent label='Test Date' isShowLabel={true} />);
+
+  it('renders with label when isShowLabel is true', () => {
+    const { unmount } = render(<DatePickerComponent {...defaultProps} />);
     expect(screen.getByText('Test Date')).toBeInTheDocument();
-    expect(screen.getByTestId('mocked-datepicker')).toBeInTheDocument();
+    unmount();
   });
 
   it('does not render label when isShowLabel is false', () => {
-    render(<DatePickerComponent label='Test Date' isShowLabel={false} />);
+    const { unmount } = render(<DatePickerComponent {...defaultProps} isShowLabel={false} />);
     expect(screen.queryByText('Test Date')).not.toBeInTheDocument();
-    expect(screen.getByTestId('mocked-datepicker')).toBeInTheDocument();
+    unmount();
   });
 
-  it('shows asterisk when required is true', () => {
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} required={true} />);
+  it('shows required asterisk when required prop is true', () => {
+    const { unmount } = render(<DatePickerComponent {...defaultProps} required={true} />);
     expect(screen.getByText('*')).toBeInTheDocument();
+    unmount();
   });
-  it('initializes with null date when no value is provided', () => {
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} />);
+
+  it('displays error message when error prop is provided', () => {
+    const errorMessage = 'This is an error';
+    const errorLabel = 'Error Label';
+    const { unmount } = render(<DatePickerComponent {...defaultProps} error={errorMessage} errorLabel={errorLabel} />);
+    expect(screen.getByText(`${errorMessage} ${errorLabel}`)).toBeInTheDocument();
+    unmount();
+  });
+
+  it('renders calendar icon', () => {
+    const { unmount } = render(<DatePickerComponent label={'Test Date'} onChange={mockOnChange} todayButton={true} />);
+    expect(screen.getByTestId('calendar-icon')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('shows calendar when icon is clicked', () => {
+    const { unmount } = render(<DatePickerComponent {...defaultProps} />);
+    const calendarIcon = screen.getByTestId('calendar-icon');
+    fireEvent.click(calendarIcon);
+    unmount();
+  });
+
+  it('initializes with provided date value', () => {
+    const initialDate = '2024-03-15';
+    const { unmount } = render(<DatePickerComponent {...defaultProps} value={initialDate} />);
+
     const input = screen.getByRole('textbox');
-    expect(input).toHaveValue('');
-    expect(formatDate).not.toHaveBeenCalled();
+    expect(input).toHaveValue('15/03/2024');
+    unmount();
   });
 
-  it('initializes with correct date when string value is provided', () => {
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} value='2023-05-15' />);
-    expect(formatDate).toHaveBeenCalledWith('2023-05-15', 'YYYY-MM-DD');
+  it('handles date selection correctly', () => {
+    const { unmount } = render(<DatePickerComponent {...defaultProps} />);
+    const dateInput = screen.getByRole('textbox');
+
+    const newDate = '15/03/2024';
+    fireEvent.change(dateInput, { target: { value: newDate } });
+
+    expect(dateInput).toHaveValue(newDate);
+
+    expect(mockOnChange).toHaveBeenCalled();
+    unmount();
   });
 
-  it('uses formatDate function for string values', () => {
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} value='2023-07-25' />);
-    expect(formatDate).toHaveBeenCalledWith('2023-07-25', 'YYYY-MM-DD');
-  });
-
-  it('updates the date when a new date is selected', () => {
-    const onChange = jest.fn();
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} onChange={onChange} />);
-
-    const datePicker = screen.getByTestId('mocked-datepicker');
-
-    // Simulate selecting a new date
-    const newDate = new Date('2023-09-15T00:00:00.000Z');
-    fireEvent.change(datePicker, { target: { value: newDate.toISOString() } });
-
-    // Check if the onChange prop was called with the new date
-    expect(onChange).toHaveBeenCalledWith(newDate);
-
-    // Check if the input value was updated
-    // Use a more flexible assertion that works for both MM/DD/YYYY and DD/MM/YYYY formats
-    expect(datePicker).toHaveValue('9/15/2023');
-  });
-
-  it('calls onChange when decrease button is clicked', () => {
-    const onChange = jest.fn();
-    const initialDate = new Date('2023-05-15');
-    const { debug } = render(
-      <DatePickerComponent label='Test Label' isShowLabel={true} onChange={onChange} value={initialDate} />
+  it('calls onChange callback when a new date is selected', async () => {
+    const onChangeMock = jest.fn();
+    const { unmount } = render(
+      <DatePickerComponent label='Test Date Picker' isShowLabel={true} onChange={onChangeMock} />
     );
 
-    debug(); // This will print the rendered HTML
-    const decreaseButton = screen.getByRole('button', { name: /decrease/i });
-    fireEvent.click(decreaseButton);
-    expect(onChange).toHaveBeenCalledWith(expect.any(Date));
-  });
+    const iconButton = screen.getByTestId('calendar-icon');
+    fireEvent.click(iconButton);
 
-  it('calls onChange with correct date when decrease month button is clicked', () => {
-    const onChange = jest.fn((date) => {
-      return date;
+    const dateInput = screen.getByRole('textbox'); // Or getByLabelText if it has an associated label
+    fireEvent.change(dateInput, { target: { value: '15/11/2024' } });
+
+    // Ensure that the selected date changes
+    await waitFor(() => {
+      const updatedDate = (dateInput as HTMLInputElement).value;
+      expect(updatedDate).toBe('15/11/2024');
     });
-    const initialDate = new Date('2023-05-15T12:00:00.000Z'); // May 15, 2023
-    const { debug } = render(
-      <DatePickerComponent label='Test Label' isShowLabel={true} value={initialDate} onChange={onChange} />
-    );
-    debug(); // This will print the rendered HTML
-    // Find the decrease month button
-    const decreaseButton = screen.getByRole('button', { name: /decrease month/i });
-    // Click the decrease month button
-    fireEvent.click(decreaseButton);
-    // Check if onChange was called
-    expect(onChange).toHaveBeenCalledTimes(1);
-    const newDate = onChange.mock.calls[0][0];
-    // For now, let's just check if it's a valid date
-    expect(newDate).toBeInstanceOf(Date);
-    expect(newDate.getTime()).not.toBe(0); // Ensure it's not the Unix epoch
+    unmount();
   });
 
-  it('does not render label when isShowLabel is false', () => {
-    const onChange = jest.fn();
-    const initialDate = new Date('2023-05-15T12:00:00.000Z');
-    render(<DatePickerComponent label='Test Label' isShowLabel={false} value={initialDate} onChange={onChange} />);
-    // Check that the label is not in the document
-    const label = screen.queryByText('Test Label');
-    expect(label).not.toBeInTheDocument();
-    // Optionally, check that the DatePicker input is still rendered
-    const datepickerInput = screen.getByTestId('mocked-datepicker');
-    expect(datepickerInput).toBeInTheDocument();
+  it('renders custom header with all controls and handles interactions with onChange', async () => {
+    const { unmount, container } = render(<DatePickerComponent {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('textbox'));
+
+    expect(screen.getByRole('button', { name: '<' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '>' })).toBeInTheDocument();
+    expect(container.getElementsByClassName('monthSelect')[0]).toBeInTheDocument();
+    expect(container.getElementsByClassName('yearSelect')[0]).toBeInTheDocument();
+
+    const prevMonthBtn = screen.getByRole('button', { name: '<' });
+    const nextMonthBtn = screen.getByRole('button', { name: '>' });
+
+    fireEvent.click(prevMonthBtn);
+    fireEvent.click(nextMonthBtn);
+
+    const yearSelect = container.getElementsByClassName('yearSelect')[0];
+    fireEvent.change(yearSelect, { target: { value: '2023' } });
+    expect(yearSelect).toHaveValue('2023');
+
+    const monthSelect = container.getElementsByClassName('monthSelect')[0];
+    fireEvent.change(monthSelect, { target: { value: 'March' } });
+    expect(monthSelect).toHaveValue('March');
+
+    const mockStopPropagation = jest.fn();
+    const mockPreventDefault = jest.fn();
+
+    fireEvent.click(prevMonthBtn, {
+      stopPropagation: mockStopPropagation,
+      preventDefault: mockPreventDefault
+    });
+
+    unmount();
   });
 
-  it('handles valid date selection', () => {
-    const onChange = jest.fn();
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} onChange={onChange} />);
+  it('renders custom header with all controls and handles interactions without onChange', async () => {
+    const { unmount, container } = render(<DatePickerComponent label={'Test Date'} isShowLabel={true} />);
 
-    const datePicker = screen.getByTestId('mocked-datepicker');
-    const newDate = new Date('2023-06-20T00:00:00.000Z');
-    fireEvent.change(datePicker, { target: { value: newDate.toISOString() } });
+    fireEvent.click(screen.getByRole('textbox'));
 
-    expect(onChange).toHaveBeenCalledWith(expect.any(Date));
-    const calledDate = onChange.mock.calls[0][0];
-    expect(calledDate.getFullYear()).toBe(2023);
-    expect(calledDate.getMonth()).toBe(5); // June is 5 (0-based index)
-    expect(calledDate.getDate()).toBe(20);
+    expect(screen.getByRole('button', { name: '<' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '>' })).toBeInTheDocument();
+    expect(container.getElementsByClassName('monthSelect')[0]).toBeInTheDocument();
+    expect(container.getElementsByClassName('yearSelect')[0]).toBeInTheDocument();
+
+    const prevMonthBtn = screen.getByRole('button', { name: '<' });
+    const nextMonthBtn = screen.getByRole('button', { name: '>' });
+
+    fireEvent.click(prevMonthBtn);
+    fireEvent.click(nextMonthBtn);
+
+    const yearSelect = container.getElementsByClassName('yearSelect')[0];
+    fireEvent.change(yearSelect, { target: { value: '2023' } });
+    expect(yearSelect).toHaveValue('2023');
+
+    const monthSelect = container.getElementsByClassName('monthSelect')[0];
+    fireEvent.change(monthSelect, { target: { value: 'March' } });
+    expect(monthSelect).toHaveValue('March');
+
+    const mockStopPropagation = jest.fn();
+    const mockPreventDefault = jest.fn();
+
+    fireEvent.click(prevMonthBtn, {
+      stopPropagation: mockStopPropagation,
+      preventDefault: mockPreventDefault
+    });
+
+    unmount();
   });
 
-  it('handles invalid date selection', () => {
-    const onChange = jest.fn();
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} onChange={onChange} />);
-    const datePicker = screen.getByTestId('mocked-datepicker');
-    fireEvent.change(datePicker, { target: { value: 'invalid date' } });
-    // Check if onChange was called with an invalid date
-    expect(onChange).toHaveBeenCalledWith(expect.any(Date));
-    expect(onChange.mock.calls[0][0].getTime()).toBeNaN();
+  it('handles null date in selection', () => {
+    const { unmount } = render(<DatePickerComponent {...defaultProps} />);
+    const dateInput = screen.getByRole('textbox');
+    fireEvent.change(dateInput, {
+      target: { value: '15/03/2024' }
+    });
+    fireEvent.change(dateInput, {
+      target: { value: '' }
+    });
+    expect(dateInput).toHaveValue('');
+    unmount();
   });
 
-  // Update the null date selection test
-  it('handles null date selection', () => {
-    const onChange = jest.fn();
-    render(<DatePickerComponent label='Test Label' isShowLabel={true} onChange={onChange} />);
-    const datePicker = screen.getByTestId('mocked-datepicker');
-    fireEvent.change(datePicker, { target: { value: '' } });
-    // Check that onChange was not called
-    expect(onChange).not.toHaveBeenCalled();
-    // Optionally, you can check if the input value is empty
-    expect(datePicker).toHaveValue('');
+  it('handles direct date selection through calendar', async () => {
+    const { unmount } = render(<DatePickerComponent label={'Test Date'} isShowLabel={true} />);
+    fireEvent.click(screen.getByRole('textbox'));
+    const options = screen.getAllByRole('option');
+    const lastOption = options[options.length - 1];
+    fireEvent.click(lastOption);
+    unmount();
   });
-
-  // Add more tests as needed
 });

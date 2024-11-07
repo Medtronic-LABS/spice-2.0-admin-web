@@ -1,5 +1,3 @@
-import React from 'react';
-import { shallow } from 'enzyme';
 import { render, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Dropdown from '../Dropdown';
@@ -10,10 +8,6 @@ describe('Dropdown', () => {
     { menuText: 'Item 2', route: '/item2' },
     { menuText: 'Item 3', onClick: jest.fn() }
   ];
-
-  beforeEach(() => {
-    shallow(<Dropdown label='Test Button' menuItems={menuItems} />);
-  });
 
   it('should render the label and menu items', () => {
     const { getByText } = render(

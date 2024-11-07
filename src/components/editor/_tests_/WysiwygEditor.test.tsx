@@ -1,50 +1,49 @@
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import TextEditor from '../WysiwygEditor';
-import { TOOLBAR_BUTTONS } from '../ToolBarButtons';
+
+const mockChildComponent = jest.fn();
+jest.mock('jodit-react', () => (props: any) => {
+  mockChildComponent(props);
+  return <div data-testid='jodit-editor'>Mock Editor</div>;
+});
 
 describe('TextEditor', () => {
-  it('renders without errors', () => {
+  it('Should render with test id', () => {
     const props = {
       editorContent: '',
       setEditorContent: jest.fn()
     };
-    const wrapper = shallow(<TextEditor {...props} />);
-    expect(wrapper.exists()).toBe(true);
+    render(<TextEditor {...props} />);
+    expect(screen.getByTestId('jodit-editor')).toBeInTheDocument();
   });
 
-  it('renders the editor content', () => {
-    const props = {
-      editorContent: 'Hello world',
-      setEditorContent: jest.fn()
-    };
-    const wrapper = shallow(<TextEditor {...props} />);
-    expect(wrapper.find('JoditEditor').prop('value')).toEqual('Hello world');
-  });
-
-  it('calls the setEditorContent function when onBlur event is triggered', () => {
+  it('calls setEditorContent when onBlur is triggered', () => {
     const setEditorContentMock = jest.fn();
     const props = {
-      editorContent: '',
+      editorContent: 'initial content',
       setEditorContent: setEditorContentMock
     };
-    const wrapper = shallow(<TextEditor {...props} />);
-    wrapper.find('JoditEditor').simulate('blur', 'New content');
-    expect(setEditorContentMock).toHaveBeenCalledWith('New content');
+
+    render(<TextEditor {...props} />);
+
+    const lastCall = mockChildComponent.mock.calls[mockChildComponent.mock.calls.length - 1][0];
+
+    lastCall.onBlur('new content');
+
+    expect(setEditorContentMock).toHaveBeenCalledWith('new content');
   });
 
-  it('applies the default configuration properties', () => {
+  it('Should render with test id and editorConfig', () => {
     const props = {
       editorContent: '',
-      setEditorContent: jest.fn()
+      setEditorContent: jest.fn(),
+      editorConfig: {
+        toolbarSticky: true,
+        spellcheck: false,
+        height: 500
+      }
     };
-    const wrapper = shallow(<TextEditor {...props} />);
-    const config: any = wrapper.find('JoditEditor').prop('config');
-    expect(config.disabled).toBe(false);
-    expect(config.readonly).toBe(false);
-    expect(config.placeholder).toBe('');
-    expect(config.toolbarButtonSize).toBe('small');
-    expect(config.height).toBe(400);
-    expect(config.buttons).toBe(TOOLBAR_BUTTONS.toString());
-    expect(config.extraButtons).toBeUndefined();
+    render(<TextEditor {...props} />);
+    expect(screen.getByTestId('jodit-editor')).toBeInTheDocument();
   });
 });

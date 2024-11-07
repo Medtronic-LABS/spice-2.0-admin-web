@@ -1,48 +1,72 @@
-import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import ErrorBoundary from '../ErrorBoundary';
 
 describe('ErrorBoundary', () => {
   it('renders children when there is no error', () => {
-    const wrapper = shallow(
+    render(
       <ErrorBoundary>
         <div>Hello World</div>
       </ErrorBoundary>
     );
-    expect(wrapper.contains(<div>Hello World</div>)).toBe(true);
+    expect(screen.getByText('Hello World')).toBeInTheDocument();
   });
 
   it('renders error message when there is an error', () => {
-    const wrapper = shallow(
+    const FailingComponent = () => {
+      throw new Error('Test Error');
+    };
+
+    render(
       <ErrorBoundary>
-        <div>{null}</div>
+        <FailingComponent />
       </ErrorBoundary>
     );
-    wrapper.setState({ hasError: true });
-    expect(
-      wrapper.containsMatchingElement(<h2>We&apos;re sorry, something went wrong. Please try after sometime.</h2>)
-    ).toBe(true);
+
+    expect(screen.getByText(`We're sorry, something went wrong. Please try after sometime.`)).toBeInTheDocument();
   });
 
   it('renders custom error message when provided', () => {
-    const wrapper = shallow(
+    const FailingComponent = () => {
+      throw new Error('Test Error');
+    };
+
+    render(
       <ErrorBoundary message='Oops!'>
-        <div>{null}</div>
+        <FailingComponent />
       </ErrorBoundary>
     );
-    wrapper.setState({ hasError: true });
-    expect(wrapper.containsMatchingElement(<h2>Oops!</h2>)).toBe(true);
+
+    expect(screen.getByText('Oops!')).toBeInTheDocument();
   });
 
   it('resets state when pathname changes', () => {
-    const wrapper = mount(
+    const { rerender } = render(
       <ErrorBoundary pathname='/old'>
-        <div>{null}</div>
+        <div>Initial Content</div>
       </ErrorBoundary>
     );
-    wrapper.setState({ hasError: true });
-    expect(wrapper.state('hasError')).toBe(true);
-    wrapper.setProps({ pathname: '/new' });
-    expect(wrapper.state('hasError')).toBe(false);
+
+    expect(screen.getByText('Initial Content')).toBeInTheDocument();
+
+    const FailingComponent = () => {
+      throw new Error('Test Error');
+    };
+
+    rerender(
+      <ErrorBoundary pathname='/old'>
+        <FailingComponent />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByText(`We're sorry, something went wrong. Please try after sometime.`)).toBeInTheDocument();
+
+    rerender(
+      <ErrorBoundary pathname='/new'>
+        <div>New Content</div>
+      </ErrorBoundary>
+    );
+
+    expect(screen.queryByText(`We're sorry, something went wrong. Please try after sometime.`)).not.toBeInTheDocument();
+    expect(screen.getByText('New Content')).toBeInTheDocument();
   });
 });

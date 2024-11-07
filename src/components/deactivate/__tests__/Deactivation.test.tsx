@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Form } from 'react-final-form';
@@ -39,12 +38,12 @@ describe('Deactivation', () => {
   });
 
   it('displays error messages for required fields', async () => {
-    const handleSubmit = jest.fn();
+    const handleFormSubmit = jest.fn();
     render(
       <MemoryRouter>
-        <Form onSubmit={handleSubmit}>
-          {({ handleSubmit : formHandleSubmit}) => (
-            <form onSubmit={formHandleSubmit}>
+        <Form onSubmit={handleFormSubmit}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
               <Deactivation formName='testForm' />
               <button type='submit'>Submit</button>
             </form>

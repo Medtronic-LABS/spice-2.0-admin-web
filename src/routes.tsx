@@ -50,7 +50,7 @@ import RegionFormCustomization from './containers/region/RegionFormCustomization
 import ProgramList from './containers/program/ProgramList';
 import ProgramForm from './containers/program/CreateProgram';
 import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
-import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
+import WorkflowFormCustomization from './containers/workflow/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
 import LabTestCustomizationLayoutCom from './container_com/labtest/LabTestCustomizationLayout';
 import LabTestListCom from './container_com/labtest/LabtestList';

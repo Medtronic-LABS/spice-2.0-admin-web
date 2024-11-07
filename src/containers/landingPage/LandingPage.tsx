@@ -65,7 +65,7 @@ const LandingPage = (): React.ReactElement => {
         icon: InsightsLogo,
         hasDomain: true,
         suiteAccessName: INSIGHTS,
-        domainUrl: undefined
+        domainUrl: process.env.REACT_APP_INSIGHT_WEB_URL
       }
     ],
     [role]

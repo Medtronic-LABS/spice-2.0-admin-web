@@ -49,6 +49,7 @@ const Loader = ({
       className={`${styles.loaderBackdrop} ${isFullScreen ? styles.fullScreen : ''} ${
         isBackgroundTransparent ? '' : styles.backgroundOpaque
       }`}
+      data-testid='loader'
     >
       <div className={`${className}`}>
         <div id='mdt-logo' style={{ width: 75, height: 75 }}>

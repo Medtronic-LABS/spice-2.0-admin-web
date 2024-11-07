@@ -65,12 +65,12 @@ const IconButton = ({
     <button
       type={type}
       disabled={disabled}
-      style={buttonCustomStyle.iconStyle}
+      style={buttonCustomStyle?.iconStyle}
       className={`btn primary-btn ${styles.iconButton} ${buttonCustomClass}`}
       onClick={handleClick}
     >
       {buttonIconElmt()}
-      <span style={buttonCustomStyle.textStyle} className={styles.btnLabel + ' ' + buttonCustomClass}>
+      <span style={buttonCustomStyle?.textStyle} className={styles.btnLabel + ' ' + buttonCustomClass}>
         {label}
       </span>
     </button>
