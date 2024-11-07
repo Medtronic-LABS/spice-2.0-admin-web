@@ -9,7 +9,7 @@ import {
 import { runSaga } from 'redux-saga';
 import * as labtestService from '../../../services/labtestAPI';
 import * as ACTION_TYPES from '../actionTypes';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/labtestDataConstants';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/labTestDataConstants';
 import { AxiosResponse } from 'axios';
 import * as labTestAction from '../actions';
 
@@ -19,22 +19,22 @@ const updateLabTestCustomizationRequestMockData = MOCK_DATA_CONSTANTS.FETCH_LAB_
 const labTestDetailsMockData = MOCK_DATA_CONSTANTS.FETCH_LAB_TEST_RESPONSE_PAYLOAD;
 
 describe('labTest Saga and Actioon', () => {
-    it('fetchLab Request', async () => {
-        const { labtests, total } = labTestDetailsMockData;
-        const fetchLabTestSpy = jest.spyOn(labtestService, 'fetchLabTest').mockImplementation(() => {
-          return Promise.resolve({ data: { entityList: labtests, totalCount: total } } as AxiosResponse);
-        });
-        const dispatched: any = [];
-        await runSaga(
-          {
-            dispatch: (action) => dispatched.push(action)
-          },
-          fetchLabTest,
-          { data: { ...labTestDetailsRequestMockData } as any, type: ACTION_TYPES.FETCH_LABTEST_REQUEST }
-        ).toPromise();
-        expect(fetchLabTestSpy).toHaveBeenCalledWith({ countryId: 1, limit: 10, searchTerm: '', skip: 0 });
-        expect(dispatched).toEqual([labTestAction.fetchLabtestsSuccess(labTestDetailsMockData)]);
-      });
+  it('fetchLab Request', async () => {
+    const { labtests, total } = labTestDetailsMockData;
+    const fetchLabTestSpy = jest.spyOn(labtestService, 'fetchLabTest').mockImplementation(() => {
+      return Promise.resolve({ data: { entityList: labtests, totalCount: total } } as AxiosResponse);
+    });
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchLabTest,
+      { data: { ...labTestDetailsRequestMockData } as any, type: ACTION_TYPES.FETCH_LABTEST_REQUEST }
+    ).toPromise();
+    expect(fetchLabTestSpy).toHaveBeenCalledWith({ countryId: 1, limit: 10, searchTerm: '', skip: 0 });
+    expect(dispatched).toEqual([labTestAction.fetchLabtestsSuccess(labTestDetailsMockData)]);
+  });
   it('fetchLab successfully', async () => {
     const { labtests, total } = labTestDetailsMockData;
     const fetchLabTestSpy = jest.spyOn(labtestService, 'fetchLabTest').mockImplementation(() => {
@@ -104,7 +104,7 @@ describe('labTest Saga and Actioon', () => {
 
   it('fetchUnitList successfully', async () => {
     const fetchUnitListTestSpy = jest.spyOn(labtestService, 'fetchUnitList').mockImplementation(() => {
-      return Promise.resolve({data:[{ id: '1', unit: '' }]} as AxiosResponse);
+      return Promise.resolve({ data: [{ id: '1', unit: '' }] } as AxiosResponse);
     });
     const dispatched: any = [];
     await runSaga(
@@ -130,12 +130,12 @@ describe('labTest Saga and Actioon', () => {
       fetchUnitList
     ).toPromise();
     expect(fetchUnitListTestSpy).toHaveBeenCalledWith();
-    expect(dispatched).toEqual([labTestAction.fetchUnitListFail(error)])
+    expect(dispatched).toEqual([labTestAction.fetchUnitListFail(error)]);
   });
 
   it('fetchLabTestCustomizationSaga successfully', async () => {
     const fetchUnitListTestSpy = jest.spyOn(labtestService, 'fetchLabtestCustomization').mockImplementation(() => {
-      return Promise.resolve({data:{entity:labTestCustomizedRequestMockData}} as AxiosResponse);
+      return Promise.resolve({ data: { entity: labTestCustomizedRequestMockData } } as AxiosResponse);
     });
     const dispatched: any = [];
     await runSaga(
@@ -143,10 +143,14 @@ describe('labTest Saga and Actioon', () => {
         dispatch: (action) => dispatched.push(action)
       },
       fetchLabTestCustomizationSaga,
-      {name:'',type:ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_REQUEST}
+      { name: '', type: ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_REQUEST }
     ).toPromise();
-    expect(fetchUnitListTestSpy).toHaveBeenCalledWith({name:""});
-    expect(dispatched).toEqual([labTestAction.fetchLabTestCustomizationSuccess({payload:MOCK_DATA_CONSTANTS.FETCH_LAB_TEST_CUSTOMIZATION_RESPONSE})])
+    expect(fetchUnitListTestSpy).toHaveBeenCalledWith({ name: '' });
+    expect(dispatched).toEqual([
+      labTestAction.fetchLabTestCustomizationSuccess({
+        payload: MOCK_DATA_CONSTANTS.FETCH_LAB_TEST_CUSTOMIZATION_RESPONSE
+      })
+    ]);
   });
 
   it('fetchLabTestCustomizationSaga Failure', async () => {
@@ -160,15 +164,15 @@ describe('labTest Saga and Actioon', () => {
         dispatch: (action) => dispatched.push(action)
       },
       fetchLabTestCustomizationSaga,
-      {name:'',type:ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_REQUEST}
+      { name: '', type: ACTION_TYPES.FETCH_LABTEST_CUSTOMIZATION_REQUEST }
     ).toPromise();
-    expect(fetchUnitListTestSpy).toHaveBeenCalledWith({name:""});
-    expect(dispatched).toEqual([labTestAction.fetchLabTestCustomizationFailure(error)])
+    expect(fetchUnitListTestSpy).toHaveBeenCalledWith({ name: '' });
+    expect(dispatched).toEqual([labTestAction.fetchLabTestCustomizationFailure(error)]);
   });
 
   it('labTestCustomizationSaga successfully', async () => {
     const labTestCustomizationSagaSpy = jest.spyOn(labtestService, 'addLabTestCustomization').mockImplementation(() => {
-      return Promise.resolve({data:labTestCustomizedRequestMockData} as AxiosResponse);
+      return Promise.resolve({ data: labTestCustomizedRequestMockData } as AxiosResponse);
     });
     const dispatched: any = [];
     await runSaga(
@@ -176,10 +180,10 @@ describe('labTest Saga and Actioon', () => {
         dispatch: (action) => dispatched.push(action)
       },
       labTestCustomizationSaga,
-      {data:{...labTestCustomizedRequestMockData},type:ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST}
+      { data: { ...labTestCustomizedRequestMockData }, type: ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST }
     ).toPromise();
-    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({...labTestCustomizedRequestMockData});
-    expect(dispatched).toEqual([labTestAction.labtestCustomizationSuccess()])
+    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({ ...labTestCustomizedRequestMockData });
+    expect(dispatched).toEqual([labTestAction.labtestCustomizationSuccess()]);
   });
 
   it('labTestCustomizationSaga Failure', async () => {
@@ -193,42 +197,46 @@ describe('labTest Saga and Actioon', () => {
         dispatch: (action) => dispatched.push(action)
       },
       labTestCustomizationSaga,
-      {data:{...labTestCustomizedRequestMockData},type:ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST}
+      { data: { ...labTestCustomizedRequestMockData }, type: ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST }
     ).toPromise();
-    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({...labTestCustomizedRequestMockData});
-    expect(dispatched).toEqual([labTestAction.labtestCustomizationFailure(error)])
+    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({ ...labTestCustomizedRequestMockData });
+    expect(dispatched).toEqual([labTestAction.labtestCustomizationFailure(error)]);
   });
 
   it('labTestCustomizationSaga update successfully', async () => {
-    const labTestCustomizationSagaSpy = jest.spyOn(labtestService, 'updateLabTestCustomization').mockImplementation(() => {
-      return Promise.resolve({data:updateLabTestCustomizationRequestMockData} as AxiosResponse);
-    });
+    const labTestCustomizationSagaSpy = jest
+      .spyOn(labtestService, 'updateLabTestCustomization')
+      .mockImplementation(() => {
+        return Promise.resolve({ data: updateLabTestCustomizationRequestMockData } as AxiosResponse);
+      });
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
       labTestCustomizationSaga,
-      {data:{...updateLabTestCustomizationRequestMockData},type:ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST}
+      { data: { ...updateLabTestCustomizationRequestMockData }, type: ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST }
     ).toPromise();
-    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({...updateLabTestCustomizationRequestMockData});
-    expect(dispatched).toEqual([labTestAction.labtestCustomizationSuccess()])
+    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({ ...updateLabTestCustomizationRequestMockData });
+    expect(dispatched).toEqual([labTestAction.labtestCustomizationSuccess()]);
   });
   it('labTestCustomizationSaga update Failure', async () => {
     const error: Error = new Error('Unable to Update.');
-    const labTestCustomizationSagaSpy = jest.spyOn(labtestService, 'updateLabTestCustomization').mockImplementation(() => {
-      return Promise.reject(error);
-    });
+    const labTestCustomizationSagaSpy = jest
+      .spyOn(labtestService, 'updateLabTestCustomization')
+      .mockImplementation(() => {
+        return Promise.reject(error);
+      });
     const dispatched: any = [];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action)
       },
       labTestCustomizationSaga,
-      {data:{...updateLabTestCustomizationRequestMockData},type:ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST}
+      { data: { ...updateLabTestCustomizationRequestMockData }, type: ACTION_TYPES.LABTEST_CUSTOMIZATION_REQUEST }
     ).toPromise();
-    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({...updateLabTestCustomizationRequestMockData});
-    expect(dispatched).toEqual([labTestAction.labtestCustomizationFailure(error)])
+    expect(labTestCustomizationSagaSpy).toHaveBeenCalledWith({ ...updateLabTestCustomizationRequestMockData });
+    expect(dispatched).toEqual([labTestAction.labtestCustomizationFailure(error)]);
   });
   it('validateLabtest successfully', async () => {
     const validateLabtestSagaSpy = jest.spyOn(labtestService, 'validateLabtest').mockImplementation(() => {
@@ -240,10 +248,10 @@ describe('labTest Saga and Actioon', () => {
         dispatch: (action) => dispatched.push(action)
       },
       validateLabtest,
-      {name:'',countryId:1,type:ACTION_TYPES.VALIDATE_LABTEST_REQUEST}
+      { name: '', countryId: 1, type: ACTION_TYPES.VALIDATE_LABTEST_REQUEST }
     ).toPromise();
-    expect(validateLabtestSagaSpy).toHaveBeenCalledWith({name:'',countryId:1});
-    expect(dispatched).toEqual([labTestAction.validateLabtestSuccess()])
+    expect(validateLabtestSagaSpy).toHaveBeenCalledWith({ name: '', countryId: 1 });
+    expect(dispatched).toEqual([labTestAction.validateLabtestSuccess()]);
   });
   it('validateLabtest Failure', async () => {
     const error: Error = new Error('Unable to Validate.');
@@ -256,9 +264,9 @@ describe('labTest Saga and Actioon', () => {
         dispatch: (action) => dispatched.push(action)
       },
       validateLabtest,
-      {name:'',countryId:1,type:ACTION_TYPES.VALIDATE_LABTEST_REQUEST}
+      { name: '', countryId: 1, type: ACTION_TYPES.VALIDATE_LABTEST_REQUEST }
     ).toPromise();
-    expect(validateLabtestSagaSpy).toHaveBeenCalledWith({name:'',countryId:1});
-    expect(dispatched).toEqual([labTestAction.validateLabtestFailure(error)])
+    expect(validateLabtestSagaSpy).toHaveBeenCalledWith({ name: '', countryId: 1 });
+    expect(dispatched).toEqual([labTestAction.validateLabtestFailure(error)]);
   });
 });

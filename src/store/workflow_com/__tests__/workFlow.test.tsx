@@ -278,8 +278,7 @@ describe('workflow reducer', () => {
       tenantId: '',
       formId: '',
       formType: 'Screening',
-      category: 'Input_form',
-      
+      category: 'Input_form'
     });
     expect(dispatched).toEqual([workFlowActions.deactivateConsentSuccess()]);
   });
@@ -310,8 +309,7 @@ describe('workflow reducer', () => {
       tenantId: '',
       formId: '',
       formType: 'Screening',
-      category: 'Input_form',
-      
+      category: 'Input_form'
     });
     expect(dispatched).toEqual([workFlowActions.deactivateConsentFailure()]);
   });

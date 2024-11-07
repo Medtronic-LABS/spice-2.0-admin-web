@@ -52,7 +52,6 @@ import ProgramForm from './containers/program/CreateProgram';
 import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
 import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
-import RegionCom from './container_com/region/Region';
 import AddMedicationCom from './container_com/medication/AddMedication';
 import MedicationListCom from './container_com/medication/MedicationList';
 import LabTestCustomizationLayoutCom from './container_com/labtest/LabTestCustomizationLayout';
@@ -81,12 +80,6 @@ export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 export const A = [HEALTH_FACILITY_ADMIN];
 
 const communityRoutes = [
-  {
-    path: PROTECTED_ROUTES.regionCommunity,
-    exact: true,
-    component: RegionCom,
-    authorisedRoles: SU_SA
-  },
   {
     path: PROTECTED_ROUTES.healthFacilityByAdmin,
     exact: true,

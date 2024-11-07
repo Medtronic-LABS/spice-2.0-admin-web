@@ -390,7 +390,7 @@ describe('getUserPayload', () => {
         countryCode: null,
         culture: null,
         district: undefined,
-        "chiefdom": undefined,
+        chiefdom: undefined
       })
     ]);
   });
@@ -402,7 +402,7 @@ describe('getUserPayload', () => {
         gender: 'Male',
         username: 'adminuser',
         phoneNumber: '123-456-7890',
-        tenantId: 123,
+        tenantId: 123
       }
     ];
     const result = getUserPayload({
@@ -412,30 +412,30 @@ describe('getUserPayload', () => {
       // isSuperAdmin: true, // Ensure this is included to test the super admin logic
       spiceRolesGroup: []
     });
-    
+
     expect(result).toEqual([
       expect.objectContaining({
-        "chiefdom": undefined,
-         "country": {
-           "id": 1,
-         },
-         "countryCode": null,
-         "culture": null,
-         "district": undefined,
-         "firstName": "Admin",
-         "gender": "Male",
-         "lastName": "User",
-         "phoneNumber": "123-456-7890",
-         "redRisk": undefined,
-         "roleIds": [],
-         "supervisorId": null,
-         "tenantId": 123,
-         "timezone": undefined,
-         "username": "adminuser",
-         "village": undefined,
-         "villageIds": [],
+        chiefdom: undefined,
+        country: {
+          id: 1
+        },
+        countryCode: null,
+        culture: null,
+        district: undefined,
+        firstName: 'Admin',
+        gender: 'Male',
+        lastName: 'User',
+        phoneNumber: '123-456-7890',
+        redRisk: undefined,
+        roleIds: [],
+        supervisorId: null,
+        tenantId: 123,
+        timezone: undefined,
+        username: 'adminuser',
+        village: undefined,
+        villageIds: []
       })
     ]);
-});
+  });
   // Add more test cases as needed for different scenarios
 });

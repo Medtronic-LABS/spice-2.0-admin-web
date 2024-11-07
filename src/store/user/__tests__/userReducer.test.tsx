@@ -280,7 +280,7 @@ describe('userReducer', () => {
       errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_FAILURE,
+      type: USERTYPES.CHANGE_PASSWORD_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -295,7 +295,7 @@ describe('userReducer', () => {
       errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_SUCCESS,
+      type: USERTYPES.CHANGE_PASSWORD_SUCCESS
     };
     const expectedState = {
       ...initialState,
@@ -309,7 +309,7 @@ describe('userReducer', () => {
       errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.CHANGE_OWN_PASSWORD_FAILURE,
+      type: USERTYPES.CHANGE_OWN_PASSWORD_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -323,7 +323,7 @@ describe('userReducer', () => {
       errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS,
+      type: USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS
     };
     const expectedState = {
       ...initialState,
@@ -337,7 +337,7 @@ describe('userReducer', () => {
       errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.USER_FORGOT_PASSWORD_SUCCESS,
+      type: USERTYPES.USER_FORGOT_PASSWORD_SUCCESS
     };
     const expectedState = {
       ...initialState,
@@ -351,7 +351,7 @@ describe('userReducer', () => {
       errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.USER_FORGOT_PASSWORD_FAILURE,
+      type: USERTYPES.USER_FORGOT_PASSWORD_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -363,14 +363,14 @@ describe('userReducer', () => {
     const initialState: any = {
       isLoggedIn: true,
       errorMessage: null,
-      user:{
-        userId:1
+      user: {
+        userId: 1
       }
     };
     const action: any = {
       type: USERTYPES.FETCH_USER_BY_ID_SUCCESS,
-      data:{
-        userId:1
+      data: {
+        userId: 1
       }
     };
     const expectedState = {
@@ -384,18 +384,18 @@ describe('userReducer', () => {
     const initialState: any = {
       isLoggedIn: true,
       errorMessage: null,
-      user:{
-        userId:1
+      user: {
+        userId: 1
       }
     };
     const action: any = {
       type: USERTYPES.FETCH_USER_BY_ID_SUCCESS,
-      data:{
-        userId:2
+      data: {
+        userId: 2
       }
     };
     const expectedState = {
-      ...initialState,
+      ...initialState
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
@@ -403,12 +403,10 @@ describe('userReducer', () => {
   it('should handle RESET_PASSWORD_REQUEST', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.RESET_PASSWORD_REQUEST,
-      
+      type: USERTYPES.RESET_PASSWORD_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -420,12 +418,10 @@ describe('userReducer', () => {
   it('should handle GET_USERNAME_FOR_PASSWORD_RESET', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET,
-      
+      type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET
     };
     const expectedState = {
       ...initialState,
@@ -437,12 +433,10 @@ describe('userReducer', () => {
   it('should handle CHANGE_PASSWORD_REQUEST', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_REQUEST,
-      
+      type: USERTYPES.CHANGE_PASSWORD_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -453,12 +447,10 @@ describe('userReducer', () => {
   it('should handle CHANGE_OWN_PASSWORD_REQUEST', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.CHANGE_OWN_PASSWORD_REQUEST,
-      
+      type: USERTYPES.CHANGE_OWN_PASSWORD_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -469,12 +461,10 @@ describe('userReducer', () => {
   it('should handle USER_FORGOT_PASSWORD_REQUEST', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.USER_FORGOT_PASSWORD_REQUEST,
-      
+      type: USERTYPES.USER_FORGOT_PASSWORD_REQUEST
     };
     const expectedState = {
       ...initialState,
@@ -486,12 +476,10 @@ describe('userReducer', () => {
   it('should handle GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS,
-      
+      type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_SUCCESS
     };
     const expectedState = {
       ...initialState,
@@ -502,12 +490,10 @@ describe('userReducer', () => {
   it('should handle GET_USERNAME_FOR_PASSWORD_RESET_FAIL', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL,
-      
+      type: USERTYPES.GET_USERNAME_FOR_PASSWORD_RESET_FAIL
     };
     const expectedState = {
       ...initialState,
@@ -518,12 +504,10 @@ describe('userReducer', () => {
   it('should handle RESET_PASSWORD_FAILURE', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.RESET_PASSWORD_FAILURE,
-      
+      type: USERTYPES.RESET_PASSWORD_FAILURE
     };
     const expectedState = {
       ...initialState,
@@ -535,19 +519,15 @@ describe('userReducer', () => {
   it('should handle RESET_PASSWORD_SUCCESS', () => {
     const initialState: any = {
       isLoggedIn: true,
-      errorMessage: null,
-     
+      errorMessage: null
     };
     const action: any = {
-      type: USERTYPES.RESET_PASSWORD_SUCCESS,
-      
+      type: USERTYPES.RESET_PASSWORD_SUCCESS
     };
     const expectedState = {
       ...initialState,
       isResetPasswordLoading: false
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
- 
-
-});
+  });
 });

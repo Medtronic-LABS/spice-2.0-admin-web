@@ -34,7 +34,6 @@ import {
   validateLongitude
 } from '../validation';
 
-
 describe('Validation Test cases', () => {
   describe('isEmpty', () => {
     it('returns true for empty values', () => {
@@ -62,7 +61,6 @@ describe('Validation Test cases', () => {
       expect(required('value')).toBeUndefined();
       expect(required(['item'])).toBeUndefined();
     });
-  
   });
 
   describe('validateEmail', () => {
@@ -572,8 +570,6 @@ describe('Validation Test cases', () => {
   });
 });
 
-
-
 describe('normalizeFloatingNumber', () => {
   it('should return undefined for empty input', () => {
     expect(normalizeFloatingNumber('')).toBeUndefined();
@@ -594,11 +590,8 @@ describe('normalizeFloatingNumber', () => {
     expect(normalizeFloatingNumber('abc123.45')).toBe('123.45');
     expect(normalizeFloatingNumber('$123.45')).toBe('123.45');
     expect(normalizeFloatingNumber('123.45$')).toBe('123.45');
-  })
-
+  });
 });
-
-
 
 describe('validateLatitude', () => {
   test('should return undefined for empty or undefined values', () => {
@@ -624,8 +617,6 @@ describe('validateLatitude', () => {
     expect(validateLatitude('45.')).toBe('Please enter a valid'); // Incomplete number
   });
 });
-
-
 
 describe('validateLongitude', () => {
   test('should return undefined for empty or undefined values', () => {
@@ -655,6 +646,3 @@ describe('validateLongitude', () => {
     expect(validateEmail('')).toBe('');
   });
 });
-
-
-

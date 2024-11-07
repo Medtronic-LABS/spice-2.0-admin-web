@@ -1,5 +1,5 @@
 // src/utils/__tests__/commonUtils.test.tsx
-import {destroyToastById, dismissAllToast, error, getErrorToastArgs, info, success} from '../toastCenter';
+import { destroyToastById, dismissAllToast, error, getErrorToastArgs, info, success } from '../toastCenter';
 import { toast } from 'react-toastify';
 import { ReactComponent as WarningIcon } from '../assets/images/info-orange.svg';
 import { ReactComponent as SuccessIcon } from '../assets/images/Info-green.svg';
@@ -12,14 +12,14 @@ jest.mock('react-toastify', () => ({
     info: jest.fn(),
     dismiss: jest.fn(),
     update: jest.fn(),
-    isActive: jest.fn(),
-  },
+    isActive: jest.fn()
+  }
 }));
 jest.mock('react-toastify', () => ({
-    toast: {
-      dismiss: jest.fn(),
-    },
-  }));
+  toast: {
+    dismiss: jest.fn()
+  }
+}));
 
 describe('Toast Functions', () => {
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe('Toast Functions', () => {
           closeOnClick: true,
           position: 'bottom-right',
           autoClose: 10000,
-          toastId: toastId,
+          toastId: toastId
         }
       );
     });
@@ -58,7 +58,7 @@ describe('Toast Functions', () => {
       await error(brief, body);
 
       expect(toast.update).toHaveBeenCalledWith(toastId, {
-        className: 'shake',
+        className: 'shake'
       });
     });
   });
@@ -77,7 +77,7 @@ describe('Toast Functions', () => {
           closeButton: false,
           closeOnClick: true,
           hideProgressBar: true,
-          position: 'bottom-right',
+          position: 'bottom-right'
         }
       );
     });
@@ -97,7 +97,7 @@ describe('Toast Functions', () => {
           closeButton: false,
           closeOnClick: true,
           hideProgressBar: true,
-          position: 'bottom-right',
+          position: 'bottom-right'
         }
       );
     });
@@ -112,7 +112,7 @@ describe('Toast Functions', () => {
   it('should return error name and message from Error object', () => {
     const error = new Error('Test error message');
     const [name, message, options] = getErrorToastArgs(error, '', '');
-    
+
     expect(name).toBe('Error'); // Default name
     expect(message).toBe('Test error message');
     expect(options).toEqual({ animateIfActive: true });
@@ -120,26 +120,23 @@ describe('Toast Functions', () => {
   it('should return alternative name and message when provided', () => {
     const error = new Error('Test error message');
     const [name, message, options] = getErrorToastArgs(error, 'CustomName', 'Custom message');
-    
+
     expect(name).toBe('CustomName');
     expect(message).toBe('Test error message');
     expect(options).toEqual({ animateIfActive: true });
   });
-  
 
   it('should handle SESSION_TIMEDOUT case', () => {
     const error = new Error('Some error');
-    const [ options] = getErrorToastArgs(error, '', '');
-    
+    const [options] = getErrorToastArgs(error, '', '');
+
     expect(options).toEqual('Error'); // Should not animate
   });
   it('should call toast.dismiss with the correct toastId', () => {
     const toastId = 'test-toast-id';
-    
+
     destroyToastById(toastId);
-    
+
     expect(toast.dismiss).toHaveBeenCalledWith(toastId);
   });
 });
-
-

@@ -54,17 +54,16 @@ describe('getOpenedConsentFormName', () => {
         </body>
       </html>
     `;
-  
+
     const expectedOutput = '<!DOCTYPE html><html><head></head><body>n <p>Some content</p>n n n n </body></html>';
-  
+
     const result = removeEditorContentIfAddedHTMLPlugins(inputHTML);
-    
+
     // Normalize the result by removing extra quotes and escape characters
     const normalizedResult = result?.replace(/\\+/g, '').replace(/"/g, '');
-  
+
     expect(normalizedResult?.replace(/\s+/g, ' ').trim()).toBe(expectedOutput.replace(/\s+/g, ' ').trim());
   });
-  
 
   it('should not throw an error if grammarly element is not present', () => {
     const inputHTML = `
@@ -94,7 +93,9 @@ describe('getOpenedConsentFormName', () => {
     `;
 
     const result = removeEditorContentIfAddedHTMLPlugins(inputHTML);
-    expect(result).toEqual("\"<!DOCTYPE html><html><head></head><body>\\n          &nbsp; &nbsp; <p>   </p>\\n        \\n      \\n    </body></html>\"");
+    expect(result).toEqual(
+      '"<!DOCTYPE html><html><head></head><body>\\n          &nbsp; &nbsp; <p>   </p>\\n        \\n      \\n    </body></html>"'
+    );
   });
   it('should throw an error if removing grammarly element fails', () => {
     const inputHTML = `
@@ -105,16 +106,17 @@ describe('getOpenedConsentFormName', () => {
       </html>
     `;
 
-    const mockRemoveChild = jest.fn(() => { throw new Error('Failed to remove element'); });
-    
+    const mockRemoveChild = jest.fn(() => {
+      throw new Error('Failed to remove element');
+    });
+
     // Create a mock for the DOMParser and replace the method that removes the child
-    const parser = new DOMParser();
     const originalRemoveChild = HTMLElement.prototype.removeChild;
     HTMLElement.prototype.removeChild = mockRemoveChild;
 
     try {
       removeEditorContentIfAddedHTMLPlugins(inputHTML);
-    } catch (e:any) {
+    } catch (e: any) {
       expect(e.message).toBe('Error: Failed to remove element');
     } finally {
       // Restore original method
@@ -123,10 +125,4 @@ describe('getOpenedConsentFormName', () => {
   });
 });
 
-
-
-  // Existing tests...
-
- 
-
-
+// Existing tests...

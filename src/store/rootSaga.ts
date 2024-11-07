@@ -1,7 +1,6 @@
 import { all, fork } from 'redux-saga/effects';
 import userSaga from './user/sagas';
 import regionSaga from './region/sagas';
-import regionSagaCom from './region_com/sagas';
 import healthFacilitySaga from './healthFacility/sagas';
 import medicationSaga from './medication/sagas';
 import workflowSaga from './workflow/sagas';
@@ -18,7 +17,6 @@ import workflowSagaCom from './workflow_com/sagas';
 export function* rootSaga() {
   yield all([fork(userSaga)]);
   yield all([fork(regionSaga)]);
-  yield all([fork(regionSagaCom)]);
   yield all([fork(healthFacilitySaga)]);
   yield all([fork(healthFacilitySagaCom)]);
   yield all([fork(medicationSaga)]);

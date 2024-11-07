@@ -1,20 +1,23 @@
+import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
-import CustomTable from '../../components/customTable/CustomTable';
-import DetailCard from '../../components/detailCard/DetailCard';
-import Loader from '../../components/loader/Loader';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import { useTablePaginationHook } from '../../hooks/tablePagination';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
-import { useDispatch, useSelector } from 'react-redux';
-import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
-import styles from './Region.module.scss';
+import CustomTable from '../../components/customTable/CustomTable';
+import DetailCard from '../../components/detailCard/DetailCard';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
+import dragDropStyles from '../../components/dragDropFiles/DragDropFiles.module.scss';
+import Loader from '../../components/loader/Loader';
+import ModalForm from '../../components/modal/ModalForm';
+import APPCONSTANTS from '../../constants/appConstants';
+import { useTablePaginationHook } from '../../hooks/tablePagination';
+import useLabelFromAppType from '../../hooks/useLabelFromAppType';
 import {
   downloadFileRequest,
-  uploadFileRequest,
+  fetchCountryDetailReq,
   regionDetailsRequest,
-  fetchCountryDetailReq
+  uploadFileRequest
 } from '../../store/region/actions';
 import {
   getIsUploadingSelector,
@@ -22,14 +25,11 @@ import {
   getRegionDetailsSelector,
   getRegionIdSelector
 } from '../../store/region/selectors';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import ModalForm from '../../components/modal/ModalForm';
-import arrayMutators from 'final-form-arrays';
-import { fileDownload } from '../../utils/commonUtils';
-import { useParams } from 'react-router-dom';
 import { IMatchParams } from '../../store/region/types';
 import { roleSelector } from '../../store/user/selectors';
-
+import { fileDownload } from '../../utils/commonUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import styles from './Region.module.scss';
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -41,11 +41,13 @@ const Region = (): React.ReactElement => {
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
 
-  // 's' stands for singular title
   const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+    isCommunity,
+    hfDetails: {
+      district: { s: districtSName },
+      chiefdom: { s: chiefdomSName }
+    }
+  } = useLabelFromAppType();
 
   // Check if the current user role is Region Admin to set read-only access
   const isReadOnly = role === APPCONSTANTS.ROLES.REGION_ADMIN;
@@ -140,6 +142,24 @@ const Region = (): React.ReactElement => {
     }
   }, [getCountryDetails, regionDetailsId, regionId, tenantId]);
 
+  const fields = [
+    {
+      id: 1,
+      name: 'districtname',
+      label: districtSName
+    },
+    {
+      id: 2,
+      name: 'chiefdomname',
+      label: chiefdomSName
+    },
+    {
+      id: 3,
+      name: 'villagename',
+      label: 'VILLAGE'
+    }
+  ];
+
   return (
     <>
       {(loading || uploading) && <Loader />}
@@ -173,23 +193,18 @@ const Region = (): React.ReactElement => {
             >
               <CustomTable
                 rowData={regionDetails.list ? regionDetails.list : []}
-                columnsDef={[
-                  {
-                    id: 1,
-                    name: 'districtname',
-                    label: districtSName
-                  },
-                  {
-                    id: 2,
-                    name: 'chiefdomname',
-                    label: chiefdomSName
-                  },
-                  {
-                    id: 3,
-                    name: 'villagename',
-                    label: 'VILLAGE'
-                  }
-                ]}
+                columnsDef={
+                  isCommunity
+                    ? [
+                        ...fields,
+                        {
+                          id: 4,
+                          name: 'villagetype',
+                          label: 'VILLAGE TYPE'
+                        }
+                      ]
+                    : fields
+                }
                 isEdit={false}
                 isDelete={false}
                 page={listParams.page}
