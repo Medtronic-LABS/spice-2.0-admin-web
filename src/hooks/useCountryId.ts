@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { countryIdSelector} from '../store/user/selectors';
+import { countryIdSelector } from '../store/user/selectors';
 import sessionStorageServices from '../global/sessionStorageServices';
 import APPCONSTANTS from '../constants/appConstants';
 // import { getRegionDetailSelector } from '../store/region_com/selectors';
@@ -15,11 +15,11 @@ const useCountryId = () => {
   // const communityCountryId = useSelector(getRegionDetailSelector)?.id;
 
   return useMemo(
-    () =>(
+    () =>
       // (Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
       //   ? Number(communityCountryId)
-        // : 
-        Number(country?.id)) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID)),
+      // :
+      Number(country?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID)),
     [country?.id]
   );
 };

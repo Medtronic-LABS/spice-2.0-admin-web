@@ -107,6 +107,6 @@ test('getUserSuiteAccessSelector should return  from state', () => {
   expect(getUserSuiteAccessSelector(initialState)).toEqual(initialState.user.user.suiteAccess);
 });
 
-test('isPasswordSetSelector should return  from state', () => {  
+test('isPasswordSetSelector should return  from state', () => {
   expect(isPasswordSetSelector(initialState)).toEqual(initialState.user.user.isPasswordSet);
 });

@@ -290,12 +290,12 @@ describe('MyProfile', () => {
     expect(getAdminPayload).toHaveBeenCalled();
 
     await waitFor(() => {
-      const actions = store.getActions();
-      const updateUserAction = actions.find((action) => action.type === UPDATE_USER_REQUEST);
-      expect(updateUserAction).toBeTruthy();
-      expect(updateUserAction.payload).toEqual(mockPayload);
-      expect(updateUserAction.successCb).toBeDefined();
-      expect(updateUserAction.failureCb).toBeDefined();
+      const action = store.getActions();
+      const updateUserAct = action.find((act) => act.type === UPDATE_USER_REQUEST);
+      expect(updateUserAct).toBeTruthy();
+      expect(updateUserAct.payload).toEqual(mockPayload);
+      expect(updateUserAct.successCb).toBeDefined();
+      expect(updateUserAct.failureCb).toBeDefined();
     });
 
     expect(screen.getByTestId('loader')).toBeInTheDocument();

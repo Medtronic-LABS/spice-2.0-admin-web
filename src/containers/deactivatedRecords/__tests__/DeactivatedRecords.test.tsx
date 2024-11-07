@@ -137,12 +137,12 @@ describe('DeactivatedRecords component', () => {
 
     mockDeactivateRecordsType.successCb(() => {
       expect(fetchDetails).toHaveBeenCalled();
-      const actions = store.getActions();
-      const mockFetchDetailsType = actions.find((action) => action.type === FETCH_DISTRICT_LIST_REQUEST);
+      const act = store.getActions();
+      const mockFetchDetailsType = act.find((action) => action.type === FETCH_DISTRICT_LIST_REQUEST);
       mockFetchDetailsType.failureCb({ message: 'error' });
-      const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
+      const failureCb = jest.spyOn(mockFetchDetailsType, 'failureCb');
       waitFor(() => {
-        expect(failureCbSpy).toHaveBeenCalled();
+        expect(failureCb).toHaveBeenCalled();
       });
       expect(toastCenter.success).toHaveBeenCalledWith(
         APPCONSTANTS.SUCCESS,

@@ -116,7 +116,9 @@ describe('DatePickerComponent', () => {
   });
 
   it('calls onChange with correct date when decrease month button is clicked', () => {
-    const onChange = jest.fn((date) => console.log('onChange called with:', date));
+    const onChange = jest.fn((date) => {
+      return date;
+    });
     const initialDate = new Date('2023-05-15T12:00:00.000Z'); // May 15, 2023
     const { debug } = render(
       <DatePickerComponent label='Test Label' isShowLabel={true} value={initialDate} onChange={onChange} />

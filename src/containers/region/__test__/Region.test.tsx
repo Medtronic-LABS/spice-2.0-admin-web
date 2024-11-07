@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import Region from '../Region';
 import { userDataSelector } from '../../../store/user/selectors';
-import { getRegionDetailsSelector, getLoadingSelector, getIsUploadingSelector } from '../../../store/region/selectors'; // Adjust the import path as necessary
+import { getRegionDetailsSelector, getLoadingSelector, getIsUploadingSelector } from '../../../store/region/selectors';
 import * as commonUtils from '../../../utils/commonUtils';
 import toastCenter from '../../../utils/toastCenter';
 import APPCONSTANTS from '../../../constants/appConstants';
@@ -73,10 +73,18 @@ describe('Region Component', () => {
     // Mock the useSelector calls
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
     render(
       <Provider store={store}>
@@ -112,10 +120,18 @@ describe('Region Component', () => {
     // Mock the useSelector calls
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
 
     render(
@@ -153,10 +169,18 @@ describe('Region Component', () => {
     // Mock the useSelector calls
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
 
     render(
@@ -186,10 +210,18 @@ describe('Region Component', () => {
     // Mock the useSelector calls
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
 
     render(
@@ -226,10 +258,18 @@ describe('Region Component', () => {
     // Mock the useSelector calls
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
 
     render(
@@ -309,10 +349,18 @@ describe('Region Component', () => {
 
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
 
     render(
@@ -408,10 +456,18 @@ describe('Region Component', () => {
 
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === userDataSelector) return initialState.user.userData;
-      if (selector === getRegionDetailsSelector) return initialState.region.regionDetails;
-      if (selector === getLoadingSelector) return initialState.region.loading;
-      if (selector === getIsUploadingSelector) return initialState.region.isUploading;
+      if (selector === userDataSelector) {
+        return initialState.user.userData;
+      }
+      if (selector === getRegionDetailsSelector) {
+        return initialState.region.regionDetails;
+      }
+      if (selector === getLoadingSelector) {
+        return initialState.region.loading;
+      }
+      if (selector === getIsUploadingSelector) {
+        return initialState.region.isUploading;
+      }
     });
 
     const { container } = render(

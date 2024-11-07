@@ -1,4 +1,3 @@
-
 import * as WORKFLOW_TYPES from '../actionTypes';
 import {
   IFetchFormMetaRequest,
@@ -17,8 +16,7 @@ import {
   IFetchConsentFormFailure,
   IDeactivateConsentRequest,
   IDeactivateConsentSuccess,
-  IDeactivateConsentFailure,
-  
+  IDeactivateConsentFailure
 } from '../types';
 
 export const fetchCustomizationFormRequest = ({
@@ -41,9 +39,6 @@ export const fetchCustomizationFormRequest = ({
   successCb,
   failureCb
 });
-
-
-
 
 export const fetchCustomizationFormSuccess = ({
   payload
@@ -165,12 +160,3 @@ export const deactivateConsentFailure = (): IDeactivateConsentFailure => ({
 export const clearConsentForm = () => ({
   type: WORKFLOW_TYPES.CLEAR_CONSENT_FORM
 });
-
-
-
-
-
-
-
-
-

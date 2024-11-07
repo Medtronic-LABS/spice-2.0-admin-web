@@ -6,12 +6,13 @@ import arrayMutators from 'final-form-arrays';
 import FormContainer from '../../components/formContainer/FormContainer';
 import { Tools } from 'final-form';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import { useState } from 'react';
 import MedicationFormIcon from '../../assets/images/info-grey.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
-import { useDispatch } from 'react-redux';
 import { createMedicationRequest, validateMedication } from '../../store/medication/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAppTypeSelector } from '../../store/user/selectors';
 
 export interface IMedicationFormValues {
   medication: IMedicationDataFormValues[];
@@ -40,8 +41,10 @@ interface IMatchProps extends RouteComponentProps<IMatchParams> {}
 
 type Props = IStateProps & IDispatchProps & IRouteProps & IMatchProps;
 
-const AddMedication = (props: Props) => {
+const AddMedication = (props: Props): React.ReactElement => {
   const dispatch = useDispatch();
+  const appTypes = useSelector(getAppTypeSelector);
+
   const [previousFieldValue, setPreviousFieldValueState] = useState([] as IMedicationDataFormValues[]);
   const [internalFormState, setStateInternalFormState] = useState(
     [] as Array<{ isValueChanged: boolean; isValid: boolean }>
@@ -247,6 +250,7 @@ const AddMedication = (props: Props) => {
    */
   const saveMedication = (medication: IMedicationDataFormValues[]) => {
     const { regionId } = props.match.params;
+
     const data = medication.map((medicationData: IMedicationDataFormValues) => ({
       countryId: Number(regionId),
       classificationId: medicationData.classification.id,
@@ -260,10 +264,12 @@ const AddMedication = (props: Props) => {
       },
       dosageFormId: medicationData.dosage_form.id,
       dosageFormName: medicationData.dosage_form.name,
-      category: {
-        id: medicationData?.category?.id,
-        name: medicationData?.category?.name
-      }
+      ...(appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
+        ? {}
+        : {
+            id: medicationData?.category?.id,
+            name: medicationData?.category?.name
+          })
     }));
 
     dispatch(

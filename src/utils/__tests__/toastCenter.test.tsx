@@ -43,7 +43,7 @@ describe('Toast Functions', () => {
           closeOnClick: true,
           position: 'bottom-right',
           autoClose: 10000,
-          toastId: toastId
+          toastId
         }
       );
     });
@@ -110,16 +110,16 @@ describe('Toast Functions', () => {
     });
   });
   it('should return error name and message from Error object', () => {
-    const error = new Error('Test error message');
-    const [name, message, options] = getErrorToastArgs(error, '', '');
+    const err = new Error('Test error message');
+    const [name, message, options] = getErrorToastArgs(err, '', '');
 
     expect(name).toBe('Error'); // Default name
     expect(message).toBe('Test error message');
     expect(options).toEqual({ animateIfActive: true });
   });
   it('should return alternative name and message when provided', () => {
-    const error = new Error('Test error message');
-    const [name, message, options] = getErrorToastArgs(error, 'CustomName', 'Custom message');
+    const err = new Error('Test error message');
+    const [name, message, options] = getErrorToastArgs(err, 'CustomName', 'Custom message');
 
     expect(name).toBe('CustomName');
     expect(message).toBe('Test error message');
@@ -127,8 +127,8 @@ describe('Toast Functions', () => {
   });
 
   it('should handle SESSION_TIMEDOUT case', () => {
-    const error = new Error('Some error');
-    const [options] = getErrorToastArgs(error, '', '');
+    const err = new Error('Some error');
+    const [options] = getErrorToastArgs(err, '', '');
 
     expect(options).toEqual('Error'); // Should not animate
   });

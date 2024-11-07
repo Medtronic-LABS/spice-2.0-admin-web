@@ -10,7 +10,6 @@ import chiefdomSaga from './chiefdom/sagas';
 import programSaga from './program/sagas';
 import commonSaga from './common/sagas';
 import healthFacilitySagaCom from './healthFacility_com/sagas';
-import medicationSagaCom from './medication_com/sagas';
 import labtestSagaCom from './labTest_com/sagas';
 import workflowSagaCom from './workflow_com/sagas';
 
@@ -20,7 +19,6 @@ export function* rootSaga() {
   yield all([fork(healthFacilitySaga)]);
   yield all([fork(healthFacilitySagaCom)]);
   yield all([fork(medicationSaga)]);
-  yield all([fork(medicationSagaCom)]);
   yield all([fork(labtestSaga)]);
   yield all([fork(labtestSagaCom)]);
   yield all([fork(workflowSaga)]);

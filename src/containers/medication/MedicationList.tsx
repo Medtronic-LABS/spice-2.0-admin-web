@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import DetailCard from '../../components/detailCard/DetailCard';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import { useHistory, useParams } from 'react-router';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import Loader from '../../components/loader/Loader';
@@ -17,6 +17,7 @@ import {
 } from '../../store/medication/selectors';
 import { deleteMedication, fetchMedicationListReq, updateMedication } from '../../store/medication/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { getAppTypeSelector } from '../../store/user/selectors';
 
 /**
  * MedicationList component
@@ -26,11 +27,10 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 const MedicationList = (): React.ReactElement => {
   // Custom hook for table pagination
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-
+  const appTypes = useSelector(getAppTypeSelector);
   // State for controlling the medication edit modal
   const [isOpenMedicationModal, setOpenMedicationModal] = useState(false);
   const [medicationInitialValues, setMedicationInitialValues] = useState({});
-
   const dispatch = useDispatch();
 
   // Selectors for medication data from Redux store
@@ -143,10 +143,9 @@ const MedicationList = (): React.ReactElement => {
       brandName: data?.brand.name,
       dosageFormId: data?.dosage_form.id,
       dosageFormName: data?.dosage_form.name,
-      category: {
-        id: data?.category?.id,
-        name: data?.category?.name
-      },
+      ...(appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
+        ? {}
+        : { category: { id: data?.category?.id, name: data?.category?.name } }),
       name: data?.name,
       id: data?.id,
       codeDetails

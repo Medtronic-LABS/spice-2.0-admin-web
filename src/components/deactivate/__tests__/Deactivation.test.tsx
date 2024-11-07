@@ -8,9 +8,10 @@ import { fireEvent, waitFor } from '@testing-library/react';
 
 describe('Deactivation', () => {
   beforeEach(() => {
+    const mockSubmit = jest.fn();
     render(
       <MemoryRouter>
-        <Form onSubmit={() => {}}>{() => <Deactivation formName='testForm' />}</Form>
+        <Form onSubmit={mockSubmit}>{() => <Deactivation formName='testForm' />}</Form>
       </MemoryRouter>
     );
   });
@@ -42,8 +43,8 @@ describe('Deactivation', () => {
     render(
       <MemoryRouter>
         <Form onSubmit={handleSubmit}>
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
+          {({ handleSubmit : formHandleSubmit}) => (
+            <form onSubmit={formHandleSubmit}>
               <Deactivation formName='testForm' />
               <button type='submit'>Submit</button>
             </form>

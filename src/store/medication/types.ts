@@ -5,8 +5,24 @@ export interface IList {
   name: string;
 }
 
+interface ICountry {
+  id: number;
+  createdBy: string | null;
+  updatedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  tenantId: number;
+  name: string;
+  phoneNumberCode: string;
+  unitMeasurement: string | null;
+  regionCode: string;
+  appTypes: string[];
+  active: boolean;
+  deleted: boolean;
+}
 export interface IClassification extends IList {
   brands: IList[];
+  country: ICountry;
 }
 
 export interface IMedicationList {
@@ -153,7 +169,7 @@ export interface IMedicationPayload {
   brandName: string;
   dosageFormId: string;
   dosageFormName: string;
-  category: IList;
+  category?: IList;
   id?: string;
 }
 

@@ -6,7 +6,7 @@ const MOCK_DATA_CONSTANTS = {
     loggingIn: false,
     loggingOut: false,
     user: {
-        isPasswordSet:false
+      isPasswordSet: false
     },
     userRoles: {},
     // isRolesLoading: false,

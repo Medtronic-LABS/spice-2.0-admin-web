@@ -72,7 +72,7 @@ describe('LockedUsers', () => {
   });
 
   it('should call fetchDetails functions for super admin', async () => {
-    const store = mockStore({
+    const mockstore = mockStore({
       user: {
         lockedUsers: mockLockedUsersList,
         totalLockedUsers: 1,
@@ -80,7 +80,7 @@ describe('LockedUsers', () => {
       }
     });
     render(
-      <Provider store={store}>
+      <Provider store={mockstore}>
         <Router>
           <LockedUsers />
         </Router>
@@ -96,7 +96,7 @@ describe('LockedUsers', () => {
   });
 
   it('should call fetchDetails functions for super user', async () => {
-    const store = mockStore({
+    const stores = mockStore({
       user: {
         lockedUsers: mockLockedUsersList,
         totalLockedUsers: 1,
@@ -104,7 +104,7 @@ describe('LockedUsers', () => {
       }
     });
     render(
-      <Provider store={store}>
+      <Provider store={stores}>
         <Router>
           <LockedUsers />
         </Router>

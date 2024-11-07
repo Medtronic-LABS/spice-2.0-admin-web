@@ -376,9 +376,9 @@ describe('CustomTable', () => {
     const newProps = {
       ...props,
       actionFormatter: {
-        hideEditIcon: (rowData: any) => rowData.isEdit,
-        hideDeleteIcon: (rowData: any) => rowData.isDelete,
-        hideCustomIcon: (rowData: any) => rowData.isCustom
+        hideEditIcon: (row: any) => row.isEdit,
+        hideDeleteIcon: (row: any) => row.isDelete,
+        hideCustomIcon: (row: any) => row.isCustom
       }
     };
     render(<CustomTable {...newProps} />);

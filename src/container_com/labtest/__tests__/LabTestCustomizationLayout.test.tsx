@@ -1,13 +1,10 @@
 import React from 'react';
-import {  render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { MemoryRouter, Route } from 'react-router-dom';
 import LabTestCustomizationLayout from '../LabTestCustomizationLayout';
-import {
-  fetchLabTestCustomizationRequest,
-  fetchUnitListRequest,
-} from '../../../store/labTest/actions';
+import { fetchLabTestCustomizationRequest, fetchUnitListRequest } from '../../../store/labTest/actions';
 import { clearFormJSON } from '../../../store/workflow/actions';
 import { labTestJSONLoadingSelector } from '../../../store/labTest/selectors';
 import { Store, AnyAction } from 'redux';
@@ -103,7 +100,9 @@ describe('LabTestCustomizationLayout', () => {
 
     const { useSelector } = require('react-redux');
     useSelector.mockImplementation((selector: any) => {
-      if (selector === labTestJSONLoadingSelector) return true;
+      if (selector === labTestJSONLoadingSelector) {
+        return true;
+      }
       //   if (selector === customizationLoadingSelector) return false; // Return false for customization loading
       return null; // Default case
     });
@@ -215,6 +214,4 @@ describe('LabTestCustomizationLayout', () => {
     // Check if clearFormJSON was dispatched on unmount
     expect(dispatch).toHaveBeenCalledWith(clearFormJSON());
   });
-
- 
 });

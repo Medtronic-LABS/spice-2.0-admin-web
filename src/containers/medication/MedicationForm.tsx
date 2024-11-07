@@ -28,6 +28,8 @@ import {
 } from '../../store/medication/selectors';
 import { fetchCategoryForms, fetchClassifications, fetchDosageForms } from '../../store/medication/actions';
 import { IList } from '../../store/medication/types';
+import { APP_TYPE } from '../../constants/appConstants';
+import { getAppTypeSelector } from '../../store/user/selectors';
 
 export interface IMedicationDataFormValues {
   id?: number;
@@ -97,6 +99,8 @@ const MedicationForm = ({
   const isClassificationsLoading = useSelector(getClassificationsLoadingSelector);
   const isDosageFormsLoading = useSelector(getDosageFormsLoadingSelector);
   const isCategoryFormOptionsLoading = useSelector(getCategoryLoadingSelector);
+  const appTypes = useSelector(getAppTypeSelector);
+  const isCommunity = appTypes?.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY;
 
   const initialValue = useMemo<Array<Partial<IMedicationDataFormValues>>>(
     () => [
@@ -118,7 +122,9 @@ const MedicationForm = ({
     if (dosageFormOptions && !dosageFormOptions.length) {
       dispatch(fetchDosageForms());
     }
-    dispatch(fetchCategoryForms());
+    if (!isCommunity) {
+      dispatch(fetchCategoryForms());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, dosageFormOptions && dosageFormOptions.length]);
 
@@ -590,7 +596,7 @@ const MedicationForm = ({
                     {renderClassification(name, fields, index)}
                     {renderBrand(name, index)}
                     {renderDosageForm(name, index)}
-                    {renderCategoryForm(name, index)}
+                    {!isCommunity && renderCategoryForm(name, index)}
                   </div>
                   {renderActionIcons(fields, index, isFirstChild, isLastChild)}
                 </div>

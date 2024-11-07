@@ -116,7 +116,7 @@ describe('workflowreducer', () => {
     };
     expect(workFlowReducer(initialState, action)).toEqual(expectedState);
   });
-  
+
   it('it should handle DEACTIVATE_CONSENT_FORM_FAILURE', () => {
     const action: any = {
       type: WORKFLOWTYPES.DEACTIVATE_CONSENT_FORM_FAILURE
