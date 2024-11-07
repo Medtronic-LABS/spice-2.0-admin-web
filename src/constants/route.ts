@@ -21,7 +21,7 @@ export const PROTECTED_ROUTES = {
   regionCommunity: '/region/:regionId/:tenantId/community',
   healthFacilityBySuperAdmin: '/region/:regionId/healthFacility/list',
   healthFacilityByAdmin: '/healthFacility/list',
-  healthFacilitySummaryCom: '/healthFacility/:healthFacilityId/:hfTenantId',
+  // healthFacilitySummaryCom: '/healthFacility/:healthFacilityId/:hfTenantId',
   createHealthFacility: '/region/:regionId/healthFacility/create',
   usersBySuperAdmin: '/region/:regionId/users/list',
   usersByAdmin: '/users/list',
@@ -118,7 +118,7 @@ export const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.usersByAdmin },
   { route: PROTECTED_ROUTES.medicationByRegionCom },
   { route: PROTECTED_ROUTES.labTestByRegion },
-  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin, childRoutes: [PROTECTED_ROUTES.healthFacilitySummaryCom] }
+  { route: PROTECTED_ROUTES.healthFacilityBySuperAdmin }
 ];
 
 export const SIDE_MENU_MAPPER = {

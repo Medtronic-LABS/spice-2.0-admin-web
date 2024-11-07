@@ -40,6 +40,7 @@ import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
 import { getUserPayload } from '../../utils/commonUtils';
+import useLabelFromAppType from '../../hooks/useLabelFromAppType';
 
 interface IMatchParams {
   tenantId: string;
@@ -74,6 +75,11 @@ const UserList = (): React.ReactElement => {
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const { filterSpiceCommonRoles, filterSpiceUserRoles } = APPCONSTANTS;
   const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
+  const {
+    userList: {
+      filters: { available: showFilters }
+    }
+  } = useLabelFromAppType();
 
   /**
    * useCallback hook to refresh the user list.
@@ -121,7 +127,7 @@ const UserList = (): React.ReactElement => {
    * useEffect for fetch roles whenever countryId or rolesGrouped gets changed
    */
   useEffect(() => {
-    if (!rolesGrouped?.hasOwnProperty('SPICE')) {
+    if (!rolesGrouped?.hasOwnProperty('SPICE') && showFilters) {
       dispatch(
         fetchUserRolesAction({
           countryId: countryIdValue,
@@ -129,7 +135,7 @@ const UserList = (): React.ReactElement => {
         })
       );
     }
-  }, [countryIdValue, dispatch, rolesGrouped]);
+  }, [countryIdValue, dispatch, rolesGrouped, showFilters]);
 
   /**
    * Handler function for user delete
@@ -347,20 +353,24 @@ const UserList = (): React.ReactElement => {
    * Function to fetch list
    */
   const fetchList = useCallback(() => {
-    dispatch(
-      fetchHFListRequest({
-        countryId: countryIdValue,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: null,
-        userBased: !isSuperUser,
-        tenantIds: [tenantId],
-        failureCb: (e: Error) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR));
-        }
-      })
-    );
+    if (showFilters) {
+      dispatch(
+        fetchHFListRequest({
+          countryId: countryIdValue,
+          skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: null,
+          userBased: !isSuperUser,
+          tenantIds: [tenantId],
+          failureCb: (e: Error) => {
+            toastCenter.error(
+              ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
+            );
+          }
+        })
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isSuperUser, countryIdValue]);
+  }, [dispatch, isSuperUser, countryIdValue, showFilters]);
 
   /**
    * useEffect to invoke fetchlist function when component mounts
@@ -393,6 +403,7 @@ const UserList = (): React.ReactElement => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rolesGrouped]);
+
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading || changePasswordLoading) && <Loader />}
@@ -406,7 +417,7 @@ const UserList = (): React.ReactElement => {
           onButtonClick={handleAddUserClick}
           setSelectedRole={setSelectedRole}
           setSelectedFacility={setSelectedFacility}
-          isFilter={true}
+          isFilter={showFilters}
           onFilterData={[
             {
               id: 1,

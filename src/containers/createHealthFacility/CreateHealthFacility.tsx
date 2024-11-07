@@ -15,7 +15,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatHealthFacility } from '../healthFacility/HealthFacilitySummary';
-import { IClinicalWorkflows, IHFUserGet, IHealthFacility } from '../../store/healthFacility/types';
+import { IClinicalWorkflows, IHFUserGet, IHealthFacility, IWorkflow } from '../../store/healthFacility/types';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import {
   healthFacilityLoadingSelector,
@@ -25,7 +25,6 @@ import {
 import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getUserPayload } from '../../utils/commonUtils';
-import { filterAndExtractAppTypes } from '../../container_com/healthFacility/CreateHealthFacility';
 
 interface IMatchParams {
   regionId?: string;
@@ -35,6 +34,16 @@ interface IMatchParams {
 }
 
 interface IRouteProps extends RouteComponentProps<IMatchParams> {}
+
+export const filterAndExtractAppTypes = (allWorkflows: IWorkflow[], selectedIds: number[]): string[] => {
+  // Filter workflows by selected IDs
+  const filteredWorkflows = allWorkflows.filter((workflow) => selectedIds.includes(Number(workflow.id)));
+  // Extract appTypes from the filtered workflows and flatten the array
+  const appTypes = filteredWorkflows.flatMap((workflow) => workflow.appTypes);
+  // Remove duplicates from the appTypes array
+  const uniqueAppTypes = [...new Set(appTypes)];
+  return uniqueAppTypes;
+};
 
 /**
  * Renders the form for create site
@@ -297,7 +306,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       switch (pageNumber) {
         case PAGENUMBER.DETAILS:
           return (
-            <div className='col-lg-6 col-12'>
+            <div className='col-12'>
               <FormContainer label={`${healthFacilitySName} Details`} icon={SiteDetailsIcon}>
                 <HealthFacilityDetailsForm
                   formName='healthFacility'
@@ -318,7 +327,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         case PAGENUMBER.USER:
         default:
           return (
-            <div className='col-lg-6 col-12'>
+            <div className='col-12'>
               <FormContainer label='Add User' icon={SiteAddUserIcon}>
                 <UserForm
                   countryId={countryId}

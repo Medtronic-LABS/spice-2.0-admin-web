@@ -1,18 +1,17 @@
+import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import arrayMutators from 'final-form-arrays';
 
-import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
+import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import { PROTECTED_ROUTES } from '../../constants/route';
 import ModalForm from '../../components/modal/ModalForm';
+import { PROTECTED_ROUTES } from '../../constants/route';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
-import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import { useDispatch, useSelector } from 'react-redux';
+import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import useCountryId from '../../hooks/useCountryId';
 import {
   clearHFWorkflowList,
   deleteHealthFacilityRequest,
@@ -25,13 +24,13 @@ import {
 import {
   healthFacilityListSelector,
   healthFacilityListTotalSelector,
-  healthFacilityLoadingSelector,
-  workflowListSelector
+  healthFacilityLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { countryIdSelector, roleSelector } from '../../store/user/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
+import { getAppTypeSelector, roleSelector } from '../../store/user/selectors';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import { formatHealthFacility } from './HealthFacilitySummary';
-import sessionStorageServices from '../../global/sessionStorageServices';
 
 /**
  * Interface for modal state
@@ -59,13 +58,12 @@ interface IMatchParams {
 const HealthFacilityList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const workflows = useSelector(workflowListSelector);
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const healthFacilityCount = useSelector(healthFacilityListTotalSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
-  const countryId = useSelector(countryIdSelector);
-  const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
+  const countryId = useCountryId();
+  const appTypes = useSelector(getAppTypeSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const {
     district: { s: districtSName },
@@ -88,7 +86,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const fetchList = useCallback(() => {
     dispatch(
       fetchHFListRequest({
-        countryId: countryIdValue,
+        countryId,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,
@@ -98,7 +96,7 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryIdValue]);
+  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]);
 
   useEffect(() => {
     fetchList();
@@ -121,6 +119,7 @@ const HealthFacilityList = (): React.ReactElement => {
       fetchHFSummaryRequest({
         tenantId: data.tenantId,
         id: data.id,
+        appTypes,
         successCb: openHFEditModal,
         failureCb: (e: Error) => {
           requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_FETCH_ERROR);
@@ -143,6 +142,7 @@ const HealthFacilityList = (): React.ReactElement => {
           type: { id: hfDetails.type, name: hfDetails.type },
           city: { id: hfDetails.cityName, name: hfDetails.cityName },
           language: { id: hfDetails.language, name: hfDetails.language },
+          workflows: hfDetails.clinicalWorkflows.map((wfIds: any) => wfIds.id),
           clinicalWorkflows: hfDetails.clinicalWorkflows.map((wfIds: any) => wfIds.id),
           customizedWorkflows: hfDetails?.customizedWorkflows?.map((wfIds: any) => wfIds.id),
           rawClinicalWorkflows: hfDetails.clinicalWorkflows,
@@ -202,28 +202,21 @@ const HealthFacilityList = (): React.ReactElement => {
 
   // Fetches the workflow list
   const fetchWorkflowList = () => {
-    if (!workflows.length) {
-      dispatch(
-        fetchWorkflowListRequest({
-          countryId: Number(countryIdValue),
-          successCb: (flows) => {
-            setEditHFDetailsModal({
-              ...editHealthFacilityModal,
-              isNextClicked: true
-            });
-          },
-          failureCb: (error) =>
-            toastCenter.error(
-              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
-            )
-        })
-      );
-    } else {
-      setEditHFDetailsModal({
-        ...editHealthFacilityModal,
-        isNextClicked: true
-      });
-    }
+    dispatch(
+      fetchWorkflowListRequest({
+        countryId: Number(countryId),
+        successCb: (flows) => {
+          setEditHFDetailsModal({
+            ...editHealthFacilityModal,
+            isNextClicked: true
+          });
+        },
+        failureCb: (error) =>
+          toastCenter.error(
+            ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.CLINICAL_WORKFLOW_FETCH_FAILURE)
+          )
+      })
+    );
   };
 
   /**
@@ -274,7 +267,7 @@ const HealthFacilityList = (): React.ReactElement => {
       }
       validateLinkedRestrictions(missingIds, healthFacility.tenantId, healthFacility, linkedVillagesIds);
     } else {
-      const postData = formatHealthFacility(healthFacility, countryIdValue);
+      const postData = formatHealthFacility(healthFacility, countryId);
       if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(
           updateHFDetailsRequest({

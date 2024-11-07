@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import Searchbar from '../../components/searchbar/Searchbar';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME, NAME_CONSTANTS } from '../../constants/appConstants';
+import Searchbar from '../../components/searchbar/Searchbar';
+import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
+import APPCONSTANTS, { APP_TYPE_NAME, NAME_CONSTANTS } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -14,27 +14,26 @@ import {
   setRegionDetail
 } from '../../store/region/actions';
 import {
+  getLoadingSelector,
   getRegionsCountSelector,
   getRegionsLoadingMoreSelector,
-  getLoadingSelector,
   getRegionsSelector
 } from '../../store/region/selectors';
 import { appendZeroBefore } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
-import styles from './Region.module.scss';
 import { PROTECTED_ROUTES } from '../../constants/route';
+import localStorageServices from '../../global/localStorageServices';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import { clearChiefdomDetail } from '../../store/chiefdom/actions';
+import { clearSideMenu } from '../../store/common/actions';
+import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
+import { getClinicalWorkflowSelector } from '../../store/district/selectors';
+import { clearHFSummary } from '../../store/healthFacility/actions';
+import { IRegionDetail } from '../../store/region/types';
 import { fetchTimezoneListRequest, setAppType } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
-import { clearHFSummary } from '../../store/healthFacility/actions';
-import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
-import { clearChiefdomDetail } from '../../store/chiefdom/actions';
-import { IRegionDetail } from '../../store/region/types';
-import { getClinicalWorkflowSelector } from '../../store/district/selectors';
-import sessionStorageServices from '../../global/sessionStorageServices';
-import { clearSideMenu } from '../../store/common/actions';
-import localStorageServices from '../../global/localStorageServices';
-import { setRegionDetailCom } from '../../store/region_com/actions';
+import styles from './Region.module.scss';
 
 /**
  * Lists all the regions
@@ -125,7 +124,6 @@ const Region = (): React.ReactElement => {
       }
       dispatch(clearRegionDetail());
       dispatch(setRegionDetail(partialRegionDetail));
-      dispatch(setRegionDetailCom(partialRegionDetail));
 
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, partialRegionDetail.id);
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, partialRegionDetail.tenantId);
@@ -161,12 +159,7 @@ const Region = (): React.ReactElement => {
       regions.map(
         ({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId, appTypes }: any) => ({
           title: name,
-          detailRoute: (appTypes && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
-            ? PROTECTED_ROUTES.regionCommunity
-            : PROTECTED_ROUTES.regionSummary
-          )
-            .replace(':regionId', regionId)
-            .replace(':tenantId', tenantId),
+          detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
           setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
           tenantId,
           formId: regionId,

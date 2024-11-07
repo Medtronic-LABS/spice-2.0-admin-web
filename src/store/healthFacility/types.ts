@@ -337,6 +337,7 @@ export interface IFetchHFSummaryRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_REQUEST;
   tenantId: number;
   id: number;
+  appTypes: string[];
   successCb?: (data: IHealthFacility) => void;
   failureCb?: (error: Error) => void;
 }

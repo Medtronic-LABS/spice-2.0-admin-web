@@ -234,16 +234,13 @@ export const fetchHFSummaryRequest = ({
   tenantId,
   id,
   failureCb,
-  successCb
-}: {
-  tenantId: number;
-  id: number;
-  successCb?: (data: IHealthFacility) => void;
-  failureCb?: (error: Error) => void;
-}): IFetchHFSummaryRequest => ({
+  successCb,
+  appTypes
+}: Omit<IFetchHFSummaryRequest, 'type'>): IFetchHFSummaryRequest => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_SUMMARY_REQUEST,
   tenantId,
   id,
+  appTypes,
   failureCb,
   successCb
 });

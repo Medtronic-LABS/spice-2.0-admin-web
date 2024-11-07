@@ -53,10 +53,6 @@ import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
 import WorkflowFormCustomization from './components/formBuilder/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
 import RegionCom from './container_com/region/Region';
-import HealthFacilitySummaryCom from './container_com/healthFacility/HealthFacilitySummary';
-import HealthFacilityListCom from './container_com/healthFacility/HealthFacilityList';
-import CreateHealthFacilityCom from './container_com/healthFacility/CreateHealthFacility';
-import UserListCom from './container_com/user/UserList';
 import AddMedicationCom from './container_com/medication/AddMedication';
 import MedicationListCom from './container_com/medication/MedicationList';
 import LabTestCustomizationLayoutCom from './container_com/labtest/LabTestCustomizationLayout';
@@ -92,39 +88,21 @@ const communityRoutes = [
     authorisedRoles: SU_SA
   },
   {
-    path: PROTECTED_ROUTES.healthFacilityBySuperAdmin,
-    exact: true,
-    component: HealthFacilityListCom,
-    authorisedRoles: SU_SA
-  },
-  {
-    path: PROTECTED_ROUTES.healthFacilitySummaryCom,
-    exact: true,
-    component: HealthFacilitySummaryCom,
-    authorisedRoles: SU_SA_HFA
-  },
-  {
-    path: PROTECTED_ROUTES.createHealthFacility,
-    exact: true,
-    component: CreateHealthFacilityCom,
-    authorisedRoles: SU_SA
-  },
-  {
     path: PROTECTED_ROUTES.healthFacilityByAdmin,
     exact: true,
-    component: HealthFacilityListCom,
+    component: HealthFacilityList,
     authorisedRoles: A
   },
   {
-    path: PROTECTED_ROUTES.usersBySuperAdmin,
+    path: PROTECTED_ROUTES.userByRegion,
     exact: true,
-    component: UserListCom,
+    component: UserList,
     authorisedRoles: SU_SA
   },
   {
-    path: PROTECTED_ROUTES.usersByAdmin,
+    path: PROTECTED_ROUTES.userByHealthFacility,
     exact: true,
-    component: UserListCom,
+    component: UserList,
     authorisedRoles: A
   },
   {

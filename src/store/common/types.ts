@@ -21,6 +21,7 @@ export interface ICommanState {
 export interface IFetchSideMenuPayload {
   countryId?: number;
   roleName: string;
+  appTypes?: string[];
   successCb?: (payload: any) => void;
   failureCb?: (error: any) => void;
 }

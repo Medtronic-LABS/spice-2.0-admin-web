@@ -1,12 +1,12 @@
+import { FormApi } from 'final-form';
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
-import Checkbox from '../../components/formFields/Checkbox';
-import { convertToCaptilize } from '../../utils/validation';
 import { useSelector } from 'react-redux';
+import Checkbox from '../../components/formFields/Checkbox';
+import APPCONSTANTS from '../../constants/appConstants';
 import { workflowListSelector } from '../../store/healthFacility/selectors';
 import { IClinicalWorkflow as IWorkflow } from '../../store/workflow/types';
-import { FormApi } from 'final-form';
-import APPCONSTANTS from '../../constants/appConstants';
+import { convertToCaptilize } from '../../utils/validation';
 
 // Props interface
 interface IWorkflowsProps {

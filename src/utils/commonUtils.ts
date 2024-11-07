@@ -372,7 +372,7 @@ export const getUserPayload = ({
     // for tenantId
     let payloadTenantId = Number(user?.tenantId || tenantId); // By default add user tenantId or tenentId from URL
     if (user?.tenantId) {
-      // if user has it's own tenantId(while edit) then send that tenentId
+      // if user has it's own tenantId(while edit) then send that tenantId
       payloadTenantId = user.tenantId;
     } else if (user?.healthfacility?.tenantId) {
       // if hf admin create or user create then send assigned hf tenantId

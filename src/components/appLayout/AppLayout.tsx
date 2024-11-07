@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { matchPath, useLocation } from 'react-router-dom';
+import { APP_TYPE_NAME } from '../../constants/appConstants';
 import { PROTECTED_ROUTES, routesWithSideMenu } from '../../constants/route';
+import localStorageService from '../../global/localStorageServices';
 import { getAppTypeSelector, initializingSelector, roleSelector } from '../../store/user/selectors';
 import { stopPropogation } from '../../utils/commonUtils';
 import Breadcrumb from '../breadcrumb/Breadcrumb';
-import BreadcrumbCommunity from '../../components_com/breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 import SideMenu from '../sideMenu/SideMenu';
-import SideMenuCommunity from '../../components_com/sideMenu/SideMenu';
 import styles from './AppLayout.module.scss';
-import { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
-import localStorageService from '../../global/localStorageServices';
 
 interface IAppLayout {
   children: string | React.ReactElement | React.ReactElement[];
@@ -95,10 +93,8 @@ export const AppLayout = ({ children }: IAppLayout) => {
     () =>
       !Boolean(
         routesWithSideMenu.find(
-          ({ route, childRoutes, disabledRoles }) =>
-            [...(childRoutes || []), route]
-              .filter((v) => v)
-              .some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
+          ({ route, disabledRoles }) =>
+            [route].filter((v) => v).some((newRoute) => matchPath(pathname, { path: newRoute, exact: true })) &&
             !disabledRoles?.includes(role)
         )
       ),
@@ -164,31 +160,13 @@ export const AppLayout = ({ children }: IAppLayout) => {
     <div className={`position-relative ${pyChange} ${styles.layout} ${pxForSideMenu} d-flex justify-content-center`}>
       {!initializingApp && (
         <div className={`px-md-3 px-1  ${styles.contentCenter}`}>
-          {Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
-            ? header(
-                isBreadcrumbDisabled,
-                isMenuTogglable,
-                isSideMenuDisabledForCommunity,
-                isStyleVisible,
-                setIsMenuVisible,
-                () => <BreadcrumbCommunity />
-              )
-            : header(
-                isBreadcrumbDisabled,
-                isMenuTogglable,
-                isSideMenuDisabled,
-                isStyleVisible,
-                setIsMenuVisible,
-                () => <Breadcrumb />
-              )}
+          {header(isBreadcrumbDisabled, isMenuTogglable, isSideMenuDisabled, isStyleVisible, setIsMenuVisible, () => (
+            <Breadcrumb />
+          ))}
           <div className={`row gx-1dot25 ${styles.body}`}>
             {!isSideMenuDisabled && (
               <div className={`col-auto ${styles.sidemenu} ${isMenuTogglable && styles.togglable} ${isStyleVisible}`}>
-                {Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY ? (
-                  <SideMenuCommunity className={styles.customSidemenuClass} />
-                ) : (
-                  <SideMenu className={styles.customSidemenuClass} />
-                )}
+                <SideMenu className={styles.customSidemenuClass} />
               </div>
             )}
             <div className={`col ${isSideMenuWidth}`}>

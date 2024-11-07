@@ -1,39 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import TextInput from '../formFields/TextInput';
-import {
-  composeValidators,
-  required,
-  validateName,
-  validateLastName,
-  validateCountryCode,
-  convertToNumber
-} from '../../utils/validation';
-import BinIcon from '../../assets/images/bin.svg';
-import ResetIcon from '../../assets/images/reset.svg';
-import Radio from '../formFields/Radio';
-import SelectInput from '../formFields/SelectInput';
-import APPCONSTANTS, {
-  NAMING_VARIABLES,
-  NAME_CONSTANTS,
-  ADMIN_BASED_ON_URL,
-  CFR_SUITEACCSESS_NAME
-} from '../../constants/appConstants';
-import PlusIcon from '../../assets/images/plus_blue.svg';
-import EmailField from '../formFields/EmailField';
-import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
-import MultiSelect from '../multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
-import { isUserRolesLoading, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import {
-  fetchCommunityListRequest,
-  fetchCultureListRequest,
-  fetchTimezoneListRequest,
-  fetchUserRolesAction
-} from '../../store/user/actions';
-import userMeta from './userFormMeta';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { useLocation } from 'react-router-dom';
+import { ActionMeta, OnChangeValue } from 'react-select';
+import BinIcon from '../../assets/images/bin.svg';
+import PlusIcon from '../../assets/images/plus_blue.svg';
+import ResetIcon from '../../assets/images/reset.svg';
+import { filterRolesByAppTypeFn, roleBasedAppTypes } from '../../components_com/userForm/UserForm';
+import APPCONSTANTS, {
+  ADMIN_BASED_ON_URL,
+  CFR_SUITEACCSESS_NAME,
+  NAMING_VARIABLES
+} from '../../constants/appConstants';
+import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
+import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
+import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   clearHFListRequest,
   clearSupervisorList,
@@ -43,7 +28,6 @@ import {
   fetchPeerSupervisorListRequest,
   fetchVillagesListUserLinked
 } from '../../store/healthFacility/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   countryListSelector,
   countryLoadingSelector,
@@ -54,26 +38,44 @@ import {
   villagesFromHFListSelector,
   villagesFromHFLoadingSelector
 } from '../../store/healthFacility/selectors';
-import {
-  timezoneListSelector,
-  loadingSelector,
-  cultureListSelector,
-  cultureListLoadingSelector,
-  communityListSelector
-} from '../../store/user/selectors';
 import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
-import PhoneNumberField from '../formFields/PhoneNumber';
-import useUserFormUtils from './userFormUtils';
-import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
-import { SiteUserForm } from './userConditionalFields/AdminFields';
-import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
-import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
-import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
+import {
+  fetchCommunityListRequest,
+  fetchCultureListRequest,
+  fetchTimezoneListRequest,
+  fetchUserRolesAction
+} from '../../store/user/actions';
+import {
+  communityListSelector,
+  cultureListLoadingSelector,
+  cultureListSelector,
+  isUserRolesLoading,
+  loadingSelector,
+  roleSelector,
+  timezoneListSelector,
+  userRolesSelector
+} from '../../store/user/selectors';
+import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
 import { formatCountryCode, formatUserToastMsg } from '../../utils/commonUtils';
-import { ActionMeta, OnChangeValue } from 'react-select';
-import { useLocation } from 'react-router-dom';
-import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
-import { filterRolesByAppTypeFn, roleBasedAppTypes } from '../../components_com/userForm/UserForm';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import {
+  composeValidators,
+  convertToNumber,
+  required,
+  validateCountryCode,
+  validateLastName,
+  validateName
+} from '../../utils/validation';
+import EmailField from '../formFields/EmailField';
+import PhoneNumberField from '../formFields/PhoneNumber';
+import Radio from '../formFields/Radio';
+import SelectInput from '../formFields/SelectInput';
+import TextInput from '../formFields/TextInput';
+import MultiSelect from '../multiSelect/MultiSelect';
+import { SiteUserForm } from './userConditionalFields/AdminFields';
+import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
+import userMeta from './userFormMeta';
+import useUserFormUtils from './userFormUtils';
 
 export interface IUserFormValues {
   email: string;
@@ -168,8 +170,10 @@ const UserForm = ({
   const { mobileRoles, adminRoles, superAdminRoles } = userMeta();
   const districtList = useSelector(getDistrictListSelector);
   const {
-    district: { s: districtSName }
-  } = NAME_CONSTANTS;
+    hfDetails: {
+      district: { s: districtSName }
+    }
+  } = useLabelFromAppType();
   const [newHFList, setNewHFList] = useState(healthFacilityList);
   const [appTypeBasedRoles, setAppTypeRoles] = useState(rolesGrouped);
   const initialValue = useMemo<Array<Partial<any>>>(
@@ -1428,7 +1432,7 @@ const UserForm = ({
                       render={({ input, meta }) => (
                         <TextInput
                           {...input}
-                          disabled // country code will get autopopulated from region form
+                          disabled={true} // country code will get autopopulated from region form
                           label='Country Code'
                           errorLabel='country code'
                           error={isError(meta)}

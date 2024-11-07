@@ -137,7 +137,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
    * Fetches the side menu and formats the menu items
    */
   useEffect(() => {
-    if (!Object.keys(list).length) {
+    if (!Object.keys(list || []).length) {
       fetchSideMenu();
     } else {
       let menuBy;

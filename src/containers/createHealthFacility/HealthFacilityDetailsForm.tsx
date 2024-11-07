@@ -1,20 +1,34 @@
 import { FormApi } from 'final-form';
+import { useEffect, useState } from 'react';
 import { Field } from 'react-final-form';
-import TextInput from '../../components/formFields/TextInput';
-import {
-  composeValidators,
-  required,
-  minLength,
-  normalizePhone,
-  normalizeFloatingNumber,
-  validateMobile,
-  validateName,
-  validateLatitude,
-  validateLongitude
-} from '../../utils/validation';
-import SelectInput from '../../components/formFields/SelectInput';
-import MultiSelect from '../../components/multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router';
+import SiteDetailsIcon from '../../assets/images/info-grey.svg';
+import FormContainer from '../../components/formContainer/FormContainer';
+import SelectInput from '../../components/formFields/SelectInput';
+import TextInput from '../../components/formFields/TextInput';
+import MultiSelect from '../../components/multiSelect/MultiSelect';
+import APPCONSTANTS from '../../constants/appConstants';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import {
+  chiefdomListSelector,
+  chiefdomLoadingSelector,
+  getChiefdomDetailSelector
+} from '../../store/chiefdom/selectors';
+import { fetchDistrictDetailReq, fetchDistrictListRequest } from '../../store/district/actions';
+import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
+import {
+  clearHFFormData,
+  clearSupervisorList,
+  clearVillageList,
+  fetchCultureListRequest,
+  fetchHFTypesRequest,
+  fetchPeerSupervisorListRequest,
+  fetchUnlinkedVillagesRequest,
+  fetchVillagesListRequest
+} from '../../store/healthFacility/actions';
 import {
   cultureListSelector,
   cultureLoadingSelector,
@@ -27,34 +41,21 @@ import {
   villagesListSelector,
   villagesLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { useEffect, useState } from 'react';
-import {
-  clearHFFormData,
-  clearSupervisorList,
-  clearVillageList,
-  fetchCultureListRequest,
-  fetchHFTypesRequest,
-  fetchPeerSupervisorListRequest,
-  fetchUnlinkedVillagesRequest,
-  fetchVillagesListRequest
-} from '../../store/healthFacility/actions';
-import { useParams } from 'react-router';
-import { countryIdSelector } from '../../store/user/selectors';
 import { IObjectData, IVillages } from '../../store/healthFacility/types';
-import SiteDetailsIcon from '../../assets/images/info-grey.svg';
-import FormContainer from '../../components/formContainer/FormContainer';
-import Workflows from '../healthFacility/Workflows';
-import { fetchDistrictDetailReq, fetchDistrictListRequest } from '../../store/district/actions';
-import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
-import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
-import {
-  chiefdomListSelector,
-  chiefdomLoadingSelector,
-  getChiefdomDetailSelector
-} from '../../store/chiefdom/selectors';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import { countryIdSelector } from '../../store/user/selectors';
 import toastCenter from '../../utils/toastCenter';
-import sessionStorageServices from '../../global/sessionStorageServices';
+import {
+  composeValidators,
+  minLength,
+  normalizeFloatingNumber,
+  normalizePhone,
+  required,
+  validateLatitude,
+  validateLongitude,
+  validateMobile,
+  validateName
+} from '../../utils/validation';
+import Workflows from '../healthFacility/Workflows';
 
 interface IAddUserFormProps {
   formName: string;
@@ -100,14 +101,17 @@ const HealthFacilityDetailsForm = ({
   const villagesLoading = useSelector(villagesLoadingSelector);
   const languages = useSelector(cultureListSelector);
   const languageLoading = useSelector(cultureLoadingSelector);
-  const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-sm-6'} col-12`;
+  const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-md-6 col-lg-3'} col-12`;
   const country = useSelector(countryIdSelector);
   const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
+    hfDetails: {
+      district: { s: districtSName },
+      chiefdom: { s: chiefdomSName },
+      supervisor: { s: supervisorSName }
+    },
     healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
+  } = useLabelFromAppType();
 
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const [workflowEditedData, setWorkFlowEditedData] = useState<{
@@ -345,7 +349,7 @@ const HealthFacilityDetailsForm = ({
               )}
             />
           </div>
-          <div className={`${isEdit ? 'col-12 col-md-8' : 'col-12'}`}>
+          <div className={`${isEdit ? 'col-12 col-md-8' : 'col-12 col-lg-6'}`}>
             <Field
               name={`${formName}.address`}
               type='text'
@@ -516,7 +520,7 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <MultiSelect
                   {...(input as any)}
-                  label='Linked Community Health Assistant'
+                  label={supervisorSName}
                   labelKey='name'
                   valueKey='id'
                   isShowLabel={true}

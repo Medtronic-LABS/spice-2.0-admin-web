@@ -40,7 +40,7 @@ import {
   userDetailLoadingSelector,
   workflowListSelector
 } from '../../store/healthFacility/selectors';
-import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { countryIdSelector, getAppTypeSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import Loader from '../../components/loader/Loader';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -129,6 +129,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
+  const appTypes = useSelector(getAppTypeSelector);
 
   const lableData = useMemo(
     () => [
@@ -183,12 +184,13 @@ const HealthFacilitySummary = (): React.ReactElement => {
       fetchHFSummaryRequest({
         tenantId: Number(tenantId),
         id: Number(healthFacilityId),
+        appTypes,
         failureCb: (e) => {
           fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR);
         }
       })
     );
-  }, [dispatch, healthFacilityId, tenantId]);
+  }, [appTypes, dispatch, healthFacilityId, tenantId]);
 
   const fetchFailure = (e: Error, errorMessage: string) =>
     toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, errorMessage));

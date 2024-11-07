@@ -4,6 +4,7 @@ import { required } from '../../../utils/validation';
 import { NAMING_VARIABLES, NAME_CONSTANTS } from '../../../constants/appConstants';
 import Checkbox from '../../formFields/Checkbox';
 import useFieldVisibility from '../../../hooks/useFieldVisibility';
+import useLabelFromAppType from '../../../hooks/useLabelFromAppType';
 
 export const SiteUserForm = (props: any) => {
   const {
@@ -40,29 +41,38 @@ export const SiteUserForm = (props: any) => {
     isHFSelected
   );
 
+  const {
+    user: {
+      timezone: { available: isTimezoneAvailable },
+      culture: { available: isCultureAvailable }
+    }
+  } = useLabelFromAppType();
+
   return (
     <>
-      <div className='col-sm-6 col-12'>
-        <Field
-          name={`${name}.timezone`}
-          type='text'
-          validate={required}
-          render={({ input, meta }) => (
-            <SelectInput
-              {...(input as any)}
-              label='Timezone'
-              errorLabel='timezone'
-              labelKey='description'
-              valueKey='id'
-              options={timezoneList || []}
-              loadingOptions={isTmezoneListLoading}
-              error={isError(meta)}
-              isModel={true}
-            />
-          )}
-        />
-      </div>
-      {showCulture && (
+      {isTimezoneAvailable && (
+        <div className='col-sm-6 col-12'>
+          <Field
+            name={`${name}.timezone`}
+            type='text'
+            validate={required}
+            render={({ input, meta }) => (
+              <SelectInput
+                {...(input as any)}
+                label='Timezone'
+                errorLabel='timezone'
+                labelKey='description'
+                valueKey='id'
+                options={timezoneList || []}
+                loadingOptions={isTmezoneListLoading}
+                error={isError(meta)}
+                isModel={true}
+              />
+            )}
+          />
+        </div>
+      )}
+      {isCultureAvailable && showCulture && (
         <div className='col-sm-6 col-12'>
           <Field
             name={`${name}.culture`}
