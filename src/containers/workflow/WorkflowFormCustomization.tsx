@@ -162,7 +162,6 @@ const WorkflowFormCustomization = () => {
   };
   const accordianRef = useRef<any>([]);
   const newlyAddedIdsRef = useRef<any>([]);
-  console.log('formData--->', formData);
   return (
     <div data-testid='workflow-form-customization'>
       {formData && !loading ? (

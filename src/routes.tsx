@@ -52,8 +52,6 @@ import ProgramForm from './containers/program/CreateProgram';
 import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
 import WorkflowFormCustomization from './containers/workflow/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
-import LabTestCustomizationLayoutCom from './container_com/labtest/LabTestCustomizationLayout';
-import LabTestListCom from './container_com/labtest/LabtestList';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -95,24 +93,6 @@ const communityRoutes = [
     exact: true,
     component: UserList,
     authorisedRoles: A
-  },
-  {
-    path: PROTECTED_ROUTES.labtestListCom,
-    exact: false,
-    component: LabTestListCom,
-    authorisedRoles: SU_SA
-  },
-  // {
-  //   path: PROTECTED_ROUTES.profile,
-  //   exact: true,
-  //   component: MyProfile,
-  //   authorisedRoles: SU_SA_A
-  // },
-  {
-    path: PROTECTED_ROUTES.customizeLabTestCom,
-    exact: true,
-    component: LabTestCustomizationLayoutCom,
-    authorisedRoles: SU_SA_HFA
   }
 ];
 
