@@ -27,8 +27,9 @@ const COMMUNITY = {
     chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' },
     supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' }
   },
-  user: { timezone: { available: false }, culture: { available: false } },
-  userList: { filters: { available: false } }
+  user: { timezone: { available: false }, culture: { available: false }, redrisk: { available: false } },
+  userList: { filters: { available: false } },
+  medication: { categories: { available: false } }
 };
 
 const NON_COMMUNITY = {
@@ -47,8 +48,9 @@ const NON_COMMUNITY = {
     },
     supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' }
   },
-  user: { timezone: { available: true }, culture: { available: true } },
-  userList: { filters: { available: true } }
+  user: { timezone: { available: true }, culture: { available: true }, redrisk: { available: true } },
+  userList: { filters: { available: true } },
+  medication: { categories: { available: true } }
 };
 
 /**

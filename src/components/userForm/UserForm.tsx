@@ -172,8 +172,12 @@ const UserForm = ({
   const {
     hfDetails: {
       district: { s: districtSName }
+    },
+    userList: {
+      filters: { available: showFilters }
     }
   } = useLabelFromAppType();
+
   const [newHFList, setNewHFList] = useState(healthFacilityList);
   const [appTypeBasedRoles, setAppTypeRoles] = useState(rolesGrouped);
   const initialValue = useMemo<Array<Partial<any>>>(
@@ -222,6 +226,7 @@ const UserForm = ({
       };
       dispatch(fetchCommunityListRequest(payload));
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -266,6 +271,31 @@ const UserForm = ({
     roleOptionsState
   ]);
 
+  const getHFListFn = useCallback(() => {
+    if (countryId) {
+      dispatch(
+        fetchHFListRequest({
+          countryId,
+          skip: 0,
+          limit: null,
+          userBased: !(role === SUPER_ADMIN || role === SUPER_USER)
+        })
+      );
+    }
+  }, [countryId, dispatch, role]);
+
+  useEffect(() => {
+    if (!showFilters && countryId) {
+      setNewHFList(healthFacilityList);
+    }
+  }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
+
+  useEffect(() => {
+    if (!showFilters && countryId) {
+      getHFListFn();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const isFormInvalid = form?.getState()?.errors?.[formName]?.length;
 
   /**
@@ -366,18 +396,11 @@ const UserForm = ({
     (roles: IRoles[]) => {
       if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
         if (healthFacilityList?.length === 0 && countryId) {
-          dispatch(
-            fetchHFListRequest({
-              countryId,
-              skip: 0,
-              limit: null,
-              userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER)
-            })
-          );
+          getHFListFn();
         }
       }
     },
-    [isSuperAdmin, countryId, dispatch, role, healthFacilityList?.length]
+    [isSuperAdmin, healthFacilityList?.length, countryId, getHFListFn]
   );
   useEffect(() => {
     levelBasedInsightsRole();
@@ -500,7 +523,15 @@ const UserForm = ({
     const filteredHFList = healthFacilityList.filter((hf) => {
       // Check if any clinical workflow's appTypes includes all the selectedAppTypes
       return [...(hf.clinicalWorkflows || []), ...(hf.customizedWorkflows || [])].some((workflow) => {
-        return selectedAppTypes.some((type) => (workflow.appTypes || []).includes(type));
+        
+        return selectedAppTypes.some((type) => {
+          if(workflow.appTypes){
+            return (workflow.appTypes || []).includes(type)
+          }else {
+            return true;
+          }
+      
+    });
       });
     });
     setNewHFList(filteredHFList);
@@ -1110,11 +1141,18 @@ const UserForm = ({
             role: spiceRole = [],
             spiceInsightsRole = []
           } = form.getState().values?.users?.[index];
+
           const isSPICE = (formSuiteAccess || []).some(
             (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.spice
           );
           const isSPICEInsights = (formSuiteAccess || []).some(
             (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights
+          );
+          const isReports = (formSuiteAccess || []).some(
+            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.reports
+          );
+          const isInsights = (formSuiteAccess || []).some(
+            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.insights
           );
           return (
             <span key={`form_${idRefs.current[index]}`}>
@@ -1217,6 +1255,11 @@ const UserForm = ({
                               // CHW User selection
                               isCHUserSelectedFn(values, index);
                               updateRoleOptionsAndDisableRoles(index, values);
+                              if (showHealthFacilityFn(index)) {
+                                const fullRoles = form.getState().values[formName][index].roles;
+                                const selectedAppTypes = roleBasedAppTypes(fullRoles);
+                                filterHFByAppTypes(selectedAppTypes);
+                              }
                               // Healthfacility create admin page included healthfacility admin
                               const [isHFSelected] = values.filter(
                                 (selectedName: any) => selectedName?.name === HEALTH_FACILITY_ADMIN
@@ -1344,7 +1387,9 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {(formSuiteAccess || []).length === 1 && !isAdminForm && <div className='col-sm-6 col-12' />}
+                {(formSuiteAccess || []).length === 1 && !isReports && !isInsights && !isAdminForm && (
+                  <div className='col-sm-6 col-12' />
+                )}
                 <div className='col-sm-6 col-12'>
                   <Field
                     name={`${name}.firstName`}

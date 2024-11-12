@@ -261,10 +261,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
       }
-
-      if (postData.clinicalWorkflowIds.length) {
-        dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));
-      }
     };
 
     switch (submittedData.pageNumber) {

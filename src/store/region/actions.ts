@@ -170,9 +170,10 @@ export const clearClientRegistryStatus = (): IClearClientRegistryStatus => ({
   type: REGION_TYPES.CLEAR_CLIENT_REGISTRY_STATUS
 });
 
-export const uploadFileRequest = ({ file, successCb, failureCb }: IUploadFilePayload): IUploadFileRequest => ({
+export const uploadFileRequest = ({ file,appTypes, successCb, failureCb }: IUploadFilePayload): IUploadFileRequest => ({
   type: REGION_TYPES.UPLOAD_FILE_REQUEST,
   file,
+  appTypes,
   successCb,
   failureCb
 });
@@ -189,15 +190,18 @@ export const uploadFileFailure = (payload: any): IUploadFileFailure => ({
 
 export const downloadFileRequest = ({
   countryId,
+  appTypes,
   successCb,
   failureCb
 }: {
   countryId: number;
+  appTypes: string[];
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }): IDownloadFileRequest => ({
   type: REGION_TYPES.DOWNLOAD_FILE_REQUEST,
   countryId,
+  appTypes,
   successCb,
   failureCb
 });

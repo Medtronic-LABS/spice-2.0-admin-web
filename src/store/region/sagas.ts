@@ -96,9 +96,9 @@ export function* fetchClientRegistryStatus(action: IFetchClientRegistryStatusReq
 /*
   Worker Saga: Fired on UPLOAD_FILE_REQUEST action
 */
-export function* uploadFileSaga({ file, successCb, failureCb }: IUploadFileRequest): SagaIterator {
+export function* uploadFileSaga({ file, appTypes, successCb, failureCb }: IUploadFileRequest): SagaIterator {
   try {
-    const data = yield call(regionService.uploadFile, file);
+    const data = yield call(regionService.uploadFile, file, appTypes);
     successCb?.(data);
     yield put(regionActions.uploadFileSuccess(data));
   } catch (e: any) {
@@ -110,9 +110,9 @@ export function* uploadFileSaga({ file, successCb, failureCb }: IUploadFileReque
 /*
   Worker Saga: Fired on DOWNLOAD_FILE_REQUEST action
 */
-export function* downloadFileSaga({ countryId, successCb, failureCb }: IDownloadFileRequest): SagaIterator {
+export function* downloadFileSaga({ countryId, appTypes, successCb, failureCb }: IDownloadFileRequest): SagaIterator {
   try {
-    const { data } = yield call(regionService.downloadFile, countryId);
+    const { data } = yield call(regionService.downloadFile, countryId, appTypes);
     successCb?.(data);
     yield put(regionActions.downloadFileSuccess(data));
   } catch (e: any) {

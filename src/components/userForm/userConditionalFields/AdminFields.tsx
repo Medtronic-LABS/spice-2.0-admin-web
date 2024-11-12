@@ -44,7 +44,8 @@ export const SiteUserForm = (props: any) => {
   const {
     user: {
       timezone: { available: isTimezoneAvailable },
-      culture: { available: isCultureAvailable }
+      culture: { available: isCultureAvailable },
+      redrisk: { available: isRedRisk }
     }
   } = useLabelFromAppType();
 
@@ -95,7 +96,7 @@ export const SiteUserForm = (props: any) => {
           />
         </div>
       )}
-      {showRedRisk && (
+      {isRedRisk && showRedRisk && (
         <div className='col-6'>
           <Field
             name={`${name}.redRisk`}

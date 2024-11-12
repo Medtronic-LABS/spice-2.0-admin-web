@@ -187,6 +187,7 @@ export interface IDeactivateReqPayload {
 
 export interface IUploadFilePayload {
   file: any;
+  appTypes: string;
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }
@@ -261,6 +262,7 @@ export interface IClearClientRegistryStatus {
 export interface IUploadFileRequest {
   type: typeof ACTION_TYPES.UPLOAD_FILE_REQUEST;
   file: any;
+  appTypes: string;
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }
@@ -278,6 +280,7 @@ export interface IUploadFileFailure {
 export interface IDownloadFileRequest {
   type: typeof ACTION_TYPES.DOWNLOAD_FILE_REQUEST;
   countryId: number;
+  appTypes: string[];
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }

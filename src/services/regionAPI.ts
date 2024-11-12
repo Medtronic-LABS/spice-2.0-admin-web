@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { IFetchRegionDetailReqPayload, IRegionPayload } from '../store/region/types';
 
-export const uploadFile = (file: any) => {
+export const uploadFile = (file: any,appTypes:string) => {
   const data = new FormData();
   data.append('file', file);
+  // data.append('appTypes', appTypes);
   return axios({
     method: 'POST',
     url: '/admin-service/region-details/upload-file',
@@ -11,13 +12,14 @@ export const uploadFile = (file: any) => {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
 };
-export const downloadFile = (countryId: number) => {
+export const downloadFile = (countryId: number, appTypes: string[]) => {
   return axios({
     method: 'POST',
     url: '/admin-service/region-details/download-file',
     responseType: 'blob',
     data: {
       countryId
+      // appTypes
     }
   });
 };

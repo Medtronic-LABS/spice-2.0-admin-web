@@ -6,13 +6,13 @@ import arrayMutators from 'final-form-arrays';
 import FormContainer from '../../components/formContainer/FormContainer';
 import { Tools } from 'final-form';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import { useState } from 'react';
 import MedicationFormIcon from '../../assets/images/info-grey.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { createMedicationRequest, validateMedication } from '../../store/medication/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAppTypeSelector } from '../../store/user/selectors';
+import { useDispatch } from 'react-redux';
+import useLabelFromAppType from '../../hooks/useLabelFromAppType';
 
 export interface IMedicationFormValues {
   medication: IMedicationDataFormValues[];
@@ -43,12 +43,17 @@ type Props = IStateProps & IDispatchProps & IRouteProps & IMatchProps;
 
 const AddMedication = (props: Props): React.ReactElement => {
   const dispatch = useDispatch();
-  const appTypes = useSelector(getAppTypeSelector);
 
   const [previousFieldValue, setPreviousFieldValueState] = useState([] as IMedicationDataFormValues[]);
   const [internalFormState, setStateInternalFormState] = useState(
     [] as Array<{ isValueChanged: boolean; isValid: boolean }>
   );
+
+  const {
+    medication: {
+      categories: { available: isCategories }
+    }
+  } = useLabelFromAppType();
 
   /**
    * Checks for duplicate data validation with existing form values and existing values in database
@@ -264,7 +269,7 @@ const AddMedication = (props: Props): React.ReactElement => {
       },
       dosageFormId: medicationData.dosage_form.id,
       dosageFormName: medicationData.dosage_form.name,
-      ...(appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
+      ...(!isCategories
         ? {}
         : {
             id: medicationData?.category?.id,

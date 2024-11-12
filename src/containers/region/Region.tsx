@@ -26,7 +26,7 @@ import {
   getRegionIdSelector
 } from '../../store/region/selectors';
 import { IMatchParams } from '../../store/region/types';
-import { roleSelector } from '../../store/user/selectors';
+import { getAppTypeSelector, roleSelector } from '../../store/user/selectors';
 import { fileDownload } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import styles from './Region.module.scss';
@@ -40,13 +40,14 @@ const Region = (): React.ReactElement => {
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
+  const appTypes = useSelector(getAppTypeSelector)
 
   const {
     isCommunity,
     hfDetails: {
       district: { s: districtSName },
       chiefdom: { s: chiefdomSName }
-    }
+    },
   } = useLabelFromAppType();
 
   // Check if the current user role is Region Admin to set read-only access
@@ -60,6 +61,7 @@ const Region = (): React.ReactElement => {
     dispatch(
       downloadFileRequest({
         countryId: Number(regionId),
+        appTypes: appTypes,
         successCb: (data) => {
           const filename = regionDetails.name;
           // Initiating file download with appropriate file type (Excel sheet)
@@ -84,6 +86,7 @@ const Region = (): React.ReactElement => {
     dispatch(
       uploadFileRequest({
         file,
+        appTypes: appTypes[0],
         successCb: (_) => {
           fetchRegionDetails(); // Fetch updated region details after successful upload
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_UPLOAD_SUCCESS);

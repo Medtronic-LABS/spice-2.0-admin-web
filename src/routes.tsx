@@ -52,6 +52,7 @@ import ProgramForm from './containers/program/CreateProgram';
 import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
 import WorkflowFormCustomization from './containers/workflow/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
+import PrivacyPolicy from './containers/privacyPolicy/PrivacyPolicy';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -392,6 +393,11 @@ const publicRoutes = [
     path: PUBLIC_ROUTES.resetPassword,
     exact: true,
     component: ResetPassword
+  },
+  {
+    path: PUBLIC_ROUTES.privacyPolicy,
+    exact: true,
+    component: PrivacyPolicy
   }
 ];
 /**

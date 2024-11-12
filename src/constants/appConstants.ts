@@ -217,7 +217,9 @@ const APPCONSTANTS = {
   },
   spiceRoleGrouped: {
     spice: 'SPICE',
-    spiceInsights: 'SPICE INSIGHTS'
+    spiceInsights: 'SPICE INSIGHTS',
+    reports: 'REPORTS',
+    insights: 'INSIGHTS',
   },
   filterSpiceCommonRoles: ['cfr_quicksight_admin'],
   filterSpiceAdminRoles: ['cfr_admin'],
