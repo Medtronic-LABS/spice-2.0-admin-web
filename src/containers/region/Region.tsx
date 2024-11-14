@@ -40,14 +40,14 @@ const Region = (): React.ReactElement => {
   const uploading = useSelector(getIsUploadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
-  const appTypes = useSelector(getAppTypeSelector)
+  const appTypes = useSelector(getAppTypeSelector);
 
   const {
     isCommunity,
     hfDetails: {
       district: { s: districtSName },
       chiefdom: { s: chiefdomSName }
-    },
+    }
   } = useLabelFromAppType();
 
   // Check if the current user role is Region Admin to set read-only access
@@ -61,7 +61,7 @@ const Region = (): React.ReactElement => {
     dispatch(
       downloadFileRequest({
         countryId: Number(regionId),
-        appTypes: appTypes,
+        appTypes,
         successCb: (data) => {
           const filename = regionDetails.name;
           // Initiating file download with appropriate file type (Excel sheet)

@@ -209,7 +209,7 @@ export const getAdminPayload = ({
   const payload = userFormData.map((user: any) => {
     let roleIds: number[] = [];
     // for role, roles, roleIds
-    let spiceInsightsIds: number[] = [];
+    let reportIds: number[] = [];
     let spiceId: number[] = [];
     // add role in spiceId
     if (!isFromList) {
@@ -225,13 +225,13 @@ export const getAdminPayload = ({
               .flat()
           : [user.role.id];
     }
-    // add roles in spiceInsightIds
+    // add roles in Report Ids
     if (user.roles) {
-      spiceInsightsIds = user.roles
-        ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
+      reportIds = user.roles
+        ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.reports)
         ?.map((role: IRoles) => role.id);
     }
-    roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
+    roleIds = [...new Set([...spiceId, ...reportIds])];
 
     const userPayload: any = {
       firstName: user.firstName.trim(),
@@ -336,7 +336,7 @@ export const getUserPayload = ({
             .flat()
         : [user.role.id];
     } else {
-      let spiceInsightsIds: number[] = [];
+      let reportIds: number[] = [];
       let spiceId: number[] = [];
       // add role in spiceId
       if (user.role) {
@@ -351,11 +351,11 @@ export const getUserPayload = ({
       }
       // add roles in spiceInsightIds
       if (user.roles) {
-        spiceInsightsIds = user.roles
-          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights)
+        reportIds = user.roles
+          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.reports)
           ?.map((role: IRoles) => role.id);
       }
-      roleIds = [...new Set([...spiceId, ...spiceInsightsIds])];
+      roleIds = [...new Set([...spiceId, ...reportIds])];
     }
     const isHFAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
 

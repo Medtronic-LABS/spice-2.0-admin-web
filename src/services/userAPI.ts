@@ -156,3 +156,9 @@ export const fetchCommunityListRequest = (countryId: number) =>
     url: '/admin-service/community-units',
     data: { countryId }
   });
+
+export const fetchDesignationListRequest = (countryId: number) =>
+  axios({
+    method: 'GET',
+    url: `/admin-service/designation/list/${countryId}`
+  });

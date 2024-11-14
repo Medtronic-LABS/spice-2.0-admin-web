@@ -44,6 +44,8 @@ const initialStateGetter = {
   timezoneList: [],
   cultureList: [],
   communityList: [],
+  designationList: [],
+  designationListLoading: false,
   isLockedUserLoading: false,
   lockedUsers: [],
   totalLockedUsers: 0
@@ -255,6 +257,22 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
       return {
         ...state,
         cultureListLoading: true
+      };
+    case USERTYPES.FETCH_DESIGNATION_LIST_REQUEST:
+      return {
+        ...state,
+        designationListLoading: true
+      };
+    case USERTYPES.FETCH_DESIGNATION_LIST_SUCCESS:
+      return {
+        ...state,
+        designationListLoading: false,
+        designationList: action.payload.designationList
+      };
+    case USERTYPES.FETCH_DESIGNATION_LIST_FAILURE:
+      return {
+        ...state,
+        designationListLoading: false
       };
     case USERTYPES.REMOVE_TOKEN:
       return {

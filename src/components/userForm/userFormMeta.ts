@@ -8,6 +8,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 const useUserFormMeta = () => {
   const { SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const mobileRoles = useMemo(() => ['COMMUNITY_HEALTH_ASSISTANT'], []);
+  const onlyInsightUserRole = useMemo(() => ['SPICE_INSIGHTS_USER'], []);
   const adminRoles = useMemo(
     () => [HEALTH_FACILITY_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN, REGION_ADMIN, SUPER_ADMIN],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -34,7 +35,16 @@ const useUserFormMeta = () => {
     []
   );
   const isHFAdminRole = useMemo(() => [HEALTH_FACILITY_ADMIN], [HEALTH_FACILITY_ADMIN]);
-  return { mobileRoles, isCHPRole, adminRoles, CHRoles, superAdminRoles, hfCreateRoles, isHFAdminRole };
+  return {
+    mobileRoles,
+    isCHPRole,
+    adminRoles,
+    CHRoles,
+    superAdminRoles,
+    hfCreateRoles,
+    isHFAdminRole,
+    onlyInsightUserRole
+  };
 };
 
 export default useUserFormMeta;

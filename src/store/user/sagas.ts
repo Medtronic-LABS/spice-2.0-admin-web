@@ -398,6 +398,23 @@ export function* fetchCommunityListRequest(action: IActionProps): SagaIterator {
 }
 
 /*
+  Worker Saga: Fired on FETCH_DESIGNATION_LIST_REQUEST action
+*/
+export function* fetchDesignationListRequest(action: IActionProps): SagaIterator {
+  const { countryId } = action;
+  try {
+    const { data } = yield call(userService.fetchDesignationListRequest, countryId);
+    yield put(
+      userActions.fetchDesignationListSuccess({
+        designationList: data.entity
+      })
+    );
+  } catch (e) {
+    yield put(userActions.fetchDesignationListFailure());
+  }
+}
+
+/*
   Worker Saga: Fired on UNLOCK_USERS_REQUEST action
 */
 export function* unlockUsers({ userId, successCb, failureCb }: IUnlockUsersRequest): SagaIterator {
@@ -432,6 +449,7 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.FETCH_TIMEZONE_LIST_REQUEST, fetchTimezoneList)]);
   yield all([takeLatest(USERTYPES.FETCH_LOCKED_USERS_REQUEST, fetchLockedUsers)]);
   yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST_REQUEST, fetchCommunityListRequest)]);
+  yield all([takeLatest(USERTYPES.FETCH_DESIGNATION_LIST_REQUEST, fetchDesignationListRequest)]);
   yield all([takeLatest(USERTYPES.UNLOCK_USERS_REQUEST, unlockUsers)]);
 }
 

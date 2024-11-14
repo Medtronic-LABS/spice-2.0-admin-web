@@ -32,7 +32,7 @@ import {
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
 interface IAdminEditFormValues {
-  spiceInsightsRole: IRoles[];
+  reports: IRoles[];
   suiteAccess: Array<{ groupName: string; id: string }>;
   id: string;
   firstName: string;
@@ -134,8 +134,8 @@ const ChiefdomSummary = () => {
       chiefdomAdmin.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
       chiefdomAdmin.role =
         chiefdomAdmin.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spice) || [];
-      chiefdomAdmin.spiceInsightsRole =
-        chiefdomAdmin.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights) || [];
+      chiefdomAdmin.reports =
+        chiefdomAdmin.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.reports) || [];
       setIsChiefdomAdminEdit(true);
       chiefdomAdminForEdit.current = { users: [chiefdomAdmin] };
       setShowChiefdomAdminModal(true);

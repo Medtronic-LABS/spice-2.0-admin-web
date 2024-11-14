@@ -59,7 +59,9 @@ import {
   IRemoveToken,
   ISetAppType,
   ISetAppTypeSuccess,
-  ISetAppTypeFailure
+  ISetAppTypeFailure,
+  IFetchDesignationListPayload,
+  IFetchDesignationList
 } from './types';
 
 export const loginRequest = ({
@@ -404,6 +406,22 @@ export const fetchCommunityListSuccess = (payload: IFetchCommunityListPayload) =
 
 export const fetchCommunityListFailure = () => ({
   type: USER_TYPES.FETCH_COMMUNITY_LIST_FAILURE
+});
+
+export const fetchDesignationListRequest = ({ countryId }: { countryId: number }): IFetchDesignationList => ({
+  type: USER_TYPES.FETCH_DESIGNATION_LIST_REQUEST,
+  countryId
+});
+
+export const fetchDesignationListSuccess = (payload: IFetchDesignationListPayload) => {
+  return {
+    type: USER_TYPES.FETCH_DESIGNATION_LIST_SUCCESS,
+    payload
+  };
+};
+
+export const fetchDesignationListFailure = () => ({
+  type: USER_TYPES.FETCH_DESIGNATION_LIST_FAILURE
 });
 
 export const fetchTimezoneListSuccess = (payload: IFetchTimezoneListSuccessPayload) => ({

@@ -170,7 +170,12 @@ export const clearClientRegistryStatus = (): IClearClientRegistryStatus => ({
   type: REGION_TYPES.CLEAR_CLIENT_REGISTRY_STATUS
 });
 
-export const uploadFileRequest = ({ file,appTypes, successCb, failureCb }: IUploadFilePayload): IUploadFileRequest => ({
+export const uploadFileRequest = ({
+  file,
+  appTypes,
+  successCb,
+  failureCb
+}: IUploadFilePayload): IUploadFileRequest => ({
   type: REGION_TYPES.UPLOAD_FILE_REQUEST,
   file,
   appTypes,

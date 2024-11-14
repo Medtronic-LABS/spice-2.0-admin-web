@@ -179,8 +179,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       suiteAccess: [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()],
       country: { phoneNumberCode: values.countryCode },
       role: values.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spice) || [],
-      spiceInsightsRole:
-        values.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.spiceInsights) || []
+      reports: values.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.reports) || []
     };
 
     setIsOpenAdminModal(true);

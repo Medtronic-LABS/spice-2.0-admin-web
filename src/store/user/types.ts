@@ -406,6 +406,7 @@ export interface IUserState {
   isRolesLoading: boolean;
   communityList: any[];
   islockedUsersLoading?: boolean;
+  designationList: any[];
 }
 
 export interface ILoginFailurePayload {
@@ -780,6 +781,21 @@ export interface ISetAppTypeFailure {
   error: Error;
 }
 
+export interface IFetchDesignationList {
+  type: typeof USER_TYPES.FETCH_DESIGNATION_LIST_REQUEST;
+  countryId: number;
+  successCb?: (payload: IFetchCommunityListPayload) => void;
+  failureCb?: (error: Error) => void;
+}
+export interface IDesignationList {
+  id: string;
+  name: string;
+}
+
+export interface IFetchDesignationListPayload {
+  designationList: IDesignationList[];
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -854,4 +870,7 @@ export type UserActions =
   | IRemoveToken
   | ISetAppType
   | ISetAppTypeSuccess
-  | ISetAppTypeFailure;
+  | ISetAppTypeFailure
+  | IFetchDesignationListPayload
+  | IDesignationList
+  | IFetchDesignationList;

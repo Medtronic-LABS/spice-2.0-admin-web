@@ -32,6 +32,7 @@ const getLockedUsers = (state: AppState) => state.user.lockedUsers;
 const getLockedUsersCount = (state: AppState) => state.user.totalLockedUsers;
 const getcommunityList = (state: AppState) => state.user.communityList;
 const getLockedUsersLoading = (state: AppState) => state.user.islockedUsersLoading;
+const getDesignationList = (state: AppState) => state.user.designationList;
 
 export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
 export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
@@ -66,3 +67,4 @@ export const countryListSelector = createSelector(getCountryList, (countryList) 
 export const lockedUsers = createSelector(getLockedUsers, (users) => users);
 export const lockedUsersCount = createSelector(getLockedUsersCount, (total) => total);
 export const isLockedUserLoading = createSelector(getLockedUsersLoading, (loading) => loading);
+export const designationListSelector = createSelector(getDesignationList, (designationList) => designationList);
