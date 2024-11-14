@@ -499,6 +499,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
                     key={rowDataItem.id || rowIndex}
                     onClick={() => navigateToDetail(rowDataItem)}
                     className={handleRowStyle(isLastChild)}
+                    data-testid={`row-${rowDataItem.id || rowIndex}`}
                   >
                     {columnsDef &&
                       columnsDef.map((column: IColumns, columnIndex: number) => (

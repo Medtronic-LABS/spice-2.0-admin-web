@@ -333,7 +333,7 @@ const UserList = (): React.ReactElement => {
   return (
     <>
       {(hfUserLoading || hfUserDetailLoading || loading) && <Loader />}
-      <div className='col-12'>
+      <div className='col-12' data-testid='admins-component'>
         <DetailCard
           buttonLabel='Add Admin'
           header='Admins'

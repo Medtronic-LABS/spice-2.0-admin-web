@@ -70,12 +70,14 @@ const ModalForm = React.memo(
     const isFromCloseBtn = true;
 
     return ReactDOM.createPortal(
-      <div ref={ref} className={`${styles.modal} modal modal-show`}>
+      <div ref={ref} className={`${styles.modal} modal modal-show`} data-testId='modal-form'>
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
           <div className={`modal-content ${styles.modalContent}`}>
             {/* Modal header */}
             <div id='modal-header' className='modal-header py-1 px-1dot25 justify-content-between'>
-              <h5 className={`modal-title ${styles.modalTitle}`}>{title}</h5>
+              <h5 className={`modal-title ${styles.modalTitle}`} data-testid='modal-title'>
+                {title}
+              </h5>
               <div
                 className={`d-flex justify-content-center align-items-center ${styles.closeIcon}`}
                 onClick={() => handleCancel(isFromCloseBtn)}

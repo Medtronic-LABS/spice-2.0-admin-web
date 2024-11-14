@@ -1,115 +1,136 @@
-import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import configureMockStore from 'redux-mock-store';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import configureStore from 'redux-mock-store';
 import ChiefdomSummary from '../ChiefdomSummary';
-import OU_MOCK_DATA_CONSTANTS from '../../../tests/mockData/chiefdomDataConstants';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
+import { fetchChiefdomDetail } from '../../../store/chiefdom/actions';
+import { ReactNode } from 'react';
+import { JSX } from 'react/jsx-runtime';
 
-const mockStore = configureMockStore();
-jest.mock('../../../assets/images/edit.svg', () => ({
-  ReactComponent: 'EditIcon'
+jest.mock('../../../store/chiefdom/actions', () => ({
+  fetchChiefdomDetail: jest.fn(),
+  updateChiefdomReq: jest.fn()
+}));
+jest.mock('../../../store/healthFacility/actions', () => ({
+  createHFUserRequest: jest.fn(),
+  deleteHFUserRequest: jest.fn(),
+  updateHFUserRequest: jest.fn()
 }));
 
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useState: jest.fn().mockReturnValue([true, jest.fn()])
+jest.mock('../../../components/userForm/UserForm', () => () => {
+  return <div data-testid='mock-userForm'>userForm</div>;
+});
+
+jest.mock('../../assets/images/edit.svg', () => ({
+  ReactComponent: () => <svg data-testid='edit-icon' />
 }));
 
-jest.mock('../../../constants/appConstants', () => ({
-  ...jest.requireActual('../../../constants/appConstants'),
-  ROLES: {
-    SUPER_USER: 'SUPER_USER',
-    SUPER_ADMIN: 'SUPER_ADMIN',
-    REGION_ADMIN: 'REGION_ADMIN',
-    DISTRICT_ADMIN: 'DISTRICT_ADMIN',
-    CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN'
+const mockStore = configureStore([]);
+const renderWithProviders = (
+  ui: string | number | boolean | JSX.Element | Iterable<ReactNode> | null | undefined,
+  { store }: any = {}
+) => {
+  return render(
+    <Provider store={store}>
+      <BrowserRouter>{ui}</BrowserRouter>
+    </Provider>
+  );
+};
+
+const mockChiefdomAdmin: any = {
+  id: '1',
+  tenantId: '100',
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john.doe@example.com',
+  gender: 'Male',
+  countryCode: '+1',
+  phoneNumber: '1234567890',
+  username: 'johndoe',
+  timezone: {
+    id: '1',
+    description: 'America/New_York'
   },
-  CHIEFDOM_DELETE_CONFIRMATION: undefined
-}));
+  country: 'United States',
+  organizationName: 'Health Department',
+  roles: [{ groupName: 'SPICE', id: 'SPICE' }]
+};
 
-jest.mock('../../../hooks/tablePagination', () => ({
-  useTablePaginationHook: jest.fn(() => ({
-    listParams: {
-      page: 2,
-      rowsPerPage: 10
-    },
-    setListReqParams: jest.fn()
-  }))
-}));
-
-describe('Chiefdom Summary', () => {
+describe('ChiefdomSummary Component', () => {
   let store: any;
-  let wrapper: any;
 
   beforeEach(() => {
     store = mockStore({
       chiefdom: {
-        chiefdomDetail: OU_MOCK_DATA_CONSTANTS.CHIEFDOM_ADMIN_REQUEST_PAYLOAD,
-        admins: OU_MOCK_DATA_CONSTANTS.FETCH_CHIEFDOM_ADMINS_RESPONSE_PAYLOAD,
+        chiefdomDetail: { name: 'Test Chiefdom', districtName: 'Test District' },
+        admins: [mockChiefdomAdmin],
+        loading: false
+      },
+      user: {
+        role: [{ groupName: 'ADMIN', id: 'ADMIN' }]
+      },
+      healthFacility: {
+        peerSupervisorList: { list: [] },
+        villagesList: { list: [] },
         loading: false
       },
       district: {
-        district: {
-          id: '1',
-          clinicalWorkflow: [1],
-          users: MOCK_DATA_CONSTANTS.DISTRICT_DETAIL_RESPONSE_PAYLOAD.users,
-          name: 'districtOne',
-          maxNoOfUsers: '22',
-          tenantId: '1'
-        },
-        districtOptions: [
-          {
-            name: 'accOne',
-            id: '1',
-            tenantId: '1'
-          }
-        ],
-        loadingOptions: false
-      },
-      user: {
-        user: {
-          countryId: '1'
-        },
-        timezoneList: [
-          {
-            id: 1
-          },
-          {
-            id: 2
-          }
-        ],
-        countryList: [
-          { id: 1, countryCode: '91' },
-          {
-            id: 2,
-            countryCode: '232'
-          }
-        ]
+        loading: false
       }
     });
+    store.dispatch = jest.fn();
+  });
 
-    wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/tenant/1']}>
-          <Route path='/tenant/:tenantId'>
-            <ChiefdomSummary />
-          </Route>
-        </MemoryRouter>
-      </Provider>
+  it('renders the chiefdom details', () => {
+    renderWithProviders(<ChiefdomSummary />, { store });
+    expect(screen.getByText('Test Chiefdom')).toBeInTheDocument();
+    expect(screen.getByText('Test District')).toBeInTheDocument();
+  });
+
+  it('opens edit modal for Chiefdom when Edit button is clicked', async () => {
+    const { getAllByTestId } = renderWithProviders(<ChiefdomSummary />, { store });
+    const [editButton] = getAllByTestId('edit-icon');
+    fireEvent.click(editButton);
+    await waitFor(() => expect(screen.getByText('Edit Sub County')).toBeInTheDocument());
+  });
+
+  it('opens add admin modal when Add Chiefdom Admin button is clicked', async () => {
+    const { getAllByTestId } = renderWithProviders(<ChiefdomSummary />, { store });
+    const [addButton] = getAllByTestId('detail-card-button');
+    fireEvent.click(addButton);
+    const [expectedTitle] = screen.getAllByText('Sub County Admin');
+    await waitFor(() => expect(expectedTitle).toBeInTheDocument());
+  });
+
+  it('fetches chiefdom details on component mount', () => {
+    renderWithProviders(<ChiefdomSummary />, { store });
+    expect(fetchChiefdomDetail).toHaveBeenCalled();
+  });
+
+  it('handles search functionality', async () => {
+    renderWithProviders(<ChiefdomSummary />, { store });
+    const searchInput = screen.getByTestId('table-search-input');
+    // Simulate typing in the search box
+    fireEvent.change(searchInput, { target: { value: 'John' } });
+
+    // Ensure search triggers an expected dispatch action
+    await waitFor(() => {
+      expect(store.dispatch).toHaveBeenCalled();
+    });
+  });
+
+  it('handles admin delete action', async () => {
+    // mock chiefdom admin for delete functionality
+    const { getAllByTestId } = renderWithProviders(<ChiefdomSummary />, { store });
+
+    const [deleteButton] = getAllByTestId('delete-icon');
+    fireEvent.click(deleteButton);
+    await waitFor(() =>
+      expect(screen.getByText('Are you sure want to delete the sub county admin?')).toBeInTheDocument()
     );
-  });
-
-  it('should render CustomTable component', () => {
-    expect(wrapper.find('CustomTable')).toHaveLength(1);
-  });
-
-  it('should render DetailCard component', () => {
-    expect(wrapper.find('DetailCard')).toHaveLength(2);
-  });
-
-  it('should render ModalForm component', () => {
-    expect(wrapper.find('Memo()')).toHaveLength(2);
+    // Confirm deletion
+    const [confirmButton] = getAllByTestId('delete-ok-button');
+    fireEvent.click(confirmButton);
+    await waitFor(() => expect(store.dispatch).toHaveBeenCalled());
   });
 });

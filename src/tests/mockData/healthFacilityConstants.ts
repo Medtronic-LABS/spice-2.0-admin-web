@@ -337,6 +337,193 @@ const HF_CI_DI_CDI = {
   chiefdomId: 13
 };
 
+const mockHealthFacilityList = [
+  {
+    id: 1,
+    name: 'Central Health Facility',
+    type: 'Hospital',
+    phuFocalPersonName: 'Dr. John Doe',
+    phuFocalPersonNumber: '+123456789',
+    address: '123 Health Street, Cityville',
+    district: {
+      id: 1,
+      name: 'District 1',
+      tenantId: 1001
+    },
+    chiefdom: {
+      tenantId: '2001',
+      id: 10,
+      name: 'Chiefdom A'
+    },
+    cityName: 'Cityville',
+    latitude: '34.0522',
+    longitude: '-118.2437',
+    postalCode: '90210',
+    language: 'English',
+    tenantId: 3001,
+    peerSupervisors: [
+      {
+        id: 1,
+        firstName: 'Jane',
+        lastName: 'Smith',
+        name: 'Jane Smith',
+        tenantId: '3001',
+        roles: {
+          id: 2,
+          name: 'Supervisor',
+          displayName: 'Supervisor',
+          groupName: 'Group A',
+          suiteAccessName: 'Suite X',
+          appTypes: ['type1', 'type2']
+        }
+      }
+    ],
+    linkedVillages: [
+      {
+        id: 101,
+        name: 'Village Alpha',
+        chiefdomId: '2001',
+        countryId: 'CountryID_123',
+        districtId: 'DistrictID_456'
+      },
+      {
+        id: 102,
+        name: 'Village Beta',
+        chiefdomId: '2002',
+        countryId: 'CountryID_123',
+        districtId: 'DistrictID_456'
+      }
+    ],
+    clinicalWorkflows: [
+      {
+        id: 201,
+        name: 'Workflow Alpha',
+        moduleType: 'Clinical',
+        workflowName: 'Initial Checkup',
+        appTypes: ['type1']
+      },
+      {
+        id: 202,
+        name: 'Workflow Beta',
+        moduleType: 'Clinical',
+        workflowName: 'Follow-Up',
+        appTypes: ['type2']
+      }
+    ],
+    workflows: [201, 202],
+    customizedWorkflows: [
+      {
+        id: 203,
+        name: 'Custom Workflow Alpha',
+        moduleType: 'Clinical',
+        workflowName: 'Custom Initial Checkup',
+        appTypes: ['type3']
+      }
+    ],
+    defaultTrueWorkflows: [
+      {
+        id: 204,
+        name: 'Default Workflow Alpha',
+        moduleType: 'Clinical',
+        workflowName: 'Emergency Handling',
+        appTypes: ['type1', 'type2']
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: 'New Whales Health Facility',
+    type: 'Hospital',
+    phuFocalPersonName: 'Dr. Jermi Vel',
+    phuFocalPersonNumber: '+123456789',
+    address: '123 Health Street, billiyVile',
+    district: {
+      id: 1,
+      name: 'District 1',
+      tenantId: 1001
+    },
+    chiefdom: {
+      tenantId: '2001',
+      id: 10,
+      name: 'Chiefdom A'
+    },
+    cityName: 'billiyVile',
+    latitude: '34.0522',
+    longitude: '-118.2437',
+    postalCode: '90210',
+    language: 'English',
+    tenantId: 3001,
+    peerSupervisors: [
+      {
+        id: 1,
+        firstName: 'Robert',
+        lastName: 'Smith',
+        name: 'Robert Smith',
+        tenantId: '3001',
+        roles: {
+          id: 2,
+          name: 'Supervisor',
+          displayName: 'Supervisor',
+          groupName: 'Group A',
+          suiteAccessName: 'Suite X',
+          appTypes: ['type1', 'type2']
+        }
+      }
+    ],
+    linkedVillages: [
+      {
+        id: 101,
+        name: 'Village Alpha',
+        chiefdomId: '2001',
+        countryId: 'CountryID_123',
+        districtId: 'DistrictID_456'
+      },
+      {
+        id: 102,
+        name: 'Village Beta',
+        chiefdomId: '2002',
+        countryId: 'CountryID_123',
+        districtId: 'DistrictID_456'
+      }
+    ],
+    clinicalWorkflows: [
+      {
+        id: 201,
+        name: 'Workflow Alpha',
+        moduleType: 'Clinical',
+        workflowName: 'Initial Checkup',
+        appTypes: ['type1']
+      },
+      {
+        id: 202,
+        name: 'Workflow Beta',
+        moduleType: 'Clinical',
+        workflowName: 'Follow-Up',
+        appTypes: ['type2']
+      }
+    ],
+    workflows: [201, 202],
+    customizedWorkflows: [
+      {
+        id: 203,
+        name: 'Custom Workflow Alpha',
+        moduleType: 'Clinical',
+        workflowName: 'Custom Initial Checkup',
+        appTypes: ['type3']
+      }
+    ],
+    defaultTrueWorkflows: [
+      {
+        id: 204,
+        name: 'Default Workflow Alpha',
+        moduleType: 'Clinical',
+        workflowName: 'Emergency Handling',
+        appTypes: ['type1', 'type2']
+      }
+    ]
+  }
+];
+
 export {
   HF_LIST_FETCH_PAYLOAD,
   HF_LIST,
@@ -358,5 +545,6 @@ export {
   HF_CI_DI,
   HF_CI_DI_CDI,
   HF_IDS_TI,
-  HF_DASHBOARD_LIST
+  HF_DASHBOARD_LIST,
+  mockHealthFacilityList
 };

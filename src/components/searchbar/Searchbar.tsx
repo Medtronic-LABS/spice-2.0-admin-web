@@ -33,6 +33,7 @@ const Searchbar = ({ placeholder, onSearch, isOutlined = true }: ISearchbarProps
         placeholder={placeholder || 'Search'}
         onChange={onChange}
         value={searchText}
+        data-testid={'table-search-input'}
       />
       <img src={SearchIcon} alt='' />
     </div>

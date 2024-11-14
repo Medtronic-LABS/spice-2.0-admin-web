@@ -292,11 +292,13 @@ const HealthFacilityList = (): React.ReactElement => {
     const url = ((regionId && PROTECTED_ROUTES.createHealthFacilityByRegion) ||
       (districtId && PROTECTED_ROUTES.createHealthFacilityByDistrict) ||
       (chiefdomId && PROTECTED_ROUTES.createHealthFacilityByChiefdom)) as string;
-    history.push(
-      url
-        .replace(':tenantId', tenantId)
-        .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
-    );
+    if (url) {
+      history.push(
+        url
+          .replace(':tenantId', tenantId)
+          .replace(/(:regionId)|(:districtId)|(:chiefdomId)/, (regionId || chiefdomId || districtId) as string)
+      );
+    }
   };
 
   /**
@@ -308,32 +310,6 @@ const HealthFacilityList = (): React.ReactElement => {
       PROTECTED_ROUTES.healthFacilitySummary.replace(':healthFacilityId', data.id).replace(':tenantId', data.tenantId)
     );
   };
-
-  /**
-   * Handles the health facility delete event
-   * @param {Object} param0 - The delete parameters
-   * @param {Object} param0.data - The health facility data
-   */
-  const handleHFDelete = useCallback(
-    ({ data: { id, tenantId: hfTenantId } }: { data: { id: number; tenantId: number } }) => {
-      dispatch(
-        deleteHealthFacilityRequest({
-          data: {
-            id,
-            tenantId: hfTenantId
-          },
-          successCb: () => {
-            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DELETE_SUCCESS);
-            fetchList();
-          },
-          failureCb: (e) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_DELETE_FAIL));
-          }
-        })
-      );
-    },
-    [dispatch, fetchList]
-  );
 
   return (
     <>
@@ -382,7 +358,6 @@ const HealthFacilityList = (): React.ReactElement => {
             rowsPerPage={listParams.rowsPerPage}
             count={healthFacilityCount}
             onRowEdit={openEditDialogue}
-            onDeleteClick={handleHFDelete}
             handlePageChange={handlePage}
             handleRowClick={handleRowClick}
             confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION}

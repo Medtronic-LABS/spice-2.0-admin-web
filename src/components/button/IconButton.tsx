@@ -68,6 +68,7 @@ const IconButton = ({
       style={buttonCustomStyle?.iconStyle}
       className={`btn primary-btn ${styles.iconButton} ${buttonCustomClass}`}
       onClick={handleClick}
+      data-testid='detail-card-button'
     >
       {buttonIconElmt()}
       <span style={buttonCustomStyle?.textStyle} className={styles.btnLabel + ' ' + buttonCustomClass}>
