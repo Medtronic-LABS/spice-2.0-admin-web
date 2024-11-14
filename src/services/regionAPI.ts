@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { IFetchRegionDetailReqPayload, IRegionPayload } from '../store/region/types';
 
-export const uploadFile = (file: any,appTypes:string) => {
+export const uploadFile = (file: any, appTypes: string) => {
   const data = new FormData();
   data.append('file', file);
-  // data.append('appTypes', appTypes);
+  data.append('appTypes', appTypes);
   return axios({
     method: 'POST',
     url: '/admin-service/region-details/upload-file',
@@ -18,8 +18,8 @@ export const downloadFile = (countryId: number, appTypes: string[]) => {
     url: '/admin-service/region-details/download-file',
     responseType: 'blob',
     data: {
-      countryId
-      // appTypes
+      countryId,
+      appTypes
     }
   });
 };
