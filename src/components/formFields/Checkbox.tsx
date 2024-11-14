@@ -22,6 +22,7 @@ const Checkbox = ({ label, readOnly, switchCheckbox, ...inputProps }: ICheckboxP
       className={`d-inline-flex align-items-center ${styles.checkboxLabel} ${
         switchCheckbox && 'pt-1dot75 pb-1dot5 h-100'
       } ${switchCheckbox && styles.clSwitch} ${readOnly ? styles.disabled : ''}`}
+      data-testid='checkbox'
     >
       <div className={`${switchCheckbox && 'd-inline-flex align-items-center'}`}>
         {switchCheckbox && <span className={styles.checkboxLabelText}>{label}</span>}

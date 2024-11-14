@@ -30,7 +30,8 @@ describe('RadioGroup Container Test Cases', () => {
         optionsList: [],
         orientation: 0,
         errorMessage: '',
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });
@@ -50,7 +51,8 @@ describe('RadioGroup Container Test Cases', () => {
         errorMessage: {},
         isEnabled: {},
         isEditable: {},
-        unitMeasurement: {}
+        unitMeasurement: {},
+        isEnrollment: {}
       });
     });
   });

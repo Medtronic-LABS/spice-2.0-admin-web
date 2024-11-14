@@ -30,7 +30,8 @@ describe('EditTextConfig', () => {
       inputType: -1,
       isNotDefault: true,
       minLength: undefined,
-      maxLength: undefined
+      maxLength: undefined,
+      isEnrollment: true
     });
   });
 
@@ -71,6 +72,12 @@ describe('EditTextConfig', () => {
     };
     if (EDIT_TEXT_CONFIG.getJSON) {
       expect(EDIT_TEXT_CONFIG.getJSON(json)).toEqual(expectedJson);
+    }
+
+    if (EDIT_TEXT_CONFIG.getJSON) {
+      expect(EDIT_TEXT_CONFIG.getJSON({ ...json, fieldName: { label: 'Test Field Name' }, id: null })).toEqual(
+        expectedJson
+      );
     }
   });
 });

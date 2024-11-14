@@ -28,7 +28,8 @@ describe('Age Container Test Cases', () => {
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         hint: undefined,
         disableFutureDate: true,
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });
@@ -45,7 +46,8 @@ describe('Age Container Test Cases', () => {
         isEnabled: {},
         visibility: {},
         isEditable: {},
-        unitMeasurement: {}
+        unitMeasurement: {},
+        isEnrollment: {}
       });
     });
   });

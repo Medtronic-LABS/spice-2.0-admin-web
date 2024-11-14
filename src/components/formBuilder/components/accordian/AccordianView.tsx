@@ -133,7 +133,7 @@ const AccordianHeader = ({
     return [...creatableViews];
   };
   return (
-    <div className='row g-0 w-100'>
+    <div className='row g-0 w-100' data-testid='accordian-header'>
       <div className='col-lg-8 col-7'>{currentFamilyGroup[familyName].title}</div>
       {collapsedGroup[familyName as keyof typeof collapsedGroup] && (
         <div className='col-lg-4 col-5 d-flex justify-content-end'>
@@ -144,6 +144,7 @@ const AccordianHeader = ({
               id='edit-field-order'
               data-bs-toggle='dropdown'
               aria-expanded='false'
+              aria-label='edit-field-order'
               disabled={Object.keys(currentFamilyGroup).length < 3}
               onClick={() => setEditGroupedFieldsOrder({ isOpen: true, familyName })}
             >
@@ -157,6 +158,7 @@ const AccordianHeader = ({
                 id='newfieldoptions'
                 data-bs-toggle='dropdown'
                 aria-expanded='false'
+                aria-label='add-new-field'
                 disabled={addNewFieldDisabled}
               >
                 <img className='me-0dot5' width='14' height='14' src={plusIcon} alt='plus-icon' />
@@ -176,6 +178,7 @@ const AccordianHeader = ({
                           e.preventDefault();
                           handleAddNewField(familyName, view.value);
                         }}
+                        aria-label={view.label}
                       >
                         {view.label}
                       </button>
@@ -227,7 +230,7 @@ const AccordianBody = ({
     return false;
   };
   return (
-    <div className='row'>
+    <div className='row' data-testid='accordian-body'>
       {Object.keys(currentFamilyGroup)
         .sort(
           (fieldA: string, fieldB: string) =>
@@ -268,8 +271,9 @@ const AccordianBody = ({
                     <div
                       onClick={() => handleDeleteField(familyName, fieldGroupName)}
                       className='pointer d-flex align-items-center'
+                      data-testid='delete-field-icon'
                     >
-                      <img className='me-0dot5' title='Delete' src={BinIcon} alt='' />
+                      <img className='me-0dot5' title='Delete' src={BinIcon} alt='delete' />
                       <span className={`${styles.customizationFont}`}>Delete</span>
                     </div>
                   </div>
@@ -597,7 +601,7 @@ const AccordianView = ({
   };
 
   return (
-    <div className={`${styles.formBuilderViewTwo} container-fluid px-0 w-100`}>
+    <div className={`${styles.formBuilderViewTwo} container-fluid px-0 w-100`} data-testid='accordian-view'>
       <Form
         mutators={{
           ...arrayMutators,

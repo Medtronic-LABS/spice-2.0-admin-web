@@ -37,7 +37,7 @@ const Accordian = ({ header, body, collapsed, defaultCollapsed, onToggle: onTogg
     onToggleProps?.();
   };
   return (
-    <div className='accordion'>
+    <div className='accordion' data-testid='accordian'>
       <div className='accordion-item'>
         <div
           className={`accordion-header ${show ? styles.headerBorder : styles.headerBorderonHide}`}

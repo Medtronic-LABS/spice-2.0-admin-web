@@ -1,5 +1,5 @@
-import { mount } from 'enzyme';
 import EDIT_TEXT_CONFIG from '../EditText';
+import { render } from '@testing-library/react';
 
 describe('EditTextConfig', () => {
   let editTextFields: any;
@@ -9,7 +9,7 @@ describe('EditTextConfig', () => {
   });
 
   it('should render without errors', () => {
-    const wrapper = mount(<div />);
+    const wrapper = render(<div />);
     expect(wrapper).toBeDefined();
   });
 
@@ -121,6 +121,19 @@ describe('getJSON function', () => {
     if (EDIT_TEXT_CONFIG.getJSON) {
       const result: any = EDIT_TEXT_CONFIG.getJSON(json);
       expect(result.maxValue).toBeUndefined();
+    }
+  });
+
+  it('should render ranges with no empty values', () => {
+    const json = {
+      id: '1',
+      title: 'Title',
+      fieldName: { label: 'Field Name' },
+      ranges: ['1', '2', '']
+    };
+    if (EDIT_TEXT_CONFIG.getJSON) {
+      const result: any = EDIT_TEXT_CONFIG.getJSON(json);
+      expect(result.ranges).toEqual(['1', '2']);
     }
   });
 });

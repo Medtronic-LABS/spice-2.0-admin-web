@@ -1,14 +1,11 @@
-import React from 'react';
-import { mount } from 'enzyme';
 import FormContainer from '../FormContainer';
+import { render, screen } from '@testing-library/react';
 
 describe('FormContainer', () => {
-  let wrapper: any;
-
   beforeEach(() => {
-    wrapper = mount(
+    render(
       <FormContainer label='Form Label' icon='test-icon.png'>
-        <div className='test-child' />
+        <div data-testid='test-child' />
       </FormContainer>
     );
   });
@@ -18,26 +15,33 @@ describe('FormContainer', () => {
   });
 
   it('renders the header tag with the correct text', () => {
-    const header = wrapper.find('header');
-    expect(header.text()).toEqual('Form Label');
-    expect(wrapper.find('header')).toHaveLength(1);
+    const header = screen.getByRole('banner');
+    expect(header).toHaveTextContent('Form Label');
+    expect(screen.getByRole('banner')).toBeInTheDocument();
   });
 
   it('renders an icon when provided', () => {
-    const img = wrapper.find('img');
-    expect(wrapper.find('img')).toHaveLength(1);
-    expect(img.prop('src')).toEqual('test-icon.png');
+    const img = screen.getByRole('img') as HTMLImageElement;
+    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(img.src).toContain('test-icon.png');
   });
 
   it('renders a label when provided', () => {
     const label = 'Form Label';
-    const bTag = wrapper.find('b');
-    expect(bTag.text()).toEqual(label);
-    expect(wrapper.find('b')).toHaveLength(1);
+    const bTag = screen.getByText(label);
+    expect(bTag).toHaveTextContent(label);
   });
 
   it('renders a className when provided', () => {
-    expect(wrapper.find('.test-child')).toHaveLength(1);
-    expect(wrapper.find('.test-child').exists()).toBe(true);
+    expect(screen.getByTestId('test-child')).toBeInTheDocument();
+  });
+
+  it('renders required label witout image icon', () => {
+    render(
+      <FormContainer label='Form Label' required={true}>
+        <div data-testid='test-child' />
+      </FormContainer>
+    );
+    expect(screen.getByText('*')).toBeInTheDocument();
   });
 });

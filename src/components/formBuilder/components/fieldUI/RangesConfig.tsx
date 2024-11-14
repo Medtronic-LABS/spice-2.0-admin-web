@@ -230,7 +230,7 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
   };
 
   return (
-    <div className='col-4 col-12'>
+    <div className='col-4 col-12' data-testid='ranges-config-wrapper'>
       <div className='d-flex align-items-center '>
         <div
           className={`d-flex mt-1 mb-0dot5 theme-text lh-1dot25 ${!!obj.fieldName ? 'pointer' : 'not-allowed'}`}
@@ -311,6 +311,7 @@ const RangesConfig = ({ name, obj, field, form }: any) => {
                             onClick={() => {
                               fields.push(initialValue);
                             }}
+                            data-testid='add-new-range-plus-icon'
                           >
                             <CustomTooltip title='Add'>
                               <img className={`me-0dot5`} src={PlusIcon} alt='plus-icon' />

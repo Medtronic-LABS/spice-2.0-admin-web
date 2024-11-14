@@ -156,7 +156,12 @@ export const ReorderModel = ({
                 <button type='button' className='btn secondary-btn me-0dot625 px-1dot125 ms-auto' onClick={onCancel}>
                   Cancel
                 </button>
-                <button type='button' className='btn primary-btn px-1dot75' onClick={onSubmit}>
+                <button
+                  type='button'
+                  className='btn primary-btn px-1dot75'
+                  data-testid='confirm-btn'
+                  onClick={onSubmit}
+                >
                   Confirm
                 </button>
               </div>

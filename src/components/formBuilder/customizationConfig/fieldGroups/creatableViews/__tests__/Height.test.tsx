@@ -19,7 +19,8 @@ describe('HEIGHT_CONFIG', () => {
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
         condition: [],
         errorMessage: '',
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });
@@ -36,7 +37,8 @@ describe('HEIGHT_CONFIG', () => {
         condition: {},
         fieldName: {},
         isEditable: {},
-        unitMeasurement: {}
+        unitMeasurement: {},
+        isEnrollment: {}
       });
     });
   });
@@ -73,6 +75,11 @@ describe('HEIGHT_CONFIG', () => {
       };
       if (HEIGHT_CONFIG.getJSON) {
         const result = HEIGHT_CONFIG.getJSON(input);
+        expect(result).toEqual(expected);
+      }
+
+      if (HEIGHT_CONFIG.getJSON) {
+        const result = HEIGHT_CONFIG.getJSON({ ...input, fieldName: 'Height' });
         expect(result).toEqual(expected);
       }
     });

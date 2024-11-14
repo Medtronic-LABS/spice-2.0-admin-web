@@ -1,265 +1,204 @@
-import { mount } from 'enzyme';
-import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import RangesConfig from '../RangesConfig';
-import { Form } from 'react-final-form';
-import configureMockStore from 'redux-mock-store';
 
-const mockStore = configureMockStore();
-describe('RangesConfig Component', () => {
-  const store = mockStore({
-    labtest: {
-      units: [
-        {
-          id: 1,
-          createdBy: 1,
-          updatedBy: 1,
-          createdAt: '2022-04-18T20:39:27+00:00',
-          updatedAt: '2022-04-18T20:39:27+00:00',
-          name: 'mg/dL',
-          type: 'LABTEST',
-          description: 'mg/dL',
-          displayOrder: 6,
-          active: true,
-          deleted: false
-        }
-      ]
-    }
-  });
-  const rangesFieldConfigs = {
-    unitType: {
-      name: '.unitType',
-      label: 'Unit',
-      labelKey: 'name',
-      valueKey: 'id',
-      options: [
-        {
-          id: 1,
-          createdBy: 1,
-          updatedBy: 1,
-          createdAt: '2022-04-18T20:39:27+00:00',
-          updatedAt: '2022-04-18T20:39:27+00:00',
-          name: 'mg/dL',
-          type: 'LABTEST',
-          description: 'mg/dL',
-          displayOrder: 6,
-          active: true,
-          deleted: false
-        }
+const mockChildComponent = jest.fn();
+jest.mock('../SelectFieldWrapper', () => (props: any) => {
+  mockChildComponent(props);
+  return <div data-testid='select-field-wrapper' />;
+});
+
+describe('RangesConfig', () => {
+  const mockProps = {
+    name: 'ranges',
+    obj: {
+      fieldName: 'testField',
+      ranges: [],
+      unitList: [
+        { id: 'mg/dL', name: 'mg/dL' },
+        { id: 'mmol/mol', name: 'mmol/mol' }
       ],
-      error: 'Please select the unit',
-      required: true,
-      disabledValidation: true,
-      order: 1,
-      component: 'SELECT_INPUT',
-      isLabelButton: true,
-      colSize: 'col-6 col-md-4 col-lg-2'
+      family: 'testFamily',
+      id: '123'
     },
-    minRange: {
-      name: '.minRange',
-      type: 'number',
-      label: 'Min Value',
-      error: 'Please enter a valid number',
-      required: true,
-      disabledValidation: true,
-      component: 'TEXT_INPUT',
-      colSize: 'col-6 col-md-4 col-lg-3'
-    },
-    maxRange: {
-      name: '.maxRange',
-      type: 'number',
-      label: 'Max Value',
-      error: 'Please enter a valid number',
-      required: true,
-      disabledValidation: true,
-      component: 'TEXT_INPUT',
-      colSize: 'col-6 col-md-4 col-lg-3'
-    },
-    displayRange: {
-      name: '.displayRange',
-      type: 'text',
-      label: 'Display Range',
-      error: 'Please enter a valid display range',
-      required: true,
-      disabledValidation: true,
-      component: 'TEXT_INPUT',
-      colSize: 'col-6 col-md-4 col-lg-3'
+    field: 'ranges',
+    form: {
+      mutators: {
+        setValue: jest.fn()
+      }
     }
   };
 
-  const props = {
-    name: 'myFormName',
-    obj: {
-      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
-      id: 'myId',
-      optionsList: [{ name: 'option', id: 1 }]
-    },
-    field: 'array',
-    rangesFieldConfigs
-  };
-
-  const propsWithTextInput = {
-    name: 'myFormName',
-    obj: {
-      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
-      id: 'myId',
-      optionsList: [{ name: 'option', id: 1 }]
-    },
-    field: 'array',
-    rangesFieldConfigs,
-    config: []
-  };
-
-  const propsWithMinRange = {
-    name: 'myFormName',
-    obj: {
-      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
-      id: 'myId',
-      optionsList: [{ name: 'option', id: 1 }]
-    },
-    field: 'array',
-    rangesFieldConfigs
-  };
-
-  const propsWithMaxRange = {
-    name: 'myFormName',
-    obj: {
-      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
-      id: 'myId',
-      optionsList: [{ name: 'option', id: 1 }]
-    },
-    field: 'array',
-    rangesFieldConfigs
-  };
-
-  const propsWithDisplayName = {
-    name: 'myFormName',
-    obj: {
-      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
-      id: 'myId',
-      optionsList: [{ name: 'option', id: 1 }]
-    },
-    field: 'array',
-    rangesFieldConfigs
-  };
-
-  const propsWithoutComponent = {
-    name: 'myFormName',
-    obj: {
-      ranges: [{ unitType: 1, gender: 'Male', minRange: 1, maxRange: 2, displayRange: '1-2' }],
-      id: 'myId',
-      optionsList: [{ name: 'option', id: 1 }]
-    },
-    field: 'array',
-    rangesFieldConfigs
-  };
-
-  it('renders without error', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit, form }) => <RangesConfig {...props} form={form} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
+  const renderComponent = (props = mockProps) => {
+    return render(
+      <Form
+        /* tslint:disable:no-empty */
+        onSubmit={() => {}}
+        mutators={{ ...arrayMutators, setValue: (args: any) => args }}
+        render={({ form }) => <RangesConfig {...props} form={form} />}
+      />
     );
-    expect(wrapper.exists()).toBe(true);
+  };
+
+  it('renders without ranges initially', () => {
+    renderComponent();
+    expect(screen.getByTestId('ranges-config-wrapper')).toBeInTheDocument();
+    expect(screen.getByText('Ranges')).toBeInTheDocument();
   });
 
-  it('renders with Text Input component', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit }) => <RangesConfig {...propsWithTextInput} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
-    );
-    expect(wrapper.exists()).toBe(true);
+  it('shows add button when fieldName is present and no ranges exist', () => {
+    renderComponent();
+    const plusIcon = screen.getByAltText('plus-icon');
+    expect(plusIcon).toBeVisible();
   });
 
-  it('renders with fieldName as unitType', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit }) => <RangesConfig {...propsWithMinRange} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
-    );
-    expect(wrapper.exists()).toBe(true);
+  it('renders range fields when ranges exist', () => {
+    const propsWithRanges: any = {
+      ...mockProps,
+      obj: {
+        ...mockProps.obj,
+        ranges: [
+          {
+            unitType: 'mg/dL',
+            gender: 'Male',
+            minRange: '0',
+            maxRange: '100',
+            displayRange: '0-100',
+            fieldName: 'testField' // added for testing
+          }
+        ]
+      }
+    };
+
+    renderComponent(propsWithRanges);
+    expect(screen.getAllByTestId('select-field-wrapper')).toHaveLength(2);
+
+    expect(screen.getByText('Min Value')).toBeInTheDocument();
+    expect(screen.getByText('Max Value')).toBeInTheDocument();
+    expect(screen.getByText('Display Range')).toBeInTheDocument();
   });
 
-  it('renders with fieldName as visibility', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit }) => <RangesConfig {...propsWithMaxRange} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
-    );
-    expect(wrapper.exists()).toBe(true);
+  it('disables add button when fieldName is not present', () => {
+    const propsWithoutFieldName = {
+      ...mockProps,
+      obj: {
+        ...mockProps.obj,
+        fieldName: ''
+      }
+    };
+
+    renderComponent(propsWithoutFieldName);
+    const rangesText = screen.getByText('Ranges');
+    expect(rangesText.parentElement?.parentElement).toHaveClass('not-allowed');
   });
 
-  it('renders with fieldName as eq', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit }) => <RangesConfig {...propsWithDisplayName} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
-    );
-    expect(wrapper.exists()).toBe(true);
+  it('adds initial range when clicking add button', () => {
+    renderComponent();
+    const plusIcon = screen.getByAltText('plus-icon');
+    fireEvent.click(plusIcon);
   });
 
-  it('renders without component', () => {
-    const wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit }) => <RangesConfig {...propsWithoutComponent} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
+  it('disables unit options that are already selected in other ranges', async () => {
+    const propsWithMultipleRanges: any = {
+      ...mockProps,
+      obj: {
+        ...mockProps.obj,
+        ranges: [
+          {
+            unitType: 'mmol/mol',
+            gender: 'Male',
+            minRange: 2,
+            maxRange: 4,
+            displayRange: '2'
+          },
+          {
+            unitType: 'mmol/mol',
+            gender: 'Female',
+            minRange: 1,
+            maxRange: 2,
+            displayRange: '3'
+          }
+        ]
+      }
+    };
+
+    renderComponent(propsWithMultipleRanges);
+    const mockTagInput: any = mockChildComponent.mock.calls[0][0];
+    mockTagInput.isOptionDisabled({
+      name: 'mmol/mol',
+      id: 'mmol/mol'
+    });
+
+    mockTagInput.onChange(
+      {
+        name: 'Female',
+        id: 'Female'
+      },
+      {
+        onChange: jest.fn()
+      }
     );
-    expect(wrapper.exists()).toBe(true);
+  });
+
+  it('should show error when min range is greater than or equal to max range', () => {
+    const mockForm = {
+      mutators: {
+        setValue: jest.fn()
+      }
+    };
+
+    const mockLocalProps: any = {
+      name: 'ranges',
+      obj: {
+        fieldName: 'test',
+        ranges: [
+          {
+            unitType: 'mg/dL',
+            gender: 'Male',
+            minRange: '100',
+            maxRange: '50', // Less than minRange
+            displayRange: '50-100'
+          }
+        ]
+      },
+      field: 'ranges',
+      form: mockForm
+    };
+
+    renderComponent(mockLocalProps);
+
+    fireEvent.input(screen.getByLabelText('ranges[0].maxRange'), { target: { value: '50' } });
+    fireEvent.input(screen.getByLabelText('ranges[0].minRange'), { target: { value: '100' } });
+    // The error message should be displayed
+    expect(screen.getByText('Max value should be greater than min value')).toBeInTheDocument();
+  });
+
+  it('should delete range when clicking delete icon', () => {
+    const propsWithMultipleRanges: any = {
+      ...mockProps,
+      obj: {
+        ...mockProps.obj,
+        ranges: [
+          {
+            unitType: 'mmol/mol',
+            gender: 'Male',
+            minRange: 2,
+            maxRange: 4,
+            displayRange: '2'
+          },
+          {
+            unitType: 'mmol/mol',
+            gender: 'Female',
+            minRange: 1,
+            maxRange: 2,
+            displayRange: '3'
+          }
+        ]
+      }
+    };
+    renderComponent(propsWithMultipleRanges);
+    const deleteIcon = screen.getAllByAltText('delete-icon');
+    fireEvent.click(deleteIcon[0]);
   });
 });

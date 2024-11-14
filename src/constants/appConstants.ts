@@ -418,7 +418,6 @@ const APPCONSTANTS = {
     'November',
     'December'
   ],
-  DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION: ['fieldName', 'title', 'optionsList', 'inputType'],
   CUSTOMIZATION_FORM_CATEGORY: 'Input_form',
   levelBasedAdminRole: {
     REGION_ADMIN_LEVEL: 10,

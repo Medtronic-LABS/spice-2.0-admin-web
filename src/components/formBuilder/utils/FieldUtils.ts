@@ -8,7 +8,6 @@ import TEXT_LABEL_CONFIG from '../labTestConfig/fieldGroups/TextLabel';
 import { IComponentConfig } from '../types/ComponentConfig';
 import DATE_PICKER_CONFIG from '../labTestConfig/fieldGroups/creatableViews/DatePickerView';
 
-
 export const creatableViews = [
   { label: 'Text', value: 'EditText' },
   { label: 'Dropdown', value: 'Spinner' }

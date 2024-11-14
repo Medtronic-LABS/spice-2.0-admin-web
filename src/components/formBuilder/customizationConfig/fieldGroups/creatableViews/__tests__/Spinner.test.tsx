@@ -31,7 +31,8 @@ describe('Spinner Container Test Cases', () => {
         optionsList: [],
         errorMessage: '',
         defaultValue: '',
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });
@@ -51,7 +52,8 @@ describe('Spinner Container Test Cases', () => {
         condition: {},
         errorMessage: {},
         isEditable: {},
-        unitMeasurement: {}
+        unitMeasurement: {},
+        isEnrollment: {}
       });
     });
   });

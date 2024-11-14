@@ -28,7 +28,6 @@ describe('Spinner Container Test Cases', () => {
         hint: '',
         optionsList: [],
         errorMessage: '',
-        defaultValue: '',
         isDefault: false,
         isResult: true
       });
@@ -40,14 +39,10 @@ describe('Spinner Container Test Cases', () => {
       const customizableFieldMeta: IBaseFieldMeta = DROPDOWN_CONFIG.customizableFieldMeta;
 
       expect(customizableFieldMeta).toEqual({
-        visibility: {},
-        isEnabled: {},
         isMandatory: {},
-        defaultValue: {},
         title: {},
         fieldName: {},
         optionsList: {},
-        errorMessage: {},
         isEditable: {},
         code: {},
         isResult: {},

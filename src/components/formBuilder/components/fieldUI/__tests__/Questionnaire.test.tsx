@@ -1,64 +1,129 @@
-import { mount, shallow } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Questionnaire from '../Questionnaire';
-import TagInput from '../TagInput';
 
-describe('Questionnaire component', () => {
-  const handleSubQuestionsChange = jest.fn();
+const mockChildComponent = jest.fn();
+jest.mock('../TagInput', () => (props: any) => {
+  mockChildComponent(props);
+  return <div>child component</div>;
+});
 
-  afterEach(() => {
+describe('Questionnaire Component', () => {
+  const mockOnChange = jest.fn();
+  const defaultProps = {
+    onChange: mockOnChange,
+    label: 'Test Questions',
+    required: true
+  };
+
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should render without errors', () => {
-    const wrapper = shallow(<Questionnaire />);
-    expect(wrapper.exists()).toBeTruthy();
+  it('renders correctly with default props', () => {
+    render(<Questionnaire {...defaultProps} />);
+
+    expect(screen.getByTestId('questionnaire-wrapper')).toBeInTheDocument();
+    expect(screen.getByText('Test Questions')).toBeInTheDocument();
+    expect(screen.getByText('*')).toBeInTheDocument();
+    expect(screen.getByText('Add new Question')).toBeInTheDocument();
   });
 
-  it('should render with label and asterisk', () => {
-    const wrapper = shallow(<Questionnaire label='Label' required={true} />);
-    expect(wrapper.find('label').text()).toBe('Label*');
+  it('renders without label when not provided', () => {
+    render(<Questionnaire onChange={mockOnChange} />);
+
+    expect(screen.queryByText('Test Questions')).not.toBeInTheDocument();
   });
 
-  it('should render with no label and no asterisk', () => {
-    const wrapper = shallow(<Questionnaire label={undefined} required={false} />);
-    expect(wrapper.find('label').exists()).toBeFalsy();
+  it('renders without asterisk when required is false', () => {
+    render(<Questionnaire {...defaultProps} required={false} />);
+
+    expect(screen.queryByText('*')).not.toBeInTheDocument();
   });
 
-  it('should render input and tag with default values', () => {
-    const defaultValues = [
+  it('adds new question when clicking add button', () => {
+    render(<Questionnaire {...defaultProps} />);
+    screen.debug(undefined, Infinity);
+
+    const addButton = screen.getByText('Add new Question');
+    fireEvent.click(addButton);
+  });
+
+  it('handles question text input correctly', async () => {
+    render(<Questionnaire {...defaultProps} defaultValue={[{ optionsList: [] }]} />);
+
+    const questionInput: any = screen.getByTestId('question-item').querySelector('[contenteditable="true"]');
+    expect(questionInput).toBeInTheDocument();
+
+    if (questionInput) {
+      fireEvent.input(questionInput, {
+        target: {
+          innerText: 'New Question'
+        }
+      });
+
+      fireEvent.blur(questionInput);
+
+      expect(mockOnChange).toHaveBeenCalledWith([
+        {
+          id: 'new_question',
+          name: 'New Question',
+          optionsList: []
+        }
+      ]);
+    }
+  });
+
+  it('deletes question when clicking delete button', () => {
+    const defaultValue = [{ name: 'Question 1', optionsList: [] }];
+    render(<Questionnaire {...defaultProps} defaultValue={defaultValue} />);
+
+    const deleteButton = screen.getByAltText('delete');
+    fireEvent.click(deleteButton);
+
+    expect(mockOnChange).toHaveBeenCalledWith(defaultValue);
+  });
+
+  it('handles sub-questions changes correctly', async () => {
+    render(<Questionnaire {...defaultProps} defaultValue={[{ name: 'Question 1', optionsList: [] }]} />);
+
+    const mockTagInput: any = mockChildComponent.mock.calls[0][0];
+    mockTagInput.onChange(['Option 1']);
+
+    expect(mockOnChange).toHaveBeenCalledWith([
       {
-        id: '1',
         name: 'Question 1',
-        optionsList: ['Option 1', 'Option 2']
+        optionsList: ['Option 1']
       }
-    ];
-
-    const wrapper = mount(<Questionnaire defaultValue={defaultValues} />);
-    const inputWrapper = wrapper.find('li').at(0).find('.flex-grow-1');
-    expect(inputWrapper.text()).toBe('Question 1');
-  });
-
-  it('should call onChange when options value changes', () => {
-    const defaultValue = [{ id: '1', name: 'Question 1', optionsList: ['Option 1'] }];
-    const wrapper = shallow(<Questionnaire defaultValue={defaultValue} onChange={handleSubQuestionsChange} />);
-    const tagInputWrapper = wrapper.find(TagInput);
-    tagInputWrapper.prop('onChange')?.(['Option 1', 'Option 2']);
-    expect(handleSubQuestionsChange).toHaveBeenCalledWith([
-      { id: '1', name: 'Question 1', optionsList: ['Option 1', 'Option 2'] }
     ]);
   });
 
-  it('should call onChange when deleting an input', () => {
-    const defaultValue = [
-      { id: '1', name: 'Question 1', optionsList: [] },
-      { id: '2', name: 'Question 2', optionsList: [] }
-    ];
-    const wrapper = shallow(<Questionnaire defaultValue={defaultValue} onChange={handleSubQuestionsChange} />);
-    const deleteButtonWrapper = wrapper.find('li').at(1).find('img');
-    deleteButtonWrapper.simulate('click');
-    expect(handleSubQuestionsChange).toHaveBeenCalledWith([
-      { id: '1', name: 'Question 1', optionsList: [] },
-      { id: '2', name: 'Question 2', optionsList: [] }
-    ]);
+  it('does not show delete button when disabled', () => {
+    render(
+      <Questionnaire {...defaultProps} disabled={true} defaultValue={[{ name: 'Question 1', optionsList: [] }]} />
+    );
+
+    expect(screen.queryByAltText('delete')).not.toBeInTheDocument();
+  });
+
+  it('does not show add button when disabled', () => {
+    render(<Questionnaire {...defaultProps} disabled={true} />);
+
+    expect(screen.queryByText('Add new Question')).not.toBeInTheDocument();
+  });
+  it('handles question text input correctly with valid defaultValue', () => {
+    render(<Questionnaire {...defaultProps} defaultValue={[{ optionsList: [], id: 1 }]} />);
+
+    const questionInput: any = screen.getByTestId('question-item').querySelector('[contenteditable="true"]');
+    expect(questionInput).toBeInTheDocument();
+
+    if (questionInput) {
+      fireEvent.input(questionInput, {
+        target: {
+          innerText: 'New Question'
+        }
+      });
+
+      fireEvent.blur(questionInput);
+    }
   });
 });

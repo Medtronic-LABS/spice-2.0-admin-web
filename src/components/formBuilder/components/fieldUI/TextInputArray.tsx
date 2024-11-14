@@ -72,7 +72,9 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
             >
               {txt}
             </div>
-            {!disabled && <img onClick={() => handleDelete(i)} className='ms-0dot5 pointer' src={BinIcon} alt='' />}
+            {!disabled && (
+              <img onClick={() => handleDelete(i)} className='ms-0dot5 pointer' src={BinIcon} alt='delete' />
+            )}
           </div>
         </li>
       </Fragment>

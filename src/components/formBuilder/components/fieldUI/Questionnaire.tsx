@@ -62,7 +62,7 @@ const Questionnaire = ({ onChange, defaultValue = [], label, required = true, di
   };
 
   return (
-    <div className={styles.textInputArray}>
+    <div className={styles.textInputArray} data-testid='questionnaire-wrapper'>
       {label && (
         <>
           <label>
@@ -75,7 +75,7 @@ const Questionnaire = ({ onChange, defaultValue = [], label, required = true, di
       <ol className='pb-0dot5'>
         {value?.map((txt, i) => (
           <Fragment key={keys.current[i]}>
-            <li className='me-0dot5'>
+            <li className='me-0dot5' data-testid='question-item'>
               <div className='d-flex align-items-center'>
                 <div
                   className={`flex-grow-1 f-flex fs-0dot875 ${styles.input}`}
@@ -86,7 +86,12 @@ const Questionnaire = ({ onChange, defaultValue = [], label, required = true, di
                   {txt.name}
                 </div>
                 {!disabled && txt.name && (
-                  <img onClick={() => handleDelete(i)} className='me-0dot5 ms-0dot5 pointer' src={BinIcon} alt='' />
+                  <img
+                    onClick={() => handleDelete(i)}
+                    className='me-0dot5 ms-0dot5 pointer'
+                    src={BinIcon}
+                    alt='delete'
+                  />
                 )}
               </div>
               <div>

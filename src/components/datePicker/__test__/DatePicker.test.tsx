@@ -87,7 +87,7 @@ describe('DatePickerComponent', () => {
     const iconButton = screen.getByTestId('calendar-icon');
     fireEvent.click(iconButton);
 
-    const dateInput = screen.getByRole('textbox'); // Or getByLabelText if it has an associated label
+    const dateInput = screen.getByRole('textbox');
     fireEvent.change(dateInput, { target: { value: '15/11/2024' } });
 
     // Ensure that the selected date changes

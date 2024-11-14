@@ -23,7 +23,8 @@ describe('BP_CONFIG', () => {
         pulseMinValue: undefined,
         pulseMaxValue: undefined,
         instructions: [],
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });

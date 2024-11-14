@@ -26,7 +26,8 @@ describe('Information Label Test Cases', () => {
         isMandatory: false,
         isEnabled: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });
@@ -40,7 +41,8 @@ describe('Information Label Test Cases', () => {
         fieldName: {},
         isMandatory: {},
         isEnabled: {},
-        visibility: {}
+        visibility: {},
+        isEnrollment: {}
       });
     });
   });

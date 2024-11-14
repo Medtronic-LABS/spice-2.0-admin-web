@@ -36,7 +36,8 @@ describe('ScaleIndicator Config Component', () => {
         errorMessage: expect.any(Object),
         title: expect.any(Object),
         fieldName: expect.any(Object),
-        isEditable: expect.any(Object)
+        isEditable: expect.any(Object),
+        isEnrollment: expect.any(Object)
       };
       expect(SCALE_INDICATOR_CONFIG.customizableFieldMeta).toEqual(expectedFields);
     });

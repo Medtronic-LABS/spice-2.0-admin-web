@@ -4,6 +4,8 @@ import TextInput from '../../../../components/formFields/TextInput';
 import { required } from '../../../../utils/validation';
 import styles from '../../styles/FormBuilder.module.scss';
 import TagInput from './TagInput';
+import { useSelector } from 'react-redux';
+import { getFormMetaSelector } from '../../../../store/workflow/selectors';
 
 /**
  * Renders the boolean options component based on the provided configuration.
@@ -35,7 +37,7 @@ const BooleanOptionsRender = ({ name, obj, field }: any) => {
   };
 
   return (
-    <div className='d-flex'>
+    <div className='d-flex' data-testid='boolean-options-render'>
       {obj[field] && (
         <FieldArray name={name}>
           {(_props) =>
@@ -45,7 +47,7 @@ const BooleanOptionsRender = ({ name, obj, field }: any) => {
                   {({ input, meta }) => {
                     const config = booleanFieldConfig.find((fieldConfig: any) => fieldConfig.id === item.id);
                     return (
-                      <div key={index} className='d-flex flex-row boolean-options'>
+                      <div key={index} className='d-flex flex-row boolean-options' data-testid='boolean-options'>
                         <div className={config?.className}>
                           <TextInput
                             {...input}
@@ -107,7 +109,7 @@ const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
         }
       }}
       render={({ input }) => (
-        <div className='mb-0dot5'>
+        <div className='mb-0dot5' data-testid='string-options-render'>
           <TagInput
             {...input}
             defaultValue={
@@ -132,8 +134,8 @@ const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
  * @param {any} props - The props for the OptionList component
  */
 const OptionList = ({ name, obj, field, inputProps }: any) => {
-  const formGetMeta = [] as any[];
-  const optionType = formGetMeta.find((item: any) => obj.id === item.key)?.type || 'radio';
+  const formGetMeta = useSelector(getFormMetaSelector);
+  const optionType = formGetMeta?.find((item: any) => obj.id === item.key)?.type || 'radio';
   if (obj.viewType === 'RadioGroup' && optionType === 'checkbox') {
     const booleanDefaultValue = [
       { id: true, name: '' },

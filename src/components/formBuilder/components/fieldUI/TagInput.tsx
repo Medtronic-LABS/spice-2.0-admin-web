@@ -124,6 +124,7 @@ const TagInput = ({
             disabled={disabled}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
+            data-testid='tag-input-field'
           />
         )}
       </ul>

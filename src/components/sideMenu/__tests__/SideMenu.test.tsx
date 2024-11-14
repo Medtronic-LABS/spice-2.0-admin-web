@@ -90,6 +90,25 @@ describe('SideMenu', () => {
     });
     unmount();
   });
+  it('should fetch sidemenu if sidemenu list is undefined', () => {
+    const localStore = mockStore({
+      ...initialState,
+      common: {
+        ...initialState.common,
+        sideMenu: { list: undefined }
+      }
+    });
+    const { unmount } = renderComponent(localStore, '/region/2/3', PROTECTED_ROUTES.region);
+    const actions = localStore.getActions();
+    const fetchSideMenuActionType = actions.find((action) => action.type === FETCH_SIDEMENU_REQUEST);
+    expect(fetchSideMenuActionType).toBeTruthy();
+    fetchSideMenuActionType.payload.failureCb({ message: 'error' });
+    const failureCbSpy = jest.spyOn(fetchSideMenuActionType.payload, 'failureCb');
+    waitFor(() => {
+      expect(failureCbSpy).toHaveBeenCalled();
+    });
+    unmount();
+  });
   it('Should render the SideMenu component', () => {
     const store = mockStore(initialState);
     const mockPath = '/region/2/3';

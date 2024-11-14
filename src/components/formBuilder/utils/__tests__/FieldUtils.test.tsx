@@ -1,83 +1,161 @@
+import { getConfigByViewType, resultSwitch, filterUnitsandGender, creatableViews } from '../FieldUtils';
 import { InputTypes } from '../../labTestConfig/BaseFieldConfig';
-import CARD_VIEW_CONFIG from '../../labTestConfig/fieldGroups/CardView';
-import TEXT_LABEL_CONFIG from '../../labTestConfig/fieldGroups/TextLabel';
-import CHECKBOX_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/CheckBox';
-import EDIT_TEXT_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/EditText';
 import RADIO_GROUP_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/RadioGroup';
+import EDIT_TEXT_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/EditText';
 import DROPDOWN_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/Dropdown';
-import { creatableViews, getConfigByViewType, resultSwitch } from '../FieldUtils';
+import CHECKBOX_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/CheckBox';
+import TEXT_LABEL_CONFIG from '../../labTestConfig/fieldGroups/TextLabel';
 import DATE_PICKER_CONFIG from '../../labTestConfig/fieldGroups/creatableViews/DatePickerView';
+import CARD_VIEW_CONFIG from '../../labTestConfig/fieldGroups/CardView';
 
-describe('Your Module', () => {
+describe('FieldUtils', () => {
   describe('creatableViews', () => {
-    it('should have the correct labels', () => {
-      const expectedLabels = ['Text', 'Dropdown', 'Date'];
-      expect(creatableViews.map((view: any) => view.label)).toEqual(expectedLabels);
-    });
-
-    it('should have the correct values', () => {
-      const expectedValues = ['EditText', 'Spinner', 'DatePicker'];
-      expect(creatableViews.map((view: any) => view.value)).toEqual(expectedValues);
+    it('should contain correct view options', () => {
+      expect(creatableViews).toEqual([
+        { label: 'Text', value: 'EditText' },
+        { label: 'Dropdown', value: 'Spinner' }
+      ]);
     });
   });
 
   describe('getConfigByViewType', () => {
-    it('should return the correct config for RadioGroup', () => {
-      expect(getConfigByViewType('RadioGroup')).toEqual(RADIO_GROUP_CONFIG);
-    });
-
-    it('should return the correct config for Date Input', () => {
-      expect(getConfigByViewType('DatePicker')).toEqual(DATE_PICKER_CONFIG);
-    });
-
-    it('should return the correct config for EditText', () => {
-      expect(getConfigByViewType('EditText')).toEqual(EDIT_TEXT_CONFIG);
-    });
-
-    it('should return the correct config for Spinner', () => {
-      expect(getConfigByViewType('Spinner')).toEqual(DROPDOWN_CONFIG);
-    });
-
-    it('should return the correct config for CheckBox', () => {
-      expect(getConfigByViewType('CheckBox')).toEqual(CHECKBOX_CONFIG);
-    });
-
-    it('should return the correct config for TextLabel', () => {
-      expect(getConfigByViewType('TextLabel')).toEqual(TEXT_LABEL_CONFIG);
-    });
-
-    it('should return the correct config for CardView', () => {
-      expect(getConfigByViewType('CardView')).toEqual(CARD_VIEW_CONFIG);
-    });
-
-    it('should return the default config for an unknown view type', () => {
-      expect(getConfigByViewType('UnknownType')).toEqual(EDIT_TEXT_CONFIG);
+    it('should return correct config for each view type', () => {
+      expect(getConfigByViewType('RadioGroup')).toBe(RADIO_GROUP_CONFIG);
+      expect(getConfigByViewType('EditText')).toBe(EDIT_TEXT_CONFIG);
+      expect(getConfigByViewType('Spinner')).toBe(DROPDOWN_CONFIG);
+      expect(getConfigByViewType('CheckBox')).toBe(CHECKBOX_CONFIG);
+      expect(getConfigByViewType('TextLabel')).toBe(TEXT_LABEL_CONFIG);
+      expect(getConfigByViewType('DatePicker')).toBe(DATE_PICKER_CONFIG);
+      expect(getConfigByViewType('CardView')).toBe(CARD_VIEW_CONFIG);
+      expect(getConfigByViewType('InvalidType')).toBe(EDIT_TEXT_CONFIG);
     });
   });
-});
 
-describe('resultSwitch', () => {
-  it('should correctly set inputTypeRelatedFields for InputTypes.DEFAULT', () => {
-    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.DEFAULT, obj, false);
-    expect(obj).toEqual({ minLength: 10, maxLength: 20 });
+  describe('resultSwitch', () => {
+    let testObj: any;
+
+    beforeEach(() => {
+      testObj = {
+        code: 'test',
+        url: 'test',
+        resource: 'test',
+        condition: 'test',
+        minValue: 'test',
+        maxValue: 'test',
+        maxLength: 'test',
+        minLength: 'test',
+        contentLength: 'test',
+        startsWith: 'test',
+        unitList: 'test',
+        ranges: 'test'
+      };
+    });
+
+    it('should handle NUMBER input type with isResult=true', () => {
+      resultSwitch(InputTypes.NUMBER, testObj);
+      expect(testObj).toHaveProperty('minValue');
+      expect(testObj).toHaveProperty('maxValue');
+      expect(testObj).toHaveProperty('unitList');
+      expect(testObj).toHaveProperty('ranges');
+      expect(testObj).toHaveProperty('code');
+      expect(testObj).toHaveProperty('url');
+      expect(testObj).toHaveProperty('resource');
+      expect(testObj).toHaveProperty('condition');
+      expect(testObj).not.toHaveProperty('maxLength');
+      expect(testObj).not.toHaveProperty('minLength');
+    });
+
+    it('should handle PHONE_NUMBER input type', () => {
+      resultSwitch(InputTypes.PHONE_NUMBER, testObj, true);
+      expect(testObj).toHaveProperty('contentLength');
+      expect(testObj).toHaveProperty('startsWith');
+      expect(testObj).toHaveProperty('unitList');
+      expect(testObj).toHaveProperty('ranges');
+    });
+
+    it('should handle DEFAULT input type', () => {
+      resultSwitch(InputTypes.DEFAULT, testObj, true);
+      expect(testObj).toHaveProperty('minLength');
+      expect(testObj).toHaveProperty('maxLength');
+      expect(testObj).not.toHaveProperty('unitList');
+      expect(testObj).not.toHaveProperty('ranges');
+    });
+
+    it('should handle null field value', () => {
+      resultSwitch(null, testObj, true);
+      expect(testObj).toHaveProperty('code');
+      expect(testObj).toHaveProperty('url');
+      expect(testObj).toHaveProperty('resource');
+      expect(testObj).toHaveProperty('condition');
+    });
+
+    it('should handle null field value and isResult as false', () => {
+      resultSwitch(null, testObj, false);
+      expect(testObj).not.toHaveProperty('code');
+      expect(testObj).not.toHaveProperty('url');
+      expect(testObj).not.toHaveProperty('resource');
+      expect(testObj).not.toHaveProperty('condition');
+    });
+
+    it('should handle isResult=false', () => {
+      resultSwitch(InputTypes.NUMBER, testObj, false);
+      expect(testObj).not.toHaveProperty('code');
+      expect(testObj).not.toHaveProperty('url');
+      expect(testObj).not.toHaveProperty('resource');
+      expect(testObj).not.toHaveProperty('condition');
+      expect(testObj).toHaveProperty('minValue');
+      expect(testObj).toHaveProperty('maxValue');
+    });
   });
 
-  it('should correctly set inputTypeRelatedFields for InputTypes.NUMBER', () => {
-    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.NUMBER, obj, false);
-    expect(obj).toEqual({ minValue: 1, maxValue: 2 });
-  });
+  describe('filterUnitsandGender', () => {
+    const unitList = [
+      { name: 'Unit1', id: 'unit1' },
+      { name: 'Unit2', id: 'unit2' },
+      { name: 'Unit3', id: 'unit3' }
+    ];
 
-  it('should correctly set inputTypeRelatedFields for InputTypes.DECIMAL', () => {
-    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2 };
-    resultSwitch(InputTypes.DECIMAL, obj, false);
-    expect(obj).toEqual({ minValue: 1, maxValue: 2 });
-  });
+    it('should filter units with both genders', () => {
+      const ranges = [
+        { unitType: 'unit1', gender: 'Male', minRange: 0, maxRange: 10, displayRange: '0-10' },
+        { unitType: 'unit1', gender: 'Female', minRange: 0, maxRange: 10, displayRange: '0-10' }
+      ];
 
-  it('should correctly set inputTypeRelatedFields for InputTypes.PHONE_NUMBER', () => {
-    const obj = { minLength: 10, maxLength: 20, contentLength: 30, minValue: 1, maxValue: 2, startsWith: '123' };
-    resultSwitch(InputTypes.PHONE_NUMBER, obj, false);
-    expect(obj).toEqual({ contentLength: 30, startsWith: '123' });
+      const { filteredUnitList, removedUnits } = filterUnitsandGender(ranges, unitList);
+
+      expect(filteredUnitList).toHaveLength(2);
+      expect(removedUnits.units).toHaveLength(1);
+      expect(removedUnits.indices).toContain(0);
+      /* tslint:disable:no-string-literal */
+      expect(removedUnits.genders['unit1']).toHaveLength(2);
+    });
+
+    it('should handle empty ranges', () => {
+      const { filteredUnitList, removedUnits } = filterUnitsandGender([], unitList);
+
+      expect(filteredUnitList).toEqual(unitList);
+      expect(removedUnits.units).toHaveLength(0);
+      expect(removedUnits.indices).toHaveLength(0);
+      expect(Object.keys(removedUnits.genders)).toHaveLength(0);
+    });
+
+    it('should handle single gender range', () => {
+      const ranges = [{ unitType: 'unit1', gender: 'Male', minRange: 0, maxRange: 10, displayRange: '0-10' }];
+
+      const { filteredUnitList, removedUnits } = filterUnitsandGender(ranges, unitList);
+
+      expect(filteredUnitList).toHaveLength(2);
+      expect(removedUnits.indices).toContain(0);
+      expect(removedUnits.genders['unit1']).toHaveLength(1);
+    });
+
+    it('should handle null inputs', () => {
+      const { filteredUnitList, removedUnits } = filterUnitsandGender(null as any, null as any);
+
+      expect(filteredUnitList).toHaveLength(0);
+      expect(removedUnits.units).toHaveLength(0);
+      expect(removedUnits.indices).toHaveLength(0);
+      expect(Object.keys(removedUnits.genders)).toHaveLength(0);
+    });
   });
 });

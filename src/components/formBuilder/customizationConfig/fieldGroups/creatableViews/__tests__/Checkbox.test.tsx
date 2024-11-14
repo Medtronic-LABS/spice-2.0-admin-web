@@ -18,7 +18,8 @@ describe('ICheckBoxFields', () => {
         hint: '',
         optionsList: [],
         errorMessage: '',
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       };
       const result = CHECKBOX_CONFIG.getEmptyData();
       expect(result).toEqual(expected);

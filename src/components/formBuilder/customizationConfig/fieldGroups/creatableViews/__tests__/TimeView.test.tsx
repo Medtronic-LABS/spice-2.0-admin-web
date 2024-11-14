@@ -26,7 +26,8 @@ describe('TimeView Container Test Cases', () => {
         isMandatory: false,
         isEnabled: true,
         visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-        isNotDefault: true
+        isNotDefault: true,
+        isEnrollment: true
       });
     });
   });
@@ -42,7 +43,8 @@ describe('TimeView Container Test Cases', () => {
         visibility: {},
         isEnabled: {},
         isEditable: {},
-        unitMeasurement: {}
+        unitMeasurement: {},
+        isEnrollment: {}
       });
     });
   });

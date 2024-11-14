@@ -15,7 +15,6 @@ import MultiSelectOptionList from './fieldUI/MultiSelectOptionList';
 import DatePickerWrapper from './fieldUI/DatePickerWrapper';
 import { unitsSelector } from '../../../store/labTest/selectors';
 import { useSelector } from 'react-redux';
-import APPCONSTANTS from '../../../constants/appConstants';
 import TextInputArray from './fieldUI/TextInputArray';
 import Questionnaire from './fieldUI/Questionnaire';
 
@@ -69,7 +68,6 @@ const getComponentsByFieldName = (
   // disable fields for customization
   if (isCustomizationForm && !isWorkFlowCustomization) {
     if (
-      APPCONSTANTS.DISABLED_FIELD_TYPES_FOR_REGION_CUSTOMIZATION?.includes(fieldName) ||
       (obj?.isNeededDefault && ['isMandatory', 'visibility', 'isEnabled'].includes(fieldName)) ||
       ['fieldName', 'title', 'optionsList', 'inputType'].includes(fieldName)
     ) {
@@ -150,6 +148,7 @@ export const CheckboxComponent = ({
   }, []);
   return (
     <div
+      data-testid='checkbox-component'
       className={`col-sm-4 ${
         fieldName === 'disableFutureDate'
           ? isCustomizationForm
@@ -265,7 +264,10 @@ export const SelectInputValues = ({
     value = customValue;
   }
   return (
-    <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+    <div
+      className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}
+      data-testid='select-field-wrapper'
+    >
       <SelectFieldWrapper
         name={name}
         customValue={value}
@@ -500,7 +502,10 @@ export const TextFieldComponent = ({
   };
 
   return (
-    <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+    <div
+      className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}
+      data-testid='text-field-wrapper'
+    >
       <TextFieldWrapper
         name={`${name}.${fieldName}`}
         customValue={obj.fieldName}
@@ -612,7 +617,7 @@ const RenderFields = ({
     case 'INSTRUCTIONS': {
       const fieldVal = obj[fieldName]?.length ? obj[fieldName] : [''];
       return (
-        <div className='col-12'>
+        <div className='col-12' data-testid='instructions-wrapper'>
           <Field name={`${name}.${fieldName}`}>
             {(_props) => (
               <>
@@ -633,14 +638,20 @@ const RenderFields = ({
 
     case 'OPTION_LIST': {
       return (
-        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+        <div
+          className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}
+          data-testid='option-list-wrapper'
+        >
           <OptionList field={fieldName} name={`${name}.${fieldName}`} obj={obj} form={form} inputProps={inputProps} />
         </div>
       );
     }
     case 'TARGET_VIEWS': {
       return (
-        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+        <div
+          className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}
+          data-testid='multi-select-option-list-wrapper'
+        >
           <MultiSelectOptionList
             label={'Target Views'}
             field={fieldName}
@@ -695,7 +706,10 @@ const RenderFields = ({
       const parseFn = (val: any) => val;
       const value = obj[fieldName] || null;
       return (
-        <div className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}>
+        <div
+          className={`${isCustomizationForm ? 'col-4' : 'col-12 col-md-6 col-lg-4 col-xl-3'}`}
+          data-testid='date-picker-wrapper'
+        >
           <DatePickerWrapper
             fieldName={fieldName}
             name={`${name}.${fieldName}`}
