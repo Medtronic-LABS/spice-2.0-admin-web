@@ -1,61 +1,50 @@
-import { mount } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useTablePaginationHook } from '../tablePagination';
 
 describe('useTablePaginationHook', () => {
-  let wrapper: any;
-  let handleSearchVar: any;
-  let handlePageVar: any;
-
-  beforeEach(() => {
-    wrapper = mount(<TestComponent />);
-    handleSearchVar = wrapper.find('button').at(0).prop('onClick');
-    handlePageVar = wrapper.find('button').at(1).prop('onClick');
-  });
-
-  afterEach(() => {
-    wrapper.unmount();
-  });
-
-  it('should initialize with default listParams', () => {
-    expect(wrapper.find('.page').text()).toBe('1');
-    expect(wrapper.find('.rows-per-page').text()).toBe('10');
-    expect(wrapper.find('.search-term').text()).toBe('');
-  });
-
-  it('should update listParams when handleSearch is called', () => {
-    act(() => {
-      handleSearchVar('example');
-    });
-    wrapper.update();
-
-    expect(wrapper.find('.page').text()).toBe('1');
-    expect(wrapper.find('.rows-per-page').text()).toBe('10');
-    expect(wrapper.find('.search-term').text()).toBe('example');
-  });
-
-  it('should update listParams when handlePage is called', () => {
-    act(() => {
-      handlePageVar(2, 20);
-    });
-    wrapper.update();
-
-    expect(wrapper.find('.page').text()).toBe('2');
-    expect(wrapper.find('.rows-per-page').text()).toBe('20');
-    expect(wrapper.find('.search-term').text()).toBe('');
-  });
-
   function TestComponent() {
     const { listParams, handleSearch, handlePage } = useTablePaginationHook();
 
     return (
       <div>
-        <div className='page'>{listParams.page}</div>
-        <div className='rows-per-page'>{listParams.rowsPerPage}</div>
-        <div className='search-term'>{listParams.searchTerm}</div>
+        <div data-testid='page'>{listParams.page}</div>
+        <div data-testid='rows-per-page'>{listParams.rowsPerPage}</div>
+        <div data-testid='search-term'>{listParams.searchTerm}</div>
         <button onClick={() => handleSearch('example')}>Search</button>
-        <button onClick={() => handlePage(2, 20)}>Change Page</button>
+        <button onClick={() => handlePage(2)}>Change Page</button>
       </div>
     );
   }
+
+  it('should initialize with default listParams', () => {
+    render(<TestComponent />);
+
+    expect(screen.getByTestId('page')).toHaveTextContent('1');
+    expect(screen.getByTestId('rows-per-page')).toHaveTextContent('10');
+    expect(screen.getByTestId('search-term')).toHaveTextContent('');
+  });
+
+  it('should update listParams when handleSearch is called', async () => {
+    render(<TestComponent />);
+
+    fireEvent.click(screen.getByText('Search'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page')).toHaveTextContent('1');
+      expect(screen.getByTestId('rows-per-page')).toHaveTextContent('10');
+      expect(screen.getByTestId('search-term')).toHaveTextContent('example');
+    });
+  });
+
+  it('should update listParams when handlePage is called', async () => {
+    render(<TestComponent />);
+
+    fireEvent.click(screen.getByText('Change Page'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page')).toHaveTextContent('2');
+      expect(screen.getByTestId('rows-per-page')).toHaveTextContent('10');
+      expect(screen.getByTestId('search-term')).toHaveTextContent('');
+    });
+  });
 });

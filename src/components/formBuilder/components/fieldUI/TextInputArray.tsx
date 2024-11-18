@@ -80,7 +80,7 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
       </Fragment>
     ));
   return (
-    <div className={styles.textInputArray}>
+    <div className={styles.textInputArray} data-testid='text-input-array'>
       {label && (
         <>
           <label>

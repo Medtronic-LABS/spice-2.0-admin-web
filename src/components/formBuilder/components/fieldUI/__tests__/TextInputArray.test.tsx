@@ -1,59 +1,107 @@
-import { mount, shallow } from 'enzyme';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TextInputArray from '../TextInputArray';
+import { useLocation, matchPath } from 'react-router';
+
+jest.mock('react-router', () => ({
+  useLocation: jest.fn(),
+  matchPath: jest.fn()
+}));
 
 describe('TextInputArray', () => {
-  const onChange = jest.fn();
+  const mockOnChange = jest.fn();
 
   beforeEach(() => {
-    onChange.mockClear();
+    jest.clearAllMocks();
+    (useLocation as jest.Mock).mockReturnValue({ pathname: '/some-path' });
+    (matchPath as jest.Mock).mockReturnValue(null);
   });
 
-  it('renders without crashing', () => {
-    shallow(<TextInputArray />);
+  it('renders correctly with default props', () => {
+    render(<TextInputArray onChange={mockOnChange} />);
+    expect(screen.getByTestId('text-input-array')).toBeInTheDocument();
+    expect(screen.getByText('Add new')).toBeInTheDocument();
   });
 
-  it('renders with props', () => {
-    const wrapper = mount(
-      <TextInputArray defaultValue={['test1', 'test2']} label='test label' required={true} disabled={false} />
-    );
-    expect(wrapper.prop('defaultValue')).toEqual(['test1', 'test2']);
-    expect(wrapper.prop('label')).toEqual('test label');
-    expect(wrapper.prop('required')).toEqual(true);
-    expect(wrapper.prop('disabled')).toEqual(false);
+  it('renders with label and required asterisk', () => {
+    render(<TextInputArray label='Test Label' required={true} />);
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
+    expect(screen.getByText('*')).toBeInTheDocument();
   });
 
-  it('triggers onChange when input values change', () => {
-    const wrapper = mount(<TextInputArray defaultValue={['test1', 'test2']} onChange={onChange} />);
-    wrapper
-      .find('div[contentEditable=true]')
-      .at(0)
-      .simulate('blur', { target: { innerText: 'new test' } });
-    expect(onChange).toHaveBeenCalledWith(['new test', 'test2']);
-
-    wrapper
-      .find('div[contentEditable=true]')
-      .at(1)
-      .simulate('blur', { target: { innerText: 'another new test' } });
-    expect(onChange).toHaveBeenCalledWith(['new test', 'another new test']);
+  it('renders initial values correctly', () => {
+    const defaultValue = ['Item 1', 'Item 2'];
+    render(<TextInputArray defaultValue={defaultValue} />);
+    defaultValue.forEach((item) => {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    });
   });
 
-  it('triggers onChange when inputs are deleted', () => {
-    const wrapper = mount(<TextInputArray defaultValue={['test1', 'test2']} onChange={onChange} />);
-    wrapper.find('img').at(0).simulate('click');
-    expect(onChange).toHaveBeenCalledWith(['test2']);
+  it('handles adding new items', () => {
+    render(<TextInputArray onChange={mockOnChange} />);
+    const addButton = screen.getByText('Add new');
+
+    fireEvent.click(addButton);
+    expect(screen.getAllByRole('listitem')).toHaveLength(2); // 1 empty item + add button
   });
 
-  it('adds a new input when add button is clicked', () => {
-    const handleAdd = jest.fn();
-    const wrapper = mount(<TextInputArray defaultValue={['test1', 'test2']} onChange={handleAdd} />);
-    wrapper.find('.pointer.d-flex.align-items-center.mt-0dot5').at(0).simulate('click');
-    expect(handleAdd).not.toHaveBeenCalled();
+  it('handles deleting items', () => {
+    const defaultValue = ['Item 1', 'Item 2'];
+    render(<TextInputArray defaultValue={defaultValue} onChange={mockOnChange} />);
+
+    const deleteButtons = screen.getAllByAltText('delete');
+    fireEvent.click(deleteButtons[0]);
+
+    expect(mockOnChange).toHaveBeenCalledWith(['Item 2']);
   });
 
-  it('does not add a new input when disabled', () => {
-    const handleAdd = jest.fn();
-    const wrapper = mount(<TextInputArray defaultValue={['test1', 'test2']} onChange={handleAdd} />);
-    wrapper.find('.pointer.d-flex.align-items-center.mt-0dot5').at(0).simulate('click');
-    expect(handleAdd).not.toHaveBeenCalled();
+  it('handles text input changes', async () => {
+    const defaultValue = ['Initial'];
+    render(<TextInputArray defaultValue={defaultValue} onChange={mockOnChange} />);
+
+    const input = screen.getByText('Initial');
+    input.innerText = 'Updated';
+    await waitFor(() => {
+      fireEvent.blur(input);
+    });
+
+    expect(mockOnChange).toHaveBeenCalledWith(['Updated']);
+  });
+
+  it('handles empty text input', async () => {
+    const defaultValue = ['Initial'];
+    render(<TextInputArray defaultValue={defaultValue} onChange={mockOnChange} />);
+
+    const input = screen.getByText('Initial');
+    input.innerText = '';
+    await waitFor(() => {
+      fireEvent.blur(input);
+    });
+
+    expect(mockOnChange).toHaveBeenCalledWith([]);
+  });
+
+  it('disables editing when disabled prop is true', () => {
+    const defaultValue = ['Item 1'];
+    render(<TextInputArray defaultValue={defaultValue} disabled={true} />);
+
+    expect(screen.queryByAltText('delete')).not.toBeInTheDocument();
+    expect(screen.queryByText('Add new')).not.toBeInTheDocument();
+  });
+
+  it('handles region customize form view', () => {
+    (useLocation as jest.Mock).mockReturnValue({ pathname: '/region-customize' });
+    (matchPath as jest.Mock).mockReturnValue(true);
+
+    render(<TextInputArray obj={{ readOnly: true }} />);
+    expect(screen.getByTestId('text-input-array')).toBeInTheDocument();
+  });
+
+  it('render with isRegionCustomizeForm as true and readonly as false inside obj', () => {
+    (useLocation as jest.Mock).mockReturnValue({
+      pathname: '/region/:regionId/:tenantId/:form/regionCustomize'
+    });
+    (matchPath as jest.Mock).mockReturnValue(true);
+    render(<TextInputArray obj={{ readOnly: false }} />);
+    expect(screen.getByTestId('text-input-array')).toBeInTheDocument();
   });
 });

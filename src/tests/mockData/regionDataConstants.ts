@@ -1,3 +1,5 @@
+import { IRegionDetailList } from '../../store/region/types';
+
 const MOCK_ENTITY_LIST = {
   countryid: 2,
   countrytenantid: 2,

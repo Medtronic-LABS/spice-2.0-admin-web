@@ -1,8 +1,6 @@
-import React from 'react';
-import { mount, shallow } from 'enzyme';
-import SummaryCard, { ISummaryCardProps } from '../SummaryCard';
-import styles from '../SummaryCard.module.scss';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import SummaryCard from '../SummaryCard';
 import SUMMARY_CARD_CONSTANTS from '../../../tests/mockData/summaryCardConstants';
 
 jest.mock('../../../assets/images/arrow-right-small.svg', () => ({
@@ -10,62 +8,58 @@ jest.mock('../../../assets/images/arrow-right-small.svg', () => ({
 }));
 
 describe('SummaryCard component', () => {
-  const props: ISummaryCardProps = SUMMARY_CARD_CONSTANTS.SUMMARY_CARD_PROPS;
+  const props = SUMMARY_CARD_CONSTANTS.SUMMARY_CARD_PROPS;
+
+  const renderSummaryCard = (componentProps = props) => {
+    return render(
+      <Router>
+        <SummaryCard {...componentProps} />
+      </Router>
+    );
+  };
 
   it('should render without errors', () => {
-    const wrapper = shallow(<SummaryCard {...props} />);
-    expect(wrapper).toHaveLength(1);
+    const { container } = renderSummaryCard();
+    expect(container).toBeInTheDocument();
   });
 
   it('should render a title and subtitle', () => {
-    const wrapper = shallow(<SummaryCard {...props} />);
-    expect(wrapper.find('.primary-title')).toHaveLength(3);
-    expect(wrapper.find('.fs-0dot75')).toHaveLength(1);
+    renderSummaryCard();
+    expect(screen.getByText('Example Title')).toBeInTheDocument();
+    expect(screen.getByText(/example subtitle/i)).toBeInTheDocument();
   });
 
   it('should render data elements', () => {
-    const wrapper = shallow(<SummaryCard {...props} />);
-    expect(wrapper.find(`.${styles.summaryElement}`)).toHaveLength(8);
+    renderSummaryCard();
+    const summaryElements = screen.getAllByTestId('summary-elements');
+    expect(summaryElements).toHaveLength(2);
   });
 
   it('should call onClick when data element is clicked', () => {
-    const wrapper = shallow(<SummaryCard {...props} />);
-    const wrp = wrapper
-      .find(`.${styles.summaryElement}.py-sm-1dot125.py-0dot5.px-sm-1.px-0dot5.d-flex.flex-column.mw-0`)
-      .first();
+    renderSummaryCard();
+    const summaryElement = screen.getAllByTestId('summary-elements')[0];
 
-    wrp.simulate('click');
+    fireEvent.click(summaryElement);
     expect(props.data[0].onClick).toHaveBeenCalled();
   });
 
   it('should call handleNavigation when move forward element is clicked', () => {
-    jest.mock('react-router-dom', () => ({
-      useHistory: () => ({
-        push: jest.fn()
-      })
-    }));
-    const wrapper = mount(
-      <Router>
-        <SummaryCard {...props} />
-      </Router>
-    );
-    const wrp = wrapper.find(`.align-self-center.${styles.moveForward}.my-0dot5`);
-    wrp.simulate('click');
+    renderSummaryCard();
+    const moveForwardButton = screen.getByTestId('move-forward');
+
+    fireEvent.click(moveForwardButton);
     expect(props.setBreadcrumbDetails).toHaveBeenCalled();
   });
 
   it('should call handleNavigation when move forward element is mouse leaved', () => {
-    jest.mock('react-router-dom', () => ({
-      useHistory: () => ({
-        push: jest.fn()
-      })
-    }));
-    const wrapper = mount(
-      <Router>
-        <SummaryCard {...props} />
-      </Router>
-    );
-    const wrp = wrapper.find(`.align-self-center.${styles.moveForward}.my-0dot5`);
-    wrp.simulate('mouseleave');
+    renderSummaryCard();
+    const moveForwardButton = screen.getByTestId('move-forward');
+
+    fireEvent.mouseLeave(moveForwardButton);
+  });
+
+  it('should render with img', () => {
+    const { container } = renderSummaryCard({ ...props, img: 'test.png' });
+    expect(container).toBeInTheDocument();
   });
 });

@@ -34,13 +34,18 @@ const Radio = ({
   isRadioSquare = true
 }: IRadioProps) => {
   return (
-    <div className={styles.radioInputEnclosure}>
+    <div className={styles.radioInputEnclosure} data-testid='radio-input-enclosure'>
       <div className='input-field-label'>
         {fieldLabel}
         {required && <span className='input-asterisk text-danger'>*</span>}
       </div>
       {isRadioSquare ? (
-        <div className='btn-group w-100' role='group' aria-label='Basic radio toggle button group'>
+        <div
+          className='btn-group w-100'
+          role='group'
+          aria-label='Basic radio toggle button group'
+          data-testid='radio-button-group'
+        >
           {options.map((option: any) => (
             <button
               key={option.value}
@@ -57,14 +62,18 @@ const Radio = ({
         </div>
       ) : (
         options.map((option: any) => (
-          <label key={option.value} className={`d-inline-flex align-items-center ${styles.radioContainer}`}>
+          <label
+            key={option.value}
+            className={`d-inline-flex align-items-center ${styles.radioContainer}`}
+            data-testid='radio-label'
+          >
             <div className={`${styles.radioWrapper} me-0dot5`}>
               <input
                 {...input}
                 type='radio'
                 className='d-flex'
                 value={option.value}
-                checked={option.value === (input.value || value)}
+                checked={option.value === (input?.value || value)}
                 onChange={(event) => handleChange(input, onChange as (e: any) => void, event.target.value)}
               />
             </div>

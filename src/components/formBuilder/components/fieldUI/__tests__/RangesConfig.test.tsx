@@ -65,7 +65,7 @@ describe('RangesConfig', () => {
             minRange: '0',
             maxRange: '100',
             displayRange: '0-100',
-            fieldName: 'testField' // added for testing
+            fieldName: 'testField'
           }
         ]
       }
@@ -157,7 +157,7 @@ describe('RangesConfig', () => {
             unitType: 'mg/dL',
             gender: 'Male',
             minRange: '100',
-            maxRange: '50', // Less than minRange
+            maxRange: '50',
             displayRange: '50-100'
           }
         ]
@@ -170,7 +170,6 @@ describe('RangesConfig', () => {
 
     fireEvent.input(screen.getByLabelText('ranges[0].maxRange'), { target: { value: '50' } });
     fireEvent.input(screen.getByLabelText('ranges[0].minRange'), { target: { value: '100' } });
-    // The error message should be displayed
     expect(screen.getByText('Max value should be greater than min value')).toBeInTheDocument();
   });
 

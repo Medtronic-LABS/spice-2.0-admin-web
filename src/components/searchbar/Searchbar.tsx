@@ -27,7 +27,7 @@ const Searchbar = ({ placeholder, onSearch, isOutlined = true }: ISearchbarProps
   );
 
   return (
-    <div className={styles.searchbarContainer}>
+    <div className={styles.searchbarContainer} data-testid='searchbar-container'>
       <input
         className={isOutlined ? styles.searchbarOutlined : styles.searchbar}
         placeholder={placeholder || 'Search'}

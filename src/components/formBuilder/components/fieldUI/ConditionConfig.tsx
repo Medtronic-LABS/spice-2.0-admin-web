@@ -65,7 +65,7 @@ const SelectInputComponent = ({
   }
 
   return (
-    <div className='col-4'>
+    <div className='col-4' data-testid='select-input-component'>
       <SelectFieldWrapper
         name={`${name}[${index}]${config?.name}`}
         customValue={value}
@@ -93,7 +93,7 @@ const TextInputComponent = ({ name, fieldName, item, config, index }: any) => {
     parseFn = (val: any) => (val > 0 ? val : null);
   }
   return (
-    <div className='col-4'>
+    <div className='col-4' data-testid='text-input-component'>
       <TextFieldWrapper
         name={`${name}[${index}]${config.name}`}
         customValue={value}
@@ -276,7 +276,7 @@ const ConditionConfig = ({ name, obj, field, form, targetIds, unAddedFields, new
         </div>
       </div>
       {obj[field].length ? (
-        <div className={`${styles.conditionsContainer}`}>
+        <div className={`${styles.conditionsContainer}`} data-testid='conditions-container'>
           <FieldArray
             name={name}
             validate={(values) => {

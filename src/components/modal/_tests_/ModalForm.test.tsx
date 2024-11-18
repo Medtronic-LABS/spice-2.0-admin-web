@@ -1,4 +1,4 @@
-import { mount, shallow } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ModalForm, { IModalProps } from '../ModalForm';
 
 describe('<ModalForm />', () => {
@@ -15,51 +15,49 @@ describe('<ModalForm />', () => {
   });
 
   it('renders without crashing', () => {
-    const wrapper = shallow(<ModalForm {...props} />);
-    expect(wrapper.length).toBe(1);
+    render(<ModalForm {...props} />);
+    expect(screen.getByText('Test Modal')).toBeInTheDocument();
   });
 
-  it('should match snapshot', () => {
-    const wrapper = shallow(<ModalForm {...props} />);
-    expect(wrapper).toMatchSnapshot();
-  });
-
-  it('should close modal when handleCancel is clicked', () => {
-    const wrapper = mount(<ModalForm {...props} />);
-    wrapper.setProps({ cancelText: 'Cancel' });
-    wrapper.find('.btn.secondary-btn.me-0dot5').simulate('click');
+  it('should close modal when cancel button is clicked', () => {
+    render(<ModalForm {...props} cancelText='Cancel' />);
+    fireEvent.click(screen.getByText('Cancel'));
     expect(props.handleCancel).toHaveBeenCalled();
   });
 
-  it('should call handleFormSubmit when submit button is clicked', () => {
-    const wrapper = mount(<ModalForm {...props} />);
-    wrapper.setProps({ handleForceSubmit: true });
-    wrapper.find('.btn.primary-btn').simulate('click');
+  it(`should call handleFormSubmit with handleForceSubmitprop true
+    when submit button is clicked`, () => {
+    render(<ModalForm {...props} handleForceSubmit={true} />);
+    fireEvent.click(screen.getByText('Submit'));
+    expect(props.handleFormSubmit).toHaveBeenCalled();
+  });
+
+  it(`should call handleFormSubmit with handleForceSubmit prop false
+    when submit button is clicked`, () => {
+    render(<ModalForm {...props} handleForceSubmit={false} />);
+    fireEvent.click(screen.getByText('Submit'));
     expect(props.handleFormSubmit).toHaveBeenCalled();
   });
 
   it('should show deactivate button if deactivateLabel prop is provided', () => {
-    props.deactivateLabel = 'Deactivate';
-    const wrapper = mount(<ModalForm {...props} />);
-    expect(wrapper.find('.btn.danger-btn').length).toBe(1);
+    render(<ModalForm {...props} deactivateLabel='Deactivate' />);
+    expect(screen.getByText('Deactivate')).toBeInTheDocument();
   });
 
   it('should disable submit button when submitDisabled prop is true', () => {
-    props.submitDisabled = true;
-    const wrapper = mount(<ModalForm {...props} />);
-    expect(wrapper.find('.btn.primary-btn').prop('disabled')).toBe(true);
+    render(<ModalForm {...props} submitDisabled={true} />);
+    expect(screen.getByText('Submit')).toBeDisabled();
   });
 
   it('should call handleFormSubmit on submit button click when handleForceSubmit prop is true', () => {
-    props.handleForceSubmit = true;
-    const wrapper = mount(<ModalForm {...props} />);
-    wrapper.find('.btn.primary-btn').simulate('click');
+    render(<ModalForm {...props} handleForceSubmit={true} />);
+    fireEvent.click(screen.getByText('Submit'));
     expect(props.handleFormSubmit).toHaveBeenCalled();
   });
 
-  it('does not call handleFormSubmit when handleForceSubmit is false', () => {
+  it('calls handleFormSubmit when form is submitted and handleForceSubmit is false', () => {
     const mockHandleFormSubmit = jest.fn();
-    const wrapper = mount(
+    render(
       <ModalForm
         show={true}
         // tslint:disable-next-line:no-empty
@@ -70,31 +68,35 @@ describe('<ModalForm />', () => {
         submitText='Submit'
       />
     );
-    wrapper.find('form').simulate('submit');
+    const submitBtn = screen.getByText('Submit');
+    fireEvent.click(submitBtn);
     expect(mockHandleFormSubmit).toHaveBeenCalled();
   });
 
   it('should render with the correct title', () => {
-    const title = 'Test Title';
-    const wrapper = shallow(<ModalForm {...props} title={title} show={true} />);
-    expect(wrapper.find('.modal-title').text()).toEqual(title);
+    render(<ModalForm {...props} title='Test Title' />);
+    expect(screen.getByText('Test Title')).toBeInTheDocument();
   });
 
   it('should render with the correct cancel text', () => {
-    const cancelText = 'Cancel';
-    const wrapper = mount(<ModalForm {...props} cancelText={cancelText} show={true} />);
-    expect(wrapper.find('.btn.secondary-btn.me-0dot5').text()).toEqual(cancelText);
+    render(<ModalForm {...props} cancelText='Cancel' />);
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
   it('should render with the correct submit text', () => {
-    const submitText = 'Submit';
-    const wrapper = mount(<ModalForm {...props} submitText={submitText} />);
-    expect(wrapper.find('.btn.primary-btn').text()).toEqual(submitText);
+    render(<ModalForm {...props} submitText='Submit' />);
+    expect(screen.getByText('Submit')).toBeInTheDocument();
   });
 
   it('does not render when show is false', () => {
-    // tslint:disable-next-line:no-empty
-    const wrapper = mount(<ModalForm {...props} show={false} handleCancel={() => {}} title='Test Modal' />);
-    expect(wrapper.isEmptyRender()).toBe(true);
+    render(<ModalForm {...props} show={false} />);
+    expect(screen.queryByText('Test Modal')).not.toBeInTheDocument();
+  });
+
+  it('handle cancel button click', () => {
+    render(<ModalForm {...props} />);
+    const closeBtn = screen.getByAltText('close');
+    fireEvent.click(closeBtn);
+    expect(props.handleCancel).toHaveBeenCalled();
   });
 });

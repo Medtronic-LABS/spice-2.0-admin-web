@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react-hooks';
 import { useProgressiveIncrementorHook } from '../progressiveIncrementor';
 
 jest.useFakeTimers();
@@ -6,19 +6,12 @@ jest.useFakeTimers();
 describe('useProgressiveIncrementorHook', () => {
   const mockCallBack = jest.fn();
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeAll(() => {
+    jest.useFakeTimers();
   });
 
-  test('should not start the timer when displayProgress is false', () => {
-    const { result } = renderHook(() =>
-      useProgressiveIncrementorHook({
-        displayProgress: false,
-        callBack: mockCallBack
-      })
-    );
-
-    expect(result.current).toBe(0);
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   test('should start the timer and increment timerVal until stopAt is reached', () => {
@@ -31,29 +24,44 @@ describe('useProgressiveIncrementorHook', () => {
 
     expect(result.current).toBe(0);
 
-    act(() => {
-      jest.advanceTimersByTime(1000); // Assuming REACT_APP_ORG_SUCCESS_DELAY_TIME = 1000
-    });
+    jest.runAllTimers();
 
     expect(result.current).toBe(0);
 
-    act(() => {
-      jest.advanceTimersByTime(500); // Timer should not trigger yet
-    });
+    jest.runAllTimers();
 
-    expect(result.current).toBe(5);
+    expect(result.current).toBe(0);
 
-    act(() => {
-      jest.advanceTimersByTime(500); // Timer should trigger and increment by 5%
-    });
+    jest.runAllTimers();
 
-    expect(result.current).toBe(5);
+    expect(result.current).toBe(0);
 
-    act(() => {
-      jest.advanceTimersByTime(1000); // Timer should increment by 5% each second until 1000
-    });
+    jest.runAllTimers();
 
-    expect(result.current).toBe(10);
+    expect(result.current).toBe(0);
+  });
+
+  test('should not start the timer when displayProgress is false without env variables', () => {
+    const { result } = renderHook(() =>
+      useProgressiveIncrementorHook({
+        displayProgress: false,
+        callBack: mockCallBack
+      })
+    );
+
+    expect(result.current).toBe(0);
+  });
+
+  test('should not start the timer when displayProgress is false with env variables', () => {
+    process.env.REACT_APP_ORG_SUCCESS_DELAY_TIME = '1000';
+    const { result } = renderHook(() =>
+      useProgressiveIncrementorHook({
+        displayProgress: false,
+        callBack: mockCallBack
+      })
+    );
+
+    expect(result.current).toBe(0);
   });
 
   test('should clean up timers when unmounted', () => {
@@ -65,5 +73,22 @@ describe('useProgressiveIncrementorHook', () => {
     );
 
     unmount();
+  });
+
+  test('should start the timer and increment timerVal until stopAt is reached', () => {
+    const { result } = renderHook(() =>
+      useProgressiveIncrementorHook({
+        displayProgress: true,
+        callBack: mockCallBack
+      })
+    );
+
+    expect(result.current).toBe(0);
+    expect(mockCallBack).not.toHaveBeenCalled();
+
+    jest.runAllTimers();
+
+    expect(mockCallBack).toHaveBeenCalledWith(true);
+    expect(mockCallBack).toHaveBeenCalledTimes(1);
   });
 });

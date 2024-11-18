@@ -10,7 +10,7 @@ interface ITextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElemen
 
 const TextAreaInput = ({ label, isShowLabel = true, error = '', errorLabel = '', ...props }: ITextAreaProps) => {
   return (
-    <div className={`${styles.textInput} ${error ? styles.danger : ''}`}>
+    <div className={`${styles.textInput} ${error ? styles.danger : ''}`} data-testid='text-area-input'>
       {isShowLabel && <label htmlFor={props.name}>{label}</label>}
       <br />
       <textarea {...props} className='w-100' maxLength={300} aria-label={label} />

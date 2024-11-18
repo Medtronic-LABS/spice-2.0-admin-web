@@ -77,4 +77,35 @@ describe('useLoadMorePagination', () => {
 
     expect(result.current.isLastPage).toBe(false);
   });
+
+  test('should decrement page number when onFail is called', () => {
+    const { result } = renderHook(() =>
+      useLoadMorePagination({
+        total: 20,
+        itemsPerPage: 5,
+        onLoadMore: mockOnLoadMore,
+        defaultPage: 1
+      })
+    );
+
+    act(() => {
+      result.current.loadMore();
+    });
+
+    const onFail = mockOnLoadMore.mock.calls[0][0].onFail;
+
+    act(() => {
+      onFail();
+    });
+
+    act(() => {
+      result.current.loadMore();
+    });
+
+    expect(mockOnLoadMore).toHaveBeenLastCalledWith({
+      skip: 5,
+      limit: 5,
+      onFail: expect.any(Function)
+    });
+  });
 });

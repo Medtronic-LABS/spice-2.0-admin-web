@@ -10,7 +10,6 @@ interface ICheckboxGroupProps extends React.InputHTMLAttributes<HTMLInputElement
   meta?: { [key: string]: any };
 }
 
-
 const CheckboxGroup = ({
   errorLabel,
   options,
@@ -37,13 +36,16 @@ const CheckboxGroup = ({
     }
   };
   return (
-    <div>
+    <div data-testid='checkbox-group'>
       <div className='input-field-label'>
         {fieldLabel}
         {required && <span className='input-asterisk'>*</span>}
       </div>
       {options.map((option: { value: string; label: string }) => (
-        <label key={option.value} className={`d-inline-flex align-items-center ${styles.checkboxLabel} ${styles.checkboxGroupLabel}`}>
+        <label
+          key={option.value}
+          className={`d-inline-flex align-items-center ${styles.checkboxLabel} ${styles.checkboxGroupLabel}`}
+        >
           <div className={styles.checkboxWrapper}>
             <input
               type='checkbox'
@@ -51,18 +53,17 @@ const CheckboxGroup = ({
               onClick={(event: React.BaseSyntheticEvent) => setValue(event, option.value)}
               onKeyPress={onKeyPress}
               defaultChecked={fields?.value?.includes(option.value) || false}
-              onChange={(event) => (event.target.value)}
+              onChange={(event) => event.target.value}
             />
           </div>
           {<span>{option.label}</span>}
         </label>
       ))}
       <div className={styles.error}>
-        { (fields?.value && meta?.error) || (meta?.touched && meta.error) ? `${meta.error} ${errorLabel}` : ''}
+        {(fields?.value && meta?.error) || (meta?.touched && meta.error) ? `${meta.error} ${errorLabel}` : ''}
       </div>
     </div>
   );
 };
 
 export default CheckboxGroup;
-

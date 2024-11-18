@@ -1617,7 +1617,13 @@ const UserForm = ({
                       parse={convertToNumber}
                       format={(value: string) => formatCountryCode(value)}
                       render={({ input, meta }) => (
-                        <TextInput {...input} label='Country Code' errorLabel='country code' error={isError(meta)} />
+                        <TextInput
+                          {...input}
+                          disabled={true} // country code will get auto populated from region form
+                          label='Country Code'
+                          errorLabel='country code'
+                          error={isError(meta)}
+                        />
                       )}
                     />
                   ) : (

@@ -52,10 +52,10 @@ const MultiSelectOptionList: React.FC<IMultiSelectOptionListProps> = ({
   useEffect(() => {
     setSelectedValues((prevSelectedValues) => {
       return prevSelectedValues.filter((selectedValue: any) =>
-        targetIds.find((targetId: { key: string }) => targetId.key === selectedValue.value)
+        targetIds?.find((targetId: { key: string }) => targetId.key === selectedValue.value)
       );
     });
-  }, [targetIds.length, targetIds]);
+  }, [targetIds?.length, targetIds]);
 
   const validateSelectedValues = (value: IOption[], selectedFields: any) => {
     // Pass selectedFields as an argument

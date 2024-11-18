@@ -1,47 +1,104 @@
-import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Radio from '../Radio';
 
-describe('Radio component', () => {
-  const options = [
+describe('Radio Component', () => {
+  const mockOptions = [
     { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' }
+    { value: 'option2', label: 'Option 2' }
   ];
-  const input = {
-    value: 'option2',
-    onChange: jest.fn()
+
+  const mockInput = {
+    onChange: jest.fn(),
+    value: ''
   };
-  const meta = {
+
+  const mockMeta = {
     touched: true,
     error: 'This field is required'
   };
-  const fieldLabel = 'Choose an option';
 
-  it('should render radio buttons with labels', () => {
-    const wrapper = mount(<Radio options={options} input={input} meta={meta} fieldLabel={fieldLabel} />);
-    expect(wrapper.find('label')).toHaveLength(3);
-    expect(wrapper.find('input[type="radio"]')).toHaveLength(3);
-    expect(wrapper.find('input[value="option1"]').prop('checked')).toBeFalsy();
-    expect(wrapper.find('input[value="option2"]').prop('checked')).toBeTruthy();
-    expect(wrapper.find('input[value="option3"]').prop('checked')).toBeFalsy();
-    expect(wrapper.find('label').at(0).text()).toBe('Option 1');
-    expect(wrapper.find('label').at(1).text()).toBe('Option 2');
-    expect(wrapper.find('label').at(2).text()).toBe('Option 3');
-    expect(wrapper.find('.input-field-label').text()).toBe(`${fieldLabel}`);
+  const defaultProps = {
+    options: mockOptions,
+    input: mockInput,
+    onChange: jest.fn()
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('should call the onChange prop when a radio button is clicked', () => {
-    const onChangeMock = jest.fn();
-    const wrapper = mount(
-      <Radio options={options} input={input} meta={meta} fieldLabel={fieldLabel} onChange={onChangeMock} />
-    );
-    const option1Radio = wrapper.find('input[value="option1"]');
-    option1Radio.simulate('change', { target: { value: 'option1' } });
-    expect(input.onChange).toHaveBeenCalledWith('option1');
-    expect(onChangeMock).toHaveBeenCalledWith('option1');
-    expect(wrapper.find('input[value="option2"]').prop('checked')).toBeTruthy();
-    expect(wrapper.find('input[value="option1"]').prop('checked')).toBeFalsy();
-    expect(wrapper.find('input[value="option3"]').prop('checked')).toBeFalsy();
+  it('renders radio square buttons correctly', () => {
+    render(<Radio {...defaultProps} isRadioSquare={true} />);
+
+    const buttonGroup = screen.getByTestId('radio-button-group');
+    expect(buttonGroup).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(2);
+  });
+
+  it('renders traditional radio buttons correctly', () => {
+    render(<Radio {...defaultProps} isRadioSquare={false} />);
+
+    expect(screen.queryByTestId('radio-button-group')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('radio')).toHaveLength(2);
+    expect(screen.getAllByTestId('radio-label')).toHaveLength(2);
+  });
+
+  it('displays field label and required asterisk', () => {
+    render(<Radio {...defaultProps} fieldLabel='Test Label' required={true} />);
+
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
+    expect(screen.getByText('*')).toBeInTheDocument();
+  });
+
+  it('shows error message when meta has error and is touched', () => {
+    render(<Radio {...defaultProps} meta={mockMeta} errorLabel='custom error' />);
+
+    expect(screen.getByText('This field is required custom error')).toBeInTheDocument();
+  });
+
+  it('handles square radio button click correctly', () => {
+    render(<Radio {...defaultProps} isRadioSquare={true} />);
+
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[0]);
+
+    expect(mockInput.onChange).toHaveBeenCalledWith('option1');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('option1');
+  });
+
+  it('handles traditional radio button change correctly with onChange', () => {
+    render(<Radio {...defaultProps} isRadioSquare={false} />);
+
+    const inputs = screen.getAllByRole('radio');
+    fireEvent.click(inputs[0]);
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith('option1');
+  });
+
+  it('handles traditional radio button change correctly without onChange', () => {
+    render(<Radio {...defaultProps} input={undefined as any} isRadioSquare={false} onChange={undefined} />);
+
+    const inputs = screen.getAllByRole('radio');
+    fireEvent.click(inputs[0]);
+
+    expect(defaultProps.onChange).not.toHaveBeenCalled();
+  });
+
+  it('correctly sets active state for square buttons', () => {
+    const inputWithValue = { ...mockInput, value: 'option1' };
+    render(<Radio {...defaultProps} input={inputWithValue} isRadioSquare={true} />);
+
+    const buttons = screen.getAllByRole('button');
+    expect(buttons[0]).toHaveClass('btn-primary');
+    expect(buttons[1]).toHaveClass('btn-outline-secondary');
+  });
+
+  it('correctly sets checked state for traditional radio buttons', () => {
+    const inputWithValue = { ...mockInput, value: 'option1' };
+    render(<Radio {...defaultProps} input={inputWithValue} isRadioSquare={false} />);
+
+    const radioInputs = screen.getAllByRole('radio');
+    expect(radioInputs[0]).toBeChecked();
+    expect(radioInputs[1]).not.toBeChecked();
   });
 });

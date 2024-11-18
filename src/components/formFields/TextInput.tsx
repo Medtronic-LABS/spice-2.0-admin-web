@@ -52,7 +52,7 @@ const TextInput = ({
     />
   );
   return (
-    <div className={`${styles.textInput} ${error ? styles.danger : ''}`}>
+    <div className={`${styles.textInput} ${error ? styles.danger : ''}`} data-testid='text-input'>
       {isShowLabel && (
         <>
           <label htmlFor={props.name}>

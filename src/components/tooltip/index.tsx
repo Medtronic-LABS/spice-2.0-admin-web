@@ -37,6 +37,7 @@ const CustomTooltip = ({ children, title }: ICustomTooltipProps) => {
       data-bs-placement='top'
       data-bs-original-title={title}
       title={title}
+      data-testid='tooltip'
     >
       {children}
     </div>

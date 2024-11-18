@@ -56,6 +56,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
           : '')
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [errorRef.current, submitEnabledStatus, validating]
   );
 
@@ -123,6 +124,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
     if (currentphoneNumber && countryCode) {
       validatePhoneNumberFn(form?.getState().values[formName][index]?.phoneNumber, true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentphoneNumber, countryCode]);
 
   return (

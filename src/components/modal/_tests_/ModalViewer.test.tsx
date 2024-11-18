@@ -1,85 +1,66 @@
-import { mount } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ModalViewer from '../ModalViewer';
-import styles from '../ModalForm.module.scss';
+
+jest.mock('../../../assets/images/close.svg', () => ({
+  ReactComponent: 'closeIcon'
+}));
 
 describe('ModalViewer', () => {
-  let wrapper: any;
   const mockHandleCancel = jest.fn();
-  const mockChildren = <div>Mock children</div>;
+  const defaultProps = {
+    title: 'Test Modal',
+    show: true,
+    handleCancel: mockHandleCancel
+  };
 
   beforeEach(() => {
-    wrapper = mount(
-      <ModalViewer title='Test Modal' show={true} handleCancel={mockHandleCancel}>
-        <div>Test Content</div>
+    mockHandleCancel.mockClear();
+    jest.clearAllMocks();
+  });
+
+  it('should not render when show is false', () => {
+    render(
+      <ModalViewer {...defaultProps} show={false}>
+        <div>Modal Content</div>
       </ModalViewer>
     );
+
+    expect(screen.queryByTestId('modal-viewer')).not.toBeInTheDocument();
   });
 
-  afterEach(() => {
-    wrapper.unmount();
-  });
-
-  it('renders without crashing', () => {
-    wrapper = mount(
-      <ModalViewer title='Test title' show={true} handleCancel={mockHandleCancel}>
-        {mockChildren}
+  it('should render modal with correct title and content', () => {
+    render(
+      <ModalViewer {...defaultProps}>
+        <div>Modal Content</div>
       </ModalViewer>
     );
-    expect(wrapper).toBeDefined();
+
+    expect(screen.getByTestId('modal-viewer')).toBeInTheDocument();
+    expect(screen.getByText('Test Modal')).toBeInTheDocument();
+    expect(screen.getByText('Modal Content')).toBeInTheDocument();
   });
 
-  it('renders with size md prop', () => {
-    wrapper = mount(
-      <ModalViewer title='Test title' show={true} size='modal-md' handleCancel={mockHandleCancel}>
-        {mockChildren}
+  it('should call handleCancel when close button is clicked', () => {
+    render(
+      <ModalViewer {...defaultProps}>
+        <div>Modal Content</div>
       </ModalViewer>
     );
-    expect(wrapper).toBeDefined();
+
+    const closeButton = screen.getByAltText('close');
+    fireEvent.click(closeButton);
+    expect(mockHandleCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('renders with size lg prop', () => {
-    wrapper = mount(
-      <ModalViewer title='Test title' show={true} size='modal-lg' handleCancel={mockHandleCancel}>
-        {mockChildren}
+  it('should render content inside Form when renderInsideForm is true', () => {
+    render(
+      <ModalViewer {...defaultProps} renderInsideForm={true} size='modal-lg'>
+        <div>
+          <button type='submit'>Render form submit</button>
+        </div>
       </ModalViewer>
     );
-    expect(wrapper).toBeDefined();
-  });
 
-  it('renders the correct title', () => {
-    const title = 'Test title';
-    wrapper = mount(
-      <ModalViewer title={title} show={true} handleCancel={mockHandleCancel}>
-        {mockChildren}
-      </ModalViewer>
-    );
-    const titleElement = wrapper.find('.modal-title');
-    expect(titleElement.text()).toEqual(title);
-  });
-
-  it('renders the children', () => {
-    wrapper = mount(
-      <ModalViewer title='Test title' show={true} handleCancel={mockHandleCancel}>
-        {mockChildren}
-      </ModalViewer>
-    );
-    expect(wrapper.contains(mockChildren)).toEqual(true);
-  });
-
-  it('calls handleCancel when close button is clicked', () => {
-    wrapper = mount(
-      <ModalViewer title='Test title' show={true} handleCancel={mockHandleCancel}>
-        {mockChildren}
-      </ModalViewer>
-    );
-    const closeButton = wrapper.find(`.d-flex.justify-content-center.align-items-center.${styles.closeIcon}`);
-    closeButton.simulate('click');
-    expect(mockHandleCancel).toHaveBeenCalled();
-  });
-
-  it('does not render when show is false', () => {
-    // tslint:disable-next-line:no-empty
-    const modalWrapper = mount(<ModalViewer show={false} handleCancel={() => {}} title='Test Modal' />);
-    expect(modalWrapper.isEmptyRender()).toBe(true);
+    fireEvent.click(screen.getByText('Render form submit'));
   });
 });

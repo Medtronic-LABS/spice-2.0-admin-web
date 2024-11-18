@@ -93,7 +93,7 @@ const TagInput = ({
 
   const taginputClass = `${styles.items} ${disabled ? 'no-pointer-events ' + styles.disabledItems : ''}`;
   return (
-    <div className={`${styles.tagInput} ${styles[classChange]}`}>
+    <div className={`${styles.tagInput} ${styles[classChange]}`} data-testid='tag-input'>
       {label && (
         <>
           <label>
@@ -111,7 +111,7 @@ const TagInput = ({
         {items.map((item: string, i: number) => (
           <li key={i} className={taginputClass}>
             {item}
-            <span className={`ps-0dot75 ${styles.remove}`} onClick={() => handleRemoveItem(i)}>
+            <span className={`ps-0dot75 ${styles.remove}`} onClick={() => handleRemoveItem(i)} data-testid='remove-tag'>
               x
             </span>
           </li>

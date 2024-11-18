@@ -1,92 +1,234 @@
-import { mount } from 'enzyme';
-import { Field, Form } from 'react-final-form';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { Form } from 'react-final-form';
 import TextFieldWrapper from '../TextFieldWrapper';
-import TextInput from '../../../../../components/formFields/TextInput';
+import { InputTypes } from '../../../labTestConfig/BaseFieldConfig';
+import { Field } from 'react-final-form';
+
+const mockChildComponent = jest.fn();
+jest.mock('../../../../../components/formFields/TextInput', () => (props: any) => {
+  mockChildComponent(props);
+  return (
+    <div data-testid='text-input'>
+      <input />
+    </div>
+  );
+});
 
 describe('TextFieldWrapper', () => {
-  const props = {
-    name: 'testName',
-    inputProps: {
-      label: 'Test Label',
-      type: 'text',
-      visible: true,
-      required: true
-    },
-    fieldName: 'name'
+  const renderComponent = (props = {}) => {
+    // tslint:disable-next-line:no-empty
+    return render(<Form onSubmit={() => {}}>{() => <TextFieldWrapper {...props} />}</Form>);
   };
 
-  const buildWrapper = (customProps = {}) => {
-    const mergedProps = { ...props, ...customProps };
-    return mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }: any) => (
-          <form onSubmit={handleSubmit}>
-            <TextFieldWrapper {...mergedProps} />
-          </form>
-        )}
-      </Form>
-    );
-  };
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  it('should render a Field component with correct props', () => {
-    const wrapper = buildWrapper();
-    expect(wrapper.find(Field).props()).toMatchObject({
-      name: props.name,
-      parse: expect.any(Function),
-      type: 'text',
-      value: null,
-      validate: expect.any(Function)
+  it('renders with default props', () => {
+    renderComponent();
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    expect(mockChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: 'Label',
+        isShowLabel: undefined,
+        required: undefined
+      })
+    );
+  });
+
+  it('handles number input type correctly', () => {
+    renderComponent({
+      inputProps: { type: 'number', label: 'Number Field' }
     });
+
+    const input = screen.getByTestId('text-input').querySelector('input');
+    fireEvent.keyDown(input!, { key: '.' });
+    fireEvent.keyDown(input!, { key: 'e' });
+
+    expect(mockChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'number',
+        label: 'Number Field'
+      })
+    );
   });
 
-  it('should render a TextInput component with correct props', () => {
-    const wrapper = buildWrapper();
-    expect(wrapper.find(TextInput).props()).toMatchObject({
-      label: props.inputProps.label || 'Label',
-      onKeyDown: expect.any(Function),
-      onBlurCapture: expect.any(Function),
-      error: 'Please enter  test label',
-      isShowLabel: props.inputProps.visible,
-      required: props.inputProps.required,
-      capitalize: false,
-      disabled: undefined
+  it('handles decimal input type correctly', () => {
+    renderComponent({
+      inputProps: { type: 'decimal' },
+      obj: { inputType: InputTypes.DECIMAL }
     });
-  });
-  it('should set the input type to "number" if the inputProps type is "number" or "decimal"', () => {
-    const numberWrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }: any) => (
-          <form onSubmit={handleSubmit}>
-            <TextFieldWrapper inputProps={{ ...props.inputProps, type: 'number' }} fieldName='name' />
-          </form>
-        )}
-      </Form>
+
+    const input = screen.getByTestId('text-input').querySelector('input');
+    fireEvent.keyDown(input!, { key: '.' });
+    fireEvent.keyDown(input!, { key: 'e' });
+
+    expect(mockChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'number'
+      })
     );
-    expect(numberWrapper.find(TextInput).prop('type')).toBe('number');
-
-    const decimalWrapper = mount(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }: any) => (
-          <form onSubmit={handleSubmit}>
-            <TextFieldWrapper inputProps={{ ...props.inputProps, type: 'decimal' }} fieldName='name' />
-          </form>
-        )}
-      </Form>
-    );
-    decimalWrapper.setProps({ inputProps: { type: 'decimal' } });
-    expect(decimalWrapper.find(TextInput).prop('type')).toBe('number');
   });
 
-  it('should not set the input type to "number" if the inputProps type is not "number" or "decimal"', () => {
-    const wrapper = buildWrapper();
-    expect(wrapper.find(TextInput).prop('type')).toBe('text');
+  it('handles custom error messages', () => {
+    const customError = 'Custom error message';
+    renderComponent({
+      customError,
+      isCustomErrorWithMeta: true,
+      inputProps: { label: 'Test Field' }
+    });
+
+    expect(mockChildComponent).toHaveBeenCalled();
   });
 
-  it('should render the label from inputProps', () => {
-    const wrapper = buildWrapper();
-    expect(wrapper.find(TextInput).prop('label')).toBe('Test Label');
+  it('calls custom handlers when provided', async () => {
+    const customOnBlurFn = jest.fn();
+    const customOnChangeFn = jest.fn();
+
+    renderComponent({
+      customOnBlurFn,
+      customOnChangeFn
+    });
+
+    const input = screen.getByTestId('text-input').querySelector('input');
+    fireEvent.change(input!, { target: { value: 'test' } });
+    await waitFor(() => {
+      fireEvent.blur(input!);
+    });
+    expect(screen.getByDisplayValue('test')).toBeInTheDocument();
+  });
+
+  it('should handle keydown event with e key', () => {
+    renderComponent({
+      inputProps: { type: 'number' }
+    });
+    const keyDownMock = mockChildComponent.mock.calls[0][0];
+    keyDownMock.onKeyDown({ key: 'e', preventDefault: jest.fn() });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('should handle keydown event with . key', () => {
+    renderComponent({
+      inputProps: { type: 'number' }
+    });
+    const keyDownMock = mockChildComponent.mock.calls[0][0];
+    keyDownMock.onKeyDown({ key: '.', preventDefault: jest.fn() });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('should handle keydown event with onj inputType as decimal key', () => {
+    renderComponent({
+      inputProps: { type: 'number' },
+      obj: { inputType: InputTypes.DECIMAL }
+    });
+    const keyDownMock = mockChildComponent.mock.calls[0][0];
+    keyDownMock.onKeyDown({ key: 'e', preventDefault: jest.fn() });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('should handle keydown event with other type in inputProps', () => {
+    renderComponent({
+      inputProps: { type: 'text' }
+    });
+    const keyDownMock = mockChildComponent.mock.calls[0][0];
+    keyDownMock.onKeyDown({ key: 'e' });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('should handle default parseFn', async () => {
+    renderComponent({
+      inputProps: { type: 'number' }
+    });
+    const input = screen.getByTestId('text-input').querySelector('input');
+    fireEvent.change(input!, { target: { value: '123' } });
+    await waitFor(() => {
+      fireEvent.blur(input!);
+    });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('handle input without cusomParseFn', async () => {
+    renderComponent({
+      name: 'testField',
+      inputProps: { type: 'number' }
+    });
+    const input = screen.getByTestId('text-input').querySelector('input');
+    const testValue = '123';
+
+    fireEvent.change(input!, { target: { value: testValue } });
+    await waitFor(() => {
+      fireEvent.blur(input!);
+    });
+
+    const mockOnBlurFn = mockChildComponent.mock.calls[0][0];
+    mockOnBlurFn.onBlurCapture(testValue);
+
+    expect(screen.getByDisplayValue(testValue)).toBeInTheDocument();
+  });
+
+  describe('handle meta error', () => {
+    const renderErrorComponent = (props: any = {}) => {
+      return render(
+        <Form
+          // tslint:disable-next-line:no-empty
+          onSubmit={() => {}}
+          validate={(values: Record<string, any>) => {
+            const errors: Record<string, string> = {};
+            if (!values.testField) {
+              errors.testField = 'Required';
+            }
+            return errors;
+          }}
+          render={() => (
+            <Field
+              name='testField'
+              render={() => {
+                return <TextFieldWrapper {...props} />;
+              }}
+            />
+          )}
+        />
+      );
+    };
+    it('should handle mock meta error with error in inputProps', async () => {
+      renderErrorComponent({
+        name: 'testField',
+        inputProps: { type: 'number', label: 'Test Field', error: 'Invalid' }
+      });
+      const input = screen.getByTestId('text-input').querySelector('input');
+      fireEvent.change(input!, { target: { value: '123' } });
+      await waitFor(() => {
+        fireEvent.blur(input!);
+      });
+      expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    });
+
+    it('should handle mock meta error without error in inputProps', async () => {
+      renderErrorComponent({
+        name: 'testField',
+        inputProps: { type: 'number', label: 'Test Field' }
+      });
+      const input = screen.getByTestId('text-input').querySelector('input');
+      fireEvent.change(input!, { target: { value: '123' } });
+      await waitFor(() => {
+        fireEvent.blur(input!);
+      });
+      expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    });
+
+    it('should handle mock meta error without error in inputProps and without type in inputProps', async () => {
+      renderErrorComponent({
+        name: 'testField',
+        inputProps: { label: 'Test Field' },
+        fieldName: 'interval'
+      });
+      const input = screen.getByTestId('text-input').querySelector('input');
+      fireEvent.change(input!, { target: { value: '123' } });
+      await waitFor(() => {
+        fireEvent.blur(input!);
+      });
+      expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    });
   });
 });

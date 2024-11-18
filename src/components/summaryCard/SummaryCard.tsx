@@ -82,6 +82,7 @@ const SummaryCard = ({
       flex-sm-nowrap flex-wrap \
       justify-content-sm-between justify-content-start \
       `}
+      data-testid='summary-card'
     >
       {title && (
         <div className={`d-flex align-items-center align-self-center mw-0 py-0dot5 ${styles.titleContainer}`}>
@@ -111,6 +112,7 @@ const SummaryCard = ({
             sessionStorageServices.setItem(APPCONSTANTS.FORM_ID, formId);
             onClick?.(event);
           }}
+          data-testid='summary-elements'
         >
           <div className='primary-title lh-1dot375'>{value}</div>
           <div className={`subtle-small-text ${disableEllipsis ? '' : 'text-ellipsis'}`}>{label}</div>
@@ -120,6 +122,7 @@ const SummaryCard = ({
         className={`align-self-center ${styles.moveForward} my-0dot5`}
         onMouseLeave={handleLinkHover}
         onClick={handleNavigation}
+        data-testid='move-forward'
       >
         <ArrowRight aria-labelledby='arrow-right' />
       </div>

@@ -83,7 +83,7 @@ const MultiSelect = (props: any): React.ReactElement => {
 
   // To auto select if only 1 option is available
   useEffect(() => {
-    if (props.options.length === 1 && props.required && props.isDefaultSelected) {
+    if (props.options?.length === 1 && props.required && props.isDefaultSelected) {
       setTimeout(() => {
         change(props.name, props.options);
       }, 0);
@@ -312,7 +312,7 @@ const MultiSelect = (props: any): React.ReactElement => {
     allOption.label = selectAllLabel.current;
 
     return (
-      <div className={`d-flex flex-column ${styles.selectInputContainer}`}>
+      <div className={`d-flex flex-column ${styles.selectInputContainer}`} data-testid='multi-select'>
         {newProps.isShowLabel && !newProps.showOnlyDropdown && (
           <label className='mb-0dot5 fs-0dot875 lh-1dot25'>
             {newProps.label}
@@ -355,7 +355,7 @@ const MultiSelect = (props: any): React.ReactElement => {
   }
 
   return (
-    <div className={`d-flex flex-column `}>
+    <div className={`d-flex flex-column `} data-testid='multi-select'>
       {newProps.isShowLabel && !newProps.showOnlyDropdown && (
         <label className={`mb-0dot5 fs-0dot875 lh-1dot25 ${styles.labelCSS}`}>
           <span className={styles.labelCSS}>{newProps.label}</span>

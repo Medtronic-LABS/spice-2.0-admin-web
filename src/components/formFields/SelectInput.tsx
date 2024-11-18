@@ -160,7 +160,7 @@ const SelectInput = ({
   };
 
   return (
-    <div className={`d-flex flex-column ${styles.selectInputContainer}`}>
+    <div className={`d-flex flex-column ${styles.selectInputContainer}`} data-testid='select-input'>
       {isShowLabel && !showOnlyDropdown && (
         <label className='mb-0dot5 fs-0dot875 lh-1dot25'>
           {label}
@@ -263,7 +263,7 @@ export const AsyncSelectInput = ({
   };
 
   return (
-    <div className={`d-flex flex-column ${styles.selectInputContainer}`}>
+    <div className={`d-flex flex-column ${styles.selectInputContainer}`} data-testid='async-select-input'>
       <label className='mb-0dot5 fs-0dot875 lh-1dot25 d-inline-flex'>
         {label}
         {required && <span className='input-asterisk'>*</span>}

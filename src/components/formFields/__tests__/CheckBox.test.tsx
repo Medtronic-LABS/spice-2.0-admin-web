@@ -1,45 +1,65 @@
-import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Checkbox from '../Checkbox';
-import styles from './Checkbox.module.scss';
 
 describe('Checkbox', () => {
   it('should render correctly with label', () => {
-    const wrapper = mount(<Checkbox label='Test Label' />);
-    expect(wrapper.find('label')).toHaveLength(1);
-    expect(wrapper.find('input[type="checkbox"]')).toHaveLength(1);
-    expect(wrapper.find('span').text()).toEqual('Test Label');
+    render(<Checkbox label='Test Label' />);
+    expect(screen.getByLabelText('Test Label')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
-  it('should handle onClick event', () => {
+  it('should handle onClick event', async () => {
     const mockOnClick = jest.fn();
-    const wrapper = mount(<Checkbox label='Test Label' onClick={mockOnClick} />);
-    wrapper.find('input[type="checkbox"]').simulate('click');
+    render(<Checkbox label='Test Label' onClick={mockOnClick} />);
+    await userEvent.click(screen.getByRole('checkbox'));
     expect(mockOnClick).toHaveBeenCalled();
   });
 
   it('should render correctly with switchCheckbox', () => {
-    const wrapper = mount(<Checkbox label='Test Label' switchCheckbox={true} />);
-    expect(wrapper.find(`.${styles.clSwitch}`)).toHaveLength(1);
-    expect(wrapper.find(`.${styles.switcher}`)).toHaveLength(1);
-    expect(wrapper.find(`.${styles.checkboxLabelText}`).text()).toEqual('Test Label');
+    render(<Checkbox label='Test Label' switchCheckbox={true} />);
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
+    expect(screen.getByTestId('checkbox')).toBeInTheDocument();
   });
 
   it('should disable checkbox when readOnly is true', () => {
-    const wrapper = mount(<Checkbox label='Test Label' readOnly={true} />);
-    expect(wrapper.find('input[type="checkbox"]').prop('disabled')).toEqual(undefined);
+    render(<Checkbox label='Test Label' readOnly={true} />);
+    expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
-  it('should handle Enter key press', () => {
+  it('should handle click event on checkbox', () => {
     const mockOnClick = jest.fn();
-    const wrapper = mount(<Checkbox label='Test Label' onClick={mockOnClick} />);
-    wrapper.find('input[type="checkbox"]').simulate('keyPress', { key: 'Enter' });
+    render(<Checkbox label='Test Label' onClick={mockOnClick} />);
+    fireEvent.click(screen.getByRole('checkbox'));
     expect(mockOnClick).toHaveBeenCalled();
   });
 
   it('should handle inputProps correctly', () => {
-    const wrapper = mount(<Checkbox label='Test Label' id='testId' data-testid='testCheckbox' />);
-    expect(wrapper.find('input[type="checkbox"]').prop('id')).toEqual('testId');
-    expect(wrapper.find('input[type="checkbox"]').prop('data-testid')).toEqual('testCheckbox');
+    render(<Checkbox label='Test Label' id='testId' data-testid='testCheckbox' />);
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toHaveAttribute('id', 'testId');
+    expect(checkbox).toHaveAttribute('data-testid', 'testCheckbox');
+  });
+
+  it('should handle Enter key press', () => {
+    const mockOnClick = jest.fn();
+    render(<Checkbox label='Test Label' onClick={mockOnClick} />);
+
+    const checkbox = screen.getByRole('checkbox');
+    checkbox.focus();
+    fireEvent.keyPress(checkbox, { key: 'Enter', code: 'Enter', charCode: 13 });
+
+    expect(screen.getByRole('checkbox')).toBeChecked();
+  });
+
+  it('should handle other key press', () => {
+    const mockOnClick = jest.fn();
+    render(<Checkbox label='Test Label' onClick={mockOnClick} />);
+
+    const checkbox = screen.getByRole('checkbox');
+    checkbox.focus();
+    fireEvent.keyPress(checkbox, { key: ' ', code: 'Space', charCode: 32 });
+
+    expect(screen.getByRole('checkbox')).not.toBeChecked();
   });
 });

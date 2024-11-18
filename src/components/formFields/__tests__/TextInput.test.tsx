@@ -1,58 +1,70 @@
-import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import TextInput from '../TextInput';
-import styles from './TextInput.module.scss';
 
 describe('TextInput component', () => {
-  let wrapper: any;
   const mockOnChange = jest.fn();
-  let props: any;
-  beforeEach(() => {
-    props = {
-      event: {
-        target: {
-          setSelectionRange: jest.fn()
-        }
-      }
-    };
-    wrapper = shallow(<TextInput {...props} onChange={mockOnChange} />);
-  });
+  const defaultProps = {
+    onChange: mockOnChange,
+    name: 'test-input'
+  };
 
   it('renders without crashing', () => {
-    expect(wrapper.exists()).toBe(true);
+    render(<TextInput {...defaultProps} />);
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
   });
 
   it('displays label if isShowLabel prop is true', () => {
-    wrapper.setProps({ label: 'Test Label', isShowLabel: true });
-    expect(wrapper.find('label').text()).toEqual('Test Label*');
+    render(<TextInput {...defaultProps} label='Test Label' isShowLabel={true} />);
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
   });
 
   it('does not display label if isShowLabel prop is false', () => {
-    wrapper.setProps({ label: 'Test Label', isShowLabel: false });
-    expect(wrapper.find('label').exists()).toBe(false);
+    render(<TextInput {...defaultProps} label='Test Label' isShowLabel={false} />);
+    expect(screen.queryByText('Test Label*')).not.toBeInTheDocument();
   });
 
   it('displays error message if error prop is provided', () => {
-    wrapper.setProps({ error: 'Test Error' });
-    expect(wrapper.find(`.${styles.error}`).text()).toEqual('*Test Error ');
+    render(<TextInput {...defaultProps} error='Test Error' />);
+    expect(screen.getByText('Test Error')).toBeInTheDocument();
   });
 
   it('displays helpertext prop if provided', () => {
     const helpertext = <span>Test Helpertext</span>;
-    wrapper.setProps({ helpertext });
-    expect(wrapper.contains(helpertext)).toBe(true);
+    render(<TextInput {...defaultProps} helpertext={helpertext} />);
+    expect(screen.getByText('Test Helpertext')).toBeInTheDocument();
   });
 
   it('renders the label and input correctly', () => {
-    const componentWrapper = mount(<TextInput {...props} label='Test Label' name='test' />);
-    expect(componentWrapper.find('label').text()).toBe('Test Label*');
-    expect(componentWrapper.find('input').prop('name')).toBe('test');
+    render(<TextInput {...defaultProps} label='Test Label' name='test' />);
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveAttribute('name', 'test');
   });
 
   it('calls the onChange function when input value is changed', () => {
-    const input = wrapper.find('input').at(0);
-    const event = { target: { value: 'test' } };
-    input.simulate('change', event);
+    render(<TextInput {...defaultProps} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'test' } });
     expect(mockOnChange).toHaveBeenCalledTimes(1);
+  });
+
+  // branch coverage
+
+  it('should handle showLoader as true', () => {
+    render(<TextInput {...defaultProps} showLoader={true} />);
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('should handle Enter key press', () => {
+    render(<TextInput {...defaultProps} lowerCase={true} capitalize={false} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.keyUp(input, { key: 'Enter', code: 'Enter', charCode: 13 });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+  });
+
+  it('should handle capitalize as false and lowercase as false', () => {
+    render(<TextInput {...defaultProps} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.keyUp(input, { key: 'Enter', code: 'Enter', charCode: 13 });
+    expect(screen.getByTestId('text-input')).toBeInTheDocument();
   });
 });

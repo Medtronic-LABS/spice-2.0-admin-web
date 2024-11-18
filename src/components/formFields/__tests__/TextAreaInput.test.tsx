@@ -1,20 +1,52 @@
-import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import TextAreaInput from '../TextAreaInput';
 
 describe('TextAreaInput', () => {
-  it('should render a label', () => {
-    const wrapper = mount(<TextAreaInput label='Name' name='name' />);
-    expect(wrapper.find('label').text()).toEqual('Name');
+  const defaultProps = {
+    label: 'Test Label',
+    name: 'test-input'
+  };
+
+  it('renders with default props', () => {
+    render(<TextAreaInput {...defaultProps} />);
+
+    expect(screen.getByTestId('text-area-input')).toBeInTheDocument();
+    expect(screen.getByLabelText('Test Label')).toBeInTheDocument();
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
   });
 
-  it('should not render the label if isShowLabel prop is false', () => {
-    const wrapper = mount(<TextAreaInput label='Name' name='name' isShowLabel={false} />);
-    expect(wrapper.find('label').exists()).toEqual(false);
+  it('renders without label when isShowLabel is false', () => {
+    render(<TextAreaInput {...defaultProps} isShowLabel={false} />);
+
+    expect(screen.getByTestId('text-area-input')).toBeInTheDocument();
+    expect(screen.getByLabelText('Test Label')).toBeInTheDocument();
+    expect(screen.queryByText('Test Label')).not.toBeInTheDocument();
   });
 
-  it('should have the correct maxLength prop', () => {
-    const wrapper = mount(<TextAreaInput label='Name' name='name' maxLength={300} />);
-    expect(wrapper.find('textarea').prop('maxLength')).toEqual(300);
+  it('displays error message and error label when error prop is provided', () => {
+    const errorProps = {
+      ...defaultProps,
+      error: 'Error message',
+      errorLabel: '(Please fix this)'
+    };
+
+    render(<TextAreaInput {...errorProps} />);
+
+    expect(screen.getByText('Error message (Please fix this)')).toBeInTheDocument();
+  });
+
+  it('applies maxLength of 300 to textarea', () => {
+    render(<TextAreaInput {...defaultProps} />);
+
+    const textarea = screen.getByLabelText('Test Label');
+    expect(textarea).toHaveAttribute('maxLength', '300');
+  });
+
+  it('passes through additional props to textarea', () => {
+    render(<TextAreaInput {...defaultProps} placeholder='Enter text here' disabled={true} />);
+
+    const textarea = screen.getByLabelText('Test Label');
+    expect(textarea).toHaveAttribute('placeholder', 'Enter text here');
+    expect(textarea).toBeDisabled();
   });
 });

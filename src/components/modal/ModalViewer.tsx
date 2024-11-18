@@ -28,7 +28,7 @@ const ModalViewer = React.memo(
       return null;
     }
     return ReactDOM.createPortal(
-      <div className={`${styles.modal} modal modal-show`}>
+      <div className={`${styles.modal} modal modal-show`} data-testid='modal-viewer'>
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
           <div className={`modal-content ${styles.modalContent}`}>
             <div className='modal-header py-1 px-1dot25 justify-content-between'>

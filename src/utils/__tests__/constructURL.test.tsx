@@ -41,4 +41,44 @@ describe('constructUrl', () => {
     const constructedUrl = constructUrl(requestUrl as any);
     expect(constructedUrl).toBe(expectedUrl);
   });
+
+  it('should construct the URL correctly when limit is undefined', () => {
+    const requestUrl = {
+      resource: '/api/resource',
+      query: {
+        pageNo: 1,
+        limit: undefined,
+        sortField: 'name',
+        sortOrder: 'asc',
+        filters: '',
+        search: [],
+        coreFilters: null
+      }
+    };
+
+    const expectedUrl = '/api/resource?$sort[name]=asc';
+
+    const constructedUrl = constructUrl(requestUrl as any);
+    expect(constructedUrl).toBe(expectedUrl);
+  });
+
+  it('should construct the URL correctly when sortOrder is undefined', () => {
+    const requestUrl = {
+      resource: '/api/resource',
+      query: {
+        pageNo: 1,
+        limit: 10,
+        sortField: 'name',
+        sortOrder: undefined,
+        filters: '',
+        search: [],
+        coreFilters: null
+      }
+    };
+
+    const expectedUrl = '/api/resource?$limit=10&$skip=10';
+
+    const constructedUrl = constructUrl(requestUrl as any);
+    expect(constructedUrl).toBe(expectedUrl);
+  });
 });

@@ -13,7 +13,6 @@ import APPCONSTANTS from '../../constants/appConstantsCom';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
 import { IGroupRoles, IRoles, IUser } from '../../store/user/types';
-import MultiSelect from '../multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
 import { isUserRolesLoading, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { fetchUserRolesAction } from '../../store/user/actions';
@@ -49,6 +48,7 @@ import {
   SUPER_ADMIN,
   SUPER_USER
 } from '../../routes';
+import MultiSelect from '../../components/multiSelect/MultiSelect';
 
 interface IUserFormProps {
   form: FormApi<any>;

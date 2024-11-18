@@ -32,9 +32,9 @@ const DatePickerWrapper = ({
         <>
           <DatePickerComponent
             {...(input as any)}
-            label={inputProps.label}
+            label={inputProps?.label}
             isShowLabel={true}
-            errorLabel={inputProps.label.toLowerCase()}
+            errorLabel={inputProps?.label?.toLowerCase()}
             onChange={(date: Date) => {
               const selectedDate = convertDate(date);
               input.onChange(selectedDate);

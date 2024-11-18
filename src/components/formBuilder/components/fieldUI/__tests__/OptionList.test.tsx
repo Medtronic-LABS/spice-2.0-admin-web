@@ -5,9 +5,6 @@ import configureStore from 'redux-mock-store';
 import arrayMutators from 'final-form-arrays';
 import OptionList from '../OptionList';
 
-// jest.mock('../../../../../components/formFields/TextInput', () => () => <input data-testid='text-input' />);
-// jest.mock('../TagInput', () => () => <input data-testid='tag-input' />);
-
 const mockChildComponent = jest.fn();
 jest.mock('../TagInput', () => (props: any) => {
   mockChildComponent(props);

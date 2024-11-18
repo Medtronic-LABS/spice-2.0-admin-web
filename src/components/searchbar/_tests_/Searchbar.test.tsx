@@ -1,56 +1,79 @@
-import { mount, shallow } from 'enzyme';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Searchbar from '../Searchbar';
 
 describe('Searchbar', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
+
   const mockOnSearch = jest.fn();
-  jest.useFakeTimers();
 
-  it('renders without crashing', () => {
-    shallow(<Searchbar onSearch={mockOnSearch} />);
+  it('renders correctly with default props', () => {
+    render(<Searchbar onSearch={mockOnSearch} />);
+
+    const searchInput = screen.getByTestId('table-search-input');
+    expect(searchInput).toBeInTheDocument();
+    expect(searchInput).toHaveAttribute('placeholder', 'Search');
+    expect(searchInput).toHaveValue('');
   });
 
-  it('renders with default placeholder text', () => {
-    const wrapper = shallow(<Searchbar onSearch={mockOnSearch} />);
-    const input = wrapper.find('input');
-    expect(input.prop('placeholder')).toEqual('Search');
+  it('renders with custom placeholder', () => {
+    render(<Searchbar onSearch={mockOnSearch} placeholder='Custom search' isOutlined={false} />);
+
+    const searchInput = screen.getByTestId('table-search-input');
+    expect(searchInput).toHaveAttribute('placeholder', 'Custom search');
   });
 
-  it('renders with custom placeholder text', () => {
-    const placeholder = 'Type something to search...';
-    const wrapper = shallow(<Searchbar placeholder={placeholder} onSearch={mockOnSearch} />);
-    const input = wrapper.find('input');
-    expect(input.prop('placeholder')).toEqual(placeholder);
+  it('updates input value on change', () => {
+    render(<Searchbar onSearch={mockOnSearch} />);
+
+    const searchInput = screen.getByTestId('table-search-input');
+    fireEvent.change(searchInput, { target: { value: 'test search' } });
+
+    expect(searchInput).toHaveValue('test search');
   });
 
-  it('calls onSearch when input value changes', () => {
-    const newMockOnSearch = jest.fn();
-    const searchText = 'Hello world';
-    const wrapper = mount(<Searchbar onSearch={newMockOnSearch} />);
-    const input = wrapper.find('input');
-    input.simulate('change', { target: { value: searchText } });
-    jest.runOnlyPendingTimers(); // execute the setTimeout callback
-    expect(newMockOnSearch).toHaveBeenCalledWith(searchText);
+  it('debounces search callback', async () => {
+    render(<Searchbar onSearch={mockOnSearch} />);
+
+    const searchInput = screen.getByTestId('table-search-input');
+
+    fireEvent.change(searchInput, { target: { value: 't' } });
+    fireEvent.change(searchInput, { target: { value: 'te' } });
+    fireEvent.change(searchInput, { target: { value: 'test' } });
+
+    expect(mockOnSearch).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(mockOnSearch).toHaveBeenCalledTimes(1);
+      expect(mockOnSearch).toHaveBeenCalledWith('test');
+    });
   });
 
-  it('clears the timer and updates search text when input value changes', () => {
-    const searchText = 'Hello world';
-    const wrapper = shallow(<Searchbar onSearch={mockOnSearch} />);
-    const input = wrapper.find('input');
-    const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
-    input.simulate('change', { target: { value: searchText } });
-    expect(clearTimeoutSpy).toHaveBeenCalled();
-    expect(wrapper.find('input').prop('value')).toEqual(searchText);
-  });
+  it('clears previous timeout on new input', async () => {
+    render(<Searchbar onSearch={mockOnSearch} />);
 
-  it('renders an outlined searchbar by default', () => {
-    const wrapper = shallow(<Searchbar onSearch={mockOnSearch} />);
-    const input = wrapper.find('input');
-    expect(input.hasClass('searchbarOutlined')).toBe(false);
-  });
+    const searchInput = screen.getByTestId('table-search-input');
 
-  it('renders a non-outlined searchbar when isOutlined is false', () => {
-    const wrapper = shallow(<Searchbar onSearch={mockOnSearch} isOutlined={false} />);
-    const input = wrapper.find('input');
-    expect(input.hasClass('searchbar')).toBe(false);
+    fireEvent.change(searchInput, { target: { value: 'test' } });
+
+    jest.advanceTimersByTime(200);
+
+    fireEvent.change(searchInput, { target: { value: 'new test' } });
+
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(mockOnSearch).toHaveBeenCalledTimes(1);
+      expect(mockOnSearch).toHaveBeenCalledWith('new test');
+    });
   });
 });

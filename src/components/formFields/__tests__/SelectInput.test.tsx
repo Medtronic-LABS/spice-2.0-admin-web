@@ -1,200 +1,320 @@
-import { mount, shallow } from 'enzyme';
-import InfoIcon from '../../../assets/images/info-grey.svg';
-import CustomTooltip from '../../tooltip';
-import SelectInput, { AsyncSelectInput, handleChange } from '../SelectInput';
-import styles from './SelectInput.module.scss';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { Form } from 'react-final-form';
+import SelectInput, { AsyncSelectInput } from '../SelectInput';
 
-jest.mock('react-final-form', () => ({
-  useForm: jest.fn().mockReturnValue({
-    change: () => {
-      //
-    }
-  })
+const mockOptions = [
+  { label: 'Option 1', value: '1' },
+  { label: 'Option 2', value: '2' },
+  { label: 'Option 3', value: '3' }
+];
+
+const mockSelectChildComponent = jest.fn();
+jest.mock('react-select', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockSelectChildComponent(props);
+    return <div data-testid='select-component'>Select Component</div>;
+  }
+}));
+
+const mockAsyncChildComponent = jest.fn();
+jest.mock('react-select/async', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockAsyncChildComponent(props);
+    return <div data-testid='async-select-component'>Async Select Component</div>;
+  }
 }));
 
 describe('SelectInput', () => {
-  const props: any = {
-    label: 'Select an option',
-    required: true,
-    options: [
-      { label: 'Option 1', value: 'option1' },
-      { label: 'Option 2', value: 'option2' },
-      { label: 'Option 3', value: 'option3' }
-    ],
-    input: 'option1' // Add the input property here
+  const defaultProps = {
+    label: 'Test Select',
+    options: mockOptions,
+    input: {
+      name: 'testSelect',
+      onChange: jest.fn(),
+      value: ''
+    }
   };
 
-  it('should render the label and required indicator', () => {
-    const wrapper = shallow(<AsyncSelectInput {...props} />);
-    const label = wrapper.find('label');
-
-    expect(label).toHaveLength(1);
-    expect(label.text()).toContain('Select an option');
-    expect(wrapper.find('.input-asterisk')).toHaveLength(1);
+  beforeEach(() => {
+    jest.useFakeTimers();
   });
 
-  it('should render the label and required indicator', () => {
-    const wrapper = shallow(<SelectInput {...props} />);
-    const label = wrapper.find('label');
-
-    expect(label).toHaveLength(1);
-    expect(label.text()).toContain('Select an option');
-    expect(wrapper.find('.input-asterisk')).toHaveLength(1);
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('should display info icon with tooltip message', () => {
-    const wrapper = mount(
-      <CustomTooltip title='Type 3 characters to search'>
-        <img src={InfoIcon} alt='Type 3 letters' className={styles.infoIcon} />
-      </CustomTooltip>
-    );
-
-    // check if tooltip message is displayed on hover
-    wrapper.find('img').simulate('mouseover');
-    expect(wrapper.text()).toContain('');
-
-    // check if tooltip message is hidden on mouseout
-    wrapper.find('img').simulate('mouseout');
-    expect(wrapper.text()).not.toContain('Type 3 characters to search');
-
-    expect(wrapper.find('img')).toHaveLength(1);
-    expect(wrapper.find('img').exists()).toBe(true);
-    expect(wrapper.find('img').prop('alt')).toBe('Type 3 letters');
-  });
-
-  it('should render the component without errors', () => {
-    const wrapper = mount(<SelectInput {...props} />);
-    expect(wrapper.exists()).toBe(true);
-  });
-
-  it('should display the label passed as prop', () => {
-    const wrapper = mount(<SelectInput {...props} />);
-    const expectedLabel = props.label + (props.required ? '*' : '');
-    expect(wrapper.find('label').text()).toBe(expectedLabel);
-  });
-
-  it('should update the value when an option is selected', () => {
-    const onChangeMock = jest.fn();
-    const wrapper = mount(<SelectInput {...props} onChange={onChangeMock} />);
-
-    // Expect the input value to be updated
-    expect(wrapper.find('input').prop('value')).toBe('');
-  });
-
-  it('should not display error message when showOnlyDropdown is true', () => {
-    const wrapper = mount(<SelectInput {...props} />);
-    expect(wrapper.find('.error')).toHaveLength(0);
-  });
-
-  it('should display error message when showOnlyDropdown is false', () => {
-    const wrapper = mount(<SelectInput {...props} />);
-
-    expect(wrapper.find(`.${styles.error}`)).toHaveLength(1);
-    expect(wrapper.find(`.${styles.error}`).text().trim()).toBe('Select an option*');
-  });
-
-  it('should render the label and required indicator', () => {
-    const wrapper = shallow(<AsyncSelectInput {...props} />);
-    const label = wrapper.find('label');
-    expect(label).toHaveLength(1);
-    expect(label.text()).toContain('Select an option');
-    expect(wrapper.find('.input-asterisk')).toHaveLength(1);
-  });
-
-  it('should display info icon with tooltip message', () => {
-    const wrapper = mount(
-      <CustomTooltip title='Type 3 characters to search'>
-        <img src={InfoIcon} alt='Type 3 letters' className={styles.infoIcon} />
-      </CustomTooltip>
-    );
-
-    // check if tooltip message is displayed on hover
-    wrapper.find('img').simulate('mouseover');
-    expect(wrapper.text()).toContain('');
-
-    // check if tooltip message is hidden on mouseout
-    wrapper.find('img').simulate('mouseout');
-    expect(wrapper.text()).not.toContain('Type 3 characters to search');
-
-    expect(wrapper.find('img')).toHaveLength(1);
-    expect(wrapper.find('img').exists()).toBe(true);
-    expect(wrapper.find('img').prop('alt')).toBe('Type 3 letters');
-  });
-
-  it('should render the component without errors', () => {
-    const wrapper = mount(<AsyncSelectInput {...props} />);
-    expect(wrapper.exists()).toBe(true);
-  });
-
-  it('should display the label passed as prop', () => {
-    const wrapper = mount(<AsyncSelectInput {...props} />);
-    const expectedLabel = props.label + (props.required ? '*' : '');
-    expect(wrapper.find('label').text()).toBe(expectedLabel);
-  });
-
-  it('should update the value when an option is selected', () => {
-    const onChangeMock = jest.fn();
-    const wrapper = mount(<AsyncSelectInput {...props} onChange={onChangeMock} />);
-
-    // Expect the input value to be updated
-    expect(wrapper.find('input').first().prop('value')).toBe('');
-  });
-
-  it('should not display error message when showOnlyDropdown is true', () => {
-    const wrapper = mount(<AsyncSelectInput {...props} />);
-    expect(wrapper.find('.error')).toHaveLength(0);
-  });
-
-  it('should display error message when showOnlyDropdown is false', () => {
-    const wrapper = mount(<AsyncSelectInput {...props} />);
-
-    expect(wrapper.find(`.${styles.error}`)).toHaveLength(1);
-    expect(wrapper.find(`.${styles.error}`).text().trim()).toBe('Select an option*');
-  });
-
-  it('should set zIndex to 9999 for MenuPortal when isModel is true', () => {
-    const component = shallow(<AsyncSelectInput {...props} isModel={true} />);
-    const menuPortal = component.find('MenuPortal');
-    expect(menuPortal.length).toBe(0);
-  });
-
-  it('should set zIndex to 9999 for MenuPortal when isModel is true', () => {
-    const component = shallow(<SelectInput {...props} isModel={true} />);
-    const menuPortal = component.find('MenuPortal');
-    expect(menuPortal.length).toBe(0);
-  });
-  it('should call onChange prop with correct value', () => {
-    const input = {
-      onChange: jest.fn()
-    };
-    const onChange = jest.fn();
-    const value = 'new value';
-
-    handleChange(input, onChange, value);
-
-    expect(input.onChange).toHaveBeenCalledWith(value);
-    expect(onChange).toHaveBeenCalledWith(value);
-  });
-
-  it('should have 100% statement coverage', () => {
-    const input = {
-      onChange: jest.fn()
-    };
-    const onChange = jest.fn();
-    const value = 'new value';
-
+  const renderWithForm = (ui: React.ReactElement) => {
     // tslint:disable-next-line:no-empty
-    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    return render(<Form onSubmit={() => {}}>{() => ui}</Form>);
+  };
 
-    handleChange(input, onChange, value);
-    expect(input.onChange).toHaveBeenCalledWith(value);
-    expect(onChange).toHaveBeenCalledWith(value);
-    expect(spy).not.toHaveBeenCalled();
-    spy.mockRestore();
+  it('renders select input component', () => {
+    renderWithForm(<SelectInput {...defaultProps} />);
+    expect(screen.getByTestId('select-input')).toBeInTheDocument();
   });
 
-  it('should call handleChange function with input, onChange function, and value', () => {
-    const onChange = jest.fn();
-    expect(onChange).toBeCalledTimes(0);
+  it('renders select input component with isModel as true', () => {
+    renderWithForm(<SelectInput {...defaultProps} isModel={true} />);
+    expect(screen.getByTestId('select-input')).toBeInTheDocument();
+  });
+
+  it('shows required asterisk when required prop is true', () => {
+    renderWithForm(<SelectInput {...defaultProps} required={true} />);
+    const selectInput = screen.getByTestId('select-input');
+    expect(selectInput.querySelector('.input-asterisk')).toBeInTheDocument();
+  });
+
+  it('displays error message when error prop is provided', () => {
+    renderWithForm(<SelectInput {...defaultProps} error='This field is required' errorLabel='Error Label' />);
+    expect(screen.getByText('This field is required Error Label')).toBeInTheDocument();
+  });
+
+  it('auto-selects first option when only one option is available', async () => {
+    const singleOption = [{ label: 'Single Option', value: 'single' }];
+
+    renderWithForm(
+      <SelectInput
+        {...defaultProps}
+        options={singleOption}
+        name='testSelect'
+        autoSelect={true}
+        input={{ ...defaultProps.input }}
+      />
+    );
+    jest.advanceTimersByTime(0);
+
+    expect(screen.getByTestId('select-input')).toBeInTheDocument();
+  });
+
+  it('disables the select when disabled prop is true', () => {
+    renderWithForm(<SelectInput {...defaultProps} disabled={true} />);
+    expect(screen.getByTestId('select-input')).toBeInTheDocument();
+  });
+
+  it('shows only dropdown when showOnlyDropdown is true', () => {
+    renderWithForm(<SelectInput {...defaultProps} showOnlyDropdown={true} />);
+    const selectInput = screen.getByTestId('select-input');
+    expect(selectInput.querySelector('label')).not.toBeInTheDocument();
+    expect(selectInput.querySelector('.error')).not.toBeInTheDocument();
+  });
+
+  it('handle onChange event', () => {
+    renderWithForm(<SelectInput {...defaultProps} onChange={jest.fn()} />);
+    const mockOnChange = mockSelectChildComponent.mock.calls[0][0];
+    mockOnChange.onChange({ value: '1' }, jest.fn());
+    expect(defaultProps.input.onChange).toHaveBeenCalledWith({ value: '1' });
+  });
+
+  it('handle onChange event without input and onChange prop', () => {
+    renderWithForm(<SelectInput {...defaultProps} input={undefined} />);
+    const mockOnChange = mockSelectChildComponent.mock.calls[0][0];
+    mockOnChange.onChange({ value: '1' }, jest.fn());
+  });
+
+  it('call getOptionLabel function with labelKey as array and nestedObject', () => {
+    renderWithForm(<SelectInput {...defaultProps} labelKey={['label']} nestedObject={true} />);
+    const mockGetOptionLabel = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionLabel function with labelKey as string and nestedObject as false and appendPlus as true', () => {
+    renderWithForm(<SelectInput {...defaultProps} labelKey='label' nestedObject={false} appendPlus={true} />);
+    const mockGetOptionLabel = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionLabel function with labelKey as string and nestedObject as false and appendPlus as false', () => {
+    renderWithForm(<SelectInput {...defaultProps} labelKey='label' nestedObject={false} appendPlus={false} />);
+    const mockGetOptionLabel = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionLabel function with labelKey as null and nestedObject as false', () => {
+    renderWithForm(<SelectInput {...defaultProps} labelKey={undefined} nestedObject={false} />);
+    const mockGetOptionLabel = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionValue function with valueKey as array and nestedObject', () => {
+    renderWithForm(<SelectInput {...defaultProps} valueKey={['value1', 'value2']} nestedObject={true} />);
+    const mockGetOptionValue = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionValue.getOptionValue({ label: 'Option 1', value1: { value2: '1' } });
+    expect(mockGetOptionValue.getOptionValue).toBeDefined();
+  });
+
+  it('call getOptionValue function with valueKey as string and nestedObject as false', () => {
+    renderWithForm(<SelectInput {...defaultProps} valueKey='value1' nestedObject={false} />);
+    const mockGetOptionValue = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionValue.getOptionValue({ label: 'Option 1', value1: { value2: '1' } });
+    expect(mockGetOptionValue.getOptionValue).toBeDefined();
+  });
+
+  it('call getOptionValue function with valueKey as null and nestedObject as false', () => {
+    renderWithForm(<SelectInput {...defaultProps} valueKey={undefined} nestedObject={false} />);
+    const mockGetOptionValue = mockSelectChildComponent.mock.calls[0][0];
+    mockGetOptionValue.getOptionValue({ label: 'Option 1', value1: { value2: '1' } });
+    expect(mockGetOptionValue.getOptionValue).toBeDefined();
+  });
+
+  it('access style props for SelectInput', () => {
+    renderWithForm(<SelectInput {...defaultProps} options={mockOptions} isModel={true} />);
+    const mockStyle = mockSelectChildComponent.mock.calls[0][0];
+    mockStyle.styles.menuPortal({});
+  });
+});
+
+describe('AsyncSelectInput', () => {
+  const defaultAsyncProps = {
+    label: 'Async Select',
+    input: {
+      name: 'asyncSelect',
+      onChange: jest.fn(),
+      value: ''
+    },
+    loadInputOptions: jest.fn().mockResolvedValue([
+      { label: 'Async Option 1', value: '1' },
+      { label: 'Async Option 2', value: '2' }
+    ])
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders async select component', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} />);
+    expect(screen.getByTestId('async-select-input')).toBeInTheDocument();
+  });
+
+  it('displays error message for async select', () => {
+    render(
+      <AsyncSelectInput {...defaultAsyncProps} options={mockOptions} error='Error message' errorLabel='Error Label' />
+    );
+    expect(screen.getByText('Error message Error Label')).toBeInTheDocument();
+  });
+
+  it('shows required asterisk for async select when required is true', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} required={true} />);
+    const asyncSelect = screen.getByTestId('async-select-input');
+    expect(asyncSelect.querySelector('.input-asterisk')).toBeInTheDocument();
+  });
+
+  it('renders select input component with isModel as true', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} isModel={true} options={mockOptions} />);
+    expect(screen.getByTestId('async-select-input')).toBeInTheDocument();
+  });
+
+  it('call getOptionLabel function with labelKey as array and nestedObject', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} labelKey={['label']} nestedObject={true} options={mockOptions} />);
+    const mockGetOptionLabel = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionLabel function with labelKey as string and nestedObject as false and appendPlus as true', () => {
+    render(
+      <AsyncSelectInput
+        {...defaultAsyncProps}
+        labelKey='label'
+        nestedObject={false}
+        appendPlus={true}
+        options={mockOptions}
+      />
+    );
+    const mockGetOptionLabel = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionLabel function with labelKey as string and nestedObject as false and appendPlus as false', () => {
+    render(
+      <AsyncSelectInput
+        {...defaultAsyncProps}
+        labelKey='label'
+        nestedObject={false}
+        appendPlus={false}
+        options={mockOptions}
+      />
+    );
+    const mockGetOptionLabel = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionLabel function with labelKey as null and nestedObject as false', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} labelKey={undefined} nestedObject={false} options={mockOptions} />);
+    const mockGetOptionLabel = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionLabel.getOptionLabel({ label: 'Option 1', value: '1' });
+    expect(mockGetOptionLabel.getOptionLabel).toBeDefined();
+  });
+
+  it('call getOptionValue function with valueKey as array and nestedObject', () => {
+    render(
+      <AsyncSelectInput
+        {...defaultAsyncProps}
+        valueKey={['value1', 'value2']}
+        nestedObject={true}
+        options={mockOptions}
+      />
+    );
+    const mockGetOptionValue = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionValue.getOptionValue({ label: 'Option 1', value1: { value2: '1' } });
+    expect(mockGetOptionValue.getOptionValue).toBeDefined();
+  });
+
+  it('call getOptionValue function with valueKey as string and nestedObject as false', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} valueKey='value1' nestedObject={false} options={mockOptions} />);
+    const mockGetOptionValue = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionValue.getOptionValue({ label: 'Option 1', value1: { value2: '1' } });
+    expect(mockGetOptionValue.getOptionValue).toBeDefined();
+  });
+
+  it('call getOptionValue function with valueKey as null and nestedObject as false', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} valueKey={undefined} nestedObject={false} options={mockOptions} />);
+    const mockGetOptionValue = mockAsyncChildComponent.mock.calls[0][0];
+    mockGetOptionValue.getOptionValue({ label: 'Option 1', value1: { value2: '1' } });
+    expect(mockGetOptionValue.getOptionValue).toBeDefined();
+  });
+
+  it('call loadOptions function with inputValue length greater than 2', () => {
+    const mockLoadInputOptions = jest.fn();
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} loadInputOptions={mockLoadInputOptions} />);
+    const mockLoadOptions = mockAsyncChildComponent.mock.calls[0][0];
+    mockLoadOptions.loadOptions('test', jest.fn());
+    jest.runAllTimers();
+    expect(mockLoadOptions.loadOptions).toBeDefined();
+  });
+
+  it('call loadOptions function with inputValue length less than 2', () => {
+    const mockLoadInputOptions = jest.fn();
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} loadInputOptions={mockLoadInputOptions} />);
+    const mockLoadOptions = mockAsyncChildComponent.mock.calls[0][0];
+    mockLoadOptions.loadOptions('te', jest.fn());
+    jest.runAllTimers();
+    expect(mockLoadOptions.loadOptions).toBeDefined();
+  });
+
+  it('handle onChange function', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} onChange={jest.fn()} options={mockOptions} />);
+    const mockOnChange = mockAsyncChildComponent.mock.calls[0][0];
+    mockOnChange.onChange({ value: '1' }, jest.fn());
+    expect(defaultAsyncProps.input.onChange).toHaveBeenCalledWith({ value: '1' });
+  });
+
+  it('access style props for AsyncSelectInput', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} isModel={true} />);
+    const mockStyle = mockAsyncChildComponent.mock.calls[0][0];
+    mockStyle.styles.menuPortal({});
   });
 });

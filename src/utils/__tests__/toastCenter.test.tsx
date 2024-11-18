@@ -1,9 +1,6 @@
-// src/utils/__tests__/commonUtils.test.tsx
-import { destroyToastById, dismissAllToast, error, getErrorToastArgs, info, success } from '../toastCenter';
 import { toast } from 'react-toastify';
-import { ReactComponent as WarningIcon } from '../assets/images/info-orange.svg';
-import { ReactComponent as SuccessIcon } from '../assets/images/Info-green.svg';
-import { ReactComponent as InfoIcon } from '../assets/images/Info-blue.svg';
+import { error, success, info, destroyToastById, dismissAllToast, getErrorToastArgs } from '../toastCenter';
+import ERRORS from '../../constants/errors';
 
 jest.mock('react-toastify', () => ({
   toast: {
@@ -11,132 +8,164 @@ jest.mock('react-toastify', () => ({
     success: jest.fn(),
     info: jest.fn(),
     dismiss: jest.fn(),
-    update: jest.fn(),
-    isActive: jest.fn()
-  }
-}));
-jest.mock('react-toastify', () => ({
-  toast: {
-    dismiss: jest.fn()
+    isActive: jest.fn(),
+    update: jest.fn()
   }
 }));
 
-describe('Toast Functions', () => {
+describe('toastCenter', () => {
   beforeEach(() => {
-    jest.clearAllMocks(); // Clear mocks before each test
+    jest.clearAllMocks();
+    jest.useFakeTimers();
   });
 
   describe('error', () => {
-    it('should show a warning toast with the correct parameters', async () => {
-      const brief = 'Warning!';
-      const body = 'This is a warning message.';
-      const toastId = await error(brief, body);
+    it('should show warning toast with brief message only', async () => {
+      const brief = 'Error occurred';
+      await error(brief);
 
-      expect(toast.dismiss).toHaveBeenCalled(); // Check if all toasts are dismissed
-      expect(toast.isActive).toHaveBeenCalledWith(`${brief}_${body}`);
       expect(toast.warning).toHaveBeenCalledWith(
-        expect.anything(), // Check the messageFormatter output
-        {
-          icon: <WarningIcon />,
+        expect.any(Object),
+        expect.objectContaining({
           closeButton: true,
           hideProgressBar: true,
-          closeOnClick: true,
           position: 'bottom-right',
           autoClose: 10000,
-          toastId
-        }
+          toastId: `${brief}_`
+        })
       );
     });
 
-    it('should update an active toast with shake class if preventDuplicate is true', async () => {
-      const brief = 'Warning!';
-      const body = 'This is a warning message.';
-      const toastId = `${brief}_${body}`;
-
-      (toast.isActive as jest.Mock).mockReturnValue(true); // Mocking isActive to return true
-
+    it('should show warning toast with brief and body', async () => {
+      const brief = 'Error occurred';
+      const body = 'Detailed error message';
       await error(brief, body);
 
-      expect(toast.update).toHaveBeenCalledWith(toastId, {
+      expect(toast.warning).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          toastId: `${brief}_${body}`
+        })
+      );
+    });
+
+    it('should animate existing toast when preventDuplicate and animateIfActive are true', async () => {
+      const brief = 'Error occurred';
+      (toast.isActive as jest.Mock).mockReturnValue(true);
+
+      await error(brief, undefined, { preventDuplicate: true, animateIfActive: true });
+
+      expect(toast.update).toHaveBeenCalledWith(`${brief}_`, {
         className: 'shake'
       });
+
+      jest.advanceTimersByTime(500);
+
+      expect(toast.update).toHaveBeenCalledWith(`${brief}_`, {
+        className: 'shake'
+      });
+    });
+
+    it('should animate existing toast when preventDuplicate as false and animateIfActive are true', async () => {
+      const brief = 'Error occurred';
+      (toast.isActive as jest.Mock).mockReturnValue(true);
+
+      await error(brief, undefined, { preventDuplicate: false, animateIfActive: true });
     });
   });
 
   describe('success', () => {
-    it('should show a success toast with the correct parameters', () => {
-      const brief = 'Success!';
-      const body = 'This is a success message.';
-      success(brief, body);
+    it('should show success toast with brief message only', () => {
+      const brief = 'Operation successful';
+      success(brief);
 
-      expect(toast.dismiss).toHaveBeenCalled(); // Check if all toasts are dismissed
       expect(toast.success).toHaveBeenCalledWith(
-        expect.anything(), // Check the messageFormatter output
-        {
-          icon: <SuccessIcon />,
+        expect.any(Object),
+        expect.objectContaining({
           closeButton: false,
-          closeOnClick: true,
           hideProgressBar: true,
           position: 'bottom-right'
-        }
+        })
       );
+    });
+
+    it('should show success toast with brief and body', () => {
+      const brief = 'Operation successful';
+      const body = 'Your changes have been saved';
+      success(brief, body);
+
+      expect(toast.success).toHaveBeenCalled();
     });
   });
 
   describe('info', () => {
-    it('should show an info toast with the correct parameters', () => {
-      const brief = 'Info!';
-      const body = 'This is an info message.';
-      info(brief, body);
+    it('should show info toast with brief message only', () => {
+      const brief = 'Information';
+      info(brief);
 
-      expect(toast.dismiss).toHaveBeenCalled(); // Check if all toasts are dismissed
       expect(toast.info).toHaveBeenCalledWith(
-        expect.anything(), // Check the messageFormatter output
-        {
-          icon: <InfoIcon />,
+        expect.any(Object),
+        expect.objectContaining({
           closeButton: false,
-          closeOnClick: true,
           hideProgressBar: true,
           position: 'bottom-right'
-        }
+        })
       );
+    });
+
+    it('should show info toast with brief and body', () => {
+      const brief = 'Information';
+      const body = 'Additional details';
+      info(brief, body);
+
+      expect(toast.info).toHaveBeenCalled();
+    });
+  });
+
+  describe('destroyToastById', () => {
+    it('should dismiss specific toast by id', () => {
+      const toastId = 'test-toast';
+      destroyToastById(toastId);
+
+      expect(toast.dismiss).toHaveBeenCalledWith(toastId);
     });
   });
 
   describe('dismissAllToast', () => {
     it('should dismiss all toasts', () => {
       dismissAllToast();
+
       expect(toast.dismiss).toHaveBeenCalled();
     });
   });
-  it('should return error name and message from Error object', () => {
-    const err = new Error('Test error message');
-    const [name, message, options] = getErrorToastArgs(err, '', '');
 
-    expect(name).toBe('Error'); // Default name
-    expect(message).toBe('Test error message');
-    expect(options).toEqual({ animateIfActive: true });
-  });
-  it('should return alternative name and message when provided', () => {
-    const err = new Error('Test error message');
-    const [name, message, options] = getErrorToastArgs(err, 'CustomName', 'Custom message');
+  describe('getErrorToastArgs', () => {
+    it('should return custom error name and message', () => {
+      const localError = new Error('Custom error');
+      localError.name = 'CustomError';
+      const [name, message, options] = getErrorToastArgs(localError, '', '');
 
-    expect(name).toBe('CustomName');
-    expect(message).toBe('Test error message');
-    expect(options).toEqual({ animateIfActive: true });
-  });
+      expect(name).toBe('CustomError');
+      expect(message).toBe('Custom error');
+      expect(options.animateIfActive).toBe(true);
+    });
 
-  it('should handle SESSION_TIMEDOUT case', () => {
-    const err = new Error('Some error');
-    const [options] = getErrorToastArgs(err, '', '');
+    it('should return alternative name and message when provided', () => {
+      const localError = new Error(ERRORS.SERVER_ERROR.message);
+      const altName = 'Alternative Error';
+      const altMessage = 'Alternative message';
+      const [name, message, options] = getErrorToastArgs(localError, altName, altMessage);
 
-    expect(options).toEqual('Error'); // Should not animate
-  });
-  it('should call toast.dismiss with the correct toastId', () => {
-    const toastId = 'test-toast-id';
+      expect(name).toBe(altName);
+      expect(message).toBe(altMessage);
+      expect(options.animateIfActive).toBe(true);
+    });
 
-    destroyToastById(toastId);
+    it('should set animateIfActive to false for SESSION_TIMEDOUT', () => {
+      const localError = new Error('SESSION_TIMEDOUT');
+      const [, , options] = getErrorToastArgs(localError, '', 'SESSION_TIMEDOUT');
 
-    expect(toast.dismiss).toHaveBeenCalledWith(toastId);
+      expect(options.animateIfActive).toBe(false);
+    });
   });
 });
