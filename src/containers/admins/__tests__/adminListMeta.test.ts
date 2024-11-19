@@ -21,12 +21,14 @@ describe('Formatting Functions', () => {
       {
         displayName: 'Admin',
         id: 0,
-        name: ''
+        name: '',
+        appTypes: []
       },
       {
         displayName: 'Manager',
         id: 0,
-        name: ''
+        name: '',
+        appTypes: []
       }
     ],
     organizations: [

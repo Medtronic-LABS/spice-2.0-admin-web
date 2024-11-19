@@ -25,6 +25,63 @@ export const MOCK_REGION_DETAIL = {
   totalCount: 2
 };
 
+export const mockRegionDetailList: IRegionDetailList[] = [
+  {
+    countrycode: '001',
+    countryname: 'Sample Country A',
+    countryid: 1,
+    countrytenantid: 1001,
+    districtcode: 'D001',
+    districtname: 'Sample District A1',
+    districtid: 101,
+    districttenantid: 2001,
+    chiefdomcode: 'C001',
+    chiefdomname: 'Sample Chiefdom A1',
+    chiefdomid: 201,
+    chiefdomtenantid: 3001,
+    villagecode: 'V001',
+    villagename: 'Sample Village A1',
+    villageid: 301,
+    villagetype: 'Urban'
+  },
+  {
+    countrycode: '002',
+    countryname: 'Sample Country B',
+    countryid: 2,
+    countrytenantid: 1002,
+    districtcode: 'D002',
+    districtname: 'Sample District B1',
+    districtid: 102,
+    districttenantid: 2002,
+    chiefdomcode: 'C002',
+    chiefdomname: 'Sample Chiefdom B1',
+    chiefdomid: 202,
+    chiefdomtenantid: 3002,
+    villagecode: 'V002',
+    villagename: 'Sample Village B1',
+    villageid: 302,
+    villagetype: 'Rural'
+  },
+  {
+    countrycode: null,
+    countryname: 'Sample Country C',
+    countryid: 3,
+    countrytenantid: 1003,
+    districtcode: 'D003',
+    districtname: 'Sample District C1',
+    districtid: 103,
+    districttenantid: 2003,
+    chiefdomcode: null,
+    chiefdomname: 'Sample Chiefdom C1',
+    chiefdomid: 203,
+    chiefdomtenantid: 3003,
+    villagecode: 'V003',
+    villagename: 'Sample Village C1',
+    villageid: 303,
+    villagetype: null
+  }
+];
+
 const MOCK_DATA_CONSTANTS = {
   FETCH_REGION_LIST_REPONSE: {
     isLoadMore: false,

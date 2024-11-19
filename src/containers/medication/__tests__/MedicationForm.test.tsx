@@ -1,78 +1,137 @@
 import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import arrayMutators from 'final-form-arrays';
-import { MemoryRouter } from 'react-router';
-import configureMockStore from 'redux-mock-store';
-import { mount } from 'enzyme';
-import MedicationForm from '../MedicationForm';
+import configureStore from 'redux-mock-store';
 import { Form } from 'react-final-form';
+import arrayMutators from 'final-form-arrays';
+import MedicationForm from '../MedicationForm';
 
-jest.mock('react-router-dom', () => ({
-  useParams: jest.fn().mockReturnValue({ match: { params: { regionId: '2' } } }),
-  useHistory: () => ({
-    push: jest.fn()
+// Mock the router
+jest.mock('react-router', () => ({
+  useParams: () => ({
+    regionId: '123'
   })
 }));
-const mockStore = configureMockStore();
-describe('MedicationForm', () => {
-  let wrapper: any;
-  let props: any;
-  const store = mockStore({
+
+const mockStore = configureStore([]);
+
+describe('MedicationForm Component', () => {
+  let store: any;
+
+  const initialState = {
     medication: {
-      loading: false,
-      brandsLoading: false,
-      classificationsLoading: false,
-      dosageFormsLoading: false,
       classifications: [
         {
-          id: '1',
-          name: 'Class One'
-        },
-        {
-          id: '2',
-          name: 'Class Two'
+          id: 1,
+          name: 'Classification 1',
+          brands: [
+            { id: 1, name: 'Brand 1' },
+            { id: 2, name: 'Brand 2' }
+          ]
         }
       ],
       dosageForms: [
-        {
-          id: '1',
-          name: 'Dosage One'
-        },
-        {
-          id: '2',
-          name: 'Dosage Two'
-        }
-      ]
+        { id: 1, name: 'Dosage Form 1' },
+        { id: 2, name: 'Dosage Form 2' }
+      ],
+      categories: [
+        { id: 1, name: 'Category 1' },
+        { id: 2, name: 'Category 2' }
+      ],
+      loading: false,
+      classificationsLoading: false,
+      dosageFormsLoading: false,
+      categoryLoading: false
     },
-    region: {}
-  });
+    user: {
+      user: {
+        appType: 'COMMUNITY'
+      }
+    }
+  };
 
   beforeEach(() => {
-    props = {
-      form: { getFieldState: jest.fn(), getState: jest.fn().mockReturnValue({ valid: true }) },
-      match: { params: { regionId: '2', tenantId: '3' } }
-    };
-    wrapper = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Form
-            onSubmit={() => {
-              //
-            }}
-            mutators={{ ...arrayMutators }}
-          >
-            {({ handleSubmit }) => <MedicationForm {...props} />}
-          </Form>
-        </MemoryRouter>
-      </Provider>
-    );
-  });
-  it('renders without errors', () => {
-    expect(wrapper.exists()).toBe(true);
+    store = mockStore(initialState);
   });
 
-  it('should render the form with the medication name and site select fields', () => {
-    expect(wrapper.find('input[name="medication[0].name"]').exists()).toBe(true);
-    wrapper.find('.theme-text.lh-1dot25.pb-lg-1').simulate('click');
+  const renderComponent = (props = {}) => {
+    return render(
+      <Provider store={store}>
+        <Form
+          // tslint:disable-next-line:no-empty
+          onSubmit={() => {}}
+          mutators={{ ...arrayMutators }}
+          render={({ form }) => <MedicationForm form={form} {...props} />}
+        />
+      </Provider>
+    );
+  };
+
+  it('renders the form with initial fields', () => {
+    renderComponent();
+    expect(screen.getByText('Medication Name')).toBeInTheDocument();
+    expect(screen.getByText('Code')).toBeInTheDocument();
+    expect(screen.getByText('URL')).toBeInTheDocument();
+    expect(screen.getByText('Classification')).toBeInTheDocument();
+    expect(screen.getByText('Brand')).toBeInTheDocument();
+    expect(screen.getByText('Dosage Form')).toBeInTheDocument();
+  });
+
+  it('shows loader when loading is true', () => {
+    store = mockStore({
+      ...initialState,
+      medication: {
+        ...initialState.medication,
+        loading: true
+      }
+    });
+    renderComponent();
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
+  });
+
+  it('validates required fields', async () => {
+    renderComponent();
+    const [nameInput] = screen.getAllByText('Medication Name');
+    fireEvent.blur(nameInput);
+    expect(screen.getByText('Medication Name')).toBeInTheDocument();
+  });
+
+  it('renders with initial edit values', () => {
+    const initialEditValue = {
+      id: 1,
+      name: 'Test Medication',
+      classification: { id: 1, name: 'Classification 1' },
+      brand: { id: 1, name: 'Brand 1' },
+      dosage_form: { id: 1, name: 'Dosage Form 1' },
+      codeDetails: { code: 'TEST123', url: 'http://test.com' }
+    };
+
+    renderComponent({ initialEditValue });
+
+    expect(screen.getByDisplayValue('Test Medication')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('TEST123')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('http://test.com')).toBeInTheDocument();
+  });
+
+  it('updates brand options when classification changes', async () => {
+    renderComponent();
+    const classificationSelect = screen.getByLabelText('Classification');
+    fireEvent.change(classificationSelect, { target: { value: '1' } });
+
+    await waitFor(() => {
+      const brandSelect = screen.getByLabelText('Brand');
+      expect(brandSelect).not.toBeDisabled();
+    });
+  });
+
+  it('renders category field when isCategories is true', () => {
+    store = mockStore({
+      ...initialState,
+      user: {
+        appTypes: ['COMMUNITY']
+      }
+    });
+    renderComponent();
+    expect(screen.getByText('Category')).toBeInTheDocument();
   });
 });

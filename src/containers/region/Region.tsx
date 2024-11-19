@@ -195,7 +195,7 @@ const Region = (): React.ReactElement => {
               onButtonClick={onDownloadClick}
             >
               <CustomTable
-                rowData={regionDetails.list ? regionDetails.list : []}
+                rowData={regionDetails.list ?? []}
                 columnsDef={
                   isCommunity
                     ? [
