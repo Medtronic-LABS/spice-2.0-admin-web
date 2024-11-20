@@ -5,13 +5,13 @@ import { routesWithSideMenu } from '../../constants/route';
 import styles from './SideMenu.module.scss';
 import { fetchSideMenuRequest } from '../../store/common/actions';
 import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
-import { loadingSelector as userLoadingSelector } from '../../store/user/selectors';
+import { getAppTypeSelector, loadingSelector as userLoadingSelector } from '../../store/user/selectors';
 import { getLoadingSelector as regionLoadingSelector } from '../../store/region/selectors';
 import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import { ISideMenu } from '../../store/common/types';
 import Loader from '../loader/Loader';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS, { SIDE_MENU_FETCHING_HIERARCHY } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS, SIDE_MENU_FETCHING_HIERARCHY } from '../../constants/appConstants';
 import toastCenter from '../../utils/toastCenter';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getMedicationLoadingSelector } from '../../store/medication/selectors';
@@ -45,8 +45,12 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const workflowLoading = useSelector(workflowLoadingSelector);
   const userLoading = useSelector(userLoadingSelector);
   const programLoading = useSelector(programLoadingSelector);
+  const appTypes = useSelector(getAppTypeSelector);
 
   const sideMenuLoading = useSelector(getLoadingSelector);
+  const {
+    healthFacility: { s: healthFacility }
+  } = NAME_CONSTANTS;
 
   const getLoading = useCallback(
     () =>
@@ -76,6 +80,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   );
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = Number(countryId?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
+  const countryTenantId = Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_TENANT_ID));
   const role = useSelector(roleSelector);
 
   const { list }: { list: any } = useSelector(getSideMenuSelector);
@@ -112,13 +117,12 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
     (rawMenu: ISideMenu[]) => {
       let choosenRoutes: ISideMenu[] = [...rawMenu];
       const routeVariableValues = {
-        ':regionId': regionId,
+        ':regionId': regionId ?? countryIdValue,
         ':districtId': districtId,
         ':chiefdomId': chiefdomId,
         ':healthFacilityId': healthFacilityId,
-        ':tenantId': tenantId
+        ':tenantId': regionId || appTypes.includes(APP_TYPE.NON_COMMUNITY) ? tenantId : countryTenantId
       };
-
       choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
         menu = { ...menu };
         if (menu?.route) {
@@ -130,7 +134,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       });
       setFetchedSideMenu(choosenRoutes);
     },
-    [chiefdomId, districtId, healthFacilityId, regionId, tenantId]
+    [appTypes, chiefdomId, countryIdValue, countryTenantId, districtId, healthFacilityId, regionId, tenantId]
   );
 
   /**
@@ -155,7 +159,14 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       {getLoading() && <Loader />}
       <div className={`${styles.sideMenu} py-0dot25 ${className}`} data-testid='side-menu-component'>
         {[...fetchedSideMenu]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
-          const isActive = matchPath(pathname, { exact: true, path: rest.route });
+          let isActive = false;
+          if (appTypes.includes(APP_TYPE.NON_COMMUNITY)) {
+            isActive = !!matchPath(pathname, { exact: true, path: rest.route });
+          } else {
+            isActive =
+              !!matchPath(pathname, { exact: true, path: rest.route }) ||
+              (displayName === healthFacility && pathname.split('/').includes(APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY));
+          }
           return (
             <NavLink
               to={rest.route}

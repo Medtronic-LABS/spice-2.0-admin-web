@@ -5,7 +5,7 @@ import arrayMutators from 'final-form-arrays';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
@@ -130,7 +130,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
     healthFacility: { s: healthFacilitySName }
   } = NAME_CONSTANTS;
   const appTypes = useSelector(getAppTypeSelector);
-
   const lableData = useMemo(
     () => [
       { label: `${healthFacilitySName} Name`, value: healthFacility?.name },
@@ -146,7 +145,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: 'Facility ID', value: healthFacility?.postalCode },
       { label: 'Language', value: healthFacility?.language },
       {
-        label: 'Linked Community Health Assistant',
+        label: appTypes.includes(APP_TYPE.NON_COMMUNITY)
+          ? 'Linked Community Health Assistant'
+          : 'Linked Peer Supervisors',
         value: healthFacility?.peerSupervisors,
         subKey: 'name',
         style: { col: 'col-12', subCol: 'col-3' }

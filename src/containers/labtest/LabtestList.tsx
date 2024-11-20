@@ -250,7 +250,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
         <div className='col-12'>
           <DetailCard
             buttonLabel='Add Lab Test'
-            header='Lab Test List'
+            header='Lab/Imaging Database'
             isSearch={true}
             onSearch={handleSearch}
             onButtonClick={openAddLabTest}
