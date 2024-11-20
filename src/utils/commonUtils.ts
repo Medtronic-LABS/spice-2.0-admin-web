@@ -242,7 +242,8 @@ export const getAdminPayload = ({
       // for create region countryCode will be come as free text
       countryCode: user?.countryCode?.phoneNumberCode || user?.countryCode,
       roleIds,
-      timezone: user?.timezone
+      timezone: user?.timezone,
+      designation: { name: user?.designation?.name, id: user?.designation?.id }
     };
 
     const hasRole = (roleName: string) => user?.roles?.some((role: { name: string }) => role.name === roleName);
@@ -398,7 +399,8 @@ export const getUserPayload = ({
       village: user?.village,
       timezone: user?.timezone,
       district: user?.district,
-      chiefdom: user?.chiefdom
+      chiefdom: user?.chiefdom,
+      designation: { name: user?.designation?.name, id: user?.designation?.id }
     };
     // add id for edit
     if (user?.id) {

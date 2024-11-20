@@ -1259,6 +1259,8 @@ const UserForm = ({
                               `${formName}[${index}].roles`,
                               (allRoles || []).filter((v: IRoles) => v.groupName !== 'SPICE')
                             );
+                            // clear designation whenever SPICE suiteaccess gets removed
+                            form.change(`${formName}[${index}].designation`, null);
                           }
                           isCHUserSelectedFn(spiceRole, index);
                           updateRoleOptionsAndDisableRoles(index);
@@ -1355,6 +1357,9 @@ const UserForm = ({
                                 );
                               }
 
+                              // clear designation whenever role gets update
+                              form.change(`${formName}[${index}].designation`, null);
+
                               // Other than chp role village must be clear
                               if (!isCHPSelected(values)) {
                                 form.batch(() => {
@@ -1389,6 +1394,8 @@ const UserForm = ({
                               if (values.name === HEALTH_FACILITY_ADMIN && cultureList && !cultureList.length) {
                                 dispatch(fetchCultureListRequest());
                               }
+                              // clear designation whenever role gets update
+                              form.change(`${formName}[${index}].designation`, null);
                             }}
                           />
                         );
@@ -1403,8 +1410,13 @@ const UserForm = ({
                       type='text'
                       validate={required}
                       render={({ input, meta }) => {
-                        const roleName = form.getState().values.users?.[index].roles;
-                        const selectedRoleNames = (roleName || []).map((roleDetails: any) => roleDetails.name);
+                        let roleName = [];
+                        if (form.getState().values.users?.[index].roles) {
+                          roleName = form.getState().values.users?.[index].roles;
+                        } else if (form.getState().values.users?.[index].role) {
+                          roleName = form.getState().values.users?.[index].role;
+                        }
+                        const selectedRoleNames = roleName.map((roleDetails: any) => roleDetails.name);
                         const selectedName = (designationList || []).filter((selectedRoleData: any) =>
                           selectedRoleNames.includes(selectedRoleData.role.name)
                         );

@@ -763,6 +763,7 @@ export interface IUserPayload {
   district?: string;
   chiefdom?: string;
   redRisk?: boolean;
+  designation: { id: string; name: string };
 }
 export interface ISetAppType {
   type: typeof USER_TYPES.SET_APP_TYPE;

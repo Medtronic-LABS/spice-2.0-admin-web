@@ -424,6 +424,10 @@ export const fetchDesignationListFailure = () => ({
   type: USER_TYPES.FETCH_DESIGNATION_LIST_FAILURE
 });
 
+export const clearDesignationList = () => ({
+  type: USER_TYPES.CLEAR_DESIGNATION_LIST
+});
+
 export const fetchTimezoneListSuccess = (payload: IFetchTimezoneListSuccessPayload) => ({
   type: USER_TYPES.FETCH_TIMEZONE_LIST_SUCCESS,
   payload

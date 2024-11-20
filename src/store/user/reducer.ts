@@ -274,6 +274,12 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         ...state,
         designationListLoading: false
       };
+    case USERTYPES.CLEAR_DESIGNATION_LIST:
+      return {
+        ...state,
+        designationListLoading: false,
+        designationList: []
+      };
     case USERTYPES.REMOVE_TOKEN:
       return {
         ...state,

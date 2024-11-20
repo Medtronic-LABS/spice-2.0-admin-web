@@ -31,7 +31,7 @@ import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/distric
 import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import { clearHFSummary } from '../../store/healthFacility/actions';
 import { IRegionDetail } from '../../store/region/types';
-import { fetchTimezoneListRequest, setAppType } from '../../store/user/actions';
+import { clearDesignationList, fetchTimezoneListRequest, setAppType } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
 import styles from './Region.module.scss';
 
@@ -77,11 +77,6 @@ const Region = (): React.ReactElement => {
   });
 
   useEffect(() => {
-    dispatch(clearSideMenu());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     dispatch(
       fetchRegionsRequest({
         skip: 0,
@@ -110,6 +105,8 @@ const Region = (): React.ReactElement => {
     dispatch(clearChiefdomDetail());
     dispatch(clearHFSummary());
     dispatch(clearClientRegistryStatus());
+    dispatch(clearSideMenu());
+    dispatch(clearDesignationList());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
