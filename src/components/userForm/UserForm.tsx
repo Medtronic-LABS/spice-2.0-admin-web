@@ -1410,13 +1410,19 @@ const UserForm = ({
                       type='text'
                       validate={required}
                       render={({ input, meta }) => {
-                        let roleName = [];
-                        if (form.getState().values.users?.[index].roles) {
-                          roleName = form.getState().values.users?.[index].roles;
-                        } else if (form.getState().values.users?.[index].role) {
-                          roleName = form.getState().values.users?.[index].role;
+                        let selectedRoles = [];
+                        if (
+                          Array.isArray(form.getState().values.users?.[index].roles) &&
+                          form.getState().values.users?.[index].roles.length
+                        ) {
+                          selectedRoles = form.getState().values.users?.[index].roles;
+                        } else if (
+                          Array.isArray(form.getState().values.users?.[index].role) &&
+                          form.getState().values.users?.[index].role.length
+                        ) {
+                          selectedRoles = form.getState().values.users?.[index].role;
                         }
-                        const selectedRoleNames = roleName.map((roleDetails: any) => roleDetails.name);
+                        const selectedRoleNames = selectedRoles.map((role: { name: string }) => role.name);
                         const selectedName = (designationList || []).filter((selectedRoleData: any) =>
                           selectedRoleNames.includes(selectedRoleData.role.name)
                         );

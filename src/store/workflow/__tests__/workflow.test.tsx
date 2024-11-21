@@ -65,7 +65,7 @@ describe('Workflow Sagas', () => {
       });
     });
 
-    it('Fails to fetch customization or consent form and dispatches failure', async () => {
+    it('Fails to fetch customization or consent form and dispatches failure with instance of error', async () => {
       const error = new Error('Failed to fetch customization or consent form');
       const fetchCustomizationSpy = jest
         .spyOn(workflowService, 'fetchCustomizationForm')
@@ -80,6 +80,23 @@ describe('Workflow Sagas', () => {
       ).toPromise();
       expect(fetchCustomizationSpy).toHaveBeenCalledWith(inputFormRegionReqPayload);
       expect(dispatched).toEqual([workflowActions.fetchCustomizationFormFailure(error)]);
+    });
+
+    it('Fails to fetch customization or consent form and dispatches failure without instance of error', async () => {
+      const error = 'Failed to fetch customization or consent form';
+      const fetchCustomizationSpy = jest
+        .spyOn(workflowService, 'fetchCustomizationForm')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchCustomizationForm,
+        { ...inputFormRegionReqPayload, type: ACTION_TYPES.FETCH_CUSTOMIZATION_FORM_REQUEST }
+      ).toPromise();
+      expect(fetchCustomizationSpy).toHaveBeenCalledWith(inputFormRegionReqPayload);
+      expect(dispatched).not.toEqual([workflowActions.fetchCustomizationFormFailure(error)]);
     });
   });
   // Test fetchFormMeta saga
@@ -127,7 +144,7 @@ describe('Workflow Sagas', () => {
         ]);
       });
     });
-    it('Fetch form meta for screening and dispatches failure', async () => {
+    it('Fetch form meta for screening and dispatches failure with instance of error', async () => {
       const error = new Error('Failed to fetch form meta for screening');
       const fetchFormMetaSpy = jest
         .spyOn(workflowService, 'fetchFormMeta')
@@ -145,6 +162,26 @@ describe('Workflow Sagas', () => {
       ).toPromise();
       expect(fetchFormMetaSpy).toHaveBeenCalledWith('screeninglog' as FormLogType);
       expect(dispatched).toEqual([workflowActions.fetchFormMetaFailure()]);
+    });
+
+    it('Fetch form meta for screening and dispatches failure without instance of error', async () => {
+      const error = 'Failed to fetch form meta for screening';
+      const fetchFormMetaSpy = jest
+        .spyOn(workflowService, 'fetchFormMeta')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchFormMeta,
+        {
+          type: ACTION_TYPES.FETCH_FORM_META_REQUEST,
+          formType: 'screening' as FormType
+        }
+      ).toPromise();
+      expect(fetchFormMetaSpy).toHaveBeenCalledWith('screeninglog' as FormLogType);
+      expect(dispatched).not.toEqual([workflowActions.fetchFormMetaFailure()]);
     });
   });
 
@@ -169,7 +206,7 @@ describe('Workflow Sagas', () => {
       expect(dispatched).toEqual([workflowActions.customizeFormSuccess()]);
     });
 
-    it('Update customization form and dispatches failure', async () => {
+    it('Update customization form and dispatches failure with instance of error', async () => {
       const updateFormDataSpy = jest
         .spyOn(workflowService, 'updateCustomizationForm')
         .mockImplementation(() => Promise.reject(new Error('Failed to update the form')));
@@ -186,6 +223,25 @@ describe('Workflow Sagas', () => {
       ).toPromise();
       expect(updateFormDataSpy).toHaveBeenCalledWith(updateInputFormReqPayload);
       expect(dispatched).toEqual([workflowActions.customizeFormFailure()]);
+    });
+
+    it('Update customization form and dispatches failure without instance of error', async () => {
+      const updateFormDataSpy = jest
+        .spyOn(workflowService, 'updateCustomizationForm')
+        .mockImplementation(() => Promise.reject('Failed to update the form'));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        customizeForm,
+        {
+          ...updateInputFormReqPayload,
+          type: ACTION_TYPES.CUSTOMIZE_FORM_REQUEST
+        }
+      ).toPromise();
+      expect(updateFormDataSpy).toHaveBeenCalledWith(updateInputFormReqPayload);
+      expect(dispatched).not.toEqual([workflowActions.customizeFormFailure()]);
     });
   });
 
@@ -214,7 +270,7 @@ describe('Workflow Sagas', () => {
       expect(generator.next().done).toBe(true);
     });
 
-    it('should handle failure', () => {
+    it('should handle failure with instance of error', () => {
       const action: any = {
         formType: 'type',
         formId: '1',
@@ -235,6 +291,30 @@ describe('Workflow Sagas', () => {
         })
       );
       expect(generator.throw(error).value).toEqual(put(workflowActions.deactivateConsentFailure()));
+      expect(generator.next().done).toBe(true);
+    });
+
+    it('should handle failure without instance of error', () => {
+      const action: any = {
+        formType: 'type',
+        formId: '1',
+        category: 'category',
+        tenantId: 'tenantId',
+        successCb: jest.fn(),
+        failureCb: jest.fn()
+      };
+      const error = 'Error deactivating consent form';
+
+      const generator: any = deactivateConsentForm(action);
+      expect(generator.next().value).toEqual(
+        call(workflowService.deactivateConsentForm as any, {
+          formType: 'Type',
+          formId: '1',
+          category: 'category',
+          tenantId: 'tenantId'
+        })
+      );
+      expect(generator.throw(error).value).not.toEqual(put(workflowActions.deactivateConsentFailure()));
       expect(generator.next().done).toBe(true);
     });
   });
@@ -266,13 +346,22 @@ describe('Workflow Sagas', () => {
       expect(generator.next().done).toBe(true);
     });
 
-    it('should handle failure', () => {
+    it('should handle failure with instance of error', () => {
       const action: any = { data: {} };
       const error = new Error('Error fetching clinical workflows');
 
       const generator: any = fetchClinicalWorkflows(action);
       expect(generator.next().value).toEqual(call(workflowService.fetchClinicalWorkflows, action.data));
       expect(generator.throw(error).value).toEqual(put(workflowActions.fetchClinicalWorkflowFailure()));
+      expect(generator.next().done).toBe(true);
+    });
+    it('should handle failure without instance of error', () => {
+      const action: any = { data: {} };
+      const error = 'Error fetching clinical workflows';
+
+      const generator: any = fetchClinicalWorkflows(action);
+      expect(generator.next().value).toEqual(call(workflowService.fetchClinicalWorkflows, action.data));
+      expect(generator.throw(error).value).not.toEqual(put(workflowActions.fetchClinicalWorkflowFailure()));
       expect(generator.next().done).toBe(true);
     });
   });
@@ -292,7 +381,7 @@ describe('Workflow Sagas', () => {
       expect(generator.next().done).toBe(true);
     });
 
-    it('should handle failure', () => {
+    it('should handle failure with instance of error', () => {
       const action: any = {
         data: {},
         successCb: jest.fn(),
@@ -303,6 +392,20 @@ describe('Workflow Sagas', () => {
       const generator: any = createWorkflowRequest(action);
       expect(generator.next().value).toEqual(call(workflowService.createWorkflowModule, action.data));
       expect(generator.throw(error).value).toEqual(put(workflowActions.createWorkflowModuleFailure(error)));
+      expect(generator.next().done).toBe(true);
+    });
+
+    it('should handle failure without instance of error', () => {
+      const action: any = {
+        data: {},
+        successCb: jest.fn(),
+        failureCb: jest.fn()
+      };
+      const error: any = 'Error creating workflow';
+
+      const generator: any = createWorkflowRequest(action);
+      expect(generator.next().value).toEqual(call(workflowService.createWorkflowModule, action.data));
+      expect(generator.throw(error).value).not.toEqual(put(workflowActions.createWorkflowModuleFailure(error)));
       expect(generator.next().done).toBe(true);
     });
   });
@@ -322,7 +425,7 @@ describe('Workflow Sagas', () => {
       expect(generator.next().done).toBe(true);
     });
 
-    it('should handle failure', () => {
+    it('should handle failure with instance of error', () => {
       const action: any = {
         data: {},
         successCb: jest.fn(),
@@ -333,6 +436,20 @@ describe('Workflow Sagas', () => {
       const generator: any = updateWorkflowRequest(action);
       expect(generator.next().value).toEqual(call(workflowService.updateWorkflowModule, action.data));
       expect(generator.throw(error).value).toEqual(put(workflowActions.updateWorkflowModuleFailure(error)));
+      expect(generator.next().done).toBe(true);
+    });
+
+    it('should handle failure without instance of error', () => {
+      const action: any = {
+        data: {},
+        successCb: jest.fn(),
+        failureCb: jest.fn()
+      };
+      const error: any = 'Error updating workflow';
+
+      const generator: any = updateWorkflowRequest(action);
+      expect(generator.next().value).toEqual(call(workflowService.updateWorkflowModule, action.data));
+      expect(generator.throw(error).value).not.toEqual(put(workflowActions.updateWorkflowModuleFailure(error)));
       expect(generator.next().done).toBe(true);
     });
   });
@@ -351,7 +468,7 @@ describe('Workflow Sagas', () => {
       expect(generator.next().value).toEqual(put(workflowActions.deleteWorkflowModuleSuccess()));
       expect(generator.next().done).toBe(true);
     });
-    it('should handle failure', () => {
+    it('should handle failure with instance of error', () => {
       const action: any = {
         data: {},
         successCb: jest.fn(),
@@ -362,6 +479,20 @@ describe('Workflow Sagas', () => {
       const generator: any = deleteWorkflowRequest(action);
       expect(generator.next().value).toEqual(call(workflowService.deleteWorkflowModule, action.data));
       expect(generator.throw(error).value).toEqual(put(workflowActions.deleteWorkflowModuleFailure(error)));
+      expect(generator.next().done).toBe(true);
+    });
+
+    it('should handle failure without instance of error', () => {
+      const action: any = {
+        data: {},
+        successCb: jest.fn(),
+        failureCb: jest.fn()
+      };
+      const error: any = 'Error deleting workflow';
+
+      const generator: any = deleteWorkflowRequest(action);
+      expect(generator.next().value).toEqual(call(workflowService.deleteWorkflowModule, action.data));
+      expect(generator.throw(error).value).not.toEqual(put(workflowActions.deleteWorkflowModuleFailure(error)));
       expect(generator.next().done).toBe(true);
     });
   });

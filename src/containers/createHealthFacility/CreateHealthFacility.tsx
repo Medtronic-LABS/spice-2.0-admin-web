@@ -234,7 +234,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     };
 
     const handleSubmitPage = () => {
-      if (!regionId) {
+      if (!countryId) {
         return;
       }
       // adding default clinicalworkflows explicitly to payload, since it's not getting added by default
