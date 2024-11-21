@@ -4,11 +4,13 @@ import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { SL_REGION } from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import { validatePhoneNumber } from '../../services/userAPI';
+import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { useSelector } from 'react-redux';
 
 interface IProps {
   id: number;
@@ -40,10 +42,13 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
   const [isNetworkError, setNetworkError] = useState(false);
   const alreadyExistError = APPCONSTANTS.PHONE_NUMBER_ALREADY_EXISTS_ERR_MSG;
   const duplicationError = APPCONSTANTS.PHONE_NUMBER_DUPLICATION_ERR_MSG;
+  const regionDetails = useSelector(getRegionDetailsSelector);
 
   const isValidPhoneNumber = (phoneNumber?: string, checkSameNumberAgain?: boolean) => {
     return (
-      phoneNumber && !validateMobile(phoneNumber) && (lastCheckedNumber.current !== phoneNumber || checkSameNumberAgain)
+      phoneNumber &&
+      !validateMobile(phoneNumber, SL_REGION.includes(regionDetails.name)) &&
+      (lastCheckedNumber.current !== phoneNumber || checkSameNumberAgain)
     );
   };
 

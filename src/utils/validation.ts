@@ -192,12 +192,35 @@ export function validateFullName(name: string) {
 }
 
 /**
- * To check whether mobile number contains ten digit number
+ * To check whether mobile number contains valid digits and pattern
  * @param mobileNo mobile number string
+ * @param isSl boolean to indicate if Sri Lankan validation should be applied
+ * @returns {string} error message or empty string
  */
-export function validateMobile(mobileNo: string) {
-  const regex = /^\d{8,10}$/;
-  return !mobileNo || regex.test(mobileNo) ? '' : 'Please enter a valid ';
+export function validateMobile(mobileNo: string, isSl: boolean): string {
+  if (!mobileNo) return '';
+
+  if (isSl) {
+    // For SL:
+    // 1. Check if number has 8-10 digits
+    const digitCheck = /^\d{8,10}$/;
+    // 2. Check for 5 or more consecutive same digits
+    const repeatingDigitsCheck = /(\d)\1{4,}/;
+
+    // Number is invalid if:
+    // - it doesn't have 8-10 digits OR
+    // - it has 5 or more consecutive same digits
+    if (!digitCheck.test(mobileNo) || repeatingDigitsCheck.test(mobileNo)) {
+      return 'Please enter a valid ';
+    }
+  } else {
+    // For non-SL: just check if number has 8-10 digits
+    if (!/^\d{8,10}$/.test(mobileNo)) {
+      return 'Please enter a valid ';
+    }
+  }
+
+  return '';
 }
 
 /**

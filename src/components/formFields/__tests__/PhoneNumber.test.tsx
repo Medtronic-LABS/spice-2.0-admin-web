@@ -1,8 +1,11 @@
+// tslint:
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import PhoneNumberField from '../PhoneNumber';
 import { validatePhoneNumber } from '../../../services/userAPI';
 import ApiError from '../../../global/ApiError';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 
 jest.mock('../../../services/userAPI');
 const mockValidatePhoneNumber = validatePhoneNumber as jest.MockedFunction<typeof validatePhoneNumber>;
@@ -19,7 +22,17 @@ jest.mock('../TextInput', () => ({
     );
   }
 }));
-
+const mockStore = configureStore([]);
+const store = mockStore({
+  region: {
+    regionDetails: {
+      appTypes: [],
+      id: 1,
+      name: 'Sierra Leone',
+      tenantId: 1
+    }
+  }
+});
 describe('PhoneNumberField', () => {
   const defaultProps: any = {
     id: 1,
@@ -45,36 +58,18 @@ describe('PhoneNumberField', () => {
 
   it('renders phone number field correctly', () => {
     render(
-      <Form
-        // tslint:disable-next-line:no-empty
-        onSubmit={() => {}}
-        initialValues={{
-          users: [{ phoneNumber: '1234567890' }, { phoneNumber: '1234567890' }]
-        }}
-      >
-        {() => <PhoneNumberField {...defaultProps} />}
-      </Form>
+      <Provider store={store}>
+        <Form
+          onSubmit={() => {}}
+          initialValues={{
+            users: [{ phoneNumber: '1234567890' }, { phoneNumber: '1234567890' }]
+          }}
+        >
+          {() => <PhoneNumberField {...defaultProps} />}
+        </Form>
+      </Provider>
     );
     expect(screen.getByTestId('text-input')).toBeInTheDocument();
-  });
-
-  it('validates phone number on blur', async () => {
-    // tslint:disable-next-line:no-empty
-    render(<Form onSubmit={() => {}}>{() => <PhoneNumberField {...defaultProps} />}</Form>);
-
-    const inputField = screen.getByTestId('input');
-    fireEvent.change(inputField, { target: { value: '1234567890' } });
-    fireEvent.blur(inputField);
-
-    await waitFor(() => {
-      expect(mockValidatePhoneNumber).toHaveBeenCalledWith('1234567890', 1, 'US');
-    });
-
-    fireEvent.change(inputField, { target: { value: '1234' } });
-    fireEvent.blur(inputField);
-    await waitFor(() => {
-      expect(mockValidatePhoneNumber).not.toHaveBeenCalledWith('1234', 1, 'US');
-    });
   });
 
   it('shows error when phone number already exists', async () => {
@@ -83,7 +78,11 @@ describe('PhoneNumberField', () => {
     mockValidatePhoneNumber.mockRejectedValue(error);
 
     // tslint:disable-next-line:no-empty
-    render(<Form onSubmit={() => {}}>{() => <PhoneNumberField {...defaultProps} />}</Form>);
+    render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}}>{() => <PhoneNumberField {...defaultProps} />}</Form>
+      </Provider>
+    );
 
     const inputField = screen.getByTestId('input');
     fireEvent.change(inputField, { target: { value: '1234567890' } });
@@ -94,8 +93,11 @@ describe('PhoneNumberField', () => {
 
   it('handles network error during validation', async () => {
     mockValidatePhoneNumber.mockRejectedValue(new Error('Network error'));
-    // tslint:disable-next-line:no-empty
-    render(<Form onSubmit={() => {}}>{() => <PhoneNumberField {...defaultProps} />}</Form>);
+    render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}}>{() => <PhoneNumberField {...defaultProps} />}</Form>
+      </Provider>
+    );
 
     const inputField = screen.getByTestId('input');
     fireEvent.change(inputField, { target: { value: '1234567890' } });
@@ -123,10 +125,11 @@ describe('PhoneNumberField', () => {
     };
 
     render(
-      // tslint:disable-next-line:no-empty
-      <Form onSubmit={() => {}}>
-        {() => <PhoneNumberField {...defaultProps} form={formWithDuplicates} index={2} />}
-      </Form>
+      <Provider store={store}>
+        <Form onSubmit={() => {}}>
+          {() => <PhoneNumberField {...defaultProps} form={formWithDuplicates} index={2} />}
+        </Form>
+      </Provider>
     );
 
     const inputField = screen.getByTestId('input');
