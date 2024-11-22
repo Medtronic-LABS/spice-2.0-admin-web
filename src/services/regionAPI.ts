@@ -12,6 +12,7 @@ export const uploadFile = (file: any, appTypes: string) => {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
 };
+
 export const downloadFile = (countryId: number, appTypes: string[]) => {
   return axios({
     method: 'POST',

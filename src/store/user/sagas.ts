@@ -35,8 +35,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     sessionStorageServices.setItem('iLi', true);
     sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headers?.Tenantid);
     yield put(userActions.addUserTenantID(headers?.Tenantid));
-    const encryptedToken = encryptData(headers?.authorization);
-    sessionStorageServices.setItem(APPCONSTANTS.AUTHTOKEN, encryptedToken);
     const {
       data: {
         entity: {
@@ -85,7 +83,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
   } catch (e: any) {
     if (e instanceof Error) {
       sessionStorageServices.clearAllItem();
-      sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
       sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
       sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
       yield put(userActions.resetStore());
@@ -99,14 +96,12 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
   Worker Saga: Fired on LOGOUT_REQUEST action
 */
 export function* logout(): SagaIterator {
-  const token = sessionStorageServices.getItem(APPCONSTANTS.AUTHTOKEN);
   try {
-    yield call(userService.logout, token);
+    yield call(userService.logout);
     sessionStorageServices.clearAllItem();
     yield put(userActions.resetStore());
     yield put(userActions.logoutSuccess());
   } catch (e) {
-    sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
     sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
     yield put(userActions.removeUserTenantID());
     yield put(userActions.logoutFailure());
@@ -182,7 +177,6 @@ export function* fetchLoggedInUser(): SagaIterator {
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {
     sessionStorageServices.clearAllItem();
-    sessionStorageServices.deleteItem(APPCONSTANTS.AUTHTOKEN);
     sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
     yield put(userActions.resetStore());
     yield put(userActions.fetchLoggedInUserFail());

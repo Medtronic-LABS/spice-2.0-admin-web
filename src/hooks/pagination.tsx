@@ -17,23 +17,27 @@ export const useLoadMorePagination = ({
   defaultPage?: number;
 }): {
   isLastPage: boolean;
-  loadMore: () => void;
+  loadMore: (data: any) => void;
   resetPage: () => void;
 } => {
   const totalPages = Math.max(Math.ceil(total / itemsPerPage), 1);
   const page = useRef<number>(defaultPage <= totalPages ? defaultPage : 1);
-  const loadMore = useCallback(() => {
-    if (totalPages > page.current) {
-      page.current = page.current + 1;
-      onLoadMore({
-        skip: (page.current - 1) * itemsPerPage,
-        limit: itemsPerPage,
-        onFail: () => {
-          page.current = page.current - 1;
-        }
-      });
-    }
-  }, [totalPages, itemsPerPage, onLoadMore]);
+  const loadMore = useCallback(
+    (data: any) => {
+      console.log(data);
+      if (totalPages > page.current) {
+        page.current = page.current + 1;
+        onLoadMore({
+          skip: (page.current - 1) * itemsPerPage,
+          limit: itemsPerPage,
+          onFail: () => {
+            page.current = page.current - 1;
+          }
+        });
+      }
+    },
+    [totalPages, itemsPerPage, onLoadMore]
+  );
   const resetPage = useCallback(() => {
     page.current = 1;
   }, []);

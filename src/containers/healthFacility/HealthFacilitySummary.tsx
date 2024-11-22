@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import arrayMutators from 'final-form-arrays';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import arrayMutators from 'final-form-arrays';
 
-import DetailCard from '../../components/detailCard/DetailCard';
-import CustomTable from '../../components/customTable/CustomTable';
 import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
-import { useTablePaginationHook } from '../../hooks/tablePagination';
-import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
+import CustomTable from '../../components/customTable/CustomTable';
+import DetailCard from '../../components/detailCard/DetailCard';
+import Loader from '../../components/loader/Loader';
 import UserForm from '../../components/userForm/UserForm';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import { useTablePaginationHook } from '../../hooks/tablePagination';
 import {
   clearHFWorkflowList,
   clearSupervisorList,
@@ -27,6 +27,12 @@ import {
   validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import {
+  healthFacilityLoadingSelector,
+  healthFacilitySelector,
+  userDetailLoadingSelector,
+  workflowListSelector
+} from '../../store/healthFacility/selectors';
+import {
   IHFUserGet,
   IHFUserPost,
   IHealthFacility,
@@ -34,17 +40,10 @@ import {
   IPeerSupervisor,
   IVillages
 } from '../../store/healthFacility/types';
-import {
-  healthFacilityLoadingSelector,
-  healthFacilitySelector,
-  userDetailLoadingSelector,
-  workflowListSelector
-} from '../../store/healthFacility/selectors';
 import { countryIdSelector, getAppTypeSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import { IRoles } from '../../store/user/types';
-import Loader from '../../components/loader/Loader';
-import sessionStorageServices from '../../global/sessionStorageServices';
 import { formatRoles, getUserPayload } from '../../utils/commonUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -423,15 +422,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
           successCb: (userData: any) => {
             setIsHFUserEdit(true);
             const postData = { ...userData };
-            const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
-            postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-            postData.role = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
-            postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-            postData.insightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-            postData.supervisor = postData.supervisor && {
-              ...postData.supervisor,
-              name: `${postData.supervisor.firstName || ''} ${postData.supervisor.lastName || ''}`
-            };
             hfUserForEdit.current = { users: [{ ...postData }] };
             setHFUserModal(true);
           },

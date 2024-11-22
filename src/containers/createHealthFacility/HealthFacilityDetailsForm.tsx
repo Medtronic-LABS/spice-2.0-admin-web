@@ -10,7 +10,7 @@ import TextInput from '../../components/formFields/TextInput';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import {
   chiefdomListSelector,
@@ -105,13 +105,13 @@ const HealthFacilityDetailsForm = ({
   const country = useSelector(countryIdSelector);
   const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
     hfDetails: {
-      district: { s: districtSName },
-      chiefdom: { s: chiefdomSName },
       supervisor: { s: supervisorSName }
     },
     healthFacility: { s: healthFacilitySName }
-  } = useLabelFromAppType();
+  } = useAppTypeConfigs();
 
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const [workflowEditedData, setWorkFlowEditedData] = useState<{

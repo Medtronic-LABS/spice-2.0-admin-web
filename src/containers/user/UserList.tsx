@@ -1,20 +1,21 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { FormApi } from 'final-form';
+import arrayMutators from 'final-form-arrays';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import arrayMutators from 'final-form-arrays';
-import { FormApi } from 'final-form';
 
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
+import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
-import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
+import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
+import { villageBasedRoles } from '../../constants/roleConstants';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
-import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
-import { columnDef } from './userListMeta';
-import CustomTable from '../../components/customTable/CustomTable';
-import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
 import {
   clearSupervisorList,
   clearVillageHFList,
@@ -25,7 +26,6 @@ import {
   fetchUserDetailRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   healthFacilityListSelector,
   healthFacilityListUsersTotalSelector,
@@ -34,13 +34,13 @@ import {
   healthFacilityUsersLoadingSelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IRoles } from '../../store/user/types';
-import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
+import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
-import sessionStorageServices from '../../global/sessionStorageServices';
-import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
+import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { getUserPayload } from '../../utils/commonUtils';
-import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
+import { columnDef } from './userListMeta';
 
 interface IMatchParams {
   tenantId: string;
@@ -79,7 +79,7 @@ const UserList = (): React.ReactElement => {
     userList: {
       filters: { available: showFilters }
     }
-  } = useLabelFromAppType();
+  } = useAppTypeConfigs();
 
   /**
    * useCallback hook to refresh the user list.
@@ -169,26 +169,12 @@ const UserList = (): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
-    if (
-      (value.roles || []).some((userRole: IUserRole) =>
-        [NAMING_VARIABLES.COMMUNITY_HEALTH_PROMOTER].includes(userRole.name)
-      )
-    ) {
+    if ((value.roles || []).some((userRole: IUserRole) => villageBasedRoles.includes(userRole.name))) {
       dispatch(
         fetchUserDetailRequest({
           id: Number(value?.id),
           successCb: (user: any) => {
             const postData = { ...user };
-            const allSuiteAccess = user.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
-            postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-            postData.role =
-              postData.roles.filter((r: IRoles) => r.groupName === 'SPICE' && r.name !== NAMING_VARIABLES.redRisk) ||
-              [];
-            postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-            postData.supervisor = {
-              ...postData.supervisor,
-              name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
-            };
             userForEdit.current = { users: [{ ...postData }] };
             setIsOpenUserModal({ isOpen: true, isEdit: true });
           },
@@ -199,11 +185,6 @@ const UserList = (): React.ReactElement => {
       );
     } else {
       const postData = { ...value };
-      const allSuiteAccess = value.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
-      postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-      postData.role =
-        postData.roles.filter((r: IRoles) => r.groupName === 'SPICE' && r.name !== NAMING_VARIABLES.redRisk) || [];
-      postData.spiceInsightsRole = postData.roles.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
       userForEdit.current = { users: [{ ...postData }] };
       setIsOpenUserModal({ isOpen: true, isEdit: true });
     }

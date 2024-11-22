@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { APP_TYPE_NAME, NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -25,6 +25,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import localStorageServices from '../../global/localStorageServices';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { clearChiefdomDetail } from '../../store/chiefdom/actions';
 import { clearSideMenu } from '../../store/common/actions';
 import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
@@ -56,7 +57,7 @@ const Region = (): React.ReactElement => {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,

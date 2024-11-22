@@ -1,17 +1,37 @@
 import { useCallback } from 'react';
-import { IRoles } from '../../store/user/types';
+import APPCONSTANTS from '../../constants/appConstants';
+import { villageBasedRoles } from '../../constants/roleConstants';
+import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 
+export const filterRolesByAppTypeFn = (data: IGroupRoles, appType: string) => {
+  const filteredData: { [key: string]: any[] } = {};
+
+  // Iterate over each group in the data
+  for (const group in data) {
+    if (true) {
+      if (data.hasOwnProperty(group)) {
+        const filteredRoles = data[group].filter((role: IRoles) => (role.appTypes || []).includes(appType));
+        // If there are any roles left after filtering, add them to the filteredData
+        if (filteredRoles.length > 0) {
+          filteredData[group] = filteredRoles;
+        }
+      }
+    }
+  }
+  return filteredData;
+};
+
 const useUserFormUtils = () => {
-  const { mobileRoles, isCHPRole, isHFAdminRole } = UserFormMeta();
+  const { mobileRoles, isHFAdminRole } = UserFormMeta();
   const isCHASelected = useCallback(
     (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => mobileRoles.includes(userRole.name)),
     [mobileRoles]
   );
 
-  const isCHPSelected = useCallback(
-    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => isCHPRole.includes(userRole.name)),
-    [isCHPRole]
+  const isCHPCHWSelected = useCallback(
+    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => villageBasedRoles.includes(userRole.name)),
+    []
   );
   const isRoleExists = useCallback(
     (roles: IRoles[], validRoles: string[] = mobileRoles) =>
@@ -45,14 +65,70 @@ const useUserFormUtils = () => {
     (roles: IRoles[]) => (roles || [])?.some((userRole: IRoles) => isHFAdminRole.includes(userRole.name)),
     [isHFAdminRole]
   );
+
+  /**
+   * get spice pre populate while open admin pages
+   */
+  const getSpiceGroupName = (suiteAccess: any[]) =>
+    suiteAccess.find(
+      (suitAccessData: { id: string; groupName: string }) =>
+        suitAccessData.groupName === APPCONSTANTS.spiceRoleGrouped.spice
+    );
+
+  const formUserData = (values: any) => {
+    const allSuiteAccess =
+      (values?.roles || []).map((r: IRoles) => ({
+        groupName: r.groupName,
+        id: r.groupName
+      })) || [];
+    const suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()] || [];
+    const spiceRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'SPICE') || [];
+    const reportRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'REPORTS') || [];
+    const insightRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'INSIGHTS') || [];
+    const isCHW = (values?.roles || []).some((userRole: IRoles) => ['CHW'].includes(userRole.name));
+    return {
+      suiteAccess,
+      role: spiceRoles,
+      reportRoles,
+      insightRoles,
+      selectedRoles: spiceRoles || [],
+      selectedReportRoles: reportRoles,
+      selectedInsightRoles: insightRoles,
+      supervisor: isCHW
+        ? values?.supervisor && {
+            ...values.supervisor,
+            name: `${values.supervisor.firstName || ''} ${values.supervisor.lastName || ''}`
+          }
+        : undefined,
+      mandatorySuiteAccess: suiteAccess,
+
+      reportUserOrganization: (values?.reportUserOrganization || []).length
+        ? (values?.reportUserOrganization || []).map((hf: any) => ({
+            ...hf,
+            id: hf.formDataId,
+            tenantId: hf.id
+          }))
+        : undefined,
+      insightUserOrganization: (values?.insightUserOrganization || []).length
+        ? (values?.insightUserOrganization || []).map((hf: any) => ({
+            ...hf,
+            id: hf.formDataId,
+            tenantId: hf.id
+          }))
+        : undefined
+    };
+  };
+
   return {
     isCHASelected,
-    isCHPSelected,
+    isCHPCHWSelected,
     isRoleExists,
     disableSiteRoles,
     siteRolesChange,
     getSuiteAccessList,
-    isHFAdminSelected
+    isHFAdminSelected,
+    getSpiceGroupName,
+    formUserData
   };
 };
 

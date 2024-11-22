@@ -526,7 +526,7 @@ export function* fetchWorkflowListSagaRequest({
     // Current workflow filter based on appTypes
     if (appTypes && appTypes.length === 1) {
       filteredWorkflows = list.filter((workflow: IWorkflow) => {
-        const workflowAppTypes = workflow.appTypes;
+        const workflowAppTypes = workflow.appTypes || [];
         return workflowAppTypes.includes(appTypes[0]);
       });
     } else {

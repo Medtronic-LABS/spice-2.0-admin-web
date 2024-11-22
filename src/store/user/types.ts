@@ -757,6 +757,8 @@ export interface IUserPayload {
   tenantId?: number;
   supervisorId?: number | null;
   roleIds: number[];
+  reportUserOrganizationIds: number[];
+  insightUserOrganizationIds: number[];
   villageIds?: number[];
   village?: string;
   timezone: { id: number; name?: string };

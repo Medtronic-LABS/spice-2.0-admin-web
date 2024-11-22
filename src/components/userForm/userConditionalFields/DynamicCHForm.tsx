@@ -2,6 +2,7 @@ import { Field } from 'react-final-form';
 import { required } from '../../../utils/validation';
 import SelectInput from '../../formFields/SelectInput';
 import MultiSelect from '../../multiSelect/MultiSelect';
+import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
 
 export const DynamicCHForm = ({
   index,
@@ -17,11 +18,18 @@ export const DynamicCHForm = ({
   isChaUser,
   isChpUser,
   communityList,
-  isHFCreate
+  isHFCreate,
+  showVillages
 }: any) => {
+  const {
+    user: {
+      supervisor: { label, error: supervisorError }
+    }
+  } = useAppTypeConfigs();
+
   return (
     <>
-      {isChpUser && !isHFCreate && (
+      {showVillages && (
         <>
           <div className='col-sm-6 col-12'>
             <Field
@@ -32,8 +40,8 @@ export const DynamicCHForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label='Community Health Assistant'
-                  errorLabel='Community health assistant'
+                  label={label}
+                  errorLabel={supervisorError}
                   labelKey='name'
                   valueKey='id'
                   disabled={isProfile}

@@ -330,11 +330,7 @@ export const getUserPayload = ({
     // for role, roles, roleIds
     if (isHFCreate) {
       roleIds = Array.isArray(user.roles)
-        ? (user.roles || [])
-            .map((id: any) => {
-              return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-            })
-            .flat()
+        ? (user.roles || []).map((id: any) => (Array.isArray(id) ? id.map((e: any) => e.id) : id.id)).flat()
         : [user.role.id];
     } else {
       let reportIds: number[] = [];
@@ -343,14 +339,10 @@ export const getUserPayload = ({
       if (user.role) {
         spiceId =
           Array.isArray(user.roles) && user.roles.length
-            ? (user.roles || [])
-                .map((id: any) => {
-                  return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-                })
-                .flat()
+            ? (user.roles || []).map((id: any) => (Array.isArray(id) ? id.map((e: any) => e.id) : id.id)).flat()
             : [user.role.id];
       }
-      // add roles in spiceInsightIds
+      // add roles in reportIds
       if (user.roles) {
         reportIds = user.roles
           ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.reports)
@@ -400,7 +392,14 @@ export const getUserPayload = ({
       timezone: user?.timezone,
       district: user?.district,
       chiefdom: user?.chiefdom,
-      designation: { name: user?.designation?.name, id: user?.designation?.id }
+      designation: { name: user?.designation?.name, id: user?.designation?.id },
+      reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization) ? user.reportUserOrganization : []).map(
+        ({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId
+      ),
+      insightUserOrganizationIds: (Array.isArray(user?.insightUserOrganization)
+        ? user.insightUserOrganization
+        : []
+      ).map(({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId)
     };
     // add id for edit
     if (user?.id) {

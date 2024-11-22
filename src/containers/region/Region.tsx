@@ -12,7 +12,7 @@ import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import APPCONSTANTS from '../../constants/appConstants';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
-import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import {
   downloadFileRequest,
   fetchCountryDetailReq,
@@ -44,11 +44,9 @@ const Region = (): React.ReactElement => {
 
   const {
     isCommunity,
-    hfDetails: {
-      district: { s: districtSName },
-      chiefdom: { s: chiefdomSName }
-    }
-  } = useLabelFromAppType();
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName }
+  } = useAppTypeConfigs();
 
   // Check if the current user role is Region Admin to set read-only access
   const isReadOnly = role === APPCONSTANTS.ROLES.REGION_ADMIN;

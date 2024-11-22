@@ -9,7 +9,7 @@ import BinIcon from '../../assets/images/bin.svg';
 import ResetIcon from '../../assets/images/reset.svg';
 import Radio from '../formFields/Radio';
 import SelectInput from '../formFields/SelectInput';
-import APPCONSTANTS from '../../constants/appConstantsCom';
+import APPCONSTANTS from '../../constants/appConstants';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import EmailField from '../formFields/EmailField';
 import { IGroupRoles, IRoles, IUser } from '../../store/user/types';

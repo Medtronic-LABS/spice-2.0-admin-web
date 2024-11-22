@@ -65,7 +65,7 @@ const renderWorkflowByModuleType = (
       const isPregnancy = selectedValue?.workflowName === pregnancy;
       const isPregnancyAnc = selectedValue?.workflowName === pregnancyAnc;
       const selectedClinicalWFs: number[] = form?.getState().values.healthFacility.clinicalWorkflows;
-      if ((isPregnancy || isPregnancyAnc) && selectedClinicalWFs.includes(selectedValue.id)) {
+      if ((isPregnancy || isPregnancyAnc) && (selectedClinicalWFs || []).includes(selectedValue.id)) {
         const idToRemove = clinicalWorkflowsWOphq4.find(
           (v) => v?.workflowName === (isPregnancy ? pregnancyAnc : pregnancy)
         );
@@ -189,7 +189,7 @@ const Workflows: React.FC<IWorkflowsProps> = ({
       );
       const phq4Workflow = clinicalWorkflowsWphq4.find((value) => value.workflowName === phq4);
       const selectedClinicalWFs = form?.getState().values.healthFacility.clinicalWorkflows;
-      if (selectedClinicalWFs?.includes((phq4Workflow || {}).id)) {
+      if ((selectedClinicalWFs || [])?.includes((phq4Workflow || {}).id)) {
         setPhq4Selected(true);
       } else {
         const substanceAbuseId = clinicalWorkflowsWphq4

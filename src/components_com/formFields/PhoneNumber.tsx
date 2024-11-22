@@ -4,7 +4,7 @@ import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
-import APPCONSTANTS from '../../constants/appConstantsCom';
+import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { IHFUserGet } from '../../store/healthFacility_com/types';

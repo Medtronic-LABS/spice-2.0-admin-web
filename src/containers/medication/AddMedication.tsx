@@ -12,7 +12,7 @@ import MedicationFormIcon from '../../assets/images/info-grey.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { createMedicationRequest, validateMedication } from '../../store/medication/actions';
 import { useDispatch } from 'react-redux';
-import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 export interface IMedicationFormValues {
   medication: IMedicationDataFormValues[];
@@ -53,7 +53,7 @@ const AddMedication = (props: Props): React.ReactElement => {
     medication: {
       categories: { available: isCategories }
     }
-  } = useLabelFromAppType();
+  } = useAppTypeConfigs();
 
   /**
    * Checks for duplicate data validation with existing form values and existing values in database

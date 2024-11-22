@@ -1,35 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import TextInput from '../formFields/TextInput';
-import {
-  composeValidators,
-  required,
-  validateName,
-  validateLastName,
-  validateCountryCode,
-  convertToNumber
-} from '../../utils/validation';
-import BinIcon from '../../assets/images/bin.svg';
-import ResetIcon from '../../assets/images/reset.svg';
-import Radio from '../formFields/Radio';
-import SelectInput from '../formFields/SelectInput';
-import APPCONSTANTS, { NAMING_VARIABLES, ADMIN_BASED_ON_URL } from '../../constants/appConstants';
-import PlusIcon from '../../assets/images/plus_blue.svg';
-import EmailField from '../formFields/EmailField';
-import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
-import MultiSelect from '../multiSelect/MultiSelect';
 import { useDispatch, useSelector } from 'react-redux';
-import { isUserRolesLoading, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import {
-  fetchCommunityListRequest,
-  fetchCultureListRequest,
-  fetchDesignationListRequest,
-  fetchTimezoneListRequest,
-  fetchUserRolesAction
-} from '../../store/user/actions';
-import userMeta from './userFormMeta';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { useLocation } from 'react-router-dom';
+import { ActionMeta } from 'react-select';
+import BinIcon from '../../assets/images/bin.svg';
+import PlusIcon from '../../assets/images/plus_blue.svg';
+import ResetIcon from '../../assets/images/reset.svg';
+import { filterRolesByAppTypeFn, roleBasedAppTypes } from '../../components_com/userForm/UserForm';
+import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
+import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
+import { useRoleMeta, useRoleOptions } from '../../hooks/roleHook';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
+import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
+import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
+import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   clearHFListRequest,
   clearSupervisorList,
@@ -39,7 +26,6 @@ import {
   fetchPeerSupervisorListRequest,
   fetchVillagesListUserLinked
 } from '../../store/healthFacility/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   countryListSelector,
   countryLoadingSelector,
@@ -50,28 +36,43 @@ import {
   villagesFromHFListSelector,
   villagesFromHFLoadingSelector
 } from '../../store/healthFacility/selectors';
-import {
-  timezoneListSelector,
-  loadingSelector,
-  cultureListSelector,
-  cultureListLoadingSelector,
-  designationListSelector,
-  communityListSelector
-} from '../../store/user/selectors';
 import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
-import PhoneNumberField from '../formFields/PhoneNumber';
-import useUserFormUtils from './userFormUtils';
-import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
-import { SiteUserForm } from './userConditionalFields/AdminFields';
-import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
-import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
-import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
+import {
+  fetchCommunityListRequest,
+  fetchCultureListRequest,
+  fetchDesignationListRequest,
+  fetchUserRolesAction
+} from '../../store/user/actions';
+import {
+  communityListSelector,
+  cultureListLoadingSelector,
+  cultureListSelector,
+  designationListSelector,
+  isUserRolesLoading,
+  roleSelector,
+  userRolesSelector
+} from '../../store/user/selectors';
+import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
 import { formatCountryCode, formatUserToastMsg } from '../../utils/commonUtils';
-import { ActionMeta } from 'react-select';
-import { useLocation } from 'react-router-dom';
-import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
-import { filterRolesByAppTypeFn, roleBasedAppTypes } from '../../components_com/userForm/UserForm';
-import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import {
+  composeValidators,
+  convertToNumber,
+  required,
+  validateCountryCode,
+  validateLastName,
+  validateName
+} from '../../utils/validation';
+import EmailField from '../formFields/EmailField';
+import PhoneNumberField from '../formFields/PhoneNumber';
+import Radio from '../formFields/Radio';
+import SelectInput from '../formFields/SelectInput';
+import TextInput from '../formFields/TextInput';
+import MultiSelect from '../multiSelect/MultiSelect';
+import { SiteUserForm } from './userConditionalFields/AdminFields';
+import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
+import userMeta from './userFormMeta';
+import useUserFormUtils from './userFormUtils';
 
 export interface IUserFormValues {
   email: string;
@@ -84,6 +85,12 @@ export interface IUserFormValues {
   gender: string;
   country: { countryCode: string };
   isHF?: boolean;
+}
+
+export interface IDisabledRoles {
+  SPICE: IRoles[];
+  REPORTS: IRoles[];
+  INSIGHTS: IRoles[];
 }
 
 type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
@@ -132,8 +139,15 @@ const UserForm = ({
   } else {
     fetchingFor = ADMIN_BASED_ON_URL[currentModule];
   }
-  const { isCHASelected, isCHPSelected, isRoleExists, siteRolesChange, getSuiteAccessList, isHFAdminSelected } =
-    useUserFormUtils();
+  const {
+    isCHPCHWSelected,
+    isRoleExists,
+    siteRolesChange,
+    getSuiteAccessList,
+    isHFAdminSelected,
+    getSpiceGroupName,
+    formUserData
+  } = useUserFormUtils();
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
   const healthFacilityList = useSelector(healthFacilityListSelector);
@@ -155,28 +169,26 @@ const UserForm = ({
   const [villages, setVillages] = useState([[...villagesList.list]] as IVillages[][]);
   const [autoFetchData, setAutoFetchData] = useState(autoFetchedDataState?.autoFetchData || ([] as any[]));
   const [isCHAUser, setUserAsCHA] = useState(chwState?.isCHAUser || [false]);
-  const [isCHPUser, setUserAsCHP] = useState([false]);
+  const [isCHWCHPUser, setUserAsCHWCHP] = useState([false]);
   const [selectedAdmins, setSelectedAdmins] = useState<string>('');
   const roleOptions = useRef<IRoles[][]>(roleOptionsState?.current || []);
   const disabledRoles = useRef<IRoles[][]>(disabledRolesState?.disabledRoles || ([] as IRoles[][]));
   const [autoFetched, setAutoFetched] = useState<boolean[]>(autoFetchedState?.autoFetch || ([] as boolean[]));
   const fetchedData = useRef([] as any[]);
   const [clearEmail, setClearEmail] = useState(false);
-  const [reportsRole, setReportsRole] = useState<IRoles[]>([]);
+  // const [reportsRole, setReportsRole] = useState<IRoles[]>([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const { mobileRoles, adminRoles, superAdminRoles, CHRoles, onlyInsightUserRole } = userMeta();
+  const { mobileRoles, adminRoles, superAdminRoles, CHRoles } = userMeta();
   const districtList = useSelector(getDistrictListSelector);
   const {
-    hfDetails: {
-      district: { s: districtSName }
-    },
     userList: {
       filters: { available: showFilters }
     },
     user: {
       designation: { available: isDesignationListShow }
-    }
-  } = useLabelFromAppType();
+    },
+    district: { s: districtSName }
+  } = useAppTypeConfigs();
 
   const [newHFList, setNewHFList] = useState(healthFacilityList);
   const [appTypeBasedRoles, setAppTypeRoles] = useState(rolesGrouped);
@@ -203,22 +215,24 @@ const UserForm = ({
     [cultureList]
   );
 
+  // new hook related state and ref
+  const disabledNRoles = useRef<IDisabledRoles[]>([{ SPICE: [], REPORTS: [], INSIGHTS: [] }]);
+  const showSpiceHFRef = useRef(false);
+  const showReportHFRef = useRef(false);
+  const showInsightHFRef = useRef(false);
+  const [showVillage, setShowVillage] = useState(false);
+  const spiceRoles = useRef([] as IRoles[]);
+  const reportRolesRef = useRef([] as IRoles[]);
+  const insightRolesRef = useRef([] as IRoles[]);
+  ///////////////////////////////////////////////////////
+
   useEffect(() => {
     setAppTypeRoles(
       appTypes && appTypes.length === 1 ? filterRolesByAppTypeFn(rolesGrouped, appTypes[0]) : rolesGrouped
     );
   }, [appTypes, rolesGrouped]);
 
-  const timezoneList = useSelector(timezoneListSelector);
-  const isTmezoneListLoading = useSelector(loadingSelector);
   useEffect(() => {
-    if (!(timezoneList || []).length) {
-      dispatch(fetchTimezoneListRequest());
-    }
-    if (!(cultureList || []).length) {
-      dispatch(fetchCultureListRequest());
-    }
-
     if (countryId && isDesignationListShow) {
       dispatch(fetchDesignationListRequest({ countryId }));
     }
@@ -316,18 +330,12 @@ const UserForm = ({
     () => [
       {
         ...initialEditValue,
+        ...formUserData(initialEditValue),
         hfTenantIds: isEdit
           ? (initialEditValue?.organizations || [])
               .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
               .map((org: any) => org.id)
           : [],
-        role: (initialEditValue?.role || [])?.filter(
-          (editedValue: { name: string; displayName: string | null }) =>
-            editedValue?.name !== NAMING_VARIABLES.redRisk && editedValue?.displayName !== null
-        ),
-        mandatorySuiteAccess: initialEditValue?.suiteAccess,
-        selectedRoles: initialEditValue?.role || [],
-        selectedReportsRole: initialEditValue?.reportRoles || [],
         culture:
           !isCultureListLoading &&
           cultureList?.find(
@@ -351,15 +359,6 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [cultureList, initialEditValue, districtList, chiefdomList, isCultureListLoading, isEdit]
   );
-
-  /**
-   * get spice pre populate while open admin pages
-   */
-  const getSpiceGroupName = (suiteAccess: any[]) =>
-    suiteAccess.find(
-      (suitAccessData: { id: string; groupName: string }) =>
-        suitAccessData.groupName === APPCONSTANTS.spiceRoleGrouped.spice
-    );
 
   /**
    * Resets the admin form fields to their initial state.
@@ -400,26 +399,7 @@ const UserForm = ({
     [form, initialValue, isAdminForm, defaultSelectedRole, autoFetched, appTypeBasedRoles.SPICE]
   );
 
-  const isInsightUserSelected = useCallback(
-    (roles: IRoles[]) => (roles || []).some((userRole: IRoles) => onlyInsightUserRole.includes(userRole.name)),
-    [onlyInsightUserRole]
-  );
-  /**
-   * Handles the logic for super admin to peer supervisor conversion.
-   * @param {IRoles[]} roles - The roles of the user
-   */
-  const SuperAdminToPeerSuperviserFn = useCallback(
-    (roles: IRoles[]) => {
-      if (isSuperAdmin && roles?.some((element: any) => element.name !== 'SUPER_ADMIN')) {
-        if (healthFacilityList?.length === 0 && countryId) {
-          getHFListFn();
-        }
-      }
-    },
-    [isSuperAdmin, healthFacilityList?.length, countryId, getHFListFn]
-  );
   useEffect(() => {
-    levelBasedReportsRole();
     return () => {
       dispatch(clearSupervisorList());
       dispatch(clearVillageHFList());
@@ -458,9 +438,9 @@ const UserForm = ({
     };
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
-    if (isRoleExists(userData.role, ['SUPER_ADMIN', 'SUPER_USER'])) {
-      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE, index);
-    } else if (isCHPSelected(userData.role) && isHFCreate) {
+    if (isRoleExists(userData.role, [SUPER_ADMIN, SUPER_USER, REPORT_ADMIN])) {
+      emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE.replace('Super', 'Super/Report'), index);
+    } else if (isCHPCHWSelected(userData.role) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHP_USER_EXCEPTION_HF_CREATE, index);
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
@@ -487,7 +467,7 @@ const UserForm = ({
         const { formDataId: id, name } = userData.organizations[0];
         userData.healthFacility = { id, name };
       }
-      if (showHealthFacilityFn(index)) {
+      if (showSpiceHFRef.current) {
         const fullRoles = form.getState().values[`${formName}[${index}].roles`];
         const selectedAppTypes = roleBasedAppTypes(fullRoles);
         filterHFByAppTypes(selectedAppTypes);
@@ -499,7 +479,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].role`, filteredUserRoles || []);
         form.change(`${formName}[${index}].roles`, userData.roles || []);
         form.change(`${formName}[${index}].reportRoles`, userData.reportRoles || []);
-        form.change(`${formName}[${index}].selectedReportsRole`, userData.reportRoles || []);
+        form.change(`${formName}[${index}].selectedReportRoles`, userData.reportRoles || []);
         form.change(`${formName}[${index}].selectedRoles`, userData?.selectedRoles || []);
         form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
         form.change(`${formName}[${index}].lastName`, userData.lastName || '');
@@ -511,6 +491,8 @@ const UserForm = ({
         });
         form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
         form.change(`${formName}[${index}].healthFacility`, userData.healthFacility || null);
+        form.change(`${formName}[${index}].reportUserOrganization`, userData.reportUserOrganization || null);
+        form.change(`${formName}[${index}].insightUserOrganization`, userData.insightUserOrganization || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
         form.change(`${formName}[${index}].villages`, userData.villages || []);
         form.change(`${formName}[${index}].organizations`, userData.organizations || []);
@@ -525,12 +507,11 @@ const UserForm = ({
       const newFetchedData = [...fetchedData.current];
       newFetchedData[index] = userData;
       fetchedData.current = newFetchedData;
-      isCHUserSelectedFn(userData.role, index);
-      updateRoleOptionsAndDisableRoles(index, userData.roles);
-      if (isCHPSelected(userData.roles)) {
+      dataBasedRoleChange(userData);
+      if (isCHPCHWSelected(userData.roles)) {
         const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
-        fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'village', index);
-        fetchListWithConditions(selectedRoles(index), tenantIds, userData.id, 'supervisor', index);
+        fetchListWithConditions(tenantIds, userData.id, 'village', index);
+        fetchListWithConditions(tenantIds, userData.id, 'supervisor', index);
       }
     }
   };
@@ -733,7 +714,7 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       adminRoles,
-      isCHPSelected,
+      isCHPCHWSelected,
       isHF,
       isHFCreate,
       mobileRoles,
@@ -742,29 +723,6 @@ const UserForm = ({
       superAdminRoles,
       selectedAdmins
     ]
-  );
-
-  /**
-   * Handles the selection of CHA and CHP users.
-   * @param {IRoles[]} roles - The roles of the user
-   * @param {number} index - The index of the form
-   */
-  const isCHUserSelectedFn = useCallback(
-    (roles: IRoles[], index: number) => {
-      // getting CHA user selected status
-      if (isSiteUser) {
-        const newChaStatus = [...isCHAUser];
-        newChaStatus[index] = isCHASelected(roles);
-        setUserAsCHA(newChaStatus);
-
-        // getting CHP user selected status
-        const newChpStatus = [...isCHPUser];
-        newChpStatus[index] = isCHPSelected(roles);
-        setUserAsCHP(newChpStatus);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [roleOptions, roleOptions.current]
   );
 
   // Peer Supervisor fetch
@@ -808,14 +766,8 @@ const UserForm = ({
   );
 
   // Common function for the supervisor and village list fetch with conditions
-  const fetchListWithConditions = (
-    roles: IRoles[],
-    tenantIds: number[] = [],
-    userId: string,
-    name: string,
-    index: number
-  ) => {
-    if (isCHPSelected(roles) && tenantIds.length) {
+  const fetchListWithConditions = (tenantIds: number[] = [], userId: string, name: string, index: number) => {
+    if (tenantIds.length) {
       if (name === 'village') {
         return fetchVillagesList(tenantIds, userId, index);
       } else {
@@ -823,7 +775,6 @@ const UserForm = ({
       }
     }
   };
-
   /**
    * Fetches the health facility list based on the provided values.
    * @param {IRoles} values - The values object containing tenantIds
@@ -849,24 +800,13 @@ const UserForm = ({
    * Effect hook to fetch village and supervisor lists based on the initial edit data.
    */
   useEffect(() => {
-    if (isEdit && !isProfile) {
+    if (isEdit && showVillage && !isProfile) {
       const tenantIds = [...initialEditData[0].hfTenantIds].filter((v: number) => v);
-      fetchListWithConditions(selectedRoles(0), tenantIds, initialEditData[0]?.id, 'village', 0);
-      fetchListWithConditions(selectedRoles(0), tenantIds, initialEditData[0]?.id, 'supervisor', 0);
+      fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
+      fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoFetchData]);
-
-  /**
-   * Effect hook to handle CH user selection.
-   */
-  useEffect(() => {
-    if (isEdit) {
-      if (isSiteUser) {
-        isCHUserSelectedFn(form.getState()?.values?.users[0]?.role, 0);
-      }
-    }
-  }, [form, isCHUserSelectedFn, isEdit, isProfile, selectedRoles, isSiteUser]);
+  }, [autoFetchData, showVillage]);
 
   /**
    * Initializes the data for the user form.
@@ -883,7 +823,7 @@ const UserForm = ({
         const selectedRole = appTypeBasedRoles.SPICE?.find(
           (spiceRole: IRoles) => spiceRole.name === defaultSelectedRole
         );
-        levelBasedReportsRole(selectedRole?.level);
+        // levelBasedReportsRole(selectedRole?.level);
         const initialEditDataForRole = {
           role: [selectedRole],
           suiteAccess: [getSpiceGroupName(suiteAccess)]
@@ -914,106 +854,6 @@ const UserForm = ({
       });
     }
   }, [autoFetchData, form, isEdit, isHFCreate, updateRoleOptionsAndDisableRoles]);
-
-  /**
-   * Filters and returns a list of admin roles based on specific conditions.
-   * @returns {IRoles[]} A filtered array of roles that match the given conditions.
-   */
-  const getAdminRoles = (): IRoles[] => {
-    const filteredRoles = roleOptions.current?.[0]?.filter((roleData: any) => {
-      const { name, displayName, suiteAccessName } = roleData;
-      const suiteNameLower = suiteAccessName?.toLowerCase() || '';
-      // Early exits for 'RED_RISK_USER' or null display name
-      if (name === NAMING_VARIABLES.redRisk || displayName === null) {
-        return false;
-      }
-      if (isHFCreate) {
-        return (
-          (suiteNameLower !== APPCONSTANTS.spiceRole.spice || name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN) &&
-          name !== APPCONSTANTS.ALL_ROLES.COMMUNITY_HEALTH_PROMOTER
-        );
-      }
-      // Health facility conditions
-      if (isHF) {
-        return name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN || suiteNameLower !== APPCONSTANTS.spiceRole.spice;
-      }
-      // Site user condition
-      if (isSiteUser) {
-        return suiteNameLower !== APPCONSTANTS.spiceRole.spice;
-      }
-
-      // District level condition
-      const isDistrictLevel = fetchingFor === ADMIN_BASED_ON_URL.district;
-      const isChiefdomOrHealthFacility =
-        fetchingFor === ADMIN_BASED_ON_URL.chiefdom &&
-        (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
-      const isHealthFacility =
-        fetchingFor === ADMIN_BASED_ON_URL['health-facility'] &&
-        (role === APPCONSTANTS.ROLES.SUPER_USER || role === APPCONSTANTS.ROLES.SUPER_ADMIN);
-
-      if (isDistrictLevel) {
-        return (
-          suiteNameLower === APPCONSTANTS.spiceRole.spice &&
-          name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
-          name !== APPCONSTANTS.ROLES.SUPER_ADMIN
-        );
-      }
-
-      if (isChiefdomOrHealthFacility) {
-        return (
-          suiteNameLower === APPCONSTANTS.spiceRole.spice &&
-          name !== ADMIN_BASED_ON_URL.chiefdom &&
-          name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
-          name !== APPCONSTANTS.ROLES.SUPER_ADMIN
-        );
-      }
-
-      if (isHealthFacility) {
-        return (
-          suiteNameLower === APPCONSTANTS.spiceRole.spice &&
-          name !== ADMIN_BASED_ON_URL.chiefdom &&
-          name !== APPCONSTANTS.ROLES.REGION_ADMIN &&
-          name !== APPCONSTANTS.ROLES.SUPER_ADMIN &&
-          name !== ADMIN_BASED_ON_URL['health-facility']
-        );
-      }
-
-      // Default fallback
-      return suiteNameLower === APPCONSTANTS.spiceRole.spice;
-    });
-
-    // Return filtered roles or an empty array if undefined or null and roles must be non-community
-    return filteredRoles.filter(
-      (roleData: any) => roleData.appTypes.includes(APPCONSTANTS.appTypes.non_community) ?? []
-    );
-  };
-
-  /**
-   * Filters roles based on the user's level for SPICE INSIGHTS and sets the reports role state.
-   *
-   * @param {number} level - The user level used to filter roles.
-   */
-  const levelBasedReportsRole = (level?: number) => {
-    const filteredRoles = appTypeBasedRoles[APPCONSTANTS.spiceRoleGrouped.reports]?.filter((roleData: any) => {
-      return roleData.appTypes.includes(APPCONSTANTS.appTypes.non_community);
-    });
-    setReportsRole(filteredRoles || []);
-  };
-
-  const showHealthFacilityFn = (index: number) => {
-    const { roles: allRoles, healthFacility } = form.getState().values?.users?.[index] || [];
-    const isHFAdmin =
-      !isHFCreate &&
-      !isHF &&
-      !isEdit &&
-      isSiteUser &&
-      !(allRoles || []).some((userRole: IRoles) => [SUPER_ADMIN, SUPER_USER, REPORT_ADMIN].includes(userRole.name));
-
-    if (!isHFAdmin && healthFacility?.id) {
-      form.change(`${formName}[${index}].healthFacility`, null);
-    }
-    return isHFAdmin;
-  };
 
   /**
    * Fetches district details based on the health facility tenant ID.
@@ -1101,13 +941,6 @@ const UserForm = ({
   }, [form.getState().values.users?.[0]?.chiefdom?.tenantId]);
 
   useEffect(() => {
-    if (initialEditData && initialEditData.length > 0) {
-      levelBasedReportsRole();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialEditData, isAdminForm]);
-
-  useEffect(() => {
     // healthFacility auto populate for insight role and culture input fields
     const [selectedHf] = form.getState()?.values?.users;
     if (selectedHf?.role) {
@@ -1116,60 +949,77 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getState()?.values?.users?.[0]?.role?.name]);
 
-  const reportRoleOptions = useCallback(() => {
-    if (isHF) {
-      return (appTypeBasedRoles.REPORTS || []).filter((v: IRoles) => v.name !== REPORT_ADMIN) || [];
+  // custom hooks for role change
+  const { roleChange } = useRoleMeta({
+    appTypeBasedRoles,
+    disabledRoles: disabledNRoles,
+    isHF,
+    isHFCreate,
+    isEdit,
+    isSiteUser,
+    formData: autoFetchData,
+    isCHAStatus: isCHAUser,
+    isCHWCHPStatus: isCHWCHPUser,
+    onRoleChange: ({
+      disabledRoles: disabledRolesFromHook,
+      showSpiceHFList,
+      showReportHFList,
+      showInsightHFList,
+      showVillages,
+      isCHAStatus,
+      isCHWCHPStatus
+    }) => {
+      disabledNRoles.current = disabledRolesFromHook;
+      showSpiceHFRef.current = showSpiceHFList;
+      showReportHFRef.current = showReportHFList;
+      showInsightHFRef.current = showInsightHFList;
+      setShowVillage(showVillages);
+
+      // getting CHA user selected status
+      setUserAsCHA(isCHAStatus);
+
+      // getting CHP user selected status
+      setUserAsCHWCHP(isCHWCHPStatus);
     }
-    return appTypeBasedRoles.REPORTS || [];
-  }, [appTypeBasedRoles.REPORTS, isHF]);
+  });
 
-  const disabledReportRoles = useRef([] as IRoles[][]);
-  const disabledInsightRoles = useRef([] as IRoles[][]);
+  // custom hooks for role options
+  const { getRoleOptions } = useRoleOptions({
+    isHF,
+    isHFCreate,
+    isEdit,
+    isSiteUser,
+    allRoles: appTypeBasedRoles,
+    currentModule,
+    roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
+      spiceRoles.current = spiceRoleOptions;
+      reportRolesRef.current = newReportRoles;
+      insightRolesRef.current = insightRoleOptions;
+    }
+  });
 
-  const getReportRoles = useCallback(
-    (
-      index: number,
-      spiceRoles?: IRoles[],
-      reportRole?: IRoles,
-      suiteAccess?: Array<{
-        groupName: any;
-        id: any;
-      }>,
-      isSuiteRemoved = false
-    ) => {
-      const REPORTS = 'REPORTS';
-      const { reportRoles = [], suiteAccess: formSuiteAccess = [] } = form.getState().values?.users?.[index] || {};
-      const formReportRoles = spiceRoles || reportRoles || [];
-      const suiteAccessSelected = suiteAccess || formSuiteAccess || [];
-      const isReportSuite = suiteAccessSelected.some((v: any) => v.groupName === REPORTS);
-      if (!isReportSuite) {
-        return [];
-      }
-      const selectedReportsRole = isSuiteRemoved ? formReportRoles[0]?.name : reportRole?.name;
-      const disabledRolesReports = selectedReportsRole
-        ? (reportRoleOptions() || []).filter((r: IRoles) => r.name !== selectedReportsRole)
-        : [];
-      const newDisabledReportRoles = [...disabledReportRoles.current];
-      newDisabledReportRoles[index] = disabledRolesReports;
-      disabledReportRoles.current = [...newDisabledReportRoles];
-      return disabledRolesReports;
+  const dataBasedRoleChange = useCallback(
+    (userData: any = {}) => {
+      const { reportRoles = [], insightRoles = [], role: spiceEditRoles = [] } = userData || {};
+      const editRoles = [
+        { roles: spiceEditRoles, suite: SPICE },
+        { roles: reportRoles, suite: REPORTS },
+        { roles: insightRoles, suite: INSIGHTS }
+      ];
+      editRoles.forEach(({ roles, suite }) => {
+        roleChange({ roles, index: 0, currentSuite: suite });
+      });
     },
-    [form, reportRoleOptions]
+    [roleChange]
   );
 
-  const getInsightRoles = useCallback(
-    (index: number) => {
-      const { insightRoles: formInsightRoles = [] } = form.getState().values?.users?.[index] || {};
-      const filteredRoles = (appTypeBasedRoles.INSIGHTS || []).filter((inRole: IRoles) =>
-        formInsightRoles.some((r: any) => r.name !== inRole.name)
-      );
-      const newDisabledInsightRoles = [...disabledInsightRoles.current];
-      newDisabledInsightRoles[index] = filteredRoles;
-      disabledInsightRoles.current = newDisabledInsightRoles;
-      return filteredRoles;
-    },
-    [appTypeBasedRoles.INSIGHTS, form]
-  );
+  useEffect(() => {
+    getRoleOptions();
+    if (isEdit && !isProfile) {
+      dataBasedRoleChange(autoFetchData[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFetchData[0]]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -1179,11 +1029,12 @@ const UserForm = ({
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
           // SUITE options
           const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
+          // getRoleOptions(index);
           const {
             mandatorySuiteAccess,
             selectedRoles: mandatoryRoles = [],
-            selectedReportsRole: mandatoryReportsRole = [],
-            selectedInsightsRole: mandatoryInsightsRole = [],
+            selectedReportRoles: mandatoryReportsRole = [],
+            selectedInsightRoles: mandatoryInsightsRole = [],
             suiteAccess: formSuiteAccess = [],
             roles: allRoles = [],
             role: spiceRole = [],
@@ -1199,13 +1050,6 @@ const UserForm = ({
           const isInsights = (formSuiteAccess || []).some(
             (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.insights
           );
-          const filteredInsightsRoles = appTypeBasedRoles[APPCONSTANTS.spiceRoleGrouped.insights]?.filter(
-            (roleData: any) => {
-              return roleData.appTypes.includes(APPCONSTANTS.appTypes.non_community);
-            }
-          );
-          getReportRoles(index, undefined, undefined, formSuiteAccess, true);
-          getInsightRoles(index);
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1242,29 +1086,21 @@ const UserForm = ({
                             : mandatorySuiteAccess || ''
                         }
                         onChange={(values: any[], actionMeta: ActionMeta<any>) => {
-                          const selectedGroupName = values.map((option: any) => option.groupName) || [];
-                          if (!selectedGroupName.includes(APPCONSTANTS.spiceRoleGrouped.reports)) {
-                            form.change(`${formName}[${index}].reportRoles`, []);
-                            form.change(`${formName}[${index}].insights`, []);
-                            form.change(
-                              `${formName}[${index}].roles`,
-                              (allRoles || []).filter(
-                                (v: IRoles) => v.groupName !== APPCONSTANTS.spiceRoleGrouped.reports
-                              )
-                            );
-                          }
-                          if (!selectedGroupName.includes('SPICE')) {
-                            form.change(`${formName}[${index}].role`, []);
-                            form.change(
-                              `${formName}[${index}].roles`,
-                              (allRoles || []).filter((v: IRoles) => v.groupName !== 'SPICE')
-                            );
-                            // clear designation whenever SPICE suiteaccess gets removed
-                            form.change(`${formName}[${index}].designation`, null);
-                          }
-                          isCHUserSelectedFn(spiceRole, index);
-                          updateRoleOptionsAndDisableRoles(index);
-                          getReportRoles(index, undefined, undefined, values, true);
+                          const selectedGroupNames = values.map((option: any) => option.groupName) || [];
+                          let newAllRoles: IRoles[] = [];
+                          const suiteFormName = {
+                            SPICE: `${formName}[${index}].role`,
+                            REPORTS: `${formName}[${index}].reportRoles`,
+                            INSIGHTS: `${formName}[${index}].insightRoles`
+                          };
+                          Object.keys(suiteFormName).forEach((r: string) => {
+                            if (selectedGroupNames.includes(r)) {
+                              newAllRoles = [...newAllRoles, ...allRoles.filter((v: IRoles) => v.groupName === r)];
+                            } else {
+                              form.change((suiteFormName as any)[r], []);
+                            }
+                          });
+                          form.change(`${formName}[${index}].roles`, newAllRoles);
                           input.onChange(values);
                         }}
                       />
@@ -1294,41 +1130,32 @@ const UserForm = ({
                             isModel={true}
                             isMulti={true}
                             required={true}
-                            options={getAdminRoles()}
+                            options={spiceRoles.current}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
-                                ...(disabledRoles.current[index] || [])
+                                ...(disabledNRoles.current[index].SPICE || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                                 : null;
                             }}
                             mandatoryOptions={mandatoryRoles ? mandatoryRoles : []}
-                            disabledOptions={disabledRoles.current[index]}
+                            disabledOptions={disabledNRoles.current[index].SPICE}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
+                              roleChange({ roles: values, index, currentSuite: 'SPICE' });
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].role`, [...values]);
                               form.change(`${formName}[${index}].roles`, [...reportRoles, ...insightRoles, ...values]);
-                              // User Modified as Peer Superviser from Super Admin
-                              SuperAdminToPeerSuperviserFn(values);
-                              // CHW User selection
-                              isCHUserSelectedFn(values, index);
-                              updateRoleOptionsAndDisableRoles(index, values);
-                              if (showHealthFacilityFn(index)) {
+                              if (showSpiceHFRef.current) {
                                 const fullRoles = form.getState().values[formName][index].roles;
                                 const selectedAppTypes = roleBasedAppTypes(fullRoles);
                                 filterHFByAppTypes(selectedAppTypes);
                               }
-                              // Healthfacility create admin page included healthfacility admin
-                              const [isHFSelected] = values.filter(
-                                (selectedName: any) => selectedName?.name === HEALTH_FACILITY_ADMIN
-                              );
-                              levelBasedReportsRole(isHFSelected?.level ? isHFSelected?.level : null);
                               // fetch HF list based on CHW selection
-                              if (isCHPSelected(values)) {
+                              if (showVillage) {
                                 if (!isEdit && !autoFetched[index]) {
                                   // To clear the Selected village during Add User
                                   form.batch(() => {
@@ -1341,27 +1168,16 @@ const UserForm = ({
                                   ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
                                   isHF ? hfTenantId : undefined // Include hfTenantId only when isHF is true
                                 ].filter((v: number | undefined) => v); // Filtering out undefined values
-                                fetchListWithConditions(
-                                  selectedRoles(index),
-                                  tenantIds,
-                                  initialEditData[0]?.id,
-                                  'village',
-                                  index
-                                );
-                                fetchListWithConditions(
-                                  selectedRoles(index),
-                                  tenantIds,
-                                  initialEditData[0]?.id,
-                                  'supervisor',
-                                  index
-                                );
+
+                                fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', index);
+                                fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', index);
                               }
 
                               // clear designation whenever role gets update
                               form.change(`${formName}[${index}].designation`, null);
 
                               // Other than chp role village must be clear
-                              if (!isCHPSelected(values)) {
+                              if (!isCHPCHWSelected(values)) {
                                 form.batch(() => {
                                   form.change(`${formName}[${index}].villages`, {});
                                 });
@@ -1376,7 +1192,7 @@ const UserForm = ({
                             errorLabel='Please select role.'
                             labelKey='displayName'
                             valueKey='id'
-                            options={!isProfile ? getAdminRoles() : []}
+                            options={!isProfile ? spiceRoles.current : []}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             isModel={true}
@@ -1384,9 +1200,6 @@ const UserForm = ({
                             onChange={(values: any) => {
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...reportRoles, ...insightRoles, values]);
-                              // clear a spice is now not neccessary
-                              // form.change(`${formName}[${index}].reportRoles`, []);
-                              levelBasedReportsRole(values.level);
                               setSelectedAdmins(values?.name);
                               // fetch HF list based on CHW selection
                               input.onChange(values);
@@ -1470,26 +1283,22 @@ const UserForm = ({
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] ? mandatoryReportsRole : []),
-                                ...(disabledReportRoles.current[index] || []),
-                                ...(mandatoryReportsRole || [])
+                                ...(mandatoryReportsRole || []),
+                                ...(disabledNRoles.current[index].REPORTS || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                                 : null;
                             }}
                             required={true}
-                            options={reportsRole}
+                            options={reportRolesRef.current}
                             mandatoryOptions={mandatoryReportsRole ? mandatoryReportsRole : []}
-                            disabledOptions={disabledReportRoles.current[index] || []}
+                            disabledOptions={disabledNRoles.current[index].REPORTS || []}
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any, { option, action }: { option: any; action: string }) => {
-                              if (spiceRole.length) {
-                                form.change(`${formName}[${index}].roles`, [...spiceRole, ...insightRoles, ...values]);
-                              } else {
-                                form.change(`${formName}[${index}].roles`, [...insightRoles, ...values]);
-                              }
-                              getReportRoles(index, undefined, action === 'select-option' ? option : null);
+                              roleChange({ roles: values, index, currentSuite: 'REPORTS' });
+                              form.change(`${formName}[${index}].roles`, [...spiceRole, ...insightRoles, ...values]);
                               input.onChange(values);
                             }}
                           />
@@ -1524,25 +1333,21 @@ const UserForm = ({
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] ? mandatoryInsightsRole : []),
                                 ...(mandatoryInsightsRole || []),
-                                ...(disabledInsightRoles.current[index] || [])
+                                ...(disabledNRoles.current[index].INSIGHTS || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                                 : null;
                             }}
                             required={true}
-                            options={filteredInsightsRoles}
+                            options={insightRolesRef.current}
                             mandatoryOptions={mandatoryInsightsRole ? mandatoryInsightsRole : []}
-                            disabledOptions={disabledInsightRoles.current[index] || []}
+                            disabledOptions={disabledNRoles.current[index].INSIGHTS || []}
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any) => {
-                              if (spiceRole.length) {
-                                form.change(`${formName}[${index}].roles`, [...[spiceRole], ...reportRoles, ...values]);
-                              } else {
-                                form.change(`${formName}[${index}].roles`, [...reportRoles, ...values]);
-                              }
-                              getInsightRoles(index);
+                              roleChange({ roles: values, index, currentSuite: 'INSIGHTS' });
+                              form.change(`${formName}[${index}].roles`, [...spiceRole, ...reportRoles, ...values]);
                               input.onChange(values);
                             }}
                           />
@@ -1615,6 +1420,7 @@ const UserForm = ({
                     isHF={isHF}
                     isHFCreate={isHFCreate}
                     isSiteUser={isSiteUser}
+                    tenantId={hfTenantId}
                     onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
                     parentOrgId={
                       isSiteUser && !parentOrgId
@@ -1683,7 +1489,7 @@ const UserForm = ({
                     }
                   />
                 </div>
-                {isSPICE && showHealthFacilityFn(index) && (
+                {isSPICE && showSpiceHFRef.current && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1717,7 +1523,7 @@ const UserForm = ({
                                 form.change(villagesFieldData, []);
                               }
 
-                              if (isCHPUser[index]) {
+                              if (showVillage) {
                                 fetchSupervisorList(
                                   formData?.organizations
                                     ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
@@ -1745,10 +1551,42 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {isInsights && isInsightUserSelected(allRoles) && (
+                {isReports && showReportHFRef.current && (
                   <div className='col-sm-6 col-12'>
                     <Field
-                      name={`${name}.supersetUserOrganization`}
+                      name={`${name}.reportUserOrganization`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => {
+                        return (
+                          <MultiSelect
+                            {...(input as any)}
+                            label='Health Facility for Reports'
+                            errorLabel='health facility for reports'
+                            labelKey='name'
+                            valueKey='id'
+                            required={true}
+                            isShowLabel={true}
+                            isSelectAll={true}
+                            isDefaultSelected={true}
+                            placeholder=''
+                            menuPlacement={'auto'}
+                            isDisabled={isProfile}
+                            isModel={true}
+                            isMulti={true}
+                            options={healthFacilityList || []}
+                            loadingOptions={hfLoading}
+                            error={isError(meta)}
+                          />
+                        );
+                      }}
+                    />
+                  </div>
+                )}
+                {isInsights && showInsightHFRef.current && (
+                  <div className='col-sm-6 col-12'>
+                    <Field
+                      name={`${name}.insightUserOrganization`}
                       type='text'
                       validate={required}
                       render={({ input, meta }) => {
@@ -1768,7 +1606,7 @@ const UserForm = ({
                             isDisabled={isProfile}
                             isModel={true}
                             isMulti={true}
-                            options={newHFList || []}
+                            options={healthFacilityList || []}
                             loadingOptions={hfLoading}
                             error={isError(meta)}
                           />
@@ -1788,10 +1626,11 @@ const UserForm = ({
                   villagesLoading={villagesLoading}
                   villages={villages}
                   isError={isError}
-                  isChpUser={isCHPUser[index]}
+                  isChpUser={isCHWCHPUser[index]}
                   isChaUser={isCHAUser[index]}
                   communityList={communityList || []}
                   isHFCreate={isHFCreate}
+                  showVillages={showVillage}
                 />
                 <SiteUserForm
                   isAdminForm={isAdminForm}
@@ -1801,8 +1640,6 @@ const UserForm = ({
                   isError={isError}
                   isCultureListLoading={isCultureListLoading}
                   cultureList={cultureList || []}
-                  isTmezoneListLoading={isTmezoneListLoading}
-                  timezoneList={timezoneList || []}
                   communityList={communityList || []}
                   districtDetails={{ list: districtList || [], loading: districtLoading }}
                   chiefdomDetails={{ list: chiefdomList || [], loading: chiefdomLoading }}

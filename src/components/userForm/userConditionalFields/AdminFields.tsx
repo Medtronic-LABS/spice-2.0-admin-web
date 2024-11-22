@@ -4,17 +4,24 @@ import { required } from '../../../utils/validation';
 import { NAMING_VARIABLES, NAME_CONSTANTS } from '../../../constants/appConstants';
 import Checkbox from '../../formFields/Checkbox';
 import useFieldVisibility from '../../../hooks/useFieldVisibility';
-import useLabelFromAppType from '../../../hooks/useLabelFromAppType';
+import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadingSelector, timezoneListSelector } from '../../../store/user/selectors';
+import { useEffect } from 'react';
+import { fetchCultureListRequest, fetchTimezoneListRequest } from '../../../store/user/actions';
 
 export const SiteUserForm = (props: any) => {
+  const dispatch = useDispatch();
+
+  const timezoneList = useSelector(timezoneListSelector);
+  const isTimezoneListLoading = useSelector(loadingSelector);
+
   const {
     index,
     name,
     isError,
-    isCultureListLoading,
     cultureList,
-    timezoneList,
-    isTmezoneListLoading,
+    isCultureListLoading,
     isSiteUser,
     selectedAdmins,
     districtDetails,
@@ -47,7 +54,16 @@ export const SiteUserForm = (props: any) => {
       culture: { available: isCultureAvailable },
       redrisk: { available: isRedRisk }
     }
-  } = useLabelFromAppType();
+  } = useAppTypeConfigs();
+
+  useEffect(() => {
+    if (!(timezoneList || []).length) {
+      dispatch(fetchTimezoneListRequest());
+    }
+    if (!(cultureList || []).length) {
+      dispatch(fetchCultureListRequest());
+    }
+  }, []);
 
   return (
     <>
@@ -65,7 +81,7 @@ export const SiteUserForm = (props: any) => {
                 labelKey='description'
                 valueKey='id'
                 options={timezoneList || []}
-                loadingOptions={isTmezoneListLoading}
+                loadingOptions={isTimezoneListLoading}
                 error={isError(meta)}
                 isModel={true}
               />
@@ -169,7 +185,7 @@ export const SiteUserForm = (props: any) => {
             render={({ input, meta }) => (
               <SelectInput
                 {...(input as any)}
-                label='Assigned Health Facility'
+                label='Assigned Health Facility1'
                 errorLabel='assigned health facility'
                 labelKey='name'
                 valueKey='id'

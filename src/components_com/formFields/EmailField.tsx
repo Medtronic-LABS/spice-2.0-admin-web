@@ -2,7 +2,7 @@ import { AxiosResponse } from 'axios';
 import { FormApi } from 'final-form';
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Field, FieldRenderProps } from 'react-final-form';
-import APPCONSTANTS from '../../constants/appConstantsCom';
+import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import styles from './TextInput.module.scss';
 
@@ -153,7 +153,7 @@ const EmailField = forwardRef(
             return;
           }
           setLoading(true);
-          await fetchUserByEmail(email, tenantId).then((res) => {
+          await fetchUserByEmail({ appTypes: ['COMMUNITY'], email, tenantId }).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });

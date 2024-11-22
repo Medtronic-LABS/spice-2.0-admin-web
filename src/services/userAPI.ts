@@ -14,11 +14,11 @@ export const login = (username: string, password: string) => {
   });
 };
 
-export const logout = (token: string) =>
+export const logout = () =>
   axios({
     method: 'POST',
-    url: '/auth-service/logout',
-    headers: { Authorization: token }
+    url: '/auth-service/logout'
+    // headers: { Authorization: token }
   });
 
 export const fetchLoggedInUser = () =>
@@ -34,17 +34,26 @@ export const updateUser = (payload: IUpdateUserDetail) =>
     data: payload
   });
 
-export const fetchUserByEmail = (
-  email: string,
-  tenantId?: number | undefined,
-  parentOrganizationId?: string,
-  ignoreTenantId?: string,
-  isSiteUsers?: boolean
-) =>
+export const fetchUserByEmail = ({
+  email,
+  tenantId,
+  parentOrganizationId,
+  ignoreTenantId,
+  isSiteUsers,
+  appTypes
+}: {
+  appTypes: string[];
+  email: string;
+  tenantId?: number | undefined;
+  parentOrganizationId?: string;
+  ignoreTenantId?: string;
+  isSiteUsers?: boolean;
+}) =>
   axios({
     method: 'POST',
     url: '/user-service/user/validate-user',
     data: {
+      appTypes,
       email,
       parentOrganizationId,
       ignoreTenantId,

@@ -314,7 +314,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
           );
         case PAGENUMBER.WORKFLOW:
           return (
-            <FormContainer label='Clinical Workflows Involved' required={true} icon={SiteDetailsIcon}>
+            <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
               <Workflows formName='healthFacility' form={form} />
             </FormContainer>
           );

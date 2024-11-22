@@ -19,19 +19,23 @@ const COMMUNITY = {
   // p for plural name
   ...commonLabels,
   isCommunity: true,
+  district: {
+    s: 'District',
+    p: 'Districts'
+  },
+  chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' },
   hfDetails: {
-    district: {
-      s: 'District',
-      p: 'Districts'
-    },
-    chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' },
     supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' }
   },
   user: {
     timezone: { available: false },
     culture: { available: false },
     redrisk: { available: false },
-    designation: { available: false }
+    designation: { available: false },
+    supervisor: {
+      label: 'Select Peer Supervisor',
+      error: 'select peer supervisor'
+    }
   },
   userList: { filters: { available: false } },
   medication: { categories: { available: false } }
@@ -42,22 +46,26 @@ const NON_COMMUNITY = {
   // p for plural name
   isCommunity: false,
   ...commonLabels,
+  district: {
+    s: 'County',
+    p: 'Counties'
+  },
+  chiefdom: {
+    s: 'Sub County',
+    p: 'Sub Counties'
+  },
   hfDetails: {
-    district: {
-      s: 'County',
-      p: 'Counties'
-    },
-    chiefdom: {
-      s: 'Sub County',
-      p: 'Sub Counties'
-    },
     supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' }
   },
   user: {
     timezone: { available: true },
     culture: { available: true },
     redrisk: { available: true },
-    designation: { available: true }
+    designation: { available: true },
+    supervisor: {
+      label: 'Community Health Assistant',
+      error: 'Community health assistant'
+    }
   },
   userList: { filters: { available: true } },
   medication: { categories: { available: true } }
@@ -67,16 +75,16 @@ const NON_COMMUNITY = {
  * Custom hook to get the label base on the appType.
  * @return {string}
  */
-const useLabelFromAppType = () => {
+const useAppTypeConfigs = () => {
   // const country = useSelector(countryIdSelector);
   const appTypes = useSelector(getAppTypeSelector);
 
   return useMemo(
     () =>
       Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
-        ? COMMUNITY
-        : NON_COMMUNITY,
+        ? { ...COMMUNITY, appTypes }
+        : { ...NON_COMMUNITY, appTypes },
     [appTypes]
   );
 };
-export default useLabelFromAppType;
+export default useAppTypeConfigs;

@@ -1,7 +1,6 @@
 const APPCONSTANTS = {
   APP_TYPE: 'web',
   HASH_ALGORITM: 'sha512',
-  AUTHTOKEN: 'at',
   USER_TENANTID: 'uti',
   APP_VERSION: 'av',
   SECRET_TOKEN: 'sat',
@@ -228,7 +227,8 @@ const APPCONSTANTS = {
   filterSpiceAdminRoles: ['cfr_admin'],
   filterSpiceUserRoles: ['cfr_user'],
   // USER
-  CHP_USER_EXCEPTION_HF_CREATE: 'CHP user should not be created in Health facility create',
+  CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
+  CHP_USER_EXCEPTION_HF_CREATE: 'CHP/CHW user should not be created in Health facility create',
   SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_CREATE_SUCCESS: 'User details created successfully.',
@@ -359,7 +359,9 @@ const APPCONSTANTS = {
 
   FORGOT_USER_FAILURE_ERR_MSG: 'Unable to submit the request. Please try after sometime.',
   EMAIL_ALREADY_EXISTS_ERR_MSG: 'Email ID already exists',
+  EMR_ERR_MSG: 'Email ID already exists in EMR role',
   CFR_ERR_MSG: 'Email ID already exists in CFR role',
+  SITE_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add Site Admin',
   HEALTH_FACILITY_ADMIN_PERMISSION_ERR_MSG: 'You dont have permission to add health facility admin',
   EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG: 'Email ID already exists in different organization',
   EMAIL_DUPLICATION_ERR_MSG: `Multiple users can't have same`,

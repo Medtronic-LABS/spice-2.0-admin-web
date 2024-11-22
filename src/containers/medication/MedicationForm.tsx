@@ -28,7 +28,7 @@ import {
 } from '../../store/medication/selectors';
 import { fetchCategoryForms, fetchClassifications, fetchDosageForms } from '../../store/medication/actions';
 import { IList } from '../../store/medication/types';
-import useLabelFromAppType from '../../hooks/useLabelFromAppType';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 export interface IMedicationDataFormValues {
   id?: number;
@@ -102,7 +102,7 @@ const MedicationForm = ({
     medication: {
       categories: { available: isCategories }
     }
-  } = useLabelFromAppType();
+  } = useAppTypeConfigs();
 
   const initialValue = useMemo<Array<Partial<IMedicationDataFormValues>>>(
     () => [

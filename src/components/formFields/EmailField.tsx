@@ -11,6 +11,8 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { composeValidators, required, validateEmail } from '../../utils/validation';
 import TextInput from './TextInput';
 import { IHFUserGet } from '../../store/healthFacility/types';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useSelector } from 'react-redux';
 
 const EmailField = forwardRef(
   (
@@ -26,6 +28,7 @@ const EmailField = forwardRef(
       onFindExistingUser,
       parentOrgId,
       ignoreTenantId,
+      tenantId,
       isHF = false,
       isHFCreate = false,
       isSiteUser = false
@@ -41,6 +44,7 @@ const EmailField = forwardRef(
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
       parentOrgId?: string;
+      tenantId?: number;
       ignoreTenantId?: string;
       isHF: boolean;
       isHFCreate: boolean;
@@ -72,6 +76,7 @@ const EmailField = forwardRef(
     const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
     const duplicationError = APPCONSTANTS.EMAIL_DUPLICATION_ERR_MSG;
     const siteAdminError = APPCONSTANTS.HEALTH_FACILITY_ADMIN_PERMISSION_ERR_MSG;
+    const { isCommunity, appTypes } = useAppTypeConfigs();
     useImperativeHandle(
       ref,
       () => ({
@@ -162,7 +167,20 @@ const EmailField = forwardRef(
           }
           setLoading(true);
           const isAdminFetched = !(isHF || isHFCreate) && isSiteUser;
-          await fetchUserByEmail(email, undefined, parentOrgId, ignoreTenantId, isAdminFetched).then((res) => {
+          const emailFetchPayload = isCommunity
+            ? {
+                email,
+                tenantId,
+                appTypes
+              }
+            : {
+                appTypes,
+                email,
+                parentOrganizationId: parentOrgId,
+                ignoreTenantId,
+                isSiteUsers: isAdminFetched
+              };
+          await fetchUserByEmail(emailFetchPayload).then((res) => {
             submitEnabledStatus.current = true;
             fetchUserByEmailResFn(res, email);
           });
@@ -211,12 +229,13 @@ const EmailField = forwardRef(
     );
 
     useEffect(() => {
-      if (lastOrgId.current !== parentOrgId || lastIgnoreTenantId.current !== ignoreTenantId) {
+      if (!isCommunity && (lastOrgId.current !== parentOrgId || lastIgnoreTenantId.current !== ignoreTenantId)) {
         lastOrgId.current = parentOrgId;
         lastIgnoreTenantId.current = ignoreTenantId;
         validateUser(currentEmail.current, true);
       }
     }, [parentOrgId, validateUser, ignoreTenantId]);
+
     return (
       <Field
         name={`${name}.username`}

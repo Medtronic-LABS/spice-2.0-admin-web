@@ -14,7 +14,6 @@ import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import useCountryId from '../../hooks/useCountryId';
 import {
   clearHFWorkflowList,
-  deleteHealthFacilityRequest,
   fetchHFListRequest,
   fetchHFSummaryRequest,
   fetchWorkflowListRequest,

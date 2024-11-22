@@ -39,7 +39,7 @@ describe('useUserFormUtils', () => {
   test('should return true if a CHP role is selected', () => {
     const { result } = renderHook(() => useUserFormUtils());
 
-    const { isCHPSelected } = result.current;
+    const { isCHPCHWSelected: isCHPSelected } = result.current;
     const isSelected = isCHPSelected(mockRoles);
 
     expect(isSelected).toBe(true);
@@ -48,7 +48,7 @@ describe('useUserFormUtils', () => {
   test('should return false if no CHP role is selected', () => {
     const { result } = renderHook(() => useUserFormUtils());
 
-    const { isCHPSelected } = result.current;
+    const { isCHPCHWSelected: isCHPSelected } = result.current;
     const isSelected = isCHPSelected([
       {
         name: 'Admin',
