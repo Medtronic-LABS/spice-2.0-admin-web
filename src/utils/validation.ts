@@ -198,7 +198,9 @@ export function validateFullName(name: string) {
  * @returns {string} error message or empty string
  */
 export function validateMobile(mobileNo: string, isSl: boolean): string {
-  if (!mobileNo) return '';
+  if (!mobileNo) {
+    return '';
+  }
 
   if (isSl) {
     // For SL:

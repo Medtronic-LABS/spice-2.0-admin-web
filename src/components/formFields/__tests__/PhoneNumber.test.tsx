@@ -1,4 +1,4 @@
-// tslint:
+/* tslint:disable:no-empty */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import PhoneNumberField from '../PhoneNumber';

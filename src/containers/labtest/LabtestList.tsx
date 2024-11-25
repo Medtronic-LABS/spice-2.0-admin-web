@@ -22,6 +22,7 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import ModalForm from '../../components/modal/ModalForm';
 import LabtestModalForm from './LabtestModalForm';
 import { camelCase } from 'lodash';
+import { decodeURIText } from '../../utils/commonUtils';
 
 interface IMatchParams {
   regionId: string;
@@ -256,7 +257,10 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
             onButtonClick={openAddLabTest}
           >
             <CustomTable
-              rowData={labTestList}
+              rowData={labTestList.map((labTestRowData: ILabTest) => ({
+                ...labTestRowData,
+                testName: labTestRowData.testName ? decodeURIText(labTestRowData.testName) : ''
+              }))}
               columnsDef={[
                 {
                   id: 1,

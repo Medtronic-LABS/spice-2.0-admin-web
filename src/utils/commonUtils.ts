@@ -415,3 +415,11 @@ export const getUserPayload = ({
   });
   return payload;
 };
+
+export const decodeURIText = (text: string) => {
+  try {
+    return decodeURIComponent(text);
+  } catch {
+    return text; // Return the original text if decoding fails
+  }
+};

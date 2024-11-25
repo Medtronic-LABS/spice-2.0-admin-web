@@ -152,9 +152,9 @@ const mockStore = configureStore([]);
 const store = mockStore(initialState);
 const email = 'test@example.com';
 
-const renderComponent = (store: any = {}) => {
+const renderComponent = (localStore: any = {}) => {
   return render(
-    <Provider store={store}>
+    <Provider store={localStore}>
       <Router>
         <AdminList />
       </Router>
@@ -162,9 +162,9 @@ const renderComponent = (store: any = {}) => {
   );
 };
 
-const renderWithMemoryRouter = (store: any = {}, initialEntries: string[] = ['/tenant/1']) => {
+const renderWithMemoryRouter = (localStore: any = {}, initialEntries: string[] = ['/tenant/1']) => {
   return render(
-    <Provider store={store}>
+    <Provider store={localStore}>
       <MemoryRouter initialEntries={initialEntries}>
         <AdminList />
       </MemoryRouter>
