@@ -93,6 +93,51 @@ interface IRoleOptions {
   }) => void;
 }
 
+const filterSPICERoles = (
+  roles: IRoles[],
+  {
+    isHFCreate,
+    isHF,
+    isSiteUser,
+    currentModule,
+    isCommunity
+  }: {
+    isHFCreate: boolean;
+    isHF: boolean;
+    isSiteUser: boolean;
+    currentModule?: string;
+    isCommunity?: boolean;
+  }
+) => {
+  return roles.filter((role: IRoles) => {
+    const { name, displayName, suiteAccessName } = role;
+    const suiteNameLower = suiteAccessName?.toLowerCase() || '';
+    if (name === redRisk || displayName === null) {
+      return false;
+    }
+    const adminFormRoles = suiteNameLower === spiceRole.spice;
+    const siteUserCondition = !adminFormRoles;
+    const isHFCondition = siteUserCondition || name === hfAdminRole;
+    const isCommunityCondition = isHFCondition || name === superAdminRole;
+    const isHFCreateCondition = isHFCondition && !villageBasedRoles.includes(name);
+
+    if (isHFCreate) {
+      return isHFCreateCondition;
+    }
+    if (isHF) {
+      return isHFCondition;
+    }
+    // Site user condition
+    if (isSiteUser) {
+      return isCommunity ? isCommunityCondition : siteUserCondition;
+    }
+    if (!isSiteUser && currentModule) {
+      return suiteNameLower === spiceRole.spice && HIERARCHY_ROLES[urlBased[currentModule]].includes(name);
+    }
+    return adminFormRoles;
+  });
+};
+
 /**
  * A hook for roles Meta
  */
@@ -163,7 +208,14 @@ export const useRoleMeta = ({
         validInsightRoles,
         isAfMobile = false
       }: IFindDisabledRoles) => {
-        const selectedRoleGroup = rolesGrouped[suite || ''] || [];
+        // In findDisabledRoles function:
+        const SPICERoles = filterSPICERoles(rolesGrouped[suite || ''] || [], {
+          isHFCreate,
+          isHF,
+          isSiteUser
+        });
+
+        const selectedRoleGroup = SPICERoles || [];
         if (suite === 'SPICE') {
           return spiceDRoles.length
             ? spiceDRoles
@@ -179,6 +231,8 @@ export const useRoleMeta = ({
           return insightDRoles.length
             ? insightDRoles
             : selectedRoleGroup.filter((groupedRole: IRoles) => !(validInsightRoles || []).includes(groupedRole.name));
+        } else {
+          return [];
         }
       };
 
@@ -317,35 +371,13 @@ export const useRoleOptions = ({
   const getRoleOptions = useCallback(() => {
     const newRoles = appTypes && appTypes.length === 1 ? filterRolesByAppTypeFn(allRoles, appTypes[0]) : allRoles;
     // returns the SPICE roles based on the conditions
-    const SPICERoles = (newRoles.SPICE || [])
-      .filter((role: IRoles) => {
-        const { name, displayName, suiteAccessName } = role;
-        const suiteNameLower = suiteAccessName?.toLowerCase() || '';
-        if (name === redRisk || displayName === null) {
-          return false;
-        }
-        const adminFormRoles = suiteNameLower === spiceRole.spice;
-        const siteUserCondition = !adminFormRoles;
-        const isHFCondition = siteUserCondition || name === hfAdminRole;
-        const isCommunityCondition = isHFCondition || name === superAdminRole;
-        const isHFCreateCondition = isHFCondition && !villageBasedRoles.includes(name);
-        if (isHFCreate) {
-          return isHFCreateCondition;
-        }
-        if (isHF) {
-          return isHFCondition;
-        }
-        // Site user condition
-        if (isSiteUser) {
-          return isCommunity ? isCommunityCondition : siteUserCondition;
-        }
-
-        if (!isSiteUser) {
-          return suiteNameLower === spiceRole.spice && HIERARCHY_ROLES[urlBased[currentModule]].includes(name);
-        }
-        return adminFormRoles;
-      })
-      .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
+    const SPICERoles = filterSPICERoles(newRoles.SPICE || [], {
+      isHFCreate,
+      isHF,
+      isSiteUser,
+      currentModule,
+      isCommunity
+    }).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
 
     // returns the REPORTS roles based on the consitions
     const reportRoleOptions =

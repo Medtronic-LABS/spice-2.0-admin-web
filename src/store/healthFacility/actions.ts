@@ -368,9 +368,9 @@ export const fetchHFUserListRequest = ({
   searchTerm,
   roleNames,
   isSiteUsers,
+  tenantBased,
   tenantId,
   tenantIds,
-  tenantBased,
   successCb,
   failureCb
 }: Omit<IFetchHFUserListRequest, 'type'>): IFetchHFUserListRequest => ({
@@ -381,9 +381,9 @@ export const fetchHFUserListRequest = ({
   searchTerm,
   roleNames,
   isSiteUsers,
+  tenantBased,
   tenantId,
   tenantIds,
-  tenantBased,
   successCb,
   failureCb
 });

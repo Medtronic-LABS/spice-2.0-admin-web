@@ -261,8 +261,8 @@ export function* fetchHFUserList({
   searchTerm,
   roleNames,
   isSiteUsers,
-  tenantIds,
   tenantBased,
+  tenantIds,
   successCb,
   failureCb
 }: IFetchHFUserListRequest): SagaIterator {

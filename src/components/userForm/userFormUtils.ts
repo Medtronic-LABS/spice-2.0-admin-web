@@ -118,6 +118,35 @@ const useUserFormUtils = () => {
         : undefined
     };
   };
+  const filterRolesByAppTypeFn = (data: IGroupRoles, appType: string) => {
+    const filteredData: { [key: string]: any[] } = {};
+
+    // Iterate over each group in the data
+    for (const group in data) {
+      if (true) {
+        if (data.hasOwnProperty(group)) {
+          const filteredRoles = data[group].filter((role: IRoles) => (role.appTypes || []).includes(appType));
+          // If there are any roles left after filtering, add them to the filteredData
+          if (filteredRoles.length > 0) {
+            filteredData[group] = filteredRoles;
+          }
+        }
+      }
+    }
+    return filteredData;
+  };
+
+  // Filter roles and get appTypes without duplicates
+  const roleBasedAppTypes = (newRoles: IRoles[] = []) => {
+    return newRoles.reduce<string[]>((acc, roleVal) => {
+      (roleVal.appTypes || []).forEach((newAppType: string) => {
+        if (!acc.includes(newAppType)) {
+          acc.push(newAppType);
+        }
+      });
+      return acc;
+    }, []);
+  };
 
   return {
     isCHASelected,
@@ -128,7 +157,9 @@ const useUserFormUtils = () => {
     getSuiteAccessList,
     isHFAdminSelected,
     getSpiceGroupName,
-    formUserData
+    formUserData,
+    roleBasedAppTypes,
+    filterRolesByAppTypeFn
   };
 };
 

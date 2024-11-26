@@ -56,6 +56,7 @@ import {
   validateName
 } from '../../utils/validation';
 import Workflows from '../healthFacility/Workflows';
+import { filterLanguagesByAppTypes } from '../../utils/commonUtils';
 
 interface IAddUserFormProps {
   formName: string;
@@ -506,7 +507,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='language'
                   labelKey='name'
                   valueKey='id'
-                  options={languages}
+                  options={filterLanguagesByAppTypes(languages, appTypes)}
                   loadingOptions={languageLoading}
                   error={(meta.touched && meta.error) || undefined}
                   isModel={isEdit ? true : false}

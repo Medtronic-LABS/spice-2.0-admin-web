@@ -6,7 +6,6 @@ import { useLocation } from 'react-router-dom';
 import BinIcon from '../../assets/images/bin.svg';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import ResetIcon from '../../assets/images/reset.svg';
-import { filterRolesByAppTypeFn, roleBasedAppTypes } from '../../components_com/userForm/UserForm';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
 import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -142,7 +141,9 @@ const UserForm = ({
     getSuiteAccessList,
     isHFAdminSelected,
     getSpiceGroupName,
-    formUserData
+    formUserData,
+    roleBasedAppTypes,
+    filterRolesByAppTypeFn
   } = useUserFormUtils();
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
@@ -244,12 +245,8 @@ const UserForm = ({
 
   useEffect(() => {
     if (!isHF && isEdit) {
-      const roleValues = initialEditValue?.role;
-      if (!isSuperAdmin) {
-        setIsSuperAdmin(roleValues?.some((element: any) => element.name === 'SUPER_ADMIN'));
-      }
       if (!isSiteUser) {
-        const [selectedAdminRole] = initialEditValue.role;
+        const [selectedAdminRole] = initialEditValue?.role || [];
         setSelectedAdmins(selectedAdminRole?.name);
       }
     }
@@ -991,6 +988,8 @@ const UserForm = ({
           const isInsights = (formSuiteAccess || []).some(
             (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.insights
           );
+          console.log(spiceRoles.current, '<------ spiceRoles.current');
+          console.log(disabledRoles.current, '<------ disabledRoles.current?.[index]?.SPICE');
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1039,7 +1038,9 @@ const UserForm = ({
                               newAllRoles = [...newAllRoles, ...allRoles.filter((v: IRoles) => v.groupName === r)];
                             } else {
                               form.change((suiteFormName as any)[r], []);
-                              disabledRoles.current[index][r] = [] as IRoles[];
+                              let currentDisabledRoles = { ...disabledRoles.current?.[index] };
+                              currentDisabledRoles[r] = [] as IRoles[];
+                              disabledRoles.current[index] = currentDisabledRoles;
                               if (r === SPICE) {
                                 form.change(`${formName}[${index}].designation`, null);
                               }
@@ -1079,14 +1080,14 @@ const UserForm = ({
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
-                                ...(disabledRoles.current[index].SPICE || [])
+                                ...(disabledRoles.current?.[index]?.SPICE || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
                                 : null;
                             }}
                             mandatoryOptions={mandatoryRoles ? mandatoryRoles : []}
-                            disabledOptions={disabledRoles.current[index].SPICE}
+                            disabledOptions={disabledRoles.current?.[index]?.SPICE || []}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
@@ -1225,7 +1226,7 @@ const UserForm = ({
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] ? mandatoryReportsRole : []),
                                 ...(mandatoryReportsRole || []),
-                                ...(disabledRoles.current[index].REPORTS || [])
+                                ...(disabledRoles.current?.[index]?.REPORTS || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
@@ -1234,7 +1235,7 @@ const UserForm = ({
                             required={true}
                             options={reportRolesRef.current}
                             mandatoryOptions={mandatoryReportsRole ? mandatoryReportsRole : []}
-                            disabledOptions={disabledRoles.current[index].REPORTS || []}
+                            disabledOptions={disabledRoles.current?.[index]?.REPORTS || []}
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any, { option, action }: { option: any; action: string }) => {
@@ -1274,7 +1275,7 @@ const UserForm = ({
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] ? mandatoryInsightsRole : []),
                                 ...(mandatoryInsightsRole || []),
-                                ...(disabledRoles.current[index].INSIGHTS || [])
+                                ...(disabledRoles.current?.[index]?.INSIGHTS || [])
                               ];
                               return optionsToBeDisabled.length
                                 ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
@@ -1283,7 +1284,7 @@ const UserForm = ({
                             required={true}
                             options={insightRolesRef.current}
                             mandatoryOptions={mandatoryInsightsRole ? mandatoryInsightsRole : []}
-                            disabledOptions={disabledRoles.current[index].INSIGHTS || []}
+                            disabledOptions={disabledRoles.current?.[index]?.INSIGHTS || []}
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any) => {

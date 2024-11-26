@@ -99,6 +99,11 @@ const MultiSelect = (props: any): React.ReactElement => {
   const multiOption = (multiSelectprops: any): React.ReactElement => {
     const isChecked = !(newProps.disabledOptions || []).some((v: any) => v.id === multiSelectprops.value);
     const isDisabled = !![...(newProps.disabledOptions || [])].some((v: any) => v.id === multiSelectprops.value);
+    console.log(
+      multiSelectprops.isSelected,
+      isAllSelected.current,
+      '<---------- multiSelectprops.isSelected || isAllSelected.current'
+    );
     return (
       <components.Option {...multiSelectprops}>
         <div className='d-flex align-items-baseline h-100'>
@@ -310,7 +315,7 @@ const MultiSelect = (props: any): React.ReactElement => {
       selectAllLabel.current = 'Select all';
     }
     allOption.label = selectAllLabel.current;
-
+    console.log(isAllSelected.current, '<---------- isAllSelected');
     return (
       <div className={`d-flex flex-column ${styles.selectInputContainer}`} data-testid='multi-select'>
         {newProps.isShowLabel && !newProps.showOnlyDropdown && (

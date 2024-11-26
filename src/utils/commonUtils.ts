@@ -183,6 +183,11 @@ export const formatRoles = (user: IHFUserGet) => {
     .join(',')}`;
 };
 
+export const filterLanguagesByAppTypes = (languages: any[], appTypes: string[]) => {
+  const appTypesSet = new Set(appTypes); // Use a Set for faster lookup
+  return languages.filter((language) => language.appTypes.some((appType: string) => appTypesSet.has(appType)));
+};
+
 /**
  * Generates an admin payload from user form data.
  * @param {Object} params - The parameters for generating the payload
@@ -242,8 +247,8 @@ export const getAdminPayload = ({
       // for create region countryCode will be come as free text
       countryCode: user?.countryCode?.phoneNumberCode || user?.countryCode,
       roleIds,
-      timezone: user?.timezone,
-      designation: { name: user?.designation?.name, id: user?.designation?.id }
+      timezone: user?.timezone?.id ? user?.timezone : null,
+      designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null
     };
 
     const hasRole = (roleName: string) => user?.roles?.some((role: { name: string }) => role.name === roleName);
@@ -296,7 +301,7 @@ export const getAdminPayload = ({
     }
     // add culture for hf admin
     if (isHFAdmin && user?.culture) {
-      userPayload.culture = user.culture;
+      userPayload.culture = user?.culture || null;
     }
     return userPayload;
   });
@@ -389,10 +394,10 @@ export const getUserPayload = ({
       roleIds,
       villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
       village: user?.village,
-      timezone: user?.timezone,
+      timezone: user?.timezone?.id ? user?.timezone : null,
       district: user?.district,
       chiefdom: user?.chiefdom,
-      designation: { name: user?.designation?.name, id: user?.designation?.id },
+      designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null,
       reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization) ? user.reportUserOrganization : []).map(
         ({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId
       ),
@@ -407,7 +412,7 @@ export const getUserPayload = ({
     }
     // add redrisk if not hf admin
     if (!isHFAdmin) {
-      userPayload.redRisk = user?.redRisk;
+      userPayload.redRisk = user?.redRisk ?? null;
     }
 
     return userPayload;
