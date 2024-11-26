@@ -4,6 +4,7 @@ import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
 import CryptoJS from 'crypto-js';
 import { IHFUserGet, IUserRole } from '../store/healthFacility/types';
 import { IRoles, IUserPayload } from '../store/user/types';
+import { redRisk } from '../constants/roleConstants';
 
 export const jsonParse = (value: any) => {
   if (value) {
@@ -426,4 +427,10 @@ export const decodeURIText = (text: string) => {
   } catch {
     return text; // Return the original text if decoding fails
   }
+};
+
+export const removeRedRiskFromRoleArray = (roleArray = []) => {
+  return roleArray?.filter(
+    (role: { name: string; displayName: string | null }) => role?.name !== redRisk && role?.displayName !== null
+  );
 };

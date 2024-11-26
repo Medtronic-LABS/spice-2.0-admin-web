@@ -51,7 +51,7 @@ import {
   userRolesSelector
 } from '../../store/user/selectors';
 import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
-import { formatCountryCode, formatUserToastMsg } from '../../utils/commonUtils';
+import { formatCountryCode, formatUserToastMsg, removeRedRiskFromRoleArray } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   composeValidators,
@@ -69,7 +69,7 @@ import TextInput from '../formFields/TextInput';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
-import useUserFormUtils from './userFormUtils';
+import useUserFormUtils, { filterRolesByAppTypeFn } from './userFormUtils';
 
 export interface IUserFormValues {
   email: string;
@@ -142,8 +142,7 @@ const UserForm = ({
     isHFAdminSelected,
     getSpiceGroupName,
     formUserData,
-    roleBasedAppTypes,
-    filterRolesByAppTypeFn
+    roleBasedAppTypes
   } = useUserFormUtils();
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
@@ -175,7 +174,6 @@ const UserForm = ({
   const [autoFetched, setAutoFetched] = useState<boolean[]>(autoFetchedState?.autoFetch || ([] as boolean[]));
   const fetchedData = useRef([] as any[]);
   const [clearEmail, setClearEmail] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const districtList = useSelector(getDistrictListSelector);
   const {
     userList: {
@@ -226,6 +224,7 @@ const UserForm = ({
     setAppTypeRoles(
       appTypes && appTypes.length === 1 ? filterRolesByAppTypeFn(rolesGrouped, appTypes[0]) : rolesGrouped
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appTypes, rolesGrouped]);
 
   useEffect(() => {
@@ -250,7 +249,7 @@ const UserForm = ({
         setSelectedAdmins(selectedAdminRole?.name);
       }
     }
-  }, [initialEditValue, isHF, isEdit, isSuperAdmin, isSiteUser]);
+  }, [initialEditValue, isHF, isEdit, isSiteUser]);
 
   useEffect(() => {
     return () => {
@@ -742,7 +741,11 @@ const UserForm = ({
     const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
     roleOptions.current = [appTypeBasedRoles.SPICE];
     if (isEdit) {
-      setAutoFetchData(initialEditData);
+      const initialEditDataWithoutRedrisk = initialEditData.map((editData) => ({
+        ...editData,
+        role: removeRedRiskFromRoleArray(editData?.role)
+      }));
+      setAutoFetchData(initialEditDataWithoutRedrisk);
     } else if (data.length) {
       setAutoFetchData(data);
     } else if (isAdminForm && defaultSelectedRole) {
@@ -988,8 +991,6 @@ const UserForm = ({
           const isInsights = (formSuiteAccess || []).some(
             (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.insights
           );
-          console.log(spiceRoles.current, '<------ spiceRoles.current');
-          console.log(disabledRoles.current, '<------ disabledRoles.current?.[index]?.SPICE');
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1038,7 +1039,7 @@ const UserForm = ({
                               newAllRoles = [...newAllRoles, ...allRoles.filter((v: IRoles) => v.groupName === r)];
                             } else {
                               form.change((suiteFormName as any)[r], []);
-                              let currentDisabledRoles = { ...disabledRoles.current?.[index] };
+                              const currentDisabledRoles = { ...disabledRoles.current?.[index] };
                               currentDisabledRoles[r] = [] as IRoles[];
                               disabledRoles.current[index] = currentDisabledRoles;
                               if (r === SPICE) {
@@ -1166,16 +1167,19 @@ const UserForm = ({
                       validate={required}
                       render={({ input, meta }) => {
                         let userSelectedRoles = [];
+                        // for user create and edit
                         if (
-                          Array.isArray(form.getState().values.users?.[index].roles) &&
-                          form.getState().values.users?.[index].roles.length
-                        ) {
-                          userSelectedRoles = form.getState().values.users?.[index].roles;
-                        } else if (
                           Array.isArray(form.getState().values.users?.[index].role) &&
                           form.getState().values.users?.[index].role.length
                         ) {
                           userSelectedRoles = form.getState().values.users?.[index].role;
+                        } else if (
+                          !Array.isArray(form.getState().values.users?.[index].role) &&
+                          form.getState().values.users?.[index].role &&
+                          form.getState().values.users?.[index].role.id
+                        ) {
+                          // for admin create and edit
+                          userSelectedRoles = [form.getState().values.users?.[index].role];
                         }
                         const selectedRoleNames = userSelectedRoles.map(
                           (userRoleDetails: { name: string }) => userRoleDetails.name

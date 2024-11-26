@@ -48,7 +48,7 @@ describe('Program Reducer', () => {
     const newState = programReducer(initialState, action);
     expect(newState).toEqual(expectedState);
   });
-  it('should handle fetch program list success', () => {
+  it('should handle fetch program list success with total and programs', () => {
     const action: any = {
       type: PROGRAM_ACTION_TYPES.FETCH_PROGRAM_LIST_SUCCESS,
       payload: {
@@ -80,25 +80,16 @@ describe('Program Reducer', () => {
     const newState = programReducer(initialState, action);
     expect(newState).toEqual(expectedState);
   });
-  it('should handle fetch program list success', () => {
+  it('should handle fetch program list success without total and programs', () => {
     const action: any = {
       type: PROGRAM_ACTION_TYPES.FETCH_PROGRAM_LIST_SUCCESS,
-      payload: {
-        total: 2,
-        programs: [
-          { id: '1', name: 'Program 1' },
-          { id: '2', name: 'Program 2' }
-        ]
-      }
+      payload: {}
     };
     const expectedState = {
       ...initialState,
       loading: false,
-      total: 2,
-      programList: [
-        { id: '1', name: 'Program 1' },
-        { id: '2', name: 'Program 2' }
-      ]
+      total: 0,
+      programList: []
     };
     const newState = programReducer(initialState, action);
     expect(newState).toEqual(expectedState);

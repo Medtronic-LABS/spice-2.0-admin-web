@@ -13,7 +13,9 @@ describe('medicationReducer', () => {
     list: [],
     classifications: [],
     brands: [],
-    dosageForms: []
+    dosageForms: [],
+    categoryList: [],
+    categoryLoading: false
   };
   it('should handle FETCH_MEDICATIONS_LIST_REQUEST', () => {
     const action: any = {
@@ -284,6 +286,41 @@ describe('medicationReducer', () => {
       ...initialState,
       dosageForms: action.payload.dosageForms,
       dosageFormsLoading: false
+    };
+    expect(medicationReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_CATEGORY_FORM_FAILURE', () => {
+    const action: any = {
+      type: actionTypes.FETCH_CATEGORY_FORM_FAILURE
+    };
+    const expectedState = {
+      ...initialState,
+      categoryLoading: false
+    };
+    expect(medicationReducer(initialState, action)).toEqual(expectedState);
+  });
+  it('should handle FETCH_CATEGORY_FORM', () => {
+    const action: any = {
+      type: actionTypes.FETCH_CATEGORY_FORM
+    };
+    const expectedState = {
+      ...initialState,
+      categoryLoading: true
+    };
+    expect(medicationReducer(initialState, action)).toEqual(expectedState);
+  });
+  it('should handle FETCH_CATEGORY_FORM_SUCCESS', () => {
+    const action: any = {
+      type: actionTypes.FETCH_CATEGORY_FORM_SUCCESS,
+      payload: {
+        categoryList: ['Category A', 'Category B']
+      }
+    };
+    const expectedState = {
+      ...initialState,
+      categoryList: action.payload.categoryList,
+      categoryLoading: false
     };
     expect(medicationReducer(initialState, action)).toEqual(expectedState);
   });

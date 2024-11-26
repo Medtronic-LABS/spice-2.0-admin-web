@@ -28,6 +28,7 @@ import {
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
 import { filterRolesByAppTypeFn } from '../components/userForm/userFormUtils';
+import APPCONSTANTS from '../constants/appConstants';
 
 interface IFindDisabledRoles {
   suite: string;
@@ -159,6 +160,7 @@ export const useRoleMeta = ({
   const showReportHFList = useRef(false);
   const showInsightHFList = useRef(false);
   const showVillages = useRef(false);
+  const { appTypes } = useAppTypeConfigs();
 
   const roleChange = useCallback(
     ({ roles = [], index, currentSuite }: IRoleChangeProps) => {
@@ -246,9 +248,12 @@ export const useRoleMeta = ({
           disabledInsightRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
         {
-          selectedRoles: adminRoles,
+          selectedRoles: appTypes.includes(APPCONSTANTS.appTypes.non_community) ? [hfAdminRole] : adminRoles,
           selectedSuite: SPICE,
-          disabledSpiceRoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: adminRoles }),
+          disabledSpiceRoles: findDisabledRoles({
+            suite: SPICE,
+            validSpiceRoles: appTypes.includes(APPCONSTANTS.appTypes.non_community) ? [hfAdminRole] : adminRoles
+          }),
           disabledReportRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: facilityReportAdminRole }),
           disabledInsightRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
@@ -337,6 +342,7 @@ export const useRoleMeta = ({
         isCHWCHPStatus: newCHWCHPStatus
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       appTypeBasedRoles,
       isCHAStatus,

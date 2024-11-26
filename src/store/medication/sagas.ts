@@ -14,6 +14,7 @@ import {
   createMedicationSuccess,
   deleteMedicationFail,
   deleteMedicationSuccess,
+  fetchCategoryFormsFailure,
   fetchCategoryFormsSuccess,
   fetchClassificationsFailure,
   fetchClassificationsSuccess,
@@ -98,7 +99,7 @@ export function* fetchCategoryForms(): SagaIterator {
     const payload = { categoryList: data || [] };
     yield put(fetchCategoryFormsSuccess(payload));
   } catch {
-    yield put(fetchDosageFormsFailure());
+    yield put(fetchCategoryFormsFailure());
   }
 }
 

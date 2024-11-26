@@ -23,7 +23,9 @@ const MOCK_DATA_CONSTANTS = {
     lockedUsers: [],
     totalLockedUsers: 0,
     userTenantId: '',
-    cultureList: []
+    cultureList: [],
+    communityList: [],
+    designationList: []
   },
   MOCK_LOGIN_REQUEST: {
     username: 'testuser@test.com',
@@ -50,7 +52,9 @@ const MOCK_DATA_CONSTANTS = {
       regionCode: '',
       tenantId: 1
     },
-    suiteAccess: ['admin']
+    suiteAccess: ['admin'],
+    organizations: [{ formDataId: 1 }],
+    countryId: undefined
   },
   LOGGED_IN_USER_DATA: {
     data: {
@@ -104,6 +108,16 @@ const MOCK_DATA_CONSTANTS = {
             displayName: 'Admin',
             groupName: 'SPICE'
           }
+        ],
+        INSIGHTS: [
+          {
+            id: 3,
+            name: 'SPICE_INSIGHTS_DEVELOPER',
+            level: 1,
+            suiteAccessName: 'insights',
+            displayName: 'Insights Developer',
+            groupName: 'INSIGHTS'
+          }
         ]
       }
     }
@@ -113,42 +127,6 @@ const MOCK_DATA_CONSTANTS = {
   NO_PERMISSION_ROLE: [{ name: 'HRIO' }],
   INVALID_ROLE: [{ name: 'TEACHER' }],
 
-  // RESET_PASSWORD_REQUEST_MOCK_DATA: {
-  //   email: 'test@email.com',
-  //   password: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   token: '4',
-  //   successCB: () => null,
-  //   failureCb: () => null
-  // },
-  // CHANGE_PASSWORD_REQUEST_MOCK_DATA: {
-  //   user: 'test@email.com',
-  //   password: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   successCB: () => null,
-  //   failureCb: () => null
-  // },
-  // UPDATE_PASSWORD_REQUEST_MOCK_DATA: {
-  //   user: 'test@email.com',
-  //   oldPassword: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   newPassword: process.env.REACT_APP_PASSWORD_HASH_KEY,
-  //   successCB: () => null,
-  //   failureCb: () => null
-  // },
-  // GET_USERNAME_RESPONSE_MOCK_DATA: {
-  //   username: 'test@email.com',
-  //   isPasswordSet: true
-  // },
-  // GET_USERNAME_REQUEST_MOCK_DATA: {
-  //   token: '4',
-  //   successCB: () => null
-  // },
-  // CREATE_PASSWORD_REQUEST_MOCK_DATA: {
-  //   data: {
-  //     email: 'test@email.com',
-  //     password: process.env.REACT_APP_PASSWORD_HASH_KEY
-  //   },
-  //   id: '3',
-  //   successCB: () => null
-  // },
   FETCH_TIMEZONE_RESPONSE_PAYLOAD: {
     id: '+5',
     description: 'GMT'

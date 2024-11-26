@@ -118,23 +118,6 @@ const useUserFormUtils = () => {
         : undefined
     };
   };
-  const filterRolesByAppTypeFn = (data: IGroupRoles, appType: string) => {
-    const filteredData: { [key: string]: any[] } = {};
-
-    // Iterate over each group in the data
-    for (const group in data) {
-      if (true) {
-        if (data.hasOwnProperty(group)) {
-          const filteredRoles = data[group].filter((role: IRoles) => (role.appTypes || []).includes(appType));
-          // If there are any roles left after filtering, add them to the filteredData
-          if (filteredRoles.length > 0) {
-            filteredData[group] = filteredRoles;
-          }
-        }
-      }
-    }
-    return filteredData;
-  };
 
   // Filter roles and get appTypes without duplicates
   const roleBasedAppTypes = (newRoles: IRoles[] = []) => {
@@ -158,8 +141,7 @@ const useUserFormUtils = () => {
     isHFAdminSelected,
     getSpiceGroupName,
     formUserData,
-    roleBasedAppTypes,
-    filterRolesByAppTypeFn
+    roleBasedAppTypes
   };
 };
 

@@ -10,6 +10,7 @@ export interface IWorkflowModuleReqPayload {
   countryId?: string;
   tenantId: string;
   id?: string | number;
+  appTypes?: string[];
 }
 export interface ICreateWorkflowModule {
   type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
@@ -86,13 +87,6 @@ export interface IWorkflowState {
   clinicalWorkflows: any[];
 }
 
-export interface IWorkflowModuleReqPayload {
-  name?: string;
-  viewScreens?: string[];
-  countryId?: string;
-  tenantId: string;
-  id?: string | number;
-}
 export interface IFetchClinicalWorkflowReq {
   type: typeof ACTION_TYPES.FETCH_CLINICAL_WORKFLOW_REQUEST;
   data: IFetchClinicalWorkflowReqPayload;
@@ -101,20 +95,6 @@ export interface IFetchClinicalWorkflowReq {
 export interface IDeleteWorkflowModuleReqPayload {
   id: string;
   tenantId: string;
-}
-
-export interface ICreateWorkflowModule {
-  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
-  data: IWorkflowModuleReqPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface IUpdateWorkflowModule {
-  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST;
-  data: IWorkflowModuleReqPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
 }
 
 export interface IDeleteWorkflowModule {
@@ -262,13 +242,6 @@ export interface IResetWorkFlowModule {
   type: typeof ACTION_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST;
 }
 
-export interface ICreateWorkflowModule {
-  type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_REQUEST;
-  data: IWorkflowModuleReqPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
 export interface ICreateWorkflowModuleSuccess {
   type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_SUCCESS;
 }
@@ -276,13 +249,6 @@ export interface ICreateWorkflowModuleSuccess {
 export interface ICreateWorkflowModuleFail {
   type: typeof ACTION_TYPES.CREATE_WORKFLOW_MODULE_FAILURE;
   error: Error;
-}
-
-export interface IUpdateWorkflowModule {
-  type: typeof ACTION_TYPES.UPDATE_WORKFLOW_MODULE_REQUEST;
-  data: IWorkflowModuleReqPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
 }
 export interface IDeleteWorkflowModule {
   type: typeof ACTION_TYPES.DELETE_WORKFLOW_MODULE_REQUEST;

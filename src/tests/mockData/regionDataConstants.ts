@@ -94,7 +94,8 @@ const MOCK_DATA_CONSTANTS = {
         name: 'Kenya',
         districtCount: 2,
         chiefdomCount: 2,
-        healthFacilityCount: 2
+        healthFacilityCount: 2,
+        appTypes: ['COMMUNITY', 'NON_COMMUNITY']
       },
       {
         id: 2,
@@ -102,7 +103,8 @@ const MOCK_DATA_CONSTANTS = {
         name: 'Tanzania',
         districtCount: 2,
         chiefdomCount: 2,
-        healthFacilityCount: 2
+        healthFacilityCount: 2,
+        appTypes: ['COMMUNITY']
       }
     ],
     total: 2
@@ -148,7 +150,8 @@ const MOCK_DATA_CONSTANTS = {
     tenantId: '2',
     name: 'Kenya',
     list: [],
-    total: 2
+    total: 2,
+    appTypes: ['COMMUNITY']
   }
 };
 

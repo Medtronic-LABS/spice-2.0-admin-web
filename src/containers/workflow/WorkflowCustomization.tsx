@@ -26,6 +26,7 @@ import { ReactComponent as CustomizeIcon } from '../../assets/images/account-cus
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import Loader from '../../components/loader/Loader';
 import { IWorkflow } from '../../store/healthFacility/types';
+import { getAppTypeSelector } from '../../store/user/selectors';
 
 /**
  * Interface for route parameters
@@ -62,6 +63,7 @@ const WorkflowCustomization = (): React.ReactElement => {
   const clinicalWorkflows: IWorkflow[] = useSelector(getClinicalWorkflowSelector);
   const clinicalWorkflowsCount = useSelector(getClinicalWorkflowsCountSelector);
   const loading: boolean = useSelector(workflowLoadingSelector);
+  const appTypes = useSelector(getAppTypeSelector);
 
   const { regionId, tenantId } = useParams<IMatchParams>();
 
@@ -133,7 +135,13 @@ const WorkflowCustomization = (): React.ReactElement => {
   const handleAddWorkflowSubmit = (workflow: IClinicalWorkflow) => {
     dispatch(
       createWorkflowModule({
-        data: { ...workflow, name: workflow.name.replace(/\s+/g, ' ').trim(), countryId: regionId || '', tenantId },
+        data: {
+          ...workflow,
+          name: workflow.name.replace(/\s+/g, ' ').trim(),
+          countryId: regionId || '',
+          tenantId,
+          appTypes
+        },
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.WORKFLOW_CREATE_SUCCESS);
           closeWorkflowModal();
@@ -165,7 +173,7 @@ const WorkflowCustomization = (): React.ReactElement => {
    * @param {IClinicalWorkflow} workflow - The edited workflow data
    */
   const handleEditWorkflowSubmit = (workflow: IClinicalWorkflow) => {
-    const data = { id: workflow.id, viewScreens: workflow.viewScreens, tenantId };
+    const data = { id: workflow.id, viewScreens: workflow.viewScreens, tenantId, appTypes };
     dispatch(
       updateWorkflowModule({
         data,

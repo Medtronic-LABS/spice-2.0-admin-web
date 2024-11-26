@@ -113,19 +113,19 @@ describe('userReducer', () => {
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
 
-  // it('should handle FETCH_TIMEZONE_LIST_SUCCESS', () => {
-  //   const initialState: any = {
-  //     timezoneList: []
-  //   };
-  //   const action: any = {
-  //     type: USERTYPES.FETCH_TIMEZONE_LIST_SUCCESS,
-  //     payload: ['Timezone 1', 'Timezone 2']
-  //   };
-  //   const expectedState = {
-  //     timezoneList: ['Timezone 1', 'Timezone 2']
-  //   };
-  //   expect(userReducer(initialState, action)).toEqual(expectedState);
-  // });
+  it('should handle FETCH_TIMEZONE_LIST_SUCCESS', () => {
+    const initialState: any = {
+      timezoneList: []
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_TIMEZONE_LIST_SUCCESS,
+      payload: ['Timezone 1', 'Timezone 2']
+    };
+    const expectedState = {
+      timezoneList: ['Timezone 1', 'Timezone 2']
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
 
   it('should handle FETCH_LOGGED_IN_USER_REQUEST', () => {
     const initialState: any = {
@@ -527,6 +527,394 @@ describe('userReducer', () => {
     const expectedState = {
       ...initialState,
       isResetPasswordLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle SET_APP_TYPE', () => {
+    const initialState: any = {
+      user: {
+        appTypes: []
+      }
+    };
+    const action: any = {
+      type: USERTYPES.SET_APP_TYPE,
+      payload: ['APP_TYPE_1', 'APP_TYPE_2']
+    };
+    const expectedState = {
+      user: {
+        appTypes: ['APP_TYPE_1', 'APP_TYPE_2']
+      }
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_COUNTRY_LIST_SUCCESS', () => {
+    const initialState: any = {
+      countryList: []
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_COUNTRY_LIST_SUCCESS,
+      payload: ['COUNTRY_1', 'COUNTRY_2']
+    };
+    const expectedState = {
+      countryList: ['COUNTRY_1', 'COUNTRY_2']
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_CULTURE_LIST_SUCCESS', () => {
+    const initialState: any = {
+      cultureList: [],
+      cultureListLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_CULTURE_LIST_SUCCESS,
+      payload: ['CULTURE_1', 'CULTURE_2']
+    };
+    const expectedState = {
+      cultureList: ['CULTURE_1', 'CULTURE_2'],
+      cultureListLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_COMMUNITY_LIST_REQUEST', () => {
+    const initialState: any = {
+      communityListLoading: false,
+      communityList: []
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_COMMUNITY_LIST_REQUEST,
+      payload: []
+    };
+    const expectedState = {
+      communityListLoading: true,
+      communityList: []
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_COMMUNITY_LIST_SUCCESS', () => {
+    const initialState: any = {
+      communityList: [],
+      communityListLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_COMMUNITY_LIST_SUCCESS,
+      payload: { entityList: ['COMMUNITY_1', 'COMMUNITY_2'] }
+    };
+    const expectedState = {
+      communityList: ['COMMUNITY_1', 'COMMUNITY_2'],
+      communityListLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle UPDATE_PASSWORD_REQUEST', () => {
+    const initialState: any = {
+      loading: false
+    };
+    const action: any = {
+      type: USERTYPES.UPDATE_PASSWORD_REQUEST
+    };
+    const expectedState = {
+      loading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle CREATE_PASSWORD_REQUEST', () => {
+    const initialState: any = {
+      loading: false
+    };
+    const action: any = {
+      type: USERTYPES.CREATE_PASSWORD_REQUEST
+    };
+    const expectedState = {
+      loading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle UNLOCK_USERS_REQUEST', () => {
+    const initialState: any = {
+      loading: false
+    };
+    const action: any = {
+      type: USERTYPES.UNLOCK_USERS_REQUEST
+    };
+    const expectedState = {
+      loading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_LOCKED_USERS_REQUEST', () => {
+    const initialState: any = {
+      isLockedUserLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_LOCKED_USERS_REQUEST
+    };
+    const expectedState = {
+      isLockedUserLoading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_LOCKED_USERS_SUCCESS', () => {
+    const initialState: any = {
+      isLockedUserLoading: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_LOCKED_USERS_SUCCESS,
+      payload: { lockedUsers: ['LOCKED_USER_1', 'LOCKED_USER_2'], totalCount: 2 }
+    };
+    const expectedState = {
+      isLockedUserLoading: false,
+      lockedUsers: ['LOCKED_USER_1', 'LOCKED_USER_2'],
+      totalLockedUsers: 2
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle UNLOCK_USERS_SUCCESS', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.UNLOCK_USERS_SUCCESS
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle UNLOCK_USERS_FAILURE', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.UNLOCK_USERS_FAILURE
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle CHANGE_PASSWORD_FAIL', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.CHANGE_PASSWORD_FAIL
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle UPDATE_PASSWORD_FAIL', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.UPDATE_PASSWORD_FAIL
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle UPDATE_PASSWORD_SUCCESS', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.UPDATE_PASSWORD_SUCCESS
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle CREATE_PASSWORD_SUCCESS', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.CREATE_PASSWORD_SUCCESS
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle CREATE_PASSWORD_FAIL', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.CREATE_PASSWORD_FAIL
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_LOCKED_USERS_FAILURE', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_LOCKED_USERS_FAILURE
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_USER_BY_EMAIL', () => {
+    const initialState: any = {
+      loading: true,
+      showLoader: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_USER_BY_EMAIL
+    };
+    const expectedState = {
+      loading: false,
+      showLoader: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_USER_BY_EMAIL_SUCCESS', () => {
+    const initialState: any = {
+      showLoader: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_USER_BY_EMAIL_SUCCESS
+    };
+    const expectedState = {
+      showLoader: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_USER_BY_EMAIL_FAIL', () => {
+    const initialState: any = {
+      showLoader: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_USER_BY_EMAIL_FAIL
+    };
+    const expectedState = {
+      showLoader: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_CULTURE_LIST_REQUEST', () => {
+    const initialState: any = {
+      cultureListLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_CULTURE_LIST_REQUEST
+    };
+    const expectedState = {
+      cultureListLoading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_DESIGNATION_LIST_REQUEST', () => {
+    const initialState: any = {
+      designationListLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_DESIGNATION_LIST_REQUEST
+    };
+    const expectedState = {
+      designationListLoading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_DESIGNATION_LIST_SUCCESS', () => {
+    const initialState: any = {
+      designationListLoading: true,
+      designationList: []
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_DESIGNATION_LIST_SUCCESS,
+      payload: { designationList: ['DESIGNATION_1', 'DESIGNATION_2'] }
+    };
+    const expectedState = {
+      designationList: ['DESIGNATION_1', 'DESIGNATION_2'],
+      designationListLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_DESIGNATION_LIST_FAILURE', () => {
+    const initialState: any = {
+      designationListLoading: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_DESIGNATION_LIST_FAILURE
+    };
+    const expectedState = {
+      designationListLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle CLEAR_DESIGNATION_LIST', () => {
+    const initialState: any = {
+      designationList: ['DESIGNATION_1', 'DESIGNATION_2']
+    };
+    const action: any = {
+      type: USERTYPES.CLEAR_DESIGNATION_LIST
+    };
+    const expectedState = {
+      designationList: [],
+      designationListLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+  it('should handle REMOVE_TOKEN', () => {
+    const initialState: any = {};
+    const action: any = {
+      type: USERTYPES.REMOVE_TOKEN
+    };
+    const expectedState = {
+      token: ''
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });

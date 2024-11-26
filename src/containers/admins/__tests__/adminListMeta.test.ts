@@ -7,7 +7,7 @@ import {
   formatDistrict,
   formatChiefdom
 } from '../adminListMeta';
-import { IHFUserGet, IUserRole } from '../../../store/healthFacility/types';
+import { IHFUserGet } from '../../../store/healthFacility/types';
 
 const config = {
   chiefdomModuleName: 'Chiefdoms',
@@ -58,6 +58,12 @@ describe('Formatting Functions', () => {
     const result = formatRoles(user);
     expect(result).toBe('Admin, Manager');
   });
+
+  it('formats roles correctly without roles array', () => {
+    const result = formatRoles({ ...user, roles: undefined as any });
+    expect(result).toBe('');
+  });
+
   it('formats health facility names when role matches', () => {
     const result = formatHealthFacility(user);
     expect(result).toBe('');
@@ -70,6 +76,11 @@ describe('Formatting Functions', () => {
 
   it('returns an empty string when no organizations match', () => {
     const result = formatOrganizations(user, 'DISTRICT_ADMIN');
+    expect(result).toBe('');
+  });
+
+  it('formats organizations without organizations array', () => {
+    const result = formatOrganizations({ ...user, organizations: undefined as any }, 'HEALTH_FACILITY_ADMIN');
     expect(result).toBe('');
   });
   it('returns correct column definitions', () => {

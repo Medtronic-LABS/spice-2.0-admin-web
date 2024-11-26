@@ -344,19 +344,19 @@ describe('Validation', () => {
     describe('validateMobile', () => {
       test('should return an empty string for a mobile number with 8 to 10 digits', () => {
         const input = '12345678';
-        const result = validateMobile(input);
+        const result = validateMobile(input, false);
         expect(result).toBe('');
       });
 
       test('should return an empty string for an empty mobile number', () => {
         const input = '';
-        const result = validateMobile(input);
+        const result = validateMobile(input, false);
         expect(result).toBe('');
       });
 
       test('should return an error message for a mobile number with invalid characters or length', () => {
         const input = '12345';
-        const result = validateMobile(input);
+        const result = validateMobile(input, false);
         expect(result).toBe('Please enter a valid ');
       });
     });

@@ -269,12 +269,12 @@ const AddMedication = (props: Props): React.ReactElement => {
       },
       dosageFormId: medicationData.dosage_form.id,
       dosageFormName: medicationData.dosage_form.name,
-      ...(!isCategories
-        ? {}
-        : {
+      category: isCategories
+        ? {
             id: medicationData?.category?.id,
             name: medicationData?.category?.name
-          })
+          }
+        : undefined
     }));
 
     dispatch(

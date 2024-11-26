@@ -17,7 +17,11 @@ import {
   showLoaderSelector,
   tenantIdSelector,
   userDataSelector,
-  userRolesSelector
+  userRolesSelector,
+  communityListSelector,
+  timezoneListSelector,
+  designationListSelector,
+  countryIdSelector
 } from '../selectors';
 
 const initialState: any = {
@@ -61,9 +65,9 @@ test('tenantIdSelector should return tenantId from state', () => {
 });
 
 // Test timezoneListSelector
-// test('timezoneListSelector should return timezoneList from state', () => {
-//   expect(timezoneListSelector(initialState)).toEqual(initialState.user.timezoneList);
-// });
+test('timezoneListSelector should return timezoneList from state', () => {
+  expect(timezoneListSelector(initialState)).toEqual(initialState.user.timezoneList);
+});
 
 // Test loadingSelector
 test('loadingSelector should return loading from state', () => {
@@ -109,4 +113,16 @@ test('getUserSuiteAccessSelector should return  from state', () => {
 
 test('isPasswordSetSelector should return  from state', () => {
   expect(isPasswordSetSelector(initialState)).toEqual(initialState.user.user.isPasswordSet);
+});
+
+test('communityListSelector should return  from state', () => {
+  expect(communityListSelector(initialState)).toEqual(initialState.user.communityList);
+});
+
+test('designationListSelector should return  from state', () => {
+  expect(designationListSelector(initialState)).toEqual(initialState.user.designationList);
+});
+
+test('countryIdSelector should return  from state', () => {
+  expect(countryIdSelector(initialState)).toEqual(initialState.user.country);
 });
