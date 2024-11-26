@@ -7,7 +7,7 @@ import FormContainer from '../../components/formContainer/FormContainer';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import SiteAddUserIcon from '../../assets/images/avatar-o.svg';
 import Loader from '../../components/loader/Loader';
-import UserForm from '../../components/userForm/UserForm';
+import UserForm, { IDisabledRoles } from '../../components/userForm/UserForm';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import Workflows from '../healthFacility/Workflows';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
@@ -291,6 +291,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     workflows
   ]);
 
+  const [disabledRoleState, setDisabledRoles] = useState<IDisabledRoles[]>([]);
+
   /**
    * Renders the appropriate form component based on the current page number
    * @param pageNumber - The current page number
@@ -337,6 +339,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                   parentOrgId={selectedchiefdomTenantId || tenantId}
                   ignoreTenantId={''}
                   isSiteUser={true}
+                  disabledRolesState={{ disabledRoles: disabledRoleState, setDisabledRoles }}
                   appTypes={submittedData.data?.appTypes || []}
                 />
               </FormContainer>
@@ -356,7 +359,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       countryId,
       autoFetch,
       selectedchiefdomTenantId,
-      tenantId
+      tenantId,
+      disabledRoleState
     ]
   );
 

@@ -635,6 +635,7 @@ export interface IPeerSupervisor {
 export interface IFetchPeerSupervisorListRequest {
   type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST;
   tenantIds: number[];
+  appTypes: string[];
   successCb?: (data: { list: IPeerSupervisor[]; hfTenantIds: number[] }, total: number) => void;
   failureCb?: (error: Error) => void;
 }

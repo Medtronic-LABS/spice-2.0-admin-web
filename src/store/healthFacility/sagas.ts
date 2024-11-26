@@ -262,6 +262,7 @@ export function* fetchHFUserList({
   roleNames,
   isSiteUsers,
   tenantIds,
+  tenantBased,
   successCb,
   failureCb
 }: IFetchHFUserListRequest): SagaIterator {
@@ -276,6 +277,7 @@ export function* fetchHFUserList({
       searchTerm,
       roleNames,
       isSiteUsers,
+      tenantBased,
       tenantIds,
       appTypes: yield select((state: AppState) => state.user?.user?.appTypes)
     });
@@ -465,6 +467,7 @@ export function* fetchVillagesListFromHFSagaRequest({
 */
 export function* fetchPeerSupervisorListSagaRequest({
   tenantIds,
+  appTypes,
   successCb,
   failureCb
 }: IFetchPeerSupervisorListRequest): SagaIterator {
@@ -472,7 +475,7 @@ export function* fetchPeerSupervisorListSagaRequest({
     const {
       data: { entity: peerSupervisorList },
       totalCount: total
-    } = yield call(hfService.fetchPeerSupervisorList as any, tenantIds);
+    } = yield call(hfService.fetchPeerSupervisorList as any, tenantIds, appTypes);
     const list = peerSupervisorList.map((supervisor: IPeerSupervisor) => ({
       ...supervisor,
       name: `${supervisor.firstName} ${supervisor.lastName}`

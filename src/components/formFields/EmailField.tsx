@@ -170,7 +170,6 @@ const EmailField = forwardRef(
           const emailFetchPayload = isCommunity
             ? {
                 email,
-                tenantId,
                 appTypes
               }
             : {

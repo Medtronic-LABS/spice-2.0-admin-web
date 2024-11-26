@@ -76,6 +76,7 @@ const UserList = (): React.ReactElement => {
   const { filterSpiceCommonRoles, filterSpiceUserRoles } = APPCONSTANTS;
   const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
   const {
+    appTypes,
     userList: {
       filters: { available: showFilters }
     }
@@ -282,6 +283,7 @@ const UserList = (): React.ReactElement => {
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
         isSiteUser={true}
+        appTypes={appTypes}
       />
     );
   };

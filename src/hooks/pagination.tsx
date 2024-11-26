@@ -24,7 +24,6 @@ export const useLoadMorePagination = ({
   const page = useRef<number>(defaultPage <= totalPages ? defaultPage : 1);
   const loadMore = useCallback(
     (data: any) => {
-      console.log(data);
       if (totalPages > page.current) {
         page.current = page.current + 1;
         onLoadMore({

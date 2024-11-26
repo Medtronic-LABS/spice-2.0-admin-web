@@ -148,11 +148,11 @@ export const fetchVillagesListfromHF = (tenantIds: number[], userId: number) =>
     data: { tenantIds, userId }
   });
 
-export const fetchPeerSupervisorList = (tenantIds: number[]) =>
+export const fetchPeerSupervisorList = (tenantIds: number[], appTypes: string[]) =>
   axios({
     url: '/user-service/user/peer-supervisors',
     method: 'POST',
-    data: { tenantIds }
+    data: { tenantIds, appTypes }
   });
 
 export const fetchWorkflowList = (data: any) =>

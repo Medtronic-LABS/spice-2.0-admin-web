@@ -370,6 +370,7 @@ export const fetchHFUserListRequest = ({
   isSiteUsers,
   tenantId,
   tenantIds,
+  tenantBased,
   successCb,
   failureCb
 }: Omit<IFetchHFUserListRequest, 'type'>): IFetchHFUserListRequest => ({
@@ -382,6 +383,7 @@ export const fetchHFUserListRequest = ({
   isSiteUsers,
   tenantId,
   tenantIds,
+  tenantBased,
   successCb,
   failureCb
 });
@@ -572,12 +574,14 @@ export const fetchVillagesListFromHFFailure = (error: Error): IFetchVillagesList
 // PEER_SUPERVISOR LIST
 export const fetchPeerSupervisorListRequest = ({
   tenantIds,
+  appTypes,
   successCb,
   failureCb
 }: Omit<IFetchPeerSupervisorListRequest, 'type'>): IFetchPeerSupervisorListRequest => {
   return {
     type: HF_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
     tenantIds,
+    appTypes,
     successCb,
     failureCb
   };

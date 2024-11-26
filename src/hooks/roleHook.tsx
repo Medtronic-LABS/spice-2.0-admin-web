@@ -27,6 +27,7 @@ import {
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
+import { filterRolesByAppTypeFn } from '../components/userForm/userFormUtils';
 
 interface IFindDisabledRoles {
   suite: string;
@@ -81,6 +82,7 @@ interface IRoleOptions {
   isEdit: boolean | undefined;
   isAdminForm?: boolean;
   isSiteUser: boolean;
+  appTypes?: string[];
   allRoles: { [key: string]: IRoles[] };
   currentModule: string;
   roleOptionsFn: (data: {
@@ -303,6 +305,7 @@ export const useRoleOptions = ({
   isHFCreate,
   isEdit,
   isSiteUser,
+  appTypes,
   allRoles,
   currentModule,
   roleOptionsFn
@@ -312,8 +315,9 @@ export const useRoleOptions = ({
   const { isCommunity } = useAppTypeConfigs();
 
   const getRoleOptions = useCallback(() => {
-    // returns the SPICE roles based on the consitions
-    const SPICERoles = (allRoles.SPICE || [])
+    const newRoles = appTypes && appTypes.length === 1 ? filterRolesByAppTypeFn(allRoles, appTypes[0]) : allRoles;
+    // returns the SPICE roles based on the conditions
+    const SPICERoles = (newRoles.SPICE || [])
       .filter((role: IRoles) => {
         const { name, displayName, suiteAccessName } = role;
         const suiteNameLower = suiteAccessName?.toLowerCase() || '';
@@ -345,14 +349,14 @@ export const useRoleOptions = ({
 
     // returns the REPORTS roles based on the consitions
     const reportRoleOptions =
-      (allRoles.REPORTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
+      (newRoles.REPORTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
 
     // returns the INSIGHTS roles based on the consitions
     const insightRoleOptions =
-      (allRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
+      (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
 
     roleOptionsFn({ spiceRoleOptions: SPICERoles, reportRoleOptions, insightRoleOptions });
-  }, [allRoles, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, roleOptionsFn]);
+  }, [allRoles, appTypes, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, roleOptionsFn]);
 
   return {
     getRoleOptions

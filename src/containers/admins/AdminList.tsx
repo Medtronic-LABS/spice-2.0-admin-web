@@ -2,13 +2,13 @@ import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
-import UserForm from '../../components/userForm/UserForm';
+import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
@@ -34,6 +34,8 @@ import { getAdminPayload } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './adminListMeta';
+import { useRoleOptions } from '../../hooks/roleHook';
+import { IRoles } from '../../store/user/types';
 
 interface IMatchParams {
   tenantId: string;
@@ -64,6 +66,26 @@ const UserList = (): React.ReactElement => {
   const { filterSpiceCommonRoles, filterSpiceAdminRoles } = APPCONSTANTS;
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const { pathname } = useLocation();
+  const currentModule: ModuleNames = pathname.split('/')[1];
+
+  const spiceRoles = useRef<IRoles[]>([]);
+
+  const { getRoleOptions } = useRoleOptions({
+    isHF: false,
+    isHFCreate: false,
+    isEdit: false,
+    isSiteUser: false,
+    allRoles: rolesGrouped,
+    currentModule,
+    roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
+      spiceRoles.current = spiceRoleOptions;
+    }
+  });
+
+  useEffect(() => {
+    getRoleOptions();
+  }, [getRoleOptions]);
 
   /**
    * useCallback hook to refresh the admin list.
@@ -299,13 +321,6 @@ const UserList = (): React.ReactElement => {
   };
 
   /**
-   * Memoized value to filter SPICE spice role
-   */
-  const roleSpiceList = (rolesGrouped?.SPICE || [])?.filter(
-    (data: { suiteAccessName: string }) => data.suiteAccessName === APPCONSTANTS.spiceRole.spice
-  );
-
-  /**
    * Memoized value to filter SPICE INSIGHTS admin roles based on certain conditions for filter dropdown
    * filter only spice common roles and spice admin roles
    */
@@ -333,7 +348,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
-              data: [...roleSpiceList, ...roleCFRList],
+              data: [...spiceRoles.current, ...roleCFRList],
               isShow: true,
               filterCount: selectedRole?.length
             }

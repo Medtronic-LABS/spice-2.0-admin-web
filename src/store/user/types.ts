@@ -4,6 +4,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import { IPeerSupervisor, IUserRole, IVillages } from '../healthFacility/types';
 import * as USER_TYPES from './actionTypes';
+import { IDisabledRoles } from '../../components/userForm/UserForm';
 
 export type roleType = (typeof APPCONSTANTS.ROLES)[keyof typeof APPCONSTANTS.ROLES];
 
@@ -28,8 +29,8 @@ export interface IUserFormProps {
   autoFetchedState?: { autoFetch: any[]; setAutoFetchState: React.Dispatch<React.SetStateAction<boolean[]>> };
   chwState?: { isCHAUser: boolean[]; setUserAsCHW: React.Dispatch<React.SetStateAction<boolean[]>> };
   disabledRolesState?: {
-    disabledRoles: IRoles[][];
-    setDisabledRoles: React.Dispatch<React.SetStateAction<IRoles[][]>>;
+    disabledRoles: IDisabledRoles[];
+    setDisabledRoles: React.Dispatch<React.SetStateAction<IDisabledRoles[]>>;
   };
   mandatoryRolesState?: {
     mandatoryRoles: IRoles[][];

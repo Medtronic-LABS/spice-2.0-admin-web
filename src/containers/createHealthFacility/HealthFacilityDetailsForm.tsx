@@ -105,6 +105,7 @@ const HealthFacilityDetailsForm = ({
   const country = useSelector(countryIdSelector);
   const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const {
+    appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     hfDetails: {
@@ -186,7 +187,7 @@ const HealthFacilityDetailsForm = ({
   useEffect(() => {
     const selectedTenantId = form.getState().values?.healthFacility?.chiefdom?.tenantId;
     if (selectedTenantId) {
-      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId] }));
+      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId], appTypes }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, form.getState().values?.healthFacility?.chiefdom?.tenantId]);

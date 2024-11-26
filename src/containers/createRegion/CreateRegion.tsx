@@ -1,23 +1,24 @@
 import { Tools } from 'final-form';
-import React, { useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
-import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
+import React, { useCallback } from 'react';
+import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import RegionForm from './RegionForm';
-import FormContainer from '../../components/formContainer/FormContainer';
-import APPCONSTANTS from '../../constants/appConstants';
-import { PROTECTED_ROUTES } from '../../constants/route';
-import { AppState } from '../../store/rootReducer';
-import { createRegionRequest } from '../../store/region/actions';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import RegionFormIcon from '../../assets/images/info-grey.svg';
 import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
+import RegionFormIcon from '../../assets/images/info-grey.svg';
+import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { fetchCountryListRequest } from '../../store/healthFacility/actions';
+import { createRegionRequest } from '../../store/region/actions';
+import { AppState } from '../../store/rootReducer';
 import { getAdminPayload } from '../../utils/commonUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import RegionForm from './RegionForm';
 
 export interface IRegionFormValues {
   region: {
@@ -33,6 +34,7 @@ const CreateRegion: React.FC = () => {
   const dispatch = useDispatch();
   const loading = useSelector((state: AppState) => state.region.loading);
 
+  const { appTypes } = useAppTypeConfigs();
   /**
    * Resets form fields whose keys include the specified substring.
    *
@@ -115,6 +117,7 @@ const CreateRegion: React.FC = () => {
                       form={form}
                       defaultSelectedRole={APPCONSTANTS.ROLES.REGION_ADMIN}
                       enableAutoPopulate={true}
+                      appTypes={appTypes}
                     />
                   </FormContainer>
                 </div>

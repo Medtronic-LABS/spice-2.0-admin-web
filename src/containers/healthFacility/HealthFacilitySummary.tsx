@@ -588,6 +588,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         hfTenantId={Number(tenantId)}
         parentOrgId={healthFacility?.chiefdom?.tenantId}
         ignoreTenantId={tenantId}
+        appTypes={appTypes}
       />
     );
   };
