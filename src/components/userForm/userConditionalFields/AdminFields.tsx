@@ -57,10 +57,10 @@ export const SiteUserForm = (props: any) => {
   } = useAppTypeConfigs();
 
   useEffect(() => {
-    if (!(timezoneList || []).length) {
+    if (!(timezoneList || []).length && isTimezoneAvailable) {
       dispatch(fetchTimezoneListRequest());
     }
-    if (!(cultureList || []).length) {
+    if (!(cultureList || []).length && isCultureAvailable) {
       dispatch(fetchCultureListRequest());
     }
   }, []);

@@ -33,17 +33,19 @@ describe('District APIs', () => {
     const skip = 0;
     const limit = 0;
     const search = 'example';
+    const appTypes = ['COMMUNITY'];
     const expectedData = {
       tenantId: 1,
       skip,
       limit,
       is_active: isActive,
-      searchTerm: search
+      searchTerm: search,
+      appTypes: ['COMMUNITY']
     };
 
     mockAxios.onPost('/admin-service/district/district-list').reply(200, {});
 
-    await fetchDistrictList(tenantId, isActive, skip, limit, search);
+    await fetchDistrictList(tenantId, isActive, skip, limit, appTypes, search);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district/district-list');
@@ -55,17 +57,19 @@ describe('District APIs', () => {
     const isActive = true;
     const skip = 0;
     const limit = 10;
+    const appTypes = ['COMMUNITY'];
     const expectedData = {
       tenantId: 1,
       skip,
       limit,
       is_active: isActive,
-      searchTerm: ''
+      searchTerm: '',
+      appTypes: ['COMMUNITY']
     };
 
     mockAxios.onPost('/admin-service/district/district-list').reply(200, {});
 
-    await fetchDistrictList(tenantId, isActive, skip, limit, '');
+    await fetchDistrictList(tenantId, isActive, skip, limit, appTypes, '');
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district/district-list');

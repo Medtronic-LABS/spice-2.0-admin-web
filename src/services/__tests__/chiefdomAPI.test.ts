@@ -32,10 +32,11 @@ describe('Chiefdom APIs', () => {
     const skip = 0;
     const sort = 'name';
     const searchTerm = 'example';
+    const appTypes = ['COMMUNITY'];
 
     mockAxios.onPost('/admin-service/chiefdom/list').reply(200, {});
 
-    await fetchChiefdomDashboardList(tenantId, limit, skip, sort, searchTerm);
+    await fetchChiefdomDashboardList(tenantId, limit, skip, sort, appTypes, searchTerm);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/chiefdom/list');
@@ -44,7 +45,8 @@ describe('Chiefdom APIs', () => {
       skip,
       sort,
       tenantId,
-      searchTerm
+      searchTerm,
+      appTypes
     });
   });
 
@@ -54,10 +56,11 @@ describe('Chiefdom APIs', () => {
     const skip = 0;
     const sort = 'name';
     const searchTerm = '';
+    const appTypes = ['COMMUNITY'];
 
     mockAxios.onPost('/admin-service/chiefdom/list').reply(200, {});
 
-    await fetchChiefdomDashboardList(tenantId, limit, skip, sort, searchTerm);
+    await fetchChiefdomDashboardList(tenantId, limit, skip, sort, appTypes, searchTerm);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/chiefdom/list');
@@ -66,7 +69,8 @@ describe('Chiefdom APIs', () => {
       skip,
       sort,
       tenantId,
-      searchTerm
+      searchTerm,
+      appTypes
     });
   });
 

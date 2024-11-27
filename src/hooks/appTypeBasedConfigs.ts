@@ -32,6 +32,7 @@ const COMMUNITY = {
     culture: { available: false },
     redrisk: { available: false },
     designation: { available: false },
+    community: { available: false },
     supervisor: {
       label: 'Select Peer Supervisor',
       error: 'select peer supervisor'
@@ -62,6 +63,7 @@ const NON_COMMUNITY = {
     culture: { available: true },
     redrisk: { available: true },
     designation: { available: true },
+    community: { available: true },
     supervisor: {
       label: 'Community Health Assistant',
       error: 'Community health assistant'

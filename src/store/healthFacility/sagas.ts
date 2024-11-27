@@ -349,10 +349,11 @@ export function* fetchDistrictListSagaRequest({
   failureCb
 }: IFetchDistrictListRequest): SagaIterator {
   try {
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entity: list },
       totalCount: total
-    } = yield call(hfService.fetchDistrictList as any, countryId);
+    } = yield call(hfService.fetchDistrictList as any, countryId, appTypes);
     successCb?.(list, total);
     yield put(fetchDistrictListSuccess({ list, total }));
   } catch (e) {
@@ -373,10 +374,11 @@ export function* fetchChiefdomListSagaRequest({
   failureCb
 }: IFetchChiefdomListRequest): SagaIterator {
   try {
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entity: list },
       totalCount: total
-    } = yield call(hfService.fetchChiefdomList as any, countryId, districtId);
+    } = yield call(hfService.fetchChiefdomList as any, countryId, districtId, appTypes);
     successCb?.(list, total);
     yield put(fetchChiefdomListSuccess({ list, total }));
   } catch (e) {
@@ -398,10 +400,11 @@ export function* fetchVillagesListSagaRequest({
   failureCb
 }: IFetchVillagesListRequest): SagaIterator {
   try {
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entity: list },
       totalCount: total
-    } = yield call(hfService.fetchVillagesList as any, countryId, districtId, chiefdomId);
+    } = yield call(hfService.fetchVillagesList as any, countryId, districtId, chiefdomId, appTypes);
     successCb?.(list, total);
     yield put(fetchVillagesListSuccess({ list, total }));
   } catch (e) {
@@ -424,10 +427,18 @@ export function* fetchUnlinkedVillagesSagaRequest({
   failureCb
 }: IFetchUnlinkedVillagesRequest): SagaIterator {
   try {
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entity: list },
       totalCount: total
-    } = yield call(hfService.fetchUnlinkedVillagesAPI as any, countryId, districtId, chiefdomId, healthFacilityId);
+    } = yield call(
+      hfService.fetchUnlinkedVillagesAPI as any,
+      countryId,
+      districtId,
+      chiefdomId,
+      appTypes,
+      healthFacilityId
+    );
     successCb?.(list, total);
     yield put(fetchUnlinkedVillagesListSuccess({ list, total }));
   } catch (e) {
@@ -449,9 +460,10 @@ export function* fetchVillagesListFromHFSagaRequest({
   failureCb
 }: IFetchVillagesListFromHFRequest): SagaIterator {
   try {
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entity: list }
-    } = yield call(hfService.fetchVillagesList as any, countryId, districtId, chiefdomId);
+    } = yield call(hfService.fetchVillagesList as any, countryId, districtId, chiefdomId, appTypes);
     successCb?.({ list, hfTenantIds: [countryId] });
     yield put(fetchVillagesListFromHFSuccess({ data: { list, hfTenantIds: [countryId] } }));
   } catch (e) {

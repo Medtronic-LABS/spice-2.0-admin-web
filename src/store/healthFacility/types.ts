@@ -714,6 +714,7 @@ export interface IClearHealthFacilityDetail {
 export interface ICulture {
   id: number;
   name: string;
+  appTypes: string[];
 }
 
 export interface ICountryCode {

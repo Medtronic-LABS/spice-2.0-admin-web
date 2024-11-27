@@ -50,6 +50,7 @@ export function* fetchDistrictList({
 }: IFetchDistrictListRequest): SagaIterator {
   try {
     let response: { entityList: IDistrict[]; totalCount: number };
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     if (!isActive) {
       const { data } = yield call(
         districtService.fetchDeactivatedAccounts as any,
@@ -61,7 +62,15 @@ export function* fetchDistrictList({
       );
       response = data;
     } else {
-      const { data } = yield call(districtService.fetchDistrictList as any, tenantId, isActive, skip, limit, search);
+      const { data } = yield call(
+        districtService.fetchDistrictList as any,
+        tenantId,
+        isActive,
+        skip,
+        limit,
+        appTypes,
+        search
+      );
       response = data;
     }
     const payload = { districtList: response?.entityList || [], total: response.totalCount };

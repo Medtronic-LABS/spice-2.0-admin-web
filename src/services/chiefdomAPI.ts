@@ -12,12 +12,14 @@ export const fetchChiefdomDashboardList = (
   limit: number | null,
   skip: number,
   sort: string,
+  appTypes: string[],
   searchTerm?: string
 ) =>
   axios({
     method: 'POST',
     url: '/admin-service/chiefdom/list',
     data: {
+      appTypes,
       limit,
       skip,
       sort,

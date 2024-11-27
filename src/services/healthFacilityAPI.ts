@@ -105,47 +105,49 @@ export const deleteHFUser = (data: IDeleteUserPayload) =>
     data
   });
 
-export const fetchDistrictList = (countryId: number) =>
+export const fetchDistrictList = (countryId: number, appTypes: string[]) =>
   axios({
     url: '/admin-service/district-list',
     method: 'POST',
-    data: { countryId }
+    data: { countryId, appTypes }
   });
 
-export const fetchChiefdomList = (countryId: number, districtId: number) =>
+export const fetchChiefdomList = (countryId: number, districtId: number, appTypes: string[]) =>
   axios({
     url: '/admin-service/chiefdom-list',
     method: 'POST',
     data: {
       countryId,
-      districtId
+      districtId,
+      appTypes
     }
   });
 
-export const fetchVillagesList = (countryId: number, districtId: number, chiefdomId: number) =>
+export const fetchVillagesList = (countryId: number, districtId: number, chiefdomId: number, appTypes: string[]) =>
   axios({
     url: '/admin-service/villages-list',
     method: 'POST',
-    data: { countryId, districtId, chiefdomId }
+    data: { countryId, districtId, chiefdomId, appTypes }
   });
 
 export const fetchUnlinkedVillagesAPI = (
   countryId: number,
   districtId: number,
   chiefdomId: number,
+  appTypes: string[],
   healthFacilityId?: number
 ) =>
   axios({
     url: 'admin-service/unlinked-villages-list',
     method: 'POST',
-    data: { countryId, districtId, chiefdomId, healthFacilityId }
+    data: { countryId, districtId, chiefdomId, healthFacilityId, appTypes }
   });
 
-export const fetchVillagesListfromHF = (tenantIds: number[], userId: number) =>
+export const fetchVillagesListfromHF = (tenantIds: number[], userId: number, appTypes: string[]) =>
   axios({
     url: '/admin-service/healthfacility/unlinked-villages-list',
     method: 'POST',
-    data: { tenantIds, userId }
+    data: { tenantIds, userId, appTypes }
   });
 
 export const fetchPeerSupervisorList = (tenantIds: number[], appTypes: string[]) =>

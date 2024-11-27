@@ -4,22 +4,20 @@ import { villageBasedRoles } from '../../constants/roleConstants';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 
-export const filterRolesByAppTypeFn = (data: IGroupRoles, appType: string) => {
-  const filteredData: { [key: string]: any[] } = {};
+export const filterRolesByAppTypeFn = (fullRoles: IGroupRoles, appTypes: string[] = []) => {
+  const filteredRoles: any = {};
 
-  // Iterate over each group in the data
-  for (const group in data) {
-    if (true) {
-      if (data.hasOwnProperty(group)) {
-        const filteredRoles = data[group].filter((role: IRoles) => (role.appTypes || []).includes(appType));
-        // If there are any roles left after filtering, add them to the filteredData
-        if (filteredRoles.length > 0) {
-          filteredData[group] = filteredRoles;
-        }
+  if (appTypes.length > 1) {
+    return fullRoles;
+  } else {
+    for (const [groupName, roles] of Object.entries(fullRoles)) {
+      const filteredGroup = roles.filter((role) => role.appTypes.some((type) => (appTypes || []).includes(type)));
+      if (filteredGroup.length > 0) {
+        filteredRoles[groupName] = filteredGroup;
       }
     }
+    return filteredRoles;
   }
-  return filteredData;
 };
 
 const useUserFormUtils = () => {
@@ -130,6 +128,15 @@ const useUserFormUtils = () => {
       return acc;
     }, []);
   };
+  const separateRolesByGroupName = (roles: IRoles[]): Record<string, IRoles[]> => {
+    return roles.reduce((result, role) => {
+      if (!result[role.groupName || '']) {
+        result[role.groupName || ''] = [];
+      }
+      result[role.groupName || ''].push(role);
+      return result;
+    }, {} as Record<string, IRoles[]>);
+  };
 
   return {
     isCHASelected,
@@ -141,7 +148,8 @@ const useUserFormUtils = () => {
     isHFAdminSelected,
     getSpiceGroupName,
     formUserData,
-    roleBasedAppTypes
+    roleBasedAppTypes,
+    separateRolesByGroupName
   };
 };
 

@@ -13,12 +13,14 @@ export const fetchDistrictList = (
   isActive: boolean,
   skip: number,
   limit: number | null,
+  appTypes: string[],
   search?: string
 ) =>
   axios({
     method: 'POST',
     url: '/admin-service/district/district-list',
     data: {
+      appTypes,
       tenantId,
       skip,
       limit,

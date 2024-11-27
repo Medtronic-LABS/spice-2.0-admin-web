@@ -7,7 +7,7 @@ import BinIcon from '../../assets/images/bin.svg';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import ResetIcon from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
+import { SPICE } from '../../constants/roleConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta, useRoleOptions } from '../../hooks/roleHook';
 import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
@@ -181,7 +181,9 @@ const UserForm = ({
       filters: { available: showFilters }
     },
     user: {
-      designation: { available: isDesignationListShow }
+      culture: { available: showCulture },
+      designation: { available: isDesignationListShow },
+      community: { available: isCommunityListShow }
     },
     district: { s: districtSName }
   } = useAppTypeConfigs();
@@ -204,27 +206,27 @@ const UserForm = ({
         villages: [],
         supervisor: '',
         organizations: [],
-        culture: cultureList?.find((culture: { id: number }) => culture.id === APPCONSTANTS.DEFAULT_CULTURE.id),
+        culture: showCulture
+          ? cultureList?.find((culture: { id: number }) => culture.id === APPCONSTANTS.DEFAULT_CULTURE.id)
+          : undefined,
         country: ''
       }
     ],
-    [cultureList]
+    [cultureList, showCulture]
   );
 
   // new hook related state and ref
-  const showSpiceHFRef = useRef(false);
-  const showReportHFRef = useRef(false);
-  const showInsightHFRef = useRef(false);
-  const [showVillage, setShowVillage] = useState(false);
+  const showSpiceHFRef = useRef<boolean[]>([false]);
+  const showReportHFRef = useRef<boolean[]>([false]);
+  const showInsightHFRef = useRef<boolean[]>([false]);
+  const [showVillage, setShowVillage] = useState<boolean[]>([false]);
   const spiceRoles = useRef([] as IRoles[]);
   const reportRolesRef = useRef([] as IRoles[]);
   const insightRolesRef = useRef([] as IRoles[]);
 
   // role filter based on appTypes
   useEffect(() => {
-    setAppTypeRoles(
-      appTypes && appTypes.length === 1 ? filterRolesByAppTypeFn(rolesGrouped, appTypes[0]) : rolesGrouped
-    );
+    setAppTypeRoles(filterRolesByAppTypeFn(rolesGrouped, appTypes));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appTypes, rolesGrouped]);
 
@@ -232,7 +234,7 @@ const UserForm = ({
     if (countryId && isDesignationListShow) {
       dispatch(fetchDesignationListRequest({ countryId }));
     }
-    if (isSiteUser && countryId && communityList && !(communityList || []).length) {
+    if (isCommunityListShow && isSiteUser && countryId && communityList && !(communityList || []).length) {
       const payload = {
         countryId,
         search: ''
@@ -330,6 +332,7 @@ const UserForm = ({
           : [],
         culture:
           !isCultureListLoading &&
+          showCulture &&
           cultureList?.find(
             (culture: { id: any }) => culture.id === (initialEditValue?.cultureId || APPCONSTANTS.DEFAULT_CULTURE.id)
           ),
@@ -460,7 +463,7 @@ const UserForm = ({
         const { formDataId: id, name } = userData.organizations[0];
         userData.healthFacility = { id, name };
       }
-      if (showSpiceHFRef.current) {
+      if (showSpiceHFRef.current[index]) {
         const fullRoles = form.getState().values[`${formName}[${index}].roles`];
         const selectedAppTypes = roleBasedAppTypes(fullRoles);
         filterHFByAppTypes(selectedAppTypes);
@@ -500,7 +503,7 @@ const UserForm = ({
       const newFetchedData = [...fetchedData.current];
       newFetchedData[index] = userData;
       fetchedData.current = newFetchedData;
-      dataBasedRoleChange(userData);
+      roleChange({ allRoles: userData.roles as IRoles[], index, appTypeBasedRoles });
       if (isCHPCHWSelected(userData.roles)) {
         const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
         fetchListWithConditions(tenantIds, userData.id, 'village', index);
@@ -728,7 +731,7 @@ const UserForm = ({
    * Effect hook to fetch village and supervisor lists based on the initial edit data.
    */
   useEffect(() => {
-    if (isEdit && showVillage && !isProfile) {
+    if (isEdit && showVillage[0] && !isProfile) {
       const tenantIds = [...initialEditData[0].hfTenantIds].filter((v: number) => v);
       fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
       fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', 0);
@@ -869,9 +872,31 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getState()?.values?.users?.[0]?.role?.name]);
 
+  const setDisabledRolesFn = useCallback(
+    ({
+      disabledRoles: disabledRolesFromHook,
+      showSpiceHFList,
+      showReportHFList,
+      showInsightHFList,
+      showVillages,
+      isCHAStatus,
+      isCHWCHPStatus
+    }: any) => {
+      disabledRoles.current = disabledRolesFromHook;
+      showSpiceHFRef.current = showSpiceHFList;
+      showReportHFRef.current = showReportHFList;
+      showInsightHFRef.current = showInsightHFList;
+      setShowVillage(showVillages);
+      // getting CHA user selected status
+      setUserAsCHA(isCHAStatus);
+      // getting CHW/CHP user selected status
+      setUserAsCHWCHP(isCHWCHPStatus);
+    },
+    []
+  );
+
   // custom hooks for role change
   const { roleChange } = useRoleMeta({
-    appTypeBasedRoles,
     disabledRoles,
     isHF,
     isHFCreate,
@@ -880,6 +905,10 @@ const UserForm = ({
     formData: autoFetchData,
     isCHAStatus: isCHAUser,
     isCHWCHPStatus: isCHWCHPUser,
+    showVillagesState: showVillage,
+    showSpiceHFListState: showSpiceHFRef.current,
+    showReportHFListState: showReportHFRef.current,
+    showInsightHFListState: showInsightHFRef.current,
     onRoleChange: ({
       disabledRoles: disabledRolesFromHook,
       showSpiceHFList,
@@ -889,15 +918,15 @@ const UserForm = ({
       isCHAStatus,
       isCHWCHPStatus
     }) => {
-      disabledRoles.current = disabledRolesFromHook;
-      showSpiceHFRef.current = showSpiceHFList;
-      showReportHFRef.current = showReportHFList;
-      showInsightHFRef.current = showInsightHFList;
-      setShowVillage(showVillages);
-      // getting CHA user selected status
-      setUserAsCHA(isCHAStatus);
-      // getting CHP user selected status
-      setUserAsCHWCHP(isCHWCHPStatus);
+      setDisabledRolesFn({
+        disabledRoles: disabledRolesFromHook,
+        showSpiceHFList,
+        showReportHFList,
+        showInsightHFList,
+        showVillages,
+        isCHAStatus,
+        isCHWCHPStatus
+      });
     }
   });
 
@@ -916,53 +945,21 @@ const UserForm = ({
       insightRolesRef.current = insightRoleOptions;
     }
   });
-  //  default role change fetch while edit and from hfCreate screen.
-  const dataBasedRoleChange = useCallback(
-    (userData: any = {}) => {
-      const { reportRoles = [], insightRoles = [], role: spiceEditRoles = [] } = userData || {};
-      const editRoles = [
-        { roles: spiceEditRoles, suite: SPICE },
-        { roles: reportRoles, suite: REPORTS },
-        { roles: insightRoles, suite: INSIGHTS }
-      ];
-      editRoles.forEach(({ roles, suite }) => {
-        roleChange({ roles, index: 0, currentSuite: suite });
-      });
-    },
-    [roleChange]
-  );
 
   useEffect(() => {
     if (isHFCreate || (isEdit && !isProfile)) {
-      autoFetchData.forEach((formData: any) => {
-        dataBasedRoleChange(formData);
+      autoFetchData.forEach((formData: any, index: number) => {
+        roleChange({ allRoles: formData.roles as IRoles[], index, appTypeBasedRoles });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoFetchData]);
+  }, [autoFetchData, appTypeBasedRoles]);
 
   useEffect(() => {
     if (!(spiceRoles.current.length && reportRolesRef.current.length && insightRolesRef.current.length)) {
       getRoleOptions();
     }
   }, [getRoleOptions]);
-
-  // to maintain the state when back pressed
-  useEffect(() => {
-    return () => {
-      if (autoFetchedState) {
-        autoFetchedState.setAutoFetchState(autoFetched);
-      }
-      if (disabledRolesState) {
-        setTimeout(() => {
-          disabledRolesState.setDisabledRoles(disabledRoles.current);
-        }, 0);
-      }
-      if (roleOptionsState) {
-        roleOptionsState.current = roleOptions.current || [];
-      }
-    };
-  }, [autoFetchData, autoFetched, autoFetchedState, chwState, disabledRoles, disabledRolesState, roleOptionsState]);
 
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
@@ -1094,11 +1091,11 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
-                              roleChange({ roles: values, index, currentSuite: 'SPICE' });
+                              roleChange({ roles: values, index, currentSuite: 'SPICE', appTypeBasedRoles });
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].role`, [...values]);
                               form.change(`${formName}[${index}].roles`, [...reportRoles, ...insightRoles, ...values]);
-                              if (showSpiceHFRef.current) {
+                              if (showSpiceHFRef.current[index]) {
                                 const fullRoles = form.getState().values[formName][index].roles;
                                 const selectedAppTypes = roleBasedAppTypes(fullRoles);
                                 filterHFByAppTypes(selectedAppTypes);
@@ -1149,7 +1146,12 @@ const UserForm = ({
                               // fetch HF list based on CHW selection
                               input.onChange(values);
                               // fetch culture list HF admin
-                              if (values.name === HEALTH_FACILITY_ADMIN && cultureList && !cultureList.length) {
+                              if (
+                                values.name === HEALTH_FACILITY_ADMIN &&
+                                cultureList &&
+                                !cultureList.length &&
+                                showCulture
+                              ) {
                                 dispatch(fetchCultureListRequest());
                               }
                               // clear designation whenever role gets update
@@ -1245,7 +1247,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any, { option, action }: { option: any; action: string }) => {
-                              roleChange({ roles: values, index, currentSuite: 'REPORTS' });
+                              roleChange({ roles: values, index, currentSuite: 'REPORTS', appTypeBasedRoles });
                               form.change(`${formName}[${index}].roles`, [...spiceRole, ...insightRoles, ...values]);
                               input.onChange(values);
                             }}
@@ -1294,7 +1296,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any) => {
-                              roleChange({ roles: values, index, currentSuite: 'INSIGHTS' });
+                              roleChange({ roles: values, index, currentSuite: 'INSIGHTS', appTypeBasedRoles });
                               form.change(`${formName}[${index}].roles`, [...spiceRole, ...reportRoles, ...values]);
                               input.onChange(values);
                             }}
@@ -1437,7 +1439,7 @@ const UserForm = ({
                     }
                   />
                 </div>
-                {isSPICE && showSpiceHFRef.current && (
+                {isSPICE && showSpiceHFRef.current[index] && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1471,7 +1473,7 @@ const UserForm = ({
                                 form.change(villagesFieldData, []);
                               }
 
-                              if (showVillage) {
+                              if (showVillage[index]) {
                                 fetchSupervisorList(
                                   formData?.organizations
                                     ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
@@ -1499,7 +1501,7 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {isReports && showReportHFRef.current && (
+                {isReports && showReportHFRef.current[index] && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.reportUserOrganization`}
@@ -1531,7 +1533,7 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {isInsights && showInsightHFRef.current && (
+                {isInsights && showInsightHFRef.current[index] && (
                   <div className='col-sm-6 col-12'>
                     <Field
                       name={`${name}.insightUserOrganization`}
@@ -1578,7 +1580,7 @@ const UserForm = ({
                   isChaUser={isCHAUser[index]}
                   communityList={communityList || []}
                   isHFCreate={isHFCreate}
-                  showVillages={showVillage}
+                  showVillages={showVillage[index]}
                 />
                 <SiteUserForm
                   isAdminForm={isAdminForm}

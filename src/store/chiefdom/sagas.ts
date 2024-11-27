@@ -34,9 +34,10 @@ export function* fetchChiefdomDashboardList({
 }: IFetchChiefdomDashboardListRequest): SagaIterator {
   try {
     const tenantId = yield select((state: AppState) => state.user.user.tenantId);
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entityList: chiefdomDashboardList, totalCount: total }
-    } = yield call(chiefdomAPI.fetchChiefdomDashboardList as any, tenantId, limit, skip, undefined, search);
+    } = yield call(chiefdomAPI.fetchChiefdomDashboardList as any, tenantId, limit, skip, undefined, appTypes, search);
     const payload = { chiefdomDashboardList: chiefdomDashboardList || [], total, isLoadMore };
     successCb?.(payload);
     yield put(operatinUnitActions.fetchChiefdomDashboardListSuccess(payload));
