@@ -521,3 +521,7 @@ export const setAppTypeFailure = (error: Error): ISetAppTypeFailure => ({
   type: USER_TYPES.SET_APP_TYPE_FAILURE,
   error
 });
+
+export const clearAppType = () => ({
+  type: USER_TYPES.CLEAR_APP_TYPE
+});

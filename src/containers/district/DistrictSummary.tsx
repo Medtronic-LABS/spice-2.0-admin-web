@@ -63,6 +63,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const [isOpenDeactivateModal, setIsOpenDeactivateModal] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<any>({});
   const [openConsentForm, setOpenConsentForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const isReadOnly = role === APPCONSTANTS.ROLES.DISTRICT_ADMIN;
 
@@ -76,14 +77,14 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   useEffect(() => {
     getDistrictDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchTerm]);
 
   /**
    * Function to get district detail
    * @param {string}: search
    */
   const getDistrictDetail = useCallback(
-    (search?: string) => {
+    (search: string = searchTerm) => {
       dispatch(
         fetchDistrictDetailReq({
           tenantId,
@@ -111,7 +112,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, districtId, tenantId, district?.countryId]
+    [dispatch, districtId, tenantId, district?.countryId, searchTerm]
   );
 
   /**
@@ -145,7 +146,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
    * @param {string} search - search text
    */
   const handleSearch = (search: string) => {
-    getDistrictDetail(search);
+    setSearchTerm(search);
   };
 
   /**

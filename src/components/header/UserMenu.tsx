@@ -15,7 +15,6 @@ import {
   emailSelector,
   formDataIdSelector,
   tenantIdSelector,
-  getAppTypeSelector,
   getUserSuiteAccessSelector,
   userIdSelector
 } from '../../store/user/selectors';
@@ -23,6 +22,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
 import { CHIEFDOM_ADMIN, DISTRICT_ADMIN, REGION_ADMIN, SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * Interface for user menu item
@@ -58,7 +58,7 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
   const [passwordModal, setPasswordModal] = useState(false);
   const [submitEnable, setSubmitEnabled] = useState(false);
 
-  const appTypes = useSelector(getAppTypeSelector);
+  const { appTypes } = useAppTypeConfigs();
 
   const {
     district: { s: districtSName },

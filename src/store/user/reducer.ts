@@ -113,6 +113,14 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
           appTypes: action.payload
         }
       };
+    case USERTYPES.CLEAR_APP_TYPE:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          appTypes: []
+        }
+      };
     case USERTYPES.FETCH_USER_ROLES_REQUEST:
       return {
         ...state,

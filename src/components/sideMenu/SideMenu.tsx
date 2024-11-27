@@ -5,7 +5,7 @@ import { routesWithSideMenu } from '../../constants/route';
 import styles from './SideMenu.module.scss';
 import { fetchSideMenuRequest } from '../../store/common/actions';
 import { getLoadingSelector, getSideMenuSelector } from '../../store/common/selectors';
-import { getAppTypeSelector, loadingSelector as userLoadingSelector } from '../../store/user/selectors';
+import { loadingSelector as userLoadingSelector } from '../../store/user/selectors';
 import { getLoadingSelector as regionLoadingSelector } from '../../store/region/selectors';
 import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
 import { ISideMenu } from '../../store/common/types';
@@ -19,6 +19,7 @@ import { labtestLoadingSelector } from '../../store/labTest/selectors';
 import { districtLoadingSelector } from '../../store/district/selectors';
 import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { programLoadingSelector } from '../../store/program/selectors';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 type RouteModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
 interface ISideMenuProps {
@@ -45,7 +46,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const workflowLoading = useSelector(workflowLoadingSelector);
   const userLoading = useSelector(userLoadingSelector);
   const programLoading = useSelector(programLoadingSelector);
-  const appTypes = useSelector(getAppTypeSelector);
+  const { appTypes } = useAppTypeConfigs();
 
   const sideMenuLoading = useSelector(getLoadingSelector);
   const {
@@ -101,12 +102,13 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
         fetchSideMenuRequest({
           countryId: regionId || countryIdValue || null,
           roleName: role,
+          appTypes,
           failureCb: () => {
             toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_SIDEMENU_ERROR);
           }
         })
       ),
-    [countryIdValue, dispatch, regionId, role]
+    [appTypes, countryIdValue, dispatch, regionId, role]
   );
   /**
    * Formats the menu items

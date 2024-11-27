@@ -12,7 +12,7 @@ import { IUserRole } from '../../store/healthFacility/types';
 import { fetchCultureListRequest, fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
-import { IEditUserDetail, IRoles } from '../../store/user/types';
+import { IEditUserDetail } from '../../store/user/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getAdminPayload } from '../../utils/commonUtils';
 

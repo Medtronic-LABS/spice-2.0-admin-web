@@ -36,6 +36,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
 import {
+  clearDesignationList,
   fetchCommunityListRequest,
   fetchCultureListRequest,
   fetchDesignationListRequest,
@@ -397,6 +398,7 @@ const UserForm = ({
       dispatch(clearChiefdomList());
       dispatch(clearDistrictList());
       dispatch(clearHFListRequest());
+      dispatch(clearDesignationList());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

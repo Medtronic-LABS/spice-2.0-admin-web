@@ -32,7 +32,7 @@ import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/distric
 import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import { clearHFSummary } from '../../store/healthFacility/actions';
 import { IRegionDetail } from '../../store/region/types';
-import { clearDesignationList, fetchTimezoneListRequest, setAppType } from '../../store/user/actions';
+import { clearAppType, fetchTimezoneListRequest, setAppType } from '../../store/user/actions';
 import { timezoneListSelector } from '../../store/user/selectors';
 import styles from './Region.module.scss';
 
@@ -107,7 +107,7 @@ const Region = (): React.ReactElement => {
     dispatch(clearHFSummary());
     dispatch(clearClientRegistryStatus());
     dispatch(clearSideMenu());
-    dispatch(clearDesignationList());
+    dispatch(clearAppType());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

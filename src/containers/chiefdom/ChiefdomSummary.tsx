@@ -195,7 +195,7 @@ const ChiefdomSummary = () => {
       updateAdminRequest({
         data: payload,
         successCb: () => {
-          getChiefdomDetails(searchTerm);
+          getChiefdomDetails();
           setShowChiefdomAdminModal(false);
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
@@ -232,7 +232,7 @@ const ChiefdomSummary = () => {
         data: payload,
         successCb: () => {
           setShowChiefdomAdminModal(false);
-          getChiefdomDetails(searchTerm);
+          getChiefdomDetails();
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
             formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_CREATE_SUCCESS, chiefdomSName)
@@ -264,7 +264,7 @@ const ChiefdomSummary = () => {
             APPCONSTANTS.SUCCESS,
             formatUserToastMsg(APPCONSTANTS.CHIEFDOM_ADMIN_DELETE_SUCCESS, chiefdomSName)
           );
-          getChiefdomDetails(searchTerm);
+          getChiefdomDetails();
         },
         failureCb: (e: Error) =>
           toastCenter.error(
@@ -284,7 +284,7 @@ const ChiefdomSummary = () => {
   useEffect(() => {
     getChiefdomDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchTerm]);
 
   /**
    * Handler function for search

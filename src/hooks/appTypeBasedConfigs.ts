@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { APP_TYPE } from '../constants/appConstants';
-import { getAppTypeSelector } from '../store/user/selectors';
+import { countryIdSelector, getAppTypeSelector } from '../store/user/selectors';
 
 const commonLabels = {
   region: {
@@ -76,8 +76,18 @@ const NON_COMMUNITY = {
  * @return {string}
  */
 const useAppTypeConfigs = () => {
-  // const country = useSelector(countryIdSelector);
-  const appTypes = useSelector(getAppTypeSelector);
+  const appTypesFromUser = useSelector(getAppTypeSelector);
+  const userCountry = useSelector(countryIdSelector);
+  const appTypes = useMemo(() => {
+    // use app types from user object for super admin
+    if (appTypesFromUser && appTypesFromUser.length) {
+      return appTypesFromUser;
+    } else if (userCountry && userCountry.appTypes && userCountry.appTypes.length) {
+      // use app types from country for other admins
+      return userCountry.appTypes;
+    }
+    return [];
+  }, [appTypesFromUser, userCountry]);
 
   return useMemo(
     () =>

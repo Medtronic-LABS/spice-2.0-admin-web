@@ -133,7 +133,7 @@ const filterSPICERoles = (
       return isCommunity ? isCommunityCondition : siteUserCondition;
     }
     if (!isSiteUser && currentModule) {
-      return suiteNameLower === spiceRole.spice && HIERARCHY_ROLES[urlBased[currentModule]].includes(name);
+      return suiteNameLower === spiceRole.spice && HIERARCHY_ROLES[urlBased[currentModule]]?.includes(name);
     }
     return adminFormRoles;
   });
