@@ -123,7 +123,12 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
         ':districtId': districtId,
         ':chiefdomId': chiefdomId,
         ':healthFacilityId': healthFacilityId,
-        ':tenantId': regionId || appTypes.includes(APP_TYPE.NON_COMMUNITY) ? tenantId : countryTenantId
+        // below condition is for community app type and not include health facility role
+        ':tenantId':
+          regionId ||
+          (appTypes.includes(APP_TYPE.NON_COMMUNITY) || role === APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN
+            ? tenantId
+            : countryIdValue)
       };
       choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
         menu = { ...menu };
@@ -165,9 +170,12 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
           if (appTypes.includes(APP_TYPE.NON_COMMUNITY)) {
             isActive = !!matchPath(pathname, { exact: true, path: rest.route });
           } else {
+            const pathSegments = pathname.split('/');
             isActive =
               !!matchPath(pathname, { exact: true, path: rest.route }) ||
-              (displayName === healthFacility && pathname.split('/').includes(APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY));
+              (displayName === healthFacility &&
+                pathSegments.includes(APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY) &&
+                !pathSegments.includes('user'));
           }
           return (
             <NavLink

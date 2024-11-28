@@ -7,6 +7,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import { workflowListSelector } from '../../store/healthFacility/selectors';
 import { IClinicalWorkflow as IWorkflow } from '../../store/workflow/types';
 import { convertToCaptilize } from '../../utils/validation';
+import { getAppTypeSelector } from '../../store/user/selectors';
 
 // Props interface
 interface IWorkflowsProps {
@@ -131,6 +132,11 @@ const renderWorkflowByModuleType = (
           </Fragment>
         );
       })}
+      {form.getState().values.healthFacility?.clinicalWorkflows?.length === 0 && (
+        <div className='col-sm-6 col-12'>
+          <div className='mb-0dot5 input-field-label text-danger'>{`Select atleast one workflows`}</div>
+        </div>
+      )}
     </div>
   ) : (
     <div />
@@ -221,6 +227,11 @@ const Workflows: React.FC<IWorkflowsProps> = ({
         const defaultWorkflows =
           workflows?.filter((workflow) => workflow.moduleType === clinical && workflow.default)?.map((wf) => wf.id) ||
           [];
+        // Preserve existing clinical workflows if they exist
+        const existingClinicalWorkflows = form.getState().values.healthFacility?.clinicalWorkflows || [];
+        const allClinicalWorkflowIds = workflows
+          .filter((workflow) => workflow.moduleType === clinical)
+          .map((workflow) => workflow.id);
         const newData = {
           ...data,
           healthFacility: {
@@ -228,7 +239,7 @@ const Workflows: React.FC<IWorkflowsProps> = ({
             clinicalWorkflows:
               isHFEdit && workflowEditedData && workflowEditedData?.clinicalWorkflows
                 ? [...workflowEditedData.clinicalWorkflows, ...defaultWorkflows]
-                : newClinicalWorkflow(clinicalWorkflow, clinical),
+                : [...existingClinicalWorkflows, ...newClinicalWorkflow(clinicalWorkflow, clinical)],
             customizedWorkflows:
               isHFEdit && workflowEditedData && workflowEditedData?.customizedWorkflows
                 ? workflowEditedData.customizedWorkflows

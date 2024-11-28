@@ -2,17 +2,19 @@ import React, { useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import { ReactComponent as ArrowRight } from '../../assets/images/arrow-right-small.svg';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { convertToCaptilize } from '../../utils/validation';
 
 import styles from './SummaryCard.module.scss';
 
+export type IAppType = keyof typeof APP_TYPE;
 export interface ISummaryInfo {
   label: string;
   value: string | number;
   type?: 'number' | 'string';
   route: string;
+  appType?: IAppType[];
   disableEllipsis?: boolean;
   onClick?: (e: React.MouseEvent) => void;
 }
@@ -49,7 +51,9 @@ const SummaryCard = ({
   formId
 }: ISummaryCardProps) => {
   const history = useHistory();
-
+  const {
+    healthFacility: { s: healthFacilitySName }
+  } = NAME_CONSTANTS;
   /**
    * Handles the hover effect on the navigation link.
    * @param {React.MouseEvent<HTMLDivElement>} e - The mouse event
@@ -102,22 +106,32 @@ const SummaryCard = ({
           </div>
         </div>
       )}
-      {data.map(({ label, value, route, disableEllipsis, onClick }, i) => (
-        <Link
-          className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
-          key={`${label}_${i}`}
-          to={route}
-          onClick={(event: React.MouseEvent) => {
-            sessionStorageServices.setItem(APPCONSTANTS.ID, tenantId);
-            sessionStorageServices.setItem(APPCONSTANTS.FORM_ID, formId);
-            onClick?.(event);
-          }}
-          data-testid='summary-elements'
-        >
-          <div className='primary-title lh-1dot375'>{value}</div>
-          <div className={`subtle-small-text ${disableEllipsis ? '' : 'text-ellipsis'}`}>{label}</div>
-        </Link>
-      ))}
+      {data.map(({ label, value, route, disableEllipsis, onClick, appType }, i) =>
+        appType?.includes(APP_TYPE.NON_COMMUNITY as unknown as IAppType) || label === healthFacilitySName ? (
+          <Link
+            className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
+            key={`${label}_${i}`}
+            to={route}
+            onClick={(event: React.MouseEvent) => {
+              sessionStorageServices.setItem(APPCONSTANTS.ID, tenantId);
+              sessionStorageServices.setItem(APPCONSTANTS.FORM_ID, formId);
+              onClick?.(event);
+            }}
+            data-testid='summary-elements'
+          >
+            <div className='primary-title lh-1dot375'>{value}</div>
+            <div className={`subtle-small-text ${disableEllipsis ? '' : 'text-ellipsis'}`}>{label}</div>
+          </Link>
+        ) : (
+          <div
+            className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
+            data-testid='summary-elements'
+          >
+            <div className='primary-title lh-1dot375'>{value}</div>
+            <div className={`subtle-small-text ${disableEllipsis ? '' : 'text-ellipsis'}`}>{label}</div>
+          </div>
+        )
+      )}
       <div
         className={`align-self-center ${styles.moveForward} my-0dot5`}
         onMouseLeave={handleLinkHover}

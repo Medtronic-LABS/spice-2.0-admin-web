@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -155,40 +155,45 @@ const Region = (): React.ReactElement => {
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
       regions.map(
-        ({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId, appTypes }: any) => ({
-          title: name,
-          detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
-          setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
-          tenantId,
-          formId: regionId,
-          data: [
-            {
-              type: 'number',
-              value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
-              label: districtSName,
-              disableEllipsis: true,
-              route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
-              onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes })
-            },
-            {
-              type: 'number',
-              value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-              label: chiefdomSName,
-              route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
-              onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes })
-            },
-            {
-              type: 'number',
-              value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-              label: healthFacilitySName,
-              disableEllipsis: true,
-              route: PROTECTED_ROUTES.healthFacilityByRegion
-                .replace(':regionId', regionId)
-                .replace(':tenantId', tenantId),
-              onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes })
-            }
-          ]
-        })
+        ({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId, appTypes }: any) => {
+          return {
+            title: name,
+            detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
+            setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+            tenantId,
+            formId: regionId,
+            data: [
+              {
+                type: 'number',
+                value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
+                label: districtSName,
+                disableEllipsis: true,
+                route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+                appType: appTypes
+              },
+              {
+                type: 'number',
+                value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
+                label: chiefdomSName,
+                route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
+                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+                appType: appTypes
+              },
+              {
+                type: 'number',
+                value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
+                label: healthFacilitySName,
+                disableEllipsis: true,
+                route: PROTECTED_ROUTES.healthFacilityByRegion
+                  .replace(':regionId', regionId)
+                  .replace(':tenantId', tenantId),
+                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+                appType: appTypes
+              }
+            ]
+          };
+        }
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [regions, onDashboardExit]

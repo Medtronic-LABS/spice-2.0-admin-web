@@ -502,7 +502,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         data: {
           id,
           appTypes,
-          countryId,
+          countryId: countryIdValue,
           tenantIds: [Number(tenantId)]
         },
         successCb: () => {

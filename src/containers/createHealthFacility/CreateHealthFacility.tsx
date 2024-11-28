@@ -9,7 +9,7 @@ import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IDisabledRoles } from '../../components/userForm/UserForm';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -54,6 +54,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const history = useHistory();
   const workflows = useSelector(workflowListSelector);
   const isWorkflowLoading = useSelector(workflowLoadingSelector);
+  const { isCommunity } = useAppTypeConfigs();
   const loading = useSelector(healthFacilityLoadingSelector);
   const [submittedData, setSubmittedData] = useState({
     data: {
@@ -212,7 +213,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                 ...prev.data,
                 healthFacility: {
                   ...healthFacility,
-                  workflows: flows.map((v: any) => v?.id),
+                  clinicalWorkflows: isCommunity
+                    ? formInstance.current.getState().values.healthFacility?.clinicalWorkflows ||
+                      flows.map((v: any) => v?.id)
+                    : flows.map((v: any) => v?.id),
                   defaultTrueWorkflows: flows.filter((flow) => flow.default)?.map((f) => f?.id)
                 },
                 users
@@ -295,7 +299,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   ]);
 
   const [disabledRoleState, setDisabledRoles] = useState<IDisabledRoles[]>([]);
-
   /**
    * Renders the appropriate form component based on the current page number
    * @param pageNumber - The current page number
@@ -385,7 +388,14 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                 <button type='button' className='btn secondary-btn me-0dot625 px-1dot125 ms-auto' onClick={onCancel}>
                   {submittedData.pageNumber === PAGENUMBER.DETAILS ? 'Cancel' : 'Back'}
                 </button>
-                <button type='submit' className='btn primary-btn px-1dot75'>
+                <button
+                  type='submit'
+                  className='btn primary-btn px-1dot75'
+                  disabled={
+                    submittedData.pageNumber === PAGENUMBER.WORKFLOW &&
+                    !(form?.getState()?.values?.healthFacility?.clinicalWorkflows ?? []).length
+                  }
+                >
                   {[PAGENUMBER.USER, PAGENUMBER.SUBMIT].includes(submittedData.pageNumber) ? 'Submit' : 'Next'}
                 </button>
               </div>

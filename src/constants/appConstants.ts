@@ -444,6 +444,14 @@ export const NAME_CONSTANTS = {
     s: 'County',
     p: 'Counties'
   },
+  districtCommunity: {
+    s: 'District',
+    p: 'Districts'
+  },
+  chiefdomCommunity: {
+    s: 'Chiefdom',
+    p: 'Chiefdoms'
+  },
   chiefdom: {
     s: 'Sub County',
     p: 'Sub Counties'

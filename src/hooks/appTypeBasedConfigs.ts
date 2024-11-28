@@ -60,6 +60,14 @@ const NON_COMMUNITY = {
     s: 'County',
     p: 'Counties'
   },
+  districtCommunity: {
+    s: 'District',
+    p: 'Districts'
+  },
+  chiefdomCommunity: {
+    s: 'Chiefdom',
+    p: 'Chiefdoms'
+  },
   chiefdom: {
     s: 'Sub County',
     p: 'Sub Counties'
@@ -102,9 +110,9 @@ const useAppTypeConfigs = () => {
 
   return useMemo(
     () =>
-      Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
-        ? { ...COMMUNITY, appTypes }
-        : { ...NON_COMMUNITY, appTypes },
+      Array.isArray(appTypes) && appTypes.length === 1 && appTypes.includes(APP_TYPE.NON_COMMUNITY)
+        ? { ...NON_COMMUNITY, appTypes }
+        : { ...COMMUNITY, appTypes },
     [appTypes]
   );
 };

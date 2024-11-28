@@ -7,12 +7,18 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import UserForm from '../../components/userForm/UserForm';
 import ModalForm from '../../components/modal/ModalForm';
 import Loader from '../../components/loader/Loader';
-import { countryIdSelector, cultureListSelector, roleSelector, userIdSelector } from '../../store/user/selectors';
+import {
+  countryIdSelector,
+  cultureListSelector,
+  getAppTypeSelector,
+  roleSelector,
+  userIdSelector
+} from '../../store/user/selectors';
 import { IUserRole } from '../../store/healthFacility/types';
 import { fetchCultureListRequest, fetchUserByIdReq, updateUserRequest } from '../../store/user/actions';
 import toastCenter from '../../utils/toastCenter';
-import APPCONSTANTS from '../../constants/appConstants';
-import { IEditUserDetail } from '../../store/user/types';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
+import { IEditUserDetail, IRoles } from '../../store/user/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getAdminPayload } from '../../utils/formatObjectUtils';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -28,9 +34,9 @@ const MyProfile = (): React.ReactElement => {
   const [userDetails, setUserDetails] = useState<IEditUserDetail>();
   const [loading, setLoading] = useState<boolean>(false);
   const userForEdit = useRef({ users: [] as IEditUserDetail[] });
+  const { isCommunity } = useAppTypeConfigs();
   const { HEALTH_FACILITY_ADMIN } = APPCONSTANTS.ROLES;
-
-  const { appTypes } = useAppTypeConfigs();
+  const appTypes = useSelector(getAppTypeSelector);
   const role = useSelector(roleSelector);
   const cultureList = useSelector(cultureListSelector);
   const country = useSelector(countryIdSelector);
@@ -89,7 +95,11 @@ const MyProfile = (): React.ReactElement => {
         label: 'Role',
         value: formatRoles(userDetails || ({} as IEditUserDetail))
       },
-      { label: 'Timezone', value: userDetails?.timezone?.description, colClassName: 'col-12 col-sm-12' }
+      {
+        label: 'Timezone',
+        value: userDetails?.timezone?.description,
+        colClassName: 'col-12 col-sm-12'
+      }
     ];
     if (userDetails?.id && (userDetails.roles || []).some((userRole: IUserRole) => userRole.name === 'CHW')) {
       data.push(
@@ -161,12 +171,16 @@ const MyProfile = (): React.ReactElement => {
       {loading && <Loader />}
       <DetailCard buttonLabel='Edit My Profile' isEdit={true} header='My Profile' onButtonClick={handleEditClick}>
         <div className='row gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
-          {lableData.map(({ label, value, colClassName }) => (
-            <div key={label} className={colClassName || 'col-lg-4 col-sm-6'}>
-              <div className='charcoal-grey-text'>{label}</div>
-              <div className='primary-title text-ellipsis'>{value || '--'}</div>
-            </div>
-          ))}
+          {lableData.map(({ label, value, colClassName }) =>
+            label === 'Timezone' && isCommunity ? (
+              <></>
+            ) : (
+              <div key={label} className={colClassName || 'col-lg-4 col-sm-6'}>
+                <div className='charcoal-grey-text'>{label}</div>
+                <div className='primary-title text-ellipsis'>{value || '--'}</div>
+              </div>
+            )
+          )}
         </div>
       </DetailCard>
       <ModalForm

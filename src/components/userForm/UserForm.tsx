@@ -7,7 +7,7 @@ import BinIcon from '../../assets/images/bin.svg';
 import PlusIcon from '../../assets/images/plus_blue.svg';
 import ResetIcon from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { SPICE } from '../../constants/roleConstants';
+import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta, useRoleOptions } from '../../hooks/roleHook';
 import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
@@ -964,7 +964,6 @@ const UserForm = ({
       getRoleOptions();
     }
   }, [getRoleOptions]);
-
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
@@ -985,15 +984,9 @@ const UserForm = ({
             reportRoles = [],
             insightRoles = []
           } = form.getState().values?.users?.[index];
-          const isSPICE = (formSuiteAccess || []).some(
-            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.spice
-          );
-          const isReports = (formSuiteAccess || []).some(
-            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.reports
-          );
-          const isInsights = (formSuiteAccess || []).some(
-            (v: any) => v?.groupName === APPCONSTANTS.spiceRoleGrouped.insights
-          );
+          const isSPICE = (formSuiteAccess || []).some((v: any) => v?.groupName === SPICE);
+          const isReports = (formSuiteAccess || []).some((v: any) => v?.groupName === REPORTS);
+          const isInsights = (formSuiteAccess || []).some((v: any) => v?.groupName === INSIGHTS);
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
