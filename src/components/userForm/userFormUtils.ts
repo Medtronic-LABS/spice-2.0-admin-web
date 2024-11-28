@@ -7,9 +7,7 @@ import UserFormMeta from './userFormMeta';
 export const filterRolesByAppTypeFn = (fullRoles: IGroupRoles, appTypes: string[] = []) => {
   const filteredRoles: any = {};
 
-  if (appTypes.length > 1) {
-    return fullRoles;
-  } else {
+  if (appTypes.length === 1) {
     for (const [groupName, roles] of Object.entries(fullRoles)) {
       const filteredGroup = roles.filter((role) => role.appTypes.some((type) => (appTypes || []).includes(type)));
       if (filteredGroup.length > 0) {
@@ -17,6 +15,8 @@ export const filterRolesByAppTypeFn = (fullRoles: IGroupRoles, appTypes: string[
       }
     }
     return filteredRoles;
+  } else {
+    return fullRoles;
   }
 };
 

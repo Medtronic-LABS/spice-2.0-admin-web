@@ -1,6 +1,6 @@
 import React from 'react';
-import EditIcon from '../../assets/images/edit.svg';
-import PlusIcon from '../../assets/images/plus.svg';
+import { ReactComponent as EditIcon } from '../../assets/images/edit.svg';
+import { ReactComponent as PlusIcon } from '../../assets/images/plus.svg';
 import styles from './IconButton.module.scss';
 
 interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -41,22 +41,22 @@ const IconButton = ({
       );
     } else if (isEdit) {
       return (
-        <img
-          src={EditIcon}
+        <EditIcon
           className={`${styles.btnImgSpacing} ${buttonCustomClass ? '' : styles.btnImgFilter} ${
             buttonCustomStyle ? '' : styles.btnImgFilter
           }`}
-          alt='edit-icon'
+          aria-labelledby='edit-icon'
+          aria-label='edit-icon'
         />
       );
     } else {
       return (
-        <img
-          src={PlusIcon}
+        <PlusIcon
           className={`${styles.btnImgSpacing} ${buttonCustomClass ? '' : styles.btnImgFilter} ${
             buttonCustomStyle ? '' : styles.btnImgFilter
           }`}
-          alt='plus-icon'
+          aria-labelledby='plus-icon'
+          aria-label='plus-icon'
         />
       );
     }

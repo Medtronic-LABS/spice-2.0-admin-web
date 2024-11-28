@@ -9,7 +9,7 @@ import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IDisabledRoles } from '../../components/userForm/UserForm';
-import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -290,6 +290,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     appTypes,
     countryId,
     dispatch,
+    isCommunity,
     onCreateFailure,
     onCreateSuccess,
     regionId,

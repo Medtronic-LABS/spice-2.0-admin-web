@@ -3,9 +3,9 @@ import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import BinIcon from '../../assets/images/bin.svg';
-import PlusIcon from '../../assets/images/plus_blue.svg';
-import ResetIcon from '../../assets/images/reset.svg';
+import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
+import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
+import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
 import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -539,7 +539,8 @@ const UserForm = ({
         })
       );
     }
-  }, [countryId, dispatch, isProfile, appTypeBasedRoles, isRegionCreate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countryId, dispatch, isProfile, isRegionCreate]);
 
   /**
    * Checks if there is an error in the form field.
@@ -571,7 +572,7 @@ const UserForm = ({
                       appTypeBasedRoles.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)
                     ];
                   }
-                  if ((isAdminForm && defaultSelectedRole) || isHFCreate) {
+                  if (isAdminForm && defaultSelectedRole) {
                     const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
                     dataToPush.suiteAccess = [getSpiceGroupName(suiteAccess)];
                   }
@@ -579,7 +580,7 @@ const UserForm = ({
                 }
           }
         >
-          <img className='me-0dot5' src={PlusIcon} alt='' />
+          <PlusIcon className='me-0dot5' aria-labelledby='plus-icon' aria-label='plus-icon' />
           {isHF || isHFCreate ? APPCONSTANTS.ADD_ANOTHER_USER : APPCONSTANTS.ADD_ANOTHER_ADMIN}
         </div>
       )
@@ -605,7 +606,7 @@ const UserForm = ({
             fields.remove(index);
           }}
         >
-          <img className='me-0dot5' src={BinIcon} alt='' />
+          <BinIcon className='me-0dot5' aria-labelledby='bin-icon' aria-label='bin-icon' />
           {'Remove User'}
         </div>
       )
@@ -635,7 +636,7 @@ const UserForm = ({
             resetAdminForm(fields, index);
           }}
         >
-          <img className='me-0dot5' src={ResetIcon} alt='' />
+          <ResetIcon className='me-0dot5' aria-labelledby='reset-icon' aria-label='reset-icon' />
           Reset Fields
         </div>
       </div>
@@ -963,7 +964,6 @@ const UserForm = ({
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
           // SUITE options
           const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
-          // getRoleOptions(index);
           const {
             mandatorySuiteAccess,
             selectedRoles: mandatoryRoles = [],

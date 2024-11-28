@@ -94,6 +94,7 @@ const UserList = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         roleNames: selectedRole || [],
         isSiteUsers: true,
+        tenantBased: role === HEALTH_FACILITY_ADMIN,
         tenantId,
         tenantIds: role === HEALTH_FACILITY_ADMIN || role === CHIEFDOM_ADMIN ? [tenantId] : selectedFacility || [],
         failureCb: (e: Error) => {
