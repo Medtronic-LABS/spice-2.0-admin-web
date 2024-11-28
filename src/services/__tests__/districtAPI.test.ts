@@ -45,7 +45,7 @@ describe('District APIs', () => {
 
     mockAxios.onPost('/admin-service/district/district-list').reply(200, {});
 
-    await fetchDistrictList(tenantId, isActive, skip, limit, appTypes, search);
+    await fetchDistrictList(1, tenantId, isActive, skip, limit, appTypes, search);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district/district-list');
@@ -69,7 +69,7 @@ describe('District APIs', () => {
 
     mockAxios.onPost('/admin-service/district/district-list').reply(200, {});
 
-    await fetchDistrictList(tenantId, isActive, skip, limit, appTypes, '');
+    await fetchDistrictList(1, tenantId, isActive, skip, limit, appTypes, '');
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district/district-list');

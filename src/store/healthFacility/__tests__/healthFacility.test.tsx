@@ -505,6 +505,7 @@ describe('Create Health Facility User: CREATE_HEALTH_FACILITY_USER_REQUEST', () 
 describe('Fetch Peer Supervisor List for Health Facility: FETCH_PEER_SUPERVISOR_LIST_REQUEST', () => {
   it('Fetch peer supervisor list and dispatch success', async () => {
     const tenantIds = [2];
+    const appTypes = ['COMMUNITY'];
     const successCb = jest.fn();
     const hfPeerSupervisorSpy = jest.spyOn(hfService, 'fetchPeerSupervisorList').mockImplementation(
       () =>
@@ -522,6 +523,7 @@ describe('Fetch Peer Supervisor List for Health Facility: FETCH_PEER_SUPERVISOR_
       {
         type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
         tenantIds,
+        appTypes,
         successCb
       }
     ).toPromise();
@@ -538,6 +540,7 @@ describe('Fetch Peer Supervisor List for Health Facility: FETCH_PEER_SUPERVISOR_
     const error = new Error('Failed to fetch supervisor list');
     const failureCb = jest.fn();
     const tenantIds = [2];
+    const appTypes = ['COMMUNITY'];
     const hfPeerSupervisorSpy = jest
       .spyOn(hfService, 'fetchPeerSupervisorList')
       .mockImplementation(() => Promise.reject(error));
@@ -550,6 +553,7 @@ describe('Fetch Peer Supervisor List for Health Facility: FETCH_PEER_SUPERVISOR_
       {
         type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_LIST_REQUEST,
         tenantIds,
+        appTypes,
         failureCb
       }
     ).toPromise();
@@ -1072,7 +1076,7 @@ describe('Fetch Country List from Health Facility: FETCH_COUNTRY_LIST_REQUEST', 
 
 describe('Fetch Peer Supervisor Validation: FETCH_PEER_SUPERVISOR_VALIDATION', () => {
   it('Fetch peer supervisor and dispatches success', async () => {
-    const { ids, tenantId } = hfIdsTiRequestPayload;
+    const { ids, tenantId, appTypes } = hfIdsTiRequestPayload;
     const successCb = jest.fn();
     const peerSupervisorValidationSpy = jest
       .spyOn(hfService, 'peerSupervisorValidation')
@@ -1085,6 +1089,7 @@ describe('Fetch Peer Supervisor Validation: FETCH_PEER_SUPERVISOR_VALIDATION', (
       peerSupervisorValidationSagaRequest,
       {
         type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+        appTypes,
         ids,
         tenantId,
         successCb
@@ -1097,7 +1102,7 @@ describe('Fetch Peer Supervisor Validation: FETCH_PEER_SUPERVISOR_VALIDATION', (
   it('Fetch peer supervisor and dispatches failure', async () => {
     const error = new Error('Failed to validate peer supervisor');
     const failureCb = jest.fn();
-    const { ids, tenantId } = hfIdsTiRequestPayload;
+    const { ids, tenantId, appTypes } = hfIdsTiRequestPayload;
     const peerSupervisorValidationSpy = jest
       .spyOn(hfService, 'peerSupervisorValidation')
       .mockImplementation(() => Promise.reject(error));
@@ -1109,6 +1114,7 @@ describe('Fetch Peer Supervisor Validation: FETCH_PEER_SUPERVISOR_VALIDATION', (
       peerSupervisorValidationSagaRequest,
       {
         type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
+        appTypes,
         ids,
         tenantId,
         failureCb

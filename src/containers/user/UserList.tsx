@@ -37,7 +37,7 @@ import {
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import { getUserPayload } from '../../utils/commonUtils';
+import { getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
@@ -150,6 +150,8 @@ const UserList = (): React.ReactElement => {
         deleteHFUserRequest({
           data: {
             id,
+            appTypes,
+            countryId,
             tenantIds: organizations.map((s) => Number(s.id))
           },
           successCb: () => {
@@ -162,7 +164,7 @@ const UserList = (): React.ReactElement => {
         })
       );
     },
-    [dispatch, refreshHFUserList]
+    [appTypes, countryId, dispatch, refreshHFUserList]
   );
 
   /**
@@ -245,7 +247,8 @@ const UserList = (): React.ReactElement => {
         userFormData: users,
         countryId: countryIdValue,
         tenantId,
-        spiceRolesGroup: rolesGrouped?.SPICE
+        spiceRolesGroup: rolesGrouped?.SPICE,
+        appTypes
       });
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
@@ -265,7 +268,7 @@ const UserList = (): React.ReactElement => {
         }
       );
     },
-    [rolesGrouped?.SPICE, isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, siteUserSuccess, tenantId]
+    [countryIdValue, tenantId, rolesGrouped?.SPICE, appTypes, onSubmitHandler, isOpenUserModal.isEdit, siteUserSuccess]
   );
 
   /**

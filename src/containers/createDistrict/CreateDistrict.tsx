@@ -1,25 +1,27 @@
 import { FormApi, Tools } from 'final-form';
-import React, { useCallback, useRef } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
+import React, { useCallback, useRef } from 'react';
+import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, useParams } from 'react-router-dom';
 
-import DistrictForm from './DistrictForm';
-import FormContainer from '../../components/formContainer/FormContainer';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import { PROTECTED_ROUTES } from '../../constants/route';
-import { AppState } from '../../store/rootReducer';
-import { createDistrictRequest } from '../../store/district/actions';
-import { IDistrictPayload } from '../../store/district/types';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import DistrictFormIcon from '../../assets/images/info-grey.svg';
 import DistrictAdminFormIcon from '../../assets/images/avatar-o.svg';
+import DistrictFormIcon from '../../assets/images/info-grey.svg';
+import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { createDistrictRequest } from '../../store/district/actions';
+import { IDistrictPayload } from '../../store/district/types';
+import { AppState } from '../../store/rootReducer';
 import { countryIdSelector } from '../../store/user/selectors';
-import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
+import { formatUserToastMsg } from '../../utils/commonUtils';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import DistrictForm from './DistrictForm';
 
 interface IDistrictFormValues {
   district: {
@@ -45,8 +47,9 @@ const CreateDistrict: React.FC = () => {
   const loading = useSelector((state: AppState) => state.district.loading);
   const countryId = useSelector(countryIdSelector)?.id;
   const {
+    appTypes,
     district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * Resets the state of form fields that contain a specified substring in their key.
@@ -92,7 +95,7 @@ const CreateDistrict: React.FC = () => {
     ({ district, users }: IDistrictFormValues) => {
       const data = {
         name: district.name.trim(),
-        users: getAdminPayload({ userFormData: users, isFromList: false, countryId: regionId }),
+        users: getAdminPayload({ userFormData: users, appTypes, isFromList: false, countryId: regionId }),
         countryId: Number(regionId),
         parentOrganizationId: Number(tenantId),
         tenantId: Number(tenantId)

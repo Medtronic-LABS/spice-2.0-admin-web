@@ -49,11 +49,12 @@ export const deleteHealtFacility = (data: IDeleteHFPayload) =>
     data
   });
 
-export const fetchHFSummary = (tenantId: string, id: number) =>
+export const fetchHFSummary = (tenantId: string, id: number, appTypes: string[]) =>
   axios({
     method: 'POST',
     url: '/admin-service/healthfacility/details',
     data: {
+      appTypes,
       tenantId,
       id
     }

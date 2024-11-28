@@ -747,6 +747,7 @@ export interface IUnlockUsersRequest {
 
 export interface IUserPayload {
   id?: number;
+  appTypes: string[];
   firstName: string;
   lastName: string;
   gender: string;

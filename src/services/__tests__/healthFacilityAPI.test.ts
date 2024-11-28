@@ -84,10 +84,11 @@ describe('Health Facility APIs', () => {
 
   it('fetchDistrictList sends a GET request to /admin-service/district-list with correct data', async () => {
     const countryId = 1;
+    const appTypes = ['NON_COMMUNITY'];
 
     mockAxios.onPost('/admin-service/district-list').reply(200, {});
 
-    await fetchDistrictList(countryId);
+    await fetchDistrictList(countryId, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district-list');
@@ -100,10 +101,11 @@ describe('Health Facility APIs', () => {
     /admin-service/chiefdom-list with correct data`, async () => {
     const countryId = 1;
     const districtId = 1;
+    const appTypes = ['COMMUNITY'];
 
     mockAxios.onPost('/admin-service/chiefdom-list').reply(200, {});
 
-    await fetchChiefdomList(countryId, districtId);
+    await fetchChiefdomList(countryId, districtId, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/chiefdom-list');
@@ -141,10 +143,11 @@ describe('Health Facility APIs', () => {
   it('fetchHFSummary sends a POST request to /admin-service/healthfacility/details with correct data', async () => {
     const tenantId = '1';
     const id = 2;
+    const appTypes = ['COMMUNITY'];
 
     mockAxios.onPost('/admin-service/healthfacility/details').reply(200, {});
 
-    await fetchHFSummary(tenantId, id);
+    await fetchHFSummary(tenantId, id, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility/details');
@@ -219,7 +222,9 @@ describe('Health Facility APIs', () => {
   it('deleteHFUser sends a POST request to /admin-service/healthfacility/user-remove with correct data', async () => {
     const data = {
       id: 1,
-      tenantIds: [4]
+      countryId: 1,
+      tenantIds: [4],
+      appTypes: ['COMMUNITY']
     };
 
     mockAxios.onPost('/admin-service/healthfacility/user-remove').reply(200, {});
@@ -272,10 +277,11 @@ describe('Health Facility APIs', () => {
     const countryId = 1;
     const districtId = 1;
     const chiefdomId = 1;
+    const appTypes = ['NON_COMMUNITY'];
 
     mockAxios.onPost('/admin-service/villages-list').reply(200, {});
 
-    await fetchVillagesList(countryId, districtId, chiefdomId);
+    await fetchVillagesList(countryId, districtId, chiefdomId, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/villages-list');
@@ -288,10 +294,11 @@ describe('Health Facility APIs', () => {
     const districtId = 1;
     const chiefdomId = 1;
     const healthFacilityId = 1;
+    const appTypes = ['NON_COMMUNITY'];
 
     mockAxios.onPost('admin-service/unlinked-villages-list').reply(200, {});
 
-    await fetchUnlinkedVillagesAPI(countryId, districtId, chiefdomId, healthFacilityId);
+    await fetchUnlinkedVillagesAPI(countryId, districtId, chiefdomId, appTypes, healthFacilityId);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('admin-service/unlinked-villages-list');
@@ -306,10 +313,11 @@ describe('Health Facility APIs', () => {
   it('fetchVillagesListfromHF sends a POST request to /admin-service/healthfacility/unlinked-villages-list with correct data', async () => {
     const userId = 1;
     const tenantIds = [1];
+    const appTypes = ['NON_COMMUNITY'];
 
     mockAxios.onPost('/admin-service/healthfacility/unlinked-villages-list').reply(200, {});
 
-    await fetchVillagesListfromHF(tenantIds, userId);
+    await fetchVillagesListfromHF(tenantIds, userId, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility/unlinked-villages-list');
@@ -322,10 +330,11 @@ describe('Health Facility APIs', () => {
   it(`fetchPeerSupervisorList sends a POST request to
     /user-service/user/peer-supervisors with correct data`, async () => {
     const tenantIds = [1];
+    const appTypes = ['NON_COMMUNITY'];
 
     mockAxios.onPost('/user-service/user/peer-supervisors').reply(200, {});
 
-    await fetchPeerSupervisorList(tenantIds);
+    await fetchPeerSupervisorList(tenantIds, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/peer-supervisors');

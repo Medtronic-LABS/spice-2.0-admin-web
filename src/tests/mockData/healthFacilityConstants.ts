@@ -10,6 +10,7 @@ const CLINICAL_WORKFLOWS = [
     id: '8',
     createdBy: null,
     updatedBy: null,
+    appTypes: ['COMMUNITY'],
     createdAt: '"2024-05-08T11:23:48+00:00',
     updatedAt: '"2024-05-08T11:23:48+00:00',
     name: 'Mother and Neonate',
@@ -64,6 +65,7 @@ const HF_USERS_REQUEST = {
 
 const HF_USER = {
   id: 682,
+  appTypes: ['COMMUNITY'],
   firstName: 'Mariot',
   lastName: 'CHO',
   gender: 'Male',
@@ -156,6 +158,7 @@ const HF_SUMMARY = {
   phuFocalPersonName: 'Samir',
   phuFocalPersonNumber: '2453423623',
   address: 'Gulmarg',
+  appTypes: ['NON_COMMUNITY'],
   chiefdom: {
     id: 62,
     name: 'Gulmarg',
@@ -300,6 +303,7 @@ const CULTURE_LIST = [
     updatedAt: '2024-05-06T09:52:46+00:00',
     name: 'English',
     code: 'en',
+    appTypes: ['COMMUNITY'],
     active: true,
     deleted: false
   }
@@ -312,16 +316,20 @@ const COUNTRY_LIST = {
 
 const HF_TI_ID = {
   id: 235,
+  appTypes: ['COMMUNITY'],
   tenantId: 348
 };
 
 const HF_ID_TIS = {
   id: 757,
+  countryId: 1,
+  appTypes: ['NON_COMMUNITY'],
   tenantIds: [349]
 };
 
 const HF_IDS_TI = {
   ids: [757],
+  appTypes: ['COMMUNITY'],
   tenantId: 349,
   healthFacilityId: 23,
   linkedVillageIds: [1, 2]

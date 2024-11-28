@@ -200,7 +200,7 @@ export const useRoleMeta = ({
       // show report hf list condition
       if (roles.length && currentSuite === REPORTS) {
         isShowReportHFList =
-          !isHFCreate || roles.some((userRole: IRoles) => facilityReportAdminRole.includes(userRole.name));
+          !isHFCreate && roles.some((userRole: IRoles) => facilityReportAdminRole.includes(userRole.name));
       }
       // show insight hf list condition
       if (!!roles.length && currentSuite === INSIGHTS) {
@@ -462,7 +462,9 @@ export const useRoleOptions = ({
 
     // returns the REPORTS roles based on the consitions
     const reportRoleOptions =
-      (newRoles.REPORTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
+      (newRoles.REPORTS || [])
+        .filter((role: IRoles) => (isHFCreate || isHF ? !reportAdminRole.includes(role.name) : true))
+        .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
 
     // returns the INSIGHTS roles based on the consitions
     const insightRoleOptions =

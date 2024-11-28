@@ -615,12 +615,14 @@ export const fetchWorkflowListRequest = ({
 export const validationPeerSupervisor = ({
   ids,
   tenantId,
+  appTypes,
   successCb,
   failureCb
 }: Omit<IPeerSupervisorValidation, 'type'>): IPeerSupervisorValidation => ({
   type: HF_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
   ids,
   tenantId,
+  appTypes,
   successCb,
   failureCb
 });
@@ -642,6 +644,7 @@ export const fetchPeerSupervisorValidationsFailure = (error: Error): any => ({
 
 export const validateLinkedRestrictionsRequest = ({
   ids,
+  appTypes,
   tenantId,
   healthFacilityId,
   linkedVillageIds,
@@ -650,6 +653,7 @@ export const validateLinkedRestrictionsRequest = ({
 }: Omit<IValidateLinkedRestrictions, 'type'>): IValidateLinkedRestrictions => ({
   type: HF_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST,
   ids,
+  appTypes,
   tenantId,
   healthFacilityId,
   linkedVillageIds,

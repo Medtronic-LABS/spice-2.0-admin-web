@@ -16,9 +16,9 @@ import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { fetchCountryListRequest } from '../../store/healthFacility/actions';
 import { createRegionRequest } from '../../store/region/actions';
 import { AppState } from '../../store/rootReducer';
-import { getAdminPayload } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import RegionForm from './RegionForm';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
 
 export interface IRegionFormValues {
   region: {
@@ -74,7 +74,7 @@ const CreateRegion: React.FC = () => {
       const data = {
         ...region,
         name: region.name?.trim(),
-        users: getAdminPayload({ userFormData: users, isFromList: false })
+        users: getAdminPayload({ userFormData: users, appTypes, isFromList: false })
       };
       dispatch(
         createRegionRequest({
@@ -89,7 +89,7 @@ const CreateRegion: React.FC = () => {
         })
       );
     },
-    [dispatch, history]
+    [appTypes, dispatch, history]
   );
 
   return (

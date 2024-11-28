@@ -1,30 +1,30 @@
 import { FormApi, Tools } from 'final-form';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
-import { Form, FormRenderProps } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
-import FormContainer from '../../components/formContainer/FormContainer';
-import SiteDetailsIcon from '../../assets/images/info-grey.svg';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Form, FormRenderProps } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
 import SiteAddUserIcon from '../../assets/images/avatar-o.svg';
+import SiteDetailsIcon from '../../assets/images/info-grey.svg';
+import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IDisabledRoles } from '../../components/userForm/UserForm';
-import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
-import Workflows from '../healthFacility/Workflows';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { formatHealthFacility } from '../healthFacility/HealthFacilitySummary';
-import { IClinicalWorkflows, IHFUserGet, IHealthFacility, IWorkflow } from '../../store/healthFacility/types';
+import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
 import {
   healthFacilityLoadingSelector,
   workflowListSelector,
   workflowLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { roleSelector, countryIdSelector, userRolesSelector } from '../../store/user/selectors';
-import sessionStorageServices from '../../global/sessionStorageServices';
-import { getUserPayload } from '../../utils/commonUtils';
+import { IClinicalWorkflows, IHFUserGet, IHealthFacility, IWorkflow } from '../../store/healthFacility/types';
+import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import Workflows from '../healthFacility/Workflows';
+import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 
 interface IMatchParams {
   regionId?: string;
@@ -74,8 +74,9 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const role = useSelector(roleSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const {
+    appTypes,
     healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   useEffect(() => {
     formInstance.current?.subscribe(
@@ -249,13 +250,14 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         clinicalWFs = healthFacility.defaultTrueWorkflows;
       }
       const postUserData = getUserPayload({
+        appTypes,
         userFormData: users,
         countryId,
         isHFCreate: true,
         spiceRolesGroup: rolesGrouped?.SPICE
       });
       const postData = {
-        ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId),
+        ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId, appTypes),
         users: postUserData
       };
       if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
@@ -281,6 +283,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     PAGENUMBER.SUBMIT,
     PAGENUMBER.USER,
     PAGENUMBER.WORKFLOW,
+    appTypes,
     countryId,
     dispatch,
     onCreateFailure,

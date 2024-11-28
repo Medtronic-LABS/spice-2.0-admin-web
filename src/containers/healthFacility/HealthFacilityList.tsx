@@ -10,7 +10,8 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
 import { useDispatch, useSelector } from 'react-redux';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
 import {
   clearHFWorkflowList,
@@ -26,10 +27,10 @@ import {
   healthFacilityLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
-import { getAppTypeSelector, roleSelector } from '../../store/user/selectors';
+import { roleSelector } from '../../store/user/selectors';
+import { formatHealthFacility } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
-import { formatHealthFacility } from './HealthFacilitySummary';
 
 /**
  * Interface for modal state
@@ -62,13 +63,13 @@ const HealthFacilityList = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
   const countryId = useCountryId();
-  const appTypes = useSelector(getAppTypeSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const {
+    appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
@@ -234,6 +235,7 @@ const HealthFacilityList = (): React.ReactElement => {
     dispatch(
       validateLinkedRestrictionsRequest({
         ids: missingIds,
+        appTypes,
         tenantId: hfTenantId,
         healthFacilityId: healthFacility.id,
         linkedVillageIds,
@@ -266,7 +268,7 @@ const HealthFacilityList = (): React.ReactElement => {
       }
       validateLinkedRestrictions(missingIds, healthFacility.tenantId, healthFacility, linkedVillagesIds);
     } else {
-      const postData = formatHealthFacility(healthFacility, countryId);
+      const postData = formatHealthFacility(healthFacility, countryId, appTypes);
       if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(
           updateHFDetailsRequest({

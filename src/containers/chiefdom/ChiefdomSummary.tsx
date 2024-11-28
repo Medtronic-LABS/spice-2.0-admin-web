@@ -1,28 +1,27 @@
-import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router';
 
+import ChiefdomForm from '../../components/chiefdomForm/ChiefdomForm';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
+import UserForm from '../../components/userForm/UserForm';
+import APPCONSTANTS from '../../constants/appConstants';
 import { fetchChiefdomDetail, updateChiefdomReq } from '../../store/chiefdom/actions';
 import {
+  chiefdomLoadingSelector,
   getChiefdomDetailSelector,
-  getOuAdminsSelector,
-  chiefdomLoadingSelector
+  getOuAdminsSelector
 } from '../../store/chiefdom/selectors';
 import { IChiefdomAdmin, IChiefdomDetail } from '../../store/chiefdom/types';
-import ChiefdomForm from '../../components/chiefdomForm/ChiefdomForm';
-import UserForm from '../../components/userForm/UserForm';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { roleSelector } from '../../store/user/selectors';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
-import { IRoles, ITimezone } from '../../store/user/types';
-import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
 import {
   createHFUserRequest as createAdminRequest,
@@ -30,6 +29,9 @@ import {
   updateHFUserRequest as updateAdminRequest
 } from '../../store/healthFacility/actions';
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
+import { IRoles, ITimezone } from '../../store/user/types';
+import { formatUserToastMsg } from '../../utils/commonUtils';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
 
 interface IAdminEditFormValues {
   reports: IRoles[];
@@ -61,11 +63,13 @@ const ChiefdomSummary = () => {
   const currentRole = useSelector(roleSelector);
   const adminLoading = useSelector(healthFacilityLoadingSelector);
   const isReadOnly = currentRole === APPCONSTANTS.ROLES.CHIEFDOM_ADMIN;
+  const countryId = useCountryId();
   const { chiefdomId, tenantId }: { chiefdomId: string; tenantId: string } = useParams();
   const {
+    appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
   const countryIdValue = useCountryId();
 
   // Edit Chiefdom
@@ -184,6 +188,7 @@ const ChiefdomSummary = () => {
    */
   const handleChiefdomAdminEdit = ({ users }: { users: IAdminEditFormValues[] }) => {
     const userObj = getAdminPayload({
+      appTypes,
       userFormData: users,
       countryId: countryIdValue,
       tenantId: Number(tenantId),
@@ -220,6 +225,7 @@ const ChiefdomSummary = () => {
    */
   const handleChiefdomAdminCreate = ({ users }: { users: IAdminEditFormValues[] }) => {
     const userObj = getAdminPayload({
+      appTypes,
       userFormData: users,
       countryId: countryIdValue,
       tenantId: Number(ChiefdomDetail.tenantId),
@@ -258,7 +264,7 @@ const ChiefdomSummary = () => {
   const handleChiefdomAdminDelete = ({ data: { id } }: { data: IChiefdomAdmin }) => {
     dispatch(
       deleteAdminRequest({
-        data: { id: Number(id), tenantIds: [Number(tenantId)] },
+        data: { id: Number(id), countryId, appTypes, tenantIds: [Number(tenantId)] },
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,

@@ -9,8 +9,10 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useRoleOptions } from '../../hooks/roleHook';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import {
   clearSupervisorList,
@@ -30,12 +32,11 @@ import {
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import { countryIdSelector, emailSelector, userRolesSelector } from '../../store/user/selectors';
-import { getAdminPayload } from '../../utils/commonUtils';
+import { IRoles } from '../../store/user/types';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './adminListMeta';
-import { useRoleOptions } from '../../hooks/roleHook';
-import { IRoles } from '../../store/user/types';
 
 interface IMatchParams {
   tenantId: string;
@@ -60,9 +61,10 @@ const UserList = (): React.ReactElement => {
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const {
+    appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
   const { filterSpiceCommonRoles, filterSpiceAdminRoles } = APPCONSTANTS;
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -147,6 +149,8 @@ const UserList = (): React.ReactElement => {
         deleteHFUserRequest({
           data: {
             id,
+            appTypes,
+            countryId,
             tenantIds: organizations.map((s) => Number(s.id))
           },
           successCb: () => {
@@ -159,7 +163,7 @@ const UserList = (): React.ReactElement => {
         })
       );
     },
-    [dispatch, refreshHFUserList]
+    [appTypes, countryId, dispatch, refreshHFUserList]
   );
 
   /**
@@ -237,6 +241,7 @@ const UserList = (): React.ReactElement => {
   const handleEditSubmit = useCallback(
     ({ users }: { users: IHFUserGet[] }) => {
       const userObj = getAdminPayload({
+        appTypes,
         userFormData: users,
         countryId: countryIdValue,
         tenantId
@@ -254,7 +259,7 @@ const UserList = (): React.ReactElement => {
         );
       });
     },
-    [isOpenUserModal.isEdit, onSubmitHandler, countryIdValue, adminSuccess, tenantId]
+    [appTypes, countryIdValue, tenantId, onSubmitHandler, isOpenUserModal.isEdit, adminSuccess]
   );
 
   /**

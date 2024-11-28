@@ -3,14 +3,15 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
-import ModalForm from '../../components/modal/ModalForm';
 import { FormApi } from 'final-form';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
+import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
+import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import {
   clearHFWorkflowList,
@@ -40,8 +41,9 @@ import {
   IPeerSupervisor,
   IVillages
 } from '../../store/healthFacility/types';
-import { countryIdSelector, getAppTypeSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import { formatRoles, getUserPayload } from '../../utils/commonUtils';
+import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { formatRoles } from '../../utils/commonUtils';
+import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 
@@ -61,42 +63,6 @@ interface IModalState {
   isOpen: boolean;
   isNextClicked: boolean;
 }
-
-/**
- * Constructs a payload for health facility data.
- * This function formats the health facility object by extracting necessary fields
- * and organizing them into the structure expected by the API.
- *
- * @param {Object} hf - The health facility data object.
- * @param {number | string} countryId - The country ID associated with the health facility.
- *
- * @returns {Object} - The formatted health facility data payload.
- */
-export const formatHealthFacility = (hf: any, countryId: number | string) => {
-  const postData = {
-    id: hf.id,
-    name: hf.name.trim(),
-    type: hf.type.name,
-    phuFocalPersonName: hf.phuFocalPersonName,
-    phuFocalPersonNumber: hf.phuFocalPersonNumber,
-    address: hf.address,
-    district: hf.district,
-    chiefdom: hf.chiefdom,
-    cityName: hf.city.name,
-    latitude: hf.latitude,
-    longitude: hf.longitude,
-    postalCode: hf.postalCode,
-    country: { id: countryId },
-    language: hf.language.name,
-    parentTenantId: hf.chiefdom?.tenantId,
-    tenantId: hf.tenantId,
-    linkedSupervisorIds: (hf.peerSupervisors || []).map(({ id }: { id: number }) => id),
-    linkedVillageIds: (hf.linkedVillages || []).map(({ id }: { id: number }) => id),
-    customizedWorkflowIds: hf.customizedWorkflows || [],
-    clinicalWorkflowIds: hf.clinicalWorkflows
-  };
-  return postData;
-};
 
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -124,11 +90,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
   const {
+    appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
-  const appTypes = useSelector(getAppTypeSelector);
+    healthFacility: { s: healthFacilitySName },
+    hfDetails: { supervisor: supervisorLabel }
+  } = useAppTypeConfigs();
   const lableData = useMemo(
     () => [
       { label: `${healthFacilitySName} Name`, value: healthFacility?.name },
@@ -144,9 +111,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: 'Facility ID', value: healthFacility?.postalCode },
       { label: 'Language', value: healthFacility?.language },
       {
-        label: appTypes.includes(APP_TYPE.NON_COMMUNITY)
-          ? 'Linked Community Health Assistant'
-          : 'Linked Peer Supervisors',
+        label: supervisorLabel,
         value: healthFacility?.peerSupervisors,
         subKey: 'name',
         style: { col: 'col-12', subCol: 'col-3' }
@@ -346,6 +311,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     dispatch(
       validateLinkedRestrictionsRequest({
         ids: missingIds,
+        appTypes,
         tenantId: hfTenantId,
         healthFacilityId: healthFacility.id,
         linkedVillageIds,
@@ -371,7 +337,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    * @returns {void}
    */
   const handleHFEditDetailsSubmit = ({ healthFacility: healthFacilityData }: { healthFacility: IHealthFacility }) => {
-    const postData = formatHealthFacility(healthFacilityData, countryIdValue);
+    const postData = formatHealthFacility(healthFacilityData, countryIdValue, appTypes);
     if (!editHFDetailsModal.isNextClicked) {
       const peerSupervisors = healthFacilityData?.peerSupervisors ?? [];
       const linkedVillages = healthFacilityData?.linkedVillages ?? [];
@@ -445,6 +411,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    */
   const handleEditUserSubmit = ({ users }: { users: IHFUserPost[] }) => {
     const userObj = getUserPayload({
+      appTypes,
       userFormData: users,
       countryId: countryIdValue,
       tenantId,
@@ -505,6 +472,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    */
   const handleAddUserSubmit = ({ users }: { users: IHFUserPost[] }): void => {
     const userObj = getUserPayload({
+      appTypes,
       userFormData: users,
       countryId: countryIdValue,
       tenantId,
@@ -533,6 +501,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
       deleteHFUserRequest({
         data: {
           id,
+          appTypes,
+          countryId,
           tenantIds: [Number(tenantId)]
         },
         successCb: () => {
@@ -615,9 +585,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
             onButtonClick={openHFEditModal}
           >
             <div className='row gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
-              {lableData.map(({ label, value, style, subKey }) => (
-                <div key={label} className={`${style?.col ? style.col : 'col-lg-4 col-sm-6'}`}>
-                  <div className='fs-0dot875 charcoal-grey-text'>{label}</div>
+              {lableData.map(({ label, value, style, subKey }, index) => (
+                <div
+                  key={typeof label === 'string' ? label : index}
+                  className={`${style?.col ? style.col : 'col-lg-4 col-sm-6'}`}
+                >
+                  <div className='fs-0dot875 charcoal-grey-text'>{typeof label === 'string' ? label : label.s}</div>
                   {Array.isArray(value) ? (
                     <ol className='row'>
                       {[...value].map((data: IPeerSupervisor | IVillages) => (

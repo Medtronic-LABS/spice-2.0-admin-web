@@ -19,6 +19,7 @@ import { IDistrict } from '../../store/district/types';
 import { formatDate } from '../../utils/validation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import useCountryId from '../../hooks/useCountryId';
 
 /**
  * DeactivatedRecords component for displaying and managing deactivated district records.
@@ -30,6 +31,7 @@ const DeactivatedRecords = (): React.ReactElement => {
   const loading = useSelector(districtLoadingSelector);
   const deactivatedRecords = useSelector(getDistrictListSelector);
   const deactivatedRecordsCount = useSelector(districtCountSelector);
+  const countryId = useCountryId();
   const tenantId = useSelector(tenantIdSelector);
   const role = useSelector(roleSelector);
   const { ROLES } = APPCONSTANTS;
@@ -43,6 +45,7 @@ const DeactivatedRecords = (): React.ReactElement => {
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchDistrictListRequest({
+        countryId,
         tenantId: ROLES.REGION_ADMIN === role ? tenantId : '',
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
@@ -53,7 +56,7 @@ const DeactivatedRecords = (): React.ReactElement => {
         }
       })
     );
-  }, [ROLES.REGION_ADMIN, dispatch, role, tenantId, listParams]);
+  }, [dispatch, countryId, ROLES.REGION_ADMIN, role, tenantId, listParams]);
 
   useEffect(() => {
     fetchDetails();

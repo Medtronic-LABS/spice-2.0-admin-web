@@ -1,24 +1,26 @@
+import { Tools } from 'final-form';
+import arrayMutators from 'final-form-arrays';
 import React from 'react';
+import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
-import { Form, FormRenderProps } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
+import ChiefdomAdminFormIcon from '../../assets/images/avatar-o.svg';
+import ChiefdomFormIcon from '../../assets/images/info-grey.svg';
 import ChiefdomForm from '../../components/chiefdomForm/ChiefdomForm';
 import FormContainer from '../../components/formContainer/FormContainer';
-import { PROTECTED_ROUTES } from '../../constants/route';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
-import { createChiefdomRequest } from '../../store/chiefdom/actions';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
-import ChiefdomFormIcon from '../../assets/images/info-grey.svg';
-import ChiefdomAdminFormIcon from '../../assets/images/avatar-o.svg';
-import { IDistrictOption } from '../../store/district/types';
-import { Tools } from 'final-form';
-import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
-import { roleSelector } from '../../store/user/selectors';
-import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
+import { createChiefdomRequest } from '../../store/chiefdom/actions';
+import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
+import { IDistrictOption } from '../../store/district/types';
+import { roleSelector } from '../../store/user/selectors';
+import { formatUserToastMsg } from '../../utils/commonUtils';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
 export interface IChiefdomFormValues {
   chiefdom: {
@@ -50,8 +52,9 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
   const countryIdValue = useCountryId();
 
   const {
+    appTypes,
     chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * Navigates back to the appropriate route based on available IDs and user role.
@@ -106,7 +109,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
       ...chiefdom,
       name: chiefdom.name.trim(),
       villages: village.map((e: string) => ({ name: e })),
-      users: getAdminPayload({ userFormData: users, isFromList: false, countryId: countryIdValue }),
+      users: getAdminPayload({ userFormData: users, appTypes, isFromList: false, countryId: countryIdValue }),
       countryId: countryIdValue,
       districtId: Number(district?.id) || Number(districtId),
       parentOrganizationId: districtId ? Number(tenantId) : Number(district?.tenantId),

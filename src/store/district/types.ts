@@ -114,6 +114,7 @@ export interface IFetchDistrictListRequest {
   skip?: number;
   limit?: number | null;
   tenantId?: string | number;
+  countryId: number;
   search?: string;
   successCb?: (payload: IFetchDistrictListSuccessPayload) => void;
   failureCb?: (error: Error) => void;

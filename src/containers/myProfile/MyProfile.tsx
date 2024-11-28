@@ -14,7 +14,8 @@ import toastCenter from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
 import { IEditUserDetail } from '../../store/user/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
-import { getAdminPayload } from '../../utils/commonUtils';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * MyProfile component for displaying and editing user profile information.
@@ -29,6 +30,7 @@ const MyProfile = (): React.ReactElement => {
   const userForEdit = useRef({ users: [] as IEditUserDetail[] });
   const { HEALTH_FACILITY_ADMIN } = APPCONSTANTS.ROLES;
 
+  const { appTypes } = useAppTypeConfigs();
   const role = useSelector(roleSelector);
   const cultureList = useSelector(cultureListSelector);
   const country = useSelector(countryIdSelector);
@@ -105,18 +107,6 @@ const MyProfile = (): React.ReactElement => {
   useEffect(() => {
     if (userDetails && userDetails.id) {
       const postData: any = { ...userDetails };
-      // const allSuiteAccess = postData.roles?.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName })) || [];
-      // postData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-      // postData.role = postData.roles?.filter((r: IRoles) => r.groupName === 'SPICE') || [];
-      // postData.spiceInsightsRole = postData.roles?.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-      // postData.insightsRole = postData.roles?.filter((r: IRoles) => r.groupName === 'SPICE INSIGHTS') || [];
-      // postData.supervisor = {
-      //   ...postData.supervisor,
-      //   name: `${postData.supervisor?.firstName || ''} ${postData.supervisor?.lastName || ''}`
-      // };
-      // postData.country = {
-      //   phoneNumberCode: postData?.countryCode?.phoneNumberCode
-      // };
       userForEdit.current = { users: [postData] as IEditUserDetail[] };
     }
   }, [userDetails]);
@@ -135,6 +125,7 @@ const MyProfile = (): React.ReactElement => {
    */
   const handleEdit = ({ users }: { users: IEditUserDetail[] }) => {
     const userObj = getAdminPayload({
+      appTypes,
       userFormData: users,
       countryId,
       isFromSummaryOrProfilePage: true

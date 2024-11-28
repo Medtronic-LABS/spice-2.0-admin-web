@@ -9,6 +9,7 @@ import {
 } from '../store/district/types';
 
 export const fetchDistrictList = (
+  countryId: number,
   tenantId: number,
   isActive: boolean,
   skip: number,
@@ -20,6 +21,7 @@ export const fetchDistrictList = (
     method: 'POST',
     url: '/admin-service/district/district-list',
     data: {
+      countryId,
       appTypes,
       tenantId,
       skip,

@@ -40,6 +40,7 @@ import APPCONSTANTS from '../../constants/appConstants';
   Worker Saga: Fired on FETCH_DISTRICT_LIST_REQUEST action
 */
 export function* fetchDistrictList({
+  countryId,
   tenantId,
   isActive,
   skip,
@@ -64,6 +65,7 @@ export function* fetchDistrictList({
     } else {
       const { data } = yield call(
         districtService.fetchDistrictList as any,
+        countryId,
         tenantId,
         isActive,
         skip,

@@ -196,9 +196,10 @@ export function* fetchUserDetailRequest({ id, successCb, failureCb }: IFetchUser
 */
 export function* fetchHFSummaryRequest({ tenantId, id, successCb, failureCb }: IFetchHFSummaryRequest): SagaIterator {
   try {
+    const appTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const {
       data: { entity: hfSummary }
-    } = yield call(hfService.fetchHFSummary as any, tenantId, id);
+    } = yield call(hfService.fetchHFSummary as any, tenantId, id, appTypes);
     const hfDetail = {
       ...hfSummary,
       peerSupervisors: hfSummary.peerSupervisors.map((supervisor: IPeerSupervisor) => ({
@@ -563,11 +564,12 @@ export function* fetchWorkflowListSagaRequest({
 export function* peerSupervisorValidationSagaRequest({
   ids,
   tenantId,
+  appTypes,
   successCb,
   failureCb
 }: IPeerSupervisorValidation): SagaIterator {
   try {
-    const { data } = yield call(hfService.peerSupervisorValidation as any, { ids, tenantId });
+    const { data } = yield call(hfService.peerSupervisorValidation as any, { ids, tenantId, appTypes });
     successCb?.(data);
   } catch (e) {
     if (e instanceof Error) {
@@ -585,12 +587,14 @@ export function* validateLinkedRestrictionsSagaRequest({
   tenantId,
   healthFacilityId,
   linkedVillageIds,
+  appTypes,
   successCb,
   failureCb
 }: IValidateLinkedRestrictions): SagaIterator {
   try {
     const { data } = yield call(hfService.validateLinkedRestrictionsAPI as any, {
       ids,
+      appTypes,
       tenantId,
       healthFacilityId,
       linkedVillageIds

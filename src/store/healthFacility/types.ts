@@ -104,6 +104,7 @@ export interface IHealthFacilityForm extends Omit<IHealthFacility, 'type' | 'cit
 
 export interface IHealthFacilityPost {
   id?: number;
+  appTypes: string[];
   name: string;
   type: string;
   phuFocalPersonName: string;
@@ -223,6 +224,7 @@ export interface IUserRole {
 
 export interface IHFUserPost {
   id?: number;
+  appTypes: string[];
   firstName: string;
   lastName: string;
   gender: string;
@@ -370,6 +372,7 @@ export interface IFetchUserDetailFailure {
 
 export interface IHFUserPayLoad {
   id: string;
+  appTypes: string[];
   tenantId: string;
   user: IHFUserPost;
 }
@@ -476,6 +479,8 @@ export interface IFetchHFUserListClear {
 
 export interface IDeleteUserPayload {
   id: number;
+  appTypes: string[];
+  countryId: number;
   tenantIds: number[];
 }
 
@@ -678,6 +683,7 @@ export interface IPeerSupervisorValidation {
   type: typeof ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION;
   ids: number[];
   tenantId: number;
+  appTypes: string[];
   successCb?: (data: IWorkflow[]) => void;
   failureCb?: (error: Error) => void;
 }
@@ -685,6 +691,7 @@ export interface IPeerSupervisorValidation {
 export interface IValidateLinkedRestrictions {
   type: typeof ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST;
   ids: number[];
+  appTypes: string[];
   tenantId: number;
   healthFacilityId: number;
   linkedVillageIds: number[];

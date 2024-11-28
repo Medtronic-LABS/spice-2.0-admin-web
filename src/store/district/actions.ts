@@ -51,6 +51,7 @@ import {
 } from './types';
 
 export const fetchDistrictListRequest = ({
+  countryId,
   tenantId,
   isActive,
   skip,
@@ -58,16 +59,9 @@ export const fetchDistrictListRequest = ({
   search,
   successCb,
   failureCb
-}: {
-  tenantId: string | number;
-  isActive: boolean;
-  skip?: number;
-  limit?: number | null;
-  search?: string;
-  successCb?: (payload: IFetchDistrictListSuccessPayload) => void;
-  failureCb?: (error: Error) => void;
-}): IFetchDistrictListRequest => ({
+}: Omit<IFetchDistrictListRequest, 'type'>): IFetchDistrictListRequest => ({
   type: DISTRICT_TYPES.FETCH_DISTRICT_LIST_REQUEST,
+  countryId,
   tenantId,
   isActive,
   skip,

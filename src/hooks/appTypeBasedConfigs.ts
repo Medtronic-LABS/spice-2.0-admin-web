@@ -19,6 +19,11 @@ const COMMUNITY = {
   // p for plural name
   ...commonLabels,
   isCommunity: true,
+  GENDER_OPTIONS: [
+    { value: 'Male', label: 'Male' },
+    { value: 'Female', label: 'Female' },
+    { value: 'Non-Binary', label: 'Non-Binary' }
+  ],
   district: {
     s: 'District',
     p: 'Districts'
@@ -47,6 +52,10 @@ const NON_COMMUNITY = {
   // p for plural name
   isCommunity: false,
   ...commonLabels,
+  GENDER_OPTIONS: [
+    { value: 'Male', label: 'Male' },
+    { value: 'Female', label: 'Female' }
+  ],
   district: {
     s: 'County',
     p: 'Counties'

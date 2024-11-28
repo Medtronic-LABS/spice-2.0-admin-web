@@ -78,6 +78,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
   const fetchDetails = useCallback(() => {
     dispatch(
       fetchDistrictListRequest({
+        countryId: Number(regionId),
         tenantId,
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,

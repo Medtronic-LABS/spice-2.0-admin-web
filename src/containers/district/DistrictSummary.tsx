@@ -1,33 +1,35 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useParams, useHistory, RouteComponentProps } from 'react-router-dom';
+import arrayMutators from 'final-form-arrays';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
+import IconLegal from '../../assets/images/icon-legal.svg';
 import CustomTable from '../../components/customTable/CustomTable';
+import Deactivation from '../../components/deactivate/Deactivation';
 import DetailCard from '../../components/detailCard/DetailCard';
-import { fetchDistrictDetailReq, updateDistrictDetail, decactivateDistrictReq } from '../../store/district/actions';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
 import Loader from '../../components/loader/Loader';
 import Modal from '../../components/modal/ModalForm';
-import DistrictForm from '../createDistrict/DistrictForm';
-import sessionStorageServices from '../../global/sessionStorageServices';
-import Deactivation from '../../components/deactivate/Deactivation';
-import { PROTECTED_ROUTES } from '../../constants/route';
 import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
-import DistrictConsentForm from './DistrictConsentForm';
-import { IDistrictAdmin, IDistrictDetail, IDistrictDeactivateFormValues, IDistrict } from '../../store/district/types';
-import arrayMutators from 'final-form-arrays';
-import IconLegal from '../../assets/images/icon-legal.svg';
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import sessionStorageServices from '../../global/sessionStorageServices';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import useCountryId from '../../hooks/useCountryId';
+import { decactivateDistrictReq, fetchDistrictDetailReq, updateDistrictDetail } from '../../store/district/actions';
 import { districtLoadingSelector, districtSelector } from '../../store/district/selectors';
-import { roleSelector } from '../../store/user/selectors';
-import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
+import { IDistrict, IDistrictAdmin, IDistrictDeactivateFormValues, IDistrictDetail } from '../../store/district/types';
 import {
   createHFUserRequest as createAdminRequest,
   deleteHFUserRequest as deleteAdminRequest,
   updateHFUserRequest as updateAdminRequest
 } from '../../store/healthFacility/actions';
-import { formatUserToastMsg, getAdminPayload } from '../../utils/commonUtils';
-import useCountryId from '../../hooks/useCountryId';
+import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../store/healthFacility/selectors';
+import { roleSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
+import { formatUserToastMsg } from '../../utils/commonUtils';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import DistrictForm from '../createDistrict/DistrictForm';
+import DistrictConsentForm from './DistrictConsentForm';
+import { getAdminPayload } from '../../utils/formatObjectUtils';
 
 interface IMatchParams {
   districtId: string;
@@ -68,8 +70,9 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const isReadOnly = role === APPCONSTANTS.ROLES.DISTRICT_ADMIN;
 
   const {
+    appTypes,
     district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * useEffect for to get district detail
@@ -237,6 +240,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
    */
   const handleAdminSubmit = ({ users }: { users: IUserFormValues[] }) => {
     const userObj = getAdminPayload({
+      appTypes,
       userFormData: users,
       countryId: countryId || sessionStorageServices.getItem(APPCONSTANTS.FORM_ID),
       tenantId: Number(tenantId),
@@ -343,7 +347,7 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
   const handleAdminDeleteClick = (values: { data: IDistrictDetail; index: number }) => {
     dispatch(
       deleteAdminRequest({
-        data: { id: Number(values.data.id), tenantIds: [Number(district.tenantId)] },
+        data: { id: Number(values.data.id), appTypes, countryId, tenantIds: [Number(district.tenantId)] },
         successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,

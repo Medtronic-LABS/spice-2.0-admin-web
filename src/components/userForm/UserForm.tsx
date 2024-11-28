@@ -177,6 +177,7 @@ const UserForm = ({
   const [clearEmail, setClearEmail] = useState(false);
   const districtList = useSelector(getDistrictListSelector);
   const {
+    GENDER_OPTIONS,
     userList: {
       filters: { available: showFilters }
     },
@@ -460,8 +461,8 @@ const UserForm = ({
       );
       userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
       if (userData.organizations.length === 1) {
-        const { formDataId: id, name } = userData.organizations[0];
-        userData.healthFacility = { id, name };
+        const { formDataId: id, name, ...rest } = userData.organizations[0];
+        userData.healthFacility = { ...rest, id, name };
       }
       if (showSpiceHFRef.current[index]) {
         const fullRoles = form.getState().values[`${formName}[${index}].roles`];
@@ -486,7 +487,7 @@ const UserForm = ({
           id: userData.countryCode
         });
         form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
-        form.change(`${formName}[${index}].healthFacility`, userData.healthFacility || null);
+        form.change(`${formName}[${index}].healthfacility`, userData.healthFacility || null);
         form.change(`${formName}[${index}].reportUserOrganization`, userData.reportUserOrganization || null);
         form.change(`${formName}[${index}].insightUserOrganization`, userData.insightUserOrganization || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
@@ -782,20 +783,23 @@ const UserForm = ({
    * Fetches district details based on the health facility tenant ID.
    */
   const fetchDetails = useCallback(() => {
-    dispatch(
-      fetchDistrictListRequest({
-        tenantId: String(hfTenantId), // url tenantId
-        isActive: true,
-        failureCb: (e) =>
-          toastCenter.error(
-            ...getErrorToastArgs(
-              e,
-              APPCONSTANTS.OOPS,
-              formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+    if (countryId) {
+      dispatch(
+        fetchDistrictListRequest({
+          countryId,
+          tenantId: String(hfTenantId), // url tenantId
+          isActive: true,
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+              )
             )
-          )
-      })
-    );
+        })
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryId, dispatch]);
 
@@ -1350,7 +1354,7 @@ const UserForm = ({
                         isRadioSquare={true}
                         fieldLabel='Gender'
                         errorLabel='gender'
-                        options={APPCONSTANTS.GENDER_OPTIONS}
+                        options={GENDER_OPTIONS}
                       />
                     )}
                   />
