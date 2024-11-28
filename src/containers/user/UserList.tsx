@@ -339,22 +339,18 @@ const UserList = (): React.ReactElement => {
    * Function to fetch list
    */
   const fetchList = useCallback(() => {
-    if (showFilters) {
-      dispatch(
-        fetchHFListRequest({
-          countryId: countryIdValue,
-          skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-          limit: null,
-          userBased: !isSuperUser,
-          tenantIds: [tenantId],
-          failureCb: (e: Error) => {
-            toastCenter.error(
-              ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
-            );
-          }
-        })
-      );
-    }
+    dispatch(
+      fetchHFListRequest({
+        countryId: countryIdValue,
+        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+        limit: null,
+        userBased: !isSuperUser,
+        tenantIds: [tenantId],
+        failureCb: (e: Error) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR));
+        }
+      })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isSuperUser, countryIdValue, showFilters]);
 

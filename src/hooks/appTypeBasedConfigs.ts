@@ -34,7 +34,7 @@ const COMMUNITY = {
   },
   user: {
     timezone: { available: false },
-    culture: { available: false },
+    culture: { available: true },
     redrisk: { available: false },
     designation: { available: false },
     community: { available: false },

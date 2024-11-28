@@ -83,7 +83,7 @@ const useUserFormUtils = () => {
     const spiceRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'SPICE') || [];
     const reportRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'REPORTS') || [];
     const insightRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'INSIGHTS') || [];
-    const isCHW = (values?.roles || []).some((userRole: IRoles) => ['CHW'].includes(userRole.name));
+    const isCHWCHP = (values?.roles || []).some((userRole: IRoles) => villageBasedRoles.includes(userRole.name));
     return {
       suiteAccess,
       role: spiceRoles,
@@ -92,7 +92,7 @@ const useUserFormUtils = () => {
       selectedRoles: spiceRoles || [],
       selectedReportRoles: reportRoles,
       selectedInsightRoles: insightRoles,
-      supervisor: isCHW
+      supervisor: isCHWCHP
         ? values?.supervisor && {
             ...values.supervisor,
             name: `${values.supervisor.firstName || ''} ${values.supervisor.lastName || ''}`

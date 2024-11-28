@@ -430,7 +430,7 @@ const UserForm = ({
    * @param {number} index - The index of the form to populate
    */
   const autoPopulateUserData = (user: any, index: number) => {
-    const userData = {
+    let userData = {
       ...user
     };
     userData.suiteAccess = userData.roles[0];
@@ -442,17 +442,7 @@ const UserForm = ({
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
       setClearEmail(false);
-      const allSuiteAccess = userData.roles.map((r: IRoles) => ({ groupName: r.groupName, id: r.groupName }));
-      userData.suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
-      userData.role = userData.roles.filter((r: IRoles) => r.groupName === 'SPICE') || [];
-      userData.reportRoles =
-        userData.roles.filter((r: IRoles) => r.groupName === APPCONSTANTS.spiceRoleGrouped.reports) || [];
-      userData.supervisor = {
-        ...userData.supervisor,
-        name: `${userData.supervisor?.firstName || ''} ${userData.supervisor?.lastName || ''}`
-      };
-      userData.selectedRoles = [...(userData?.roles || [])];
-      userData.mandatorySuiteAccess = userData.suiteAccess;
+      userData = { ...userData, ...formUserData(user) };
       const filteredUserRoles = userData?.roles?.filter(
         (roleToFilter: any) =>
           (roleToFilter.name !== NAMING_VARIABLES.redRisk &&
@@ -476,6 +466,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].role`, filteredUserRoles || []);
         form.change(`${formName}[${index}].roles`, userData.roles || []);
         form.change(`${formName}[${index}].reportRoles`, userData.reportRoles || []);
+        form.change(`${formName}[${index}].insightRoles`, userData.insightRoles || []);
         form.change(`${formName}[${index}].selectedReportRoles`, userData.reportRoles || []);
         form.change(`${formName}[${index}].selectedRoles`, userData?.selectedRoles || []);
         form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
@@ -720,7 +711,7 @@ const UserForm = ({
             skip: 0,
             limit: null,
             tenantIds: values.tenantIds,
-            userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER)
+            userBased: !(role === SUPER_ADMIN || role === SUPER_USER)
           })
         );
       }
@@ -1014,7 +1005,7 @@ const UserForm = ({
                         isMulti={true}
                         isModel={true}
                         required={true}
-                        isClearable={!isAdminForm && !isEdit && !autoFetched[index]}
+                        isClearable={false}
                         mandatoryOptions={
                           isAdminForm
                             ? isEdit
@@ -1026,15 +1017,25 @@ const UserForm = ({
                           const selectedGroupNames: string[] = values.map((option: any) => option.groupName) || [];
                           let newAllRoles: IRoles[] = [];
                           const suiteFormName = {
-                            SPICE: `${formName}[${index}].role`,
-                            REPORTS: `${formName}[${index}].reportRoles`,
-                            INSIGHTS: `${formName}[${index}].insightRoles`
+                            SPICE: {
+                              role: `${formName}[${index}].role`,
+                              hfList: `${formName}[${index}].healthfaciliity`
+                            },
+                            REPORTS: {
+                              role: `${formName}[${index}].reportRoles`,
+                              hfList: `${formName}[${index}].reportUserOrganization`
+                            },
+                            INSIGHTS: {
+                              role: `${formName}[${index}].insightRoles`,
+                              hfList: `${formName}[${index}].insightUserOrganization`
+                            }
                           };
                           Object.keys(suiteFormName).forEach((r: string) => {
                             if (selectedGroupNames.includes(r)) {
                               newAllRoles = [...newAllRoles, ...allRoles.filter((v: IRoles) => v.groupName === r)];
                             } else {
-                              form.change((suiteFormName as any)[r], []);
+                              form.change((suiteFormName as any)[r].role, []);
+                              form.change((suiteFormName as any)[r].hfList, []);
                               const currentDisabledRoles = { ...disabledRoles.current?.[index] };
                               currentDisabledRoles[r] = [] as IRoles[];
                               disabledRoles.current[index] = currentDisabledRoles;
@@ -1088,7 +1089,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
-                              roleChange({ roles: values, index, currentSuite: 'SPICE', appTypeBasedRoles });
+                              roleChange({ allRoles: values, index, currentSuite: 'SPICE', appTypeBasedRoles });
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].role`, [...values]);
                               form.change(`${formName}[${index}].roles`, [...reportRoles, ...insightRoles, ...values]);
@@ -1244,7 +1245,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any, { option, action }: { option: any; action: string }) => {
-                              roleChange({ roles: values, index, currentSuite: 'REPORTS', appTypeBasedRoles });
+                              roleChange({ allRoles: values, index, currentSuite: 'REPORTS', appTypeBasedRoles });
                               form.change(`${formName}[${index}].roles`, [...spiceRole, ...insightRoles, ...values]);
                               input.onChange(values);
                             }}
@@ -1293,7 +1294,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any) => {
-                              roleChange({ roles: values, index, currentSuite: 'INSIGHTS', appTypeBasedRoles });
+                              roleChange({ allRoles: values, index, currentSuite: 'INSIGHTS', appTypeBasedRoles });
                               form.change(`${formName}[${index}].roles`, [...spiceRole, ...reportRoles, ...values]);
                               input.onChange(values);
                             }}

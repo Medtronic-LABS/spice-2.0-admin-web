@@ -106,7 +106,7 @@ export const getUserPayload = ({
       payloadTenantId = user.tenantId;
     } else if (user?.healthfacility?.tenantId) {
       // if hf admin create or user create then send assigned hf tenantId
-      payloadTenantId = Number(user?.healthfacility?.tenantId);
+      payloadTenantId = Number(user.healthfacility.tenantId);
     } else if (tenantId) {
       // send URL tenantId from summary page
       payloadTenantId = Number(tenantId);
