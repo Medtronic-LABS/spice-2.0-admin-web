@@ -153,7 +153,6 @@ export const useRoleMeta = ({
   isHFCreate,
   isEdit,
   isSiteUser,
-  formData,
   isCHAStatus,
   isCHWCHPStatus,
   showSpiceHFListState,
@@ -169,7 +168,7 @@ export const useRoleMeta = ({
 
   // specific role changes to fetch CHA CHW CHP validations and show HF list, villages list etc
   const roleSpecificChanges = useCallback(
-    (roles: IRoles[], currentSuite: string, index: number) => {
+    (roles: IRoles[] = [], currentSuite: string, index: number) => {
       const isCHAUser = (roles || []).some((userRole: IRoles) => chaRole.includes(userRole.name));
       const isCHWCHPUser = (roles || []).some((userRole: IRoles) => villageBasedRoles.includes(userRole.name));
       let isShowVillages = false;
@@ -181,7 +180,7 @@ export const useRoleMeta = ({
         isShowVillages = isHFCreate ? false : isCHWCHPUser;
         roles.forEach((userRole: IRoles) => {
           if (
-            [...allHFNeededRoles, 'HEALTH_FACILITY_ADMIN'].includes(userRole.name) &&
+            [...allHFNeededRoles, hfAdminRole].includes(userRole.name) &&
             !isHFCreate &&
             !isHF &&
             !isEdit &&
@@ -198,13 +197,14 @@ export const useRoleMeta = ({
         isShowVillages = false;
       }
       // show report hf list condition
-      if (roles.length && currentSuite === REPORTS) {
+      if (currentSuite === REPORTS) {
         isShowReportHFList =
-          !isHFCreate && roles.some((userRole: IRoles) => facilityReportAdminRole.includes(userRole.name));
+          !!roles.length && roles.some((userRole: IRoles) => facilityReportAdminRole.includes(userRole.name));
       }
       // show insight hf list condition
-      if (!!roles.length && currentSuite === INSIGHTS) {
-        isShowInsightHFList = roles.some((userRole: IRoles) => insightUserRole.includes(userRole.name));
+      if (currentSuite === INSIGHTS) {
+        isShowInsightHFList =
+          !!roles.length && roles.some((userRole: IRoles) => insightUserRole.includes(userRole.name));
       }
       return {
         isCHAUser,
@@ -219,12 +219,9 @@ export const useRoleMeta = ({
   );
 
   const roleChange = useCallback(
-    ({ allRoles = [], index, currentSuite = '', appTypeBasedRoles = [] as any }: IRoleChangeProps) => {
+    ({ allRoles = [], index, appTypeBasedRoles = [] as any }: IRoleChangeProps) => {
       const rolesGrouped = appTypeBasedRoles;
       const allDisabledRoles: IDisabledRoles[] = propDisabledRoles.current;
-      const currentIndex = index;
-      const disabledRoles = allDisabledRoles[currentIndex] || [];
-      const { SPICE: spiceDRoles = [], REPORTS: reportDRoles = [], INSIGHTS: insightDRoles = [] } = disabledRoles;
 
       const findDisabledRoles = ({
         suite,
@@ -234,29 +231,28 @@ export const useRoleMeta = ({
         isAfMobile = false
       }: IFindDisabledRoles) => {
         // In findDisabledRoles function:
-        const SPICERoles = filterSPICERoles(rolesGrouped[suite || ''] || [], {
-          isHFCreate,
-          isHF,
-          isSiteUser,
-          isCommunity
-        });
+        const selectedRoleGroup =
+          filterSPICERoles(rolesGrouped[suite || ''] || [], {
+            isHFCreate,
+            isHF,
+            isSiteUser,
+            isCommunity
+          }) || [];
 
-        const selectedRoleGroup = SPICERoles || [];
         if (suite === 'SPICE') {
-          return spiceDRoles.length
-            ? spiceDRoles
-            : selectedRoleGroup.filter(
-                (groupedRole: IRoles) =>
-                  !(isAfMobile ? [allRoles[0]?.name] : validSpiceRoles || []).includes(groupedRole?.name)
-              );
+          return selectedRoleGroup.filter((groupedRole: IRoles) =>
+            (validSpiceRoles || []).length
+              ? !(isAfMobile ? [allRoles[0]?.name] : validSpiceRoles || []).includes(groupedRole?.name)
+              : false
+          );
         } else if (suite === 'REPORTS') {
-          return reportDRoles.length
-            ? reportDRoles
-            : selectedRoleGroup.filter((groupedRole: IRoles) => !(validReportRoles || []).includes(groupedRole.name));
+          return selectedRoleGroup.filter((groupedRole: IRoles) =>
+            (validReportRoles || []).length ? !(validReportRoles || []).includes(groupedRole.name) : false
+          );
         } else if (suite === 'INSIGHTS') {
-          return insightDRoles.length
-            ? insightDRoles
-            : selectedRoleGroup.filter((groupedRole: IRoles) => !(validInsightRoles || []).includes(groupedRole.name));
+          return selectedRoleGroup.filter(
+            (groupedRole: IRoles) => !(validInsightRoles || []).includes(groupedRole.name)
+          );
         } else {
           return [];
         }
@@ -305,15 +301,15 @@ export const useRoleMeta = ({
         {
           selectedRoles: insightUserRole,
           selectedSuite: INSIGHTS,
-          disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: superAdminRoles }),
-          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: reportAdminRole }),
+          disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: [] }),
+          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: [] }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: insightUserRole })
         },
         {
           selectedRoles: insightDeveloperRole,
           selectedSuite: INSIGHTS,
-          disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: superAdminRoles }),
-          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: reportAdminRole }),
+          disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: [] }),
+          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: [] }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: insightDeveloperRole })
         },
         {
@@ -334,9 +330,14 @@ export const useRoleMeta = ({
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         }
       ];
-      let disabledSpiceRoles: IRoles[] = [];
-      let disabledReportRoles: IRoles[] = [];
-      let disabledInsightRoles: IRoles[] = [];
+      const newDisabledRoles: { [key: string]: IRoles[] } = {
+        SPICE: [],
+        REPORTS: [],
+        INSIGHTS: []
+      };
+      // let disabledSpiceRoles: IRoles[] = [];
+      // let disabledReportRoles: IRoles[] = [];
+      // let disabledInsightRoles: IRoles[] = [];
 
       interface IRoleChangesConfig {
         isCHAUser: boolean;
@@ -348,35 +349,26 @@ export const useRoleMeta = ({
       }
       let roleChangesConfig: IRoleChangesConfig = {} as IRoleChangesConfig;
 
-      const seperatedRoles = separateRolesByGroupName(allRoles);
-
-      Object.keys(seperatedRoles).forEach((suite: string) => {
+      allRoles.forEach((roleValue: IRoles) => {
         const disabledAllRoles =
-          rolesMeta.find((newRoles) =>
-            seperatedRoles[suite].some((propRoles: IRoles) => {
-              return newRoles.selectedRoles.includes(propRoles.name);
-            })
-          ) || ({} as IRoleMeta);
-        if (suite === SPICE) {
-          disabledSpiceRoles = disabledAllRoles.disabledSPICERoles;
+          rolesMeta.find((newRoles) => newRoles.selectedRoles.includes(roleValue.name)) || ({} as IRoleMeta);
+        if ((disabledAllRoles.disabledSPICERoles || []).length) {
+          newDisabledRoles[SPICE] = [
+            ...new Set([...newDisabledRoles[SPICE], ...(disabledAllRoles.disabledSPICERoles || [])])
+          ];
         }
-        if (suite === REPORTS) {
-          disabledReportRoles = disabledAllRoles.disabledREPORTSRoles;
+        if ((disabledAllRoles.disabledREPORTSRoles || []).length) {
+          newDisabledRoles[REPORTS] = disabledAllRoles.disabledREPORTSRoles || [];
         }
-        if (suite === INSIGHTS) {
-          disabledInsightRoles = disabledAllRoles.disabledINSIGHTSRoles;
+        if ((disabledAllRoles.disabledINSIGHTSRoles || []).length) {
+          newDisabledRoles[INSIGHTS] = disabledAllRoles.disabledINSIGHTSRoles || [];
         }
-
-        roleChangesConfig = roleSpecificChanges(seperatedRoles[suite], suite, index);
+        // to set other role specific changes like hf field, supervisor, villages, etc
+        roleChangesConfig = roleSpecificChanges([roleValue], roleValue.groupName || '', index);
       });
 
-      const newDisabledRoles = {
-        SPICE: disabledSpiceRoles,
-        REPORTS: disabledReportRoles,
-        INSIGHTS: disabledInsightRoles
-      };
       const newDRoles = [...allDisabledRoles];
-      newDRoles[currentIndex] = newDisabledRoles;
+      newDRoles[index] = newDisabledRoles;
 
       //  isCHA Status
       const newChaStatus = [...isCHAStatus];
@@ -428,7 +420,6 @@ export const useRoleMeta = ({
 export const useRoleOptions = ({
   isHF,
   isHFCreate,
-  isEdit,
   isSiteUser,
   allRoles,
   currentModule,
@@ -449,13 +440,13 @@ export const useRoleOptions = ({
       isCommunity
     }).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
 
-    // returns the REPORTS roles based on the consitions
+    // returns the REPORTS roles based on the conditions
     const reportRoleOptions =
       (newRoles.REPORTS || [])
         .filter((role: IRoles) => (isHFCreate || isHF ? !reportAdminRole.includes(role.name) : true))
         .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
 
-    // returns the INSIGHTS roles based on the consitions
+    // returns the INSIGHTS roles based on the conditions
     const insightRoleOptions =
       (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
 

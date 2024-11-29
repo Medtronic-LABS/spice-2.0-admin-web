@@ -22,9 +22,9 @@ export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN'];
 export const reportAdminRole = ['REPORT_ADMIN'];
 export const facilityReportAdminRole = ['FACILITY_REPORT_ADMIN'];
 // INSIGHTS
-export const allInsightRoles = ['SPICE_INSIGHTS_USER', 'SPICE_INSIGHTS_DEVELOPER'];
-export const insightUserRole = ['SPICE_INSIGHTS_USER'];
-export const insightDeveloperRole = ['SPICE_INSIGHTS_DEVELOPER'];
+export const allInsightRoles = ['INSIGHTS_USER', 'INSIGHTS_DEVELOPER'];
+export const insightUserRole = ['INSIGHTS_USER'];
+export const insightDeveloperRole = ['INSIGHTS_DEVELOPER'];
 
 // NON_COMMUNITY
 export const chaRole = ['COMMUNITY_HEALTH_ASSISTANT'];

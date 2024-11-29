@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadingSelector, timezoneListSelector } from '../../../store/user/selectors';
 import { useEffect } from 'react';
 import { fetchCultureListRequest, fetchTimezoneListRequest } from '../../../store/user/actions';
-import { filterLanguagesByAppTypes } from '../../../utils/commonUtils';
 
 export const SiteUserForm = (props: any) => {
   const dispatch = useDispatch();
@@ -50,7 +49,6 @@ export const SiteUserForm = (props: any) => {
   );
 
   const {
-    appTypes,
     user: {
       timezone: { available: isTimezoneAvailable },
       culture: { available: isCultureAvailable },
@@ -104,7 +102,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
-                options={filterLanguagesByAppTypes(cultureList, appTypes) || []}
+                options={cultureList || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
                 isModel={true}

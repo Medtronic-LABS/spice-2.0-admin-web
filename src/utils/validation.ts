@@ -204,6 +204,10 @@ export function validateMobile(mobileNo: string, isSl: boolean): string {
 
   if (isSl) {
     // For SL:
+    // Check if the number starts with zero
+    if (mobileNo.startsWith('0')) {
+      return 'Please enter a valid ';
+    }
     // 1. Check if number has 8-10 digits
     const digitCheck = /^\d{8,10}$/;
     // 2. Check for 5 or more consecutive same digits

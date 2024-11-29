@@ -1014,7 +1014,14 @@ const UserForm = ({
                             : mandatorySuiteAccess || ''
                         }
                         onChange={(values: any[]) => {
-                          const selectedGroupNames: string[] = values.map((option: any) => option.groupName) || [];
+                          const suiteOrder: { [key: string]: number } = {
+                            SPICE: 1,
+                            REPORTS: 2,
+                            INSIGHTS: 3
+                          };
+                          const sortedSuites = values.sort((a, b) => suiteOrder[a.groupName] - suiteOrder[b.groupName]);
+                          const selectedGroupNames: string[] =
+                            sortedSuites.map((option: any) => option.groupName) || [];
                           let newAllRoles: IRoles[] = [];
                           const suiteFormName = {
                             SPICE: {
@@ -1036,16 +1043,14 @@ const UserForm = ({
                             } else {
                               form.change((suiteFormName as any)[r].role, []);
                               form.change((suiteFormName as any)[r].hfList, []);
-                              const currentDisabledRoles = { ...disabledRoles.current?.[index] };
-                              currentDisabledRoles[r] = [] as IRoles[];
-                              disabledRoles.current[index] = currentDisabledRoles;
                               if (r === SPICE) {
                                 form.change(`${formName}[${index}].designation`, null);
                               }
                             }
                           });
                           form.change(`${formName}[${index}].roles`, newAllRoles);
-                          input.onChange(values);
+                          roleChange({ allRoles: newAllRoles, index, appTypeBasedRoles });
+                          input.onChange(sortedSuites);
                         }}
                       />
                     )}
@@ -1089,10 +1094,15 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
-                              roleChange({ allRoles: values, index, currentSuite: 'SPICE', appTypeBasedRoles });
+                              const currentAllRoles = [...reportRoles, ...insightRoles, ...values];
+                              roleChange({
+                                allRoles: currentAllRoles,
+                                index,
+                                appTypeBasedRoles
+                              });
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].role`, [...values]);
-                              form.change(`${formName}[${index}].roles`, [...reportRoles, ...insightRoles, ...values]);
+                              form.change(`${formName}[${index}].roles`, currentAllRoles);
                               if (showSpiceHFRef.current[index]) {
                                 const fullRoles = form.getState().values[formName][index].roles;
                                 const selectedAppTypes = roleBasedAppTypes(fullRoles);
@@ -1115,7 +1125,7 @@ const UserForm = ({
                                 fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', index);
                                 fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', index);
                               } else {
-                                // Other than chp role village must be clear
+                                // Other than chw/chp role village must be clear
                                 form.batch(() => {
                                   form.change(`${formName}[${index}].villages`, {});
                                 });
@@ -1245,8 +1255,13 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any, { option, action }: { option: any; action: string }) => {
-                              roleChange({ allRoles: values, index, currentSuite: 'REPORTS', appTypeBasedRoles });
-                              form.change(`${formName}[${index}].roles`, [...spiceRole, ...insightRoles, ...values]);
+                              const currentAllRoles = [...spiceRole, ...insightRoles, ...values];
+                              roleChange({
+                                allRoles: currentAllRoles,
+                                index,
+                                appTypeBasedRoles
+                              });
+                              form.change(`${formName}[${index}].roles`, currentAllRoles);
                               input.onChange(values);
                             }}
                           />
@@ -1294,8 +1309,13 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any) => {
-                              roleChange({ allRoles: values, index, currentSuite: 'INSIGHTS', appTypeBasedRoles });
-                              form.change(`${formName}[${index}].roles`, [...spiceRole, ...reportRoles, ...values]);
+                              const currentAllRoles = [...spiceRole, ...reportRoles, ...values];
+                              roleChange({
+                                allRoles: currentAllRoles,
+                                index,
+                                appTypeBasedRoles
+                              });
+                              form.change(`${formName}[${index}].roles`, currentAllRoles);
                               input.onChange(values);
                             }}
                           />
