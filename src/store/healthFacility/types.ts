@@ -232,7 +232,7 @@ export interface IHFUserPost {
   phoneNumber: string;
   country?: { id: number } | null;
   countryCode?: string;
-  tenantId?: number; // healthFacility tenantId
+  tenantId?: number | null; // healthFacility tenantId
   roleIds: number[];
   district?: string | number;
   chiefdom?: string;

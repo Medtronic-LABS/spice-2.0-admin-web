@@ -756,7 +756,7 @@ export interface IUserPayload {
   culture?: string;
   countryCode?: string;
   country?: any;
-  tenantId?: number;
+  tenantId?: number | null;
   supervisorId?: number | null;
   roleIds: number[];
   reportUserOrganizationIds: number[];
