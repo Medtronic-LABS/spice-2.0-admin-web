@@ -649,9 +649,13 @@ const UserForm = ({
   // Peer Supervisor fetch
   const fetchSupervisorList = useCallback(
     (tenantIds: number[], index: number) => {
+      const uniqueTenantIds = tenantIds.reduce(
+        (unique: number[], id) => (unique.includes(id) ? unique : [...unique, id]),
+        []
+      );
       dispatch(
         fetchPeerSupervisorListRequest({
-          tenantIds,
+          tenantIds: uniqueTenantIds,
           appTypes: appTypes || [''],
           successCb: ({ list }: { list: IPeerSupervisor[] }) => {
             const newSupervisors = [...peerSupervisors];

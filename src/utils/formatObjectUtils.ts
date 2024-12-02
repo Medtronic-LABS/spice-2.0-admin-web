@@ -111,8 +111,9 @@ export const getUserPayload = ({
       // send URL tenantId from summary page
       payloadTenantId = Number(tenantId);
     }
-    const isSpiceRoleContains =
-      user.roles.some((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice).length > 0;
+    const isSpiceRoleContains = user.roles.some(
+      (role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice
+    );
     const userPayload: IUserPayload = {
       appTypes,
       firstName: user.firstName.trim(),
