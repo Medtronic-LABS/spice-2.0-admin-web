@@ -90,6 +90,14 @@ const NON_COMMUNITY = {
   medication: { categories: { available: true } }
 };
 
+const noAppTypes = {
+  ...COMMUNITY,
+  GENDER_OPTIONS: [
+    { value: 'Male', label: 'Male' },
+    { value: 'Female', label: 'Female' }
+  ]
+};
+
 /**
  * Custom hook to get the label base on the appType.
  * @return {string}
@@ -112,7 +120,7 @@ const useAppTypeConfigs = () => {
     () =>
       Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY)
         ? { ...NON_COMMUNITY, appTypes }
-        : { ...COMMUNITY, appTypes },
+        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}) },
     [appTypes]
   );
 };

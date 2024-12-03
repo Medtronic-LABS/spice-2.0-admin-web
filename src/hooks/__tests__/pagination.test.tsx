@@ -32,7 +32,10 @@ describe('useLoadMorePagination', () => {
     );
 
     act(() => {
-      result.current.loadMore();
+      result.current.loadMore({
+        skip: 5,
+        limit: 5
+      });
     });
 
     expect(mockOnLoadMore).toHaveBeenCalledWith({
@@ -54,7 +57,11 @@ describe('useLoadMorePagination', () => {
     );
 
     act(() => {
-      result.current.loadMore();
+      result.current.loadMore({
+        skip: 5,
+        limit: 5,
+        onFail: jest.fn()
+      });
     });
 
     expect(mockOnLoadMore).not.toHaveBeenCalled();
@@ -89,7 +96,11 @@ describe('useLoadMorePagination', () => {
     );
 
     act(() => {
-      result.current.loadMore();
+      result.current.loadMore({
+        skip: 5,
+        limit: 5,
+        onFail: jest.fn()
+      });
     });
 
     const onFail = mockOnLoadMore.mock.calls[0][0].onFail;
@@ -99,7 +110,11 @@ describe('useLoadMorePagination', () => {
     });
 
     act(() => {
-      result.current.loadMore();
+      result.current.loadMore({
+        skip: 5,
+        limit: 5,
+        onFail: jest.fn()
+      });
     });
 
     expect(mockOnLoadMore).toHaveBeenLastCalledWith({
