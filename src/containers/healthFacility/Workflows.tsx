@@ -7,7 +7,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import { workflowListSelector } from '../../store/healthFacility/selectors';
 import { IClinicalWorkflow as IWorkflow } from '../../store/workflow/types';
 import { convertToCaptilize } from '../../utils/validation';
-import { getAppTypeSelector } from '../../store/user/selectors';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 // Props interface
 interface IWorkflowsProps {
@@ -132,11 +132,6 @@ const renderWorkflowByModuleType = (
           </Fragment>
         );
       })}
-      {form.getState().values.healthFacility?.clinicalWorkflows?.length === 0 && (
-        <div className='col-sm-6 col-12'>
-          <div className='mb-0dot5 input-field-label text-danger'>{`Select atleast one workflows`}</div>
-        </div>
-      )}
     </div>
   ) : (
     <div />
@@ -160,6 +155,7 @@ const Workflows: React.FC<IWorkflowsProps> = ({
     WORKFLOW_MODULE: { clinical, customized },
     WORKFLOW_NAME: { phq4, substanceAbuse, suicideScreener }
   } = APPCONSTANTS;
+  const { isCommunity } = useAppTypeConfigs();
 
   /**
    * Gets the HF workflow IDs
@@ -227,11 +223,9 @@ const Workflows: React.FC<IWorkflowsProps> = ({
         const defaultWorkflows =
           workflows?.filter((workflow) => workflow.moduleType === clinical && workflow.default)?.map((wf) => wf.id) ||
           [];
-        // Preserve existing clinical workflows if they exist
-        const existingClinicalWorkflows = form.getState().values.healthFacility?.clinicalWorkflows || [];
-        const allClinicalWorkflowIds = workflows
-          .filter((workflow) => workflow.moduleType === clinical)
-          .map((workflow) => workflow.id);
+        // Preserve existing workflows if they exist
+        const existingClinicalWorkflows = form.getState()?.values.healthFacility?.clinicalWorkflows || [];
+        const existingCustomizedWorkflows = form.getState()?.values.healthFacility?.customizedWorkflows || [];
         const newData = {
           ...data,
           healthFacility: {
@@ -243,7 +237,7 @@ const Workflows: React.FC<IWorkflowsProps> = ({
             customizedWorkflows:
               isHFEdit && workflowEditedData && workflowEditedData?.customizedWorkflows
                 ? workflowEditedData.customizedWorkflows
-                : newClinicalWorkflow(hfCustomizedWorkflows, customized)
+                : [...existingCustomizedWorkflows, ...newClinicalWorkflow(hfCustomizedWorkflows, customized)]
           }
         };
         mentalHealthSelection();
@@ -264,6 +258,9 @@ const Workflows: React.FC<IWorkflowsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workflows]);
 
+  const formClinicalWFsLength = (form?.getState()?.values.healthFacility?.clinicalWorkflows || [])?.length;
+  const formCustomizedWFsLength = (form?.getState()?.values.healthFacility?.customizedWorkflows || [])?.length;
+
   return (
     <>
       {renderWorkflowByModuleType(
@@ -275,6 +272,11 @@ const Workflows: React.FC<IWorkflowsProps> = ({
         pregnancyCheckTimeout.current
       )}
       {renderWorkflowByModuleType(workflows, customized)}
+      {(isCommunity ? formClinicalWFsLength === 0 : formClinicalWFsLength === 0 && formCustomizedWFsLength === 0) && (
+        <div className='col-sm-6 col-12'>
+          <div className='mb-0dot5 input-field-label text-danger'>Select atleast one workflows</div>
+        </div>
+      )}
     </>
   );
 };

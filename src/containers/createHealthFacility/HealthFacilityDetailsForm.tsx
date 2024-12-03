@@ -56,7 +56,7 @@ import {
   validateName
 } from '../../utils/validation';
 import Workflows from '../healthFacility/Workflows';
-import { filterLanguagesByAppTypes } from '../../utils/commonUtils';
+import { filterByAppTypes } from '../../utils/commonUtils';
 
 interface IAddUserFormProps {
   formName: string;
@@ -305,19 +305,24 @@ const HealthFacilityDetailsForm = ({
               name={`${formName}.type`}
               type='text'
               validate={required}
-              render={({ input, meta }) => (
-                <SelectInput
-                  {...(input as any)}
-                  label={`${healthFacilitySName} Type`}
-                  errorLabel='type'
-                  labelKey='name'
-                  valueKey='id'
-                  defaultValue={hfTypesList.find((type: IObjectData) => type.name === (data.type?.name || data.type))}
-                  options={hfTypesList}
-                  loadingOptions={hfTypesLoading}
-                  error={(meta.touched && meta.error) || undefined}
-                />
-              )}
+              render={({ input, meta }) => {
+                const filteredHFTypes = filterByAppTypes(hfTypesList, appTypes);
+                return (
+                  <SelectInput
+                    {...(input as any)}
+                    label={`${healthFacilitySName} Type`}
+                    errorLabel='type'
+                    labelKey='name'
+                    valueKey='id'
+                    defaultValue={filteredHFTypes?.find(
+                      (type: IObjectData) => type.name === (data.type?.name || data.type)
+                    )}
+                    options={filteredHFTypes}
+                    loadingOptions={hfTypesLoading}
+                    error={(meta.touched && meta.error) || undefined}
+                  />
+                );
+              }}
             />
           </div>
           <div className={columnStyle}>
@@ -509,7 +514,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='language'
                   labelKey='name'
                   valueKey='id'
-                  options={filterLanguagesByAppTypes(languages, appTypes)}
+                  options={filterByAppTypes(languages, appTypes)}
                   loadingOptions={languageLoading}
                   error={(meta.touched && meta.error) || undefined}
                   isModel={isEdit ? true : false}

@@ -12,7 +12,6 @@ import { composeValidators, required, validateEmail } from '../../utils/validati
 import TextInput from './TextInput';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
-import { useSelector } from 'react-redux';
 
 const EmailField = forwardRef(
   (
@@ -28,7 +27,6 @@ const EmailField = forwardRef(
       onFindExistingUser,
       parentOrgId,
       ignoreTenantId,
-      tenantId,
       isHF = false,
       isHFCreate = false,
       isSiteUser = false
@@ -44,7 +42,6 @@ const EmailField = forwardRef(
       enableAutoPopulate?: boolean;
       onFindExistingUser?: (user: any) => void;
       parentOrgId?: string;
-      tenantId?: number;
       ignoreTenantId?: string;
       isHF: boolean;
       isHFCreate: boolean;
@@ -233,6 +230,7 @@ const EmailField = forwardRef(
         lastIgnoreTenantId.current = ignoreTenantId;
         validateUser(currentEmail.current, true);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [parentOrgId, validateUser, ignoreTenantId]);
 
     return (

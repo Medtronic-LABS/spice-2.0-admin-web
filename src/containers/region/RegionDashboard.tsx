@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -98,7 +98,7 @@ const Region = (): React.ReactElement => {
   }, [dispatch, timezoneList?.length]);
 
   /**
-   * To remove Region, District, Chiefdom, Site Details cache in store
+   * To remove Region based details
    */
   useEffect(() => {
     dispatch(clearRegionDetail());
@@ -108,6 +108,7 @@ const Region = (): React.ReactElement => {
     dispatch(clearClientRegistryStatus());
     dispatch(clearSideMenu());
     dispatch(clearAppType());
+    localStorageServices.deleteItem(APP_TYPE_NAME);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -231,7 +232,7 @@ const Region = (): React.ReactElement => {
         <div className='col-12'>
           <div className='row gx-1dot25 gy-1dot25'>
             {parsedData.map((summaryProps: ISummaryCardProps, i: number) => (
-              <div key={`region${i}`} className='col-lg-6 col-12 mx-lg-0 mx-auto'>
+              <div key={`region-${i}`} className='col-lg-6 col-12 mx-lg-0 mx-auto'>
                 <SummaryCard {...summaryProps} disableImg={true} />
               </div>
             ))}

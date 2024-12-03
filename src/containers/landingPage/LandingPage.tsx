@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { useHistory } from 'react-router';
 import { HOME_PAGE_BY_ROLE } from '../../constants/route';
@@ -7,11 +7,14 @@ import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg
 import { ReactComponent as ReportingPortalLogo } from '../../assets/images/reports.svg';
 import { ReactComponent as InsightsLogo } from '../../assets/images/insights.svg';
 
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
 import { Link } from 'react-router-dom';
 import { goToUrl } from '../../utils/routeUtil';
 import Loader from '../../components/loader/Loader';
+import localStorageServices from '../../global/localStorageServices';
+import { clearSideMenu } from '../../store/common/actions';
+import { clearAppType } from '../../store/user/actions';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -32,9 +35,10 @@ interface ISpiceSuite {
 
 const LandingPage = (): React.ReactElement => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
- const [suites, setSuites] = useState<ISpiceSuite[]>([]);
+  const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
   /**
    * Memoized value to spiceSuites with dependency on role
@@ -86,6 +90,16 @@ const LandingPage = (): React.ReactElement => {
     }
     setSuites(authorisedSuites);
   }, [history, userSuiteAccess, spiceSuites]);
+
+  /**
+   * To remove Region based details
+   */
+  useEffect(() => {
+    dispatch(clearSideMenu());
+    dispatch(clearAppType());
+    localStorageServices.deleteItem(APP_TYPE_NAME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Renders the content of a suite card

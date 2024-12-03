@@ -110,7 +110,7 @@ const useAppTypeConfigs = () => {
 
   return useMemo(
     () =>
-      Array.isArray(appTypes) && appTypes.length === 1 && appTypes.includes(APP_TYPE.NON_COMMUNITY)
+      Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY)
         ? { ...NON_COMMUNITY, appTypes }
         : { ...COMMUNITY, appTypes },
     [appTypes]

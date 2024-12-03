@@ -183,9 +183,9 @@ export const formatRoles = (user: IHFUserGet) => {
     .join(',')}`;
 };
 
-export const filterLanguagesByAppTypes = (languages: any[], appTypes: string[]) => {
+export const filterByAppTypes = (datas: any[], appTypes: string[]) => {
   const appTypesSet = new Set(appTypes); // Use a Set for faster lookup
-  return languages.filter((language) => language.appTypes.some((appType: string) => appTypesSet.has(appType)));
+  return datas.filter((data) => data.appTypes.some((appType: string) => appTypesSet.has(appType)));
 };
 
 export const decodeURIText = (text: string) => {

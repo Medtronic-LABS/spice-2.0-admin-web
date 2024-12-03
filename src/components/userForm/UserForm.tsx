@@ -186,7 +186,8 @@ const UserForm = ({
       designation: { available: isDesignationListShow },
       community: { available: isCommunityListShow }
     },
-    district: { s: districtSName }
+    district: { s: districtSName },
+    isCommunity
   } = useAppTypeConfigs();
 
   const [newHFList, setNewHFList] = useState(healthFacilityList);
@@ -245,15 +246,6 @@ const UserForm = ({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (!isHF && isEdit) {
-      if (!isSiteUser) {
-        const [selectedAdminRole] = initialEditValue?.role || [];
-        setSelectedAdmins(selectedAdminRole?.name);
-      }
-    }
-  }, [initialEditValue, isHF, isEdit, isSiteUser]);
 
   useEffect(() => {
     return () => {
@@ -355,6 +347,13 @@ const UserForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [cultureList, initialEditValue, districtList, chiefdomList, isCultureListLoading, isEdit]
   );
+
+  useEffect(() => {
+    if (!isHF && isEdit && !isSiteUser) {
+      const [selectedAdminRole] = initialEditData?.[0]?.role || [];
+      setSelectedAdmins(selectedAdminRole?.name);
+    }
+  }, [initialEditData, isHF, isEdit, isSiteUser]);
 
   /**
    * Resets the admin form fields to their initial state.
@@ -478,7 +477,9 @@ const UserForm = ({
           id: userData.countryCode
         });
         form.change(`${formName}[${index}].phoneNumber`, userData.phoneNumber || '');
-        form.change(`${formName}[${index}].healthfacility`, userData.healthFacility || null);
+        if (isCommunity) {
+          form.change(`${formName}[${index}].healthfacility`, userData.healthFacility || null);
+        }
         form.change(`${formName}[${index}].reportUserOrganization`, userData.reportUserOrganization || null);
         form.change(`${formName}[${index}].insightUserOrganization`, userData.insightUserOrganization || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
@@ -571,10 +572,15 @@ const UserForm = ({
                     dataToPush.role = [
                       appTypeBasedRoles.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)
                     ];
-                  }
-                  if (isAdminForm && defaultSelectedRole) {
                     const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
                     dataToPush.suiteAccess = [getSpiceGroupName(suiteAccess)];
+                  }
+                  if (
+                    isRegionCreate &&
+                    !form?.getState()?.errors?.region?.phoneNumberCode &&
+                    form.getState()?.values?.region?.phoneNumberCode?.length
+                  ) {
+                    dataToPush.countryCode = form.getState()?.values?.region?.phoneNumberCode;
                   }
                   fields.push(dataToPush);
                 }
@@ -818,27 +824,32 @@ const UserForm = ({
 
   /**
    * Effect hook to set the district ID based on the selected admins.
+   * This function ensures showing chiefdom list based on hierarchy when add/edit admin
+   * Using zero index value only as add/edit admin have only one user form
    */
   useEffect(() => {
-    const districtDataId = form.getState().values.users?.[0]?.district?.tenantId;
-    const [existingDistrict] = initialEditData;
+    const selectedDistrictTenantId = form.getState().values.users?.[0]?.district?.tenantId; // for add
+    const [existingDistrict] = initialEditData; // for edit
 
     const existingDistrictId = existingDistrict?.organizations?.filter(
       (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
     );
     const { defaultRoleName = '' } = existingDistrict;
 
-    let districtId = null;
+    let payloadTenantId = null;
+    // if current role is district admin then send URL tenantId
     if (role === DISTRICT_ADMIN) {
-      districtId = hfTenantId;
+      payloadTenantId = hfTenantId;
     } else if (defaultRoleName === HEALTH_FACILITY_ADMIN) {
-      districtId = null;
+      payloadTenantId = null;
     } else {
-      districtId = districtDataId || existingDistrictId?.[0]?.id;
+      payloadTenantId = selectedDistrictTenantId || existingDistrictId?.[0]?.id;
     }
-    if (districtId && !isSiteUser) {
-      dispatch(fetchChiefdomListRequest({ tenantId: districtId }));
+    if (payloadTenantId && !isSiteUser) {
+      // for other admins send selected district tenentId
+      dispatch(fetchChiefdomListRequest({ tenantId: payloadTenantId }));
     } else if (!isSiteUser && fetchingFor === REGION_ADMIN && hfTenantId) {
+      // for region admin send URL tenentId
       dispatch(fetchChiefdomListRequest({ tenantId: String(hfTenantId) }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -846,15 +857,18 @@ const UserForm = ({
 
   /**
    * Effect hook to fetch chiefdom details based on the selected admins.
+   * This function ensures showing HF list based on hierachy when add/edit admin
+   * Using zero index value only add/edit admin have only one user form
    */
   useEffect(() => {
-    const chiefdomData = form.getState().values.users?.[0]?.chiefdom;
-    const [existingDistrict] = initialEditData;
+    const selectedChiefdomData = form.getState().values.users?.[0]?.chiefdom; // for add
+    const [existingDistrict] = initialEditData; // for edit
     const existingchiefdomDataId = existingDistrict?.organizations?.filter(
       (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
     );
-    const chiefdomDetails = chiefdomData ?? existingchiefdomDataId?.[0];
-    const chiefdomId = role === CHIEFDOM_ADMIN ? hfTenantId : chiefdomData?.tenantId ?? existingchiefdomDataId?.[0]?.id;
+    const chiefdomDetails = selectedChiefdomData ?? existingchiefdomDataId?.[0];
+    const chiefdomId =
+      role === CHIEFDOM_ADMIN ? hfTenantId : selectedChiefdomData?.tenantId ?? existingchiefdomDataId?.[0]?.id;
     if (chiefdomId) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [chiefdomId] });
     } else if (!isSiteUser && healthFacilityList.length === 0 && fetchingFor === ADMIN_BASED_ON_URL.chiefdom) {
@@ -1175,51 +1189,54 @@ const UserForm = ({
                     />
                   </div>
                 )}
-                {isSPICE && isDesignationListShow && (
-                  <div className='col-sm-6 col-12'>
-                    <Field
-                      name={`${name}.designation`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => {
-                        let userSelectedRoles = [];
-                        // for user create and edit
-                        if (
-                          Array.isArray(form.getState().values.users?.[index].role) &&
-                          form.getState().values.users?.[index].role.length
-                        ) {
-                          userSelectedRoles = form.getState().values.users?.[index].role;
-                        } else if (
-                          !Array.isArray(form.getState().values.users?.[index].role) &&
-                          form.getState().values.users?.[index].role &&
-                          form.getState().values.users?.[index].role.id
-                        ) {
-                          // for admin create and edit
-                          userSelectedRoles = [form.getState().values.users?.[index].role];
-                        }
-                        const selectedRoleNames = userSelectedRoles.map(
-                          (userRoleDetails: { name: string }) => userRoleDetails.name
-                        );
-                        const selectedName = (designationList || []).filter((selectedRoleData: any) =>
-                          selectedRoleNames.includes(selectedRoleData.role.name)
-                        );
-                        return (
-                          <SelectInput
-                            {...(input as any)}
-                            label='Designation'
-                            errorLabel='designation'
-                            required={true}
-                            labelKey='name'
-                            valueKey='id'
-                            options={selectedName || []}
-                            error={isError(meta)}
-                            isModel={true}
-                          />
-                        );
-                      }}
-                    />
-                  </div>
-                )}
+                {isSPICE &&
+                  isDesignationListShow &&
+                  (!isProfile ||
+                    form.getState().values.users?.[index].role[0].name !== APPCONSTANTS.ROLES.SUPER_USER) && (
+                    <div className='col-sm-6 col-12'>
+                      <Field
+                        name={`${name}.designation`}
+                        type='text'
+                        validate={required}
+                        render={({ input, meta }) => {
+                          let userSelectedRoles = [];
+                          // for user create and edit
+                          if (
+                            Array.isArray(form.getState().values.users?.[index].role) &&
+                            form.getState().values.users?.[index].role.length
+                          ) {
+                            userSelectedRoles = form.getState().values.users?.[index].role;
+                          } else if (
+                            !Array.isArray(form.getState().values.users?.[index].role) &&
+                            form.getState().values.users?.[index].role &&
+                            form.getState().values.users?.[index].role.id
+                          ) {
+                            // for admin create and edit
+                            userSelectedRoles = [form.getState().values.users?.[index].role];
+                          }
+                          const selectedRoleNames = userSelectedRoles.map(
+                            (userRoleDetails: { name: string }) => userRoleDetails.name
+                          );
+                          const selectedName = (designationList || []).filter((selectedRoleData: any) =>
+                            selectedRoleNames.includes(selectedRoleData.role.name)
+                          );
+                          return (
+                            <SelectInput
+                              {...(input as any)}
+                              label='Designation'
+                              errorLabel='designation'
+                              required={true}
+                              labelKey='name'
+                              valueKey='id'
+                              options={selectedName || []}
+                              error={isError(meta)}
+                              isModel={true}
+                            />
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
                 {isReports && (
                   <div className='col-sm-6 col-12'>
                     <Field
@@ -1392,7 +1409,6 @@ const UserForm = ({
                     isHF={isHF}
                     isHFCreate={isHFCreate}
                     isSiteUser={isSiteUser}
-                    tenantId={hfTenantId}
                     onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
                     parentOrgId={
                       isSiteUser && !parentOrgId

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadingSelector, timezoneListSelector } from '../../../store/user/selectors';
 import { useEffect } from 'react';
 import { fetchCultureListRequest, fetchTimezoneListRequest } from '../../../store/user/actions';
-import { filterLanguagesByAppTypes } from '../../../utils/commonUtils';
+import { filterByAppTypes } from '../../../utils/commonUtils';
 
 export const SiteUserForm = (props: any) => {
   const dispatch = useDispatch();
@@ -65,6 +65,7 @@ export const SiteUserForm = (props: any) => {
     if (!(cultureList || []).length && isCultureAvailable) {
       dispatch(fetchCultureListRequest());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -104,7 +105,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
-                options={filterLanguagesByAppTypes(cultureList, appTypes) || []}
+                options={filterByAppTypes(cultureList, appTypes) || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
                 isModel={true}
@@ -187,7 +188,7 @@ export const SiteUserForm = (props: any) => {
             render={({ input, meta }) => (
               <SelectInput
                 {...(input as any)}
-                label='Assigned Health Facility1'
+                label='Assigned Health Facility'
                 errorLabel='assigned health facility'
                 labelKey='name'
                 valueKey='id'

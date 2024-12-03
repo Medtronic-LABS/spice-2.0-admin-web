@@ -213,10 +213,11 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                 ...prev.data,
                 healthFacility: {
                   ...healthFacility,
-                  clinicalWorkflows: isCommunity
-                    ? formInstance.current.getState().values.healthFacility?.clinicalWorkflows ||
-                      flows.map((v: any) => v?.id)
-                    : flows.map((v: any) => v?.id),
+                  clinicalWorkflows:
+                    formInstance.current.getState().values.healthFacility?.clinicalWorkflows ||
+                    (isCommunity
+                      ? flows.map((v: any) => v?.id)
+                      : flows.filter((flow) => flow.default)?.map((f) => f?.id)),
                   defaultTrueWorkflows: flows.filter((flow) => flow.default)?.map((f) => f?.id)
                 },
                 users
@@ -382,6 +383,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         }}
         render={({ handleSubmit, form }: FormRenderProps<any>) => {
           formInstance.current = form;
+          const formClinicalWFsLength = (form?.getState()?.values?.healthFacility?.clinicalWorkflows || []).length;
+          const formCustomizedWFsLength = (form?.getState()?.values?.healthFacility?.customizedWorkflows || []).length;
           return (
             <form onSubmit={handleSubmit} data-testid='create-site-form'>
               <div className='row g-1dot25'>{renderByPage(submittedData.pageNumber, form)}</div>
@@ -394,7 +397,9 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                   className='btn primary-btn px-1dot75'
                   disabled={
                     submittedData.pageNumber === PAGENUMBER.WORKFLOW &&
-                    !(form?.getState()?.values?.healthFacility?.clinicalWorkflows ?? []).length
+                    (isCommunity
+                      ? formClinicalWFsLength === 0
+                      : formClinicalWFsLength === 0 && formCustomizedWFsLength === 0)
                   }
                 >
                   {[PAGENUMBER.USER, PAGENUMBER.SUBMIT].includes(submittedData.pageNumber) ? 'Submit' : 'Next'}

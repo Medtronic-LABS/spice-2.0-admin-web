@@ -13,6 +13,10 @@ import {
 } from '../../utils/validation';
 import styles from '../workflow/WorkflowForm.module.scss';
 import Checkbox from '../../components/formFields/Checkbox';
+import { useDispatch } from 'react-redux';
+import { clearAppType, setAppType } from '../../store/user/actions';
+import localStorageServices from '../../global/localStorageServices';
+import { APP_TYPE_NAME } from '../../constants/appConstants';
 
 const appTypes = [
   { name: 'Community', _id: 'COMMUNITY' },
@@ -25,6 +29,7 @@ const appTypes = [
  */
 const RegionForm = (): React.ReactElement => {
   const form = useForm();
+  const dispatch = useDispatch();
   const appTypesError = required(form?.getState()?.values.region?.appTypes);
   const appTypesTouched = form?.getState()?.touched?.['region.appTypes'];
 
@@ -44,6 +49,20 @@ const RegionForm = (): React.ReactElement => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getState()?.values?.region?.phoneNumberCode]);
+
+  // cleating app type when component mounts
+  useEffect(() => {
+    dispatch(clearAppType());
+    localStorageServices.deleteItem(APP_TYPE_NAME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleAppTypeClick = () => {
+    setTimeout(() => {
+      const selectedAppTypes = form.getState()?.values?.region?.appTypes || [];
+      dispatch(setAppType(selectedAppTypes));
+    }, 0);
+  };
 
   return (
     <div className='row gx-1dot25'>
@@ -94,7 +113,9 @@ const RegionForm = (): React.ReactElement => {
                   validate={composeValidators(required)}
                   type='checkbox'
                   value={forms._id}
-                  render={({ input }) => <Checkbox label={convertToCaptilize(forms.name)} {...input} />}
+                  render={({ input }) => (
+                    <Checkbox label={convertToCaptilize(forms.name)} {...input} onClick={handleAppTypeClick} />
+                  )}
                 />
               </div>
             );

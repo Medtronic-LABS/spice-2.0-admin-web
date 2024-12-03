@@ -110,6 +110,21 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       ),
     [appTypes, countryIdValue, dispatch, regionId, role]
   );
+
+  /**
+   * Gets the tenant ID based on the app type and role
+   * @returns {number} The tenant ID
+   */
+  const getTenentId = (): number => {
+    if (
+      appTypes.includes(APP_TYPE.NON_COMMUNITY) ||
+      (appTypes.includes(APP_TYPE.COMMUNITY) && (regionId || role === APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN))
+    ) {
+      return tenantId;
+    }
+    return countryTenantId;
+  };
+
   /**
    * Formats the menu items
    * @param {ISideMenu[]} rawMenu - The raw menu items
@@ -119,16 +134,11 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
     (rawMenu: ISideMenu[]) => {
       let choosenRoutes: ISideMenu[] = [...rawMenu];
       const routeVariableValues = {
-        ':regionId': regionId ?? countryIdValue,
+        ':regionId': regionId || countryIdValue, // for community and non-community
         ':districtId': districtId,
         ':chiefdomId': chiefdomId,
         ':healthFacilityId': healthFacilityId,
-        // below condition is for community app type and not include health facility role
-        ':tenantId':
-          regionId ||
-          (appTypes.includes(APP_TYPE.NON_COMMUNITY) || role === APPCONSTANTS.ALL_ROLES.HEALTH_FACILITY_ADMIN
-            ? tenantId
-            : countryIdValue)
+        ':tenantId': getTenentId()
       };
       choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
         menu = { ...menu };
@@ -141,6 +151,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       });
       setFetchedSideMenu(choosenRoutes);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [appTypes, chiefdomId, countryIdValue, countryTenantId, districtId, healthFacilityId, regionId, tenantId]
   );
 
@@ -161,22 +172,28 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
     }
   }, [fetchSideMenu, formatMenuItems, list, currentModule, role]);
 
+  const getActiveStatus = (route: any, displayName: string) => {
+    const pathSegments = pathname.split('/');
+    if (matchPath(pathname, { exact: true, path: route })) {
+      return true;
+    } else if (
+      // for community admin login
+      appTypes.includes(APP_TYPE.COMMUNITY) &&
+      displayName === healthFacility &&
+      pathSegments.includes(APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY) &&
+      !pathSegments.includes('user')
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
       {getLoading() && <Loader />}
       <div className={`${styles.sideMenu} py-0dot25 ${className}`} data-testid='side-menu-component'>
         {[...fetchedSideMenu]?.map(({ displayName, disabled, ...rest }: any, i: number) => {
-          let isActive = false;
-          if (appTypes.includes(APP_TYPE.NON_COMMUNITY)) {
-            isActive = !!matchPath(pathname, { exact: true, path: rest.route });
-          } else {
-            const pathSegments = pathname.split('/');
-            isActive =
-              !!matchPath(pathname, { exact: true, path: rest.route }) ||
-              (displayName === healthFacility &&
-                pathSegments.includes(APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY) &&
-                !pathSegments.includes('user'));
-          }
+          const isActive = getActiveStatus(rest.route, displayName);
           return (
             <NavLink
               to={rest.route}
