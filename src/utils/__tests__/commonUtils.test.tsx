@@ -10,9 +10,14 @@ import {
   formatDate,
   jsonParse,
   formatCountryCode,
-  formatRoles
+  formatRoles,
+  filterByAppTypes,
+  decodeURIText,
+  removeRedRiskFromRoleArray
 } from '../commonUtils';
 import { IHFUserGet } from '../../store/healthFacility/types';
+import APPCONSTANTS from '../../constants/appConstants';
+import { redRisk } from '../../constants/roleConstants';
 
 jest.mock('file-saver', () => ({
   saveAs: jest.fn()
@@ -339,6 +344,56 @@ describe('commonUtils', () => {
       };
       const result = formatRoles(user);
       expect(result).toBe('');
+    });
+  });
+
+  describe('filterByAppTypes', () => {
+    it('should filter the data by appTypes', () => {
+      const result = filterByAppTypes(
+        [
+          { id: 1, name: APPCONSTANTS.appTypes.community, appTypes: [APPCONSTANTS.appTypes.community] },
+          { id: 2, name: APPCONSTANTS.appTypes.non_community, appTypes: [APPCONSTANTS.appTypes.non_community] }
+        ],
+        [APPCONSTANTS.appTypes.community]
+      );
+      expect(result).toEqual([
+        { id: 1, name: APPCONSTANTS.appTypes.community, appTypes: [APPCONSTANTS.appTypes.community] }
+      ]);
+    });
+  });
+
+  describe('decodeURIText', () => {
+    it('should decode the text', () => {
+      const result = decodeURIText('test');
+      expect(result).toBe('test');
+    });
+
+    it('should return original text when decoding fails', () => {
+      const originalDecodeURI = global.decodeURIComponent;
+      global.decodeURIComponent = jest.fn(() => {
+        throw new Error('Decoding failed');
+      });
+
+      const malformedText = '%E0%A4%A';
+      const result = decodeURIText(malformedText);
+
+      expect(result).toBe(malformedText);
+
+      global.decodeURIComponent = originalDecodeURI;
+    });
+  });
+
+  describe('removeRedRiskFromRoleArray', () => {
+    it('should remove the redRisk role from the array', () => {
+      const result = removeRedRiskFromRoleArray([
+        { name: redRisk, displayName: null },
+        { name: 'user', displayName: 'User' }
+      ] as any);
+      expect(result).toEqual([{ name: 'user', displayName: 'User' }]);
+    });
+    it('should remove the redRisk role with empty array', () => {
+      const result = removeRedRiskFromRoleArray([]);
+      expect(result).toEqual([]);
     });
   });
 });
