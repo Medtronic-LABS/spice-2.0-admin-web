@@ -15,6 +15,7 @@ import Loader from '../../components/loader/Loader';
 import localStorageServices from '../../global/localStorageServices';
 import { clearSideMenu } from '../../store/common/actions';
 import { clearAppType } from '../../store/user/actions';
+import { SUPER_ADMIN, SUPER_USER } from '../../routes';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -96,8 +97,10 @@ const LandingPage = (): React.ReactElement => {
    */
   useEffect(() => {
     dispatch(clearSideMenu());
-    dispatch(clearAppType());
-    localStorageServices.deleteItem(APP_TYPE_NAME);
+    if ([SUPER_ADMIN, SUPER_USER].includes(role)) {
+      dispatch(clearAppType());
+      localStorageServices.deleteItem(APP_TYPE_NAME);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

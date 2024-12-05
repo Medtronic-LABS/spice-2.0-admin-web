@@ -401,15 +401,29 @@ const HealthFacilitySummary = (): React.ReactElement => {
   );
 
   /**
-   * Handles the submission of health facility (HF) user details for editing.
-   * It processes the user data, formats it into the required payload, and dispatches a request to update the user.
+   * Common submit handler for user add and edit
+   * @param {IHFUserPost} data - API Payload data
+   * @param {any} actionFn - redux action function
+   * @param {any} successCB - callback for api success
+   * @param {any} failureCB - callback for api failure
+   */
+  const onSubmitHandler = useCallback(
+    (data: IHFUserPost, actionFn: any, successCB: (data: any) => void, failureCB: (error: any) => void) => {
+      dispatch(actionFn({ data, successCb: successCB, failureCb: failureCB }));
+    },
+    [dispatch]
+  );
+
+  /**
+   * Handles the submission of user details for adding a new health facility (HF) user.
+   * It processes the user data, formats it into the required payload, and dispatches a request to create the user.
    *
    * @param {Object} formData - The submitted form data.
    * @param {IHFUserPost[]} formData.users - An array of user objects from the form.
    *
    * @returns {void}
    */
-  const handleEditUserSubmit = ({ users }: { users: IHFUserPost[] }) => {
+  const handleAddEditUserSubmit = ({ users }: { users: IHFUserPost[] }): void => {
     const userObj = getUserPayload({
       appTypes,
       userFormData: users,
@@ -418,14 +432,20 @@ const HealthFacilitySummary = (): React.ReactElement => {
       spiceRolesGroup: rolesGrouped?.SPICE
     });
     const data: IHFUserPost = userObj[0];
-    dispatch(
-      updateHFUserRequest({
-        data,
-        successCb: healthfacilityUserSuccess,
-        failureCb: (e) => {
-          fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR);
+    const isUserEdit = isHFUserEdit || data.id;
+    onSubmitHandler(
+      data,
+      isUserEdit ? updateHFUserRequest : createHFUserRequest,
+      healthfacilityUserSuccess,
+      (e: Error) => {
+        if (isUserEdit) {
+          setHFUserModal(false);
         }
-      })
+        fetchFailure(
+          e,
+          isUserEdit ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
+        );
+      }
     );
   };
 
@@ -460,37 +480,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
     hfUserForEdit.current = { users: [] };
     setHFUserModal(true);
   }, [hfUserForEdit]);
-
-  /**
-   * Handles the submission of user details for adding a new health facility (HF) user.
-   * It processes the user data, formats it into the required payload, and dispatches a request to create the user.
-   *
-   * @param {Object} formData - The submitted form data.
-   * @param {IHFUserPost[]} formData.users - An array of user objects from the form.
-   *
-   * @returns {void}
-   */
-  const handleAddUserSubmit = ({ users }: { users: IHFUserPost[] }): void => {
-    const userObj = getUserPayload({
-      appTypes,
-      userFormData: users,
-      countryId: countryIdValue,
-      tenantId,
-      isHFCreate: true,
-      spiceRolesGroup: rolesGrouped?.SPICE
-    });
-    const data: IHFUserPost = userObj[0];
-    dispatch(
-      createHFUserRequest({
-        data,
-        successCb: healthfacilityUserSuccess,
-        failureCb: (e: Error) => {
-          setHFUserModal(false);
-          fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR);
-        }
-      })
-    );
-  };
 
   /**
    * Handles the click event to delete a health facility user
@@ -676,7 +665,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
           cancelText='Cancel'
           submitText='Submit'
           handleCancel={() => setHFUserModal(false)}
-          handleFormSubmit={isHFUserEdit ? handleEditUserSubmit : handleAddUserSubmit}
+          handleFormSubmit={handleAddEditUserSubmit}
           initialValues={hfUserForEdit.current}
           render={userFormRender}
           mutators={{ ...arrayMutators }}

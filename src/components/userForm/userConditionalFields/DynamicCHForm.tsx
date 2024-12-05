@@ -31,7 +31,7 @@ export const DynamicCHForm = ({
     <>
       {showVillages && (
         <>
-          <div className='col-sm-6 col-12'>
+          <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
             <Field
               name={`${name}.supervisor`}
               type='text'
@@ -54,7 +54,7 @@ export const DynamicCHForm = ({
               )}
             />
           </div>
-          <div className='col-sm-6 col-12'>
+          <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
             <Field
               name={`${name}.villages`}
               type='text'
@@ -94,7 +94,7 @@ export const DynamicCHForm = ({
         </>
       )}
       {isChaUser && (
-        <div className='col-sm-6 col-12'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field
             name={`${name}.communityUnit`}
             type='text'

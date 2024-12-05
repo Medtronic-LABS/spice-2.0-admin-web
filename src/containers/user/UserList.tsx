@@ -42,11 +42,12 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
 
-interface IMatchParams {
+export interface IMatchParams {
   tenantId: string;
   regionId: string;
   districtId: string;
   chiefdomId: string;
+  healthFacilityId: string;
 }
 
 /**
@@ -55,7 +56,7 @@ interface IMatchParams {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId } = useParams<IMatchParams>();
+  const { regionId, tenantId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);
@@ -247,21 +248,21 @@ const UserList = (): React.ReactElement => {
       const userObj = getUserPayload({
         userFormData: users,
         countryId: countryIdValue,
-        tenantId,
+        tenantId: tenantId && !regionId ? tenantId : undefined, // region tenantId should not be used
         spiceRolesGroup: rolesGrouped?.SPICE,
         appTypes
       });
       const data: IHFUserPost = userObj[0];
       onSubmitHandler(
         { ...data },
-        isOpenUserModal.isEdit ? updateHFUserRequest : createHFUserRequest,
+        isOpenUserModal.isEdit || data.id ? updateHFUserRequest : createHFUserRequest,
         siteUserSuccess,
         (e) => {
           toastCenter.error(
             ...getErrorToastArgs(
               e,
               APPCONSTANTS.OOPS,
-              isOpenUserModal.isEdit
+              isOpenUserModal.isEdit || data.id
                 ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
                 : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
             )
@@ -269,7 +270,16 @@ const UserList = (): React.ReactElement => {
         }
       );
     },
-    [countryIdValue, tenantId, rolesGrouped?.SPICE, appTypes, onSubmitHandler, isOpenUserModal.isEdit, siteUserSuccess]
+    [
+      countryIdValue,
+      tenantId,
+      regionId,
+      rolesGrouped?.SPICE,
+      appTypes,
+      onSubmitHandler,
+      isOpenUserModal.isEdit,
+      siteUserSuccess
+    ]
   );
 
   /**
@@ -340,18 +350,22 @@ const UserList = (): React.ReactElement => {
    * Function to fetch list
    */
   const fetchList = useCallback(() => {
-    dispatch(
-      fetchHFListRequest({
-        countryId: countryIdValue,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: null,
-        userBased: !isSuperUser,
-        tenantIds: [tenantId],
-        failureCb: (e: Error) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR));
-        }
-      })
-    );
+    if (showFilters) {
+      dispatch(
+        fetchHFListRequest({
+          countryId: countryIdValue,
+          skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: null,
+          userBased: !isSuperUser,
+          tenantIds: tenantId && !regionId ? [tenantId] : [],
+          failureCb: (e: Error) => {
+            toastCenter.error(
+              ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
+            );
+          }
+        })
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isSuperUser, countryIdValue, showFilters]);
 

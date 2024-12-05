@@ -65,7 +65,7 @@ export const getUserPayload = ({
   const payload = userFormData.map((user: any) => {
     let roleIds: number[] = [];
     // for role, roles, roleIds
-    if (isHFCreate) {
+    if (!user.id) {
       roleIds = Array.isArray(user.roles)
         ? (user.roles || []).map((id: any) => (Array.isArray(id) ? id.map((e: any) => e.id) : id.id)).flat()
         : [user.role.id];
@@ -103,17 +103,16 @@ export const getUserPayload = ({
     let payloadTenantId = Number(user?.tenantId || tenantId); // By default add user tenantId or tenentId from URL
     if (user?.tenantId) {
       // if user has it's own tenantId(while edit) then send that tenantId
-      payloadTenantId = user.tenantId;
-    } else if (user?.healthfacility?.tenantId) {
+      payloadTenantId = Number(user.tenantId);
+    }
+    if (user?.healthfacility?.tenantId) {
       // if hf admin create or user create then send assigned hf tenantId
       payloadTenantId = Number(user.healthfacility.tenantId);
-    } else if (tenantId) {
+    }
+    if (tenantId) {
       // send URL tenantId from summary page
       payloadTenantId = Number(tenantId);
     }
-    const isSpiceRoleContains = user.roles?.some(
-      (role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice
-    );
     const userPayload: IUserPayload = {
       appTypes,
       firstName: user.firstName.trim(),
@@ -124,7 +123,7 @@ export const getUserPayload = ({
       culture: user?.culture || null,
       countryCode: user?.countryCode?.phoneNumberCode || null,
       country: { id: Number(countryId) },
-      tenantId: isSpiceRoleContains ? payloadTenantId : null,
+      tenantId: payloadTenantId,
       supervisorId: Number(user.supervisor?.id) || null,
       roleIds,
       villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),

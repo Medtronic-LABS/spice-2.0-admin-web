@@ -116,7 +116,7 @@ const filterSPICERoles = (
   }
 ) => {
   return roles.filter((role: IRoles) => {
-    const { name, displayName, suiteAccessName } = role;
+    const { name, displayName, suiteAccessName, groupName } = role;
     const suiteNameLower = suiteAccessName?.toLowerCase() || '';
     if (name === redRisk || displayName === null) {
       return false;
@@ -126,11 +126,16 @@ const filterSPICERoles = (
     const isHFCondition = siteUserCondition || name === hfAdminRole;
     const isCommunityCondition = isHFCondition || name === superAdminRole;
     const isHFCreateCondition = isHFCondition && !villageBasedRoles.includes(name);
+    const isReports = groupName === REPORTS;
+    const isReportAdmin = name === reportAdminRole[0];
 
     if (isHFCreate) {
       return isHFCreateCondition;
     }
     if (isHF) {
+      if (isReports) {
+        return !isReportAdmin;
+      }
       return isHFCondition;
     }
     // Site user condition
@@ -165,57 +170,59 @@ export const useRoleMeta = ({
 } => {
   const { appTypes, isCommunity } = useAppTypeConfigs();
   const { separateRolesByGroupName } = useUserFormUtils();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const showFields = {
+    isShowVillages: false,
+    isShowSpiceHFList: false,
+    isShowReportHFList: false,
+    isShowInsightHFList: false
+  };
 
   // specific role changes to fetch CHA CHW CHP validations and show HF list, villages list etc
   const roleSpecificChanges = useCallback(
     (roles: IRoles[] = [], currentSuite: string, index: number) => {
       const isCHAUser = (roles || []).some((userRole: IRoles) => chaRole.includes(userRole.name));
       const isCHWCHPUser = (roles || []).some((userRole: IRoles) => villageBasedRoles.includes(userRole.name));
-      let isShowVillages = false;
-      let isShowSpiceHFList = showSpiceHFListState[index];
-      let isShowReportHFList = showReportHFListState[index];
-      let isShowInsightHFList = showInsightHFListState[index];
       // show HF and show Villages condition
       if (roles.length && currentSuite === SPICE) {
-        isShowVillages = isHFCreate ? false : isCHWCHPUser;
+        if (isCHWCHPUser) {
+          showFields.isShowVillages = isHFCreate ? false : isCHWCHPUser;
+        }
         roles.forEach((userRole: IRoles) => {
           if (
             [...allHFNeededRoles, hfAdminRole].includes(userRole.name) &&
             !isHFCreate &&
             !isHF &&
-            !isEdit &&
+            // !isEdit &&
             isSiteUser
           ) {
-            isShowSpiceHFList = true;
+            showFields.isShowSpiceHFList = true;
             return;
           } else {
-            isShowSpiceHFList = false;
+            showFields.isShowSpiceHFList = false;
           }
         });
       } else if (currentSuite === SPICE) {
-        isShowSpiceHFList = false;
-        isShowVillages = false;
+        showFields.isShowSpiceHFList = false;
+        showFields.isShowVillages = false;
       }
       // show report hf list condition
       if (currentSuite === REPORTS) {
-        isShowReportHFList =
+        showFields.isShowReportHFList =
           !!roles.length && roles.some((userRole: IRoles) => facilityReportAdminRole.includes(userRole.name));
       }
       // show insight hf list condition
       if (currentSuite === INSIGHTS) {
-        isShowInsightHFList =
+        showFields.isShowInsightHFList =
           !!roles.length && roles.some((userRole: IRoles) => insightUserRole.includes(userRole.name));
       }
       return {
         isCHAUser,
         isCHWCHPUser,
-        isShowVillages,
-        isShowSpiceHFList,
-        isShowReportHFList,
-        isShowInsightHFList
+        showFields
       };
     },
-    [isEdit, isHF, isHFCreate, isSiteUser, showInsightHFListState, showReportHFListState, showSpiceHFListState]
+    [isHF, isHFCreate, isSiteUser, showFields]
   );
 
   const roleChange = useCallback(
@@ -335,18 +342,18 @@ export const useRoleMeta = ({
         REPORTS: [],
         INSIGHTS: []
       };
-      // let disabledSpiceRoles: IRoles[] = [];
-      // let disabledReportRoles: IRoles[] = [];
-      // let disabledInsightRoles: IRoles[] = [];
 
       interface IRoleChangesConfig {
         isCHAUser: boolean;
         isCHWCHPUser: boolean;
-        isShowVillages: boolean;
-        isShowSpiceHFList: boolean;
-        isShowReportHFList: boolean;
-        isShowInsightHFList: boolean;
+        showFields: {
+          isShowVillages: boolean;
+          isShowSpiceHFList: boolean;
+          isShowReportHFList: boolean;
+          isShowInsightHFList: boolean;
+        };
       }
+
       let roleChangesConfig: IRoleChangesConfig = {} as IRoleChangesConfig;
 
       allRoles.forEach((roleValue: IRoles) => {
@@ -379,14 +386,14 @@ export const useRoleMeta = ({
       newCHWCHPStatus[index] = roleChangesConfig.isCHWCHPUser;
 
       const newShowVillage = [...showVillagesState];
-      newShowVillage[index] = roleChangesConfig.isShowVillages;
+      newShowVillage[index] = roleChangesConfig.showFields?.isShowVillages;
 
       const newShowSpiceHF = [...showSpiceHFListState];
-      newShowSpiceHF[index] = roleChangesConfig.isShowSpiceHFList;
+      newShowSpiceHF[index] = roleChangesConfig.showFields?.isShowSpiceHFList;
       const newShowReportHF = [...showReportHFListState];
-      newShowReportHF[index] = roleChangesConfig.isShowReportHFList;
+      newShowReportHF[index] = roleChangesConfig.showFields?.isShowReportHFList;
       const newShowInsightHF = [...showInsightHFListState];
-      newShowInsightHF[index] = roleChangesConfig.isShowInsightHFList;
+      newShowInsightHF[index] = roleChangesConfig.showFields?.isShowInsightHFList;
 
       onRoleChange({
         disabledRoles: newDRoles,
@@ -449,7 +456,6 @@ export const useRoleOptions = ({
     // returns the INSIGHTS roles based on the conditions
     const insightRoleOptions =
       (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
-
     roleOptionsFn({ spiceRoleOptions: SPICERoles, reportRoleOptions, insightRoleOptions });
   }, [allRoles, appTypes, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, roleOptionsFn]);
 

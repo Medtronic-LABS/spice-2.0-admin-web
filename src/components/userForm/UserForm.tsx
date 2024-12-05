@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
 import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
+import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta, useRoleOptions } from '../../hooks/roleHook';
 import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
@@ -125,6 +126,7 @@ const UserForm = ({
   const idRefs = useRef([new Date().getTime()]);
   const { pathname } = useLocation();
   const formName = 'users';
+  const { tenantId } = useParams<IMatchParams>();
   const dispatch = useDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
   const role = useSelector(roleSelector);
@@ -276,17 +278,19 @@ const UserForm = ({
   ]);
 
   const getHFListFn = useCallback(() => {
+    const isSuperUser = [SUPER_ADMIN, SUPER_USER].includes(role);
     if (countryId) {
       dispatch(
         fetchHFListRequest({
           countryId,
           skip: 0,
           limit: null,
-          userBased: !(role === SUPER_ADMIN || role === SUPER_USER)
+          tenantIds: !isSuperUser ? [tenantId] : undefined,
+          userBased: !isSuperUser
         })
       );
     }
-  }, [countryId, dispatch, role]);
+  }, [countryId, dispatch, role, tenantId]);
 
   useEffect(() => {
     if (!showFilters && countryId) {
@@ -450,8 +454,8 @@ const UserForm = ({
       );
       userData.selectedVillages = [...(Array.isArray(userData.villages) ? userData.villages : [])];
       if (userData.organizations.length === 1) {
-        const { formDataId: id, name, ...rest } = userData.organizations[0];
-        userData.healthFacility = { ...rest, id, name };
+        const { formDataId: id, name, id: orgTenantId, ...rest } = userData.organizations[0];
+        userData.healthFacility = { ...rest, id, name, tenantId: orgTenantId };
       }
       if (showSpiceHFRef.current[index]) {
         const fullRoles = form.getState().values[`${formName}[${index}].roles`];
@@ -466,6 +470,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].roles`, userData.roles || []);
         form.change(`${formName}[${index}].reportRoles`, userData.reportRoles || []);
         form.change(`${formName}[${index}].insightRoles`, userData.insightRoles || []);
+        form.change(`${formName}[${index}].selectedInsightRoles`, userData.insightRoles || []);
         form.change(`${formName}[${index}].selectedReportRoles`, userData.reportRoles || []);
         form.change(`${formName}[${index}].selectedRoles`, userData?.selectedRoles || []);
         form.change(`${formName}[${index}].firstName`, userData?.firstName || '');
@@ -1075,7 +1080,7 @@ const UserForm = ({
                   />
                 </div>
                 {(isSPICE || isAdminForm) && (
-                  <div className={`${'col-sm-6'} `}>
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6'} `}>
                     <Field
                       name={`${name}.role`}
                       type='text'
@@ -1192,8 +1197,7 @@ const UserForm = ({
                 {isSPICE &&
                   isDesignationListShow &&
                   // don't show for superuser
-                  (!isProfile ||
-                    form.getState().values.users?.[index].role[0].name !== APPCONSTANTS.ROLES.SUPER_USER) &&
+                  (!isProfile || spiceRole[0].name !== APPCONSTANTS.ROLES.SUPER_USER) &&
                   !isRegionCreate && ( // don't show while create region
                     <div className='col-sm-6 col-12'>
                       <Field
@@ -1240,7 +1244,7 @@ const UserForm = ({
                     </div>
                   )}
                 {isReports && (
-                  <div className='col-sm-6 col-12'>
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
                       name={`${name}.reportRoles`}
                       type='text'
@@ -1294,7 +1298,7 @@ const UserForm = ({
                   </div>
                 )}
                 {isInsights && (
-                  <div className='col-sm-6 col-12'>
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
                       name={`${name}.insightRoles`}
                       type='text'
@@ -1348,7 +1352,7 @@ const UserForm = ({
                   </div>
                 )}
                 {!isAdminForm && <div className='col-12' />}
-                <div className='col-sm-6 col-12'>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                   <Field
                     name={`${name}.firstName`}
                     type='text'
@@ -1365,7 +1369,7 @@ const UserForm = ({
                     )}
                   />
                 </div>
-                <div className='col-sm-6 col-12'>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                   <Field
                     name={`${name}.lastName`}
                     type='text'
@@ -1382,21 +1386,7 @@ const UserForm = ({
                     )}
                   />
                 </div>
-                <div className='col-12'>
-                  <Field
-                    name={`${name}.gender`}
-                    render={(props) => (
-                      <Radio
-                        {...props}
-                        isRadioSquare={true}
-                        fieldLabel='Gender'
-                        errorLabel='gender'
-                        options={GENDER_OPTIONS}
-                      />
-                    )}
-                  />
-                </div>
-                <div className={`col-12`}>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-12'} `}>
                   <EmailField
                     ref={emailFieldRef}
                     formName={formName}
@@ -1424,7 +1414,21 @@ const UserForm = ({
                     }
                   />
                 </div>
-                <div className='col-sm-6 col-12'>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-8' : 'col-12'} `}>
+                  <Field
+                    name={`${name}.gender`}
+                    render={(props) => (
+                      <Radio
+                        {...props}
+                        isRadioSquare={true}
+                        fieldLabel='Gender'
+                        errorLabel='gender'
+                        options={GENDER_OPTIONS}
+                      />
+                    )}
+                  />
+                </div>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                   {isRegionCreate ? (
                     <Field
                       name={`${name}.countryCode`}
@@ -1464,7 +1468,7 @@ const UserForm = ({
                     />
                   )}
                 </div>
-                <div className='col-sm-6 col-12'>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                   <PhoneNumberField
                     id={form.getState().values.users[index]?.id}
                     fieldName='phoneNumber'
@@ -1480,9 +1484,11 @@ const UserForm = ({
                   />
                 </div>
                 {isSPICE &&
-                  // for non-community show assigned HF while user edit
-                  (showSpiceHFRef.current[index] || (!isCommunity && isSiteUser && isEdit)) && (
-                    <div className='col-sm-6 col-12'>
+                  (isEdit
+                    ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
+                      (!isCommunity && isSiteUser)
+                    : showSpiceHFRef.current[index] && !isEdit) && (
+                    <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                       <Field
                         name={`${name}.${NAMING_VARIABLES.healthFacility}`}
                         type='text'
@@ -1499,7 +1505,7 @@ const UserForm = ({
                               loadingOptions={hfLoading}
                               error={isError(meta)}
                               isModel={true}
-                              disabled={isProfile || isEdit}
+                              disabled={isProfile}
                               onChange={(hf: IHealthFacility) => {
                                 emailDisabledFn('', index, false);
                                 const formData = form.getState()?.values?.users?.[index];
@@ -1544,7 +1550,7 @@ const UserForm = ({
                     </div>
                   )}
                 {isReports && showReportHFRef.current[index] && (
-                  <div className='col-sm-6 col-12'>
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
                       name={`${name}.reportUserOrganization`}
                       type='text'
@@ -1576,7 +1582,7 @@ const UserForm = ({
                   </div>
                 )}
                 {isInsights && showInsightHFRef.current[index] && (
-                  <div className='col-sm-6 col-12'>
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
                       name={`${name}.insightUserOrganization`}
                       type='text'
@@ -1638,6 +1644,7 @@ const UserForm = ({
                   siteRolesChange={siteRolesChange}
                   selectedAdmins={selectedAdmins}
                   role={role}
+                  isProfile={isProfile}
                   isSiteUser={isSiteUser}
                   healthFacilityList={healthFacilityList}
                   hfLoading={hfLoading}

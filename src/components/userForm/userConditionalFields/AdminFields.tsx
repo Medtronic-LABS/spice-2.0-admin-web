@@ -34,7 +34,8 @@ export const SiteUserForm = (props: any) => {
     role,
     isHFAdminSelected,
     isHFCreate,
-    isEdit
+    isEdit,
+    isProfile
   } = props;
   const { form, formName } = formDetails;
   const isHFSelected =
@@ -71,7 +72,7 @@ export const SiteUserForm = (props: any) => {
   return (
     <>
       {isTimezoneAvailable && (
-        <div className='col-sm-6 col-12'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field
             name={`${name}.timezone`}
             type='text'
@@ -93,7 +94,7 @@ export const SiteUserForm = (props: any) => {
         </div>
       )}
       {isCultureAvailable && showCulture && (
-        <div className='col-sm-6 col-12'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field
             name={`${name}.culture`}
             type='text'
@@ -116,7 +117,7 @@ export const SiteUserForm = (props: any) => {
         </div>
       )}
       {isRedRisk && showRedRisk && (
-        <div className='col-6'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6'} `}>
           <Field
             name={`${name}.redRisk`}
             type='checkbox'
@@ -125,7 +126,7 @@ export const SiteUserForm = (props: any) => {
         </div>
       )}
       {showDistrict && (
-        <div className='col-sm-6 col-12'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field
             name={`${name}.${NAMING_VARIABLES.district}`}
             type='text'
@@ -153,7 +154,7 @@ export const SiteUserForm = (props: any) => {
         </div>
       )}
       {showChiefdom && (
-        <div className='col-sm-6 col-12'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field
             name={`${name}.${NAMING_VARIABLES.chiefdom}`}
             type='text'
@@ -180,7 +181,7 @@ export const SiteUserForm = (props: any) => {
         </div>
       )}
       {showHealthFacility && (
-        <div className='col-sm-6 col-12'>
+        <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field
             name={`${name}.${NAMING_VARIABLES.healthFacility}`}
             type='text'
@@ -192,6 +193,7 @@ export const SiteUserForm = (props: any) => {
                 errorLabel='assigned health facility'
                 labelKey='name'
                 valueKey='id'
+                disabled={isProfile}
                 options={healthFacilityList}
                 loadingOptions={hfLoading}
                 error={isError(meta)}
