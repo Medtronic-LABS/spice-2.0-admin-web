@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -167,7 +167,7 @@ const Region = (): React.ReactElement => {
               {
                 type: 'number',
                 value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
-                label: districtSName,
+                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? 'County' : districtSName,
                 disableEllipsis: true,
                 route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
                 onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
@@ -176,7 +176,7 @@ const Region = (): React.ReactElement => {
               {
                 type: 'number',
                 value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-                label: chiefdomSName,
+                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? 'Sub County' : chiefdomSName,
                 route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
                 onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
                 appType: appTypes

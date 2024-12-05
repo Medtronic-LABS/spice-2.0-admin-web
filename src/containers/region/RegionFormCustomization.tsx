@@ -13,7 +13,7 @@ import {
 import { formJSONSelector, getFormMetaSelector, loadingSelector } from '../../store/workflow/selectors';
 import { FormType } from '../../store/workflow/types';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import Loader from '../../components/loader/Loader';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import IconButton from '../../components/button/IconButton';
@@ -49,7 +49,8 @@ const RegionFormCustomization = (): React.ReactElement => {
   const cultureList = useSelector(cultureListSelector);
   const isCultureListLoading = useSelector(cultureListLoadingSelector);
   const defaultCulture = useMemo(
-    () => (cultureList || []).find((culture: { id: number }) => culture.id === APPCONSTANTS.DEFAULT_CULTURE.id),
+    () =>
+      (cultureList || []).find((culture: { appTypes: string[] }) => culture.appTypes.includes(APP_TYPE.NON_COMMUNITY)),
     [cultureList]
   );
   const [currentCulture, setCulture] = useState(defaultCulture);
