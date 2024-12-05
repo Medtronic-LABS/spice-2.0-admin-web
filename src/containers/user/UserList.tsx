@@ -10,7 +10,7 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
-import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, NAMING_VARIABLES } from '../../constants/appConstants';
 import { villageBasedRoles } from '../../constants/roleConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -383,7 +383,8 @@ const UserList = (): React.ReactElement => {
    */
   const spiceUserRole = useMemo(() => {
     return rolesGrouped?.SPICE?.filter(
-      (data: { suiteAccessName: string; name: string; displayName: string }) =>
+      (data: { appTypes: string; suiteAccessName: string; name: string; displayName: string }) =>
+        data.appTypes.includes(APP_TYPE.NON_COMMUNITY) &&
         data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
         (data.name !== NAMING_VARIABLES.redRisk || data.displayName !== null)
     );

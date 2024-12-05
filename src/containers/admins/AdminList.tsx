@@ -150,7 +150,7 @@ const UserList = (): React.ReactElement => {
           data: {
             id,
             appTypes,
-            countryId,
+            countryId: countryIdValue,
             tenantIds: organizations.map((s) => Number(s.id))
           },
           successCb: () => {

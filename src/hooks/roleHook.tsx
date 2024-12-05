@@ -341,7 +341,8 @@ export const useRoleMeta = ({
           selectedSuite: SPICE,
           disabledSPICERoles: findDisabledRoles({
             suite: SPICE,
-            isAfMobile: true
+            isAfMobile: true,
+            validSpiceRoles: [allRoles[0]?.name]
           }),
           disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validSpiceRoles: allReportRoles }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })

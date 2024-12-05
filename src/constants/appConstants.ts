@@ -321,7 +321,7 @@ const APPCONSTANTS = {
   UNLOCK_USER_SUCCESS: 'User unlocked successfully.',
   UNLOCK_USER_FAIL: 'Unable to unlock the user. Please try after sometime.',
 
-  DEFAULT_CULTURE: { id: 1, name: 'English - India' },
+  DEFAULT_CULTURE: { id: 2, name: 'English - India' },
   FORM_ID: 'formId',
   COUNTRY_ID: 'ci',
   COUNTRY_TENANT_ID: 'cti',
