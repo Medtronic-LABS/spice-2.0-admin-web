@@ -3,7 +3,6 @@ import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import configureMockStore from 'redux-mock-store';
-import APPCONSTANTS from '../../../constants/appConstants';
 import RegionFormCustomization from '../RegionFormCustomization';
 
 const mockStore = configureMockStore([]);
@@ -42,7 +41,7 @@ describe('RegionFormCustomization', () => {
     },
     user: {
       cultureList: [
-        { id: APPCONSTANTS.DEFAULT_CULTURE.id, name: 'English' },
+        { id: 1, name: 'English' },
         { id: 2, name: 'Spanish' }
       ],
       cultureListLoading: false

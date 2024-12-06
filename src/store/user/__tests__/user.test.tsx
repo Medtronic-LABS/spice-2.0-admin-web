@@ -70,7 +70,7 @@ const {
   suiteAccess
 } = loggedInUserMockData.data.entity;
 
-const appTypes = ['COMMUNITY'];
+const appTypes = [APPCONSTANTS.appTypes.community];
 
 const userRoles = MOCK_DATA_CONSTANTS.USER_ROLES_RESPONSE_PAYLOAD;
 
@@ -150,7 +150,7 @@ describe('User Saga', () => {
         userActions.addUserTenantID(userTenantID),
         userActions.loginSuccess({
           ...loginSuccessResponseMockData,
-          appTypes: [],
+          appTypes: [APPCONSTANTS.appTypes.community],
           country: { ...country, appTypes }
         } as any)
       ]);
@@ -188,7 +188,7 @@ describe('User Saga', () => {
         userActions.addUserTenantID(userTenantID),
         userActions.loginSuccess({
           ...loginSuccessResponseMockData,
-          appTypes: []
+          appTypes: [APPCONSTANTS.appTypes.community]
         } as any)
       ]);
     });
@@ -376,6 +376,63 @@ describe('User Saga', () => {
       expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
     });
 
+    it('Fetches details of the user who is logged in with appTypes inside country', async () => {
+      const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
+        return Promise.resolve({
+          data: {
+            entity: {
+              username: email,
+              firstName,
+              lastName,
+              id,
+              roles,
+              tenantId,
+              country: {
+                ...country,
+                appTypes
+              },
+              organizations,
+              suiteAccess,
+              appTypes
+            }
+          }
+        } as AxiosResponse);
+      });
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchLoggedInUser
+      ).toPromise();
+      expect(fetchLoggedInUserSpy).toHaveBeenCalledWith();
+      const payload = {
+        email,
+        firstName,
+        lastName,
+        userId: id,
+        role: roles[0].name,
+        roleDetail: roles[0],
+        formDataId: organizations[0]?.formDataId,
+        country: {
+          appTypes,
+          id: 1,
+          name: 'Sierra Leone',
+          phoneNumberCode: '+21',
+          regionCode: '',
+          tenantId: 1,
+          unitMeasurement: null
+        },
+        suiteAccess,
+        countryId: undefined,
+        organizations,
+        appTypes,
+        tenantId: '1'
+      };
+      expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
+    });
+
     it('Fetches details of the user who is logged in without tenantId and tenantId inside country', async () => {
       const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
         return Promise.resolve({
@@ -494,7 +551,16 @@ describe('User Saga', () => {
       expect(dispatched).toEqual([
         userActions.fetchUserRolesActionSuccess({
           ...userRoles.data.entity,
-          INSIGHTS: [],
+          INSIGHTS: [
+            {
+              displayName: 'Insights Developer',
+              groupName: 'INSIGHTS',
+              id: 3,
+              level: 1,
+              name: 'SPICE_INSIGHTS_DEVELOPER',
+              suiteAccessName: 'insights'
+            }
+          ],
           REPORTS: []
         } as any)
       ]);

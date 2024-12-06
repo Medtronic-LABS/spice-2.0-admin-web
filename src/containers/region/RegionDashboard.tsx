@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME, NAME_CONSTANTS } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -54,10 +54,15 @@ const Region = (): React.ReactElement => {
 
   const {
     region: { s: regionSName, p: regionPName },
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
   } = useAppTypeConfigs();
+
+  const {
+    district: { s: ncDistrictName },
+    districtCommunity: { s: cDistrictName },
+    chiefdom: { s: ncChiefdomName },
+    chiefdomCommunity: { s: cChiefdomName }
+  } = NAME_CONSTANTS;
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,
@@ -167,7 +172,7 @@ const Region = (): React.ReactElement => {
               {
                 type: 'number',
                 value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
-                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? 'County' : districtSName,
+                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? ncDistrictName : cDistrictName,
                 disableEllipsis: true,
                 route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
                 onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
@@ -176,7 +181,7 @@ const Region = (): React.ReactElement => {
               {
                 type: 'number',
                 value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? 'Sub County' : chiefdomSName,
+                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? ncChiefdomName : cChiefdomName,
                 route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
                 onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
                 appType: appTypes

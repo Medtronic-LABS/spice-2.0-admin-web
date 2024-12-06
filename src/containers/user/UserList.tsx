@@ -10,7 +10,7 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm from '../../components/userForm/UserForm';
-import APPCONSTANTS, { APP_TYPE, NAMING_VARIABLES } from '../../constants/appConstants';
+import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
 import { villageBasedRoles } from '../../constants/roleConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -41,6 +41,7 @@ import { getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
+import { filterByAppTypes } from '../../utils/commonUtils';
 
 export interface IMatchParams {
   tenantId: string;
@@ -56,7 +57,7 @@ export interface IMatchParams {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { regionId, tenantId } = useParams<IMatchParams>();
+  const { regionId, tenantId, healthFacilityId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);
@@ -248,7 +249,7 @@ const UserList = (): React.ReactElement => {
       const userObj = getUserPayload({
         userFormData: users,
         countryId: countryIdValue,
-        tenantId: tenantId && !regionId ? tenantId : undefined, // region tenantId should not be used
+        tenantId: tenantId && healthFacilityId ? tenantId : undefined, // use hf tenantId only
         spiceRolesGroup: rolesGrouped?.SPICE,
         appTypes
       });
@@ -273,7 +274,7 @@ const UserList = (): React.ReactElement => {
     [
       countryIdValue,
       tenantId,
-      regionId,
+      healthFacilityId,
       rolesGrouped?.SPICE,
       appTypes,
       onSubmitHandler,
@@ -382,12 +383,13 @@ const UserList = (): React.ReactElement => {
    * Remove redrisk from role list
    */
   const spiceUserRole = useMemo(() => {
-    return rolesGrouped?.SPICE?.filter(
-      (data: { appTypes: string; suiteAccessName: string; name: string; displayName: string }) =>
-        data.appTypes.includes(APP_TYPE.NON_COMMUNITY) &&
+    const rolesByAppTypes = filterByAppTypes(rolesGrouped?.SPICE || [], appTypes);
+    return rolesByAppTypes.filter(
+      (data: { suiteAccessName: string; name: string; displayName: string }) =>
         data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
         (data.name !== NAMING_VARIABLES.redRisk || data.displayName !== null)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rolesGrouped]);
 
   /**

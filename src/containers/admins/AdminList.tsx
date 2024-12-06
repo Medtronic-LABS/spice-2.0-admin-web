@@ -163,6 +163,7 @@ const UserList = (): React.ReactElement => {
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [appTypes, countryId, dispatch, refreshHFUserList]
   );
 

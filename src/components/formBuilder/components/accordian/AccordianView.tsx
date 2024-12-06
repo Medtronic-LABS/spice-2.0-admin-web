@@ -301,10 +301,7 @@ const AccordianFooter = ({ initialState, submitting, values, culture, onCancel, 
         {Boolean(Object.keys(values).length) && (
           <button
             type='submit'
-            disabled={
-              (initialState && initialState.length === 0 && submitting) ||
-              (culture?.id && culture.id !== APPCONSTANTS.DEFAULT_CULTURE.id)
-            }
+            disabled={initialState && initialState.length === 0 && submitting}
             className='btn primary-btn px-1dot75'
           >
             Submit

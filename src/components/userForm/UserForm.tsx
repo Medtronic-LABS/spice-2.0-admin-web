@@ -210,9 +210,7 @@ const UserForm = ({
         villages: [],
         supervisor: '',
         organizations: [],
-        culture: showCulture
-          ? cultureList?.find((culture: { id: number }) => culture.id === APPCONSTANTS.DEFAULT_CULTURE.id)
-          : undefined,
+        culture: showCulture ? cultureList : undefined,
         country: ''
       }
     ],
@@ -330,9 +328,7 @@ const UserForm = ({
         culture:
           !isCultureListLoading &&
           showCulture &&
-          cultureList?.find(
-            (culture: { id: any }) => culture.id === (initialEditValue?.cultureId || APPCONSTANTS.DEFAULT_CULTURE.id)
-          ),
+          cultureList?.find((culture: { id: any }) => culture.id === initialEditValue?.cultureId),
         district:
           initialEditValue?.organizations?.filter(
             (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district

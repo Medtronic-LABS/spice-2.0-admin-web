@@ -24,6 +24,8 @@ import { fetchCultureListRequest } from '../../store/user/actions';
 import { cultureListLoadingSelector, cultureListSelector } from '../../store/user/selectors';
 import styles from '../../components/formBuilder/styles/FormBuilder.module.scss';
 import { Form } from 'react-final-form';
+import { filterByAppTypes } from '../../utils/commonUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * Interface for route parameters
@@ -52,10 +54,12 @@ const RegionFormCustomization = (): React.ReactElement => {
     () =>
       (cultureList || []).find((culture: { appTypes: string[] }) => culture.appTypes.includes(APP_TYPE.NON_COMMUNITY)),
     [cultureList]
-  );
+  ); // returns first culture from array which has non community app type
   const [currentCulture, setCulture] = useState(defaultCulture);
   const accordianRef = useRef<any>([]);
   const newlyAddedIdsRef = useRef<any>([]);
+
+  const { appTypes } = useAppTypeConfigs();
 
   const {
     formRef,
@@ -125,7 +129,7 @@ const RegionFormCustomization = (): React.ReactElement => {
 
   useEffect(() => {
     dispatch(fetchCultureListRequest());
-    fetchCustomizationForm(currentCulture?.id || APPCONSTANTS.DEFAULT_CULTURE.id);
+    fetchCustomizationForm(currentCulture?.id);
     dispatch(
       fetchFormMetaRequest({
         formType: form as FormType,
@@ -218,7 +222,7 @@ const RegionFormCustomization = (): React.ReactElement => {
                     valueKey={'id'}
                     value={currentCulture as any}
                     defaultValue={defaultCulture as any}
-                    options={cultureList}
+                    options={filterByAppTypes(cultureList, appTypes)}
                     loadingOptions={isCultureListLoading}
                   />
                 )}

@@ -1,5 +1,5 @@
 import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
-import { getUserPayload, getAdminPayload } from '../formatObjectUtils';
+import { getUserPayload, getAdminPayload, formatHealthFacility } from '../formatObjectUtils';
 
 describe('formatObjectUtils', () => {
   describe('getAdminPayload', () => {
@@ -407,6 +407,54 @@ describe('formatObjectUtils', () => {
 
       expect(result[0].redRisk).toBeUndefined();
       expect(result[0].culture).toBe('en-US');
+    });
+  });
+
+  describe('formatHealthFacility', () => {
+    it('should handle health facility payload', () => {
+      const mockHf = {
+        id: 1,
+        name: 'Test HF',
+        type: { name: 'Type' },
+        phuFocalPersonName: 'Test Name',
+        phuFocalPersonNumber: '1234567890',
+        address: 'Test Address',
+        district: { id: 1 },
+        chiefdom: { id: 2, tenantId: 456 },
+        city: { name: 'Test City' },
+        language: { name: 'Test Language' },
+        country: { id: 1 },
+        tenantId: 123,
+        peerSupervisors: [{ id: 123 }],
+        linkedVillages: [{ id: 123 }],
+        customizedWorkflows: [{ id: 123 }],
+        clinicalWorkflows: [{ id: 123 }]
+      };
+      const expected = {
+        id: 1,
+        appTypes: [APPCONSTANTS.appTypes.community],
+        name: 'Test HF',
+        type: 'Type',
+        phuFocalPersonName: 'Test Name',
+        phuFocalPersonNumber: '1234567890',
+        address: 'Test Address',
+        district: { id: 1 },
+        chiefdom: { id: 2, tenantId: 456 },
+        cityName: 'Test City',
+        latitude: undefined,
+        longitude: undefined,
+        postalCode: undefined,
+        country: { id: 1 },
+        language: 'Test Language',
+        parentTenantId: 456,
+        tenantId: 123,
+        linkedSupervisorIds: [123],
+        linkedVillageIds: [123],
+        customizedWorkflowIds: [{ id: 123 }],
+        clinicalWorkflowIds: [{ id: 123 }]
+      };
+      const result = formatHealthFacility(mockHf, 1, [APPCONSTANTS.appTypes.community]);
+      expect(result).toEqual(expected);
     });
   });
 });
