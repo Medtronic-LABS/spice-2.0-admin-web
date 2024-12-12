@@ -13,14 +13,16 @@ export const redRisk = 'RED_RISK_USER';
 
 // COMMUNITY
 export const onlyCHWRoles = ['CHW'];
+export const onlyPeerSupervisor = ['PEER_SUPERVISOR'];
 export const chwPeerRoles = ['CHW', 'PEER_SUPERVISOR'];
 export const mobCommunityRoles = ['PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'SECHN', 'CHA', 'MCHA'];
 export const adminRoles = ['HEALTH_FACILITY_ADMIN', ...mobCommunityRoles];
 export const superAdminRoles = ['SUPER_ADMIN', 'SUPER_USER'];
 // REPORTS
-export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN'];
+export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN', 'HF4_REPORT_USER'];
 export const reportAdminRole = ['REPORT_ADMIN'];
 export const facilityReportAdminRole = ['FACILITY_REPORT_ADMIN'];
+export const facilityHF4ReportUserRole = ['HF4_REPORT_USER', 'FACILITY_REPORT_ADMIN'];
 // INSIGHTS
 export const allInsightRoles = ['INSIGHTS_USER', 'INSIGHTS_DEVELOPER'];
 export const insightUserRole = ['INSIGHTS_USER'];
