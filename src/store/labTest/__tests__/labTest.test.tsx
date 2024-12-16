@@ -20,9 +20,9 @@ const labTestDetailsMockData = MOCK_DATA_CONSTANTS.FETCH_LAB_TEST_RESPONSE_PAYLO
 
 describe('labTest Saga and Actioon', () => {
   it('fetchLab Request', async () => {
-    const { labtests, total } = labTestDetailsMockData;
+    const { total } = labTestDetailsMockData;
     const fetchLabTestSpy = jest.spyOn(labtestService, 'fetchLabTest').mockImplementation(() => {
-      return Promise.resolve({ data: { entityList: labtests, totalCount: total } } as AxiosResponse);
+      return Promise.resolve({ data: { entityList: undefined, totalCount: total } } as AxiosResponse);
     });
     const dispatched: any = [];
     await runSaga(
@@ -33,7 +33,7 @@ describe('labTest Saga and Actioon', () => {
       { data: { ...labTestDetailsRequestMockData } as any, type: ACTION_TYPES.FETCH_LABTEST_REQUEST }
     ).toPromise();
     expect(fetchLabTestSpy).toHaveBeenCalledWith({ countryId: 1, limit: 10, searchTerm: '', skip: 0 });
-    expect(dispatched).toEqual([labTestAction.fetchLabtestsSuccess(labTestDetailsMockData)]);
+    expect(dispatched).toEqual([labTestAction.fetchLabtestsSuccess({ ...labTestDetailsMockData, labtests: [] })]);
   });
   it('fetchLab successfully with valid labtest result', async () => {
     const { labtests, total } = labTestDetailsMockData;

@@ -19,6 +19,7 @@ import {
   INSIGHTS,
   insightUserRole,
   onlyCHWRoles,
+  onlyHF4UserRole,
   onlyPeerSupervisor,
   redRisk,
   reportAdminRole,
@@ -313,6 +314,13 @@ export const useRoleMeta = ({
           selectedSuite: REPORTS,
           disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: superAdminRoles }),
           disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: reportAdminRole }),
+          disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
+        },
+        {
+          selectedRoles: onlyHF4UserRole,
+          selectedSuite: REPORTS,
+          disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: onlyPeerSupervisor }),
+          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: facilityHF4ReportUserRole }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
         {

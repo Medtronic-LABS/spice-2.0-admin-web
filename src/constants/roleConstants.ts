@@ -21,6 +21,7 @@ export const superAdminRoles = ['SUPER_ADMIN', 'SUPER_USER'];
 // REPORTS
 export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN', 'HF4_REPORT_USER'];
 export const reportAdminRole = ['REPORT_ADMIN'];
+export const onlyHF4UserRole = ['HF4_REPORT_USER'];
 export const facilityReportAdminRole = ['FACILITY_REPORT_ADMIN'];
 export const facilityHF4ReportUserRole = ['HF4_REPORT_USER', 'FACILITY_REPORT_ADMIN'];
 // INSIGHTS
