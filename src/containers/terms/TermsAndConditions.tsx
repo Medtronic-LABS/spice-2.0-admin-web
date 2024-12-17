@@ -39,7 +39,8 @@ const TermsAndConditions = () => {
 
   const getTACDismissed = useCallback(() => {
     const item = localStorageService.getItem(APPCONSTANTS.IS_TERMS_CONDITIONS_DISMISSED);
-    return item && item !== 'undefined' ? JSON.parse(item) : false; // Default to `false` if item is null, undefined, or "undefined"
+    // Default to `false` if item is null, undefined, or "undefined"
+    return item && item !== 'undefined' ? JSON.parse(item) : false;
   }, []);
 
   const getTACDStatus = useCallback(() => {

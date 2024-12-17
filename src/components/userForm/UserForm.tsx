@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { INSIGHTS, REPORTS, SPICE } from '../../constants/roleConstants';
+import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta, useRoleOptions } from '../../hooks/roleHook';
@@ -1113,7 +1113,20 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             onChange={(values: any, key: number) => {
-                              const currentAllRoles = [...reportRoles, ...insightRoles, ...values];
+                              let reportRolesNew = reportRoles;
+                              // if report role has HF4 user and
+                              // selected spice role doesn't have peer supervisor
+                              // then remove HF4 user from reportRoles
+                              if (
+                                reportRoles.some((reportRole: { name: string }) => reportRole.name === hf4ReportUser) &&
+                                !values?.some((value: { name: string }) => value.name === peerSupervisor)
+                              ) {
+                                reportRolesNew = reportRoles?.filter(
+                                  (reportRole: { name: string }) => reportRole.name !== hf4ReportUser
+                                );
+                                form.change(`${formName}[${index}].reportRoles`, reportRolesNew);
+                              }
+                              const currentAllRoles = [...reportRolesNew, ...insightRoles, ...values];
                               roleChange({
                                 allRoles: currentAllRoles,
                                 index,

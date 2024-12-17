@@ -514,7 +514,6 @@ describe('HF sagas', () => {
   describe('Fetch Peer Supervisor List for Health Facility: FETCH_PEER_SUPERVISOR_LIST_REQUEST', () => {
     it('Fetch peer supervisor list and dispatch success', async () => {
       const tenantIds = [2];
-      const appTypes = ['COMMUNITY'];
       const successCb = jest.fn();
       const hfPeerSupervisorSpy = jest.spyOn(hfService, 'fetchPeerSupervisorList').mockImplementation(
         () =>
@@ -549,7 +548,6 @@ describe('HF sagas', () => {
       const error = new Error('Failed to fetch supervisor list');
       const failureCb = jest.fn();
       const tenantIds = [2];
-      const appTypes = ['COMMUNITY'];
       const hfPeerSupervisorSpy = jest
         .spyOn(hfService, 'fetchPeerSupervisorList')
         .mockImplementation(() => Promise.reject(error));
@@ -1089,7 +1087,7 @@ describe('HF sagas', () => {
 
   describe('Fetch Peer Supervisor Validation: FETCH_PEER_SUPERVISOR_VALIDATION', () => {
     it('Fetch peer supervisor and dispatches success', async () => {
-      const { ids, tenantId, appTypes } = hfIdsTiRequestPayload;
+      const { ids, tenantId, appTypes: requestAppTypes } = hfIdsTiRequestPayload;
       const successCb = jest.fn();
       const peerSupervisorValidationSpy = jest
         .spyOn(hfService, 'peerSupervisorValidation')
@@ -1102,20 +1100,20 @@ describe('HF sagas', () => {
         peerSupervisorValidationSagaRequest,
         {
           type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
-          appTypes,
+          appTypes: requestAppTypes,
           ids,
           tenantId,
           successCb
         }
       ).toPromise();
-      expect(peerSupervisorValidationSpy).toHaveBeenCalledWith({ ids, tenantId });
+      expect(peerSupervisorValidationSpy).toHaveBeenCalledWith({ ids, tenantId, appTypes: requestAppTypes });
       expect(successCb).toHaveBeenCalled();
     });
 
     it('Fetch peer supervisor and dispatches failure', async () => {
       const error = new Error('Failed to validate peer supervisor');
       const failureCb = jest.fn();
-      const { ids, tenantId, appTypes } = hfIdsTiRequestPayload;
+      const { ids, tenantId, appTypes: requestAppTypes } = hfIdsTiRequestPayload;
       const peerSupervisorValidationSpy = jest
         .spyOn(hfService, 'peerSupervisorValidation')
         .mockImplementation(() => Promise.reject(error));
@@ -1127,13 +1125,13 @@ describe('HF sagas', () => {
         peerSupervisorValidationSagaRequest,
         {
           type: ACTION_TYPES.FETCH_PEER_SUPERVISOR_VALIDATION,
-          appTypes,
+          appTypes: requestAppTypes,
           ids,
           tenantId,
           failureCb
         }
       ).toPromise();
-      expect(peerSupervisorValidationSpy).toHaveBeenCalledWith({ ids, tenantId });
+      expect(peerSupervisorValidationSpy).toHaveBeenCalledWith({ ids, tenantId, appTypes: requestAppTypes });
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchPeerSupervisorValidationsFailure(error)]);
     });

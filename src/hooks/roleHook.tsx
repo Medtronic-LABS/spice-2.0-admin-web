@@ -11,7 +11,7 @@ import {
   chaRole,
   CHPARoles,
   chwPeerRoles,
-  facilityHF4ReportUserRole,
+  facilityPlusHF4ReportUserRole,
   facilityReportAdminRole,
   hfAdminRole,
   HIERARCHY_ROLES,
@@ -269,6 +269,36 @@ export const useRoleMeta = ({
         }
       };
 
+      /*
+       * This function is used to get the valid report roles for peer supervisor selection
+       */
+      const getValidReportRolesForPeerSupervisorSelection = () => {
+        // check if the report roles are present in the allRoles array
+        if (allRoles.some((role) => role.groupName === REPORTS)) {
+          const reportRoles = allRoles.find((role) => role.groupName === REPORTS);
+          // check if the report roles have name property
+          if (reportRoles?.name) {
+            return [reportRoles.name];
+          }
+          // if the report roles are not present in the allRoles array, return the facilityPlusHF4ReportUserRole
+          return facilityPlusHF4ReportUserRole;
+        }
+        return facilityPlusHF4ReportUserRole;
+      };
+
+      /*
+       * This function is used to get the valid spice roles for spice selection
+       * if the all roles array is empty, return the onlyPeerSupervisor
+       * if the all roles array is not empty, return the filtered spice roles
+       * filtered spice roles are the spice roles that are present in the allRoles then
+       * array and are in the chwPeerRoles array
+       */
+      const getValidSpiceRoleForOnlyHF4 = () => {
+        const filteredSpiceRoles = (allRoles || [])
+          .filter((role) => role.groupName === SPICE && chwPeerRoles.includes(role.name))
+          .map((role) => role.name);
+        return filteredSpiceRoles?.length ? filteredSpiceRoles : onlyPeerSupervisor;
+      };
       // all roles condition
       const rolesMeta: IRoleMeta[] = [
         {
@@ -282,7 +312,10 @@ export const useRoleMeta = ({
           selectedRoles: onlyPeerSupervisor,
           selectedSuite: SPICE,
           disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: chwPeerRoles }),
-          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: facilityHF4ReportUserRole }),
+          disabledREPORTSRoles: findDisabledRoles({
+            suite: REPORTS,
+            validReportRoles: getValidReportRolesForPeerSupervisorSelection()
+          }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
         {
@@ -319,8 +352,11 @@ export const useRoleMeta = ({
         {
           selectedRoles: onlyHF4UserRole,
           selectedSuite: REPORTS,
-          disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: onlyPeerSupervisor }),
-          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: facilityHF4ReportUserRole }),
+          disabledSPICERoles: findDisabledRoles({
+            suite: SPICE,
+            validSpiceRoles: getValidSpiceRoleForOnlyHF4()
+          }),
+          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: onlyHF4UserRole }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
         {

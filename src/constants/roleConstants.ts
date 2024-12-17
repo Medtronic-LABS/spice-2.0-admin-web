@@ -10,20 +10,22 @@ export const spiceRole = {
 export const hfAdminRole = 'HEALTH_FACILITY_ADMIN';
 export const superAdminRole = 'SUPER_ADMIN';
 export const redRisk = 'RED_RISK_USER';
+export const peerSupervisor = 'PEER_SUPERVISOR';
+export const hf4ReportUser = 'HF4_REPORT_USER';
 
 // COMMUNITY
 export const onlyCHWRoles = ['CHW'];
-export const onlyPeerSupervisor = ['PEER_SUPERVISOR'];
-export const chwPeerRoles = ['CHW', 'PEER_SUPERVISOR'];
+export const onlyPeerSupervisor = [peerSupervisor];
+export const chwPeerRoles = ['CHW', peerSupervisor];
 export const mobCommunityRoles = ['PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'SECHN', 'CHA', 'MCHA'];
 export const adminRoles = ['HEALTH_FACILITY_ADMIN', ...mobCommunityRoles];
 export const superAdminRoles = ['SUPER_ADMIN', 'SUPER_USER'];
 // REPORTS
-export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN', 'HF4_REPORT_USER'];
+export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN', hf4ReportUser];
 export const reportAdminRole = ['REPORT_ADMIN'];
-export const onlyHF4UserRole = ['HF4_REPORT_USER'];
+export const onlyHF4UserRole = [hf4ReportUser];
 export const facilityReportAdminRole = ['FACILITY_REPORT_ADMIN'];
-export const facilityHF4ReportUserRole = ['HF4_REPORT_USER', 'FACILITY_REPORT_ADMIN'];
+export const facilityPlusHF4ReportUserRole = [hf4ReportUser, 'FACILITY_REPORT_ADMIN'];
 // INSIGHTS
 export const allInsightRoles = ['INSIGHTS_USER', 'INSIGHTS_DEVELOPER'];
 export const insightUserRole = ['INSIGHTS_USER'];
@@ -58,7 +60,7 @@ export const hfCreateRoles = [
   'SECHN',
   'CHA',
   'MCHA',
-  'PEER_SUPERVISOR'
+  peerSupervisor
 ];
 export const allHFNeededRoles = [...adminRoles, ...chwPeerRoles, ...mobNonCommunityRoles, ...CHPARoles];
 
