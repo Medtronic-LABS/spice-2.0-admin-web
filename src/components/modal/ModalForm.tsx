@@ -32,6 +32,7 @@ export interface IModalProps {
   initialValues?: object;
   size?: IModalSize;
   isDeactivateModal?: boolean;
+  showCloseBtn?: boolean;
 }
 
 /**
@@ -58,7 +59,8 @@ const ModalForm = React.memo(
     hideFooterButton = false,
     size,
     render,
-    mutators
+    mutators,
+    showCloseBtn = true
   }: IModalProps): React.ReactElement | null => {
     /** Reference to the modal div */
     const ref = useRef<HTMLDivElement>(null);
@@ -78,12 +80,14 @@ const ModalForm = React.memo(
               <h5 className={`modal-title ${styles.modalTitle}`} data-testid='modal-title'>
                 {title}
               </h5>
-              <div
-                className={`d-flex justify-content-center align-items-center ${styles.closeIcon}`}
-                onClick={() => handleCancel(isFromCloseBtn)}
-              >
-                <img src={close} alt='close' />
-              </div>
+              {showCloseBtn && (
+                <div
+                  className={`d-flex justify-content-center align-items-center ${styles.closeIcon}`}
+                  onClick={() => handleCancel(isFromCloseBtn)}
+                >
+                  <img src={close} alt='close' />
+                </div>
+              )}
             </div>
             {/* Form component */}
             <Form

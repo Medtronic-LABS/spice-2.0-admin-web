@@ -20,8 +20,10 @@ interface ITextEditorConfigs {
 
 interface ITextEditorProps {
   editorContent: any;
-  setEditorContent: any;
+  setEditorContent?: any;
   editorConfig?: ITextEditorConfigs;
+  basicConfig?: any;
+  removeCustomHeight?: boolean;
 }
 
 /**
@@ -32,7 +34,13 @@ interface ITextEditorProps {
  * @param {function} props.setEditorContent - Function to update the editor content
  * @param {ITextEditorConfigs} props.editorConfig - Optional configuration for the editor
  */
-const TextEditor = ({ editorContent, setEditorContent, editorConfig }: ITextEditorProps) => {
+const TextEditor = ({
+  editorContent,
+  setEditorContent,
+  editorConfig,
+  basicConfig,
+  removeCustomHeight
+}: ITextEditorProps) => {
   const basicEditorConfig = {
     toolbarSticky: true,
     spellcheck: false,
@@ -53,7 +61,8 @@ const TextEditor = ({ editorContent, setEditorContent, editorConfig }: ITextEdit
       background: 'white'
     },
     dataEnableGrammarly: 'false',
-    minHeight: (editorConfig?.height && editorConfig?.height - 40) || 400
+    minHeight: (editorConfig?.height && editorConfig?.height - 40) || 400,
+    ...basicConfig
   };
 
   const initialEditorConfig: ITextEditorConfigs = {
@@ -65,6 +74,9 @@ const TextEditor = ({ editorContent, setEditorContent, editorConfig }: ITextEdit
     buttons: editorConfig?.buttons || TOOLBAR_BUTTONS.toString()
   };
 
+  if (removeCustomHeight) {
+    delete initialEditorConfig.height;
+  }
   return (
     <div>
       <JoditEditor

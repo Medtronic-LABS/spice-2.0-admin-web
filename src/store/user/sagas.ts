@@ -9,7 +9,9 @@ import {
   ILoginRequest,
   IUnlockUsersRequest,
   IUpdateUserRequest,
-  IUser
+  IUser,
+  IFetchTermsConditionsRequest,
+  IUpdateTermsConditionsRequest
 } from './types';
 import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -31,10 +33,15 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
   try {
     const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
     const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
-    const { headers } = yield call(userService.login, username, hashedPassword);
+    const {
+      headers,
+      data: { isTermsAndConditionsAccepted }
+    } = yield call(userService.login, username, hashedPassword);
     sessionStorageServices.setItem('iLi', true);
     sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headers?.Tenantid);
     yield put(userActions.addUserTenantID(headers?.Tenantid));
+    localStorageServices.setItem(APPCONSTANTS.TAC_STATUS, isTermsAndConditionsAccepted);
+    localStorageServices.setItem(APPCONSTANTS.IS_TERMS_CONDITIONS_DISMISSED, false);
     const {
       data: {
         entity: {
@@ -425,6 +432,40 @@ export function* unlockUsers({ userId, successCb, failureCb }: IUnlockUsersReque
 }
 
 /*
+  Worker Saga: Fired on FETCH_TERMS_CONDITIONS_REQUEST action
+*/
+export function* fetchTermsConditionsSaga({ countryId, successCB }: IFetchTermsConditionsRequest): SagaIterator {
+  try {
+    const { data } = yield call(userService.fetchTermsConditionsAPI, countryId);
+    const { entity: termsConditions } = data;
+    successCB?.(termsConditions);
+    yield put(userActions.fetchTermsAndConditionsSuccess(termsConditions));
+  } catch (e) {
+    yield put(userActions.fetchTermsAndConditionsFailure(e));
+  }
+}
+/*
+  Worker Saga: Fired on UPDATE_TERMS_CONDITIONS_REQUEST action
+*/
+export function* updateTermsConditionsSaga({
+  userId,
+  isTermsAndConditionAccepted,
+  successCB,
+  failureCB
+}: IUpdateTermsConditionsRequest): SagaIterator {
+  try {
+    yield call(userService.updateTermsConditionsAPI, { userId, isTermsAndConditionAccepted });
+    successCB?.();
+    yield put(userActions.updateTermsAndConditionsSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCB?.(e);
+    }
+    yield put(userActions.updateTermsAndConditionsFailure(e));
+  }
+}
+
+/*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
 */
@@ -445,6 +486,8 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.FETCH_COMMUNITY_LIST_REQUEST, fetchCommunityListRequest)]);
   yield all([takeLatest(USERTYPES.FETCH_DESIGNATION_LIST_REQUEST, fetchDesignationListRequest)]);
   yield all([takeLatest(USERTYPES.UNLOCK_USERS_REQUEST, unlockUsers)]);
+  yield all([takeLatest(USERTYPES.FETCH_TERMS_CONDITIONS_REQUEST, fetchTermsConditionsSaga)]);
+  yield all([takeLatest(USERTYPES.UPDATE_TERMS_CONDITIONS_REQUEST, updateTermsConditionsSaga)]);
 }
 
 export default userSaga;

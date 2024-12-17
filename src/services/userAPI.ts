@@ -171,3 +171,22 @@ export const fetchDesignationListRequest = (countryId: number) =>
     method: 'GET',
     url: `/admin-service/designation/list/${countryId}`
   });
+
+export const fetchTermsConditionsAPI = (countryId: number) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/terms-and-conditions/details',
+    data: { countryId }
+  });
+export const updateTermsConditionsAPI = ({
+  userId,
+  isTermsAndConditionAccepted
+}: {
+  userId: number;
+  isTermsAndConditionAccepted: boolean;
+}) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/terms-and-conditions/update',
+    data: { userId, isTermsAndConditionAccepted }
+  });

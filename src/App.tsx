@@ -9,11 +9,14 @@ import './App.scss';
 import ErrorBoundary from './components/errorBoundary/ErrorBoundary';
 import { useSelector } from 'react-redux';
 import { getIsLoggedInSelector } from './store/user/selectors';
+import TermsAndConditions from './containers/terms/TermsAndConditions';
+import useAppTypeConfigs from './hooks/appTypeBasedConfigs';
 
 const App = () => {
   const loggedIn = useSelector(getIsLoggedInSelector);
   const { pathname } = useLocation();
   const gaTrackId = process.env.REACT_APP_GA_TRACKING_ID;
+  const { isCommunity } = useAppTypeConfigs();
 
   useEffect(() => {
     if (gaTrackId) {
@@ -33,6 +36,7 @@ const App = () => {
       <div className={`app-body ${loggedIn ? 'logged-in' : ''}`}>
         <ErrorBoundary pathname={pathname}>
           <AppRoutes />
+          {loggedIn && !isCommunity ? <TermsAndConditions /> : <></>}
         </ErrorBoundary>
       </div>
       <ToastContainer />

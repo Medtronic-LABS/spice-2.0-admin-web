@@ -61,7 +61,14 @@ import {
   ISetAppTypeSuccess,
   ISetAppTypeFailure,
   IFetchDesignationListPayload,
-  IFetchDesignationList
+  IFetchDesignationList,
+  ITermsAndConditions,
+  IFetchTermsConditionsRequest,
+  IFetchTermsConditionsSuccess,
+  IFetchTermsConditionsFailure,
+  IUpdateTermsConditionsRequest,
+  IUpdateTermsConditionsSuccess,
+  IUpdateTermsConditionsFailure
 } from './types';
 
 export const loginRequest = ({
@@ -524,4 +531,46 @@ export const setAppTypeFailure = (error: Error): ISetAppTypeFailure => ({
 
 export const clearAppType = () => ({
   type: USER_TYPES.CLEAR_APP_TYPE
+});
+
+export const fetchTermsAndConditionsRequest = ({
+  countryId,
+  successCB,
+  failureCB
+}: {
+  countryId: number;
+  successCB?: (data: ITermsAndConditions) => void;
+  failureCB?: (error: Error) => void;
+}): IFetchTermsConditionsRequest => ({
+  type: USER_TYPES.FETCH_TERMS_CONDITIONS_REQUEST,
+  countryId,
+  successCB,
+  failureCB
+});
+export const fetchTermsAndConditionsSuccess = (payload: ITermsAndConditions): IFetchTermsConditionsSuccess => ({
+  type: USER_TYPES.FETCH_TERMS_CONDITIONS_SUCCESS,
+  payload
+});
+export const fetchTermsAndConditionsFailure = (error: any): IFetchTermsConditionsFailure => ({
+  type: USER_TYPES.FETCH_TERMS_CONDITIONS_FAILURE,
+  error
+});
+export const updateTermsAndConditionsRequest = ({
+  userId,
+  isTermsAndConditionAccepted,
+  successCB,
+  failureCB
+}: Omit<IUpdateTermsConditionsRequest, 'type'>): IUpdateTermsConditionsRequest => ({
+  type: USER_TYPES.UPDATE_TERMS_CONDITIONS_REQUEST,
+  userId,
+  isTermsAndConditionAccepted,
+  successCB,
+  failureCB
+});
+export const updateTermsAndConditionsSuccess = (): IUpdateTermsConditionsSuccess => ({
+  type: USER_TYPES.UPDATE_TERMS_CONDITIONS_SUCCESS
+});
+export const updateTermsAndConditionsFailure = (error: any): IUpdateTermsConditionsFailure => ({
+  type: USER_TYPES.UPDATE_TERMS_CONDITIONS_FAILURE,
+  error
 });

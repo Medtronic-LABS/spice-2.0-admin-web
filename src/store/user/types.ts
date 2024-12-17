@@ -53,6 +53,18 @@ export interface IOrganizations {
   parentOrganizationId: number;
 }
 
+export interface ITermsAndConditions {
+  id: number;
+  countryId: string;
+  formInput: string;
+}
+export interface IFetchTermsConditionsRequest {
+  type: typeof USER_TYPES.FETCH_TERMS_CONDITIONS_REQUEST;
+  countryId: number;
+  successCB?: (data: ITermsAndConditions) => void;
+  failureCB?: (e: Error) => void;
+}
+
 export interface IUser {
   userId: string;
   email: string;
@@ -67,6 +79,8 @@ export interface IUser {
   suiteAccess: string[];
   appTypes: string[];
   organizations?: IOrganizations[] | [];
+  isTermsConditionsLoading?: boolean;
+  termsAndConditions?: ITermsAndConditions;
 }
 
 export interface IPhoneNumberCode {
@@ -408,6 +422,8 @@ export interface IUserState {
   communityList: any[];
   islockedUsersLoading?: boolean;
   designationList: any[];
+  isTermsConditionsLoading: boolean;
+  termsAndConditions?: ITermsAndConditions;
 }
 
 export interface ILoginFailurePayload {
@@ -801,6 +817,35 @@ export interface IFetchDesignationListPayload {
   designationList: IDesignationList[];
 }
 
+export interface IFetchTermsConditionsRequest {
+  type: typeof USER_TYPES.FETCH_TERMS_CONDITIONS_REQUEST;
+  countryId: number;
+  successCB?: (data: ITermsAndConditions) => void;
+  failureCB?: (e: Error) => void;
+}
+export interface IFetchTermsConditionsSuccess {
+  type: typeof USER_TYPES.FETCH_TERMS_CONDITIONS_SUCCESS;
+  payload: ITermsAndConditions;
+}
+export interface IFetchTermsConditionsFailure {
+  type: typeof USER_TYPES.FETCH_TERMS_CONDITIONS_FAILURE;
+  error: any;
+}
+export interface IUpdateTermsConditionsRequest {
+  type: typeof USER_TYPES.UPDATE_TERMS_CONDITIONS_REQUEST;
+  userId: number;
+  isTermsAndConditionAccepted: boolean;
+  successCB?: () => void;
+  failureCB?: (e: Error) => void;
+}
+export interface IUpdateTermsConditionsSuccess {
+  type: typeof USER_TYPES.UPDATE_TERMS_CONDITIONS_SUCCESS;
+}
+export interface IUpdateTermsConditionsFailure {
+  type: typeof USER_TYPES.UPDATE_TERMS_CONDITIONS_FAILURE;
+  error: any;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -878,4 +923,10 @@ export type UserActions =
   | ISetAppTypeFailure
   | IFetchDesignationListPayload
   | IDesignationList
-  | IFetchDesignationList;
+  | IFetchDesignationList
+  | IFetchTermsConditionsRequest
+  | IFetchTermsConditionsSuccess
+  | IFetchTermsConditionsFailure
+  | IUpdateTermsConditionsRequest
+  | IUpdateTermsConditionsSuccess
+  | IUpdateTermsConditionsFailure;

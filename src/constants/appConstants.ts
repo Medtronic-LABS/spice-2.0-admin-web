@@ -22,6 +22,7 @@ const APPCONSTANTS = {
   FIRST_NAME_LENGTH: 100,
   LAST_NAME_LENGTH: 100,
   FAMILY_NAME_LENGTH: 100,
+  TAC_STATUS: 'tac',
   SUITE_ACCESS: {
     ADMIN: 'admin',
     CFR: 'cfr',
@@ -246,6 +247,8 @@ const APPCONSTANTS = {
   USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
   NO_VILLAGE_FOUND: 'No village available. Villages are already linked to other users.',
   ADD_ANOTHER_USER: 'Add Another User',
+  IS_TERMS_CONDITIONS_DISMISSED: 'isTacD',
+  TERMSCONDITIONS_UPDATE_FAIL: 'Failed to accept terms and conditions.',
   // Admin
   ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
   ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',

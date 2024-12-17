@@ -2,7 +2,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import * as USERTYPES from './actionTypes';
 
-import { IUserState, IUser } from './types';
+import { IUserState, IUser, ITermsAndConditions } from './types';
 
 const userInitialStateGetter = (): IUser => ({
   email: '',
@@ -16,7 +16,9 @@ const userInitialStateGetter = (): IUser => ({
   formDataId: '',
   country: {},
   suiteAccess: [],
-  countryId: undefined
+  countryId: undefined,
+  termsAndConditions: {} as ITermsAndConditions,
+  isTermsConditionsLoading: false
 });
 
 // This should be function instead of object,
@@ -48,7 +50,9 @@ const initialStateGetter = {
   designationListLoading: false,
   isLockedUserLoading: false,
   lockedUsers: [],
-  totalLockedUsers: 0
+  totalLockedUsers: 0,
+  termsAndConditions: {} as ITermsAndConditions,
+  isTermsConditionsLoading: false
 };
 
 const userReducer = (state: IUserState = initialStateGetter, action = {} as any) => {
@@ -216,6 +220,22 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         ...state,
         communityListLoading: false,
         communityList: action.payload.entityList
+      };
+    case USERTYPES.FETCH_TERMS_CONDITIONS_REQUEST:
+      return {
+        ...state,
+        isTermsConditionsLoading: true
+      };
+    case USERTYPES.FETCH_TERMS_CONDITIONS_SUCCESS:
+      return {
+        ...state,
+        isTermsConditionsLoading: false,
+        termsAndConditions: action.payload
+      };
+    case USERTYPES.FETCH_TERMS_CONDITIONS_FAILURE:
+      return {
+        ...state,
+        isTermsConditionsLoading: false
       };
     case USERTYPES.UPDATE_PASSWORD_REQUEST:
     case USERTYPES.CREATE_PASSWORD_REQUEST:
