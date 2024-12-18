@@ -126,7 +126,7 @@ const UserForm = ({
   const idRefs = useRef([new Date().getTime()]);
   const { pathname } = useLocation();
   const formName = 'users';
-  const { tenantId } = useParams<IMatchParams>();
+  const { tenantId, healthFacilityId } = useParams<IMatchParams>();
   const dispatch = useDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
   const role = useSelector(roleSelector);
@@ -703,9 +703,9 @@ const UserForm = ({
   const fetchListWithConditions = (tenantIds: number[] = [], userId: string, name: string, index: number) => {
     if (tenantIds.length) {
       if (name === 'village') {
-        return fetchVillagesList(tenantIds, userId, index);
+        return fetchVillagesList([...new Set(tenantIds)], userId, index);
       } else {
-        return fetchSupervisorList(tenantIds, index);
+        return fetchSupervisorList([...new Set(tenantIds)], index);
       }
     }
   };
@@ -1148,12 +1148,22 @@ const UserForm = ({
                                     form.change(`${formName}[${index}].villages`, {});
                                   });
                                 }
+                                /*
+                                 * tenantIds is an array of tenantIds,
+                                 * that are used to fetch the village and supervisor lists.
+                                 * It includes the tenantIds from the initialEditData
+                                 * the tenantId from the HF field or the HF id and tenantId if present
+                                 * the tenantIds from the fetched data
+                                 * and the hfTenantId if isHF is true.
+                                 * The filter function is used to remove undefined values from the array.
+                                 */
                                 const tenantIds = [
                                   ...(initialEditData[index]?.hfTenantIds || []),
-                                  form.getState().values?.users?.[0]?.healthfacility?.tenantId,
+                                  Number(form.getState().values?.users?.[0]?.healthfacility?.tenantId) ||
+                                    (healthFacilityId && tenantId ? Number(tenantId) : undefined),
                                   ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
-                                  isHF ? hfTenantId : undefined // Include hfTenantId only when isHF is true
-                                ].filter((v: number | undefined) => v); // Filtering out undefined values
+                                  isHF ? Number(hfTenantId) : undefined
+                                ].filter((v: number | undefined) => v);
                                 fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', index);
                                 fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', index);
                               } else {
