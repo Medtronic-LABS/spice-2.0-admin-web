@@ -195,6 +195,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_TITLE: 'Delete Health Facility',
   HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
   HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
+  FETCH_CITY_LIST_FAILURE: 'Unable to load city list. Please try after sometime',
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
   WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select workflow',
   CUSTOMIZED_WORKFLOW: 'Customized Workflow',

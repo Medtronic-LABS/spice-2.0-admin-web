@@ -26,7 +26,8 @@ import {
   IFetchUnlinkedVillagesRequest,
   IPeerSupervisorValidation,
   IFetchVillagesListUserLinked,
-  IWorkflow
+  IWorkflow,
+  IFetchCityListRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -73,7 +74,8 @@ import {
   fetchUnlinkedVillagesListSuccess,
   fetchUnlinkedVillagesListFailure,
   validateLinkedRestrictionsSuccess,
-  validateLinkedRestrictionsFailure
+  validateLinkedRestrictionsFailure,
+  fetchCityListSuccess
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -99,7 +101,8 @@ import {
   FETCH_HF_DASHBOARD_LIST_REQUEST,
   LINKED_RESTRICTIONS_VALIDATION_REQUEST,
   FETCH_UNLINKED_VILLAGES_REQUEST,
-  FETCH_VILLAGES_LIST_USER_LINKED
+  FETCH_VILLAGES_LIST_USER_LINKED,
+  FETCH_CITY_LIST_REQUEST_FOR_HF
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
@@ -417,6 +420,27 @@ export function* fetchVillagesListSagaRequest({
 }
 
 /*
+  Worker Saga: Fired on FETCH_CITY_LIST_REQUEST_FOR_HF action
+*/
+export function* fetchCityListSagaRequest({
+  searchTerm,
+  appTypes,
+  successCb,
+  failureCb
+}: IFetchCityListRequest): SagaIterator {
+  try {
+    const { data } = yield call(hfService.fetchCityList, searchTerm, appTypes);
+    successCb(data);
+    yield put(fetchCityListSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(fetchVillagesListFailure(e));
+    }
+  }
+}
+
+/*
   Worker Saga: Fired on FETCH_UNLINKED_VILLAGES_REQUEST action
 */
 export function* fetchUnlinkedVillagesSagaRequest({
@@ -693,6 +717,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST_FOR_HF, fetchDistrictListSagaRequest)]);
   yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF, fetchChiefdomListSagaRequest)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST_FOR_HF, fetchVillagesListSagaRequest)]);
+  yield all([takeLatest(FETCH_CITY_LIST_REQUEST_FOR_HF, fetchCityListSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_LIST_REQUEST, fetchPeerSupervisorListSagaRequest)]);
   yield all([takeLatest(FETCH_WORKFLOW_LIST_REQUEST, fetchWorkflowListSagaRequest)]);
   yield all([takeLatest(FETCH_PEER_SUPERVISOR_VALIDATION, peerSupervisorValidationSagaRequest)]);

@@ -26,6 +26,7 @@ const TagInput = ({
   classChange = '',
   allowOnlyNumbers = false,
   fromChiefDom,
+  required = true,
   ...props
 }: ITagInputProps) => {
   const [items, setItems] = useState<string[]>(defaultValue || []);
@@ -98,7 +99,7 @@ const TagInput = ({
         <>
           <label>
             {label}
-            {<span className='input-asterisk'>*</span>}
+            {required && <span className='input-asterisk'>*</span>}
           </label>
           <br />
         </>

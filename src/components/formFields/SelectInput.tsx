@@ -31,6 +31,7 @@ interface ISelectBoxProps {
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onChange?: (e: any) => void;
+  onInput?: (e: any) => void;
   isOptionDisabled?: (data: any) => boolean;
   value?: { value: string; label: string };
   options: any;
@@ -77,6 +78,7 @@ const SelectInput = ({
   onFocus,
   onBlur,
   onChange,
+  onInput,
   placeholder,
   error = '',
   errorLabel = '',
@@ -188,6 +190,7 @@ const SelectInput = ({
         isMulti={isMulti}
         onBlur={onBlur}
         onChange={(value) => handleChange(input, onChange as (e: any) => void, value)}
+        onInputChange={onInput}
         placeholder={placeholder || ''}
         openMenuOnFocus={true}
         isLoading={loadingOptions}

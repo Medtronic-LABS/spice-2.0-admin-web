@@ -108,7 +108,7 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
     const payload = {
       ...chiefdom,
       name: chiefdom.name.trim(),
-      villages: village.map((e: string) => ({ name: e })),
+      villages: village?.map((e: string) => ({ name: e })) || [],
       users: getAdminPayload({ userFormData: users, appTypes, isFromList: false, countryId: countryIdValue }),
       countryId: countryIdValue,
       districtId: Number(district?.id) || Number(districtId),

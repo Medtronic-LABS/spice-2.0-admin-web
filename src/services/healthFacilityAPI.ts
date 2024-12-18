@@ -190,3 +190,10 @@ export const fetchCountryCodeList = () =>
     url: '/admin-service/country-codes',
     method: 'POST'
   });
+
+export const fetchCityList = (searchTerm: string, appTypes: string[]) =>
+  axios({
+    url: '/admin-service/healthfacility/list-cities',
+    method: 'POST',
+    data: { searchTerm, appTypes }
+  });

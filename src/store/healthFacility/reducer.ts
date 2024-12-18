@@ -257,6 +257,7 @@ const healthFacilityReducer = (
         chiefdomLoading: false
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CITY_LIST_REQUEST_FOR_HF:
       return {
         ...state,
         villagesLoading: true
@@ -269,6 +270,8 @@ const healthFacilityReducer = (
         villagesTotal: action.payload.total
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CITY_LIST_FAILURE_FOR_HF:
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_CITY_LIST_SUCCESS_FOR_HF:
       return {
         ...state,
         villagesLoading: false

@@ -93,7 +93,10 @@ import {
   IObjectData,
   IFetchVillagesListUserLinked,
   IClearHFFormData,
-  IClearHFWorkflowList
+  IClearHFWorkflowList,
+  IFetchCityListRequest,
+  IFetchCityListSuccess,
+  IFetchCityListFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 
@@ -490,6 +493,29 @@ export const fetchVillagesListSuccess = (payload: IFetchVillagespayload): IFetch
 
 export const fetchVillagesListFailure = (error: Error): IFetchVillagesListFailure => ({
   type: HF_TYPES.FETCH_VILLAGES_LIST_FAILURE_FOR_HF,
+  error
+});
+
+// city list
+export const fetchCityListRequest = ({
+  searchTerm,
+  appTypes,
+  successCb,
+  failureCb
+}: Omit<IFetchCityListRequest, 'type'>): IFetchCityListRequest => ({
+  type: HF_TYPES.FETCH_CITY_LIST_REQUEST_FOR_HF,
+  searchTerm,
+  appTypes,
+  successCb,
+  failureCb
+});
+
+export const fetchCityListSuccess = (): IFetchCityListSuccess => ({
+  type: HF_TYPES.FETCH_CITY_LIST_SUCCESS_FOR_HF
+});
+
+export const fetchCityListFailure = (error: Error): IFetchCityListFailure => ({
+  type: HF_TYPES.FETCH_CITY_LIST_FAILURE_FOR_HF,
   error
 });
 

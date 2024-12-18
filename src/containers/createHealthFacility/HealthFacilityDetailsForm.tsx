@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -23,6 +23,7 @@ import {
   clearHFFormData,
   clearSupervisorList,
   clearVillageList,
+  fetchCityListRequest,
   fetchCultureListRequest,
   fetchHFTypesRequest,
   fetchPeerSupervisorListRequest,
@@ -41,9 +42,9 @@ import {
   villagesListSelector,
   villagesLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IObjectData, IVillages } from '../../store/healthFacility/types';
+import { ICity, IObjectData, IVillages } from '../../store/healthFacility/types';
 import { countryIdSelector } from '../../store/user/selectors';
-import toastCenter from '../../utils/toastCenter';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   composeValidators,
   minLength,
@@ -112,8 +113,12 @@ const HealthFacilityDetailsForm = ({
     hfDetails: {
       supervisor: { s: supervisorSName }
     },
-    healthFacility: { s: healthFacilitySName }
+    healthFacility: { s: healthFacilitySName },
+    isCommunity
   } = useAppTypeConfigs();
+  const [cityList, setCityList] = useState<ICity[]>([]);
+  const timerId: React.MutableRefObject<number | undefined> = useRef<number>();
+  const [cityLoading, setCityLoading] = useState(false);
 
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const [workflowEditedData, setWorkFlowEditedData] = useState<{
@@ -268,6 +273,41 @@ const HealthFacilityDetailsForm = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchCityList = useCallback(
+    (searchTerm: string) => {
+      dispatch(
+        fetchCityListRequest({
+          searchTerm,
+          appTypes,
+          successCb: (result) => {
+            setCityList(result);
+            setCityLoading(false);
+          },
+          failureCb: (error) => {
+            setCityList([]);
+            setCityLoading(false);
+            toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.FETCH_CITY_LIST_FAILURE));
+          }
+        })
+      );
+    },
+    [appTypes, dispatch]
+  );
+
+  const fetchCityListDebounce = useCallback(
+    (searchTerm: string) => {
+      if (searchTerm.length >= 3) {
+        setCityLoading(true);
+        clearTimeout(timerId.current);
+        timerId.current = setTimeout(() => fetchCityList(searchTerm), 500) as any;
+      } else {
+        setCityLoading(false);
+        setCityList([]);
+      }
+    },
+    [fetchCityList]
+  );
 
   return (
     <>
@@ -435,21 +475,27 @@ const HealthFacilityDetailsForm = ({
           </div>
           <div className={columnStyle}>
             <Field
-              required={true}
+              required={isCommunity ? true : false}
               name={`${formName}.city`}
               type='text'
-              validate={required}
+              validate={isCommunity ? required : undefined}
               render={({ input, meta }) => (
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label='City/Village'
-                  errorLabel='city/village'
+                  label={isCommunity ? 'City/Village' : 'City'}
+                  errorLabel={isCommunity ? 'city/village' : 'city'}
                   labelKey='name'
                   valueKey='id'
-                  options={villagesList}
-                  loadingOptions={villagesLoading}
-                  error={(meta.touched && meta.error) || undefined}
+                  options={isCommunity ? villagesList : cityList}
+                  loadingOptions={isCommunity ? villagesLoading : cityLoading}
+                  error={(isCommunity && meta.touched && meta.error) || undefined}
+                  required={isCommunity ? true : false}
+                  onInput={(value) => {
+                    if (!isCommunity) {
+                      fetchCityListDebounce(value);
+                    }
+                  }}
                 />
               )}
             />
@@ -554,7 +600,7 @@ const HealthFacilityDetailsForm = ({
             <Field
               name={`${formName}.linkedVillages`}
               type='text'
-              validate={required}
+              validate={isCommunity ? required : undefined}
               render={({ input, meta }) => {
                 return (
                   <MultiSelect
@@ -563,7 +609,7 @@ const HealthFacilityDetailsForm = ({
                     errorLabel='linked villages'
                     labelKey='name'
                     valueKey='id'
-                    required={true}
+                    required={isCommunity ? true : false}
                     isShowLabel={true}
                     isSelectAll={true}
                     placeholder=''
@@ -573,7 +619,7 @@ const HealthFacilityDetailsForm = ({
                     isMulti={true}
                     options={unlinkedVillagesList}
                     loading={unlinkedVillagesLoading}
-                    error={(meta.touched && meta.error) || undefined}
+                    error={(isCommunity && meta.touched && meta.error) || undefined}
                     controlStyles={{
                       borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
                       '&:focus-visible': {

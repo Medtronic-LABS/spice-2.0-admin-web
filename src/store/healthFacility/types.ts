@@ -130,6 +130,11 @@ export interface IVillages {
   countryId: string;
   districtId: string;
 }
+
+export interface ICity {
+  label: string;
+  value: string;
+}
 export interface IClinicalWorkflows {
   id: number;
   name: string;
@@ -571,6 +576,22 @@ export interface IFetchVillagesListFailure {
   error: Error;
 }
 
+export interface IFetchCityListRequest {
+  type: typeof ACTION_TYPES.FETCH_CITY_LIST_REQUEST_FOR_HF;
+  searchTerm: string;
+  appTypes: string[];
+  successCb: (data: ICity[]) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchCityListSuccess {
+  type: typeof ACTION_TYPES.FETCH_CITY_LIST_SUCCESS_FOR_HF;
+}
+export interface IFetchCityListFailure {
+  type: typeof ACTION_TYPES.FETCH_CITY_LIST_FAILURE_FOR_HF;
+  error: Error;
+}
+
 export interface IClearHFWorkflowList {
   type: typeof ACTION_TYPES.CLEAR_HF_WORKFLOW_LIST;
 }
@@ -845,4 +866,7 @@ export type HealthFacilityActions =
   | IFetchHFUserListClear
   | IValidateLinkedRestrictionsFailure
   | IClearHFFormData
-  | IClearHFWorkflowList;
+  | IClearHFWorkflowList
+  | IFetchCityListRequest
+  | IFetchCityListFailure
+  | IFetchCityListSuccess;
