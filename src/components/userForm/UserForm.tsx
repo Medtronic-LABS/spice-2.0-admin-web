@@ -372,13 +372,19 @@ const UserForm = ({
       // Handle special cases for admin form or health facility creation
       if ((isAdminForm && defaultSelectedRole) || isHFCreate) {
         const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
+        const defaultAdminSelected = appTypeBasedRoles.SPICE?.find(
+          (spiceRole: IRoles) => spiceRole.name === defaultSelectedRole
+        );
         fields.update(index, {
           ...form.getState().values?.users[index],
-          role:
-            isAdminForm && defaultSelectedRole
-              ? [appTypeBasedRoles.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)]
-              : [],
-          suiteAccess: defaultSelectedRole ? [getSpiceGroupName(suiteAccess)] : []
+          role: isAdminForm && defaultSelectedRole ? [defaultAdminSelected] : [],
+          roles: isAdminForm && defaultSelectedRole ? [defaultAdminSelected] : [],
+          suiteAccess: defaultSelectedRole ? [getSpiceGroupName(suiteAccess)] : [],
+          countryCode:
+            form.getState()?.values?.region?.phoneNumberCode?.length &&
+            !form?.getState()?.errors?.region?.phoneNumberCode
+              ? form.getState()?.values?.region?.phoneNumberCode
+              : undefined
         });
       }
 
@@ -570,9 +576,11 @@ const UserForm = ({
                   idRefs.current.push(new Date().getTime());
                   const dataToPush = { ...initialValue[0] };
                   if (isAdminForm && defaultSelectedRole) {
-                    dataToPush.role = [
-                      appTypeBasedRoles.SPICE?.find((spiceRole: IRoles) => spiceRole.name === defaultSelectedRole)
-                    ];
+                    const defaultAddAdminRole = appTypeBasedRoles.SPICE?.find(
+                      (spiceRole: IRoles) => spiceRole.name === defaultSelectedRole
+                    );
+                    dataToPush.role = [defaultAddAdminRole];
+                    dataToPush.roles = [defaultAddAdminRole];
                     const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
                     dataToPush.suiteAccess = [getSpiceGroupName(suiteAccess)];
                   }
@@ -765,6 +773,7 @@ const UserForm = ({
         // levelBasedReportsRole(selectedRole?.level);
         const initialEditDataForRole = {
           role: [selectedRole],
+          roles: [selectedRole],
           suiteAccess: [getSpiceGroupName(suiteAccess)]
         };
         setAutoFetchData([initialEditDataForRole]);
@@ -1301,7 +1310,11 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any, { option, action }: { option: any; action: string }) => {
-                              const currentAllRoles = [...spiceRole, ...insightRoles, ...values];
+                              const currentAllRoles = [
+                                ...(Array.isArray(spiceRole) ? spiceRole : [spiceRole]),
+                                ...insightRoles,
+                                ...values
+                              ];
                               roleChange({
                                 allRoles: currentAllRoles,
                                 index,
@@ -1355,7 +1368,11 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
                             onChange={(values: any) => {
-                              const currentAllRoles = [...spiceRole, ...reportRoles, ...values];
+                              const currentAllRoles = [
+                                ...(Array.isArray(spiceRole) ? spiceRole : [spiceRole]),
+                                ...reportRoles,
+                                ...values
+                              ];
                               roleChange({
                                 allRoles: currentAllRoles,
                                 index,

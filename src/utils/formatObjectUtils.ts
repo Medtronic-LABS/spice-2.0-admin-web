@@ -1,5 +1,5 @@
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
-import { IRoles, IUserPayload } from '../store/user/types';
+import { IUserPayload } from '../store/user/types';
 
 /**
  * Constructs a payload for health facility data.
@@ -63,30 +63,7 @@ export const getUserPayload = ({
   spiceRolesGroup?: Array<{ name: string; id: number }>;
 }) => {
   const payload = userFormData.map((user: any) => {
-    let roleIds: number[] = [];
-    // for role, roles, roleIds
-    if (!user.id) {
-      roleIds = Array.isArray(user.roles)
-        ? (user.roles || []).map((id: any) => (Array.isArray(id) ? id.map((e: any) => e.id) : id.id)).flat()
-        : [user.role.id];
-    } else {
-      let reportIds: number[] = [];
-      let spiceId: number[] = [];
-      // add role in spiceId
-      if (user.role) {
-        spiceId =
-          Array.isArray(user.roles) && user.roles.length
-            ? (user.roles || []).map((id: any) => (Array.isArray(id) ? id.map((e: any) => e.id) : id.id)).flat()
-            : [user.role.id];
-      }
-      // add roles in reportIds
-      if (user.roles) {
-        reportIds = user.roles
-          ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.reports)
-          ?.map((role: IRoles) => role.id);
-      }
-      roleIds = [...new Set([...spiceId, ...reportIds])];
-    }
+    let roleIds: number[] = (user.roles || []).map((role: any) => role.id);
     const isHFAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
 
     // add or remove redrisk roleId from roleIds array
@@ -125,7 +102,7 @@ export const getUserPayload = ({
       country: { id: Number(countryId) },
       tenantId: payloadTenantId,
       supervisorId: Number(user.supervisor?.id) || null,
-      roleIds,
+      roleIds: [...new Set(roleIds)],
       villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
       village: user?.village,
       timezone: user?.timezone?.id ? user?.timezone : null,
@@ -180,32 +157,7 @@ export const getAdminPayload = ({
   isFromSummaryOrProfilePage?: boolean;
 }) => {
   const payload = userFormData.map((user: any) => {
-    let roleIds: number[] = [];
-    // for role, roles, roleIds
-    let reportIds: number[] = [];
-    let spiceId: number[] = [];
-    // add role in spiceId
-    if (!isFromList) {
-      // if not from admin list
-      spiceId = [Array.isArray(user?.role) ? user.role[0]?.id : user?.role?.id];
-    } else if (user.role) {
-      spiceId =
-        Array.isArray(user.roles) && user.roles.length
-          ? (user.roles || [])
-              .map((id: any) => {
-                return Array.isArray(id) ? id.map((e: any) => e.id) : id.id;
-              })
-              .flat()
-          : [user.role.id];
-    }
-    // add roles in Report Ids
-    if (user.roles) {
-      reportIds = user.roles
-        ?.filter((role: IRoles) => role.groupName === APPCONSTANTS.spiceRoleGrouped.reports)
-        ?.map((role: IRoles) => role.id);
-    }
-    roleIds = [...new Set([...spiceId, ...reportIds])];
-
+    const roleIds: number[] = (user.roles || []).map((role: any) => role.id);
     const userPayload: any = {
       firstName: user.firstName.trim(),
       lastName: user.lastName.trim(),
@@ -214,7 +166,7 @@ export const getAdminPayload = ({
       phoneNumber: user.phoneNumber,
       // for create region countryCode will be come as free text
       countryCode: user?.countryCode?.phoneNumberCode || user?.countryCode,
-      roleIds,
+      roleIds: [...new Set(roleIds)],
       timezone: user?.timezone?.id ? user?.timezone : null,
       designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null
     };

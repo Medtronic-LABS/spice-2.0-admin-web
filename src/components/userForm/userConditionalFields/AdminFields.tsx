@@ -67,7 +67,7 @@ export const SiteUserForm = (props: any) => {
       dispatch(fetchCultureListRequest());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isTimezoneAvailable]);
 
   return (
     <>
