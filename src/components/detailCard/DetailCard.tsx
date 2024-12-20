@@ -30,13 +30,16 @@ interface IDetailCardProps {
   bodyClassName?: string;
   setSelectedRole?: SetSelectedState;
   setSelectedFacility?: SetSelectedState;
+  onChange?: (data: any, name: string) => void;
 }
 
 interface IFilteredData {
   id: number;
   name: string;
+  key?: string;
   isSearchable: boolean;
   isFacility: boolean;
+  isGeneric?: boolean;
   data: any[];
   isShow: boolean;
   filterCount?: number;
@@ -68,12 +71,13 @@ const DetailCard = ({
   className = '',
   bodyClassName = '',
   setSelectedRole,
-  setSelectedFacility
+  setSelectedFacility,
+  onChange
 }: IDetailCardProps): React.ReactElement => {
   const buttonClass = `${
-    buttonLabel && onButtonClick ? (isFilter ? 'me-lg-0 me-xxl-1 mt-1' : 'me-1 mt-1') : 'mt-0'
+    buttonLabel && onButtonClick ? (isFilter ? 'me-lg-0 me-xxl-0dot5 mt-1' : 'me-1 mt-1') : 'mt-0'
   } mt-lg-0`;
-  const searchClass = `${isSearch ? 'mt-1' : ''} mt-lg-0`;
+  const searchClass = `${isSearch ? 'mt-auto ms-0dot5' : ''} mt-lg-0`;
 
   /**
    * Renders the search bar if isSearch is true and onSearch is provided.
@@ -92,16 +96,20 @@ const DetailCard = ({
    * @param filteredData - Data for the filter component.
    * @returns React.ReactElement | null
    */
-  const renderFilter = (isFacility: boolean, filteredData: IFilteredData) => {
+  const renderFilter = (isFacility: boolean, filteredData: IFilteredData, isGeneric: boolean = false) => {
     return isFilter ? (
-      <Filter
-        filterData={filteredData}
-        isFacility={isFacility}
-        setSelectedRole={setSelectedRole}
-        setSelectedFacility={setSelectedFacility}
-        filterCount={filteredData.filterCount}
-        key={filteredData?.id}
-      />
+      <div className='d-flex mt-auto'>
+        <Filter
+          filterData={filteredData}
+          isFacility={isFacility}
+          isGeneric={isGeneric}
+          setSelectedRole={setSelectedRole}
+          setSelectedFacility={setSelectedFacility}
+          onChange={onChange}
+          filterCount={filteredData.filterCount}
+          key={filteredData?.id}
+        />
+      </div>
     ) : null;
   };
 
@@ -136,12 +144,15 @@ const DetailCard = ({
           {header}
         </span>
         <div
-          className={`d-flex justify-content-between  ${
-            buttonLabel && onButtonClick ? 'justify-content-lg-end' : ''
-          }  ${isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'} flex-grow-md-0 ${styles.buttonContainer}`}
+          className={`d-flex justify-content-between ${buttonLabel && onButtonClick ? 'justify-content-lg-end' : ''}  ${
+            isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'
+          } ${buttonLabel && isSearch && isFilter ? '' : ''} flex-grow-md-0 ${styles.buttonContainer}`}
         >
           {renderSearchBar()}
-          {onFilterData?.map((data: IFilteredData) => data.data && renderFilter(data.isFacility, data))}
+
+          {onFilterData?.map(
+            (data: IFilteredData) => data.data && renderFilter(data.isFacility, data, data?.isGeneric)
+          )}
           <div className='d-flex'>
             {renderCustomIcon()}
             {buttonLabel && onButtonClick ? (

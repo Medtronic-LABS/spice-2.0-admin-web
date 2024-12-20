@@ -11,11 +11,19 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import CustomTable from '../../components/customTable/CustomTable';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  getMedicationClassificationsSelector,
+  getMedicationDosageFormsSelector,
   getMedicationListCountSelector,
   getMedicationListSelector,
   getMedicationLoadingSelector
 } from '../../store/medication/selectors';
-import { deleteMedication, fetchMedicationListReq, updateMedication } from '../../store/medication/actions';
+import {
+  deleteMedication,
+  fetchClassifications,
+  fetchDosageForms,
+  fetchMedicationListReq,
+  updateMedication
+} from '../../store/medication/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { getAppTypeSelector } from '../../store/user/selectors';
 
@@ -31,12 +39,15 @@ const MedicationList = (): React.ReactElement => {
   // State for controlling the medication edit modal
   const [isOpenMedicationModal, setOpenMedicationModal] = useState(false);
   const [medicationInitialValues, setMedicationInitialValues] = useState({});
+  const [filters, setFilters] = useState<any>({ classificationIds: [], brandIds: [], dosageFormIds: [] });
   const dispatch = useDispatch();
 
   // Selectors for medication data from Redux store
   const medicationList = useSelector(getMedicationListSelector);
   const loading = useSelector(getMedicationLoadingSelector);
   const listCount = useSelector(getMedicationListCountSelector);
+  const classificationOptions = useSelector(getMedicationClassificationsSelector);
+  const dosageFormOptions = useSelector(getMedicationDosageFormsSelector);
 
   // Get route parameters
   const { regionId, tenantId }: { regionId: string; tenantId: string } = useParams();
@@ -45,23 +56,37 @@ const MedicationList = (): React.ReactElement => {
   /**
    * Fetches the medication list
    */
-  const fetchList = useCallback(() => {
-    dispatch(
-      fetchMedicationListReq({
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: listParams.rowsPerPage,
-        search: listParams.searchTerm,
-        countryId: Number(regionId),
-        failureCb: (e) =>
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.MEDICATION_FETCH_ERROR))
-      })
-    );
-  }, [dispatch, regionId, listParams]);
+  const fetchList = useCallback(
+    ({ classificationIds = null, brandIds = null, dosageFormIds = null, skip = null }: any) => {
+      dispatch(
+        fetchMedicationListReq({
+          skip: skip ?? (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: listParams.rowsPerPage,
+          classificationIds: classificationIds ?? filters.classificationIds,
+          brandIds: brandIds ?? filters.brandIds,
+          dosageFormIds: dosageFormIds ?? filters.dosageFormIds,
+          search: listParams.searchTerm,
+          countryId: Number(regionId),
+          failureCb: (e) =>
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.MEDICATION_FETCH_ERROR))
+        })
+      );
+    },
+    [dispatch, regionId, listParams, filters]
+  );
+
+  const fetchFilterOptions = useCallback(() => {
+    dispatch(fetchClassifications({ countryId: Number(regionId) }));
+    if (dosageFormOptions && !dosageFormOptions.length) {
+      dispatch(fetchDosageForms());
+    }
+  }, [dispatch, dosageFormOptions, regionId]);
 
   // Fetch medication list when component mounts or when dependencies change
   useEffect(() => {
-    fetchList();
-  }, [dispatch, fetchList, regionId, listParams]);
+    fetchList({});
+    fetchFilterOptions();
+  }, [dispatch, fetchList, regionId, listParams, fetchFilterOptions]);
 
   /**
    * Handles the "Add Medication" button click
@@ -124,6 +149,30 @@ const MedicationList = (): React.ReactElement => {
     setMedicationInitialValues({});
   };
 
+  const handleFilterChange = (option: any, name: string) => {
+    let newFilters = Object.assign({}, filters);
+    let brandIds: any = [];
+    if (name === 'classificationIds') {
+      let brands: any = [];
+      const selectedClassifications: any = classificationOptions.filter((data: any) =>
+        option.some((id: number) => id === Number(data.id))
+      );
+      selectedClassifications.map((data: any) => {
+        brands = [...new Set([...brands, ...data.brands])];
+        return data;
+      });
+      const uniqueBrandIds: any = Array.from(new Set(brands.map((item: any) => item.id)));
+      brandIds = uniqueBrandIds.filter((value: any) => filters.brandIds.includes(value));
+    }
+    newFilters = {
+      ...newFilters,
+      [name]: option,
+      ...(name === 'classificationIds' && { brandIds })
+    };
+    setFilters(newFilters);
+    fetchList({ ...newFilters, skip: 0 });
+  };
+
   /**
    * Handles the submission of edited medication data
    * @param {Object} param0 - Object containing the edited medication data
@@ -173,14 +222,65 @@ const MedicationList = (): React.ReactElement => {
     return <MedicationForm form={form} initialEditValue={medicationInitialValues} disableOptions={true} />;
   };
 
+  const getBrandOptions = useCallback(() => {
+    let brands: any = [];
+    const selectedClassifications: any = classificationOptions.filter((data: any) =>
+      filters.classificationIds.some((id: number) => id === Number(data.id))
+    );
+    selectedClassifications.map((data: any) => {
+      brands = [...new Set([...brands, ...data.brands])];
+      return data;
+    });
+    return brands.reduce((acc: any, obj: any) => {
+      if (!acc.some((o: any) => o.id === obj.id)) {
+        acc.push(obj);
+      }
+      return acc;
+    }, []);
+  }, [classificationOptions, filters]);
+
   return (
     <>
       {loading && <Loader />}
       <div className='col-lg-12'>
         <div className='mt-0'>
           <DetailCard
-            buttonLabel='Add Medication'
+            buttonLabel='Add'
             header='Medication List'
+            isFilter={true}
+            onFilterData={[
+              {
+                id: 1,
+                name: 'Classification',
+                key: 'classificationIds',
+                isFacility: false,
+                isGeneric: true,
+                isSearchable: false,
+                data: classificationOptions,
+                isShow: true
+              },
+              {
+                id: 2,
+                name: 'Brand',
+                key: 'brandIds',
+                isFacility: false,
+                isGeneric: true,
+                isSearchable: false,
+                data: getBrandOptions(),
+                isShow: true
+              },
+              {
+                id: 3,
+                name: 'Dosage Form',
+                key: 'dosageFormIds',
+                isFacility: false,
+                isGeneric: true,
+                isSearchable: false,
+                data: dosageFormOptions,
+                isShow: true
+              }
+            ]}
+            onChange={handleFilterChange}
             isSearch={true}
             onSearch={handleSearch}
             onButtonClick={handleAddMedication}

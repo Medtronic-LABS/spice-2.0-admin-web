@@ -1,7 +1,15 @@
 import axios from 'axios';
 import { IDeleteMedicationRequestPayload, IMedicationPayload } from '../store/medication/types';
 
-export const getMedicationList = (skip: number, limit: number | null, countryId: string, search?: string) =>
+export const getMedicationList = (
+  skip: number,
+  limit: number | null,
+  countryId: string,
+  classificationIds: number[],
+  brandIds: number[],
+  dosageFormIds: number[],
+  search?: string
+) =>
   axios({
     url: '/admin-service/medication/list',
     method: 'POST',
@@ -9,6 +17,9 @@ export const getMedicationList = (skip: number, limit: number | null, countryId:
       countryId: Number(countryId),
       limit,
       skip,
+      classificationIds,
+      brandIds,
+      dosageFormIds,
       ...(search ? { searchTerm: search } : {})
     }
   });

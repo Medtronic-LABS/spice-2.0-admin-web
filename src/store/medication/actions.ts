@@ -29,6 +29,9 @@ export const fetchMedicationListReq = ({
   limit,
   search,
   countryId,
+  classificationIds,
+  brandIds,
+  dosageFormIds,
   failureCb
 }: Omit<IFetchMedicationListReq, 'type'>): IFetchMedicationListReq => ({
   type: MEDICATION_TYPES.FETCH_MEDICATIONS_LIST_REQUEST,
@@ -36,6 +39,9 @@ export const fetchMedicationListReq = ({
   limit,
   search,
   countryId,
+  classificationIds,
+  brandIds,
+  dosageFormIds,
   failureCb
 });
 

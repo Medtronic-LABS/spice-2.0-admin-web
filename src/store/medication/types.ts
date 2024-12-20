@@ -69,6 +69,9 @@ export interface IFetchMedicationListReq {
   type: typeof ACTION_TYPES.FETCH_MEDICATIONS_LIST_REQUEST;
   skip: number;
   limit: number | null;
+  classificationIds: number[] | null;
+  brandIds: number[] | null;
+  dosageFormIds: number[] | null;
   search?: string;
   countryId: number;
   failureCb?: (error: Error) => void;

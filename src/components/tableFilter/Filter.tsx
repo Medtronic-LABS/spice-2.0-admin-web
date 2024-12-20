@@ -6,6 +6,7 @@ import { IHFUserGet } from '../../store/healthFacility/types';
 interface IFilteredData {
   isShow: any;
   name: string;
+  key?: string;
   isSearchable: boolean;
   data: any[];
 }
@@ -13,12 +14,15 @@ interface IFilteredData {
 interface ITableFilterProps {
   filterData: IFilteredData;
   isFacility: boolean;
+  isGeneric?: boolean;
   setSelectedRole: any;
   setSelectedFacility: any;
+  onChange?: any;
   filterCount?: number;
 }
 
 interface IOption {
+  id: string;
   name: string;
   tenantId: string;
 }
@@ -26,8 +30,10 @@ interface IOption {
 const TableFilter: React.FC<ITableFilterProps> = ({
   filterData,
   isFacility,
+  isGeneric,
   setSelectedFacility,
   setSelectedRole,
+  onChange,
   filterCount
 }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -51,7 +57,26 @@ const TableFilter: React.FC<ITableFilterProps> = ({
    * @param {IOption} option - The selected option object.
    */
   const handleSelectChange = (option: IOption) => {
-    if (isFacility) {
+    if (isGeneric) {
+      if (option.name === selectAllLabel) {
+        if (isAllSelected.current) {
+          onChange([], filterData.key);
+        } else {
+          onChange(
+            filteredOptions.map((opt) => opt.id),
+            filterData.key
+          );
+        }
+      } else {
+        const selectedFilterOptions = selectedOptions.includes(option.name)
+          ? selectedOptions.filter((name: string) => name !== option.name)
+          : [...selectedOptions, option.name];
+        const selectedData = filterData.data
+          .filter((data: any) => selectedFilterOptions.includes(data.name))
+          .map((data: any) => data.id && data.id);
+        onChange(selectedData, filterData.key);
+      }
+    } else if (isFacility) {
       if (option.name === selectAllLabel) {
         if (isAllSelected.current) {
           setSelectedFacility([]);
@@ -206,7 +231,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
       {filterData.isShow && (
         <div className={`${styles.selectHeader}`}>
           <div
-            className={`${styles.selectHeader} ${styles.container} d-flex align-items-center justify-content-between px-1 border rounded border-secondary mx-1 position-relative filter-container`}
+            className={`${styles.selectHeader} ${styles.container} d-flex align-items-center justify-content-between px-0dot5 border rounded border-secondary mx-0dot5 position-relative filter-container`}
             onClick={handleDropdownToggle}
             ref={dropdownContainerRef}
           >
@@ -250,7 +275,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                           onChange={() => handleSelectChange(option)}
                           className='mr-2'
                         />
-                        {!isFacility ? option.displayName : option.name} {formatHealthFacility(option)}
+                        {(!isFacility ? option.displayName : option.name) || option.name} {formatHealthFacility(option)}
                       </label>
                     </li>
                   ))}

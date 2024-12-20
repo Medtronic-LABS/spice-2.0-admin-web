@@ -26,6 +26,8 @@
       }
     }
     .buttonContainer {
+      flex-wrap: wrap;
+      row-gap: 1rem;
       @media (min-width: 1024px) and (max-width: 1400px) {
         align-items: center;
         width: 100%;

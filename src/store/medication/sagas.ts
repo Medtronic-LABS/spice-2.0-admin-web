@@ -42,6 +42,9 @@ import {
 export function* fetchMedicationList({
   skip,
   limit,
+  classificationIds,
+  brandIds,
+  dosageFormIds,
   search,
   countryId,
   failureCb
@@ -49,7 +52,16 @@ export function* fetchMedicationList({
   try {
     const {
       data: { entityList: list, totalCount: total }
-    } = yield call(medicationService.getMedicationList as any, skip, limit, countryId, search);
+    } = yield call(
+      medicationService.getMedicationList as any,
+      skip,
+      limit,
+      countryId,
+      classificationIds,
+      brandIds,
+      dosageFormIds,
+      search
+    );
     const response = { list: list || [], total };
     yield put(fetchMedicationListSuccess(response));
   } catch (e: any) {
