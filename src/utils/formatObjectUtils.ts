@@ -22,7 +22,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string, appTyp
     address: hf.address,
     district: hf.district,
     chiefdom: hf.chiefdom,
-    cityName: hf.city.name,
+    cityName: hf?.city?.name || null,
     latitude: hf.latitude,
     longitude: hf.longitude,
     postalCode: hf.postalCode,
