@@ -213,7 +213,7 @@ export const useRoleMeta = ({
       // show report hf list condition
       if (currentSuite === REPORTS) {
         showFields.isShowReportHFList =
-          !!roles.length && roles.some((userRole: IRoles) => facilityReportAdminRole.includes(userRole.name));
+          !!roles.length && roles.some((userRole: IRoles) => facilityPlusHF4ReportUserRole.includes(userRole.name));
       }
       // show insight hf list condition
       if (currentSuite === INSIGHTS) {
