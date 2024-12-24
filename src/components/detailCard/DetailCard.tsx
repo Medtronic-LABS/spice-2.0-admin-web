@@ -43,6 +43,7 @@ interface IFilteredData {
   data: any[];
   isShow: boolean;
   filterCount?: number;
+  placeholder?: string;
 }
 
 /**
@@ -108,6 +109,7 @@ const DetailCard = ({
           onChange={onChange}
           filterCount={filteredData.filterCount}
           key={filteredData?.id}
+          placeholder={filteredData?.placeholder}
         />
       </div>
     ) : null;

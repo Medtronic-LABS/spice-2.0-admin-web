@@ -37,7 +37,11 @@ import {
   IChiefdomDropdownRequest,
   IChiefdomDropdownFailure,
   IChiefdomDropdownSuccess,
-  IChiefdomDropdownSuccessPayload
+  IChiefdomDropdownSuccessPayload,
+  IFetchChiefDomsByCountryIdRequest,
+  IFetchChiefDomsByCountryIdSuccess,
+  IFetchChiefDomsByCountryIdSuccessPayload,
+  IFetchChiefDomsByCountryIdFailure
 } from './types';
 import * as ACTION_TYPES from './actionTypes';
 
@@ -274,4 +278,31 @@ export const fetchChiefdomDropdownFailure = (error: Error): IChiefdomDropdownFai
 
 export const clearChiefdomDropdown = () => ({
   type: ACTION_TYPES.CLEAR_DROPDOWN_VALUES
+});
+
+export const fetchChiefDomsByCountryIdRequest = ({
+  data,
+  successCb,
+  failureCb
+}: {
+  data: { countryId: string | number };
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}): IFetchChiefDomsByCountryIdRequest => ({
+  type: ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const fetchChiefDomsByCountryIdSuccess = (
+  payload: IFetchChiefDomsByCountryIdSuccessPayload
+): IFetchChiefDomsByCountryIdSuccess => ({
+  type: ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_SUCCESS,
+  payload
+});
+
+export const fetchChiefDomsByCountryIdFailure = (error: Error): IFetchChiefDomsByCountryIdFailure => ({
+  type: ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_FAILURE,
+  error
 });

@@ -106,6 +106,9 @@ export const fetchHFListRequest = ({
   limit,
   searchTerm,
   tenantIds,
+  healthFacilityTypes,
+  districtIds,
+  chiefdomIds,
   userBased,
   successCb,
   failureCb
@@ -116,6 +119,9 @@ export const fetchHFListRequest = ({
   countryId,
   searchTerm,
   tenantIds,
+  healthFacilityTypes,
+  districtIds,
+  chiefdomIds,
   userBased,
   successCb,
   failureCb

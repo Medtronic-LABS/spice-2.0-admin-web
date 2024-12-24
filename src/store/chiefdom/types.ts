@@ -28,6 +28,7 @@ export interface IChiefdomList {
 export interface IChiefdomState {
   chiefdom?: IChiefdom;
   chiefdomList: IChiefdomList[];
+  allChiefdoms: IChiefdomList[];
   listTotal: number;
   chiefdomDetail: IChiefdomDetail;
   admins: IChiefdomAdmin[];
@@ -329,6 +330,27 @@ export interface IClearOUDropdown {
   type: typeof ACTION_TYPES.CLEAR_DROPDOWN_VALUES;
 }
 
+export interface IFetchChiefDomsByCountryIdRequest {
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_REQUEST;
+  data: { countryId: number | string };
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchChiefDomsByCountryIdSuccessPayload {
+  chiefdomList: IChiefdomList[];
+}
+
+export interface IFetchChiefDomsByCountryIdSuccess {
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_SUCCESS;
+  payload: IFetchChiefDomsByCountryIdSuccessPayload;
+}
+
+export interface IFetchChiefDomsByCountryIdFailure {
+  type: typeof ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_FAILURE;
+  error: Error;
+}
+
 export type ChiefdomActions =
   | IFetchChiefdomDashboardListRequest
   | IFetchChiefdomDashboardListSuccess
@@ -365,4 +387,7 @@ export type ChiefdomActions =
   | IChiefdomDropdownRequest
   | IChiefdomDropdownSuccess
   | IChiefdomDropdownFailure
-  | IClearOUDropdown;
+  | IClearOUDropdown
+  | IFetchChiefDomsByCountryIdRequest
+  | IFetchChiefDomsByCountryIdSuccess
+  | IFetchChiefDomsByCountryIdFailure;

@@ -17,6 +17,7 @@ export const initialState: IDistrictState = {
     }
   },
   districtList: [],
+  allDistricts: [],
   districtOptions: [],
   admins: [],
   total: 0,
@@ -32,6 +33,7 @@ export const initialState: IDistrictState = {
 const districtReducer = (state = initialState, action = {} as DistrictActions): IDistrictState => {
   switch (action.type) {
     case DISTRICT_TYPES.FETCH_DISTRICT_LIST_REQUEST:
+    case DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST:
     case DISTRICT_TYPES.FETCH_DISTRICT_DETAIL_REQUEST:
     case DISTRICT_TYPES.CREATE_DISTRICT_REQUEST:
     case DISTRICT_TYPES.UPDATE_DISTRICT_DETAIL_REQUEST:
@@ -48,8 +50,15 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
       return {
         ...state,
         loading: false,
-        districtList: action.payload.districtList,
+        allDistricts: action.payload.districtList,
         total: action.payload.total,
+        error: null
+      };
+    case DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        allDistricts: action.payload.districtList,
         error: null
       };
     case DISTRICT_TYPES.CLEAR_DISTRICT_LIST:
@@ -59,6 +68,7 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
         total: 0
       };
     case DISTRICT_TYPES.FETCH_DISTRICT_LIST_FAILURE:
+    case DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_FAILURE:
     case DISTRICT_TYPES.CREATE_DISTRICT_FAILURE:
     case DISTRICT_TYPES.UPDATE_DISTRICT_DETAIL_FAIL:
       return {

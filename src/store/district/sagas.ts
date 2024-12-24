@@ -16,7 +16,8 @@ import {
   IFetchDistrictOptionsRequest,
   IActivateAccountReq,
   IDistrict,
-  IFetchDistrictOptionsPayload
+  IFetchDistrictOptionsPayload,
+  IFetchDistrictsByCountryIdRequest
 } from './types';
 import * as districtActions from './actions';
 import * as hfActions from '../healthFacility/actions';
@@ -31,7 +32,8 @@ import {
   DELETE_DISTRICT_ADMIN_REQUEST,
   DEACTIVATE_DISTRICT_REQUEST,
   FETCH_DISTRICT_OPTIONS_REQUEST,
-  ACTIVATE_ACCOUNT_REQUEST
+  ACTIVATE_ACCOUNT_REQUEST,
+  FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST
 } from './actionTypes';
 import { AppState } from '../rootReducer';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -86,6 +88,22 @@ export function* fetchDistrictList({
   }
 }
 
+export function* fetchDistrictsByCountryList({
+  data: { countryId },
+  successCb,
+  failureCb
+}: IFetchDistrictsByCountryIdRequest): SagaIterator {
+  try {
+    const responce = yield call(districtService.fetchDistrictsByCountryId as any, countryId);
+    const payload = { districtList: responce.data || [] };
+    yield put(districtActions.fetchDistrictsByCountryIdSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(districtActions.fetchDistrictListFailure(e));
+    }
+  }
+}
 /*
   Worker Saga: Fired on CREATE_DISTRICT_REQUEST action
 */
@@ -282,6 +300,7 @@ export function* fetchDistrictOptions(action: IFetchDistrictOptionsRequest): Sag
 */
 function* districtSaga() {
   yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST, fetchDistrictList)]);
+  yield all([takeLatest(FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST, fetchDistrictsByCountryList)]);
   yield all([takeLatest(CREATE_DISTRICT_REQUEST, createDistrict)]);
   yield all([takeLatest(FETCH_DISTRICT_DETAIL_REQUEST, fetchDistrictDetail)]);
   yield all([takeLatest(FETCH_DISTRICT_DASHBOARD_LIST_REQUEST, getDashboardDistrict)]);

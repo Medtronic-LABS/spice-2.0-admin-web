@@ -18,7 +18,10 @@ export const fetchHealthFacilityList = ({
   userBased,
   tenantBased,
   searchTerm,
-  tenantIds = []
+  tenantIds = [],
+  healthFacilityTypes = [],
+  districtIds = [],
+  chiefdomIds = []
 }: IFetchHFListRequest) =>
   axios({
     method: 'POST',
@@ -28,6 +31,9 @@ export const fetchHealthFacilityList = ({
       skip: skip || null,
       countryId,
       tenantIds,
+      healthFacilityTypes,
+      districtIds,
+      chiefdomIds,
       userBased,
       tenantBased,
       searchTerm: searchTerm || '',

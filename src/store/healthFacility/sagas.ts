@@ -118,6 +118,9 @@ export function* fetchHealthFacilityList({
   userBased,
   tenantBased,
   tenantIds,
+  healthFacilityTypes,
+  districtIds,
+  chiefdomIds,
   successCb,
   failureCb
 }: IFetchHFListRequest): SagaIterator {
@@ -131,6 +134,9 @@ export function* fetchHealthFacilityList({
       searchTerm,
       userBased,
       tenantIds,
+      healthFacilityTypes,
+      districtIds,
+      chiefdomIds,
       tenantBased
     });
     const payload = { healthFacilityList: healthFacilities || [], total, limit };

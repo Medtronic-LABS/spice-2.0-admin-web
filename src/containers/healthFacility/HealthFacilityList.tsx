@@ -17,20 +17,27 @@ import {
   clearHFWorkflowList,
   fetchHFListRequest,
   fetchHFSummaryRequest,
+  fetchHFTypesRequest,
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
+import { fetchDistrictsByCountryIdRequest } from '../../store/district/actions';
 import {
   healthFacilityListSelector,
   healthFacilityListTotalSelector,
-  healthFacilityLoadingSelector
+  healthFacilityLoadingSelector,
+  hfTypesSelector
 } from '../../store/healthFacility/selectors';
+import { getAllDistrictListSelector } from '../../store/district/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { roleSelector } from '../../store/user/selectors';
 import { formatHealthFacility } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
+import { getAllChiefdomsSelector } from '../../store/chiefdom/selectors';
+import { fetchChiefDomsByCountryIdRequest } from '../../store/chiefdom/actions';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 /**
  * Interface for modal state
@@ -62,6 +69,9 @@ const HealthFacilityList = (): React.ReactElement => {
   const healthFacilityCount = useSelector(healthFacilityListTotalSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
+  const hfTypesList = useSelector(hfTypesSelector);
+  const districtList = useSelector(getAllDistrictListSelector);
+  const chiefdomList = useSelector(getAllChiefdomsSelector);
   const countryId = useCountryId();
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const {
@@ -79,27 +89,70 @@ const HealthFacilityList = (): React.ReactElement => {
     data: {} as IHealthFacilityForm,
     isNextClicked: false
   });
+  const [filters, setFilters] = useState<any>({ healthFacilityTypes: [], districtIds: [], chiefdomIds: [] });
 
   /**
    * Fetches the health facility list
    */
-  const fetchList = useCallback(() => {
-    dispatch(
-      fetchHFListRequest({
-        countryId,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: listParams.rowsPerPage,
-        searchTerm: listParams.searchTerm,
-        userBased: !isSuperUser,
-        tenantIds: [tenantId],
-        failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]);
+  const fetchList = useCallback(
+    ({ skip = null, healthFacilityTypes = null, districtIds = null, chiefdomIds = null }: any) => {
+      dispatch(
+        fetchHFListRequest({
+          countryId,
+          skip: skip ?? (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: listParams.rowsPerPage,
+          searchTerm: listParams.searchTerm,
+          userBased: !isSuperUser,
+          tenantIds: [tenantId],
+          healthFacilityTypes: healthFacilityTypes ?? filters.healthFacilityTypes,
+          districtIds: districtIds ?? filters.districtIds,
+          chiefdomIds: chiefdomIds ?? filters.chiefdomIds,
+          failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
+        })
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]
+  );
 
   useEffect(() => {
-    fetchList();
+    if (!hfTypesList.length) {
+      dispatch(fetchHFTypesRequest({}));
+    }
+    if (!districtList.length) {
+      dispatch(
+        fetchDistrictsByCountryIdRequest({
+          data: { countryId },
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, chiefdomSName)
+              )
+            )
+        })
+      );
+    }
+    if (!chiefdomList.length) {
+      dispatch(
+        fetchChiefDomsByCountryIdRequest({
+          data: { countryId },
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_LIST_FETCH_ERROR, chiefdomSName)
+              )
+            )
+        })
+      );
+    }
+  }, [dispatch, hfTypesList.length]);
+
+  useEffect(() => {
+    fetchList({});
   }, [listParams, dispatch, fetchList]);
 
   /**
@@ -194,7 +247,7 @@ const HealthFacilityList = (): React.ReactElement => {
 
   const hfUpdateSuccess = () => {
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS);
-    fetchList();
+    fetchList({});
     closeHealthFacilityEditModal(true);
   };
   const fetchFailure = (e: Error, errorMessage: string) =>
@@ -312,16 +365,67 @@ const HealthFacilityList = (): React.ReactElement => {
     );
   };
 
+  const handleFilterChange = (option: any, name: string) => {
+    let newFilters = Object.assign({}, filters);
+    let healthFacilityTypes: any = [];
+    if (name === 'healthFacilityTypes') {
+      healthFacilityTypes = hfTypesList.filter((data: any) => option.includes(data.id)).map((item: any) => item.name);
+    }
+    newFilters = {
+      ...newFilters,
+      [name]: option,
+      ...(name === 'healthFacilityTypes' && { healthFacilityTypes })
+    };
+    setFilters(newFilters);
+    fetchList({ ...newFilters, skip: 0 });
+  };
+
   return (
     <>
       {loading && <Loader />}
       <div className='col-12'>
         <DetailCard
-          buttonLabel={`Add ${healthFacilitySName}`}
+          buttonLabel={'Add'}
           header={healthFacilitySName}
           isSearch={true}
           onSearch={handleSearch}
           onButtonClick={openCreateHealthFacility}
+          onChange={handleFilterChange}
+          isFilter={true}
+          onFilterData={[
+            {
+              id: 1,
+              name: 'Type',
+              key: 'healthFacilityTypes',
+              isFacility: false,
+              isGeneric: true,
+              isSearchable: false,
+              data: hfTypesList,
+              isShow: true
+            },
+            {
+              id: 2,
+              name: 'District',
+              key: 'districtIds',
+              isFacility: false,
+              isGeneric: true,
+              isSearchable: true,
+              placeholder: 'Search District',
+              data: districtList,
+              isShow: true
+            },
+            {
+              id: 3,
+              name: 'Chief Dom',
+              key: 'chiefdomIds',
+              isFacility: false,
+              isGeneric: true,
+              isSearchable: true,
+              placeholder: 'Search Chiefdom',
+              data: chiefdomList,
+              isShow: true
+            }
+          ]}
         >
           <CustomTable
             rowData={healthFacilityList}

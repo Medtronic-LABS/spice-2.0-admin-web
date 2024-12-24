@@ -3,6 +3,7 @@ import { AppState } from '../rootReducer';
 
 const getChiefdomDashboardList = (state: AppState) => state.chiefdom.chiefdomDashboardList;
 const getChiefdomList = (state: AppState) => state.chiefdom.chiefdomList;
+const getAllChiefdoms = (state: AppState) => state.chiefdom.allChiefdoms;
 const getChiefdomCount = (state: AppState) => state.chiefdom.total;
 const getChiefdomListCount = (state: AppState) => state.chiefdom.listTotal;
 const getChiefdomLoading = (state: AppState) => state.chiefdom.loading;
@@ -19,6 +20,7 @@ export const chiefdomDashboardListSelector = createSelector(
 );
 
 export const chiefdomListSelector = createSelector(getChiefdomList, (chiefdomList) => chiefdomList);
+export const getAllChiefdomsSelector = createSelector(getAllChiefdoms, (chiefdomList) => chiefdomList);
 
 export const chiefdomCountSelector = createSelector(getChiefdomCount, (chiefdomCount) => chiefdomCount);
 export const chiefdomListCountSelector = createSelector(getChiefdomListCount, (chiefdomListCount) => chiefdomListCount);

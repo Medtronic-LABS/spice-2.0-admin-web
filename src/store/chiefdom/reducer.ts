@@ -3,6 +3,7 @@ import * as ACTION_TYPES from './actionTypes';
 
 export const initialState: IChiefdomState = {
   chiefdomList: [],
+  allChiefdoms: [],
   listTotal: 0,
   chiefdomDetail: {
     id: '',
@@ -51,6 +52,7 @@ const chiefdomReducer = (state: IChiefdomState = initialState, action = {} as Ch
         loadingMore: false
       };
     case ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST:
+    case ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_REQUEST:
     case ACTION_TYPES.FETCH_CHIEFDOM_DETAIL_REQUEST:
     case ACTION_TYPES.CREATE_CHIEFDOM_REQUEST:
     case ACTION_TYPES.UPDATE_CHIEFDOM_REQUEST:
@@ -89,6 +91,12 @@ const chiefdomReducer = (state: IChiefdomState = initialState, action = {} as Ch
         listTotal: action.payload.total,
         loading: false
       };
+    case ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_SUCCESS:
+      return {
+        ...state,
+        allChiefdoms: action.payload.chiefdomList,
+        loading: false
+      };
     case ACTION_TYPES.CLEAR_CHIEFDOM_LIST:
       return {
         ...state,
@@ -108,6 +116,7 @@ const chiefdomReducer = (state: IChiefdomState = initialState, action = {} as Ch
       };
     case ACTION_TYPES.UPDATE_CHIEFDOM_ADMIN_SUCCESS:
     case ACTION_TYPES.FETCH_CHIEFDOM_LIST_FAILURE:
+    case ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_FAILURE:
     case ACTION_TYPES.CREATE_CHIEFDOM_SUCCESS:
     case ACTION_TYPES.CREATE_CHIEFDOM_FAILURE:
     case ACTION_TYPES.UPDATE_CHIEFDOM_FAILURE:

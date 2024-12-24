@@ -47,7 +47,11 @@ import {
   IActivateDistrictFail,
   ISetDistrictDetails,
   IClearDistrictList,
-  IClearDistrictAdmin
+  IClearDistrictAdmin,
+  IFetchDistrictsByCountryIdRequest,
+  IFetchDistrictsByCountryIdSuccess,
+  IFetchDistrictsByCountryIdSuccessPayload,
+  IFetchDistrictsByCountryIdFailure
 } from './types';
 
 export const fetchDistrictListRequest = ({
@@ -315,4 +319,31 @@ export const clearDistrictAdmin = (): IClearDistrictAdmin => ({
 
 export const resetClinicalWorkflow = () => ({
   type: DISTRICT_TYPES.RESET_CLINICAL_WORKFLOW_REQUEST
+});
+
+export const fetchDistrictsByCountryIdRequest = ({
+  data,
+  successCb,
+  failureCb
+}: {
+  data: { countryId: string | number };
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}): IFetchDistrictsByCountryIdRequest => ({
+  type: DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const fetchDistrictsByCountryIdSuccess = (
+  payload: IFetchDistrictsByCountryIdSuccessPayload
+): IFetchDistrictsByCountryIdSuccess => ({
+  type: DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_SUCCESS,
+  payload
+});
+
+export const fetchDistrictsByCountryIdFailure = (error: Error): IFetchDistrictsByCountryIdFailure => ({
+  type: DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_FAILURE,
+  error
 });

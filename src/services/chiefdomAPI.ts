@@ -111,3 +111,10 @@ export const fetchChiefdomForDropdown = (params: { tenantId: string }) =>
       isPaginated: false
     }
   });
+
+export const fetchChiefdomsByCountryId = (countryId: string) =>
+  axios({
+    method: 'POST',
+    url: `/admin-service/data/chiefdoms/${countryId}`,
+    data: {}
+  });

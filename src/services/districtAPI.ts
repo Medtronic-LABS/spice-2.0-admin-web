@@ -126,3 +126,10 @@ export const fetchDistrictAdmins = (data: IFetchDistrictList) =>
     url: '/user-service/user/admin-users',
     data
   });
+
+export const fetchDistrictsByCountryId = (countryId: string) =>
+  axios({
+    method: 'POST',
+    url: `/admin-service/data/districts/${countryId}`,
+    data: {}
+  });

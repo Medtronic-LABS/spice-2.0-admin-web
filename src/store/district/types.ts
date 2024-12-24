@@ -48,6 +48,7 @@ export interface IDistrictState {
   loading: boolean;
   loadingOptions: boolean;
   districtList: IDistrict[];
+  allDistricts: IDistrict[];
   districtOptions: IDistrictOption[];
   admins: IAdminEditFormValues[];
   total: number;
@@ -405,6 +406,27 @@ export interface IWorkflowModuleReqPayload {
   id?: string;
 }
 
+export interface IFetchDistrictsByCountryIdRequest {
+  type: typeof ACTION_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST;
+  data: { countryId: number | string };
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchDistrictsByCountryIdSuccessPayload {
+  districtList: IDistrict[];
+}
+
+export interface IFetchDistrictsByCountryIdSuccess {
+  type: typeof ACTION_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_SUCCESS;
+  payload: IFetchDistrictsByCountryIdSuccessPayload;
+}
+
+export interface IFetchDistrictsByCountryIdFailure {
+  type: typeof ACTION_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_FAILURE;
+  error: Error;
+}
+
 export type DistrictActions =
   | IFetchDistrictListRequest
   | IFetchDistrictListSuccess
@@ -444,4 +466,7 @@ export type DistrictActions =
   | IClearDistrictDetail
   | ISetDistrictDetails
   | IClearDistrictList
-  | IClearDistrictAdmin;
+  | IClearDistrictAdmin
+  | IFetchDistrictsByCountryIdRequest
+  | IFetchDistrictsByCountryIdSuccess
+  | IFetchDistrictsByCountryIdFailure;

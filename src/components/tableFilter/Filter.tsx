@@ -19,6 +19,7 @@ interface ITableFilterProps {
   setSelectedFacility: any;
   onChange?: any;
   filterCount?: number;
+  placeholder?: string;
 }
 
 interface IOption {
@@ -34,7 +35,8 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   setSelectedFacility,
   setSelectedRole,
   onChange,
-  filterCount
+  filterCount,
+  placeholder
 }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -253,7 +255,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
               {filterData.isSearchable && (
                 <input
                   type='text'
-                  placeholder='Search Facility'
+                  placeholder={placeholder ?? 'Search Facility'}
                   className='form-control mb-1'
                   onChange={(e) => handleSearchChange(e.target.value)}
                 />

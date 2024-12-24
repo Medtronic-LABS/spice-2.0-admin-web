@@ -13,7 +13,8 @@ import {
   IDeleteChiefdomAdminRequest,
   IFetchChiefdomByIdRequest,
   ICreateChiefdomAdminRequest,
-  IChiefdomDropdownRequest
+  IChiefdomDropdownRequest,
+  IFetchChiefDomsByCountryIdRequest
 } from './types';
 import * as ACTION_TYPES from './actionTypes';
 import { AppState } from '../rootReducer';
@@ -115,6 +116,26 @@ export function* fetchChiefdomList({
     if (e instanceof Error) {
       failureCb?.(e);
       yield put(operatinUnitActions.fetchChiefdomListFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_REQUEST action
+*/
+export function* fetchChiefdomByCountryId({
+  data: { countryId },
+  successCb,
+  failureCb
+}: IFetchChiefDomsByCountryIdRequest): SagaIterator {
+  try {
+    const responce = yield call(chiefdomAPI.fetchChiefdomsByCountryId as any, countryId);
+    const payload = { chiefdomList: responce.data || [] };
+    yield put(operatinUnitActions.fetchChiefDomsByCountryIdSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(operatinUnitActions.fetchChiefDomsByCountryIdFailure(e));
     }
   }
 }
@@ -249,6 +270,7 @@ function* chiefdomSaga() {
   yield all([takeLatest(ACTION_TYPES.FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST, fetchChiefdomDashboardList)]);
   yield all([takeLatest(ACTION_TYPES.FETCH_CHIEFDOM_DETAIL_REQUEST, fetchChiefdomDetail)]);
   yield all([takeLatest(ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST, fetchChiefdomList)]);
+  yield all([takeLatest(ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_REQUEST, fetchChiefdomByCountryId)]);
   yield all([takeLatest(ACTION_TYPES.CREATE_CHIEFDOM_REQUEST, createChiefdom)]);
   yield all([takeLatest(ACTION_TYPES.UPDATE_CHIEFDOM_REQUEST, updateChiefdom)]);
   yield all([takeLatest(ACTION_TYPES.UPDATE_CHIEFDOM_ADMIN_REQUEST, updateChiefdomAdmin)]);
