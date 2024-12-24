@@ -10,7 +10,7 @@ import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../consta
 import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
-import { useRoleMeta, useRoleOptions } from '../../hooks/roleHook';
+import { useRoleMeta } from '../../hooks/roleHook';
 import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
 import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
@@ -72,6 +72,7 @@ import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import useUserFormUtils, { filterRolesByAppTypeFn } from './userFormUtils';
+import { useRoleOptions } from '../../hooks/roleOptionsHook';
 
 export interface IUserFormValues {
   email: string;
@@ -503,6 +504,7 @@ const UserForm = ({
       const newFetchedData = [...fetchedData.current];
       newFetchedData[index] = userData;
       fetchedData.current = newFetchedData;
+      getRoleOptions(index, userData.roles);
       roleChange({ allRoles: userData.roles as IRoles[], index, appTypeBasedRoles });
       if (isCHPCHWSelected(userData.roles)) {
         const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
@@ -981,9 +983,14 @@ const UserForm = ({
 
   useEffect(() => {
     if (!(spiceRoles.current.length && reportRolesRef.current.length && insightRolesRef.current.length)) {
-      getRoleOptions();
+      if (isEdit) {
+        getRoleOptions(0, initialEditData[0].roles || []);
+      } else {
+        getRoleOptions();
+      }
     }
-  }, [getRoleOptions]);
+  }, [autoFetchData, getRoleOptions, initialEditData, isEdit]);
+
   return (
     <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
@@ -1065,18 +1072,35 @@ const UserForm = ({
                               hfList: `${formName}[${index}].insightUserOrganization`
                             }
                           };
+                          const removeHF4User = (completeRoles: IRoles[]) =>
+                            completeRoles.filter((newRoles: IRoles) => newRoles.name !== hf4ReportUser);
+                          let selectedAllRoles = [...allRoles];
                           Object.keys(suiteFormName).forEach((r: string) => {
                             if (selectedGroupNames.includes(r)) {
-                              newAllRoles = [...newAllRoles, ...allRoles.filter((v: IRoles) => v.groupName === r)];
+                              newAllRoles = [
+                                ...newAllRoles,
+                                ...selectedAllRoles.filter((v: IRoles) => v.groupName === r)
+                              ];
                             } else {
                               form.change((suiteFormName as any)[r].role, []);
                               form.change((suiteFormName as any)[r].hfList, []);
                               if (r === SPICE) {
                                 form.change(`${formName}[${index}].designation`, null);
+                                // to remove HF4User while removing the SPICE suite
+                                const selectedReportRoles = form.getState().values[formName][index].reportRoles || [];
+                                const isHF4Selected = selectedReportRoles.some(
+                                  (newRoles: IRoles) => newRoles.name === hf4ReportUser
+                                );
+                                if (isHF4Selected) {
+                                  form.change((suiteFormName as any).REPORTS.role, []);
+                                  newAllRoles = removeHF4User(newAllRoles);
+                                  selectedAllRoles = removeHF4User(selectedAllRoles);
+                                }
                               }
                             }
                           });
                           form.change(`${formName}[${index}].roles`, newAllRoles);
+                          getRoleOptions(index, newAllRoles);
                           roleChange({ allRoles: newAllRoles, index, appTypeBasedRoles });
                           input.onChange(sortedSuites);
                         }}
@@ -1136,6 +1160,7 @@ const UserForm = ({
                                 form.change(`${formName}[${index}].reportRoles`, reportRolesNew);
                               }
                               const currentAllRoles = [...reportRolesNew, ...insightRoles, ...values];
+                              getRoleOptions(index, currentAllRoles);
                               roleChange({
                                 allRoles: currentAllRoles,
                                 index,

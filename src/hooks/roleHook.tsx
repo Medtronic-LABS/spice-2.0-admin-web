@@ -13,6 +13,7 @@ import {
   chwPeerRoles,
   facilityPlusHF4ReportUserRole,
   facilityReportAdminRole,
+  hf4ReportUser,
   hfAdminRole,
   HIERARCHY_ROLES,
   insightDeveloperRole,
@@ -21,6 +22,7 @@ import {
   onlyCHWRoles,
   onlyHF4UserRole,
   onlyPeerSupervisor,
+  peerSupervisor,
   redRisk,
   reportAdminRole,
   REPORTS,
@@ -86,24 +88,7 @@ interface IRoleHookMeta {
   showInsightHFListState: boolean[];
 }
 
-interface IRoleOptions {
-  isHF: boolean;
-  isHFCreate: boolean;
-  isEdit: boolean | undefined;
-  isAdminForm?: boolean;
-  isSiteUser: boolean;
-  appTypes?: string[];
-  allRoles: { [key: string]: IRoles[] };
-  currentModule: string;
-  roleOptionsFn: (data: {
-    spiceRoleOptions: IRoles[];
-    reportRoleOptions: IRoles[];
-    insightRoleOptions: IRoles[];
-    onFail?: () => void;
-  }) => void;
-}
-
-const filterSPICERoles = (
+export const filterSPICERoles = (
   roles: IRoles[],
   {
     isHFCreate,
@@ -117,7 +102,8 @@ const filterSPICERoles = (
     isSiteUser: boolean;
     currentModule?: string;
     isCommunity?: boolean;
-  }
+  },
+  allRoles: IRoles[]
 ) => {
   return roles.filter((role: IRoles) => {
     const { name, displayName, suiteAccessName, groupName } = role;
@@ -132,7 +118,12 @@ const filterSPICERoles = (
     const isHFCreateCondition = isHFCondition && !villageBasedRoles.includes(name);
     const isReports = groupName === REPORTS;
     const isReportAdmin = name === reportAdminRole[0];
+    const isHF4User = name === hf4ReportUser;
 
+    const isPeerSupervisor = (allRoles || []).some((r: IRoles) => r.name === peerSupervisor);
+    if (!isPeerSupervisor && isHF4User) {
+      return false;
+    }
     if (isHFCreate) {
       return isHFCreateCondition;
     }
@@ -243,12 +234,16 @@ export const useRoleMeta = ({
       }: IFindDisabledRoles) => {
         // In findDisabledRoles function:
         const selectedRoleGroup =
-          filterSPICERoles(rolesGrouped[suite || ''] || [], {
-            isHFCreate,
-            isHF,
-            isSiteUser,
-            isCommunity
-          }) || [];
+          filterSPICERoles(
+            filterRolesByAppTypeFn(rolesGrouped, appTypes)[suite || ''] || [],
+            {
+              isHFCreate,
+              isHF,
+              isSiteUser,
+              isCommunity
+            },
+            allRoles
+          ) || [];
 
         if (suite === 'SPICE') {
           return selectedRoleGroup.filter((groupedRole: IRoles) =>
@@ -270,9 +265,9 @@ export const useRoleMeta = ({
       };
 
       /*
-       * This function is used to get the valid report roles for peer supervisor selection
+       * This function is used to get the valid report roles for peer supervisor & CHW selection
        */
-      const getValidReportRolesForPeerSupervisorSelection = () => {
+      const getValidReportRolesForCHWPeerSelection = () => {
         // check if the report roles are present in the allRoles array
         if (allRoles.some((role) => role.groupName === REPORTS)) {
           const reportRoles = allRoles.find((role) => role.groupName === REPORTS);
@@ -286,26 +281,16 @@ export const useRoleMeta = ({
         return facilityPlusHF4ReportUserRole;
       };
 
-      /*
-       * This function is used to get the valid spice roles for spice selection
-       * if the all roles array is empty, return the onlyPeerSupervisor
-       * if the all roles array is not empty, return the filtered spice roles
-       * filtered spice roles are the spice roles that are present in the allRoles then
-       * array and are in the chwPeerRoles array
-       */
-      const getValidSpiceRoleForOnlyHF4 = () => {
-        const filteredSpiceRoles = (allRoles || [])
-          .filter((role) => role.groupName === SPICE && chwPeerRoles.includes(role.name))
-          .map((role) => role.name);
-        return filteredSpiceRoles?.length ? filteredSpiceRoles : onlyPeerSupervisor;
-      };
       // all roles condition
       const rolesMeta: IRoleMeta[] = [
         {
           selectedRoles: onlyCHWRoles,
           selectedSuite: SPICE,
           disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: chwPeerRoles }),
-          disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: facilityReportAdminRole }),
+          disabledREPORTSRoles: findDisabledRoles({
+            suite: REPORTS,
+            validReportRoles: getValidReportRolesForCHWPeerSelection()
+          }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
         {
@@ -314,7 +299,7 @@ export const useRoleMeta = ({
           disabledSPICERoles: findDisabledRoles({ suite: SPICE, validSpiceRoles: chwPeerRoles }),
           disabledREPORTSRoles: findDisabledRoles({
             suite: REPORTS,
-            validReportRoles: getValidReportRolesForPeerSupervisorSelection()
+            validReportRoles: getValidReportRolesForCHWPeerSelection()
           }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
         },
@@ -354,7 +339,7 @@ export const useRoleMeta = ({
           selectedSuite: REPORTS,
           disabledSPICERoles: findDisabledRoles({
             suite: SPICE,
-            validSpiceRoles: getValidSpiceRoleForOnlyHF4()
+            validSpiceRoles: chwPeerRoles
           }),
           disabledREPORTSRoles: findDisabledRoles({ suite: REPORTS, validReportRoles: onlyHF4UserRole }),
           disabledINSIGHTSRoles: findDisabledRoles({ suite: INSIGHTS, validInsightRoles: allInsightRoles })
@@ -476,45 +461,5 @@ export const useRoleMeta = ({
   );
   return {
     roleChange
-  };
-};
-
-export const useRoleOptions = ({
-  isHF,
-  isHFCreate,
-  isSiteUser,
-  allRoles,
-  currentModule,
-  roleOptionsFn
-}: IRoleOptions): {
-  getRoleOptions: (index?: number) => void;
-} => {
-  const { isCommunity, appTypes } = useAppTypeConfigs();
-
-  const getRoleOptions = useCallback(() => {
-    const newRoles = filterRolesByAppTypeFn(allRoles, appTypes);
-    // returns the SPICE roles based on the conditions
-    const SPICERoles = filterSPICERoles(newRoles.SPICE || [], {
-      isHFCreate,
-      isHF,
-      isSiteUser,
-      currentModule,
-      isCommunity
-    }).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1));
-
-    // returns the REPORTS roles based on the conditions
-    const reportRoleOptions =
-      (newRoles.REPORTS || [])
-        .filter((role: IRoles) => (isHFCreate || isHF ? !reportAdminRole.includes(role.name) : true))
-        .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
-
-    // returns the INSIGHTS roles based on the conditions
-    const insightRoleOptions =
-      (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
-    roleOptionsFn({ spiceRoleOptions: SPICERoles, reportRoleOptions, insightRoleOptions });
-  }, [allRoles, appTypes, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, roleOptionsFn]);
-
-  return {
-    getRoleOptions
   };
 };

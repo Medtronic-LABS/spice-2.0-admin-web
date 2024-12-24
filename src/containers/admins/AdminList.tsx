@@ -12,7 +12,7 @@ import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
-import { useRoleOptions } from '../../hooks/roleHook';
+import { useRoleOptions } from '../../hooks/roleOptionsHook';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import {
   clearSupervisorList,
