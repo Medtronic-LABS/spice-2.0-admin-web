@@ -19,11 +19,13 @@ import {
   fetchHFListRequest,
   fetchHFSummaryRequest,
   fetchHFTypesRequest,
+  fetchHFTypesRequest,
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   updateHFStatusRequest,
   validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
+import { fetchDistrictsByCountryIdRequest } from '../../store/district/actions';
 import { fetchDistrictsByCountryIdRequest } from '../../store/district/actions';
 import {
   healthFacilityListSelector,
@@ -37,6 +39,8 @@ import { roleSelector } from '../../store/user/selectors';
 import { formatHealthFacility } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
+import { getAllChiefdomsSelector } from '../../store/chiefdom/selectors';
+import { fetchChiefDomsByCountryIdRequest } from '../../store/chiefdom/actions';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 
 /**
@@ -89,35 +93,72 @@ const HealthFacilityList = (): React.ReactElement => {
     data: {} as IHealthFacilityForm,
     isNextClicked: false
   });
-  const [filters, setFilters] = useState<any>({
-    healthFacilityTypes: [],
-    districtIds: [],
-    chiefdomIds: [],
-    skip: null
-  });
+  const [filters, setFilters] = useState<any>({ healthFacilityTypes: [], districtIds: [], chiefdomIds: [] });
+
   /**
    * Fetches the health facility list
    */
-  const fetchList = useCallback(() => {
-    dispatch(
-      fetchHFListRequest({
-        countryId,
-        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-        limit: listParams.rowsPerPage,
-        searchTerm: listParams.searchTerm,
-        userBased: !isSuperUser,
-        tenantIds: [tenantId],
-        failureCb: (e: Error) =>
-          requestFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR, healthFacilityPName))
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.districtIds, districtId, countryId, tenantId]);
+  const fetchList = useCallback(
+    ({ skip = null, healthFacilityTypes = null, districtIds = null, chiefdomIds = null }: any) => {
+      dispatch(
+        fetchHFListRequest({
+          countryId,
+          skip: skip ?? (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+          limit: listParams.rowsPerPage,
+          searchTerm: listParams.searchTerm,
+          userBased: !isSuperUser,
+          tenantIds: [tenantId],
+          healthFacilityTypes: healthFacilityTypes ?? filters.healthFacilityTypes,
+          districtIds: districtIds ?? filters.districtIds,
+          chiefdomIds: chiefdomIds ?? filters.chiefdomIds,
+          failureCb: (e: Error) =>
+            requestFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR, healthFacilityPName))
+        })
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]
+  );
 
   useEffect(() => {
-    fetchList({ ...filters });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchList, filters.districtIds, filters.chiefdomIds, filters.healthFacilityTypes, listParams]);
+    if (!hfTypesList.length) {
+      dispatch(fetchHFTypesRequest({}));
+    }
+    if (!districtList.length) {
+      dispatch(
+        fetchDistrictsByCountryIdRequest({
+          data: { countryId },
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, chiefdomSName)
+              )
+            )
+        })
+      );
+    }
+    if (!chiefdomList.length) {
+      dispatch(
+        fetchChiefDomsByCountryIdRequest({
+          data: { countryId },
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_LIST_FETCH_ERROR, chiefdomSName)
+              )
+            )
+        })
+      );
+    }
+  }, [dispatch, hfTypesList.length]);
+
+  useEffect(() => {
+    fetchList({});
+  }, [listParams, dispatch, fetchList]);
 
   useEffect(() => {
     return () => {
@@ -224,7 +265,7 @@ const HealthFacilityList = (): React.ReactElement => {
       APPCONSTANTS.SUCCESS,
       formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS, healthFacilitySName)
     );
-    fetchList();
+    fetchList({});
     closeHealthFacilityEditModal(true);
   };
   const fetchFailure = (e: Error, errorMessage: string) =>
@@ -354,37 +395,10 @@ const HealthFacilityList = (): React.ReactElement => {
     newFilters = {
       ...newFilters,
       [name]: option,
-      ...(name === 'healthFacilityTypes' && { healthFacilityTypes }),
-      skip: 0
+      ...(name === 'healthFacilityTypes' && { healthFacilityTypes })
     };
-    if (!newFilters.districtIds.length) {
-      newFilters.chiefdomIds = [];
-    }
-    handlePage(1);
     setFilters(newFilters);
-  };
-
-  const [openConfirmationModal, setOpenConfirmationModal] = useState({
-    isOpen: false,
-    userData: {} as IHealthFacility
-  });
-
-  const handleHFChangeStatusSubmit = (data?: any) => {
-    dispatch(
-      updateHFStatusRequest({
-        id: openConfirmationModal.userData.id,
-        tenantId: Number(openConfirmationModal.userData.tenantId),
-        successCb: (newdata: any) => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_SUCCESS);
-          fetchList({});
-          setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility });
-        },
-        failureCb: (e) => {
-          setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility });
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, e.message));
-        }
-      })
-    );
+    fetchList({ ...newFilters, skip: 0 });
   };
 
   return (
@@ -398,7 +412,6 @@ const HealthFacilityList = (): React.ReactElement => {
           onSearch={handleSearch}
           onButtonClick={openCreateHealthFacility}
           onChange={handleFilterChange}
-          updatedFilterData={filters}
           isFilter={true}
           onFilterData={[
             {
@@ -408,7 +421,7 @@ const HealthFacilityList = (): React.ReactElement => {
               isFacility: false,
               isGeneric: true,
               isSearchable: false,
-              data: filterByAppTypes(hfTypesList, appTypes),
+              data: hfTypesList,
               isShow: true
             },
             {
@@ -424,7 +437,7 @@ const HealthFacilityList = (): React.ReactElement => {
             },
             {
               id: 3,
-              name: 'Chiefdom',
+              name: 'Chief Dom',
               key: 'chiefdomIds',
               isFacility: false,
               isGeneric: true,

@@ -21,7 +21,6 @@ interface ITableFilterProps {
   onChange?: any;
   filterCount?: number;
   placeholder?: string;
-  updatedFilterData?: any;
 }
 
 interface IOption {
@@ -38,8 +37,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   setSelectedRole,
   onChange,
   filterCount,
-  placeholder,
-  updatedFilterData
+  placeholder
 }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [selectedOptionsIds, setSelectedOptionsIds] = useState<number[]>([]);

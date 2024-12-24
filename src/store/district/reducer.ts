@@ -50,7 +50,7 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
       return {
         ...state,
         loading: false,
-        districtList: action.payload.districtList,
+        allDistricts: action.payload.districtList,
         total: action.payload.total,
         error: null
       };

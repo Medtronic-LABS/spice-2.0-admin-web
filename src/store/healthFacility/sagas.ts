@@ -123,6 +123,9 @@ export function* fetchHealthFacilityList({
   userBased,
   tenantBased,
   tenantIds,
+  healthFacilityTypes,
+  districtIds,
+  chiefdomIds,
   forHFAdmin,
   successCb,
   failureCb

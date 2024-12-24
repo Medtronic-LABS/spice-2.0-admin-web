@@ -177,6 +177,9 @@ export interface IFetchHFListRequest {
   userBased?: boolean;
   tenantBased?: boolean;
   tenantIds?: number[] | string[];
+  healthFacilityTypes?: number[] | string[];
+  districtIds?: number[] | string[];
+  chiefdomIds?: number[] | string[];
   forHFAdmin?: boolean;
   successCb?: (data: IFetchHFListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
