@@ -316,7 +316,7 @@ export function validateCheckbox(value: Array<number | string>) {
  * @param value
  */
 export function validateLatitude(value: any) {
-  const reg = /^(\+|-)?(?:90(?:(?:\.0{1,7})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,7})?))$/;
+  const reg = /^(\+|-)?(?:90(?:(?:\.0{1,7})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,25})?))$/;
   if (!value) {
     return undefined;
   }
@@ -328,7 +328,7 @@ export function validateLatitude(value: any) {
  * @param value
  */
 export function validateLongitude(value: any) {
-  const reg = /^(\+|-)?(?:180(?:(?:\.0{1,7})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,7})?))$/;
+  const reg = /^(\+|-)?(?:180(?:(?:\.0{1,7})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,25})?))$/;
   if (!value) {
     return undefined;
   }
