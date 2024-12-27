@@ -44,6 +44,7 @@ export interface IUserFormProps {
   isRegionCreate?: boolean;
   parentOrgId?: string;
   ignoreTenantId?: string;
+  isFromAdminList?: boolean;
 }
 
 export interface IOrganizations {

@@ -76,4 +76,7 @@ export const chiefdom = [...healthFacility, 'CHIEFDOM_ADMIN'];
 export const district = [...chiefdom, 'DISTRICT_ADMIN'];
 export const region = [...district, 'REGION_ADMIN', 'SUPER_ADMIN'];
 
+export const allAdmins = [...region];
+export const allHierarchyAdmins = [...district, 'REGION_ADMIN'];
+
 export const HIERARCHY_ROLES: { [key: string]: string[] } = { healthFacility, chiefdom, district, region };

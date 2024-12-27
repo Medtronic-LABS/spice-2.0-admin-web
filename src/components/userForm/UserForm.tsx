@@ -17,7 +17,7 @@ import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chief
 import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
 import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
-  clearHFListRequest,
+  clearHFList,
   clearSupervisorList,
   clearVillageHFList,
   fetchCountryListRequest,
@@ -119,6 +119,7 @@ const UserForm = ({
   roleOptionsState,
   isSiteUser = false,
   isAdminForm = false,
+  isFromAdminList = false,
   defaultSelectedRole,
   isRegionCreate = false,
   parentOrgId,
@@ -277,19 +278,22 @@ const UserForm = ({
   ]);
 
   const getHFListFn = useCallback(() => {
-    const isSuperUser = [SUPER_ADMIN, SUPER_USER].includes(role);
+    const isSuperUserOrSuperAdmin = [SUPER_ADMIN, SUPER_USER].includes(role);
     if (countryId) {
       dispatch(
         fetchHFListRequest({
           countryId,
           skip: 0,
           limit: null,
-          tenantIds: !isSuperUser ? [tenantId] : undefined,
-          userBased: !isSuperUser
+          // for community regions and super admin/user login to get all hf list don't sent tenantId,
+          // for community regions and hf admin login send tenantId
+          // for non community always send tenantId
+          tenantIds: isCommunity && isSuperUserOrSuperAdmin ? undefined : [tenantId],
+          userBased: !isSuperUserOrSuperAdmin
         })
       );
     }
-  }, [countryId, dispatch, role, tenantId]);
+  }, [countryId, dispatch, role, tenantId, isCommunity]);
 
   useEffect(() => {
     if (!showFilters && countryId) {
@@ -298,7 +302,7 @@ const UserForm = ({
   }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
 
   useEffect(() => {
-    if (!showFilters && countryId) {
+    if ((isCommunity || !isHFCreate) && (isFromAdminList || (!showFilters && countryId))) {
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -407,8 +411,12 @@ const UserForm = ({
       dispatch(clearVillageHFList());
       dispatch(clearChiefdomList());
       dispatch(clearDistrictList());
-      dispatch(clearHFListRequest());
       dispatch(clearDesignationList());
+      if (!isHFCreate) {
+        // clear hf only for add users, not create hf
+        // while creating hf, hf list for reports will be based on selected chiefdom
+        dispatch(clearHFList());
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -722,19 +730,21 @@ const UserForm = ({
   };
 
   /**
+   * For admin create
    * Fetches the health facility list based on the provided values.
    * @param {IRoles} values - The values object containing tenantIds
    */
   const chiefdomBasedHfList = useCallback(
     (values: IRoles) => {
       if (countryId) {
+        const isSuperUserOrSuperAdmin = [SUPER_ADMIN, SUPER_USER].includes(role);
         dispatch(
           fetchHFListRequest({
             countryId,
             skip: 0,
             limit: null,
             tenantIds: values.tenantIds,
-            userBased: !(role === SUPER_ADMIN || role === SUPER_USER)
+            userBased: !isSuperUserOrSuperAdmin
           })
         );
       }
@@ -929,6 +939,7 @@ const UserForm = ({
     isHFCreate,
     isEdit,
     isSiteUser,
+    isFromAdminList,
     formData: autoFetchData,
     isCHAStatus: isCHAUser,
     isCHWCHPStatus: isCHWCHPUser,
@@ -1224,6 +1235,15 @@ const UserForm = ({
                             error={isError(meta) && !spiceRole?.length}
                             isModel={true}
                             disabled={(isAdminForm && defaultSelectedRole) || isEdit}
+                            isOptionDisabled={(option: any) => {
+                              const optionsToBeDisabled = [
+                                ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
+                                ...(disabledRoles.current?.[index]?.SPICE || [])
+                              ];
+                              return optionsToBeDisabled.length
+                                ? optionsToBeDisabled.map((v: any) => v.id).includes(option.id)
+                                : null;
+                            }}
                             onChange={(values: any) => {
                               //  Store ALL ROLES on each update
                               form.change(`${formName}[${index}].roles`, [...reportRoles, ...insightRoles, values]);
@@ -1239,6 +1259,12 @@ const UserForm = ({
                               ) {
                                 dispatch(fetchCultureListRequest());
                               }
+                              const currentAllRoles = [...reportRoles, ...insightRoles, values];
+                              roleChange({
+                                allRoles: currentAllRoles,
+                                index,
+                                appTypeBasedRoles
+                              });
                               // clear designation whenever role gets update
                               form.change(`${formName}[${index}].designation`, null);
                             }}
@@ -1710,7 +1736,6 @@ const UserForm = ({
                   isSiteUser={isSiteUser}
                   healthFacilityList={healthFacilityList}
                   hfLoading={hfLoading}
-                  chiefdomBasedHfList={chiefdomBasedHfList}
                   formDetails={{ form, formName, fields }}
                   isHFAdminSelected={isHFAdminSelected}
                   isHFCreate={isHFCreate}

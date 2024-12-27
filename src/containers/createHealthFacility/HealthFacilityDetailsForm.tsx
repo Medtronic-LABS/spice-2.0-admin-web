@@ -25,6 +25,7 @@ import {
   clearVillageList,
   fetchCityListRequest,
   fetchCultureListRequest,
+  fetchHFListRequest,
   fetchHFTypesRequest,
   fetchPeerSupervisorListRequest,
   fetchUnlinkedVillagesRequest,
@@ -66,6 +67,7 @@ interface IAddUserFormProps {
   isEdit?: boolean;
   data?: any;
   isNextClicked?: boolean;
+  isHFCreate?: boolean;
 }
 
 interface IMatchParams {
@@ -85,7 +87,8 @@ const HealthFacilityDetailsForm = ({
   formName,
   isEdit = false,
   data = {},
-  isNextClicked
+  isNextClicked,
+  isHFCreate
 }: IAddUserFormProps): React.ReactElement => {
   const dispatch = useDispatch();
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
@@ -139,18 +142,26 @@ const HealthFacilityDetailsForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const district = useSelector(districtSelector);
+
   if (!isEdit && chiefdomId) {
     const { values: formValues = {} } = form?.getState?.() || {};
     const chiefdomFormValue = (formValues as any)?.formName?.chiefdom;
     if (!chiefdomFormValue && Number(chiefdom?.id) === Number(chiefdomId)) {
-      form?.change(`${formName}.district` as any, chiefdom.district);
+      let districtValue = {};
+      if (chiefdom.district.id) {
+        districtValue = chiefdom.district;
+      } else if (district.id) {
+        districtValue = district;
+      }
+      form?.change(`${formName}.district` as any, districtValue);
       form?.change(`${formName}.chiefdom` as any, chiefdom);
     }
   }
 
   // Logic for district autoselecting when the route is createHealthFacilityByDistrict
   // route is createhealthFacilityByDistrict, if isEdit = false and the route contains districtId param
-  const district = useSelector(districtSelector);
   useEffect(() => {
     if (!isEdit && districtId && district?.id !== districtId) {
       dispatch(
@@ -196,6 +207,18 @@ const HealthFacilityDetailsForm = ({
     const selectedTenantId = form.getState().values?.healthFacility?.chiefdom?.tenantId;
     if (selectedTenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId], appTypes }));
+    }
+    // while creating the HF,
+    // fetch HF based on selected chiefdom for reports and insights role
+    if (isHFCreate && selectedTenantId) {
+      dispatch(
+        fetchHFListRequest({
+          countryId,
+          skip: 0,
+          limit: null,
+          tenantIds: [selectedTenantId]
+        })
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, form.getState().values?.healthFacility?.chiefdom?.tenantId]);
@@ -265,7 +288,8 @@ const HealthFacilityDetailsForm = ({
         form.change(`${formName}.linkedVillages`, undefined);
       });
     }
-  }, [form, formName, isEdit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formName, isEdit]);
 
   useEffect(() => {
     return () => {
@@ -467,6 +491,8 @@ const HealthFacilityDetailsForm = ({
                     form.change(`${formName}.peerSupervisors`, undefined);
                     form.change(`${formName}.city`, undefined);
                     form.change(`${formName}.linkedVillages`, undefined);
+                    // clear hf for reports while changing chiefdom
+                    form.change('users[0].reportUserOrganization', undefined);
                     input.onChange(value);
                   }}
                 />

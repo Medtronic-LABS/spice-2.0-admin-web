@@ -278,6 +278,7 @@ const UserList = (): React.ReactElement => {
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
         isSiteUser={false}
+        isFromAdminList={true}
       />
     );
   };

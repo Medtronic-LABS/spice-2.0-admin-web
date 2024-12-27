@@ -57,7 +57,7 @@ export interface IMatchParams {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { regionId, tenantId, healthFacilityId } = useParams<IMatchParams>();
+  const { tenantId, healthFacilityId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);
@@ -358,7 +358,7 @@ const UserList = (): React.ReactElement => {
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: null,
           userBased: !isSuperUser,
-          tenantIds: tenantId && !regionId ? [tenantId] : [],
+          tenantIds: [tenantId],
           failureCb: (e: Error) => {
             toastCenter.error(
               ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)

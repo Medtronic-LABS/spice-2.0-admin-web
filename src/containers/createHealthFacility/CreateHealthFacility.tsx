@@ -318,6 +318,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                   formName='healthFacility'
                   form={formInstance.current}
                   data={submittedData.data?.healthFacility}
+                  isHFCreate={true}
                 />
               </FormContainer>
             </div>

@@ -32,7 +32,11 @@ export const useRoleOptions = ({
 }: IRoleOptions): {
   getRoleOptions: (index?: number, selectedRoles?: IRoles[]) => void;
 } => {
-  const { isCommunity, appTypes } = useAppTypeConfigs();
+  const {
+    isCommunity,
+    appTypes,
+    region: { s: regionSname }
+  } = useAppTypeConfigs();
 
   const getRoleOptions = useCallback(
     (index: any | undefined, selectedRoles: IRoles[] | undefined) => {
@@ -62,7 +66,7 @@ export const useRoleOptions = ({
               return false;
             }
             // normal validations
-            if (isHFCreate || isHF) {
+            if (isHFCreate || isHF || (!isCommunity && (isSiteUser || currentModule !== regionSname.toLowerCase()))) {
               return !reportAdminRole.includes(role.name);
             } else {
               return true;
@@ -75,7 +79,7 @@ export const useRoleOptions = ({
         (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
       roleOptionsFn({ spiceRoleOptions: SPICERoles, reportRoleOptions, insightRoleOptions });
     },
-    [allRoles, appTypes, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, roleOptionsFn]
+    [allRoles, appTypes, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, regionSname, roleOptionsFn]
   );
 
   return {

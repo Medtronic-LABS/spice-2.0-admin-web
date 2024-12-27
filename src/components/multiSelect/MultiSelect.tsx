@@ -299,7 +299,10 @@ const MultiSelect = (props: any): React.ReactElement => {
     const newFilteredOptionsLength = (newProps.disabledOptions || []).length
       ? filteredOptions.length - newProps.disabledOptions.length
       : filteredOptions.length;
-    isAllSelected.current = filteredSelectedOptions.length === newFilteredOptionsLength;
+    isAllSelected.current =
+      !!filteredSelectedOptions.length &&
+      !!newFilteredOptionsLength &&
+      filteredSelectedOptions.length === newFilteredOptionsLength;
     if (filteredSelectedOptions?.length > 0) {
       if (filteredSelectedOptions?.length === newFilteredOptionsLength) {
         selectAllLabel.current = `All (${newFilteredOptionsLength}) selected`;
