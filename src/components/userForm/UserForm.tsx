@@ -497,6 +497,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].timezone`, userData.timezone || []);
         form.change(`${formName}[${index}].culture`, userData.culture || null);
         form.change(`${formName}[${index}].redRisk`, userData.redRisk || false);
+        form.change(`${formName}[${index}].designation`, userData.designation || null);
       });
       const newAutoFetched = [...autoFetched];
       newAutoFetched[index] = true;
