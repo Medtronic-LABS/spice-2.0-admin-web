@@ -125,6 +125,9 @@ export const filterSPICERoles = (
       return false;
     }
     if (isHFCreate) {
+      if (isReports) {
+        return !isReportAdmin;
+      }
       return isHFCreateCondition;
     }
     if (isHF) {
