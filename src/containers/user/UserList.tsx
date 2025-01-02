@@ -1,7 +1,9 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useParams } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
@@ -9,6 +11,8 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
+import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
+import APPCONSTANTS from '../../constants/appConstants';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
 import { villageBasedRoles } from '../../constants/roleConstants';
@@ -38,29 +42,15 @@ import {
   userDetailLoadingSelector,
   healthFacilityUsersLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
-import {
-  changePassword,
-  fetchCHWListRequest,
-  fetchUserRolesAction,
-  forgotPasswordRequest,
-  updateUserStatus,
-  reassignCHWRequest,
-  offlineSyncRequest
-} from '../../store/user/actions';
-import {
-  countryIdSelector,
-  emailSelector,
-  roleSelector,
-  userRolesSelector,
-  chwListSelector
-} from '../../store/user/selectors';
+import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
+import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
+import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import { getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
-import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
+import { filterByAppTypes, filterHFByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface IMatchParams {
   tenantId: string;
@@ -628,64 +618,7 @@ const UserList = (): React.ReactElement => {
   const { pathname } = useLocation();
   const currentModule: ModuleNames = pathname.split('/')[1];
 
-  const [allRoles, setAllRoles] = useState([] as IRoles[]);
-  /**
-   * Calls Hook to get SPICE, REPORTS and INSIGHTS user roles based on certain conditions for filter dropdown
-   */
-  const { getRoleOptions } = useRoleOptions({
-    isHF: false,
-    isHFCreate: false,
-    isEdit: false,
-    isSiteUser: true,
-    forFilter: true,
-    appTypes,
-    allRoles: rolesGrouped,
-    currentModule,
-    roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
-      setAllRoles(
-        [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
-          a.displayName > b.displayName ? 1 : -1
-        )
-      );
-    }
-  });
-
-  useEffect(() => {
-    if (!allRoles.length) {
-      getRoleOptions();
-    }
-  }, [getRoleOptions, allRoles]);
-
-  const getParentOrganizationId = (user: { tenantId: number; organizations: any[] }): number => {
-    const matchedOrganization = user.organizations.find((org: any) => org.id === user.tenantId);
-    return matchedOrganization?.parentOrganizationId;
-  };
-
-  const PEER_SUPERVISOR_ROLE_NAME = 'PEER_SUPERVISOR';
-
-  const getPeerSupervisorRoleId = (userData: any): number | undefined => {
-    const peerSupervisorRole = userData.roles?.find(
-      (userDataRole: { name: string }) => userDataRole.name === PEER_SUPERVISOR_ROLE_NAME
-    );
-    return peerSupervisorRole?.id;
-  };
-
-  const getCHWList = useCallback(
-    (userData: any) => {
-      dispatch(
-        fetchCHWListRequest({
-          limit: 10,
-          skip: 0,
-          userId: userData.id,
-          successCb: (CHWData: any) => {
-            handleActivateClick(userData, CHWData.entityList, null);
-          }
-        })
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rolesGrouped]);
-
+  const allRoles = useRef([] as IRoles[]);
   /**
    * Memoized value to filter REPORTS user roles based on certain conditions for filter dropdown
    */
@@ -706,6 +639,28 @@ const UserList = (): React.ReactElement => {
    * Don't show icon for logged in user
    */
   const handleIconHandler = (rowData: { username: string }) => rowData.username === email;
+
+  /**
+   * Calls Hook to get SPICE, REPORTS and INSIGHTS user roles based on certain conditions for filter dropdown
+   */
+  const { getRoleOptions } = useRoleOptions({
+    isHF: false,
+    isHFCreate: false,
+    isEdit: false,
+    isSiteUser: true,
+    appTypes,
+    allRoles: rolesGrouped,
+    currentModule,
+    roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
+      allRoles.current = [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
+        a.displayName > b.displayName ? 1 : -1
+      );
+    }
+  });
+
+  useEffect(() => {
+    getRoleOptions();
+  }, [getRoleOptions]);
 
   return (
     <>
@@ -743,6 +698,7 @@ const UserList = (): React.ReactElement => {
               isFacility: false,
               isSearchable: false,
               data: [...(spiceUserRole || []), ...(roleCFRList || []), ...(roleInsightsList || [])],
+              data: [...(allRoles.current || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }
