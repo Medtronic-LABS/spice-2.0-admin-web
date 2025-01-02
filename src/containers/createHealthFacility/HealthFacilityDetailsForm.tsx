@@ -536,7 +536,7 @@ const HealthFacilityDetailsForm = ({
             <Field
               name={`${formName}.postalCode`}
               type='text'
-              validate={composeValidators(required, minLength(4))}
+              validate={composeValidators(required, minLength(3))}
               parse={normalizePhone}
               render={({ input, meta }) => (
                 <TextInput
