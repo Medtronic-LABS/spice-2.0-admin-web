@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 import React from 'react';
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
 import { redRisk } from '../constants/roleConstants';
-import { IHFUserGet, IUserRole } from '../store/healthFacility/types';
+import { IHealthFacility, IHFUserGet, IUserRole } from '../store/healthFacility/types';
 
 export const jsonParse = (value: any) => {
   if (value) {
@@ -186,6 +186,22 @@ export const formatRoles = (user: IHFUserGet) => {
 export const filterByAppTypes = (datas: any[], appTypes: string[]) => {
   const appTypesSet = new Set(appTypes); // Use a Set for faster lookup
   return datas.filter((data) => data.appTypes.some((appType: string) => appTypesSet.has(appType)));
+};
+
+// Function to filter health facilities by selected appTypes
+export const filterHFByAppTypes = (selectedAppTypes: string[], healthFacilityList: IHealthFacility[]) => {
+  return healthFacilityList.filter((hf) => {
+    // Check if any clinical workflow's appTypes includes all the selectedAppTypes
+    return [...(hf.clinicalWorkflows || []), ...(hf.customizedWorkflows || [])].some((workflow) => {
+      return selectedAppTypes.some((type) => {
+        if (workflow.appTypes) {
+          return (workflow.appTypes || []).includes(type);
+        } else {
+          return true;
+        }
+      });
+    });
+  });
 };
 
 export const decodeURIText = (text: string) => {

@@ -237,11 +237,6 @@ const TableFilter: React.FC<ITableFilterProps> = ({
             onClick={handleDropdownToggle}
             ref={dropdownContainerRef}
           >
-            {/* {!!filterCount && (
-              <span className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary'>
-                {filterCount}
-              </span>
-            )} */}
             <div className='d-flex align-items-center'>
               <FilterListIcon />
               <span className={`text-secondary py-0dot25 px-1 filter-placeholder ${styles.placeholder}`}>

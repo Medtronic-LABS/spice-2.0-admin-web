@@ -1,19 +1,20 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
-import UserForm from '../../components/userForm/UserForm';
-import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
+import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
+import APPCONSTANTS from '../../constants/appConstants';
 import { villageBasedRoles } from '../../constants/roleConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useRoleOptions } from '../../hooks/roleOptionsHook';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
 import {
@@ -37,11 +38,12 @@ import {
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
 import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
 import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
+import { IRoles } from '../../store/user/types';
 import { getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
-import { filterByAppTypes } from '../../utils/commonUtils';
+import { filterHFByAppTypes } from '../../utils/commonUtils';
 
 export interface IMatchParams {
   tenantId: string;
@@ -75,7 +77,6 @@ const UserList = (): React.ReactElement => {
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const [selectedFacility, setSelectedFacility] = useState<string[]>();
   const [selectedRole, setSelectedRole] = useState<string[]>();
-  const { filterSpiceCommonRoles, filterSpiceUserRoles } = APPCONSTANTS;
   const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
   const {
     appTypes,
@@ -378,31 +379,31 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /**
-   * Memoized value to filter SPICE user roles based on certain conditions for filter dropdown
-   * Remove redrisk from role list
-   */
-  const spiceUserRole = useMemo(() => {
-    const rolesByAppTypes = filterByAppTypes(rolesGrouped?.SPICE || [], appTypes);
-    return rolesByAppTypes.filter(
-      (data: { suiteAccessName: string; name: string; displayName: string }) =>
-        data.suiteAccessName !== APPCONSTANTS.spiceRole.spice &&
-        (data.name !== NAMING_VARIABLES.redRisk || data.displayName !== null)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rolesGrouped]);
+  const { pathname } = useLocation();
+  const currentModule: ModuleNames = pathname.split('/')[1];
 
+  const allRoles = useRef([] as IRoles[]);
   /**
-   * Memoized value to filter SPICE INSIGHTS user roles based on certain conditions for filter dropdown
-   * filter only spice common roles and spice user roles
+   * Calls Hook to get SPICE, REPORTS and INSIGHTS user roles based on certain conditions for filter dropdown
    */
-  const roleCFRList = useMemo(() => {
-    return (rolesGrouped?.['SPICE INSIGHTS'] || [])?.filter(
-      (data: { suiteAccessName: string }) =>
-        filterSpiceCommonRoles.includes(data.suiteAccessName) || filterSpiceUserRoles.includes(data.suiteAccessName)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rolesGrouped]);
+  const { getRoleOptions } = useRoleOptions({
+    isHF: false,
+    isHFCreate: false,
+    isEdit: false,
+    isSiteUser: true,
+    appTypes,
+    allRoles: rolesGrouped,
+    currentModule,
+    roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
+      allRoles.current = [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
+        a.displayName > b.displayName ? 1 : -1
+      );
+    }
+  });
+
+  useEffect(() => {
+    getRoleOptions();
+  }, [getRoleOptions]);
 
   return (
     <>
@@ -413,7 +414,7 @@ const UserList = (): React.ReactElement => {
           header='Users'
           isSearch={true}
           onSearch={handleSearch}
-          searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
+          searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL_PHONE}
           onButtonClick={handleAddUserClick}
           setSelectedRole={setSelectedRole}
           setSelectedFacility={setSelectedFacility}
@@ -424,7 +425,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Facility',
               isFacility: true,
               isSearchable: true,
-              data: healthFacilityList,
+              data: filterHFByAppTypes(appTypes, healthFacilityList),
               isShow: role !== HEALTH_FACILITY_ADMIN,
               filterCount: selectedFacility?.length
             },
@@ -433,7 +434,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Role',
               isFacility: false,
               isSearchable: false,
-              data: [...(spiceUserRole || []), ...(roleCFRList || [])],
+              data: [...(allRoles.current || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }

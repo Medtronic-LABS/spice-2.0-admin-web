@@ -43,7 +43,7 @@ const COMMUNITY = {
       error: 'select peer supervisor'
     }
   },
-  userList: { filters: { available: false } },
+  userList: { filters: { available: true } },
   medication: { categories: { available: false } }
 };
 

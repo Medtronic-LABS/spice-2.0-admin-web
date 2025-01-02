@@ -53,7 +53,12 @@ import {
   userRolesSelector
 } from '../../store/user/selectors';
 import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
-import { formatCountryCode, formatUserToastMsg, removeRedRiskFromRoleArray } from '../../utils/commonUtils';
+import {
+  filterHFByAppTypes,
+  formatCountryCode,
+  formatUserToastMsg,
+  removeRedRiskFromRoleArray
+} from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   composeValidators,
@@ -471,7 +476,7 @@ const UserForm = ({
       if (showSpiceHFRef.current[index]) {
         const fullRoles = form.getState().values[`${formName}[${index}].roles`];
         const selectedAppTypes = roleBasedAppTypes(fullRoles);
-        filterHFByAppTypes(selectedAppTypes);
+        getHFLists(selectedAppTypes);
       }
       form.batch(() => {
         form.change(`${formName}[${index}].id`, userData.id || '');
@@ -523,21 +528,8 @@ const UserForm = ({
     }
   };
 
-  // Function to filter health facilities by selected appTypes
-  const filterHFByAppTypes = (selectedAppTypes: string[]) => {
-    const filteredHFList = healthFacilityList.filter((hf) => {
-      // Check if any clinical workflow's appTypes includes all the selectedAppTypes
-      return [...(hf.clinicalWorkflows || []), ...(hf.customizedWorkflows || [])].some((workflow) => {
-        return selectedAppTypes.some((type) => {
-          if (workflow.appTypes) {
-            return (workflow.appTypes || []).includes(type);
-          } else {
-            return true;
-          }
-        });
-      });
-    });
-    setNewHFList(filteredHFList);
+  const getHFLists = (selectedAppTypes: string[]) => {
+    setNewHFList(filterHFByAppTypes(selectedAppTypes, healthFacilityList));
   };
 
   useEffect(() => {
@@ -1184,7 +1176,7 @@ const UserForm = ({
                               if (showSpiceHFRef.current[index]) {
                                 const fullRoles = form.getState().values[formName][index].roles;
                                 const selectedAppTypes = roleBasedAppTypes(fullRoles);
-                                filterHFByAppTypes(selectedAppTypes);
+                                getHFLists(selectedAppTypes);
                               }
                               // fetch HF list based on CHW selection
                               if (isCHPCHWSelected(values)) {
