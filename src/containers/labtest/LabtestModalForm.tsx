@@ -47,7 +47,12 @@ const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): Rea
             type='text'
             validate={composeValidators(required, containsOnlyLettersAndNumbers)}
             render={({ input, meta }) => (
-              <TextInput {...input} label='Code' errorLabel='code' error={(meta.touched && meta.error) || undefined} />
+              <TextInput
+                {...input}
+                label='SNOMED Code'
+                errorLabel='code'
+                error={(meta.touched && meta.error) || undefined}
+              />
             )}
           />
         </div>
@@ -58,7 +63,12 @@ const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): Rea
             type='text'
             validate={composeValidators(required)}
             render={({ input, meta }) => (
-              <TextInput {...input} label='URL' errorLabel='url' error={(meta.touched && meta.error) || undefined} />
+              <TextInput
+                {...input}
+                label='SNOMED URL'
+                errorLabel='url'
+                error={(meta.touched && meta.error) || undefined}
+              />
             )}
           />
         </div>

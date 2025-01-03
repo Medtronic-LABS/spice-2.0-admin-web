@@ -372,7 +372,7 @@ const MedicationForm = ({
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label='Code'
+              label='SNOMED Code'
               errorLabel='code'
               error={(meta.touched && meta.error) || undefined}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -404,7 +404,7 @@ const MedicationForm = ({
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label='URL'
+              label='SNOMED URL'
               errorLabel='url'
               error={(meta.touched && meta.error) || undefined}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
