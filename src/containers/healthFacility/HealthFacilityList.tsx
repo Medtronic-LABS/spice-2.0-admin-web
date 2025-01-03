@@ -110,8 +110,8 @@ const HealthFacilityList = (): React.ReactElement => {
           failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
         })
       );
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]
   );
 
@@ -149,7 +149,8 @@ const HealthFacilityList = (): React.ReactElement => {
         })
       );
     }
-  }, [dispatch, hfTypesList.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
 
   useEffect(() => {
     fetchList({});

@@ -181,6 +181,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_SUMMARY_FETCH_ERROR: 'Unable to load health facility summary details. Please try after sometime.',
   HEALTH_FACILITY_SUMMARY_UPDATE_ERROR: 'Unable to update health facility summary details. Please try after sometime.',
   HEALTH_FACILITY_CREATION_SUCCESS: 'Health facility created successfully',
+  HEALTH_FACILITY_VALIDATION_ERROR: 'Facility ID already exists',
   HEALTH_FACILITY_CREATION_ERROR: 'Unable to create health facility. Please try after sometime.',
   HEALTH_FACILITY_USER_CREATE_SUCCESS: 'Health facility user added successfully.',
   HEALTH_FACILITY_USER_CREATE_ERROR: 'Unable to add health facility user. Please try after sometime.',

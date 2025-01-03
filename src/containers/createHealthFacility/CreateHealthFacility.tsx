@@ -160,7 +160,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         isSubmitClicked: false,
         pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
       });
-      toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR));
+      toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, e.message));
     },
     [PAGENUMBER.DETAILS, submittedData]
   );
