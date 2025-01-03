@@ -115,8 +115,8 @@ const HealthFacilityList = (): React.ReactElement => {
             requestFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR, healthFacilityPName))
         })
       );
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]
   );
 
@@ -154,7 +154,8 @@ const HealthFacilityList = (): React.ReactElement => {
         })
       );
     }
-  }, [dispatch, hfTypesList.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
 
   useEffect(() => {
     fetchList({});

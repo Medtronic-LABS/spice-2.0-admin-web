@@ -183,6 +183,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DETAILS_FETCH_ERROR: 'Unable to load module_name details. Please try after sometime.',
   HEALTH_FACILITY_SUMMARY_UPDATE_ERROR: 'Unable to update module_name summary details. Please try after sometime.',
   HEALTH_FACILITY_CREATION_SUCCESS: 'Module_name created successfully',
+  HEALTH_FACILITY_VALIDATION_ERROR: 'Facility ID already exists',
   HEALTH_FACILITY_CREATION_ERROR: 'Unable to create module_name. Please try after sometime.',
   HEALTH_FACILITY_USER_CREATE_SUCCESS: 'Module_name user added successfully.',
   HEALTH_FACILITY_USER_CREATE_ERROR: 'Unable to add module_name user. Please try after sometime.',
