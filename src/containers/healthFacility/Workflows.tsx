@@ -39,6 +39,7 @@ const renderWorkflowByModuleType = (
   form?: any,
   mentalHealthSelection?: () => any,
   pregnancyCheckTimeoutRef?: any
+  pregnancyCheckTimeoutRef?: any
 ) => {
   const {
     WORKFLOW_MODULE: { clinical },
@@ -81,6 +82,7 @@ const renderWorkflowByModuleType = (
     if (pregnancyCheckTimeoutRef) {
       pregnancyCheckTimeoutRef.current = pregancyTimeOut;
     }
+
     if ([substanceAbuse, suicideScreener, phq4].includes(selectedValue?.workflowName || '') && mentalHealthSelection) {
       mentalHealthSelection();
     }

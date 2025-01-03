@@ -310,7 +310,13 @@ const UserForm = ({
   }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
 
   useEffect(() => {
-    if ((isCommunity || !isHFCreate) && (isFromAdminList || countryId)) {
+    // isCommunity - always true for isCommunity
+    // isFromAdminList - always true while creating admin
+    // isHF - always true for hf summary page
+
+    // isHFCreate - don't call for hf create
+    // countryId - always check countryId
+    if ((isCommunity || isFromAdminList || isHF) && !isHFCreate && countryId) {
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

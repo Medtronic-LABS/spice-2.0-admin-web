@@ -12,7 +12,7 @@ const MOCK_LABTEST_DETAIL = {
     displayOrder: 1,
     codeDetails: {
       code: 'code',
-      url: 'http://cwl.com'
+      url: 'https://cwl.com'
     }
   }
 };
