@@ -306,7 +306,6 @@ const APPCONSTANTS = {
   },
 
   //
-
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
   SEARCH_BY_NAME_EMAIL: 'Name / Email',
   SEARCH_BY_NAME_EMAIL_PHONE: 'Name / Email / Phone',

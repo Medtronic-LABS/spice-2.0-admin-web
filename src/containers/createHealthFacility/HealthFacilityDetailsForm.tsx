@@ -586,6 +586,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='language'
                   labelKey='name'
                   valueKey='id'
+                  disabled={true}
                   options={filterByAppTypes(languages, appTypes)}
                   loadingOptions={languageLoading}
                   error={(meta.touched && meta.error) || undefined}

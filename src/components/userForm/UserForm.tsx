@@ -1353,7 +1353,7 @@ const UserForm = ({
                             disabledOptions={disabledRoles.current?.[index]?.REPORTS || []}
                             loading={isRolesLoading}
                             error={isError(meta) && !reportRoles?.length}
-                            onChange={(values: any, { option, action }: { option: any; action: string }) => {
+                            onChange={(values: any) => {
                               const currentAllRoles = [
                                 ...(Array.isArray(spiceRole) ? spiceRole : [spiceRole]),
                                 ...insightRoles,

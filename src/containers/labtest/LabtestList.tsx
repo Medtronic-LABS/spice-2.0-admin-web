@@ -269,12 +269,6 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
                   width: '140px'
                 },
                 {
-                  id: 2,
-                  name: 'displayOrder',
-                  label: 'DISPLAY ORDER',
-                  width: '125px'
-                },
-                {
                   id: 3,
                   name: 'updated_at',
                   label: 'UPDATED ON',

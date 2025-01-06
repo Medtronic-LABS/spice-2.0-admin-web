@@ -106,6 +106,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
+                disabled={true}
                 options={filterByAppTypes(cultureList, appTypes) || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
