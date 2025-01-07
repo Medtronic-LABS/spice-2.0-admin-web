@@ -44,7 +44,8 @@ const COMMUNITY = {
     }
   },
   userList: { filters: { available: true } },
-  medication: { categories: { available: false } }
+  medication: { categories: { available: false } },
+  filterComponent: { filterIcon: { available: true } }
 };
 
 const NON_COMMUNITY = {
@@ -87,7 +88,8 @@ const NON_COMMUNITY = {
     }
   },
   userList: { filters: { available: true } },
-  medication: { categories: { available: true } }
+  medication: { categories: { available: true } },
+  filterComponent: { filterIcon: { available: false } }
 };
 
 const noAppTypes = {

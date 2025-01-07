@@ -416,8 +416,14 @@ const UserList = (): React.ReactElement => {
           onSearch={handleSearch}
           searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL_PHONE}
           onButtonClick={handleAddUserClick}
-          setSelectedRole={setSelectedRole}
-          setSelectedFacility={setSelectedFacility}
+          setSelectedRole={(filterRole: any) => {
+            setSelectedRole(filterRole);
+            handlePage(1);
+          }}
+          setSelectedFacility={(filterHf: any) => {
+            setSelectedFacility(filterHf);
+            handlePage(1);
+          }}
           isFilter={showFilters}
           onFilterData={[
             {

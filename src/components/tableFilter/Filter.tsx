@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ReactComponent as FilterListIcon } from '../../assets/images/filter-icon.svg';
 import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IFilteredData {
   isShow: any;
@@ -41,6 +42,11 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const {
+    filterComponent: {
+      filterIcon: { available: showCountIcon }
+    }
+  } = useAppTypeConfigs();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
@@ -228,22 +234,30 @@ const TableFilter: React.FC<ITableFilterProps> = ({
    */
   const formatHealthFacility = (user: IHFUserGet): string =>
     `${(user.organizations || []).map((org) => org.name).join(', ')}`;
+
+  const getSelectValueFn = () => {
+    return selectedOptions.length >= filteredOptions.length ? filteredOptions.length : selectedOptions.length;
+  };
   return (
     <>
       {filterData.isShow && (
-        <div className={`${styles.selectHeader}`}>
+        <div>
           <div
             className={`${styles.selectHeader} ${styles.container} d-flex align-items-center justify-content-between px-0dot5 border rounded border-secondary mx-0dot5 position-relative filter-container`}
             onClick={handleDropdownToggle}
             ref={dropdownContainerRef}
           >
             <div className='d-flex align-items-center'>
-              <FilterListIcon />
+              {selectedOptions.length && showCountIcon ? (
+                <span className='  badge rounded-pill bg-primary'>{getSelectValueFn()}</span>
+              ) : (
+                <FilterListIcon />
+              )}
               <span className={`text-secondary py-0dot25 px-1 filter-placeholder ${styles.placeholder}`}>
                 {filterData.name}
               </span>
             </div>
-            <div className={`text-secondary ${styles.arrow} ${isOpen ? 'open' : ''}`} />
+            <div className={`text-secondary ${styles.arrow} ${isOpen ? styles.open : ''}`} />
           </div>
           {isOpen && (
             <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded p-0dot5`}>
@@ -255,31 +269,42 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                   onChange={(e) => handleSearchChange(e.target.value)}
                 />
               )}
-              {!!filteredOptions.length ? (
+              {
                 <ul className='list-unstyled mb-0'>
-                  {[...(selectAllOption ? [selectAllOption] : []), ...filteredOptions].map((option) => (
-                    <li
-                      key={option.id}
-                      className={`${styles.selectOption} px-1 py-0dot5 ${
-                        selectedOptions.includes(option.name) && styles.selectedDropdown
-                      }`}
-                    >
-                      <label className='d-flex align-items-center fs-6'>
-                        <input
-                          type='checkbox'
-                          value={option.id}
-                          checked={selectedOptions.includes(option.name)}
-                          onChange={() => handleSelectChange(option)}
-                          className='mr-2'
-                        />
-                        {(!isFacility ? option.displayName : option.name) || option.name} {formatHealthFacility(option)}
-                      </label>
-                    </li>
-                  ))}
+                  {[...(selectAllOption ? [selectAllOption] : []), ...(filteredOptions || [undefined])].map((option) =>
+                    filteredOptions.length ? (
+                      <li
+                        key={option.id}
+                        className={`${styles.selectOption} px-1 py-0dot5 ${
+                          selectedOptions.includes(option.name) && styles.selectedDropdown
+                        }`}
+                      >
+                        <label className='d-flex align-items-center fs-6'>
+                          <input
+                            type='checkbox'
+                            value={option.id}
+                            checked={selectedOptions.includes(option.name)}
+                            onChange={() => handleSelectChange(option)}
+                            ref={(input) => {
+                              if (input) {
+                                input.indeterminate =
+                                  option.value === '*' &&
+                                  !!selectedOptions.length &&
+                                  selectedOptions.length < filteredOptions.length;
+                              }
+                            }}
+                            className='mr-2'
+                          />
+                          {(!isFacility ? option.displayName : option.name) || option.name}{' '}
+                          {formatHealthFacility(option)}
+                        </label>
+                      </li>
+                    ) : (
+                      <li>No results found</li>
+                    )
+                  )}
                 </ul>
-              ) : (
-                <p className='text-muted text-center mb-0 pe-none'>No results found</p>
-              )}
+              }
             </div>
           )}
         </div>
