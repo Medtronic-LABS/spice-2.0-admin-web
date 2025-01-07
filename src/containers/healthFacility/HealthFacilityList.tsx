@@ -41,7 +41,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import { getAllChiefdomsSelector } from '../../store/chiefdom/selectors';
 import { fetchChiefDomsByCountryIdRequest } from '../../store/chiefdom/actions';
-import { formatUserToastMsg } from '../../utils/commonUtils';
+import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 
 /**
  * Interface for modal state
@@ -93,7 +93,12 @@ const HealthFacilityList = (): React.ReactElement => {
     data: {} as IHealthFacilityForm,
     isNextClicked: false
   });
-  const [filters, setFilters] = useState<any>({ healthFacilityTypes: [], districtIds: [], chiefdomIds: [] });
+  const [filters, setFilters] = useState<any>({
+    healthFacilityTypes: [],
+    districtIds: [],
+    chiefdomIds: [],
+    skip: null
+  });
 
   /**
    * Fetches the health facility list
@@ -158,8 +163,8 @@ const HealthFacilityList = (): React.ReactElement => {
   }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
 
   useEffect(() => {
-    fetchList({});
-  }, [listParams, dispatch, fetchList]);
+    fetchList({ ...filters });
+  }, [fetchList, filters, listParams]);
 
   useEffect(() => {
     return () => {
@@ -396,10 +401,11 @@ const HealthFacilityList = (): React.ReactElement => {
     newFilters = {
       ...newFilters,
       [name]: option,
-      ...(name === 'healthFacilityTypes' && { healthFacilityTypes })
+      ...(name === 'healthFacilityTypes' && { healthFacilityTypes }),
+      skip: 0
     };
+    handlePage(1);
     setFilters(newFilters);
-    fetchList({ ...newFilters, skip: 0 });
   };
 
   return (
@@ -422,7 +428,7 @@ const HealthFacilityList = (): React.ReactElement => {
               isFacility: false,
               isGeneric: true,
               isSearchable: false,
-              data: hfTypesList,
+              data: filterByAppTypes(hfTypesList, appTypes),
               isShow: true
             },
             {
@@ -438,7 +444,7 @@ const HealthFacilityList = (): React.ReactElement => {
             },
             {
               id: 3,
-              name: 'Chief Dom',
+              name: 'Chiefdom',
               key: 'chiefdomIds',
               isFacility: false,
               isGeneric: true,

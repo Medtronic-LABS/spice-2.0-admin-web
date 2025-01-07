@@ -42,7 +42,8 @@ const COMMUNITY = {
     }
   },
   userList: { filters: { available: true } },
-  medication: { categories: { available: false } }
+  medication: { categories: { available: false } },
+  filterComponent: { filterIcon: { available: true } }
 };
 
 const NON_COMMUNITY = {

@@ -3,6 +3,7 @@ import { ReactComponent as FilterListIcon } from '../../assets/images/filter-ico
 import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IFilteredData {
   isShow: any;
@@ -292,7 +293,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
             ref={dropdownContainerRef}
           >
             <div className='d-flex align-items-center'>
-              {selectedOptions.length && showCountIcon && getSelectValueFn() > 0 ? (
+              {selectedOptions.length && showCountIcon ? (
                 <span className='  badge rounded-pill bg-primary'>{getSelectValueFn()}</span>
               ) : (
                 <FilterListIcon />
@@ -319,15 +320,15 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                     filteredOptions.length ? (
                       <li
                         key={option.id}
-                        className={`${styles.selectOption} ${
-                          option.value === '*' ? styles.selectAllLi : ''
-                        } px-1 py-0dot5 d-flex ${selectedOptionsIds.includes(option.id) && styles.selectedDropdown}`}
+                        className={`${styles.selectOption} px-1 py-0dot5 ${
+                          selectedOptions.includes(option.name) && styles.selectedDropdown
+                        }`}
                       >
                         <label className='d-flex align-items-center fs-6'>
                           <input
                             type='checkbox'
                             value={option.id}
-                            checked={selectedOptionsIds.includes(option.id)}
+                            checked={selectedOptions.includes(option.name)}
                             onChange={() => handleSelectChange(option)}
                             ref={(input) => {
                               if (input) {
@@ -342,18 +343,6 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                           {(!isFacility ? option.displayName : option.name) || option.name}{' '}
                           {formatHealthFacility(option)}
                         </label>
-                        {option.value === '*' && !!selectedOptions.length && (
-                          <label
-                            className={` ${styles.closeIcon}`}
-                            onClick={() => {
-                              isAllSelected.current = true;
-                              handleSelectChange(selectAllOptionData as any);
-                            }}
-                          >
-                            {/* <Close aria-label='close' /> */}
-                            Reset
-                          </label>
-                        )}
                       </li>
                     ) : (
                       <li>No results found</li>

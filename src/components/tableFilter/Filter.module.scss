@@ -72,6 +72,12 @@
   }
 }
 
+.selectOption {
+  label {
+    cursor: pointer;
+  }
+}
+
 .selectOption input[type='checkbox'] {
   margin-right: 8px;
 }
