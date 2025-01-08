@@ -196,9 +196,9 @@ const MyProfile = (): React.ReactElement => {
               form={form as FormApi<any>}
               initialEditValue={userForEdit.current.users[0]}
               disableOptions={true}
-              isProfile={true}
               isEdit={true}
               countryId={countryId}
+              userFormParams={{ isProfile: true }}
             />
           );
         }}

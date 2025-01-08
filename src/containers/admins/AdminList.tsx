@@ -1,6 +1,6 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
@@ -37,6 +37,8 @@ import { getAdminPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './adminListMeta';
+import { filterByAppTypes } from '../../utils/commonUtils';
+import { redRisk } from '../../constants/roleConstants';
 
 interface IMatchParams {
   tenantId: string;
@@ -65,7 +67,6 @@ const UserList = (): React.ReactElement => {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
   } = useAppTypeConfigs();
-  const { filterSpiceCommonRoles, filterSpiceAdminRoles } = APPCONSTANTS;
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const { pathname } = useLocation();
@@ -268,6 +269,9 @@ const UserList = (): React.ReactElement => {
    * @param {any} form - The form API instance used to manage the form's state and submissions.
    */
   const userFormRenderer = (form?: FormApi<any>) => {
+    const isOnlyReportUser =
+      userForEdit.current.users[0]?.roles.length === 1 &&
+      userForEdit.current.users[0]?.roles[0].suiteAccessName === APPCONSTANTS.SUITE_ACCESS.CFR;
     return (
       <UserForm
         form={form as FormApi<any>}
@@ -278,7 +282,7 @@ const UserList = (): React.ReactElement => {
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
         isSiteUser={false}
-        isFromAdminList={true}
+        userFormParams={{ isFromAdminList: true, reportUserOnlyInAdminList: isOnlyReportUser }}
       />
     );
   };
@@ -328,13 +332,35 @@ const UserList = (): React.ReactElement => {
   };
 
   /**
-   * Memoized value to filter SPICE INSIGHTS admin roles based on certain conditions for filter dropdown
-   * filter only spice common roles and spice admin roles
+   * Memoized value to filter REPORTS user roles based on certain conditions for filter dropdown
    */
-  const roleCFRList = (rolesGrouped?.['SPICE INSIGHTS'] || [])?.filter(
-    (data: { suiteAccessName: string }) =>
-      filterSpiceCommonRoles.includes(data.suiteAccessName) || filterSpiceAdminRoles.includes(data.suiteAccessName)
-  );
+  const roleCFRList = useMemo(() => {
+    return filterByAppTypes(rolesGrouped?.REPORTS || [], appTypes);
+  }, [appTypes, rolesGrouped?.REPORTS]);
+
+  /**
+   * Memoized value to filter INSIGHTS user roles based on certain conditions for filter dropdown
+   */
+  const roleInsightsList = useMemo(() => {
+    return filterByAppTypes(rolesGrouped?.INSIGHTS || [], appTypes);
+  }, [appTypes, rolesGrouped?.INSIGHTS]);
+
+  /**
+   * Icon Handler for edit, password reset and delete
+   * Don't show icons if user has mob roles in it
+   * Don't show icon for logged in user
+   */
+  const actionIconViewer = (rowData: {
+    roles: Array<{ suiteAccessName: string; displayName: string; name: string }>;
+    username: string;
+  }) => {
+    const isMobUser = rowData?.roles.some(
+      (role: { suiteAccessName: string; displayName: string; name: string }) =>
+        role.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob &&
+        (role.displayName !== null || role.name !== redRisk)
+    );
+    return isMobUser || rowData.username === email;
+  };
 
   return (
     <>
@@ -355,7 +381,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
-              data: [...spiceRoles.current, ...roleCFRList],
+              data: [...spiceRoles.current, ...roleCFRList, ...roleInsightsList],
               isShow: true,
               filterCount: selectedRole?.length
             }
@@ -380,9 +406,9 @@ const UserList = (): React.ReactElement => {
             isCustom={true}
             customIconStyle={{ width: 18 }}
             actionFormatter={{
-              hideEditIcon: (rowData: any) => rowData.username === email,
-              hideDeleteIcon: (rowData: any) => rowData.username === email,
-              hideCustomIcon: (rowData: any) => rowData.username === email
+              hideEditIcon: (rowData: any) => actionIconViewer(rowData),
+              hideDeleteIcon: (rowData: any) => actionIconViewer(rowData),
+              hideCustomIcon: (rowData: any) => actionIconViewer(rowData)
             }}
           />
         </DetailCard>

@@ -344,6 +344,7 @@ const ChiefdomSummary = () => {
         isAdminForm={true}
         defaultSelectedRole={APPCONSTANTS.ROLES.CHIEFDOM_ADMIN}
         enableAutoPopulate={true}
+        userFormParams={{ isChiefdom: true }}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps

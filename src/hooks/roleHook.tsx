@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import { IDisabledRoles } from '../components/userForm/UserForm';
 import useUserFormUtils, { filterRolesByAppTypeFn } from '../components/userForm/userFormUtils';
-import APPCONSTANTS from '../constants/appConstants';
 import {
   adminRoles,
-  allAdmins,
+  allMigrationAdmins,
   allAFSingleRoles,
   allHFNeededRoles,
   allHierarchyAdmins,
@@ -27,6 +26,7 @@ import {
   peerSupervisor,
   redRisk,
   reportAdminRole,
+  reportAndFacilityAdmin,
   REPORTS,
   SPICE,
   spiceRole,
@@ -40,9 +40,9 @@ import useAppTypeConfigs from './appTypeBasedConfigs';
 
 interface IFindDisabledRoles {
   suite: string;
-  validSpiceRoles?: string[];
-  validReportRoles?: string[];
-  validInsightRoles?: string[];
+  validSpiceRoles?: Array<string | null>;
+  validReportRoles?: Array<string | null>;
+  validInsightRoles?: Array<string | null>;
   selectedAFRoles?: IRoles[];
   isAfMobile?: boolean;
 }
@@ -82,6 +82,7 @@ interface IRoleHookMeta {
   isEdit: boolean | undefined;
   isSiteUser: boolean;
   isFromAdminList: boolean;
+  isRegionCreate: boolean;
   formData: any[];
   isCHAStatus: boolean[];
   isCHWCHPStatus: boolean[];
@@ -99,7 +100,8 @@ export const filterSPICERoles = (
     isSiteUser,
     currentModule,
     isCommunity,
-    isFromAdminList
+    isFromAdminList,
+    isRegionCreate
   }: {
     isHFCreate: boolean;
     isHF: boolean;
@@ -107,6 +109,7 @@ export const filterSPICERoles = (
     currentModule?: string;
     isCommunity?: boolean;
     isFromAdminList?: boolean;
+    isRegionCreate?: boolean;
   },
   allRoles: IRoles[]
 ) => {
@@ -129,17 +132,11 @@ export const filterSPICERoles = (
     if (!isPeerSupervisor && isHF4User) {
       return false;
     }
-    if (isHFCreate) {
+    if (isHF || isHFCreate) {
       if (isReports) {
-        return !isReportAdmin;
+        return isCommunity ? !isReportAdmin : true;
       }
-      return isHFCreateCondition;
-    }
-    if (isHF) {
-      if (isReports) {
-        return !isReportAdmin;
-      }
-      return isHFCondition;
+      return isHFCreate ? isHFCreateCondition : isHFCondition;
     }
     // Site user condition
     if (isSiteUser) {
@@ -150,6 +147,9 @@ export const filterSPICERoles = (
     }
     if (!isSiteUser && isFromAdminList) {
       return isFromAdminList;
+    }
+    if ((!isCommunity || isRegionCreate) && isReports) {
+      return true;
     }
     return adminFormRoles;
   });
@@ -171,6 +171,7 @@ export const useRoleMeta = ({
   showReportHFListState,
   showInsightHFListState,
   showVillagesState,
+  isRegionCreate,
   onRoleChange
 }: IRoleHookMeta): {
   roleChange: (data: IRoleChangeProps) => void;
@@ -252,13 +253,14 @@ export const useRoleMeta = ({
               isHF,
               isSiteUser,
               isCommunity,
-              isFromAdminList
+              isFromAdminList,
+              isRegionCreate
             },
             allRoles
           ) || [];
         const validRoles = [...new Set([...validSpiceRoles, ...validReportRoles, ...validInsightRoles])];
         return selectedRoleGroup.filter((groupedRole: IRoles) =>
-          validRoles.length ? !validRoles.includes(groupedRole?.name) : false
+          validRoles.length ? (validRoles[0] === null ? true : !validRoles.includes(groupedRole?.name)) : false
         );
       };
 
@@ -289,8 +291,19 @@ export const useRoleMeta = ({
           return [...chwPeerRoles, ...adminRoles];
         } else if (isFromAdminList) {
           return allHierarchyAdmins;
+        } else if (!isCommunity) {
+          return [...CHPARoles, ...allAFSingleRoles, hfAdminRole];
         }
         return [...CHPARoles, ...allAFSingleRoles];
+      };
+
+      const getValidSpiceRolesForReportAdminSelection = () => {
+        if (isCommunity) {
+          return superAdminRoles;
+        } else if (isHF) {
+          return [...allAFSingleRoles, ...CHPARoles, hfAdminRole];
+        }
+        return [...allHierarchyAdmins, ...allAFSingleRoles, ...CHPARoles];
       };
       // all roles condition
       const rolesMeta: IRoleMeta[] = [
@@ -315,27 +328,26 @@ export const useRoleMeta = ({
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
         {
-          selectedRoles: appTypes.includes(APPCONSTANTS.appTypes.non_community) ? [hfAdminRole] : adminRoles,
+          selectedRoles: isCommunity ? adminRoles : isHFCreate ? [hfAdminRole] : allHierarchyAdmins,
           selectedSuite: SPICE,
           disabledSPICERoles: {
             suite: SPICE,
-            validSpiceRoles: appTypes.includes(APPCONSTANTS.appTypes.non_community) ? [hfAdminRole] : adminRoles
+            validSpiceRoles: isCommunity ? adminRoles : isHFCreate ? [hfAdminRole] : allMigrationAdmins
           },
-          disabledREPORTSRoles: { suite: REPORTS, validReportRoles: facilityReportAdminRole },
+          disabledREPORTSRoles: {
+            suite: REPORTS,
+            validReportRoles: isCommunity ? facilityReportAdminRole : reportAndFacilityAdmin
+          },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
         {
           selectedRoles: superAdminRoles,
           selectedSuite: SPICE,
-          disabledSPICERoles: { suite: SPICE, validSpiceRoles: isFromAdminList ? allAdmins : superAdminRoles },
-          disabledREPORTSRoles: { suite: REPORTS, validReportRoles: reportAdminRole },
-          disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
-        },
-        {
-          selectedRoles: allHierarchyAdmins,
-          selectedSuite: SPICE,
-          disabledSPICERoles: { suite: SPICE, validSpiceRoles: allAdmins },
-          disabledREPORTSRoles: { suite: REPORTS, validReportRoles: facilityReportAdminRole },
+          disabledSPICERoles: { suite: SPICE, validSpiceRoles: isFromAdminList ? allMigrationAdmins : superAdminRoles },
+          disabledREPORTSRoles: {
+            suite: REPORTS,
+            validReportRoles: isCommunity ? reportAdminRole : [null]
+          },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
         {
@@ -351,7 +363,10 @@ export const useRoleMeta = ({
         {
           selectedRoles: reportAdminRole,
           selectedSuite: REPORTS,
-          disabledSPICERoles: { suite: SPICE, validSpiceRoles: superAdminRoles },
+          disabledSPICERoles: {
+            suite: SPICE,
+            validSpiceRoles: getValidSpiceRolesForReportAdminSelection()
+          },
           disabledREPORTSRoles: { suite: REPORTS, validReportRoles: reportAdminRole },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
@@ -422,9 +437,9 @@ export const useRoleMeta = ({
           rolesMeta.find((newRoles) => newRoles.selectedRoles.includes(roleValue.name)) || ({} as IRoleMeta);
         const disabledAllRoles = {
           ...foundAllRoles,
-          disabledSPICERoles: findDisabledRoles(foundAllRoles.disabledSPICERoles),
-          disabledREPORTSRoles: findDisabledRoles(foundAllRoles.disabledREPORTSRoles),
-          disabledINSIGHTSRoles: findDisabledRoles(foundAllRoles.disabledINSIGHTSRoles)
+          disabledSPICERoles: findDisabledRoles(foundAllRoles.disabledSPICERoles || {}),
+          disabledREPORTSRoles: findDisabledRoles(foundAllRoles.disabledREPORTSRoles || {}),
+          disabledINSIGHTSRoles: findDisabledRoles(foundAllRoles.disabledINSIGHTSRoles || {})
         };
         if ((disabledAllRoles.disabledSPICERoles || []).length) {
           newDisabledRoles[SPICE] = [

@@ -22,6 +22,7 @@ export const adminRoles = ['HEALTH_FACILITY_ADMIN', ...mobCommunityRoles];
 export const superAdminRoles = ['SUPER_ADMIN', 'SUPER_USER'];
 // REPORTS
 export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN', hf4ReportUser];
+export const reportAndFacilityAdmin = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN'];
 export const reportAdminRole = ['REPORT_ADMIN'];
 export const onlyHF4UserRole = [hf4ReportUser];
 export const facilityReportAdminRole = ['FACILITY_REPORT_ADMIN'];
@@ -76,7 +77,7 @@ export const chiefdom = [...healthFacility, 'CHIEFDOM_ADMIN'];
 export const district = [...chiefdom, 'DISTRICT_ADMIN'];
 export const region = [...district, 'REGION_ADMIN', 'SUPER_ADMIN'];
 
-export const allAdmins = [...region];
-export const allHierarchyAdmins = [...district, 'REGION_ADMIN'];
+export const allHierarchyAdmins = [...district, 'REGION_ADMIN']; // upto region admin
+export const allMigrationAdmins = [...region]; // upto super admin
 
 export const HIERARCHY_ROLES: { [key: string]: string[] } = { healthFacility, chiefdom, district, region };

@@ -26,7 +26,6 @@ import {
   clearVillageList,
   fetchCityListRequest,
   fetchCultureListRequest,
-  fetchHFListRequest,
   fetchHFTypesRequest,
   fetchPeerSupervisorListRequest,
   fetchUnlinkedVillagesRequest,
@@ -209,18 +208,6 @@ const HealthFacilityDetailsForm = ({
     const selectedTenantId = form.getState().values?.healthFacility?.chiefdom?.tenantId;
     if (selectedTenantId) {
       dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId], appTypes }));
-    }
-    // while creating the HF,
-    // fetch HF based on selected chiefdom for reports and insights role
-    if (isHFCreate && selectedTenantId) {
-      dispatch(
-        fetchHFListRequest({
-          countryId,
-          skip: 0,
-          limit: null,
-          tenantIds: [selectedTenantId]
-        })
-      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, form.getState().values?.healthFacility?.chiefdom?.tenantId]);

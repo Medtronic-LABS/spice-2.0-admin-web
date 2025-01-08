@@ -67,15 +67,13 @@ export const useRoleOptions = ({
             } else if (role.name === hf4ReportUser) {
               return false;
             }
-            // normal validations
-            if (isHFCreate || isHF || (!isCommunity && (isSiteUser || currentModule !== regionSname.toLowerCase()))) {
+
+            if (isCommunity && currentModule !== regionSname.toLowerCase()) {
               return !reportAdminRole.includes(role.name);
-            } else {
-              return true;
             }
+            return true;
           })
           .sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
-
       // returns the INSIGHTS roles based on the conditions
       const insightRoleOptions =
         (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];

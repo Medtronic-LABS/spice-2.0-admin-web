@@ -12,10 +12,7 @@ export interface IUserFormProps {
   form: FormApi<any>;
   initialEditValue?: any;
   disableOptions?: boolean;
-  isProfile?: boolean;
   isEdit?: boolean;
-  isHF?: boolean;
-  isHFCreate?: boolean;
   isRegionUser?: boolean;
   account?: { id: string; tenantId: string };
   isDropdownDisable?: boolean;
@@ -41,12 +38,20 @@ export interface IUserFormProps {
   isSiteUser?: boolean;
   isAdminForm?: boolean;
   defaultSelectedRole?: string;
-  isRegionCreate?: boolean;
   parentOrgId?: string;
   ignoreTenantId?: string;
-  isFromAdminList?: boolean;
-  isPeerSupervisor?: boolean;
-  isCHW?: boolean;
+  fetchHFListForReports?: boolean;
+  userFormParams?: {
+    isRegionCreate?: boolean;
+    isHF?: boolean;
+    isHFCreate?: boolean;
+    isProfile?: boolean;
+    isFromAdminList?: boolean;
+    isChiefdom?: boolean;
+    isCreateChiefdom?: boolean;
+    isCreateDistrict?: boolean;
+    reportUserOnlyInAdminList?: boolean;
+  };
 }
 
 export interface IOrganizations {

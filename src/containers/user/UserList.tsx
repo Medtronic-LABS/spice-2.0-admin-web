@@ -18,6 +18,7 @@ import { useRoleOptions } from '../../hooks/roleOptionsHook';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
 import {
+  clearHFList,
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
@@ -626,6 +627,9 @@ const UserList = (): React.ReactElement => {
    */
   useEffect(() => {
     fetchList();
+    return () => {
+      dispatch(clearHFList());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -688,244 +692,32 @@ const UserList = (): React.ReactElement => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch]
-  );
+  }, [rolesGrouped]);
 
-  const handleActivateToggle = (data: any) => {
-    const isCHW = data?.roles?.some((ischwRole: { name: string }) => ischwRole.name === 'CHW');
-    const isPeerSupervisor = getPeerSupervisorRoleId(data);
-    const isDeactivatingPeerSupervisor = data.active && isPeerSupervisor;
-    if (!!isDeactivatingPeerSupervisor) {
-      getCHWList(data);
-    } else if (isCHW && data.active) {
-      handleSync(data);
-    } else {
-      handleActivateClick(data, [], null);
-    }
-  };
-
-  const activeCHWList = (data: any) => {
-    dispatch(
-      updateUserStatus({
-        ...data.users[0],
-        id: data.users[0].id,
-        tenantId: data.users[0].tenantId,
-        isActive: true,
-        countryId: countryIdValue,
-        villageIds: data?.users[0]?.villages?.map((village: any) => village.id),
-        peerSupervisorId: data?.users[0]?.supervisor?.id,
-        appTypes,
-        successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_ACTIVATED);
-          setOpenConfirmationModal({ isOpen: false, userData: {} });
-          handleCancelClick();
-          refreshHFUserList();
-        },
-        failureCb: (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.USER_STATUS_UPDATE_FAILED));
-        }
-      })
-    );
-  };
   /**
-   * Handles user activation/deactivation with special handling for Peer Supervisors
-   *
-   * @param {Object} data - User data with activation status and role information
-   * @param {number} data.id - User ID
-   * @param {boolean} data.isActive - Current activation status (true for active)
-   * @param {number} data.tenantId - Tenant ID
-   * @param {Array<{name: string}>} data.roles - Array of user roles
-   *
-   * Special behavior:
-   * - For Peer Supervisors being deactivated: Shows reassignment warning
-   * - For regular users: Shows standard activation/deactivation confirmation
+   * Memoized value to filter REPORTS user roles based on certain conditions for filter dropdown
    */
-  const handleActivateClick = useCallback(
-    (
-      data: {
-        id: number;
-        active: boolean;
-        tenantId: number;
-        roles: [{ name: string; id: number }];
-        organizations: any[];
-      },
-      CHWData: any,
-      lastSyncDate: string | null
-    ) => {
-      const isCHW = data.roles.some((ischwRole: { name: string }) => ischwRole.name === 'CHW');
-      const isChwActivate = isCHW && !data.active;
-      const peerSupervisorRoleId = getPeerSupervisorRoleId(data);
-      const isPeerSupervisor = Boolean(peerSupervisorRoleId); // will be true if role ID is found
-      const parentOrganizationId: number = getParentOrganizationId(data);
-      fetchSupervisorList([parentOrganizationId], 0);
-      const isDeactivatingPeerSupervisor = data.active && isPeerSupervisor && CHWData.length;
-      const MESSAGES = {
-        PEER_SUPERVISOR_DEACTIVATION: APPCONSTANTS.PEER_SUPERVISOR_DEACTIVATION,
-        STANDARD_CONFIRMATION: (willActivate: boolean) =>
-          `Are you sure you want to ${willActivate ? 'deactivate' : 'activate'} this user?`,
-        OFFLINE_SYNC_MESSAGE: `Are you sure you want to deactivate this user?`
-      };
+  const roleCFRList = useMemo(() => {
+    return filterByAppTypes(rolesGrouped?.REPORTS || [], appTypes);
+  }, [appTypes, rolesGrouped?.REPORTS]);
 
-      const BUTTON_TEXT = {
-        PEER_SUPERVISOR: {
-          cancel: '',
-          submit: 'Reassign',
-          customButtonLabel: 'Add Peer Supervisor',
-          handleCustomButton: () => {
-            setIsOpenPeerSupervisorModal({ isOpen: true, isEdit: false });
-          }
-        },
-        STANDARD: {
-          cancel: 'Cancel',
-          submit: 'Yes'
-        }
-      };
+  /**
+   * Memoized value to filter INSIGHTS user roles based on certain conditions for filter dropdown
+   */
+  const roleInsightsList = useMemo(() => {
+    return filterByAppTypes(rolesGrouped?.INSIGHTS || [], appTypes);
+  }, [appTypes, rolesGrouped?.INSIGHTS]);
 
-      const deactivationMessage = isDeactivatingPeerSupervisor
-        ? MESSAGES.PEER_SUPERVISOR_DEACTIVATION
-        : MESSAGES.STANDARD_CONFIRMATION(data.active);
-
-      const { cancel: cancelText, submit: submitText } = isDeactivatingPeerSupervisor
-        ? BUTTON_TEXT.PEER_SUPERVISOR
-        : BUTTON_TEXT.STANDARD;
-      setOpenConfirmationModal({
-        isOpen: true,
-        userData: data,
-        roleId: getPeerSupervisorRoleId(data),
-        title: `${data.active ? 'Deactivate' : 'Activate'} User`,
-        cancelText,
-        submitText,
-        customButtonLabel: isDeactivatingPeerSupervisor ? BUTTON_TEXT.PEER_SUPERVISOR.customButtonLabel : '',
-        handleCustomButton: BUTTON_TEXT.PEER_SUPERVISOR.handleCustomButton,
-        message: deactivationMessage,
-        WarningMessage: isCHW && data.active ? deactivationMessage : '',
-        syncDate: lastSyncDate,
-        onConfirm: () => {
-          if (isDeactivatingPeerSupervisor) {
-            handleReassignClick(data);
-            setOpenConfirmationModal({ isOpen: false, userData: data });
-          } else if (isChwActivate) {
-            setOpenConfirmationModal({ isOpen: false, userData: data });
-            setIsOpenCHWUserModal({ isOpen: true, isEdit: true });
-          } else {
-            dispatch(
-              updateUserStatus({
-                id: data.id,
-                isActive: !data.active,
-                tenantId: data.tenantId,
-                countryId: countryIdValue,
-                appTypes,
-                successCb: () => {
-                  toastCenter.success(
-                    APPCONSTANTS.SUCCESS,
-                    !data.active ? APPCONSTANTS.USER_ACTIVATED : APPCONSTANTS.USER_DEACTIVATED
-                  );
-                  setOpenConfirmationModal({ isOpen: false, userData: {} });
-                  refreshHFUserList();
-                },
-                failureCb: (e) => {
-                  toastCenter.error(
-                    ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.USER_STATUS_UPDATE_FAILED)
-                  );
-                }
-              })
-            );
-          }
-        }
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, refreshHFUserList, getCHWList]
-  );
-
-  // Add handler for peer supervisor modal cancel
-  const handlePeerSupervisorModalCancel = () => {
-    setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
-  };
-
-  // Add peer supervisor form renderer
-  const peerSupervisorFormRenderer = (form?: FormApi<any>) => {
-    return (
-      <UserForm
-        form={form as FormApi<any>}
-        initialEditValue={openConfirmationModal.userData}
-        disableOptions={true}
-        defaultSelectedRole={APPCONSTANTS.ROLES.PEER_SUPERVISOR}
-        isEdit={isOpenPeerSupervisorModal.isEdit}
-        countryId={countryIdValue}
-        enableAutoPopulate={true}
-        hfTenantId={Number(tenantId)}
-        isSiteUser={true}
-        appTypes={appTypes}
-        isPeerSupervisor={true} // Add this prop to UserForm to handle peer supervisor specific fields
-      />
+  /**
+   * Icon Handler for edit, password reset and delete
+   * Don't show icons if user has admin roles in it
+   * Don't show icon for logged in user
+   */
+  const handleIconHandler = (rowData: { roles: Array<{ suiteAccessName: string }>; username: string }) => {
+    const isAdminUser = rowData?.roles.some(
+      (r: { suiteAccessName: string }) => r.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.admin
     );
-  };
-
-  // Handler for reassign button click
-  const handleReassignClick = (userData: any) => {
-    setIsOpenCHWListModal({
-      isOpen: true,
-      userData
-    });
-  };
-
-  // Handler for CHW list modal cancel
-  const handleCHWListModalCancel = () => {
-    setIsOpenCHWListModal({
-      isOpen: false
-    });
-  };
-
-  const handleReassignSubmit = (formData: any) => {
-    /**
-     * Transforms form data into the required API payload format
-     * @param formData - Object containing peer supervisor assignments
-     * @returns Formatted payload for the API
-     */
-    const constructReassignPayload = () => {
-      // Extract assignments from form data
-      const reassignUserList = Object.keys(formData)
-        .filter((key) => key.startsWith('peersupervisor-'))
-        .map((key) => {
-          const chwId = key.split('peersupervisor-')[1]; // Extract CHW ID from field name
-          const peerSupervisor = formData[key]; // Get selected peer supervisor data
-
-          return {
-            chwId: Number(chwId),
-            peerSupervisorId: peerSupervisor.id
-          };
-        });
-
-      return {
-        reassignUserList,
-        deactivateUserId: openConfirmationModal.userData.id
-      };
-    };
-    // Construct and validate payload
-    const payload = constructReassignPayload();
-    // Validate if we have any assignments
-    if (!payload.reassignUserList.length || chwList.length !== payload.reassignUserList.length) {
-      toastCenter.error(APPCONSTANTS.ERROR, 'Please select peer supervisors for All CHWs');
-      return;
-    }
-    // Dispatch reassign action
-    dispatch(
-      reassignCHWRequest(
-        payload,
-        () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, 'CHWs Reassigned successfully');
-          setOpenConfirmationModal({ isOpen: false, userData: {} });
-          setIsOpenCHWListModal({ isOpen: false });
-          handlePeerSupervisorModalCancel();
-          setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
-          refreshHFUserList();
-        },
-        (error) => {
-          toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, 'Failed to reassign CHWs'));
-        }
-      )
-    );
+    return isAdminUser || rowData.username === email;
   };
 
   return (
@@ -963,7 +755,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Role',
               isFacility: false,
               isSearchable: false,
-              data: [...(allRoles || [])],
+              data: [...(spiceUserRole || []), ...(roleCFRList || []), ...(roleInsightsList || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }
@@ -989,13 +781,10 @@ const UserList = (): React.ReactElement => {
             customIconStyle={{ width: 18 }}
             isActiveToggle={true}
             actionFormatter={{
-              hideEditIcon: (rowData: any) => rowData.username === email || !rowData.active,
-              hideDeleteIcon: (rowData: any) => rowData.username === email || !rowData.active,
-              hideCustomIcon: (rowData: any) => rowData.username === email || !rowData.active,
-              hideActiveToggle: (rowData: any) => rowData.username === email
+              hideEditIcon: (rowData: any) => handleIconHandler(rowData),
+              hideDeleteIcon: (rowData: any) => handleIconHandler(rowData),
+              hideCustomIcon: (rowData: any) => handleIconHandler(rowData)
             }}
-            onActivateClick={(rowData: any) => handleActivateToggle(rowData)}
-            handleCustomIconClicked={handleReassignSubmit}
           />
         </DetailCard>
         <ModalForm

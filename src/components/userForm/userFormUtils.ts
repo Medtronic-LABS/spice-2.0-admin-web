@@ -3,6 +3,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import { villageBasedRoles } from '../../constants/roleConstants';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
+import { removeRedRiskFromRoleArray } from '../../utils/commonUtils';
 
 export const filterRolesByAppTypeFn = (fullRoles: IGroupRoles, appTypes: string[] = []) => {
   const filteredRoles: any = {};
@@ -74,8 +75,9 @@ const useUserFormUtils = () => {
     );
 
   const formUserData = (values: any) => {
+    const rolesWithoutRedRisk = removeRedRiskFromRoleArray(values?.roles || []);
     const allSuiteAccess =
-      (values?.roles || []).map((r: IRoles) => ({
+      rolesWithoutRedRisk.map((r: IRoles) => ({
         groupName: r.groupName,
         id: r.groupName
       })) || [];

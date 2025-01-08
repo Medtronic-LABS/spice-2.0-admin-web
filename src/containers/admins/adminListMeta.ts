@@ -18,7 +18,10 @@ export const formatName = (user: IHFUserGet): string => `${user.firstName} ${use
  * @returns {string} A comma-separated list of the user's role display names.
  */
 export const formatRoles = (user: IHFUserGet): string =>
-  `${(user.roles || []).map((userRole: IUserRole) => userRole.displayName).join(', ')}`;
+  `${(user.roles || [])
+    .filter((filteredUserRole: IUserRole) => filteredUserRole.name !== NAMING_VARIABLES.redRisk)
+    .map((userRole: IUserRole) => userRole.displayName)
+    .join(', ')}`;
 
 /**
  * Formats the organization names for a given user and role.

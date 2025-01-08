@@ -202,7 +202,7 @@ export function validateMobile(mobileNo: string, isSl: boolean): string {
     return '';
   }
 
-  if (isSl) {
+  if (typeof isSl === 'boolean' && isSl) {
     // For SL:
     // Check if the number starts with zero
     if (mobileNo.startsWith('0')) {

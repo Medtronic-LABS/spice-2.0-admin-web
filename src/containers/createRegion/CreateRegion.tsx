@@ -112,12 +112,12 @@ const CreateRegion: React.FC = () => {
                 <div className='col-lg-6 col-12'>
                   <FormContainer label='Region Admin' icon={RegionAdminFormIcon}>
                     <UserForm
-                      isRegionCreate={true}
                       isAdminForm={true}
                       form={form}
                       defaultSelectedRole={APPCONSTANTS.ROLES.REGION_ADMIN}
                       enableAutoPopulate={true}
                       appTypes={appTypes}
+                      userFormParams={{ isRegionCreate: true }}
                     />
                   </FormContainer>
                 </div>

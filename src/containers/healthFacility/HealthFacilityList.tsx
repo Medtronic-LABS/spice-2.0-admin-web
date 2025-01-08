@@ -14,6 +14,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
 import {
+  clearHFList,
   clearHFWorkflowList,
   fetchHFListRequest,
   fetchHFSummaryRequest,
@@ -170,6 +171,13 @@ const HealthFacilityList = (): React.ReactElement => {
     fetchList({ ...filters });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchList, filters.districtIds, filters.chiefdomIds, filters.healthFacilityTypes, listParams]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearHFList());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Handles request failures

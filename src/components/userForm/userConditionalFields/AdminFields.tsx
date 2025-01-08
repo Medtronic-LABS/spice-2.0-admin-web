@@ -36,7 +36,7 @@ export const SiteUserForm = (props: any) => {
     isHFCreate,
     isEdit,
     isProfile,
-    isCHW
+    reportUserOnlyInAdminList // cfr user only from admin list
   } = props;
   const { form, formName } = formDetails;
   const isHFSelected =
@@ -144,7 +144,7 @@ export const SiteUserForm = (props: any) => {
                 options={districtDetails.list}
                 loadingOptions={districtDetails.loading}
                 error={isError(meta)}
-                disabled={isEdit} // disable when admin edit
+                disabled={isEdit && !reportUserOnlyInAdminList} // disable when admin edit
                 isModel={true}
                 onChange={(value: any) => {
                   form.change(`${formName}[0].chiefdom`, undefined);
@@ -173,7 +173,7 @@ export const SiteUserForm = (props: any) => {
                 loadingOptions={chiefdomDetails.loading}
                 error={isError(meta)}
                 isModel={true}
-                disabled={isEdit} // disable when admin edit
+                disabled={isEdit && !reportUserOnlyInAdminList} // disable when admin edit
                 onChange={(value: any) => {
                   form.change(`${formName}[0].healthfacility`, undefined);
                   input.onChange(value);
@@ -196,7 +196,7 @@ export const SiteUserForm = (props: any) => {
                 errorLabel='assigned health facility'
                 labelKey='name'
                 valueKey='id'
-                disabled={isProfile}
+                disabled={isProfile && !reportUserOnlyInAdminList}
                 options={healthFacilityList}
                 loadingOptions={hfLoading}
                 error={isError(meta)}

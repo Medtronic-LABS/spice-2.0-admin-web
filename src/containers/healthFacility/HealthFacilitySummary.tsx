@@ -540,7 +540,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
         initialEditValue={hfUserForEdit.current.users[0]}
         disableOptions={true}
         isEdit={isHFUserEdit}
-        isHF={true}
         entityName='healthFacility'
         isSiteUser={true}
         enableAutoPopulate={true}
@@ -548,6 +547,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         parentOrgId={healthFacility?.chiefdom?.tenantId}
         ignoreTenantId={tenantId}
         appTypes={appTypes}
+        userFormParams={{ isHF: true }}
       />
     );
   };

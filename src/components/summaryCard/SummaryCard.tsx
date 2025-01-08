@@ -7,6 +7,7 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 import { convertToCaptilize } from '../../utils/validation';
 
 import styles from './SummaryCard.module.scss';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 export type IAppType = keyof typeof APP_TYPE;
 export interface ISummaryInfo {
@@ -78,6 +79,8 @@ const SummaryCard = ({
     history.push({ pathname: detailRoute });
   };
 
+  const { isCommunity } = useAppTypeConfigs();
+
   return (
     <div
       className={`${styles.summaryCard} px-1dot25 d-flex mw-0 \
@@ -107,7 +110,7 @@ const SummaryCard = ({
         </div>
       )}
       {data.map(({ label, value, route, disableEllipsis, onClick, appType }, i) =>
-        appType?.includes(APP_TYPE.NON_COMMUNITY as unknown as IAppType) || label === healthFacilitySName ? (
+        appType?.includes(APP_TYPE.NON_COMMUNITY as IAppType) || label === healthFacilitySName || !isCommunity ? (
           <Link
             className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
             key={`${label}_${i}`}

@@ -232,9 +232,6 @@ const APPCONSTANTS = {
     community: 'COMMUNITY',
     non_community: 'NON_COMMUNITY'
   },
-  filterSpiceCommonRoles: ['cfr_quicksight_admin'],
-  filterSpiceAdminRoles: ['cfr_admin'],
-  filterSpiceUserRoles: ['cfr_user'],
   // USER
   CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
   CHP_USER_EXCEPTION_HF_CREATE: 'CHP/CHW user should not be created in Health facility create',

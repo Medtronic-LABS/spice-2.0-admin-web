@@ -108,10 +108,7 @@ const UserForm = ({
   form,
   initialEditValue,
   disableOptions = false,
-  isProfile = false,
   isEdit,
-  isHF = false,
-  isHFCreate = false,
   entityName,
   enableAutoPopulate,
   countryId,
@@ -125,14 +122,22 @@ const UserForm = ({
   roleOptionsState,
   isSiteUser = false,
   isAdminForm = false,
-  isFromAdminList = false,
   defaultSelectedRole,
-  isRegionCreate = false,
   parentOrgId,
   ignoreTenantId,
-  isPeerSupervisor = false,
-  isCHW = false
+  userFormParams = {}
 }: IUserFormProps): React.ReactElement => {
+  const {
+    isRegionCreate = false,
+    isHF = false,
+    isHFCreate = false,
+    isProfile = false,
+    isFromAdminList = false,
+    isChiefdom = false,
+    isCreateChiefdom = false,
+    isCreateDistrict = false,
+    reportUserOnlyInAdminList = false // cfr user only from admin list
+  } = userFormParams;
   const idRefs = useRef([new Date().getTime()]);
   const { pathname } = useLocation();
   const formName = 'users';
@@ -310,13 +315,7 @@ const UserForm = ({
   }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
 
   useEffect(() => {
-    // isCommunity - always true for isCommunity
-    // isFromAdminList - always true while creating admin
-    // isHF - always true for hf summary page
-
-    // isHFCreate - don't call for hf create
-    // countryId - always check countryId
-    if ((isCommunity || isFromAdminList || isHF) && !isHFCreate && countryId) {
+    if (countryId && !isRegionCreate && !isHF && !isCreateDistrict && !isCreateChiefdom && !isChiefdom) {
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -367,11 +366,11 @@ const UserForm = ({
   );
 
   useEffect(() => {
-    if (!isHF && isEdit && !isSiteUser) {
+    if (!isHF && isEdit && !isSiteUser && !reportUserOnlyInAdminList) {
       const [selectedAdminRole] = initialEditData?.[0]?.role || [];
       setSelectedAdmins(selectedAdminRole?.name);
     }
-  }, [initialEditData, isHF, isEdit, isSiteUser]);
+  }, [initialEditData, isHF, isEdit, isSiteUser, reportUserOnlyInAdminList]);
 
   /**
    * Resets the admin form fields to their initial state.
@@ -947,6 +946,7 @@ const UserForm = ({
     showSpiceHFListState: showSpiceHFRef.current,
     showReportHFListState: showReportHFRef.current,
     showInsightHFListState: showInsightHFRef.current,
+    isRegionCreate,
     onRoleChange: ({
       disabledRoles: disabledRolesFromHook,
       showSpiceHFList,
@@ -1238,7 +1238,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             isModel={true}
-                            disabled={(isAdminForm && defaultSelectedRole) || isEdit}
+                            disabled={(isAdminForm && defaultSelectedRole) || (isEdit && !reportUserOnlyInAdminList)}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
@@ -1269,6 +1269,7 @@ const UserForm = ({
                                 index,
                                 appTypeBasedRoles
                               });
+                              getRoleOptions(index, currentAllRoles);
                               // clear designation whenever role gets update
                               form.change(`${formName}[${index}].designation`, null);
                             }}
@@ -1584,7 +1585,7 @@ const UserForm = ({
                   (isEdit
                     ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
                       (!isCommunity && isSiteUser)
-                    : showSpiceHFRef.current[index] && !isEdit) && (
+                    : showSpiceHFRef.current[index] && (!isEdit || reportUserOnlyInAdminList)) && (
                     <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                       <Field
                         name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1751,6 +1752,7 @@ const UserForm = ({
                   isHFAdminSelected={isHFAdminSelected}
                   isHFCreate={isHFCreate}
                   isEdit={isEdit}
+                  reportUserOnlyInAdminList={reportUserOnlyInAdminList}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>

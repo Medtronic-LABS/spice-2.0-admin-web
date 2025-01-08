@@ -168,7 +168,14 @@ export const getAdminPayload = ({
       countryCode: user?.countryCode?.phoneNumberCode || user?.countryCode,
       roleIds: [...new Set(roleIds)],
       timezone: user?.timezone?.id ? user?.timezone : null,
-      designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null
+      designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null,
+      reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization) ? user.reportUserOrganization : []).map(
+        ({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId
+      ),
+      insightUserOrganizationIds: (Array.isArray(user?.insightUserOrganization)
+        ? user.insightUserOrganization
+        : []
+      ).map(({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId)
     };
 
     const hasRole = (roleName: string) => user?.roles?.some((role: { name: string }) => role.name === roleName);
