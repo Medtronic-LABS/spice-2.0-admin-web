@@ -301,13 +301,13 @@ const UserForm = ({
   }, [countryId, dispatch, role, tenantId, isCommunity]);
 
   useEffect(() => {
-    if (!showFilters && countryId) {
+    if (countryId) {
       setNewHFList(healthFacilityList);
     }
   }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
 
   useEffect(() => {
-    if ((isCommunity || !isHFCreate) && (isFromAdminList || (!showFilters && countryId))) {
+    if ((isCommunity || !isHFCreate) && (isFromAdminList || countryId)) {
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -12,6 +12,7 @@ interface IRoleOptions {
   isAdminForm?: boolean;
   isSiteUser: boolean;
   appTypes?: string[];
+  forFilter?: boolean;
   allRoles: { [key: string]: IRoles[] };
   currentModule: string;
   roleOptionsFn: (data: {
@@ -27,6 +28,7 @@ export const useRoleOptions = ({
   isHFCreate,
   isSiteUser,
   allRoles,
+  forFilter = false,
   currentModule,
   roleOptionsFn
 }: IRoleOptions): {
@@ -60,7 +62,7 @@ export const useRoleOptions = ({
           .filter((role: IRoles) => {
             // HF4User should be visible only when Peer Supervisor is selected
             const isPeerSupervisor = (selectedRoles || []).some((newRole: IRoles) => newRole.name === peerSupervisor);
-            if (isPeerSupervisor && role.name === hf4ReportUser) {
+            if ((isPeerSupervisor && role.name === hf4ReportUser) || forFilter) {
               return true;
             } else if (role.name === hf4ReportUser) {
               return false;
@@ -79,7 +81,18 @@ export const useRoleOptions = ({
         (newRoles.INSIGHTS || []).sort((a: any, b: any) => (a.displayName > b.displayName ? 1 : -1)) || [];
       roleOptionsFn({ spiceRoleOptions: SPICERoles, reportRoleOptions, insightRoleOptions });
     },
-    [allRoles, appTypes, currentModule, isCommunity, isHF, isHFCreate, isSiteUser, regionSname, roleOptionsFn]
+    [
+      allRoles,
+      appTypes,
+      currentModule,
+      forFilter,
+      isCommunity,
+      isHF,
+      isHFCreate,
+      isSiteUser,
+      regionSname,
+      roleOptionsFn
+    ]
   );
 
   return {

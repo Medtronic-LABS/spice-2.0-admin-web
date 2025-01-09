@@ -51,9 +51,17 @@
   max-height: 250px;
   overflow-y: auto;
 }
+.selectAllLi {
+  justify-content: space-between;
+  align-items: center;
+}
 
 .selectOption {
   label {
+    cursor: pointer;
+  }
+  .closeIcon {
+    margin: 0.5rem;
     cursor: pointer;
   }
 }

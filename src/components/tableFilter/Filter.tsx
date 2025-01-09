@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ReactComponent as FilterListIcon } from '../../assets/images/filter-icon.svg';
+import { ReactComponent as Close } from '../../assets/images/close.svg';
 import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -106,9 +107,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
         if (isAllSelected.current) {
           setSelectedRole([]);
         } else {
-          setSelectedRole(() => {
-            return filteredOptions.map((opt) => opt.name);
-          });
+          setSelectedRole(() => filteredOptions.map((opt) => opt.name));
         }
       } else {
         setSelectedRole((prev: string[]) => {
@@ -223,10 +222,11 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   /**
    * Filters options based on the search term.
    */
-  const filteredOptions = filterData?.data.filter((option) => {
-    return option?.name?.toLowerCase().includes(searchTerm?.toLowerCase());
-  });
-
+  const filteredOptions = filterData?.data
+    .filter((option) => {
+      return option?.name?.toLowerCase().includes(searchTerm?.toLowerCase());
+    })
+    .sort((a: any, b: any) => (a.name.trim() > b.name.trim() ? 1 : -1));
   /**
    * Formats health facility data into a string.
    * @param {IHFUserGet} user - The health facility user data.
@@ -275,9 +275,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                     filteredOptions.length ? (
                       <li
                         key={option.id}
-                        className={`${styles.selectOption} px-1 py-0dot5 ${
-                          selectedOptions.includes(option.name) && styles.selectedDropdown
-                        }`}
+                        className={`${styles.selectOption} ${
+                          option.value === '*' ? styles.selectAllLi : ''
+                        } px-1 py-0dot5 d-flex ${selectedOptions.includes(option.name) && styles.selectedDropdown}`}
                       >
                         <label className='d-flex align-items-center fs-6'>
                           <input
@@ -298,6 +298,17 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                           {(!isFacility ? option.displayName : option.name) || option.name}{' '}
                           {formatHealthFacility(option)}
                         </label>
+                        {option.value === '*' && !!selectedOptions.length && (
+                          <span
+                            className={` ${styles.closeIcon}`}
+                            onClick={() => {
+                              isAllSelected.current = true;
+                              handleSelectChange(selectAllOptionData as any);
+                            }}
+                          >
+                            <Close aria-label='close' />
+                          </span>
+                        )}
                       </li>
                     ) : (
                       <li>No results found</li>
