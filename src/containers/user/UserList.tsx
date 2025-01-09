@@ -648,6 +648,7 @@ const UserList = (): React.ReactElement => {
     isHFCreate: false,
     isEdit: false,
     isSiteUser: true,
+    forFilter: true,
     appTypes,
     allRoles: rolesGrouped,
     currentModule,

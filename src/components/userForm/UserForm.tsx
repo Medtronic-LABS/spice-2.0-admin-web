@@ -321,6 +321,11 @@ const UserForm = ({
 
   useEffect(() => {
     if (countryId && !isRegionCreate && !isCreateDistrict && !isCreateChiefdom && !isChiefdom && !isHFCreate) {
+      // af
+      getHFListFn();
+    }
+    if ((isCommunity || !isHFCreate) && (isFromAdminList || countryId)) {
+      // sl
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
