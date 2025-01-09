@@ -269,9 +269,25 @@ const UserList = (): React.ReactElement => {
    * @param {any} form - The form API instance used to manage the form's state and submissions.
    */
   const userFormRenderer = (form?: FormApi<any>) => {
-    const isOnlyReportUser =
-      userForEdit.current.users[0]?.roles.length === 1 &&
-      userForEdit.current.users[0]?.roles[0].suiteAccessName === APPCONSTANTS.SUITE_ACCESS.CFR;
+    /*
+     * Find if the user is only have report or insights or both access
+     * used to enable spice role for edit
+     * This is temporary solution, until reports and insights have dedicated menu
+     */
+    const userSuiteNames = userForEdit.current.users[0]?.roles.map(
+      (role: { suiteAccessName: string }) => role.suiteAccessName
+    );
+    const isReportOrInsightUser = userSuiteNames.includes(APPCONSTANTS.SUITE_ACCESS.ADMIN) ? false : true;
+    /*
+     * Find if the user is report super admin to
+     * disable reports role to prevent further edit
+     * This is temporary solution, until reports and insights have dedicated screen
+     */
+    const isReportSuperAdmin = userForEdit.current.users[0]?.roles.some(
+      (role: { name: string; suiteAccessName: string }) =>
+        role.name === APPCONSTANTS.ALL_ROLES.REPORT_SUPER_ADMIN &&
+        role.suiteAccessName === APPCONSTANTS.SUITE_ACCESS.CFR
+    );
     return (
       <UserForm
         form={form as FormApi<any>}
@@ -282,7 +298,11 @@ const UserList = (): React.ReactElement => {
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
         isSiteUser={false}
-        userFormParams={{ isFromAdminList: true, reportUserOnlyInAdminList: isOnlyReportUser }}
+        userFormParams={{
+          isFromAdminList: true,
+          isReportOrInsightUser,
+          isReportSuperAdmin
+        }}
       />
     );
   };

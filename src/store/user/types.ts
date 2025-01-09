@@ -50,7 +50,8 @@ export interface IUserFormProps {
     isChiefdom?: boolean;
     isCreateChiefdom?: boolean;
     isCreateDistrict?: boolean;
-    reportUserOnlyInAdminList?: boolean;
+    isReportOrInsightUser?: boolean;
+    isReportSuperAdmin?: boolean;
   };
 }
 

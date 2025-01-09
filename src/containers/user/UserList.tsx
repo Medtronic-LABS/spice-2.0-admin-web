@@ -444,6 +444,15 @@ const UserList = (): React.ReactElement => {
    * @param {any} form - The form API instance used to manage the form's state and submissions.
    */
   const userFormRenderer = (form?: FormApi<any>) => {
+    /*
+     * Find if the user is report super admin to
+     * disable reports role to prevent further edit
+     * This is temporary solution, until reports and insights have dedicated screen
+     */
+    const isReportSuperAdmin = userForEdit.current.users[0]?.roles.some(
+      (r: { name: string; suiteAccessName: string }) =>
+        r.name === APPCONSTANTS.ALL_ROLES.REPORT_SUPER_ADMIN && r.suiteAccessName === APPCONSTANTS.SUITE_ACCESS.CFR
+    );
     return (
       <UserForm
         form={form as FormApi<any>}
@@ -455,11 +464,9 @@ const UserList = (): React.ReactElement => {
         hfTenantId={Number(tenantId)}
         isSiteUser={true}
         appTypes={appTypes}
-        isCHW={
-          (openConfirmationModal?.userData?.roles?.some((chwRole: { name: string }) => chwRole?.name === 'CHW') &&
-            !openConfirmationModal?.userData?.active) ||
-          false
-        }
+        userFormParams={{
+          isReportSuperAdmin
+        }}
       />
     );
   };

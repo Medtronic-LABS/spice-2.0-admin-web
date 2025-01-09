@@ -136,7 +136,8 @@ const UserForm = ({
     isChiefdom = false,
     isCreateChiefdom = false,
     isCreateDistrict = false,
-    reportUserOnlyInAdminList = false // cfr user only from admin list
+    isReportOrInsightUser = false, // cfr or insights user only from admin list
+    isReportSuperAdmin = false
   } = userFormParams;
   const idRefs = useRef([new Date().getTime()]);
   const { pathname } = useLocation();
@@ -366,11 +367,11 @@ const UserForm = ({
   );
 
   useEffect(() => {
-    if (!isHF && isEdit && !isSiteUser && !reportUserOnlyInAdminList) {
+    if (!isHF && isEdit && !isSiteUser && !isReportOrInsightUser) {
       const [selectedAdminRole] = initialEditData?.[0]?.role || [];
       setSelectedAdmins(selectedAdminRole?.name);
     }
-  }, [initialEditData, isHF, isEdit, isSiteUser, reportUserOnlyInAdminList]);
+  }, [initialEditData, isHF, isEdit, isSiteUser, isReportOrInsightUser]);
 
   /**
    * Resets the admin form fields to their initial state.
@@ -1238,7 +1239,7 @@ const UserForm = ({
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             isModel={true}
-                            disabled={(isAdminForm && defaultSelectedRole) || (isEdit && !reportUserOnlyInAdminList)}
+                            disabled={(isAdminForm && defaultSelectedRole) || (isEdit && !isReportOrInsightUser)}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
@@ -1346,7 +1347,7 @@ const UserForm = ({
                             isSelectAll={true}
                             selectAll={false}
                             menuPlacement={'bottom'}
-                            isDisabled={isProfile}
+                            isDisabled={isProfile || isReportSuperAdmin}
                             placeholder=''
                             isModel={true}
                             isMulti={true}
@@ -1585,7 +1586,7 @@ const UserForm = ({
                   (isEdit
                     ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
                       (!isCommunity && isSiteUser)
-                    : showSpiceHFRef.current[index] && (!isEdit || reportUserOnlyInAdminList)) && (
+                    : showSpiceHFRef.current[index] && (!isEdit || isReportOrInsightUser)) && (
                     <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                       <Field
                         name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1752,7 +1753,7 @@ const UserForm = ({
                   isHFAdminSelected={isHFAdminSelected}
                   isHFCreate={isHFCreate}
                   isEdit={isEdit}
-                  reportUserOnlyInAdminList={reportUserOnlyInAdminList}
+                  reportUserOnlyInAdminList={isReportOrInsightUser}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>
