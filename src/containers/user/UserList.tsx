@@ -153,6 +153,7 @@ const UserList = (): React.ReactElement => {
     syncDate?: string | null;
   }>({ isOpen: false, userData: {} });
   const {
+    isCommunity,
     appTypes,
     userList: {
       filters: { available: showFilters }
@@ -721,9 +722,11 @@ const UserList = (): React.ReactElement => {
    * Don't show icon for logged in user
    */
   const handleIconHandler = (rowData: { roles: Array<{ suiteAccessName: string }>; username: string }) => {
-    const isAdminUser = rowData?.roles.some(
-      (r: { suiteAccessName: string }) => r.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.admin
-    );
+    const isAdminUser =
+      !isCommunity &&
+      rowData?.roles.some(
+        (r: { suiteAccessName: string }) => r.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.admin
+      );
     return isAdminUser || rowData.username === email;
   };
 

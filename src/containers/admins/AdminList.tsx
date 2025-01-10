@@ -63,6 +63,7 @@ const UserList = (): React.ReactElement => {
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const {
+    isCommunity,
     appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
@@ -277,7 +278,7 @@ const UserList = (): React.ReactElement => {
     const userSuiteNames = userForEdit.current.users[0]?.roles.map(
       (role: { suiteAccessName: string }) => role.suiteAccessName
     );
-    const isReportOrInsightUser = userSuiteNames.includes(APPCONSTANTS.SUITE_ACCESS.ADMIN) ? false : true;
+    const isReportOrInsightUser = userSuiteNames?.includes(APPCONSTANTS.SUITE_ACCESS.ADMIN) ? false : true;
     /*
      * Find if the user is report super admin to
      * disable reports role to prevent further edit
@@ -374,11 +375,13 @@ const UserList = (): React.ReactElement => {
     roles: Array<{ suiteAccessName: string; displayName: string; name: string }>;
     username: string;
   }) => {
-    const isMobUser = rowData?.roles.some(
-      (role: { suiteAccessName: string; displayName: string; name: string }) =>
-        role.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob &&
-        (role.displayName !== null || role.name !== redRisk)
-    );
+    const isMobUser =
+      !isCommunity &&
+      rowData?.roles.some(
+        (role: { suiteAccessName: string; displayName: string; name: string }) =>
+          role.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob &&
+          (role.displayName !== null || role.name !== redRisk)
+      );
     return isMobUser || rowData.username === email;
   };
 

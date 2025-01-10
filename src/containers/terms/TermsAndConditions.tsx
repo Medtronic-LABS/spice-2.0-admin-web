@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   countryIdSelector,
+  getUserSuiteAccessSelector,
   isTACLoadingSelector,
   roleSelector,
   termsAndConditionsSelector,
@@ -35,6 +36,7 @@ const TermsAndConditions = () => {
   const regiontLoading = useSelector(getLoadingSelector);
   const ouLoading = useSelector(chiefdomDropdownLoadingSelector);
   const siteLoading = useSelector(healthFacilityLoadingSelector);
+  const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
   const { formInput: tacData, countryId: termsCountryId } = termsAndConditionsData as ITermsAndConditions;
 
   const getTACDismissed = useCallback(() => {
@@ -64,7 +66,8 @@ const TermsAndConditions = () => {
   useEffect(() => {
     if (
       ((!termsAndConditionsData?.formInput && countryId?.id) || countryId?.id !== termsCountryId || !termsCountryId) &&
-      showTACCondition
+      showTACCondition &&
+      userSuiteAccess.includes(APPCONSTANTS.SUITE_ACCESS.ADMIN)
     ) {
       dispatch(
         fetchTermsAndConditionsRequest({
