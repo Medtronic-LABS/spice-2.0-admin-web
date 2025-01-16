@@ -597,7 +597,7 @@ const UserList = (): React.ReactElement => {
   const { pathname } = useLocation();
   const currentModule: ModuleNames = pathname.split('/')[1];
 
-  const allRoles = useRef([] as IRoles[]);
+  const [allRoles, setAllRoles] = useState([] as IRoles[]);
   /**
    * Memoized value to filter REPORTS user roles based on certain conditions for filter dropdown
    */
@@ -632,15 +632,19 @@ const UserList = (): React.ReactElement => {
     allRoles: rolesGrouped,
     currentModule,
     roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
-      allRoles.current = [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
-        a.displayName > b.displayName ? 1 : -1
+      setAllRoles(
+        [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
+          a.displayName > b.displayName ? 1 : -1
+        )
       );
     }
   });
 
   useEffect(() => {
-    getRoleOptions();
-  }, [getRoleOptions]);
+    if (!allRoles.length) {
+      getRoleOptions();
+    }
+  }, [getRoleOptions, allRoles]);
 
   return (
     <>
@@ -678,7 +682,7 @@ const UserList = (): React.ReactElement => {
               isFacility: false,
               isSearchable: false,
               data: [...(spiceUserRole || []), ...(roleCFRList || []), ...(roleInsightsList || [])],
-              data: [...(allRoles.current || [])],
+              data: [...(allRoles || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }
