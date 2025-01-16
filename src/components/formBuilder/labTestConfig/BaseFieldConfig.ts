@@ -61,14 +61,14 @@ export const baseFieldMeta: IBaseFieldMeta = {
   },
   code: {
     order: 1.4,
-    label: 'Code',
+    label: 'SNOMED Code',
     type: 'text',
     required: false,
     component: 'TEXT_FIELD'
   },
   url: {
     order: 1.5,
-    label: 'URL',
+    label: 'SNOMED URL',
     type: 'text',
     required: false,
     component: 'TEXT_FIELD'

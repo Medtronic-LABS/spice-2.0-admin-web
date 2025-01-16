@@ -569,6 +569,7 @@ const HealthFacilityDetailsForm = ({
                   {...input}
                   label='Facility ID'
                   errorLabel='facility id'
+                  disabled={isEdit}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}

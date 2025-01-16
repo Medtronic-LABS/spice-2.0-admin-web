@@ -114,13 +114,13 @@ const HealthFacilitySummary = (): React.ReactElement => {
         label: supervisorLabel,
         value: healthFacility?.peerSupervisors,
         subKey: 'name',
-        style: { col: 'col-12', subCol: 'col-3' }
+        style: { col: 'col-12', subCol: 'col-3 pe-1dot25' }
       },
       {
         label: 'Linked Villages',
         value: healthFacility?.linkedVillages,
         subKey: 'name',
-        style: { col: 'col-12', subCol: 'col-3' }
+        style: { col: 'col-12', subCol: 'col-3 pe-1dot25' }
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -605,7 +605,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
             header='Users'
             isSearch={true}
             onSearch={handleSearch}
-            searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
+            searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL_PHONE}
             onButtonClick={handleAddUserClick}
           >
             <CustomTable
