@@ -17,6 +17,7 @@ import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chief
 import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
 import { districtLoadingSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
+  clearAssignedHFListForHFAdmin,
   clearHFList,
   clearSupervisorList,
   clearVillageHFList,
@@ -26,6 +27,7 @@ import {
   fetchVillagesListUserLinked
 } from '../../store/healthFacility/actions';
 import {
+  assignedHFListForHFAdminSelector,
   countryListSelector,
   countryLoadingSelector,
   healthFacilityListSelector,
@@ -121,7 +123,6 @@ const UserForm = ({
   disabledRolesState,
   roleOptionsState,
   isSiteUser = false,
-  isAdminForm = false,
   defaultSelectedRole,
   parentOrgId,
   ignoreTenantId,
@@ -137,7 +138,8 @@ const UserForm = ({
     isCreateChiefdom = false,
     isCreateDistrict = false,
     isReportOrInsightUser = false, // cfr or insights user only from admin list
-    isReportSuperAdmin = false
+    isReportSuperAdmin = false,
+    isAdminForm = false
   } = userFormParams;
   const idRefs = useRef([new Date().getTime()]);
   const { pathname } = useLocation();
@@ -166,6 +168,7 @@ const UserForm = ({
   const { DISTRICT_ADMIN, HEALTH_FACILITY_ADMIN, CHIEFDOM_ADMIN } = APPCONSTANTS.ROLES;
   const isRolesLoading = useSelector(isUserRolesLoading);
   const healthFacilityList = useSelector(healthFacilityListSelector);
+  const assignedHFListHFAdmin = useSelector(assignedHFListForHFAdminSelector);
   const hfLoading = useSelector(healthFacilityLoadingSelector);
   const peerSupervisorList = useSelector(peerSupervisorListSelector);
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
@@ -205,6 +208,7 @@ const UserForm = ({
       community: { available: isCommunityListShow }
     },
     district: { s: districtSName },
+    healthFacility: { s: healthfacilitySName },
     isCommunity
   } = useAppTypeConfigs();
 
@@ -425,6 +429,7 @@ const UserForm = ({
       dispatch(clearChiefdomList());
       dispatch(clearDistrictList());
       dispatch(clearDesignationList());
+      dispatch(clearAssignedHFListForHFAdmin());
       if (!isHFCreate) {
         // clear hf only for add users, not create hf
         // while creating hf, hf list for reports will be based on selected chiefdom
@@ -744,7 +749,8 @@ const UserForm = ({
             skip: 0,
             limit: null,
             tenantIds: values.tenantIds,
-            userBased: !isSuperUserOrSuperAdmin
+            userBased: !isSuperUserOrSuperAdmin,
+            forHFAdmin: true
           })
         );
       }
@@ -887,12 +893,12 @@ const UserForm = ({
     const selectedChiefdomData = form.getState().values.users?.[0]?.chiefdom; // for add
     const [existingDistrict] = initialEditData; // for edit
     const existingchiefdomDataId = existingDistrict?.organizations?.filter(
-      (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.district
+      (formData: { formName: string }) => formData.formName === NAMING_VARIABLES.chiefdom
     );
     const chiefdomDetails = selectedChiefdomData ?? existingchiefdomDataId?.[0];
     const chiefdomId =
       role === CHIEFDOM_ADMIN ? hfTenantId : selectedChiefdomData?.tenantId ?? existingchiefdomDataId?.[0]?.id;
-    if (chiefdomId) {
+    if (chiefdomId && !isSiteUser) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [chiefdomId] });
     } else if (!isSiteUser && healthFacilityList.length === 0 && fetchingFor === ADMIN_BASED_ON_URL.chiefdom) {
       chiefdomBasedHfList({ ...chiefdomDetails, tenantIds: [hfTenantId] });
@@ -1031,101 +1037,97 @@ const UserForm = ({
               <div className='row gx-1dot25'>
                 <Field name={`${name}.id`} render={() => null} />{' '}
                 {/** A hidden field to store user id if user is auto populated */}
-                {!isPeerSupervisor && (
-                  <div className='col-sm-12 col-12'>
-                    <Field
-                      name={`${name}.suiteAccess`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
-                        <MultiSelect
-                          {...(input as any)}
-                          label='SPICE Suite Access'
-                          errorLabel='suite access'
-                          labelKey='groupName'
-                          valueKey='groupName'
-                          options={suiteAccess || []}
-                          placeholder=''
-                          disabled={isProfile || isCHW}
-                          isDisabled={isProfile || isCHW}
-                          loadingOptions={isRolesLoading}
-                          isShowLabel={true}
-                          error={isError(meta)}
-                          isMulti={true}
-                          isModel={true}
-                          required={true}
-                          isClearable={false}
-                          mandatoryOptions={
-                            isAdminForm
-                              ? isEdit
-                                ? mandatorySuiteAccess
-                                : [getSpiceGroupName(suiteAccess)]
-                              : mandatorySuiteAccess || ''
-                          }
-                          onChange={(values: any[]) => {
-                            const suiteOrder: { [key: string]: number } = {
-                              SPICE: 1,
-                              REPORTS: 2,
-                              INSIGHTS: 3
-                            };
-                            const sortedSuites = values.sort(
-                              (a, b) => suiteOrder[a.groupName] - suiteOrder[b.groupName]
-                            );
-                            const selectedGroupNames: string[] =
-                              sortedSuites.map((option: any) => option.groupName) || [];
-                            let newAllRoles: IRoles[] = [];
-                            const suiteFormName = {
-                              SPICE: {
-                                role: `${formName}[${index}].role`,
-                                hfList: `${formName}[${index}].healthfaciliity`
-                              },
-                              REPORTS: {
-                                role: `${formName}[${index}].reportRoles`,
-                                hfList: `${formName}[${index}].reportUserOrganization`
-                              },
-                              INSIGHTS: {
-                                role: `${formName}[${index}].insightRoles`,
-                                hfList: `${formName}[${index}].insightUserOrganization`
-                              }
-                            };
-                            const removeHF4User = (completeRoles: IRoles[]) =>
-                              completeRoles.filter((newRoles: IRoles) => newRoles.name !== hf4ReportUser);
-                            let selectedAllRoles = [...allRoles];
-                            Object.keys(suiteFormName).forEach((r: string) => {
-                              if (selectedGroupNames.includes(r)) {
-                                newAllRoles = [
-                                  ...newAllRoles,
-                                  ...selectedAllRoles.filter((v: IRoles) => v.groupName === r)
-                                ];
-                              } else {
-                                form.change((suiteFormName as any)[r].role, []);
-                                form.change((suiteFormName as any)[r].hfList, []);
-                                if (r === SPICE) {
-                                  form.change(`${formName}[${index}].designation`, null);
-                                  // to remove HF4User while removing the SPICE suite
-                                  const selectedReportRoles = form.getState().values[formName][index].reportRoles || [];
-                                  const isHF4Selected = selectedReportRoles.some(
-                                    (newRoles: IRoles) => newRoles.name === hf4ReportUser
-                                  );
-                                  if (isHF4Selected) {
-                                    form.change((suiteFormName as any).REPORTS.role, []);
-                                    newAllRoles = removeHF4User(newAllRoles);
-                                    selectedAllRoles = removeHF4User(selectedAllRoles);
-                                  }
+                <div className='col-sm-12 col-12'>
+                  <Field
+                    name={`${name}.suiteAccess`}
+                    type='text'
+                    validate={required}
+                    render={({ input, meta }) => (
+                      <MultiSelect
+                        {...(input as any)}
+                        label='SPICE Suite Access'
+                        errorLabel='suite access'
+                        labelKey='groupName'
+                        valueKey='groupName'
+                        options={suiteAccess || []}
+                        placeholder=''
+                        disabled={isProfile}
+                        isDisabled={isProfile}
+                        loadingOptions={isRolesLoading}
+                        isShowLabel={true}
+                        error={isError(meta)}
+                        isMulti={true}
+                        isModel={true}
+                        required={true}
+                        isClearable={false}
+                        mandatoryOptions={
+                          isAdminForm
+                            ? isEdit
+                              ? mandatorySuiteAccess
+                              : [getSpiceGroupName(suiteAccess)]
+                            : mandatorySuiteAccess || ''
+                        }
+                        onChange={(values: any[]) => {
+                          const suiteOrder: { [key: string]: number } = {
+                            SPICE: 1,
+                            REPORTS: 2,
+                            INSIGHTS: 3
+                          };
+                          const sortedSuites = values.sort((a, b) => suiteOrder[a.groupName] - suiteOrder[b.groupName]);
+                          const selectedGroupNames: string[] =
+                            sortedSuites.map((option: any) => option.groupName) || [];
+                          let newAllRoles: IRoles[] = [];
+                          const suiteFormName = {
+                            SPICE: {
+                              role: `${formName}[${index}].role`,
+                              hfList: `${formName}[${index}].healthfacility`
+                            },
+                            REPORTS: {
+                              role: `${formName}[${index}].reportRoles`,
+                              hfList: `${formName}[${index}].reportUserOrganization`
+                            },
+                            INSIGHTS: {
+                              role: `${formName}[${index}].insightRoles`,
+                              hfList: `${formName}[${index}].insightUserOrganization`
+                            }
+                          };
+                          const removeHF4User = (completeRoles: IRoles[]) =>
+                            completeRoles.filter((newRoles: IRoles) => newRoles.name !== hf4ReportUser);
+                          let selectedAllRoles = [...allRoles];
+                          Object.keys(suiteFormName).forEach((r: string) => {
+                            if (selectedGroupNames.includes(r)) {
+                              newAllRoles = [
+                                ...newAllRoles,
+                                ...selectedAllRoles.filter((v: IRoles) => v.groupName === r)
+                              ];
+                            } else {
+                              form.change((suiteFormName as any)[r].role, []);
+                              form.change((suiteFormName as any)[r].hfList, []);
+                              if (r === SPICE) {
+                                form.change(`${formName}[${index}].designation`, null);
+                                // to remove HF4User while removing the SPICE suite
+                                const selectedReportRoles = form.getState().values[formName][index].reportRoles || [];
+                                const isHF4Selected = selectedReportRoles.some(
+                                  (newRoles: IRoles) => newRoles.name === hf4ReportUser
+                                );
+                                if (isHF4Selected) {
+                                  form.change((suiteFormName as any).REPORTS.role, []);
+                                  newAllRoles = removeHF4User(newAllRoles);
+                                  selectedAllRoles = removeHF4User(selectedAllRoles);
                                 }
                               }
-                            });
-                            form.change(`${formName}[${index}].roles`, newAllRoles);
-                            getRoleOptions(index, newAllRoles);
-                            roleChange({ allRoles: newAllRoles, index, appTypeBasedRoles });
-                            input.onChange(sortedSuites);
-                          }}
-                        />
-                      )}
-                    />
-                  </div>
-                )}
-                {(isSPICE || isAdminForm) && !isPeerSupervisor && (
+                            }
+                          });
+                          form.change(`${formName}[${index}].roles`, newAllRoles);
+                          getRoleOptions(index, newAllRoles);
+                          roleChange({ allRoles: newAllRoles, index, appTypeBasedRoles });
+                          input.onChange(sortedSuites);
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+                {(isSPICE || isAdminForm) && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6'} `}>
                     <Field
                       name={`${name}.role`}
@@ -1231,6 +1233,7 @@ const UserForm = ({
                         ) : (
                           <SelectInput
                             {...(input as any)}
+                            autoSelect={false} // for admins prevent autoselect
                             label={'SPICE Role'}
                             errorLabel='Please select role.'
                             labelKey='displayName'
@@ -1597,8 +1600,8 @@ const UserForm = ({
                           return (
                             <SelectInput
                               {...(input as any)}
-                              label='Assigned Health Facility'
-                              errorLabel='assigned health facility'
+                              label={`Assigned ${healthfacilitySName}`}
+                              errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
                               labelKey='name'
                               valueKey='id'
                               options={newHFList}
@@ -1659,8 +1662,8 @@ const UserForm = ({
                         return (
                           <MultiSelect
                             {...(input as any)}
-                            label='Health Facility for Reports'
-                            errorLabel='health facility for reports'
+                            label={`${healthfacilitySName} for Reports`}
+                            errorLabel={`${healthfacilitySName.toLowerCase()} for reports`}
                             labelKey='name'
                             valueKey='id'
                             required={true}
@@ -1691,8 +1694,8 @@ const UserForm = ({
                         return (
                           <MultiSelect
                             {...(input as any)}
-                            label='Health Facility for Insights'
-                            errorLabel='health facility for insights'
+                            label={`${healthfacilitySName} for Insights`}
+                            errorLabel={`${healthfacilitySName.toLowerCase()} for insights`}
                             labelKey='name'
                             valueKey='id'
                             required={true}
@@ -1747,7 +1750,7 @@ const UserForm = ({
                   role={role}
                   isProfile={isProfile}
                   isSiteUser={isSiteUser}
-                  healthFacilityList={healthFacilityList}
+                  assignedHFListHFAdmin={assignedHFListHFAdmin}
                   hfLoading={hfLoading}
                   formDetails={{ form, formName, fields }}
                   isHFAdminSelected={isHFAdminSelected}

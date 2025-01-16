@@ -4,15 +4,11 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import UserMenu from '../UserMenu';
-import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../../constants/appConstants';
 import '@testing-library/jest-dom/extend-expect';
 import { CHANGE_OWN_PASSWORD_REQUEST } from '../../../store/user/actionTypes';
 
 const { ROLES, SUITE_ACCESS } = APPCONSTANTS;
-const {
-  district: { s: districtSName },
-  chiefdom: { s: chiefdomSName }
-} = NAME_CONSTANTS;
 
 jest.mock('../../../containers/authentication/ResetPasswordFields', () => ({
   generatePassword: jest.fn()
@@ -50,6 +46,9 @@ const initialState = {
 };
 
 describe('UserMenu Component', () => {
+  const districtSName = 'District';
+  const chiefdomSName = 'Chiefdom';
+
   const store = mockStore(initialState);
 
   beforeEach(() => {

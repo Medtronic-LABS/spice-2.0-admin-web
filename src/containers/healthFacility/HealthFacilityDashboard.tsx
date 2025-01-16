@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { IHFDashboard } from '../../store/healthFacility/types';
@@ -22,6 +22,8 @@ import toastCenter from '../../utils/toastCenter';
 import styles from './HealthFacility.module.scss';
 import { clearHFSummary, fetchHFDashboardListRequest, setHFSummary } from '../../store/healthFacility/actions';
 import { clearSideMenu } from '../../store/common/actions';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 /**
  * HealthFacilityDashboard component
@@ -41,7 +43,7 @@ const HealthFacilityDashboard = (): React.ReactElement => {
   const countryId = useSelector(countryIdSelector)?.id;
   const {
     healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * Fetches health facility dashboard details
@@ -71,12 +73,16 @@ const HealthFacilityDashboard = (): React.ReactElement => {
             if (e.message === ERRORS.NETWORK_ERROR.message) {
               toastCenter.error(APPCONSTANTS.NETWORK_ERROR, APPCONSTANTS.CONNECTION_LOST);
             } else {
-              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR);
+              toastCenter.error(
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR, healthFacilityPName)
+              );
             }
           }
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [countryId, dispatch]
   );
 

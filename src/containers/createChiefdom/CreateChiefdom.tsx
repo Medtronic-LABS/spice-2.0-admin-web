@@ -159,10 +159,9 @@ const CreateChiefdom: React.FC = (): React.ReactElement => {
                     <UserForm
                       form={form}
                       countryId={countryIdValue}
-                      isAdminForm={true}
                       defaultSelectedRole={APPCONSTANTS.ROLES.CHIEFDOM_ADMIN}
                       enableAutoPopulate={true}
-                      userFormParams={{ isCreateChiefdom: true }}
+                      userFormParams={{ isCreateChiefdom: true, isAdminForm: true }}
                     />
                   </FormContainer>
                 </div>

@@ -65,6 +65,7 @@ const UserList = (): React.ReactElement => {
   const {
     isCommunity,
     appTypes,
+    healthFacility: { s: healthFacilitySName },
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
   } = useAppTypeConfigs();
@@ -412,7 +413,11 @@ const UserList = (): React.ReactElement => {
         >
           <CustomTable
             rowData={hfUserList}
-            columnsDef={columnDef({ chiefdomModuleName: chiefdomSName, districtModuleName: districtSName })}
+            columnsDef={columnDef({
+              chiefdomModuleName: chiefdomSName,
+              districtModuleName: districtSName,
+              healthFacilityModuleName: healthFacilitySName
+            })}
             isDelete={true}
             isEdit={true}
             onRowEdit={openEditModal}

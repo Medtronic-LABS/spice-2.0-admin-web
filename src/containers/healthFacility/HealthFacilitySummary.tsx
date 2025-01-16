@@ -42,7 +42,7 @@ import {
   IVillages
 } from '../../store/healthFacility/types';
 import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import { formatRoles } from '../../utils/commonUtils';
+import { formatRoles, formatUserToastMsg } from '../../utils/commonUtils';
 import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
@@ -151,10 +151,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
         id: Number(healthFacilityId),
         appTypes,
         failureCb: (e) => {
-          fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR);
+          fetchFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_FETCH_ERROR, healthFacilitySName));
         }
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appTypes, dispatch, healthFacilityId, tenantId]);
 
   const fetchFailure = (e: Error, errorMessage: string) =>
@@ -183,7 +184,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();
-          fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USERS_FETCH_ERROR);
+          fetchFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USERS_FETCH_ERROR, healthFacilitySName));
         }
       })
     );
@@ -357,7 +358,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
             data: postData,
             successCb: hfUpdateSuccess,
             failureCb: (e) => {
-              fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
+              fetchFailure(
+                e,
+                formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR, healthFacilitySName)
+              );
             }
           })
         );
@@ -370,7 +374,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
    * Handles the success response after updating health facility details
    */
   const hfUpdateSuccess = () => {
-    toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS);
+    toastCenter.success(
+      APPCONSTANTS.SUCCESS,
+      formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS, healthFacilitySName)
+    );
     refreshHFDetails();
     refreshHFUserList();
     closeHFEditModal(true);
@@ -443,7 +450,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
         }
         fetchFailure(
           e,
-          isUserEdit ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
+          isUserEdit
+            ? formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR, healthFacilitySName)
+            : formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR, healthFacilitySName)
         );
       }
     );
@@ -457,8 +466,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const healthfacilityUserSuccess = (): void => {
     // Determine the success message based on whether it's an edit or create action
     const successMessage = isHFUserEdit
-      ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS
-      : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS;
+      ? formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS, healthFacilitySName)
+      : formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_SUCCESS, healthFacilitySName);
 
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
 
@@ -495,12 +504,15 @@ const HealthFacilitySummary = (): React.ReactElement => {
           tenantIds: [Number(tenantId)]
         },
         successCb: () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS, healthFacilitySName)
+          );
           refreshHFUserList();
           refreshHFDetails();
         },
         failureCb: (e) => {
-          fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_FAIL);
+          fetchFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_FAIL, healthFacilitySName));
         }
       })
     );
@@ -638,8 +650,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
               onRowEdit={handleEditUserClick}
               onDeleteClick={handleUserDelete}
               handlePageChange={handlePage}
-              confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
-              deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
+              confirmationTitle={formatUserToastMsg(
+                APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION,
+                healthFacilitySName
+              )}
+              deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE, healthFacilitySName)}
               actionFormatter={{
                 hideEditIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active,
                 hideDeleteIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active

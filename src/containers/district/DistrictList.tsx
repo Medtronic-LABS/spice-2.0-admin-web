@@ -13,7 +13,7 @@ import {
   updateDistrictDetail
 } from '../../store/district/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import {
   districtLoadingSelector,
   getDistrictListSelector,
@@ -38,6 +38,7 @@ import { clearConsentForm } from '../../store/workflow/actions';
 import DistrictConsentForm from './DistrictConsentForm';
 import { loadingSelector } from '../../store/workflow/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IMatchParams {
   regionId: string;
@@ -70,7 +71,7 @@ const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement =
   const { regionId, tenantId } = useParams<IMatchParams>();
   const {
     district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * fetch district list API

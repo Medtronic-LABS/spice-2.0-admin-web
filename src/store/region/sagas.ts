@@ -31,6 +31,7 @@ import {
   FETCH_REGION_DETAIL_REQUEST,
   FETCH_COUNTRY_DETAILS_REQUEST
 } from './actionTypes';
+import { setLabelName } from '../common/actions';
 
 /*
   Worker Saga: Fired on FETCH_REGIONS_REQUEST action
@@ -160,6 +161,8 @@ export function* fetchCountryDetail(action: IFetchCountryDetailReq): SagaIterato
       tenantId,
       id
     });
+    const { displayValues = null } = response.data.entity;
+    yield put(setLabelName(displayValues));
     yield put(fetchCountryDetailSuccess(response.data.entity));
   } catch (e: any) {
     if (e instanceof Error) {

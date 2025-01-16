@@ -7,6 +7,8 @@ export interface IHealthFacilityState {
   hfTypesLoading: boolean;
   loading: boolean;
   healthFacilityList: IHealthFacility[];
+  assignedHFListForHFAdmin: IHealthFacility[];
+  assignedHFListForHFAdminTotal: number;
   hfTotal: number;
   allHealthFacilityList: IHealthFacility[];
   allHfTotal: number;
@@ -152,6 +154,20 @@ export interface IFetchHFListSuccessPayload {
   limit: number | null;
 }
 
+export interface ISetAssignedHFListForHFAdminPayload {
+  total: number;
+  healthFacilityList: IHealthFacility[];
+}
+
+export interface ISetAssignedHFListForHFAdmin {
+  type: typeof ACTION_TYPES.SET_ASSIGNED_HF_LIST_FOR_HF_ADMIN;
+  payload: ISetAssignedHFListForHFAdminPayload;
+}
+
+export interface IClearAssignedHFListForHFAdmin {
+  type: typeof ACTION_TYPES.CLEAR_ASSIGNED_HF_LIST_FOR_HF_ADMIN;
+}
+
 export interface IFetchHFListRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST;
   countryId: number;
@@ -161,9 +177,7 @@ export interface IFetchHFListRequest {
   userBased?: boolean;
   tenantBased?: boolean;
   tenantIds?: number[] | string[];
-  healthFacilityTypes?: number[] | string[];
-  districtIds?: number[] | string[];
-  chiefdomIds?: number[] | string[];
+  forHFAdmin?: boolean;
   successCb?: (data: IFetchHFListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
 }
@@ -903,7 +917,5 @@ export type HealthFacilityActions =
   | IFetchCityListRequest
   | IFetchCityListFailure
   | IFetchCityListSuccess
-  | IFetchHFStatusRequest
-  | IFetchHFStatusSuccess
-  | IFetchHFStatusFailure
-  | IClearChiefdomList;
+  | ISetAssignedHFListForHFAdmin
+  | IClearAssignedHFListForHFAdmin;

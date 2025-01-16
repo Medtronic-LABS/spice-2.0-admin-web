@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useEffect } from 'react';
 import DetailCard from '../../components/detailCard/DetailCard';
 import CustomTable from '../../components/customTable/CustomTable';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import {
   districtCountSelector,
   districtLoadingSelector,
@@ -20,6 +20,7 @@ import { formatDate } from '../../utils/validation';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * DeactivatedRecords component for displaying and managing deactivated district records.
@@ -37,7 +38,7 @@ const DeactivatedRecords = (): React.ReactElement => {
   const { ROLES } = APPCONSTANTS;
   const {
     district: { s: districtSName, p: districtPName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * Fetches deactivated district details based on current list parameters.

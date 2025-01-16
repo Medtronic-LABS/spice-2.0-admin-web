@@ -36,7 +36,8 @@ export const initialState: IHealthFacilityState = {
   hfTypes: [],
   hfTypesLoading: false,
   healthFacilityList: [] as IHealthFacility[],
-  allHealthFacilityList: [] as IHealthFacility[],
+  assignedHFListForHFAdmin: [] as IHealthFacility[],
+  assignedHFListForHFAdminTotal: 0,
   healthFacilityUserList: [],
   hfUser: {} as IHFUserGet,
   hfUserDetailLoading: false,
@@ -111,12 +112,18 @@ const healthFacilityReducer = (
         hfTotal: action.payload.total || 0,
         healthFacilityList: action.payload.healthFacilityList || []
       };
-    case HEALTH_FACILITY_ACTION_TYPES.FETCH_ALL_HEALTH_FACILITY_LIST_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.SET_ASSIGNED_HF_LIST_FOR_HF_ADMIN:
       return {
         ...state,
         loading: false,
-        allHfTotal: action.payload.total || 0,
-        allHealthFacilityList: action.payload.healthFacilityList || []
+        assignedHFListForHFAdmin: action.payload.healthFacilityList || [],
+        assignedHFListForHFAdminTotal: action.payload.total || 0
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ASSIGNED_HF_LIST_FOR_HF_ADMIN:
+      return {
+        ...state,
+        assignedHFListForHFAdmin: [],
+        assignedHFListForHFAdminTotal: 0
       };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_SUCCESS:
       return {

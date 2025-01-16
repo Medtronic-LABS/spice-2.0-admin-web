@@ -89,7 +89,8 @@ const TermsAndConditions = () => {
   }, [countryId, dispatch, getTACDStatus, getTACDismissed, role, showTACCondition]);
 
   const basicEditorConfig = {
-    toolbar: false
+    toolbar: false,
+    iframe: false
   };
 
   const initialEditorConfig: any = {

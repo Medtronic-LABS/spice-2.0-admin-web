@@ -10,11 +10,31 @@ interface IRouteItem {
 interface IDynamicSideMenu {
   [key: string]: IRouteItem[];
 }
+export interface ILabelName {
+  region: {
+    s: string;
+    p: string;
+  };
+  district: {
+    s: string;
+    p: string;
+  };
+  chiefdom: {
+    s: string;
+    p: string;
+  };
+  healthFacility: {
+    s: string;
+    p: string;
+  };
+}
 export interface ICommanState {
   loading: boolean;
   sideMenu: {
     list: IDynamicSideMenu | [];
   };
+  labelName: ILabelName | null;
+  labelNameLoading: boolean;
   error: string | null | Error;
 }
 
@@ -35,6 +55,16 @@ export interface ISideMenu {
   displayName: string;
   name: string;
   order: number;
+}
+
+export interface IFetchLabelNamePayload {
+  countryId: number;
+  successCb?: (payload: any) => void;
+  failureCb?: (error: any) => void;
+}
+
+export interface IFetchLabelNameResponse {
+  list: any;
 }
 
 /*
@@ -60,4 +90,19 @@ export interface IClearSideMenu {
   type: typeof ACTION_TYPES.CLEAR_SIDEMENU;
 }
 
-export type CommonActions = IFetchSideMenuRequest | IFetchSideMenuSuccess | IFetchSideMenuFailure | IClearSideMenu;
+export interface ISetLabelName {
+  type: typeof ACTION_TYPES.SET_LABELNAME;
+  values: ILabelName;
+}
+
+export interface IClearLabelName {
+  type: typeof ACTION_TYPES.CLEAR_LABELNAME;
+}
+
+export type CommonActions =
+  | IFetchSideMenuRequest
+  | IFetchSideMenuSuccess
+  | IFetchSideMenuFailure
+  | IClearSideMenu
+  | ISetLabelName
+  | IClearLabelName;

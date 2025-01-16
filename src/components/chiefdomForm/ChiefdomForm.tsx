@@ -1,22 +1,23 @@
-import React, { useEffect } from 'react';
 import { FormApi } from 'final-form';
+import React, { useEffect } from 'react';
 import { Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
-import SelectInput from '../formFields/SelectInput';
-import TextInput from '../formFields/TextInput';
+import APPCONSTANTS from '../../constants/appConstants';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { fetchDistrictDetailReq, fetchDistrictOptionsRequest } from '../../store/district/actions';
 import {
+  districtLoadingSelector,
   districtOptionsLoadingSelector,
   districtOptionsSelector,
-  districtSelector,
-  districtLoadingSelector
+  districtSelector
 } from '../../store/district/selectors';
-import { composeValidators, required, validateEntityName } from '../../utils/validation';
 import { roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import { composeValidators, required, validateEntityName } from '../../utils/validation';
 import TagInput from '../formBuilder/components/fieldUI/TagInput';
+import SelectInput from '../formFields/SelectInput';
+import TextInput from '../formFields/TextInput';
 
 interface IChiefdomFormProps {
   nestingKey?: string;
@@ -37,7 +38,7 @@ const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps):
   const {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   useEffect(() => {
     if (regionId && tenantId && !isEdit) {

@@ -1,7 +1,7 @@
 import { Field } from 'react-final-form';
 import SelectInput from '../../formFields/SelectInput';
 import { required } from '../../../utils/validation';
-import { NAMING_VARIABLES, NAME_CONSTANTS } from '../../../constants/appConstants';
+import { NAMING_VARIABLES } from '../../../constants/appConstants';
 import Checkbox from '../../formFields/Checkbox';
 import useFieldVisibility from '../../../hooks/useFieldVisibility';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
@@ -28,7 +28,7 @@ export const SiteUserForm = (props: any) => {
     districtDetails,
     chiefdomDetails,
     isAdminForm,
-    healthFacilityList,
+    assignedHFListHFAdmin,
     hfLoading,
     formDetails,
     role,
@@ -57,7 +57,10 @@ export const SiteUserForm = (props: any) => {
       timezone: { available: isTimezoneAvailable },
       culture: { available: isCultureAvailable },
       redrisk: { available: isRedRisk }
-    }
+    },
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthfacilitySName }
   } = useAppTypeConfigs();
 
   useEffect(() => {
@@ -137,8 +140,8 @@ export const SiteUserForm = (props: any) => {
             render={({ input, meta }) => (
               <SelectInput
                 {...(input as any)}
-                label={NAME_CONSTANTS.district.s}
-                errorLabel={NAME_CONSTANTS.district.s}
+                label={districtSName}
+                errorLabel={districtSName}
                 labelKey='name'
                 valueKey='id'
                 options={districtDetails.list}
@@ -165,8 +168,8 @@ export const SiteUserForm = (props: any) => {
             render={({ input, meta }) => (
               <SelectInput
                 {...(input as any)}
-                label={NAME_CONSTANTS.chiefdom.s}
-                errorLabel={NAME_CONSTANTS.chiefdom.s}
+                label={chiefdomSName}
+                errorLabel={chiefdomSName}
                 labelKey='name'
                 valueKey='id'
                 options={chiefdomDetails.list}
@@ -192,12 +195,12 @@ export const SiteUserForm = (props: any) => {
             render={({ input, meta }) => (
               <SelectInput
                 {...(input as any)}
-                label='Assigned Health Facility'
-                errorLabel='assigned health facility'
+                label={`Assigned ${healthfacilitySName}`}
+                errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
                 labelKey='name'
                 valueKey='id'
                 disabled={isProfile && !reportUserOnlyInAdminList}
-                options={healthFacilityList}
+                options={assignedHFListHFAdmin}
                 loadingOptions={hfLoading}
                 error={isError(meta)}
                 isModel={true}

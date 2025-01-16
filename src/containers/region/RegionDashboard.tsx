@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME, NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, APP_TYPE_NAME } from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import {
   clearClientRegistryStatus,
@@ -19,7 +19,7 @@ import {
   getRegionsLoadingMoreSelector,
   getRegionsSelector
 } from '../../store/region/selectors';
-import { appendZeroBefore } from '../../utils/commonUtils';
+import { appendZeroBefore, formatUserToastMsg } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
 import { PROTECTED_ROUTES } from '../../constants/route';
@@ -27,7 +27,7 @@ import localStorageServices from '../../global/localStorageServices';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { clearChiefdomDetail } from '../../store/chiefdom/actions';
-import { clearSideMenu } from '../../store/common/actions';
+import { clearLabelName, clearSideMenu, setLabelName } from '../../store/common/actions';
 import { clearDistrictDetails, resetClinicalWorkflow } from '../../store/district/actions';
 import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import { clearHFSummary } from '../../store/healthFacility/actions';
@@ -53,16 +53,12 @@ const Region = (): React.ReactElement => {
   const { push } = useHistory();
 
   const {
-    region: { s: regionSName, p: regionPName },
-    healthFacility: { s: healthFacilitySName }
+    region: { s: regionSName, p: regionPName }
   } = useAppTypeConfigs();
 
-  const {
-    district: { s: ncDistrictName },
-    districtCommunity: { s: cDistrictName },
-    chiefdom: { s: ncChiefdomName },
-    chiefdomCommunity: { s: cChiefdomName }
-  } = NAME_CONSTANTS;
+  // for community
+  const cChiefdomName = 'Chiefdom';
+  const cDistrictName = 'District';
 
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,
@@ -75,7 +71,13 @@ const Region = (): React.ReactElement => {
           isLoadMore: true,
           failureCb: (e) => {
             onFail();
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_FETCH_ERROR));
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.REGION_FETCH_ERROR, regionPName)
+              )
+            );
           }
         })
       );
@@ -87,7 +89,10 @@ const Region = (): React.ReactElement => {
       fetchRegionsRequest({
         skip: 0,
         limit: APPCONSTANTS.REGIONS_PER_PAGE,
-        failureCb: (e) => toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_FETCH_ERROR))
+        failureCb: (e) =>
+          toastCenter.error(
+            ...getErrorToastArgs(e, APPCONSTANTS.OOPS, formatUserToastMsg(APPCONSTANTS.REGION_FETCH_ERROR, regionPName))
+          )
       })
     );
     if (clinicalWorkflows.length) {
@@ -113,7 +118,9 @@ const Region = (): React.ReactElement => {
     dispatch(clearClientRegistryStatus());
     dispatch(clearSideMenu());
     dispatch(clearAppType());
+    dispatch(clearLabelName());
     localStorageServices.deleteItem(APP_TYPE_NAME);
+    sessionStorageServices.deleteItems([APPCONSTANTS.COUNTRY_ID, APPCONSTANTS.COUNTRY_TENANT_ID]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -128,6 +135,9 @@ const Region = (): React.ReactElement => {
       }
       dispatch(clearRegionDetail());
       dispatch(setRegionDetail(partialRegionDetail));
+      if (partialRegionDetail.displayValues) {
+        dispatch(setLabelName(partialRegionDetail.displayValues));
+      }
 
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, partialRegionDetail.id);
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, partialRegionDetail.tenantId);
@@ -148,10 +158,17 @@ const Region = (): React.ReactElement => {
           search,
           successCb: () => resetPage(),
           failureCb: (e) =>
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_FETCH_ERROR))
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.REGION_FETCH_ERROR, regionPName)
+              )
+            )
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, resetPage]
   );
 
@@ -161,11 +178,25 @@ const Region = (): React.ReactElement => {
   const parsedData: ISummaryCardProps[] = useMemo(
     () =>
       regions.map(
-        ({ chiefdomCount, healthFacilityCount, districtCount, name, tenantId, id: regionId, appTypes }: any) => {
+        ({
+          chiefdomCount,
+          healthFacilityCount,
+          districtCount,
+          name,
+          tenantId,
+          id: regionId,
+          appTypes,
+          displayValues
+        }: any) => {
+          const {
+            healthFacility: { s: healthFacilitySName },
+            district: { s: ncDistrictName },
+            chiefdom: { s: ncChiefdomName }
+          } = displayValues;
           return {
             title: name,
             detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
-            setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+            setBreadcrumbDetails: () => onDashboardExit({ id: regionId, name, tenantId, appTypes, displayValues }),
             tenantId,
             formId: regionId,
             data: [
@@ -175,7 +206,7 @@ const Region = (): React.ReactElement => {
                 label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? ncDistrictName : cDistrictName,
                 disableEllipsis: true,
                 route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
-                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes, displayValues }),
                 appType: appTypes
               },
               {
@@ -183,7 +214,7 @@ const Region = (): React.ReactElement => {
                 value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
                 label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? ncChiefdomName : cChiefdomName,
                 route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
-                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes, displayValues }),
                 appType: appTypes
               },
               {
@@ -194,7 +225,7 @@ const Region = (): React.ReactElement => {
                 route: PROTECTED_ROUTES.healthFacilityByRegion
                   .replace(':regionId', regionId)
                   .replace(':tenantId', tenantId),
-                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes }),
+                onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes, displayValues }),
                 appType: appTypes
               }
             ]

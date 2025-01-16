@@ -1,5 +1,5 @@
 import { SagaIterator } from 'redux-saga';
-import { all, call, put, select, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeEvery, takeLatest } from 'redux-saga/effects';
 
 import * as hfService from '../../services/healthFacilityAPI';
 import {
@@ -77,8 +77,7 @@ import {
   validateLinkedRestrictionsSuccess,
   validateLinkedRestrictionsFailure,
   fetchCityListSuccess,
-  updateHFStatusSuccess,
-  updateHFStatusFailure
+  setAssignedHFListForHFAdmin
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -123,9 +122,7 @@ export function* fetchHealthFacilityList({
   userBased,
   tenantBased,
   tenantIds,
-  healthFacilityTypes,
-  districtIds,
-  chiefdomIds,
+  forHFAdmin,
   successCb,
   failureCb
 }: IFetchHFListRequest): SagaIterator {
@@ -146,7 +143,11 @@ export function* fetchHealthFacilityList({
     });
     const payload = { healthFacilityList: healthFacilities || [], total, limit };
     successCb?.({ healthFacilityList: healthFacilities || [], total, limit });
-    yield put(fetchHFListSuccess(payload));
+    if (forHFAdmin) {
+      yield put(setAssignedHFListForHFAdmin(payload));
+    } else {
+      yield put(fetchHFListSuccess(payload));
+    }
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
@@ -744,7 +745,7 @@ export function* fetchHFChangeStatusSagaRequest({
   Allows concurrent increments.
 */
 function* healthFacilitySaga() {
-  yield all([takeLatest(FETCH_HEALTH_FACILITY_LIST_REQUEST, fetchHealthFacilityList)]);
+  yield all([takeEvery(FETCH_HEALTH_FACILITY_LIST_REQUEST, fetchHealthFacilityList)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_REQUEST, createHealthFacilityRequest)]);
   yield all([takeLatest(DELETE_HEALTH_FACILITY_REQUEST, deleteHFRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_SUMMARY_REQUEST, fetchHFSummaryRequest)]);

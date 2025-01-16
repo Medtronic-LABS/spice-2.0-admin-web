@@ -19,6 +19,7 @@ import { AppState } from '../../store/rootReducer';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import RegionForm from './RegionForm';
 import { getAdminPayload } from '../../utils/formatObjectUtils';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface IRegionFormValues {
   region: {
@@ -34,7 +35,10 @@ const CreateRegion: React.FC = () => {
   const dispatch = useDispatch();
   const loading = useSelector((state: AppState) => state.region.loading);
 
-  const { appTypes } = useAppTypeConfigs();
+  const {
+    appTypes,
+    region: { s: regionSName }
+  } = useAppTypeConfigs();
   /**
    * Resets form fields whose keys include the specified substring.
    *
@@ -82,13 +86,23 @@ const CreateRegion: React.FC = () => {
           successCb: () => {
             dispatch(fetchCountryListRequest());
             history.push(PROTECTED_ROUTES.regionDashboard);
-            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_CREATION_SUCCESS);
+            toastCenter.success(
+              APPCONSTANTS.SUCCESS,
+              formatUserToastMsg(APPCONSTANTS.REGION_CREATION_SUCCESS, regionSName)
+            );
           },
           failureCb: (e) =>
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_CREATION_ERROR))
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.REGION_CREATION_ERROR, regionSName)
+              )
+            )
         })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [appTypes, dispatch, history]
   );
 
@@ -105,19 +119,18 @@ const CreateRegion: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label='Region Details' icon={RegionFormIcon}>
+                  <FormContainer label={`${regionSName} Details`} icon={RegionFormIcon}>
                     <RegionForm />
                   </FormContainer>
                 </div>
                 <div className='col-lg-6 col-12'>
-                  <FormContainer label='Region Admin' icon={RegionAdminFormIcon}>
+                  <FormContainer label={`${regionSName} Admin`} icon={RegionAdminFormIcon}>
                     <UserForm
-                      isAdminForm={true}
                       form={form}
                       defaultSelectedRole={APPCONSTANTS.ROLES.REGION_ADMIN}
                       enableAutoPopulate={true}
                       appTypes={appTypes}
-                      userFormParams={{ isRegionCreate: true }}
+                      userFormParams={{ isRegionCreate: true, isAdminForm: true }}
                     />
                   </FormContainer>
                 </div>

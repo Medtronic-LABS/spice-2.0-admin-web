@@ -59,12 +59,8 @@ import { IRoles } from '../../store/user/types';
 import { getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
-import { chwColumnDef, columnDef } from './userListMeta';
-import { filterHFByAppTypes } from '../../utils/commonUtils';
-import Radio from '../../components/formFields/Radio';
-import { Field } from 'react-final-form';
-import './UserList.scss';
-import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
+import { columnDef } from './userListMeta';
+import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface IMatchParams {
   tenantId: string;
@@ -157,7 +153,8 @@ const UserList = (): React.ReactElement => {
     appTypes,
     userList: {
       filters: { available: showFilters }
-    }
+    },
+    healthFacility: { s: healthFacilitySname, p: healthFacilityPname }
   } = useAppTypeConfigs();
   /**
    * useCallback hook to refresh the user list.
@@ -393,37 +390,22 @@ const UserList = (): React.ReactElement => {
       });
 
       const data: IHFUserPost = userObj[0];
-
-      // If we're assigning a peer supervisor
-      if (openConfirmationModal.userData.id && openConfirmationModal.roleId) {
-        const payload: any = {
-          ...data,
-          deactivateUserId: openConfirmationModal.userData.id,
-          roleIds: [getPeerSupervisorRoleId(openConfirmationModal.userData) || 0],
-          tenantId: openConfirmationModal.userData.tenantId
-        };
-        onSubmitHandler(payload, reassignCHWRequest, siteActivateUserSuccess, (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR));
-        });
-      } else {
-        // Regular user update/create
-        onSubmitHandler(
-          { ...data },
-          isOpenUserModal.isEdit || data.id ? updateHFUserRequest : createHFUserRequest,
-          siteUserSuccess,
-          (e) => {
-            toastCenter.error(
-              ...getErrorToastArgs(
-                e,
-                APPCONSTANTS.OOPS,
-                isOpenUserModal.isEdit || data.id
-                  ? APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR
-                  : APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR
-              )
-            );
-          }
-        );
-      }
+      onSubmitHandler(
+        { ...data },
+        isOpenUserModal.isEdit || data.id ? updateHFUserRequest : createHFUserRequest,
+        siteUserSuccess,
+        (e) => {
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e,
+              APPCONSTANTS.OOPS,
+              isOpenUserModal.isEdit || data.id
+                ? formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR, healthFacilitySname)
+                : formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_CREATE_ERROR, healthFacilitySname)
+            )
+          );
+        }
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -621,7 +603,11 @@ const UserList = (): React.ReactElement => {
           tenantIds: [tenantId],
           failureCb: (e: Error) => {
             toastCenter.error(
-              ...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.ERROR,
+                formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR, healthFacilityPname)
+              )
             );
           }
         })
@@ -773,7 +759,7 @@ const UserList = (): React.ReactElement => {
         >
           <CustomTable
             rowData={hfUserList}
-            columnsDef={columnDef}
+            columnsDef={columnDef({ healthFacilityModuleName: healthFacilitySname })}
             isDelete={true}
             isEdit={true}
             onRowEdit={openEditModal}

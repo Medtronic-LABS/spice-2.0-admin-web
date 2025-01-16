@@ -11,7 +11,7 @@ import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
 import { healthFacilitySelector } from '../../store/healthFacility/selectors';
 import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { clearDistrictDetails, setDistrictDetails } from '../../store/district/actions';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 
 import styles from './Breadcrumb.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -19,6 +19,7 @@ import { clearRegionDetail, setRegionDetail } from '../../store/region/actions';
 import { clearChiefdomDetail, setChiefdomDetails } from '../../store/chiefdom/actions';
 import { clearHFSummary, setHFSummary } from '../../store/healthFacility/actions';
 import { clearSideMenu } from '../../store/common/actions';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface ISection {
   route: string;
@@ -98,7 +99,7 @@ const Breadcrumb = (): React.ReactElement => {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   const customBreadcrumbs = [
     { route: PROTECTED_ROUTES.createMedication, label: 'Add Medication', appendParent: true },

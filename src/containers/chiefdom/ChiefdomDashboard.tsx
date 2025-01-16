@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { appendZeroBefore, formatUserToastMsg } from '../../utils/commonUtils';
@@ -29,6 +29,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import styles from './Chiefdom.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { clearSideMenu } from '../../store/common/actions';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * Chiefdom Dashboard component
@@ -44,7 +45,7 @@ const ChiefdomDashboard = () => {
   const {
     chiefdom: { s: chiefdomSName, p: chiefdomPName },
     healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * Custom hook for handling load-more pagination.

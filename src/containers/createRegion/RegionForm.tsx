@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { clearAppType, setAppType } from '../../store/user/actions';
 import localStorageServices from '../../global/localStorageServices';
 import { APP_TYPE_NAME } from '../../constants/appConstants';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 const appTypes = [
   { name: 'Community', _id: 'COMMUNITY' },
@@ -64,6 +65,10 @@ const RegionForm = (): React.ReactElement => {
     }, 0);
   };
 
+  const {
+    region: { s: regionSName }
+  } = useAppTypeConfigs();
+
   return (
     <div className='row gx-1dot25'>
       <div className='col-sm-6 col-12'>
@@ -74,8 +79,8 @@ const RegionForm = (): React.ReactElement => {
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label='Region Name'
-              errorLabel='region name'
+              label={`${regionSName} Name`}
+              errorLabel={`${regionSName.toLowerCase()} name`}
               capitalize={true}
               error={(meta.touched && meta.error) || undefined}
             />

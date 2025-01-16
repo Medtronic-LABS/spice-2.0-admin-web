@@ -115,14 +115,14 @@ const APPCONSTANTS = {
   OOPS: 'Oops',
   ERROR: 'Error',
   // REGION
-  REGION_UPLOAD_SUCCESS: 'Region data uploaded successfully.',
-  REGION_UPLOAD_FAILURE: 'Unable to upload the region data. Please try after sometime.',
-  REGION_DOWNLOAD_SUCCESS: 'Region data downloaded successfully.',
-  REGION_DOWNLOAD_FAILURE: 'Unable to download the region data. Please try after sometime.',
-  REGION_CREATION_SUCCESS: 'Region created successfully.',
-  REGION_CREATION_ERROR: 'Unable to create region. Please try after sometime.',
-  REGION_FETCH_ERROR: 'Unable to load regions. Please try after sometime.',
-  REGION_DETAIL_FETCH_ERROR: 'Unable to load region details. Please try after sometime.',
+  REGION_UPLOAD_SUCCESS: 'Module_Name data uploaded successfully.',
+  REGION_UPLOAD_FAILURE: 'Unable to upload the module_name data. Please try after sometime.',
+  REGION_DOWNLOAD_SUCCESS: 'Module_Name data downloaded successfully.',
+  REGION_DOWNLOAD_FAILURE: 'Unable to download the module_name data. Please try after sometime.',
+  REGION_CREATION_SUCCESS: 'Module_Name created successfully.',
+  REGION_CREATION_ERROR: 'Unable to create module_name. Please try after sometime.',
+  REGION_FETCH_ERROR: 'Unable to load module_name. Please try after sometime.',
+  REGION_DETAIL_FETCH_ERROR: 'Unable to load module_name details. Please try after sometime.',
   // DEACTIVATED RECORDS
   ACTIVATE_COUNTY_CONFIRMATION: 'Are you sure want to activate the Module_Name?',
   ACTIVATE_COUNTY_TITLE: 'Activate Module_Name',
@@ -176,33 +176,26 @@ const APPCONSTANTS = {
   CHIEFDOM_ADMIN_CREATE_SUCCESS: 'Module_Name admin created successfully.',
   CHIEFDOM_ADMIN_CREATE_FAIL: 'Unable to create module_name admin. Please try after sometime.',
   // HF
-  HEALTH_FACILITY_DEACTIVATE_CONFIRMATION:
-    'This health facility has users linked to it. Are you sure you want to deactivate it?',
-  HEALTH_FACILITY_DEACTIVATE_SUCCESS: 'Health facility deactivated successfully',
-  HEALTH_FACILITY_DEACTIVATE_FAILURE: 'Unable to deactivate the Health facility. Please try after sometime',
-  HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load health facilities. Please try after sometime.',
-  HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load health facility users. Please try after sometime.',
-  HEALTH_FACILITY_DETAILS_UPDATE_ERROR: 'Unable to update health facility details. Please try after sometime.',
-  HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS: 'Health facility details updated successfully.',
-  HEALTH_FACILITY_DETAILS_FETCH_ERROR: 'Unable to load health facility details. Please try after sometime.',
-  HEALTH_FACILITY_SUMMARY_FETCH_ERROR: 'Unable to load health facility summary details. Please try after sometime.',
-  HEALTH_FACILITY_SUMMARY_UPDATE_ERROR: 'Unable to update health facility summary details. Please try after sometime.',
-  HEALTH_FACILITY_CREATION_SUCCESS: 'Health facility created successfully',
-  HEALTH_FACILITY_VALIDATION_ERROR: 'Facility ID already exists',
-  HEALTH_FACILITY_CREATION_ERROR: 'Unable to create health facility. Please try after sometime.',
-  HEALTH_FACILITY_USER_CREATE_SUCCESS: 'Health facility user added successfully.',
-  HEALTH_FACILITY_USER_CREATE_ERROR: 'Unable to add health facility user. Please try after sometime.',
-  HEALTH_FACILITY_USER_UPDATE_SUCCESS: 'Health facility user updated successfully.',
-  HEALTH_FACILITY_USER_UPDATE_ERROR: 'Unable to update health facility user. Please try after sometime.',
-  HEALTH_FACILITY_USER_DELETE_SUCCESS: 'Health facility user deleted successfully.',
-  HEALTH_FACILITY_USER_DELETE_FAIL: 'Unable to delete health facility user. Please try after sometime.',
-  HEALTH_FACILITY_USER_DELETE_CONFIRMATION: 'Are you sure you want to delete the health facility user?',
-  HEALTH_FACILITY_USER_DELETE_TITLE: 'Delete Health Facility User',
+  HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load module_name. Please try after sometime.', //
+  HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load module_name users. Please try after sometime.',
+  HEALTH_FACILITY_DETAILS_UPDATE_ERROR: 'Unable to update module_name details. Please try after sometime.',
+  HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS: 'Module_name details updated successfully.',
+  HEALTH_FACILITY_DETAILS_FETCH_ERROR: 'Unable to load module_name details. Please try after sometime.',
+  HEALTH_FACILITY_SUMMARY_UPDATE_ERROR: 'Unable to update module_name summary details. Please try after sometime.',
+  HEALTH_FACILITY_CREATION_SUCCESS: 'Module_name created successfully',
+  HEALTH_FACILITY_CREATION_ERROR: 'Unable to create module_name. Please try after sometime.',
+  HEALTH_FACILITY_USER_CREATE_SUCCESS: 'Module_name user added successfully.',
+  HEALTH_FACILITY_USER_CREATE_ERROR: 'Unable to add module_name user. Please try after sometime.',
+  HEALTH_FACILITY_USER_UPDATE_SUCCESS: 'Module_name user updated successfully.',
+  HEALTH_FACILITY_USER_UPDATE_ERROR: 'Unable to update module_name user. Please try after sometime.',
+  HEALTH_FACILITY_USER_DELETE_SUCCESS: 'Module_name user deleted successfully.',
+  HEALTH_FACILITY_USER_DELETE_FAIL: 'Unable to delete module_name user. Please try after sometime.',
+  HEALTH_FACILITY_USER_DELETE_CONFIRMATION: 'Are you sure you want to delete the module_name user?',
+  HEALTH_FACILITY_USER_DELETE_TITLE: 'Delete Module_Name User',
   HEALTH_FACILITY_DELETE_CONFIRMATION:
-    'Are you sure you want to delete the health facility? All the users linked to this facility will also be deleted!',
-  HEALTH_FACILITY_DELETE_TITLE: 'Delete Health Facility',
-  HEALTH_FACILITY_DELETE_SUCCESS: 'Health facility deleted successfully.',
-  HEALTH_FACILITY_DELETE_FAIL: 'Unable to delete the health facility. Please try after sometime.',
+    'Are you sure you want to delete the module_name? All the users linked to this facility will also be deleted!',
+  HEALTH_FACILITY_DELETE_TITLE: 'Delete Module_Name',
+
   FETCH_CITY_LIST_FAILURE: 'Unable to load city list. Please try after sometime',
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
   WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select workflow',
@@ -454,35 +447,6 @@ const APPCONSTANTS = {
   BY_REGION_DETAILS: 'BY_REGION_DETAILS'
 };
 
-export const NAME_CONSTANTS = {
-  // s for singular name
-  // p for plural name
-  region: {
-    s: 'Region',
-    p: 'Regions'
-  },
-  district: {
-    s: 'County',
-    p: 'Counties'
-  },
-  districtCommunity: {
-    s: 'District',
-    p: 'Districts'
-  },
-  chiefdomCommunity: {
-    s: 'Chiefdom',
-    p: 'Chiefdoms'
-  },
-  chiefdom: {
-    s: 'Sub County',
-    p: 'Sub Counties'
-  },
-  healthFacility: {
-    s: 'Health Facility',
-    p: 'Health Facilities'
-  }
-};
-
 export const ROLE_LABELS = {
   [APPCONSTANTS.ALL_ROLES.SUPER_USER]: 'Super User',
   [APPCONSTANTS.ALL_ROLES.SUPER_ADMIN]: 'Super Admin',
@@ -504,6 +468,7 @@ export const ROLE_LABELS = {
 };
 
 export const NAMING_VARIABLES = {
+  // internal purpose only, users can't able to see
   country: 'country',
   region: 'region',
   district: 'district',

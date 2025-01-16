@@ -52,6 +52,7 @@ export interface IUserFormProps {
     isCreateDistrict?: boolean;
     isReportOrInsightUser?: boolean;
     isReportSuperAdmin?: boolean;
+    isAdminForm?: boolean;
   };
 }
 

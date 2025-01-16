@@ -11,7 +11,7 @@ import { healthFacilityLoadingSelector, workflowLoadingSelector } from '../../st
 import { ISideMenu } from '../../store/common/types';
 import Loader from '../loader/Loader';
 import { countryIdSelector, roleSelector } from '../../store/user/selectors';
-import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS, SIDE_MENU_FETCHING_HIERARCHY } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE, NAMING_VARIABLES, SIDE_MENU_FETCHING_HIERARCHY } from '../../constants/appConstants';
 import toastCenter from '../../utils/toastCenter';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { getMedicationLoadingSelector } from '../../store/medication/selectors';
@@ -49,9 +49,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const { appTypes } = useAppTypeConfigs();
 
   const sideMenuLoading = useSelector(getLoadingSelector);
-  const {
-    healthFacility: { s: healthFacility }
-  } = NAME_CONSTANTS;
+  const { healthFacility } = NAMING_VARIABLES;
 
   const getLoading = useCallback(
     () =>

@@ -3,7 +3,7 @@ import { Field } from 'react-final-form';
 
 import TextInput from '../../components/formFields/TextInput';
 import { required, composeValidators, validateEntityName } from '../../utils/validation';
-import { NAME_CONSTANTS } from '../../constants/appConstants';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * District Form component
@@ -11,7 +11,7 @@ import { NAME_CONSTANTS } from '../../constants/appConstants';
 const DistrictForm = (): React.ReactElement => {
   const {
     district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
   return (
     <div className='row gx-1dot25'>
       <div className='col-12'>

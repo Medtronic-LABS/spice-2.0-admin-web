@@ -27,7 +27,7 @@ import { error, success } from '../../utils/toastCenter';
 import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
 import localStorageService from '../../global/localStorageServices';
-import { activateUser, deactivateUser, assignPeerSupervisor, reasignCHW } from '../../services/userAPI';
+import { setLabelName } from '../common/actions';
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -64,6 +64,9 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
     sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
     sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, country?.id);
+    if (country?.displayValues) {
+      yield put(setLabelName(country.displayValues));
+    }
     const { ADMIN } = APPCONSTANTS.SUITE_ACCESS;
     const spiceAdminRole = allRoles?.find(
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
@@ -160,6 +163,12 @@ export function* fetchLoggedInUser(): SagaIterator {
     }
     if (country?.tenantId) {
       sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
+    }
+    if (country?.id) {
+      sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, country?.id);
+    }
+    if (country?.displayValues) {
+      yield put(setLabelName(country.displayValues));
     }
     const { ADMIN } = APPCONSTANTS.SUITE_ACCESS;
     const spiceAdminRole = allRoles?.find(

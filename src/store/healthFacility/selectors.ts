@@ -7,6 +7,7 @@ const getHFTypes = (state: AppState) => state.healthFacility.hfTypes;
 const getHFTypesLoading = (state: AppState) => state.healthFacility.hfTypesLoading;
 const getHFTotal = (state: AppState) => state.healthFacility.hfTotal;
 const getHFListDetails = (state: AppState) => state.healthFacility.healthFacilityList;
+const getAssignedHFListForHFAdmin = (state: AppState) => state.healthFacility.assignedHFListForHFAdmin;
 const getHFUserList = (state: AppState) => state.healthFacility.healthFacilityUserList;
 const getHFUsersTotal = (state: AppState) => state.healthFacility.hfUsersTotal;
 const getHFUserLoading = (state: AppState) => state.healthFacility.hfUsersLoading;
@@ -44,6 +45,7 @@ export const hfTypesSelector = createSelector(getHFTypes, (types) => types);
 export const hfTypesLoadingSelector = createSelector(getHFTypesLoading, (loading) => loading);
 export const healthFacilityListTotalSelector = createSelector(getHFTotal, (total) => total);
 export const healthFacilityListSelector = createSelector(getHFListDetails, (hfList) => hfList);
+export const assignedHFListForHFAdminSelector = createSelector(getAssignedHFListForHFAdmin, (hfList) => hfList);
 
 export const healthFacilityUserListSelector = createSelector(getHFUserList, (siteUserList) => siteUserList);
 export const healthFacilityUsersLoadingSelector = createSelector(getHFUserLoading, (hfUsersLoading) => hfUsersLoading);

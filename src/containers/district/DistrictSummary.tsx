@@ -331,9 +331,9 @@ const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
         disableOptions={true}
         isEdit={!isAdd}
         countryId={countryId}
-        isAdminForm={true}
         defaultSelectedRole={APPCONSTANTS.ROLES.DISTRICT_ADMIN}
         enableAutoPopulate={true}
+        userFormParams={{ isAdminForm: true }}
       />
     );
   };

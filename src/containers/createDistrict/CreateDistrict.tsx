@@ -148,10 +148,9 @@ const CreateDistrict: React.FC = () => {
                     <UserForm
                       form={formInstance.current}
                       countryId={Number(regionId)}
-                      isAdminForm={true}
                       defaultSelectedRole={APPCONSTANTS.ROLES.DISTRICT_ADMIN}
                       enableAutoPopulate={true}
-                      userFormParams={{ isCreateDistrict: true }}
+                      userFormParams={{ isCreateDistrict: true, isAdminForm: true }}
                     />
                   </FormContainer>
                 </div>

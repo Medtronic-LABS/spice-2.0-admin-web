@@ -27,7 +27,7 @@ import {
 } from '../../store/region/selectors';
 import { IMatchParams } from '../../store/region/types';
 import { getAppTypeSelector, roleSelector } from '../../store/user/selectors';
-import { fileDownload } from '../../utils/commonUtils';
+import { fileDownload, formatUserToastMsg } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import styles from './Region.module.scss';
 import { clearChiefdomList } from '../../store/chiefdom/actions';
@@ -46,8 +46,10 @@ const Region = (): React.ReactElement => {
 
   const {
     isCommunity,
+    region: { s: regionSName },
     district: { s: districtSName },
-    chiefdom: { s: chiefdomSName }
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
   } = useAppTypeConfigs();
 
   // Check if the current user role is Region Admin to set read-only access
@@ -66,10 +68,13 @@ const Region = (): React.ReactElement => {
           const filename = regionDetails.name;
           // Initiating file download with appropriate file type (Excel sheet)
           fileDownload(data, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_DOWNLOAD_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.REGION_DOWNLOAD_SUCCESS, regionSName)
+          );
         },
         failureCb: (error) => {
-          toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DOWNLOAD_FAILURE);
+          toastCenter.error(APPCONSTANTS.OOPS, formatUserToastMsg(APPCONSTANTS.REGION_DOWNLOAD_FAILURE, regionSName));
         }
       })
     );
@@ -91,11 +96,14 @@ const Region = (): React.ReactElement => {
           dispatch(clearChiefdomList());
           dispatch(clearDistrictList());
           fetchRegionDetails(); // Fetch updated region details after successful upload
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_UPLOAD_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.REGION_UPLOAD_SUCCESS, regionSName)
+          );
           setUploadClicked(false); // Reset upload button state
         },
         failureCb: (e) => {
-          toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.REGION_UPLOAD_FAILURE);
+          toastCenter.error(APPCONSTANTS.OOPS, formatUserToastMsg(APPCONSTANTS.REGION_UPLOAD_FAILURE, regionSName));
         }
       })
     );
@@ -112,11 +120,18 @@ const Region = (): React.ReactElement => {
           limit: listParams.rowsPerPage,
           search: listParams.searchTerm,
           failureCb: (e) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.REGION_DETAIL_FETCH_ERROR));
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.REGION_DETAIL_FETCH_ERROR, regionSName)
+              )
+            );
           }
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, regionId]);
 
   /**
@@ -190,7 +205,7 @@ const Region = (): React.ReactElement => {
               customLabel={isReadOnly ? undefined : 'Upload'}
               customButtonIcon={UploadIcon}
               onCustomClick={() => setUploadClicked(true)}
-              header='Region'
+              header={regionSName}
               searchPlaceholder='Search Name'
               isSearch={true}
               onSearch={handleSearch}
@@ -216,8 +231,11 @@ const Region = (): React.ReactElement => {
                 rowsPerPage={listParams.rowsPerPage}
                 count={regionDetails.total}
                 handlePageChange={handlePage}
-                confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
-                deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
+                confirmationTitle={formatUserToastMsg(
+                  APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION,
+                  healthFacilitySName
+                )}
+                deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE, healthFacilitySName)}
               />
             </DetailCard>
           </div>
@@ -225,7 +243,7 @@ const Region = (): React.ReactElement => {
       </div>
       <ModalForm
         show={uploadClicked}
-        title={`Upload Region Data`}
+        title={`Upload ${regionSName} Data`}
         cancelText='Cancel'
         submitText='Submit'
         hideFooterButton={true}

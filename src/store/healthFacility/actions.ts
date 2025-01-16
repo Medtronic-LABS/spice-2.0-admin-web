@@ -97,10 +97,9 @@ import {
   IFetchCityListRequest,
   IFetchCityListSuccess,
   IFetchCityListFailure,
-  IFetchAllHFListSuccess,
-  IFetchHFStatusRequest,
-  IFetchHFStatusSuccess,
-  IFetchHFStatusFailure
+  ISetAssignedHFListForHFAdminPayload,
+  ISetAssignedHFListForHFAdmin,
+  IClearAssignedHFListForHFAdmin
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 import { IClearChiefdomList } from '../chiefdom/types';
@@ -115,6 +114,7 @@ export const fetchHFListRequest = ({
   districtIds,
   chiefdomIds,
   userBased,
+  forHFAdmin,
   successCb,
   failureCb
 }: Omit<IFetchHFListRequest, 'type'>): IFetchHFListRequest => ({
@@ -128,6 +128,7 @@ export const fetchHFListRequest = ({
   districtIds,
   chiefdomIds,
   userBased,
+  forHFAdmin,
   successCb,
   failureCb
 });
@@ -144,6 +145,17 @@ export const fetchAllHFListSuccess = (payload: IFetchHFListSuccessPayload): IFet
 export const fetchHFListFailure = (error: Error): IFetchHFListFailure => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_LIST_FAILURE,
   error
+});
+
+export const setAssignedHFListForHFAdmin = (
+  payload: ISetAssignedHFListForHFAdminPayload
+): ISetAssignedHFListForHFAdmin => ({
+  type: HF_TYPES.SET_ASSIGNED_HF_LIST_FOR_HF_ADMIN,
+  payload
+});
+
+export const clearAssignedHFListForHFAdmin = (): IClearAssignedHFListForHFAdmin => ({
+  type: HF_TYPES.CLEAR_ASSIGNED_HF_LIST_FOR_HF_ADMIN
 });
 
 export const createHFRequest = ({
@@ -713,7 +725,7 @@ export const validateLinkedRestrictionsFailure = (error: Error): IValidateLinked
   error
 });
 
-export const clearHealthFaciliityDetail = () => ({
+export const clearHealthFacilityDetail = () => ({
   type: HF_TYPES.CLEAR_HEALTH_FACILITY_DETAIL
 });
 

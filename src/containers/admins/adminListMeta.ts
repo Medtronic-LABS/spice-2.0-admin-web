@@ -63,10 +63,12 @@ export const formatChiefdom = (user: IHFUserGet): string => formatOrganizations(
 
 export const columnDef = ({
   chiefdomModuleName,
-  districtModuleName
+  districtModuleName,
+  healthFacilityModuleName
 }: {
   chiefdomModuleName: string;
   districtModuleName: string;
+  healthFacilityModuleName: string;
 }) => {
   return [
     {
@@ -85,14 +87,14 @@ export const columnDef = ({
     },
     {
       id: 3,
-      name: 'district',
+      name: district,
       label: districtModuleName,
       width: '14%',
       cellFormatter: formatDistrict
     },
     {
       id: 4,
-      name: 'chiefdom',
+      name: chiefdom,
       label: chiefdomModuleName,
       width: '14%',
       cellFormatter: formatChiefdom
@@ -100,7 +102,7 @@ export const columnDef = ({
     {
       id: 5,
       name: 'healthFacility',
-      label: 'HEALTH FACILITY',
+      label: healthFacilityModuleName,
       width: '14%',
       cellFormatter: formatHealthFacility
     },
@@ -109,7 +111,7 @@ export const columnDef = ({
       name: 'phoneNumber',
       label: 'CONTACT NUMBER',
       width: '14%',
-      cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
+      cellFormatter: (user: IHFUserGet) => `${user.countryCode ? '+' + user.countryCode : ''}  ${user.phoneNumber}`
     }
   ];
 };

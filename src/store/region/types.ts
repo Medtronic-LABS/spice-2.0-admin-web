@@ -1,4 +1,5 @@
 import { ISelectOption } from '../../components/formFields/SelectInput';
+import { ILabelName } from '../common/types';
 import { ITimezone } from '../user/types';
 import * as ACTION_TYPES from './actionTypes';
 
@@ -59,7 +60,7 @@ export interface IRegionPayload {
 }
 
 export interface IFetchRegionDetailReqPayload {
-  tenantId: string;
+  tenantId?: string;
   id: string;
   searchTerm?: string;
   failureCb?: (error: Error) => void;
@@ -167,6 +168,7 @@ export interface IRegionDetail {
   appTypes: string[];
   list: IRegionDetailList[] | [];
   total: number;
+  displayValues?: ILabelName;
 }
 
 export interface IRegionInfo {

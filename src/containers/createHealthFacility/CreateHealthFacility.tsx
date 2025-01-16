@@ -30,6 +30,7 @@ import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUt
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import Workflows from '../healthFacility/Workflows';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 interface IMatchParams {
   regionId?: string;
@@ -59,7 +60,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const history = useHistory();
   const workflows = useSelector(workflowListSelector);
   const isWorkflowLoading = useSelector(workflowLoadingSelector);
-  const { isCommunity } = useAppTypeConfigs();
   const loading = useSelector(healthFacilityLoadingSelector);
   const [submittedData, setSubmittedData] = useState({
     data: {
@@ -80,6 +80,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const role = useSelector(roleSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const {
+    isCommunity,
     appTypes,
     healthFacility: { s: healthFacilitySName }
   } = useAppTypeConfigs();
@@ -148,8 +149,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   };
 
   const onCreateSuccess = useCallback(() => {
-    dispatch(clearHFList());
-    toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS);
+    toastCenter.success(
+      APPCONSTANTS.SUCCESS,
+      formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS, healthFacilitySName)
+    );
     setSubmittedData({
       ...submittedData,
       isSubmitClicked: false,
@@ -157,7 +160,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     });
     formInstance.current.change('healthFacility', {});
     onGotoList();
-  }, [PAGENUMBER.DETAILS, dispatch, onGotoList, submittedData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [PAGENUMBER.DETAILS, onGotoList, submittedData]);
 
   const onCreateFailure = useCallback(
     (e: Error) => {
@@ -166,8 +170,15 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         isSubmitClicked: false,
         pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
       });
-      toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, e.message));
+      toastCenter.error(
+        ...getErrorToastArgs(
+          e,
+          APPCONSTANTS.ERROR,
+          formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR, healthFacilitySName)
+        )
+      );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [PAGENUMBER.DETAILS, submittedData]
   );
 

@@ -7,6 +7,8 @@ export const initialState: ICommanState = {
   sideMenu: {
     list: []
   },
+  labelName: null,
+  labelNameLoading: false,
   error: null
 };
 
@@ -38,6 +40,17 @@ const regionReducer = (state = initialState, action = {} as CommonActions): ICom
       return {
         ...state,
         sideMenu: initialState.sideMenu
+      };
+    case COMMON_TYPES.SET_LABELNAME:
+      return {
+        ...state,
+        labelName: action.values
+      };
+    case COMMON_TYPES.CLEAR_LABELNAME:
+      return {
+        ...state,
+        labelNameLoading: false,
+        labelName: null
       };
     default:
       return {

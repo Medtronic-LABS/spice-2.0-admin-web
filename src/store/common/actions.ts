@@ -5,7 +5,10 @@ import {
   IFetchSideMenuSuccess,
   IFetchSideMenuFailure,
   IFetchSideMenuResponse,
-  IClearSideMenu
+  IClearSideMenu,
+  IClearLabelName,
+  ISetLabelName,
+  ILabelName
 } from './types';
 
 export const fetchSideMenuRequest = (payload: IFetchSideMenuPayload): IFetchSideMenuRequest => ({
@@ -25,4 +28,13 @@ export const fetchSideMenuFailure = (error: Error): IFetchSideMenuFailure => ({
 
 export const clearSideMenu = (): IClearSideMenu => ({
   type: COMMON_TYPES.CLEAR_SIDEMENU
+});
+
+export const setLabelName = (values: ILabelName): ISetLabelName => ({
+  type: COMMON_TYPES.SET_LABELNAME,
+  values
+});
+
+export const clearLabelName = (): IClearLabelName => ({
+  type: COMMON_TYPES.CLEAR_LABELNAME
 });

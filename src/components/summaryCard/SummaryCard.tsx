@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import { ReactComponent as ArrowRight } from '../../assets/images/arrow-right-small.svg';
-import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { convertToCaptilize } from '../../utils/validation';
 
@@ -52,9 +52,6 @@ const SummaryCard = ({
   formId
 }: ISummaryCardProps) => {
   const history = useHistory();
-  const {
-    healthFacility: { s: healthFacilitySName }
-  } = NAME_CONSTANTS;
   /**
    * Handles the hover effect on the navigation link.
    * @param {React.MouseEvent<HTMLDivElement>} e - The mouse event
@@ -79,7 +76,10 @@ const SummaryCard = ({
     history.push({ pathname: detailRoute });
   };
 
-  const { isCommunity } = useAppTypeConfigs();
+  const {
+    isCommunity,
+    healthFacility: { s: healthFacilitySName }
+  } = useAppTypeConfigs();
 
   return (
     <div

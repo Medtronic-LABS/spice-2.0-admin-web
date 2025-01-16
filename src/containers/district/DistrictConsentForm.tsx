@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import ConsentForm from '../ConsentForm/ConsentForm';
 import {
   clearConsentForm,
@@ -15,6 +15,7 @@ import { consentFormSelector } from '../../store/workflow/selectors';
 import { removeEditorContentIfAddedHTMLPlugins } from '../../utils/consentFormHelpers';
 import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IProps {
   isOpen?: boolean;
@@ -34,7 +35,7 @@ const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose
   const [selectedFormType, setSelectedFormType] = useState({ name: '', id: -1 } as { name: string; id: number });
   const {
     district: { s: districtSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * To remove Consent form cache in store

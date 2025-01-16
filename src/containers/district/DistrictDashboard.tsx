@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
 import SummaryCard, { ISummaryCardProps } from '../../components/summaryCard/SummaryCard';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import { useLoadMorePagination } from '../../hooks/pagination';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { appendZeroBefore, formatUserToastMsg } from '../../utils/commonUtils';
@@ -23,6 +23,7 @@ import { countryIdSelector, formDataIdSelector, tenantIdSelector } from '../../s
 import styles from './District.module.scss';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { clearSideMenu } from '../../store/common/actions';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * District Dashboard component
@@ -39,8 +40,9 @@ const DistrictDashboard = () => {
   const { push } = useHistory();
   const {
     district: { s: districtSName, p: districtPName },
-    chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+    chiefdom: { s: chiefdomSName },
+    healthFacility: { s: healthFacilitySName }
+  } = useAppTypeConfigs();
 
   /**
    * Custom hook for handling load-more pagination.
@@ -190,7 +192,7 @@ const DistrictDashboard = () => {
             {
               type: 'number',
               value: Number(healthFacilityCount) ? appendZeroBefore(healthFacilityCount, 2) : '-',
-              label: 'Health Facility',
+              label: healthFacilitySName,
               route: PROTECTED_ROUTES.healthFacilityByDistrict
                 .replace(':districtId', formDataId)
                 .replace(':tenantId', _id),

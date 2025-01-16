@@ -37,10 +37,7 @@ import { roleSelector } from '../../store/user/selectors';
 import { formatHealthFacility } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
-import { chiefdomListSelector as getAllChiefdomsSelector } from '../../store/healthFacility/selectors';
-import { fetchChiefdomListRequest, clearChiefdomList } from '../../store/healthFacility/actions';
-import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
-import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
+import { formatUserToastMsg } from '../../utils/commonUtils';
 
 /**
  * Interface for modal state
@@ -81,7 +78,7 @@ const HealthFacilityList = (): React.ReactElement => {
     appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
+    healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
   } = useAppTypeConfigs();
 
   const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
@@ -101,69 +98,19 @@ const HealthFacilityList = (): React.ReactElement => {
   /**
    * Fetches the health facility list
    */
-  const fetchList = useCallback(
-    ({ skip = null, healthFacilityTypes = null, districtIds = null, chiefdomIds = null }: any) => {
-      dispatch(
-        fetchHFListRequest({
-          countryId,
-          skip: skip ?? (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-          limit: listParams.rowsPerPage,
-          searchTerm: listParams.searchTerm,
-          userBased: !isSuperUser,
-          tenantIds: [tenantId],
-          healthFacilityTypes: healthFacilityTypes ?? filters.healthFacilityTypes,
-          districtIds: districtIds ?? filters.districtIds,
-          chiefdomIds: chiefdomIds ?? filters.chiefdomIds,
-          failureCb: (e: Error) => requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR)
-        })
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      dispatch,
-      isSuperUser,
-      listParams.page,
-      listParams.rowsPerPage,
-      listParams.searchTerm,
-      countryId,
-      filters.districtIds
-    ]
-  );
-
-  useEffect(() => {
-    if (!hfTypesList.length) {
-      dispatch(fetchHFTypesRequest({}));
-    }
-    setFilters({ ...filters, chiefdomIds: [] });
-    if (!districtList.length) {
-      dispatch(
-        fetchDistrictsByCountryIdRequest({
-          data: { countryId },
-          failureCb: (e) =>
-            toastCenter.error(
-              ...getErrorToastArgs(
-                e,
-                APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, chiefdomSName)
-              )
-            )
-        })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
-
-  useEffect(() => {
-    dispatch(clearChiefdomList());
-    setFilters({ ...filters, chiefdomIds: [] });
-    if (filters.districtIds.length) {
-      dispatch(
-        fetchChiefdomListRequest({
-          countryId: Number(countryId),
-          districtIds: filters.districtIds
-        })
-      );
-    }
+  const fetchList = useCallback(() => {
+    dispatch(
+      fetchHFListRequest({
+        countryId,
+        skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+        limit: listParams.rowsPerPage,
+        searchTerm: listParams.searchTerm,
+        userBased: !isSuperUser,
+        tenantIds: [tenantId],
+        failureCb: (e: Error) =>
+          requestFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_LIST_FETCH_ERROR, healthFacilityPName))
+      })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.districtIds, districtId, countryId, tenantId]);
 
@@ -199,7 +146,7 @@ const HealthFacilityList = (): React.ReactElement => {
         appTypes,
         successCb: openHFEditModal,
         failureCb: (e: Error) => {
-          requestFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_FETCH_ERROR);
+          requestFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_FETCH_ERROR, healthFacilitySName));
         }
       })
     );
@@ -227,7 +174,10 @@ const HealthFacilityList = (): React.ReactElement => {
         } as IHealthFacilityForm
       });
     } else {
-      toastCenter.error(APPCONSTANTS.ERROR, APPCONSTANTS.HEALTH_FACILITY_SUMMARY_UPDATE_ERROR);
+      toastCenter.error(
+        APPCONSTANTS.ERROR,
+        formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_SUMMARY_UPDATE_ERROR, healthFacilitySName)
+      );
     }
   };
 
@@ -270,8 +220,11 @@ const HealthFacilityList = (): React.ReactElement => {
   };
 
   const hfUpdateSuccess = () => {
-    toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS);
-    fetchList({});
+    toastCenter.success(
+      APPCONSTANTS.SUCCESS,
+      formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS, healthFacilitySName)
+    );
+    fetchList();
     closeHealthFacilityEditModal(true);
   };
   const fetchFailure = (e: Error, errorMessage: string) =>
@@ -352,7 +305,10 @@ const HealthFacilityList = (): React.ReactElement => {
             data: postData,
             successCb: hfUpdateSuccess,
             failureCb: (e) => {
-              fetchFailure(e, APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR);
+              fetchFailure(
+                e,
+                formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_ERROR, healthFacilitySName)
+              );
             }
           })
         );
@@ -517,14 +473,11 @@ const HealthFacilityList = (): React.ReactElement => {
             onRowEdit={openEditDialogue}
             handlePageChange={handlePage}
             handleRowClick={handleRowClick}
-            confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION}
-            deleteTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE}
-            isActiveToggle={true}
-            customIconStyle={{ width: 18 }}
-            isActiveKey='active'
-            onActivateClick={(rowData: any) => {
-              setOpenConfirmationModal({ isOpen: true, userData: rowData });
-            }}
+            confirmationTitle={formatUserToastMsg(
+              APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION,
+              healthFacilitySName
+            )}
+            deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE, healthFacilitySName)}
           />
         </DetailCard>
       </div>

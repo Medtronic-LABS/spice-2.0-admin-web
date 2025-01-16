@@ -7,7 +7,7 @@ import { IDistrict, IDistrictAdmin, IAdminEditFormValues } from '../../../store/
 import { initialState } from '../../../store/district/reducer';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../../constants/appConstants';
+import APPCONSTANTS from '../../../constants/appConstants';
 import { formatUserToastMsg } from '../../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
 import { ACTIVATE_ACCOUNT_REQUEST, FETCH_DISTRICT_LIST_REQUEST } from '../../../store/district/actionTypes';
@@ -37,9 +37,8 @@ jest.mock('../../../components/customTable/CustomTable', () => (props: any) => {
   return <div>child component</div>;
 });
 
-const {
-  district: { s: districtSName, p: districtPName }
-} = NAME_CONSTANTS;
+const districtSName = 'District';
+const districtPName = 'Districts';
 
 describe('DeactivatedRecords component', () => {
   const store = mockStore({

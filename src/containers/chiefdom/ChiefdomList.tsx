@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
 
-import APPCONSTANTS, { NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import {
   chiefdomListCountSelector,
   chiefdomListSelector,
@@ -29,6 +29,7 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 import { countryIdSelector } from '../../store/user/selectors';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IChiefdomFormValue {
   name: string;
@@ -62,7 +63,7 @@ const ChiefdomList = (): React.ReactElement => {
   const {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   /**
    * To load Chiefdom List data.

@@ -3,6 +3,7 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * Interface for route parameters
@@ -59,10 +60,14 @@ const RegionCustomization = (): React.ReactElement => {
     );
   };
 
+  const {
+    region: { s: regionSName }
+  } = useAppTypeConfigs();
+
   return (
     <>
       <div className='col-12'>
-        <DetailCard header='Region Customization' isSearch={false}>
+        <DetailCard header={`${regionSName} Customization`} isSearch={false}>
           <CustomTable
             rowData={APPCONSTANTS.REGION_CUSTOMIZATION_SCREENS}
             columnsDef={[

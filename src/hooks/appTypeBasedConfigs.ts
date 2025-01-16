@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { APP_TYPE } from '../constants/appConstants';
 import { countryIdSelector, getAppTypeSelector } from '../store/user/selectors';
+import { labelNameSelector } from '../store/common/selectors';
 
 const commonLabels = {
   region: {
@@ -11,24 +12,21 @@ const commonLabels = {
   healthFacility: {
     s: 'Health Facility',
     p: 'Health Facilities'
-  }
+  },
+  district: {
+    s: 'District',
+    p: 'Districts'
+  },
+  chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' }
 };
 
 const COMMUNITY = {
-  // s for singular name
-  // p for plural name
-  ...commonLabels,
   isCommunity: true,
   GENDER_OPTIONS: [
     { value: 'Male', label: 'Male' },
     { value: 'Female', label: 'Female' },
     { value: 'Non-Binary', label: 'Non-Binary' }
   ],
-  district: {
-    s: 'District',
-    p: 'Districts'
-  },
-  chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' },
   hfDetails: {
     supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' }
   },
@@ -49,30 +47,11 @@ const COMMUNITY = {
 };
 
 const NON_COMMUNITY = {
-  // s for singular name
-  // p for plural name
   isCommunity: false,
-  ...commonLabels,
   GENDER_OPTIONS: [
     { value: 'Male', label: 'Male' },
     { value: 'Female', label: 'Female' }
   ],
-  district: {
-    s: 'County',
-    p: 'Counties'
-  },
-  districtCommunity: {
-    s: 'District',
-    p: 'Districts'
-  },
-  chiefdomCommunity: {
-    s: 'Chiefdom',
-    p: 'Chiefdoms'
-  },
-  chiefdom: {
-    s: 'Sub County',
-    p: 'Sub Counties'
-  },
   hfDetails: {
     supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' }
   },
@@ -107,6 +86,9 @@ const noAppTypes = {
 const useAppTypeConfigs = () => {
   const appTypesFromUser = useSelector(getAppTypeSelector);
   const userCountry = useSelector(countryIdSelector);
+  const nonCommunityLabelNames = useSelector(labelNameSelector);
+  const labelNames =
+    nonCommunityLabelNames && Object.keys(nonCommunityLabelNames).length ? nonCommunityLabelNames : commonLabels;
   const appTypes = useMemo(() => {
     // use app types from user object for super admin
     if (appTypesFromUser && appTypesFromUser.length) {
@@ -121,9 +103,9 @@ const useAppTypeConfigs = () => {
   return useMemo(
     () =>
       Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY)
-        ? { ...NON_COMMUNITY, appTypes }
-        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}) },
-    [appTypes]
+        ? { ...NON_COMMUNITY, appTypes, ...labelNames }
+        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}), ...labelNames },
+    [appTypes, labelNames]
   );
 };
 export default useAppTypeConfigs;

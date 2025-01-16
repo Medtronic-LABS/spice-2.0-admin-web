@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import APPCONSTANTS, { APP_TYPE, NAME_CONSTANTS } from '../../constants/appConstants';
+import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
 import styles from './Header.module.scss';
 import IconProfile from '../../assets/images/icon-profile.svg';
 import IconGlobal from '../../assets/images/icon-global.svg';
@@ -58,12 +58,12 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
   const [passwordModal, setPasswordModal] = useState(false);
   const [submitEnable, setSubmitEnabled] = useState(false);
 
-  const { appTypes } = useAppTypeConfigs();
-
   const {
+    appTypes,
+    region: { s: regionSName },
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName }
-  } = NAME_CONSTANTS;
+  } = useAppTypeConfigs();
 
   const nonCommunityUserMenus = [
     {
@@ -79,7 +79,7 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
       roles: [CHIEFDOM_ADMIN]
     },
     {
-      label: 'Region Details',
+      label: `${regionSName} Details`,
       icon: IconGlobal,
       route: PROTECTED_ROUTES.region.replace(':regionId', formDataId).replace(':tenantId', tenantId),
       roles: [REGION_ADMIN]
