@@ -251,6 +251,14 @@ const APPCONSTANTS = {
   ADD_ANOTHER_USER: 'Add Another User',
   IS_TERMS_CONDITIONS_DISMISSED: 'isTacD',
   TERMSCONDITIONS_UPDATE_FAIL: 'Failed to accept terms and conditions.',
+  PASSWORD_OPTIONS: [
+    { value: 'Change Password', label: 'Change Password' },
+    { value: 'Send Email', label: 'Reset by Email' }
+  ],
+  PASSWORD_VALUES: {
+    CHANGE_PASSWORD: 'Change Password',
+    SEND_EMAIL: 'Send Email'
+  },
   // Admin
   ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
   ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',

@@ -1,0 +1,26 @@
+.password-fields-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+
+  &.show {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 1rem;
+  }
+}
+
+.email-message {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  padding: 0 15px;
+
+  &.show {
+    max-height: 100px;
+    opacity: 1;
+    margin-top: 1rem;
+  }
+}

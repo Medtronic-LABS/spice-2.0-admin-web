@@ -36,7 +36,7 @@ import {
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
-import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
+import { changePassword, fetchUserRolesAction, forgotPasswordRequest } from '../../store/user/actions';
 import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import { getUserPayload } from '../../utils/formatObjectUtils';
@@ -44,6 +44,9 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
 import { filterHFByAppTypes } from '../../utils/commonUtils';
+import Radio from '../../components/formFields/Radio';
+import { Field } from 'react-final-form';
+import './UserList.scss';
 
 export interface IMatchParams {
   tenantId: string;
@@ -60,8 +63,10 @@ export interface IMatchParams {
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId, healthFacilityId } = useParams<IMatchParams>();
+  const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
+  const [selectedOption, setSelectedOption] = useState('');
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const role = useSelector(roleSelector);
@@ -304,15 +309,17 @@ const UserList = (): React.ReactElement => {
     );
   };
 
-  // state for Change Password
+  // State management for change password
   const [openModal, setOpenModal] = useState({ isOpen: false, userData: {} as IHFUserGet });
-  const [submitEnable, setSubmitEnabled] = useState(false);
+  const [submitEnabled, setSubmitEnabled] = useState(false);
 
   /**
    * Handler function for close modal
    */
   const onModalCancel = () => {
     setOpenModal({ isOpen: false, userData: {} as IHFUserGet });
+    setSelectedOption('');
+    setSubmitEnabled(false);
   };
 
   /**
@@ -324,28 +331,103 @@ const UserList = (): React.ReactElement => {
   };
 
   /**
-   * Submit handler for change password modal
-   * @param {object} data - change password modal form value
-   * @param {string} data.newPassword - new password value
+   * Password change form UI Component
    */
-  const handleResetPasswordSubmit = (data: { newPassword: string }) => {
-    setChangePasswordLoading(true);
-    const password = generatePassword(data.newPassword);
-    dispatch(
-      changePassword({
-        userId: Number(openModal.userData?.id),
-        password,
-        successCB: () => {
-          setChangePasswordLoading(false);
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_CHANGE_SUCCESS);
-          onModalCancel();
-        },
-        failureCb: (e) => {
-          setChangePasswordLoading(false);
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED));
-        }
-      })
+  const userPasswordChangeUI = () => {
+    return (
+      <>
+        {!appTypes.includes('NON_COMMUNITY') && (
+          <div className='col-12'>
+            <Field
+              name='userPreference.passwordChange'
+              render={(props) => (
+                <Radio
+                  {...props}
+                  isRadioSquare={true}
+                  fieldLabel='Select Action'
+                  errorLabel='option'
+                  options={APPCONSTANTS.PASSWORD_OPTIONS}
+                  onChange={(value: string) => {
+                    props.input.onChange(value);
+                    setSelectedOption(value);
+                    if (value === SEND_EMAIL) {
+                      setSubmitEnabled(true);
+                    }
+                  }}
+                />
+              )}
+            />
+          </div>
+        )}
+        <div
+          className={`password-fields-wrapper ${
+            selectedOption === CHANGE_PASSWORD || appTypes.includes('NON_COMMUNITY') ? 'show' : ''
+          }`}
+        >
+          <ResetPasswordFields
+            email={openModal.userData.username}
+            setSubmitEnabled={setSubmitEnabled}
+            adminPasswordChange={false}
+          />
+        </div>
+        <div className={`email-message ${selectedOption === SEND_EMAIL ? 'show' : ''}`}>
+          A password reset link will be sent to this email:{' '}
+          <span className='email-address'>{openModal.userData.username}</span>
+        </div>
+      </>
     );
+  };
+
+  /**
+   * Handles the submission of password reset/change form
+   * This function manages two scenarios:
+   * 1. Change Password: Directly changes the user's password
+   * 2. Send Email: Sends a password reset link to user's email
+   *
+   * @param {Object} formValues - The values from the form submission
+   * @param {Object} formValues.userPreference - User preferences object
+   * @param {string} formValues.userPreference.passwordChange - Selected option ('Change Password' or 'Send Email')
+   * @param {string} [formValues.newPassword] - New password (required only for Change Password option)
+   *
+   */
+  const handleResetPasswordSubmit = (formValues: {
+    userPreference: { passwordChange: string };
+    newPassword?: string;
+  }) => {
+    setChangePasswordLoading(true);
+
+    if (formValues.userPreference.passwordChange === CHANGE_PASSWORD) {
+      if (!formValues.newPassword) {
+        setChangePasswordLoading(false);
+        return;
+      }
+      const password = generatePassword(formValues.newPassword);
+      dispatch(
+        changePassword({
+          userId: Number(openModal.userData?.id),
+          password,
+          successCB: () => {
+            setChangePasswordLoading(false);
+            toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_CHANGE_SUCCESS);
+            onModalCancel();
+          },
+          failureCb: (e) => {
+            setChangePasswordLoading(false);
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED));
+          }
+        })
+      );
+    } else if (formValues?.userPreference?.passwordChange === SEND_EMAIL) {
+      dispatch(
+        forgotPasswordRequest({
+          email: openModal.userData.username,
+          successCB: () => {
+            setChangePasswordLoading(false);
+            onModalCancel();
+          }
+        })
+      );
+    }
   };
 
   /**
@@ -485,19 +567,16 @@ const UserList = (): React.ReactElement => {
         />
         <ModalForm
           show={openModal.isOpen}
-          title={'Change Password'}
+          title={CHANGE_PASSWORD}
           cancelText={'Cancel'}
-          submitText={'Submit'}
+          submitText={selectedOption === SEND_EMAIL ? SEND_EMAIL : 'Submit'}
           handleCancel={onModalCancel}
           handleFormSubmit={handleResetPasswordSubmit}
           size={'modal-md'}
-          submitDisabled={!submitEnable}
+          submitDisabled={selectedOption === CHANGE_PASSWORD && !submitEnabled}
+          handleForceSubmit={selectedOption === SEND_EMAIL}
         >
-          <ResetPasswordFields
-            email={openModal.userData.username}
-            setSubmitEnabled={setSubmitEnabled}
-            adminPasswordChange={false}
-          />
+          {userPasswordChangeUI()}
         </ModalForm>
       </div>
     </>
