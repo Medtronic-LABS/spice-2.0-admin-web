@@ -43,7 +43,7 @@ import {
   healthFacilityUsersLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IUserRole } from '../../store/healthFacility/types';
-import { changePassword, fetchUserRolesAction } from '../../store/user/actions';
+import { changePassword, fetchUserRolesAction, forgotPasswordRequest } from '../../store/user/actions';
 import { countryIdSelector, emailSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
 import { getUserPayload } from '../../utils/formatObjectUtils';
@@ -51,6 +51,9 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './userListMeta';
 import { filterByAppTypes, filterHFByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
+import Radio from '../../components/formFields/Radio';
+import { Field } from 'react-final-form';
+import './UserList.scss';
 
 export interface IMatchParams {
   tenantId: string;
@@ -83,19 +86,9 @@ interface ICHWListModal {
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const [isOpenUserModal, setIsOpenUserModal] = useState<IUserModalState>({
-    isOpen: false,
-    isEdit: false,
-    isSupervisor: false
-  });
-  const [isOpenPeerSupervisorModal, setIsOpenPeerSupervisorModal] = useState<IPeerSupervisorModal>({
-    isOpen: false,
-    isEdit: false
-  });
-  const [isOpenCHWListModal, setIsOpenCHWListModal] = useState<ICHWListModal>({
-    isOpen: false
-  });
+  const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const [selectedOption, setSelectedOption] = useState('');
   const countryId = useSelector(countryIdSelector);
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
@@ -442,20 +435,6 @@ const UserList = (): React.ReactElement => {
     );
   };
 
-  const CHWListFormRenderer = () => {
-    const filteredPeerSupervisorList =
-      peerSupervisorList.list?.filter((supervisor) => supervisor.id !== openConfirmationModal.userData.id) || [];
-    return (
-      <CustomTable
-        columnsDef={chwColumnDef}
-        rowData={chwList}
-        isEdit={false}
-        isDelete={false}
-        isAssignSupervisor={true}
-        peerSupervisorList={filteredPeerSupervisorList || []}
-      />
-    );
-  };
   // State management for change password
   const [openModal, setOpenModal] = useState({ isOpen: false, userData: {} as IHFUserGet });
   const [submitEnabled, setSubmitEnabled] = useState(false);
