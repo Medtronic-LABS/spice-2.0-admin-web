@@ -12,7 +12,11 @@ import {
 } from '../../store/user/selectors';
 import Loader from '../../components/loader/Loader';
 import { ITermsAndConditions } from '../../store/user/types';
-import { fetchTermsAndConditionsRequest, updateTermsAndConditionsRequest } from '../../store/user/actions';
+import {
+  fetchTermsAndConditionsRequest,
+  logoutRequest,
+  updateTermsAndConditionsRequest
+} from '../../store/user/actions';
 import TextEditor from '../../components/editor/WysiwygEditor';
 import './TermsAndConditions.scss';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
@@ -128,9 +132,8 @@ const TermsAndConditions = () => {
     );
   };
 
-  const handleDismiss = () => {
-    localStorageService.setItem(APPCONSTANTS.IS_TERMS_CONDITIONS_DISMISSED, true);
-    setShowModal(false);
+  const handleDecline = () => {
+    dispatch(logoutRequest());
   };
 
   return showTACCondition ? (
@@ -142,7 +145,7 @@ const TermsAndConditions = () => {
           title={`Terms and Conditions`}
           cancelText='Decline'
           submitText='Accept'
-          handleCancel={handleDismiss}
+          handleCancel={handleDecline}
           handleFormSubmit={handleSubmit}
           mutators={arrayMutators}
           render={editModalRender}

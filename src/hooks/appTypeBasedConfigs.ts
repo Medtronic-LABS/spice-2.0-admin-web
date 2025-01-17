@@ -14,10 +14,10 @@ const commonLabels = {
     p: 'Health Facilities'
   },
   district: {
-    s: 'District',
-    p: 'Districts'
+    s: 'County',
+    p: 'Counties'
   },
-  chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' }
+  chiefdom: { s: 'Sub County', p: 'Sub Counties' }
 };
 
 const COMMUNITY = {
@@ -89,6 +89,16 @@ const useAppTypeConfigs = () => {
   const nonCommunityLabelNames = useSelector(labelNameSelector);
   const labelNames =
     nonCommunityLabelNames && Object.keys(nonCommunityLabelNames).length ? nonCommunityLabelNames : commonLabels;
+  const communityLabelNames = useMemo(() => {
+    return {
+      ...commonLabels,
+      district: {
+        s: 'District',
+        p: 'Districts'
+      },
+      chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' }
+    };
+  }, []);
   const appTypes = useMemo(() => {
     // use app types from user object for super admin
     if (appTypesFromUser && appTypesFromUser.length) {
@@ -104,8 +114,8 @@ const useAppTypeConfigs = () => {
     () =>
       Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY)
         ? { ...NON_COMMUNITY, appTypes, ...labelNames }
-        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}), ...labelNames },
-    [appTypes, labelNames]
+        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}), ...communityLabelNames },
+    [appTypes, communityLabelNames, labelNames]
   );
 };
 export default useAppTypeConfigs;

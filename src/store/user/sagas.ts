@@ -112,6 +112,7 @@ export function* logout(): SagaIterator {
   try {
     yield call(userService.logout);
     sessionStorageServices.clearAllItem();
+    localStorageServices.deleteItem(APP_TYPE_NAME);
     yield put(userActions.resetStore());
     yield put(userActions.logoutSuccess());
   } catch (e) {
