@@ -248,6 +248,7 @@ const MedicationList = (): React.ReactElement => {
             buttonLabel='Add'
             header='Medication List'
             isFilter={true}
+            updatedFilterData={filters}
             onFilterData={[
               {
                 id: 1,

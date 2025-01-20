@@ -95,7 +95,6 @@ const HealthFacilityList = (): React.ReactElement => {
     chiefdomIds: [],
     skip: null
   });
-
   /**
    * Fetches the health facility list
    */
@@ -117,13 +116,22 @@ const HealthFacilityList = (): React.ReactElement => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, isSuperUser, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId]
+    [
+      dispatch,
+      isSuperUser,
+      listParams.page,
+      listParams.rowsPerPage,
+      listParams.searchTerm,
+      countryId,
+      filters.districtIds
+    ]
   );
 
   useEffect(() => {
     if (!hfTypesList.length) {
       dispatch(fetchHFTypesRequest({}));
     }
+    setFilters({ ...filters, chiefdomIds: [] });
     if (!districtList.length) {
       dispatch(
         fetchDistrictsByCountryIdRequest({
@@ -144,11 +152,11 @@ const HealthFacilityList = (): React.ReactElement => {
 
   useEffect(() => {
     dispatch(clearChiefdomList());
+    setFilters({ ...filters, chiefdomIds: [] });
     if (filters.districtIds.length) {
       dispatch(
         fetchChiefdomListRequest({
           countryId: Number(countryId),
-
           districtIds: filters.districtIds
         })
       );
@@ -158,7 +166,8 @@ const HealthFacilityList = (): React.ReactElement => {
 
   useEffect(() => {
     fetchList({ ...filters });
-  }, [fetchList, filters, listParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchList, filters.districtIds, filters.chiefdomIds, filters.healthFacilityTypes, listParams]);
 
   /**
    * Handles request failures
@@ -382,6 +391,9 @@ const HealthFacilityList = (): React.ReactElement => {
       ...(name === 'healthFacilityTypes' && { healthFacilityTypes }),
       skip: 0
     };
+    if (!newFilters.districtIds.length) {
+      newFilters.chiefdomIds = [];
+    }
     handlePage(1);
     setFilters(newFilters);
   };
@@ -397,6 +409,7 @@ const HealthFacilityList = (): React.ReactElement => {
           onSearch={handleSearch}
           onButtonClick={openCreateHealthFacility}
           onChange={handleFilterChange}
+          updatedFilterData={filters}
           isFilter={true}
           onFilterData={[
             {

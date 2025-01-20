@@ -22,6 +22,7 @@ interface ITableFilterProps {
   onChange?: any;
   filterCount?: number;
   placeholder?: string;
+  updatedFilterData?: any;
 }
 
 interface IOption {
@@ -38,9 +39,11 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   setSelectedRole,
   onChange,
   filterCount,
-  placeholder
+  placeholder,
+  updatedFilterData
 }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOptionsIds, setSelectedOptionsIds] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const {
@@ -60,6 +63,32 @@ const TableFilter: React.FC<ITableFilterProps> = ({
     name: string;
     displayName: string;
   } | null>(selectAllOptionData);
+
+  useEffect(() => {
+    if (filterData.name === 'Chiefdom') {
+      if (updatedFilterData?.chiefdomIds && updatedFilterData?.chiefdomIds?.length > 0) {
+        setSelectedOptions(updatedFilterData.chiefdomIds);
+        setSelectedOptionsIds(updatedFilterData.chiefdomIds);
+      } else {
+        setSelectedOptions([]);
+        setSelectedOptionsIds([]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updatedFilterData?.districtIds]);
+
+  useEffect(() => {
+    if (filterData.name === 'Brand') {
+      if (updatedFilterData?.brandIds && updatedFilterData?.brandIds?.length > 0) {
+        setSelectedOptions(updatedFilterData.brandIds);
+        setSelectedOptionsIds(updatedFilterData.brandIds);
+      } else {
+        setSelectedOptions([]);
+        setSelectedOptionsIds([]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updatedFilterData?.classificationIds]);
 
   /**
    * Handles the change of selected options.
@@ -124,10 +153,14 @@ const TableFilter: React.FC<ITableFilterProps> = ({
       if (isAllSelected.current) {
         isAllSelected.current = false;
         setSelectedOptions([]);
+        setSelectedOptionsIds([]);
       } else {
         isAllSelected.current = true;
         setSelectedOptions(() => {
           return [selectAllOption, ...filteredOptions].map((opt) => opt.name);
+        });
+        setSelectedOptionsIds(() => {
+          return [selectAllOption, ...filteredOptions].map((opt) => opt.id);
         });
       }
     } else {
@@ -135,6 +168,20 @@ const TableFilter: React.FC<ITableFilterProps> = ({
         const selectedFilterOptions = prev.includes(option.name)
           ? prev.filter((name) => name !== option.name)
           : [...prev, option.name];
+        const selectedAllIndex = selectedFilterOptions?.indexOf(selectAllLabel);
+        if (selectedFilterOptions?.length === filterData?.data?.length && selectedAllIndex === -1) {
+          selectedFilterOptions.push(selectAllLabel);
+          isAllSelected.current = true;
+        } else if (selectedAllIndex > -1) {
+          isAllSelected.current = false;
+          selectedFilterOptions.splice(selectedAllIndex, 1);
+        }
+        return selectedFilterOptions;
+      });
+      setSelectedOptionsIds((prev: any) => {
+        const selectedFilterOptions = prev.includes(option.id)
+          ? prev.filter((id: any) => id !== option.id)
+          : [...prev, option.id];
         const selectedAllIndex = selectedFilterOptions?.indexOf(selectAllLabel);
         if (selectedFilterOptions?.length === filterData?.data?.length && selectedAllIndex === -1) {
           selectedFilterOptions.push(selectAllLabel);
@@ -248,7 +295,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
             ref={dropdownContainerRef}
           >
             <div className='d-flex align-items-center'>
-              {selectedOptions.length && showCountIcon ? (
+              {selectedOptions.length && showCountIcon && getSelectValueFn() > 0 ? (
                 <span className='  badge rounded-pill bg-primary'>{getSelectValueFn()}</span>
               ) : (
                 <FilterListIcon />
@@ -277,13 +324,13 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                         key={option.id}
                         className={`${styles.selectOption} ${
                           option.value === '*' ? styles.selectAllLi : ''
-                        } px-1 py-0dot5 d-flex ${selectedOptions.includes(option.name) && styles.selectedDropdown}`}
+                        } px-1 py-0dot5 d-flex ${selectedOptionsIds.includes(option.id) && styles.selectedDropdown}`}
                       >
                         <label className='d-flex align-items-center fs-6'>
                           <input
                             type='checkbox'
                             value={option.id}
-                            checked={selectedOptions.includes(option.name)}
+                            checked={selectedOptionsIds.includes(option.id)}
                             onChange={() => handleSelectChange(option)}
                             ref={(input) => {
                               if (input) {

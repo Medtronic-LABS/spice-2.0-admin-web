@@ -8,6 +8,13 @@ import Filter from '../tableFilter/Filter';
 
 // Type for the setter functions
 type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
+
+interface IUpdatedFilterData {
+  districtIds: string[];
+  chiefdomIds: string[];
+  healthFacilityTypes: string[];
+}
+
 interface IDetailCardProps {
   header: string;
   buttonIcon?: string | React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -31,6 +38,7 @@ interface IDetailCardProps {
   setSelectedRole?: SetSelectedState;
   setSelectedFacility?: SetSelectedState;
   onChange?: (data: any, name: string) => void;
+  updatedFilterData?: IUpdatedFilterData;
 }
 
 interface IFilteredData {
@@ -73,6 +81,7 @@ const DetailCard = ({
   bodyClassName = '',
   setSelectedRole,
   setSelectedFacility,
+  updatedFilterData,
   onChange
 }: IDetailCardProps): React.ReactElement => {
   const buttonClass = `${
@@ -110,6 +119,7 @@ const DetailCard = ({
           filterCount={filteredData.filterCount}
           key={filteredData?.id}
           placeholder={filteredData?.placeholder}
+          updatedFilterData={updatedFilterData}
         />
       </div>
     ) : null;

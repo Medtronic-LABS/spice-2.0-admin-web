@@ -105,7 +105,7 @@ describe('Health Facility APIs', () => {
 
     mockAxios.onPost('/admin-service/chiefdom-list').reply(200, {});
 
-    await fetchChiefdomList(countryId, districtId, appTypes);
+    await fetchChiefdomList({ countryId, districtId, appTypes });
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/chiefdom-list');
