@@ -39,8 +39,8 @@ import { roleSelector } from '../../store/user/selectors';
 import { formatHealthFacility } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
-import { getAllChiefdomsSelector } from '../../store/chiefdom/selectors';
-import { fetchChiefDomsByCountryIdRequest } from '../../store/chiefdom/actions';
+import { chiefdomListSelector as getAllChiefdomsSelector } from '../../store/healthFacility/selectors';
+import { fetchChiefdomListRequest, clearChiefdomList } from '../../store/healthFacility/actions';
 import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 
 /**
@@ -144,23 +144,22 @@ const HealthFacilityList = (): React.ReactElement => {
         })
       );
     }
-    if (!chiefdomList.length) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
+
+  useEffect(() => {
+    dispatch(clearChiefdomList());
+    if (filters.districtIds.length) {
       dispatch(
-        fetchChiefDomsByCountryIdRequest({
-          data: { countryId },
-          failureCb: (e) =>
-            toastCenter.error(
-              ...getErrorToastArgs(
-                e,
-                APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_LIST_FETCH_ERROR, chiefdomSName)
-              )
-            )
+        fetchChiefdomListRequest({
+          countryId: Number(countryId),
+
+          districtIds: filters.districtIds
         })
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
+  }, [filters.districtIds, districtId, countryId, tenantId]);
 
   useEffect(() => {
     fetchList({ ...filters });

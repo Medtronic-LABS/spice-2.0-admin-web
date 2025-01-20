@@ -345,15 +345,16 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                           {formatHealthFacility(option)}
                         </label>
                         {option.value === '*' && !!selectedOptions.length && (
-                          <span
+                          <label
                             className={` ${styles.closeIcon}`}
                             onClick={() => {
                               isAllSelected.current = true;
                               handleSelectChange(selectAllOptionData as any);
                             }}
                           >
-                            <Close aria-label='close' />
-                          </span>
+                            {/* <Close aria-label='close' /> */}
+                            Reset All
+                          </label>
                         )}
                       </li>
                     ) : (

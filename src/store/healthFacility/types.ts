@@ -922,4 +922,5 @@ export type HealthFacilityActions =
   | IFetchCityListFailure
   | IFetchCityListSuccess
   | ISetAssignedHFListForHFAdmin
-  | IClearAssignedHFListForHFAdmin;
+  | IClearAssignedHFListForHFAdmin
+  | IClearChiefdomList;
