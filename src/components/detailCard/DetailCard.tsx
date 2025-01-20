@@ -120,6 +120,7 @@ const DetailCard = ({
           filterCount={filteredData.filterCount}
           key={filteredData?.id}
           placeholder={filteredData?.placeholder}
+          updatedFilterData={updatedFilterData}
         />
       </div>
     ) : null;

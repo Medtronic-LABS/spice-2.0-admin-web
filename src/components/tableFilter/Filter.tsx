@@ -23,6 +23,7 @@ interface ITableFilterProps {
   onChange?: any;
   filterCount?: number;
   placeholder?: string;
+  updatedFilterData?: any;
 }
 
 interface IOption {
@@ -39,7 +40,8 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   setSelectedRole,
   onChange,
   filterCount,
-  placeholder
+  placeholder,
+  updatedFilterData
 }: ITableFilterProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [selectedOptionsIds, setSelectedOptionsIds] = useState<number[]>([]);
@@ -294,7 +296,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
             ref={dropdownContainerRef}
           >
             <div className='d-flex align-items-center'>
-              {selectedOptions.length && showCountIcon ? (
+              {selectedOptions.length && showCountIcon && getSelectValueFn() > 0 ? (
                 <span className='  badge rounded-pill bg-primary'>{getSelectValueFn()}</span>
               ) : (
                 <FilterListIcon />
@@ -323,13 +325,13 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                         key={option.id}
                         className={`${styles.selectOption} ${
                           option.value === '*' ? styles.selectAllLi : ''
-                        } px-1 py-0dot5 d-flex ${selectedOptions.includes(option.name) && styles.selectedDropdown}`}
+                        } px-1 py-0dot5 d-flex ${selectedOptionsIds.includes(option.id) && styles.selectedDropdown}`}
                       >
                         <label className='d-flex align-items-center fs-6'>
                           <input
                             type='checkbox'
                             value={option.id}
-                            checked={selectedOptions.includes(option.name)}
+                            checked={selectedOptionsIds.includes(option.id)}
                             onChange={() => handleSelectChange(option)}
                             ref={(input) => {
                               if (input) {
