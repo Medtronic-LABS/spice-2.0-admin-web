@@ -90,6 +90,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
   const {
+    isCommunity,
     appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
@@ -100,8 +101,14 @@ const HealthFacilitySummary = (): React.ReactElement => {
     () => [
       { label: `${healthFacilitySName} Name`, value: healthFacility?.name },
       { label: `${healthFacilitySName} Type`, value: healthFacility?.type },
-      { label: 'PHU Focal Person Name', value: healthFacility?.phuFocalPersonName },
-      { label: 'PHU Focal Person No', value: healthFacility?.phuFocalPersonNumber },
+      {
+        label: `${isCommunity ? 'PHU Focal Person Name' : 'Facility Incharge'}`,
+        value: healthFacility?.phuFocalPersonName
+      },
+      {
+        label: `${isCommunity ? 'PHU Focal Person No' : 'Facility Incharge No'}`,
+        value: healthFacility?.phuFocalPersonNumber
+      },
       { label: districtSName, value: healthFacility?.district?.name },
       { label: chiefdomSName, value: healthFacility?.chiefdom?.name },
       { label: 'Address', value: healthFacility?.address },
