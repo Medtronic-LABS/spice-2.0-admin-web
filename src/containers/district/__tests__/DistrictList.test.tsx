@@ -15,6 +15,14 @@ const store = mockStore({
   },
   workflow: {
     loading: false
+  },
+  user: {
+    user: {
+      appTypes: []
+    }
+  },
+  common: {
+    labelName: null
   }
 });
 

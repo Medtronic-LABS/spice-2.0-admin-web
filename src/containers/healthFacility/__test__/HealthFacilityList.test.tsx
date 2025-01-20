@@ -36,6 +36,9 @@ describe('HealthFacilityList Component', () => {
       },
       user: {
         role: 'SUPER_ADMIN'
+      },
+      common: {
+        labelName: null
       }
     });
   });
@@ -60,6 +63,9 @@ describe('HealthFacilityList Component', () => {
       },
       user: {
         role: 'SUPER_ADMIN'
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -86,6 +92,9 @@ describe('HealthFacilityList Component', () => {
       },
       user: {
         role: 'SUPER_ADMIN'
+      },
+      common: {
+        labelName: null
       }
     });
     const mockHistoryPush = jest.fn();
@@ -119,6 +128,9 @@ describe('HealthFacilityList Component', () => {
       },
       user: {
         role: 'SUPER_ADMIN'
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -149,6 +161,9 @@ describe('HealthFacilityList Component', () => {
       },
       user: {
         role: 'SUPER_ADMIN'
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -170,6 +185,9 @@ describe('HealthFacilityList Component', () => {
       user: {
         role: 'SUPER_ADMIN'
       },
+      common: {
+        labelName: null
+      },
       loading: false
     });
 
@@ -190,6 +208,9 @@ describe('HealthFacilityList Component', () => {
       },
       user: {
         role: 'SUPER_ADMIN'
+      },
+      common: {
+        labelName: null
       }
     });
     render(

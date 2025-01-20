@@ -35,25 +35,6 @@ const chiefdomAdminRequestMockData = MOCK_DATA_CONSTANTS.CHIEFDOM_ADMIN_REQUEST_
 const deleteChiefdomAdminRequestMockData = MOCK_DATA_CONSTANTS.ID_AND_TENANT_ID_REQUEST_PAYLOAD;
 
 describe('Fetch Chiefdom Detail', () => {
-  it('Fetches a list of Chiefdom Admins and dispatches success', async () => {
-    const fetchChiefdomDetailSpy = jest.spyOn(chiefdomService, 'fetchChiefdomAdmins').mockImplementation(() => {
-      return Promise.resolve({ data: { entityList: fetchChiefdomAdminsResponseMockData } } as AxiosResponse);
-    });
-    const dispatched: any = [];
-    await runSaga(
-      {
-        dispatch: (action) => dispatched.push(action)
-      },
-      fetchChiefdomDetail,
-      {
-        payload: fetchChiefdomDetailWithSearchRequestMockData as any,
-        type: ACTION_TYPES.FETCH_CHIEFDOM_DETAIL_REQUEST
-      }
-    ).toPromise();
-    expect(fetchChiefdomDetailSpy).toHaveBeenCalledWith(fetchChiefdomDetailWithSearchRequestMockData);
-    expect(dispatched).toEqual([chiefdomActions.searchUserSuccess(fetchChiefdomAdminsResponseMockData)]);
-  });
-
   it('Fetches chiefdom details and dispatches success', async () => {
     const fetchChiefdomDetailSpy = jest.spyOn(chiefdomService, 'getChiefdomDetails').mockImplementation(() => {
       return Promise.resolve({

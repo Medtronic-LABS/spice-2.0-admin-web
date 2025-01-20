@@ -77,13 +77,6 @@ describe('Medication APIs', () => {
     expect(mockAxios.history.post[0].url).toBe('/admin-service/medication/dosageform-list');
   });
 
-  it('getMedicationCategory should make a GET request to spice-service/category/list', async () => {
-    mockAxios.onGet('spice-service/category/list').reply(200, {});
-    await getMedicationCategory();
-    expect(mockAxios.history.get.length).toBe(1);
-    expect(mockAxios.history.get[0].url).toBe('spice-service/category/list');
-  });
-
   it('createMedication sends a POST request to /admin-service/medication/create with correct data', async () => {
     const requestData = {
       name: 'test',

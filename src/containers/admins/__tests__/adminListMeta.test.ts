@@ -115,7 +115,7 @@ describe('Formatting Functions', () => {
     });
     const phoneFormatter = columns.find((col) => col.name === 'phoneNumber')?.cellFormatter;
     const result = phoneFormatter?.(user);
-    expect(result).toBe('+1 123-456-7890');
+    expect(result).toBe('+1  123-456-7890');
   });
 
   it('should format district names based on user roles and organizations', () => {

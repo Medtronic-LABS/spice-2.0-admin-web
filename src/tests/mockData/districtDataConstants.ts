@@ -3,6 +3,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 const MOCK_DATA_CONSTANTS = {
   FETCH_ACTIVE_DISTRICT_LIST_REQUEST_PAYLOAD: {
     isActive: true,
+    countryId: 1,
     tenantId: '5',
     skip: 0,
     limit: 10,

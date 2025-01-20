@@ -137,6 +137,7 @@ describe('Region Reducer', () => {
       loadingMore: false,
       error,
       detail: {
+        appTypes: [],
         id: '',
         name: '',
         list: [],
@@ -157,6 +158,7 @@ describe('Region Reducer', () => {
       loadingMore: false,
       error,
       detail: {
+        appTypes: [],
         id: '',
         name: '',
         list: [],
@@ -222,6 +224,7 @@ describe('Region Reducer', () => {
     const expectedState = {
       ...mainInitialState,
       detail: {
+        appTypes: [],
         id: '',
         name: '',
         tenantId: '',

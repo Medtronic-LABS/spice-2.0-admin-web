@@ -29,6 +29,10 @@ describe('DistrictDashboard', () => {
           formDataId: '1',
           tenantId: '1'
         }
+      },
+      common: {
+        sideMenu: [],
+        labelName: null
       }
     });
 
@@ -56,6 +60,10 @@ describe('DistrictDashboard', () => {
           formDataId: '1',
           tenantId: '1'
         }
+      },
+      common: {
+        sideMenu: [],
+        labelName: null
       }
     });
 
@@ -84,6 +92,10 @@ describe('DistrictDashboard', () => {
           formDataId: '1',
           tenantId: '1'
         }
+      },
+      common: {
+        sideMenu: [],
+        labelName: null
       }
     });
 
@@ -111,6 +123,10 @@ describe('DistrictDashboard', () => {
           formDataId: '1',
           tenantId: '1'
         }
+      },
+      common: {
+        sideMenu: [],
+        labelName: null
       }
     });
     const wrapperDistrict = mount(

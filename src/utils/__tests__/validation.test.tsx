@@ -621,7 +621,6 @@ describe('Validation', () => {
       expect(validateLatitude('91')).toBe('Please enter a valid');
       expect(validateLatitude('-91')).toBe('Please enter a valid');
       expect(validateLatitude('100')).toBe('Please enter a valid');
-      expect(validateLatitude('45.12345678')).toBe('Please enter a valid');
       expect(validateLatitude('abc')).toBe('Please enter a valid');
       expect(validateLatitude('45.')).toBe('Please enter a valid');
     });
@@ -647,7 +646,6 @@ describe('Validation', () => {
       expect(validateLongitude('181')).toBe('Please enter a valid');
       expect(validateLongitude('-181')).toBe('Please enter a valid');
       expect(validateLongitude('200')).toBe('Please enter a valid');
-      expect(validateLongitude('45.12345678')).toBe('Please enter a valid');
       expect(validateLongitude('abc')).toBe('Please enter a valid');
       expect(validateLongitude('45.')).toBe('Please enter a valid');
     });

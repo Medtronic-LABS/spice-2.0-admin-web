@@ -23,7 +23,7 @@ describe('WorkflowForm', () => {
     renderForm();
 
     // Check if the name input field is rendered
-    const nameInput = screen.getByLabelText(/Account Workflow Name/i);
+    const nameInput = screen.getByLabelText(/Workflow Name/i);
     expect(nameInput).toBeInTheDocument();
 
     // Check if the View Screens checkboxes are rendered
@@ -65,7 +65,7 @@ describe('WorkflowForm', () => {
     );
 
     // Fill out the form
-    const nameInput = screen.getByLabelText(/Account Workflow Name/i);
+    const nameInput = screen.getByLabelText(/Workflow Name/i);
     fireEvent.change(nameInput, { target: { value: 'New Workflow' } });
 
     const screeningCheckbox = screen.getByLabelText(/Screening/i);

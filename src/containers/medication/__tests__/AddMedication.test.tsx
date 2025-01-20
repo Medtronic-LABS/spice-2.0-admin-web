@@ -51,6 +51,9 @@ describe('AddMedication Component', () => {
       },
       user: {
         appTypes: ['COMMUNITY']
+      },
+      common: {
+        labelName: null
       }
     });
 

@@ -76,6 +76,9 @@ describe('ChiefdomSummary Component', () => {
       },
       district: {
         loading: false
+      },
+      common: {
+        labelName: null
       }
     });
     store.dispatch = jest.fn();
@@ -91,14 +94,14 @@ describe('ChiefdomSummary Component', () => {
     const { getAllByTestId } = renderWithProviders(<ChiefdomSummary />, { store });
     const [editButton] = getAllByTestId('edit-icon');
     fireEvent.click(editButton);
-    await waitFor(() => expect(screen.getByText('Edit Sub County')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Edit Chiefdom', { selector: 'span' })).toBeInTheDocument());
   });
 
   it('opens add admin modal when Add Chiefdom Admin button is clicked', async () => {
     const { getAllByTestId } = renderWithProviders(<ChiefdomSummary />, { store });
     const [addButton] = getAllByTestId('detail-card-button');
     fireEvent.click(addButton);
-    const [expectedTitle] = screen.getAllByText('Sub County Admin');
+    const [expectedTitle] = screen.getAllByText('Chiefdom Admin');
     await waitFor(() => expect(expectedTitle).toBeInTheDocument());
   });
 
@@ -126,7 +129,7 @@ describe('ChiefdomSummary Component', () => {
     const [deleteButton] = getAllByTestId('delete-icon');
     fireEvent.click(deleteButton);
     await waitFor(() =>
-      expect(screen.getByText('Are you sure want to delete the sub county admin?')).toBeInTheDocument()
+      expect(screen.getByText('Are you sure want to delete the chiefdom admin?')).toBeInTheDocument()
     );
     // Confirm deletion
     const [confirmButton] = getAllByTestId('delete-ok-button');

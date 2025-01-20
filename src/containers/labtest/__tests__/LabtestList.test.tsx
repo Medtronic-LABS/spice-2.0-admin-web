@@ -77,7 +77,7 @@ describe('LabTestList Component', () => {
   });
 
   it('renders lab test list component', () => {
-    expect(screen.getByText('Lab Test List')).toBeInTheDocument();
+    expect(screen.getByText('Lab/Imaging Database')).toBeInTheDocument();
     expect(screen.getByText('Add Lab Test')).toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe('LabTestList Component', () => {
 
     store = mockStore({
       labtest: {
-        labtests: [],
+        labTests: [],
         loading: true,
         count: 0
       }

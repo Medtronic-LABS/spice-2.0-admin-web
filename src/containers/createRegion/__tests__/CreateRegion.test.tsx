@@ -5,7 +5,7 @@ import CreateRegion from '.././CreateRegion';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-jest.mock('../../services/regionAPI');
+jest.mock('../../../services/regionAPI');
 
 describe('CreateRegion', () => {
   let wrapper: any;
@@ -13,6 +13,18 @@ describe('CreateRegion', () => {
   const mockStore = configureStore([]);
   const createRegionRequestMock = jest.fn();
   const store = mockStore({
+    healthFacility: {
+      healthFacilityList: [],
+      peerSupervisorList: { list: [] },
+      villagesList: { list: [] },
+      villagesFromHFList: { list: [], hfTenantIds: null }
+    },
+    chiefdom: {
+      chiefdomList: []
+    },
+    district: {
+      loading: false
+    },
     user: {
       timezoneList: [
         {

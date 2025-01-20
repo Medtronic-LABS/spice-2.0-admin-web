@@ -47,6 +47,9 @@ describe('MedicationForm Component', () => {
       user: {
         appType: 'COMMUNITY'
       }
+    },
+    common: {
+      labelName: null
     }
   };
 
@@ -128,7 +131,9 @@ describe('MedicationForm Component', () => {
     store = mockStore({
       ...initialState,
       user: {
-        appTypes: ['COMMUNITY']
+        user: {
+          appTypes: ['NON_COMMUNITY']
+        }
       }
     });
     renderComponent();

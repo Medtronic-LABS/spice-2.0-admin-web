@@ -53,7 +53,7 @@ describe('ChiefdomDashboard', () => {
   it('renders the header correctly', () => {
     const header = wrapper.find('.page-title');
     expect(header).toHaveLength(1);
-    expect(header.text()).toEqual('Chiefdom');
+    expect(header.text()).toEqual('Sub Counties');
   });
 
   it('renders the create chiefdom button when there are chiefdom available', () => {
@@ -61,7 +61,7 @@ describe('ChiefdomDashboard', () => {
   });
 
   it('should render the search bar', () => {
-    expect(wrapper.find('[placeholder="Search Chiefdom"]').length).toEqual(2);
+    expect(wrapper.find('[placeholder="Search Sub County"]').length).toEqual(2);
   });
 
   it('renders the no data message when there are no chiefdom available', () => {
@@ -89,8 +89,9 @@ describe('ChiefdomDashboard', () => {
     );
 
     wrapper.setProps({ noChiefdomsAvailable: true, loading: false });
-    expect(wrapper.find('.fw-bold').text()).toEqual('Let’s Get Started!');
-    expect(wrapper.find('.subtle-color').text()).toEqual('Create an chiefdom');
+    // tslint:disable-next-line:quotemark
+    expect(wrapper.find('.fw-bold').text()).toEqual("Let's Get Started!");
+    expect(wrapper.find('.subtle-color').text()).toEqual('Create an sub county');
     expect(wrapper.find('.primary-btn')).toHaveLength(1);
   });
 });

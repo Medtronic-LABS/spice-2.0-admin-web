@@ -24,6 +24,7 @@ export const MOCK_REGION_DETAIL = {
   tenantId: '1',
   name: 'Kenya',
   entityList: [MOCK_ENTITY_LIST],
+  appTypes: [],
   totalCount: 2
 };
 

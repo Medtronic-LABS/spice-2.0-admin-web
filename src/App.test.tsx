@@ -32,6 +32,10 @@ describe('App Component', () => {
   const store = mockStore({
     user: {
       isLoggedIn: true
+    },
+    common: {
+      sideMenu: { list: [] },
+      labelName: null
     }
   });
 
@@ -63,6 +67,10 @@ describe('App Component', () => {
       const localStore = mockStore({
         user: {
           isLoggedIn: false
+        },
+        common: {
+          sideMenu: { list: [] },
+          labelName: null
         }
       });
       const { queryByTestId } = render(

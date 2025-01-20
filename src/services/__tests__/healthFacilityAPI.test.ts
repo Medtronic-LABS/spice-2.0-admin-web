@@ -93,7 +93,8 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district-list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
-      countryId
+      countryId,
+      appTypes
     });
   });
 
@@ -111,7 +112,8 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post[0].url).toBe('/admin-service/chiefdom-list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       countryId,
-      districtId
+      districtId,
+      appTypes
     });
   });
 
@@ -151,7 +153,7 @@ describe('Health Facility APIs', () => {
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility/details');
-    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ tenantId, id });
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ tenantId, id, appTypes });
   });
 
   it('fetchHFUserList sends a POST request to /user-service/user/admin-users with correct data', async () => {
@@ -285,7 +287,7 @@ describe('Health Facility APIs', () => {
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/villages-list');
-    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ countryId, districtId, chiefdomId });
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ countryId, districtId, chiefdomId, appTypes });
   });
 
   it(`fetchUnlinkedVillagesAPI sends a POST request to
@@ -306,7 +308,8 @@ describe('Health Facility APIs', () => {
       countryId,
       districtId,
       chiefdomId,
-      healthFacilityId
+      healthFacilityId,
+      appTypes
     });
   });
 
@@ -323,7 +326,8 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility/unlinked-villages-list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       tenantIds,
-      userId
+      userId,
+      appTypes
     });
   });
 
@@ -339,7 +343,8 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/peer-supervisors');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
-      tenantIds
+      tenantIds,
+      appTypes
     });
   });
 

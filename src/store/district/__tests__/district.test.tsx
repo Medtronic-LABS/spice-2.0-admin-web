@@ -50,7 +50,7 @@ describe('Fetches District List: FETCH_DISTRICT_LIST_REQUEST', () => {
       fetchDistrictList,
       { ...fetchActiveDistrictRequestMockData, type: ACTION_TYPES.FETCH_DISTRICT_LIST_REQUEST }
     ).toPromise();
-    expect(fetchActivateDistrictsSpy).toHaveBeenCalledWith('5', true, 0, 10, 'Sample');
+    expect(fetchActivateDistrictsSpy).toHaveBeenCalledWith(1, '5', true, 0, 10, 'Sample');
     expect(dispatched).toEqual([
       districtActions.fetchDistrictListSuccess({
         districtList: fetchDistrictResponseMockData as any,

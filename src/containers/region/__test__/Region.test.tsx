@@ -41,6 +41,9 @@ const initialState = {
   },
   user: {
     role: 'ADMIN'
+  },
+  common: {
+    labelName: null
   }
 };
 

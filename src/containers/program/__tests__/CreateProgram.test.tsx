@@ -31,6 +31,14 @@ describe('CreateProgram', () => {
       },
       site: {
         siteDropdownOptions: {}
+      },
+      user: {
+        user: {
+          country: { id: 1, name: 'Test' }
+        }
+      },
+      healthFacility: {
+        healthFacilityList: []
       }
     });
     const history = createMemoryHistory({ initialEntries: ['/create-program'] });

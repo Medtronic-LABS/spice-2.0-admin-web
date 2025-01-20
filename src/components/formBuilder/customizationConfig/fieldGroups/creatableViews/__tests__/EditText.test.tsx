@@ -75,7 +75,7 @@ describe('EditTextConfig', () => {
     }
 
     if (EDIT_TEXT_CONFIG.getJSON) {
-      expect(EDIT_TEXT_CONFIG.getJSON({ ...json, fieldName: { label: 'Test Field Name' }, id: null })).toEqual(
+      expect(EDIT_TEXT_CONFIG.getJSON({ ...json, fieldName: { label: 'Test Field Name' }, id: 'testId' })).toEqual(
         expectedJson
       );
     }

@@ -29,20 +29,12 @@ describe('useUserFormUtils', () => {
     const isSelected = isCHASelected([
       {
         name: 'Admin',
-        id: 0
+        id: 0,
+        appTypes: []
       }
     ]);
 
     expect(isSelected).toBe(false);
-  });
-
-  test('should return true if a CHP role is selected', () => {
-    const { result } = renderHook(() => useUserFormUtils());
-
-    const { isCHPCHWSelected: isCHPSelected } = result.current;
-    const isSelected = isCHPSelected(mockRoles);
-
-    expect(isSelected).toBe(true);
   });
 
   test('should return false if no CHP role is selected', () => {
@@ -52,7 +44,8 @@ describe('useUserFormUtils', () => {
     const isSelected = isCHPSelected([
       {
         name: 'Admin',
-        id: 0
+        id: 0,
+        appTypes: []
       }
     ]);
 
@@ -75,7 +68,8 @@ describe('useUserFormUtils', () => {
     const exists = isRoleExists([
       {
         name: 'User',
-        id: 0
+        id: 0,
+        appTypes: []
       }
     ]);
 

@@ -36,6 +36,7 @@ describe('District APIs', () => {
     const appTypes = ['COMMUNITY'];
     const expectedData = {
       tenantId: 1,
+      countryId: 1,
       skip,
       limit,
       is_active: isActive,
@@ -60,6 +61,7 @@ describe('District APIs', () => {
     const appTypes = ['COMMUNITY'];
     const expectedData = {
       tenantId: 1,
+      countryId: 1,
       skip,
       limit,
       is_active: isActive,

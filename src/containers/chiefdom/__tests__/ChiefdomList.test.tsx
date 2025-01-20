@@ -89,6 +89,9 @@ describe('Chiefdom List', () => {
         country: {
           id: 1
         }
+      },
+      common: {
+        labelName: null
       }
     });
   });
@@ -133,15 +136,15 @@ describe('Chiefdom List', () => {
   it('should redirect to create Chiefdom', async () => {
     render(
       <Provider store={store}>
-        <MemoryRouter initialEntries={['/tenant/1']}>
-          <Route path='/tenant/:tenantId'>
+        <MemoryRouter initialEntries={['/region/1']}>
+          <Route path='/region/:regionId'>
             <ChiefdomList />
           </Route>
         </MemoryRouter>
       </Provider>
     );
 
-    const button = screen.getByRole('button', { name: /create/i });
+    const button = screen.getByRole('button', { name: /Add Chiefdom/i });
     userEvent.click(button);
 
     await waitFor(() => {

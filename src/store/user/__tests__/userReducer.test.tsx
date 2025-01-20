@@ -54,6 +54,10 @@ describe('userReducer', () => {
       loggingIn: false,
       isLoggedIn: false,
       user: {
+        appTypes: [],
+        countryId: undefined,
+        isTermsConditionsLoading: false,
+        termsAndConditions: {},
         email: '',
         firstName: '',
         lastName: '',
@@ -253,7 +257,7 @@ describe('userReducer', () => {
       type: USERTYPES.REMOVE_USER_TENANT_ID
     };
     const expectedState = {
-      userTenantId: 'tenant1'
+      userTenantId: ''
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
@@ -299,7 +303,8 @@ describe('userReducer', () => {
     };
     const expectedState = {
       ...initialState,
-      loading: false
+      loading: false,
+      showLoader: true
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });

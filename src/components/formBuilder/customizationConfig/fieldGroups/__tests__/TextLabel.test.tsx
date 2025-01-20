@@ -18,6 +18,7 @@ describe('TEXT_LABEL_CONFIG', () => {
       isSummary: false,
       isMandatory: false,
       isEnabled: true,
+      isEnrollment: true,
       visibility: 'visible',
       isNotDefault: true
     });

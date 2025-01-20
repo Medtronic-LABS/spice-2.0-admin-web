@@ -54,11 +54,10 @@ describe('User APIs', () => {
 
     mockAxios.onPost('/auth-service/logout').reply(200, {});
 
-    await logout(token);
+    await logout();
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/auth-service/logout');
-    expect(mockAxios.history.post[0].headers.Authorization).toBe(token);
   });
 
   it('fetchLoggedInUser sends a POST request to /user-service/user/profile', async () => {
@@ -144,17 +143,18 @@ describe('User APIs', () => {
     const email = 'test@test.com';
     const parentOrgId = '456';
     const ignoreTenantId = '789';
+    const appTypes: string[] = [];
 
     mockAxios.onPost('/user-service/user/validate-user').reply(200, {});
 
-    await fetchUserByEmail(email, parentOrgId, ignoreTenantId);
+    await fetchUserByEmail({ email, appTypes, parentOrganizationId: parentOrgId });
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/validate-user');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       email,
       parentOrganizationId: parentOrgId,
-      ignoreTenantId
+      appTypes
     });
   });
 

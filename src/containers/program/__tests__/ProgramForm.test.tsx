@@ -110,6 +110,12 @@ describe('ProgramForm', () => {
           ],
           regionTenantId: '123'
         }
+      },
+      user: {
+        user: { country: { id: 1, name: 'Test' } }
+      },
+      healthFacility: {
+        healthFacilityList: []
       }
     });
     wrapper = mount(

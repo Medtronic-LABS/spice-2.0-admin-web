@@ -6,6 +6,7 @@ import { createMemoryHistory } from 'history';
 import configureStore from 'redux-mock-store';
 import RegionDashboard from '../RegionDashboard';
 import { fetchRegionsRequest } from '../../../store/region/actions';
+import MOCK_DATA_CONSTANTS from '../../../tests/mockData/commonDataConstants';
 
 // Mock constants and data
 const mockRegions = [
@@ -16,7 +17,8 @@ const mockRegions = [
     appTypes: ['type1'],
     districtCount: 5,
     chiefdomCount: 3,
-    healthFacilityCount: 2
+    healthFacilityCount: 2,
+    displayValues: MOCK_DATA_CONSTANTS.MOCK_LABELNAME
   },
   {
     id: '2',
@@ -25,7 +27,8 @@ const mockRegions = [
     appTypes: ['type2'],
     districtCount: 10,
     chiefdomCount: 7,
-    healthFacilityCount: 5
+    healthFacilityCount: 5,
+    displayValues: MOCK_DATA_CONSTANTS.MOCK_LABELNAME
   }
 ];
 const mockStore = configureStore();
@@ -47,6 +50,9 @@ const initialState = {
   },
   district: {
     clinicalWorkflows: []
+  },
+  common: {
+    labelName: MOCK_DATA_CONSTANTS.MOCK_LABELNAME
   }
 };
 

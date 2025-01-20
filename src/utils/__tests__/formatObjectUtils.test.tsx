@@ -37,12 +37,14 @@ describe('formatObjectUtils', () => {
           username: 'johndoe',
           phoneNumber: '1234567890',
           countryCode: '+1',
-          roleIds: [1, 2],
+          roleIds: [2, 3],
           timezone: {
             id: 1,
             name: 'UTC'
           },
           designation: null,
+          reportUserOrganizationIds: [],
+          insightUserOrganizationIds: [],
           country: {
             id: 1
           }
@@ -66,12 +68,14 @@ describe('formatObjectUtils', () => {
           username: 'johndoe',
           phoneNumber: '1234567890',
           countryCode: '+1',
-          roleIds: [1, 2],
+          roleIds: [2, 3],
           timezone: {
             id: 1,
             name: 'UTC'
           },
           designation: null,
+          insightUserOrganizationIds: [],
+          reportUserOrganizationIds: [],
           country: {
             id: 1
           }
@@ -199,7 +203,7 @@ describe('formatObjectUtils', () => {
         expect.objectContaining({
           firstName: 'John',
           lastName: 'Doe',
-          roleIds: expect.arrayContaining([1, 2, 999]),
+          roleIds: [1, 2, 999],
           redRisk: true,
           appTypes: [APPCONSTANTS.appTypes.community],
           chiefdom: undefined,
@@ -217,7 +221,7 @@ describe('formatObjectUtils', () => {
           phoneNumber: '123-456-7890',
           reportUserOrganizationIds: [],
           supervisorId: null,
-          tenantId: null,
+          tenantId: 123,
           timezone: null,
           username: 'johndoe'
         })
@@ -253,7 +257,7 @@ describe('formatObjectUtils', () => {
           appTypes: [APPCONSTANTS.appTypes.community],
           firstName: 'Jane',
           lastName: 'Smith',
-          roleIds: [],
+          roleIds: [3],
           tenantId: 456,
           country: { id: 1 },
           supervisorId: null,
@@ -312,7 +316,7 @@ describe('formatObjectUtils', () => {
           redRisk: null,
           roleIds: [],
           supervisorId: null,
-          tenantId: null,
+          tenantId: 123,
           timezone: null,
           username: 'adminuser',
           village: undefined,
@@ -365,18 +369,18 @@ describe('formatObjectUtils', () => {
         {
           desc: 'user tenantId',
           user: { ...mockUser, tenantId: 111 },
-          expectedTenantId: null
+          expectedTenantId: 111
         },
         {
           desc: 'healthfacility tenantId',
           user: { ...mockUser, healthfacility: { tenantId: 222 } },
-          expectedTenantId: null
+          expectedTenantId: 222
         },
         {
           desc: 'URL tenantId',
           user: mockUser,
           tenantId: 333,
-          expectedTenantId: null
+          expectedTenantId: 333
         }
       ];
 
