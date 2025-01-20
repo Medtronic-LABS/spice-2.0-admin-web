@@ -320,7 +320,7 @@ const UserForm = ({
   }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
 
   useEffect(() => {
-    if (countryId && !isRegionCreate && !isHF && !isCreateDistrict && !isCreateChiefdom && !isChiefdom) {
+    if (countryId && !isRegionCreate && !isCreateDistrict && !isCreateChiefdom && !isChiefdom && !isHFCreate) {
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

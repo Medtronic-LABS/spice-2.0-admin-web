@@ -423,15 +423,15 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label='PHU Focal Person Name'
-                  errorLabel='PHU focal person name'
+                  label={isCommunity ? 'PHU Focal Person Name' : 'Facility Incharge'}
+                  errorLabel={isCommunity ? 'PHU focal person name' : 'facility incharge'}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}
             />
           </div>
-          <div className={columnStyle}>
+          <div className={`${columnStyle} ${isEdit && !isCommunity ? 'col-md-5' : ''}`}>
             <Field
               name={`${formName}.phuFocalPersonNumber`}
               type='text'
@@ -440,15 +440,15 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label='PHU Focal Person Number'
-                  errorLabel='PHU focal person number'
+                  label={isCommunity ? 'PHU Focal Person Number' : 'Facility Incharge No'}
+                  errorLabel={isCommunity ? 'PHU focal person number' : 'facility incharge no'}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}
             />
           </div>
-          <div className={`${isEdit ? 'col-12 col-md-8' : 'col-12 col-lg-6'}`}>
+          <div className={`col-12 ${isEdit ? (isCommunity ? 'col-md-8' : 'col-md-7') : 'col-lg-6'}`}>
             <Field
               name={`${formName}.address`}
               type='text'
