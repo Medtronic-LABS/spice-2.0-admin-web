@@ -541,6 +541,7 @@ export interface IFetchChiefdomListRequest {
   type: typeof ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF;
   countryId: number;
   districtId?: number;
+  districtIds?: number[];
   successCb?: (data: IChiefdom[], total: number) => void;
   failureCb?: (error: Error) => void;
 }
@@ -597,6 +598,10 @@ export interface IFetchCityListFailure {
 
 export interface IClearHFWorkflowList {
   type: typeof ACTION_TYPES.CLEAR_HF_WORKFLOW_LIST;
+}
+
+export interface IClearChiefdomList {
+  type: typeof ACTION_TYPES.CLEAR_CHIEFDOM_LIST;
 }
 
 interface IVillagesRequestPayload {
@@ -872,4 +877,5 @@ export type HealthFacilityActions =
   | IClearHFWorkflowList
   | IFetchCityListRequest
   | IFetchCityListFailure
-  | IFetchCityListSuccess;
+  | IFetchCityListSuccess
+  | IClearChiefdomList;

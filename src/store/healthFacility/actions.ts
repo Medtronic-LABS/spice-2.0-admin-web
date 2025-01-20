@@ -99,6 +99,7 @@ import {
   IFetchCityListFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
+import { IClearChiefdomList } from '../chiefdom/types';
 
 export const fetchHFListRequest = ({
   countryId,
@@ -453,15 +454,21 @@ export const fetchDistrictListFailure = (error: Error): IFetchDistrictListFailur
 // CHIEFDOM LIST
 export const fetchChiefdomListRequest = ({
   countryId,
+  districtIds,
   districtId,
   successCb,
   failureCb
 }: Omit<IFetchChiefdomListRequest, 'type'>): IFetchChiefdomListRequest => ({
   type: HF_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF,
   countryId,
+  districtIds,
   districtId,
   successCb,
   failureCb
+});
+
+export const clearChiefdomList = (): IClearChiefdomList => ({
+  type: HF_TYPES.CLEAR_CHIEFDOM_LIST
 });
 
 export const fetchChiefdomListSuccess = (payload: { list: IChiefdom[]; total: number }): IFetchChiefdomListSuccess => ({

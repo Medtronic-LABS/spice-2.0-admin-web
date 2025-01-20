@@ -119,13 +119,24 @@ export const fetchDistrictList = (countryId: number, appTypes: string[]) =>
     data: { countryId, appTypes }
   });
 
-export const fetchChiefdomList = (countryId: number, districtId: number, appTypes: string[]) =>
+export const fetchChiefdomList = ({
+  countryId,
+  districtId,
+  appTypes,
+  districtIds
+}: {
+  countryId: number;
+  districtId?: number;
+  appTypes: string[];
+  districtIds?: number[];
+}) =>
   axios({
     url: '/admin-service/chiefdom-list',
     method: 'POST',
     data: {
       countryId,
       districtId,
+      districtIds,
       appTypes
     }
   });

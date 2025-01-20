@@ -385,6 +385,7 @@ export function* fetchDistrictListSagaRequest({
 export function* fetchChiefdomListSagaRequest({
   countryId,
   districtId,
+  districtIds,
   successCb,
   failureCb
 }: IFetchChiefdomListRequest): SagaIterator {
@@ -393,7 +394,7 @@ export function* fetchChiefdomListSagaRequest({
     const {
       data: { entity: list },
       totalCount: total
-    } = yield call(hfService.fetchChiefdomList as any, countryId, districtId, appTypes);
+    } = yield call(hfService.fetchChiefdomList as any, { countryId, districtId, appTypes, districtIds });
     successCb?.(list, total);
     yield put(fetchChiefdomListSuccess({ list, total }));
   } catch (e) {

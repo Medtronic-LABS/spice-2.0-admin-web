@@ -256,6 +256,12 @@ const healthFacilityReducer = (
         ...state,
         chiefdomLoading: false
       };
+    case HEALTH_FACILITY_ACTION_TYPES.CLEAR_CHIEFDOM_LIST:
+      return {
+        ...state,
+        chiefdomList: [],
+        chiefdomTotal: 0
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF:
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_CITY_LIST_REQUEST_FOR_HF:
       return {
