@@ -31,6 +31,7 @@ export interface ISummaryCardProps {
   titleClassName?: string;
   formId?: string;
   tenantId?: string;
+  isRegionDashboard?: boolean;
   setBreadcrumbDetails: () => void;
 }
 
@@ -49,7 +50,8 @@ const SummaryCard = ({
   disableImg,
   titleClassName,
   tenantId,
-  formId
+  formId,
+  isRegionDashboard = false
 }: ISummaryCardProps) => {
   const history = useHistory();
   /**
@@ -113,6 +115,7 @@ const SummaryCard = ({
         appType?.includes(APP_TYPE.NON_COMMUNITY as IAppType) || label === healthFacilitySName || !isCommunity ? (
           <Link
             className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
+            style={isRegionDashboard ? { minWidth: '115px' } : {}}
             key={`${label}_${i}`}
             to={route}
             onClick={(event: React.MouseEvent) => {

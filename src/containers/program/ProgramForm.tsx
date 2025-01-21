@@ -12,6 +12,7 @@ import { countryIdSelector } from '../../store/user/selectors';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
 import { clearHFList, fetchHFListRequest } from '../../store/healthFacility/actions';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * Interface for ProgramForm props
@@ -34,6 +35,9 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const dispatch = useDispatch();
   const hfListLoading = useSelector(healthFacilityLoadingSelector);
+  const {
+    healthFacility: { s: healthFacilitySName }
+  } = useAppTypeConfigs();
 
   // Fetch health facility list on component mount
   useEffect(() => {
@@ -83,8 +87,8 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
           render={({ input, meta }) => (
             <SelectInput
               {...(input as any)}
-              label='Health Facility'
-              errorLabel='health facility'
+              label={healthFacilitySName}
+              errorLabel={healthFacilitySName.toLowerCase()}
               valueKey='id'
               labelKey='name'
               isMulti={true}
