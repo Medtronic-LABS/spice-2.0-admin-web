@@ -2,6 +2,13 @@ import axios from 'axios';
 import { IFetchUserByIdRequest, IUpdateUserDetail } from '../store/user/types';
 import APPCONSTANTS from '../constants/appConstants';
 
+interface IUserStatusPayload {
+  id: number;
+  appTypes: string[];
+  countryId: string;
+  tenantIds: number[];
+}
+
 export const login = (username: string, password: string) => {
   const data = new FormData();
   data.append('username', username);
@@ -189,4 +196,32 @@ export const updateTermsConditionsAPI = ({
     method: 'POST',
     url: '/user-service/user/terms-and-conditions/update',
     data: { userId, isTermsAndConditionAccepted }
+  });
+
+export const deactivateUser = (payload: IUserStatusPayload) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/healthfacility/user-deactivate',
+    data: payload
+  });
+
+export const activateUser = (payload: IUserStatusPayload) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/healthfacility/user-activate',
+    data: payload
+  });
+
+export const assignPeerSupervisor = (payload: { limit: number; skip: number; userId: number }) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/peer-supervisors/chw-list',
+    data: payload
+  });
+
+export const reasignCHW = (data: any) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/reassign-chw',
+    data
   });

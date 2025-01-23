@@ -68,7 +68,9 @@ import {
   IFetchTermsConditionsFailure,
   IUpdateTermsConditionsRequest,
   IUpdateTermsConditionsSuccess,
-  IUpdateTermsConditionsFailure
+  IUpdateTermsConditionsFailure,
+  IUpdateUserStatusRequest,
+  IFetchCHWListRequest
 } from './types';
 
 export const loginRequest = ({
@@ -573,4 +575,47 @@ export const updateTermsAndConditionsSuccess = (): IUpdateTermsConditionsSuccess
 export const updateTermsAndConditionsFailure = (error: any): IUpdateTermsConditionsFailure => ({
   type: USER_TYPES.UPDATE_TERMS_CONDITIONS_FAILURE,
   error
+});
+
+export const updateUserStatus = (payload: {
+  id: number;
+  isActive: boolean;
+  tenantId: number;
+  countryId: number;
+  appTypes: string[];
+  successCb?: () => void;
+  failureCb?: (error: any) => void;
+}): IUpdateUserStatusRequest => ({
+  type: USER_TYPES.UPDATE_USER_STATUS_REQUEST,
+  payload
+});
+
+export const fetchCHWListRequest = ({
+  limit,
+  skip,
+  userId,
+  successCb,
+  failureCb
+}: IFetchCHWListRequest['payload']): IFetchCHWListRequest => ({
+  type: USER_TYPES.FETCH_CHW_LIST_REQUEST,
+  payload: {
+    limit,
+    skip,
+    userId,
+    successCb,
+    failureCb
+  }
+});
+
+export const clearCHWList = () => ({
+  type: USER_TYPES.CLEAR_CHW_LIST
+});
+
+export const reassignCHWRequest = (data: any, successCb?: () => void, failureCb?: (error: Error) => void): any => ({
+  type: USER_TYPES.REASSIGN_CHW_REQUEST,
+  payload: {
+    data,
+    successCb,
+    failureCb
+  }
 });

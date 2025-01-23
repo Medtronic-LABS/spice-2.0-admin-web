@@ -90,6 +90,7 @@ export interface IUserFormValues {
   gender: string;
   country: { countryCode: string };
   isHF?: boolean;
+  isPeerSupervisor?: boolean;
 }
 
 export interface IDisabledRoles {
@@ -128,7 +129,8 @@ const UserForm = ({
   defaultSelectedRole,
   isRegionCreate = false,
   parentOrgId,
-  ignoreTenantId
+  ignoreTenantId,
+  isPeerSupervisor = false
 }: IUserFormProps): React.ReactElement => {
   const idRefs = useRef([new Date().getTime()]);
   const { pathname } = useLocation();
@@ -1022,97 +1024,101 @@ const UserForm = ({
               <div className='row gx-1dot25'>
                 <Field name={`${name}.id`} render={() => null} />{' '}
                 {/** A hidden field to store user id if user is auto populated */}
-                <div className='col-sm-12 col-12'>
-                  <Field
-                    name={`${name}.suiteAccess`}
-                    type='text'
-                    validate={required}
-                    render={({ input, meta }) => (
-                      <MultiSelect
-                        {...(input as any)}
-                        label='SPICE Suite Access'
-                        errorLabel='suite access'
-                        labelKey='groupName'
-                        valueKey='groupName'
-                        options={suiteAccess || []}
-                        placeholder=''
-                        disabled={isProfile}
-                        isDisabled={isProfile}
-                        loadingOptions={isRolesLoading}
-                        isShowLabel={true}
-                        error={isError(meta)}
-                        isMulti={true}
-                        isModel={true}
-                        required={true}
-                        isClearable={false}
-                        mandatoryOptions={
-                          isAdminForm
-                            ? isEdit
-                              ? mandatorySuiteAccess
-                              : [getSpiceGroupName(suiteAccess)]
-                            : mandatorySuiteAccess || ''
-                        }
-                        onChange={(values: any[]) => {
-                          const suiteOrder: { [key: string]: number } = {
-                            SPICE: 1,
-                            REPORTS: 2,
-                            INSIGHTS: 3
-                          };
-                          const sortedSuites = values.sort((a, b) => suiteOrder[a.groupName] - suiteOrder[b.groupName]);
-                          const selectedGroupNames: string[] =
-                            sortedSuites.map((option: any) => option.groupName) || [];
-                          let newAllRoles: IRoles[] = [];
-                          const suiteFormName = {
-                            SPICE: {
-                              role: `${formName}[${index}].role`,
-                              hfList: `${formName}[${index}].healthfaciliity`
-                            },
-                            REPORTS: {
-                              role: `${formName}[${index}].reportRoles`,
-                              hfList: `${formName}[${index}].reportUserOrganization`
-                            },
-                            INSIGHTS: {
-                              role: `${formName}[${index}].insightRoles`,
-                              hfList: `${formName}[${index}].insightUserOrganization`
-                            }
-                          };
-                          const removeHF4User = (completeRoles: IRoles[]) =>
-                            completeRoles.filter((newRoles: IRoles) => newRoles.name !== hf4ReportUser);
-                          let selectedAllRoles = [...allRoles];
-                          Object.keys(suiteFormName).forEach((r: string) => {
-                            if (selectedGroupNames.includes(r)) {
-                              newAllRoles = [
-                                ...newAllRoles,
-                                ...selectedAllRoles.filter((v: IRoles) => v.groupName === r)
-                              ];
-                            } else {
-                              form.change((suiteFormName as any)[r].role, []);
-                              form.change((suiteFormName as any)[r].hfList, []);
-                              if (r === SPICE) {
-                                form.change(`${formName}[${index}].designation`, null);
-                                // to remove HF4User while removing the SPICE suite
-                                const selectedReportRoles = form.getState().values[formName][index].reportRoles || [];
-                                const isHF4Selected = selectedReportRoles.some(
-                                  (newRoles: IRoles) => newRoles.name === hf4ReportUser
-                                );
-                                if (isHF4Selected) {
-                                  form.change((suiteFormName as any).REPORTS.role, []);
-                                  newAllRoles = removeHF4User(newAllRoles);
-                                  selectedAllRoles = removeHF4User(selectedAllRoles);
+                {!isPeerSupervisor && (
+                  <div className='col-sm-12 col-12'>
+                    <Field
+                      name={`${name}.suiteAccess`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => (
+                        <MultiSelect
+                          {...(input as any)}
+                          label='SPICE Suite Access'
+                          errorLabel='suite access'
+                          labelKey='groupName'
+                          valueKey='groupName'
+                          options={suiteAccess || []}
+                          placeholder=''
+                          disabled={isProfile}
+                          isDisabled={isProfile}
+                          loadingOptions={isRolesLoading}
+                          isShowLabel={true}
+                          error={isError(meta)}
+                          isMulti={true}
+                          isModel={true}
+                          required={true}
+                          isClearable={false}
+                          mandatoryOptions={
+                            isAdminForm
+                              ? isEdit
+                                ? mandatorySuiteAccess
+                                : [getSpiceGroupName(suiteAccess)]
+                              : mandatorySuiteAccess || ''
+                          }
+                          onChange={(values: any[]) => {
+                            const suiteOrder: { [key: string]: number } = {
+                              SPICE: 1,
+                              REPORTS: 2,
+                              INSIGHTS: 3
+                            };
+                            const sortedSuites = values.sort(
+                              (a, b) => suiteOrder[a.groupName] - suiteOrder[b.groupName]
+                            );
+                            const selectedGroupNames: string[] =
+                              sortedSuites.map((option: any) => option.groupName) || [];
+                            let newAllRoles: IRoles[] = [];
+                            const suiteFormName = {
+                              SPICE: {
+                                role: `${formName}[${index}].role`,
+                                hfList: `${formName}[${index}].healthfaciliity`
+                              },
+                              REPORTS: {
+                                role: `${formName}[${index}].reportRoles`,
+                                hfList: `${formName}[${index}].reportUserOrganization`
+                              },
+                              INSIGHTS: {
+                                role: `${formName}[${index}].insightRoles`,
+                                hfList: `${formName}[${index}].insightUserOrganization`
+                              }
+                            };
+                            const removeHF4User = (completeRoles: IRoles[]) =>
+                              completeRoles.filter((newRoles: IRoles) => newRoles.name !== hf4ReportUser);
+                            let selectedAllRoles = [...allRoles];
+                            Object.keys(suiteFormName).forEach((r: string) => {
+                              if (selectedGroupNames.includes(r)) {
+                                newAllRoles = [
+                                  ...newAllRoles,
+                                  ...selectedAllRoles.filter((v: IRoles) => v.groupName === r)
+                                ];
+                              } else {
+                                form.change((suiteFormName as any)[r].role, []);
+                                form.change((suiteFormName as any)[r].hfList, []);
+                                if (r === SPICE) {
+                                  form.change(`${formName}[${index}].designation`, null);
+                                  // to remove HF4User while removing the SPICE suite
+                                  const selectedReportRoles = form.getState().values[formName][index].reportRoles || [];
+                                  const isHF4Selected = selectedReportRoles.some(
+                                    (newRoles: IRoles) => newRoles.name === hf4ReportUser
+                                  );
+                                  if (isHF4Selected) {
+                                    form.change((suiteFormName as any).REPORTS.role, []);
+                                    newAllRoles = removeHF4User(newAllRoles);
+                                    selectedAllRoles = removeHF4User(selectedAllRoles);
+                                  }
                                 }
                               }
-                            }
-                          });
-                          form.change(`${formName}[${index}].roles`, newAllRoles);
-                          getRoleOptions(index, newAllRoles);
-                          roleChange({ allRoles: newAllRoles, index, appTypeBasedRoles });
-                          input.onChange(sortedSuites);
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-                {(isSPICE || isAdminForm) && (
+                            });
+                            form.change(`${formName}[${index}].roles`, newAllRoles);
+                            getRoleOptions(index, newAllRoles);
+                            roleChange({ allRoles: newAllRoles, index, appTypeBasedRoles });
+                            input.onChange(sortedSuites);
+                          }}
+                        />
+                      )}
+                    />
+                  </div>
+                )}
+                {(isSPICE || isAdminForm) && !isPeerSupervisor && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6'} `}>
                     <Field
                       name={`${name}.role`}
@@ -1563,72 +1569,74 @@ const UserForm = ({
                     }
                   />
                 </div>
-                {isSPICE &&
-                  (isEdit
-                    ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
-                      (!isCommunity && isSiteUser)
-                    : showSpiceHFRef.current[index] && !isEdit) && (
-                    <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
-                      <Field
-                        name={`${name}.${NAMING_VARIABLES.healthFacility}`}
-                        type='text'
-                        validate={required}
-                        render={({ input, meta }) => {
-                          return (
-                            <SelectInput
-                              {...(input as any)}
-                              label='Assigned Health Facility'
-                              errorLabel='assigned health facility'
-                              labelKey='name'
-                              valueKey='id'
-                              options={newHFList}
-                              loadingOptions={hfLoading}
-                              error={isError(meta)}
-                              isModel={true}
-                              disabled={isProfile}
-                              onChange={(hf: IHealthFacility) => {
-                                emailDisabledFn('', index, false);
-                                const formData = form.getState()?.values?.users?.[index];
-                                const supervisorFieldData = `${formName}[${index}].supervisor`;
-                                const villagesFieldData = `${formName}[${index}].villages`;
+                {(isPeerSupervisor ||
+                  (isSPICE &&
+                    (isEdit
+                      ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
+                        (!isCommunity && isSiteUser)
+                      : showSpiceHFRef.current[index] && !isEdit))) && (
+                  // (isPeerSupervisor && (
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
+                    <Field
+                      name={`${name}.${NAMING_VARIABLES.healthFacility}`}
+                      type='text'
+                      validate={required}
+                      render={({ input, meta }) => {
+                        return (
+                          <SelectInput
+                            {...(input as any)}
+                            label='Assigned Health Facility'
+                            errorLabel='assigned health facility'
+                            labelKey='name'
+                            valueKey='id'
+                            options={newHFList}
+                            loadingOptions={hfLoading}
+                            error={isError(meta)}
+                            isModel={true}
+                            disabled={isProfile}
+                            onChange={(hf: IHealthFacility) => {
+                              emailDisabledFn('', index, false);
+                              const formData = form.getState()?.values?.users?.[index];
+                              const supervisorFieldData = `${formName}[${index}].supervisor`;
+                              const villagesFieldData = `${formName}[${index}].villages`;
 
-                                form.change(supervisorFieldData, null);
-                                if (autoFetched[index] && formData?.selectedVillages?.length) {
-                                  form.change(villagesFieldData, [
-                                    ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
-                                  ]);
-                                } else {
-                                  form.change(villagesFieldData, []);
-                                }
+                              form.change(supervisorFieldData, null);
+                              if (autoFetched[index] && formData?.selectedVillages?.length) {
+                                form.change(villagesFieldData, [
+                                  ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
+                                ]);
+                              } else {
+                                form.change(villagesFieldData, []);
+                              }
 
-                                if (showVillage[index]) {
-                                  fetchSupervisorList(
-                                    formData?.organizations
-                                      ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                          (v: any) => v
-                                        )
-                                      : [hf.tenantId],
-                                    index
-                                  );
-                                  fetchVillagesList(
-                                    formData?.organizations
-                                      ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                          (v: any) => v
-                                        )
-                                      : [hf.tenantId],
-                                    formData?.id,
-                                    index
-                                  );
-                                }
+                              if (showVillage[index]) {
+                                fetchSupervisorList(
+                                  formData?.organizations
+                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                        (v: any) => v
+                                      )
+                                    : [hf.tenantId],
+                                  index
+                                );
+                                fetchVillagesList(
+                                  formData?.organizations
+                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                        (v: any) => v
+                                      )
+                                    : [hf.tenantId],
+                                  formData?.id,
+                                  index
+                                );
+                              }
 
-                                input.onChange(hf);
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </div>
-                  )}
+                              input.onChange(hf);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </div>
+                )}
                 {isReports && showReportHFRef.current[index] && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field

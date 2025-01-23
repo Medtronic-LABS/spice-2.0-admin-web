@@ -156,4 +156,38 @@
       box-shadow: 0 0.43rem 0.288rem 0 rgba(var(--black-rgb), 0.2);
     }
   }
+
+  &.small {
+    .switcher {
+      width: 32px !important;
+      height: 16px !important;
+      border-radius: 10px !important;
+      position: relative !important;
+      transition: all 0.2s ease-in-out !important;
+
+      &:before {
+        content: '' !important;
+        position: absolute !important;
+        width: 12px !important;
+        height: 12px !important;
+        margin-top: 2px !important;
+        left: 2px !important;
+        border-radius: 50% !important;
+        background-color: var(--checkbox-un-selected-circle-color) !important;
+        transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+      }
+    }
+
+    input[type='checkbox']:checked + .switcher {
+      background-color: var(--medium-blue-20) !important;
+
+      &:before {
+        left: 100% !important;
+        margin-top: 2px !important;
+        margin-left: -15px !important;
+        background-color: var(--checkbox-selection-color) !important;
+      }
+    }
+  }
 }

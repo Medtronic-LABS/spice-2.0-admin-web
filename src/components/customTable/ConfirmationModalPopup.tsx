@@ -10,6 +10,9 @@ interface IModalPopupTypes {
   handleSubmit: () => void;
   popupSize: IModalSize;
   confirmationMessage: string | undefined;
+  deactivateLabel?: string;
+  customButtonLabel?: string;
+  handleCustomButton?: () => void;
 }
 
 /**
@@ -34,7 +37,9 @@ const ConfirmationModalPopup = ({
   handleCancel,
   handleSubmit,
   popupSize = 'modal-md',
-  confirmationMessage = ''
+  confirmationMessage = '',
+  customButtonLabel,
+  handleCustomButton
 }: IModalPopupTypes) => {
   return (
     <ModalForm
@@ -46,8 +51,10 @@ const ConfirmationModalPopup = ({
       handleFormSubmit={handleSubmit}
       size={popupSize}
       submitTestId={submitTestId}
+      customButtonLabel={customButtonLabel}
+      handleCustomButton={handleCustomButton}
     >
-      <>{confirmationMessage}</>
+      <p className='text-center p-1'>{confirmationMessage}</p>
     </ModalForm>
   );
 };

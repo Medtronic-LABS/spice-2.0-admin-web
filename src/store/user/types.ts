@@ -45,6 +45,7 @@ export interface IUserFormProps {
   parentOrgId?: string;
   ignoreTenantId?: string;
   isFromAdminList?: boolean;
+  isPeerSupervisor?: boolean;
 }
 
 export interface IOrganizations {
@@ -425,6 +426,12 @@ export interface IUserState {
   designationList: any[];
   isTermsConditionsLoading: boolean;
   termsAndConditions?: ITermsAndConditions;
+  chwList: ICHWUser[];
+  chwListLoading: boolean;
+  chwListError: Error | null;
+  chwListTotal: number;
+  reassignCHWLoading: boolean;
+  reassignCHWError: Error | null;
 }
 
 export interface ILoginFailurePayload {
@@ -847,6 +854,57 @@ export interface IUpdateTermsConditionsFailure {
   error: any;
 }
 
+export interface IUpdateUserStatusRequest {
+  type: typeof USER_TYPES.UPDATE_USER_STATUS_REQUEST;
+  payload: {
+    id: number;
+    isActive: boolean;
+    tenantId: number;
+    countryId: number;
+    appTypes: string[];
+    successCb?: () => void;
+    failureCb?: (error: any) => void;
+  };
+}
+
+// Payload Types
+export interface IFetchCHWListRequest {
+  type: typeof USER_TYPES.FETCH_CHW_LIST_REQUEST;
+  payload: {
+    limit: number;
+    skip: number;
+    userId: number;
+    successCb?: (data: any) => void;
+    failureCb?: (error: Error) => void;
+  };
+}
+
+export interface ICHWUser {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+}
+
+export interface IReassignCHWRequest {
+  type: typeof USER_TYPES.REASSIGN_CHW_REQUEST;
+  payload: {
+    data: IReassignCHWPayload;
+    successCb?: () => void;
+    failureCb?: (error: Error) => void;
+  };
+}
+
+export interface IReassignCHWItem {
+  chwId: number;
+  peerSupervisorId: number;
+}
+
+export interface IReassignCHWPayload {
+  reassignUserList: IReassignCHWItem[];
+  deactivateUserId: number | null;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -930,4 +988,6 @@ export type UserActions =
   | IFetchTermsConditionsFailure
   | IUpdateTermsConditionsRequest
   | IUpdateTermsConditionsSuccess
-  | IUpdateTermsConditionsFailure;
+  | IUpdateTermsConditionsFailure
+  | IUpdateUserStatusRequest
+  | IReassignCHWRequest;

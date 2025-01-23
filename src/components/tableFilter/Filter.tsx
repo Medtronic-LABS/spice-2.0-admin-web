@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ReactComponent as FilterListIcon } from '../../assets/images/filter-icon.svg';
-import { ReactComponent as Close } from '../../assets/images/close.svg';
 import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -111,7 +110,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
           : [...selectedOptions, option.name];
         const selectedData = filterData.data
           .filter((data: any) => selectedFilterOptions.includes(data.name))
-          .map((data: any) => data.id && data.id);
+          .map((data: any) => data?.id);
         onChange(selectedData, filterData.key);
       }
     } else if (isFacility) {

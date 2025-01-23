@@ -11,7 +11,8 @@ import {
   IUpdateUserRequest,
   IUser,
   IFetchTermsConditionsRequest,
-  IUpdateTermsConditionsRequest
+  IUpdateTermsConditionsRequest,
+  IFetchCHWListRequest
 } from './types';
 import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -25,6 +26,7 @@ import { error, success } from '../../utils/toastCenter';
 import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
 import localStorageService from '../../global/localStorageServices';
+import { activateUser, deactivateUser, assignPeerSupervisor, reasignCHW } from '../../services/userAPI';
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -465,6 +467,70 @@ export function* updateTermsConditionsSaga({
   }
 }
 
+function* updateUserStatusSaga({ payload }: any): SagaIterator {
+  try {
+    const { id, isActive, successCb, countryId, tenantId, appTypes } = payload;
+    const apiPayload = {
+      id,
+      appTypes,
+      countryId,
+      tenantIds: [tenantId]
+    };
+    yield call(!isActive ? activateUser : deactivateUser, apiPayload);
+    if (successCb) {
+      successCb();
+    }
+  } catch (error) {
+    if (payload.failureCb) {
+      payload.failureCb(error);
+    }
+  }
+}
+
+function* fetchCHWListSaga({ payload }: IFetchCHWListRequest) {
+  try {
+    const { data } = yield call(assignPeerSupervisor, {
+      limit: payload.limit,
+      skip: payload.skip,
+      userId: payload.userId
+    });
+    yield put({
+      type: USERTYPES.FETCH_CHW_LIST_SUCCESS,
+      payload: {
+        data: data.entityList,
+        totalCount: data.totalCount
+      }
+    });
+
+    if (payload.successCb) {
+      yield call(payload.successCb, data);
+    }
+  } catch (error) {
+    yield put({
+      type: USERTYPES.FETCH_CHW_LIST_FAILURE,
+      payload: error
+    });
+  }
+}
+
+function* reassignCHWSaga({ payload }: any) {
+  try {
+    yield call(reasignCHW, payload.data.data ? payload.data.data : payload.data);
+    yield put({
+      type: USERTYPES.REASSIGN_CHW_SUCCESS
+    });
+
+    if (payload.successCb) {
+      yield call(payload.successCb);
+    }
+  } catch (error) {
+    yield put({
+      type: USERTYPES.REASSIGN_CHW_FAILURE,
+      payload: error
+    });
+  }
+}
+
 /*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
@@ -488,6 +554,9 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.UNLOCK_USERS_REQUEST, unlockUsers)]);
   yield all([takeLatest(USERTYPES.FETCH_TERMS_CONDITIONS_REQUEST, fetchTermsConditionsSaga)]);
   yield all([takeLatest(USERTYPES.UPDATE_TERMS_CONDITIONS_REQUEST, updateTermsConditionsSaga)]);
+  yield all([takeLatest(USERTYPES.UPDATE_USER_STATUS_REQUEST, updateUserStatusSaga)]);
+  yield all([takeLatest(USERTYPES.FETCH_CHW_LIST_REQUEST, fetchCHWListSaga)]);
+  yield all([takeLatest(USERTYPES.REASSIGN_CHW_REQUEST, reassignCHWSaga)]);
 }
 
 export default userSaga;

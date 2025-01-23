@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { useState, useRef } from 'react';
 import { ReactComponent as EditIcon } from '../../assets/images/edit.svg';
 import styles from './CustomTable.module.scss';
@@ -8,6 +9,10 @@ import APPCONSTANTS from '../../constants/appConstants';
 import ConfirmationModalPopup from './ConfirmationModalPopup';
 import Pagination from '../Pagination';
 import CustomTooltip from '../tooltip';
+import Checkbox from '../formFields/Checkbox';
+import { Field, Form, FormRenderProps } from 'react-final-form';
+import SelectInput from '../formFields/SelectInput';
+import { IPeerSupervisor } from '../../store/healthFacility/types';
 
 export interface IAnyObject {
   [key: string]: any;
@@ -17,6 +22,7 @@ export interface IActionFormatter {
   hideEditIcon?: (rowData: any) => boolean;
   hideDeleteIcon?: (rowData: any) => boolean;
   hideCustomIcon?: (rowData: any) => boolean;
+  hideActiveToggle?: (rowData: any) => boolean;
 }
 
 interface ICustomTableProps {
@@ -27,6 +33,9 @@ interface ICustomTableProps {
   actionFormatter?: IActionFormatter;
   isDelete: boolean;
   isActivate?: boolean;
+  isActiveToggle?: boolean;
+  isAssignSupervisor?: boolean;
+  peerSupervisorList?: IPeerSupervisor[];
   isCustom?: boolean;
   customTitle?: string;
   CustomIcon?: any;
@@ -54,6 +63,7 @@ interface ICustomTableProps {
   deleteTitle?: string;
   activateTitle?: string;
   handleRowClick?: (data: any) => void;
+  handleCustomIconClicked?: (data: any) => void;
 }
 
 export interface IColumns {
@@ -70,7 +80,7 @@ export interface IColumns {
  * CustomTable component for displaying data in a table format with various features
  * @param {ICustomTableProps} props - The component props
  */
-const CustomTable: React.FC<ICustomTableProps> = (props) => {
+const CustomTable = (props: ICustomTableProps) => {
   const {
     handlePageChange,
     columnsDef,
@@ -79,6 +89,8 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     actionFormatter,
     isDelete,
     isActivate = false,
+    isActiveToggle = false,
+    isAssignSupervisor = false,
     isCustom = false,
     customTitle = '',
     CustomIcon = null,
@@ -100,7 +112,8 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
     rowsPerPage,
     deleteTitle,
     activateTitle,
-    handleRowClick
+    handleRowClick,
+    peerSupervisorList = []
   } = props;
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -111,7 +124,6 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
   const tableRef = useRef<HTMLInputElement>(null);
   const currentDeleteObj = useRef<any>({});
   const currentActivateObj = useRef<any>({});
-
   /**
    * Handles page change and scrolls to top of table
    * @param {number} pageNo - The new page number
@@ -271,7 +283,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
    * @returns {boolean} True if any action is enabled, false otherwise
    */
   const isAction = () => {
-    return isEdit || isDelete || isActivate || isCustom;
+    return isEdit || isDelete || isActivate || isCustom || isActiveToggle;
   };
 
   /**
@@ -311,11 +323,18 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
   const handleShowActionHeader = (actions: boolean) => {
     return (
       actions && (
-        <th className='text-center' style={{ width: '80px' }}>
+        <th className='text-center' style={{ width: isActiveToggle ? '180px' : '80px' }}>
           Actions
         </th>
       )
     );
+  };
+
+  /**
+   * Renders peersupervisor header if peersupervisor is enabled
+   */
+  const handleShowPeersupervisorHeader = () => {
+    return isAssignSupervisor && <th style={{ width: '200px' }}>Assign Peer supervisor</th>;
   };
 
   /**
@@ -345,12 +364,46 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
       isEdit &&
       (!actionFormatter?.hideEditIcon ||
         (actionFormatter?.hideEditIcon && !actionFormatter?.hideEditIcon(rowDataValue))) && (
-        <div className={styles.editIcon} data-testid='edit-icon' onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}>
+        <div
+          className={styles.editIcon}
+          data-testid='edit-icon'
+          onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}
+          style={{ display: rowDataValue.active ? 'block' : 'none' }}
+        >
           <CustomTooltip title={'Edit'}>
             <EditIcon aria-labelledby={'edit-icon'} />
           </CustomTooltip>
         </div>
       )
+    );
+  };
+
+  /**
+   * Renders the peer supervisor selection input for each row
+   * @param rowDataValue - Row data containing CHW information
+   * @param rowIndex - Index of the current row
+   */
+  const handlePeersupervisorInput = (rowDataValue: IAnyObject, rowIndex: number) => {
+    return (
+      <div className={styles.selectWrapper}>
+        <Field
+          name={`peersupervisor-${rowDataValue.id}`}
+          render={({ input }) => (
+            <SelectInput
+              {...(input as any)}
+              size='small'
+              label=''
+              errorLabel='peersupervisor'
+              labelKey='name'
+              valueKey='id'
+              options={peerSupervisorList || []}
+              isModel={true}
+              isShowLabel={false}
+              showOnlyDropdown={true}
+            />
+          )}
+        />
+      </div>
     );
   };
 
@@ -388,6 +441,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
         className={rowDataValue.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
         data-testid='custom-icon'
         onClick={(e) => handleCustomIconClick(e, rowDataValue, rowIndex, isPopupNeeded)}
+        style={{ display: rowDataValue.active ? 'block' : 'none' }}
       >
         <CustomTooltip title={customTitle}>
           <CustomIcon style={customIconStyle} aria-labelledby={'custom-icon'} />
@@ -411,6 +465,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
         <div
           data-testid='delete-icon'
           className={styles.deleteIcon}
+          style={{ display: rowDataValue.active ? 'block' : 'none' }}
           onClick={(e) => handleDelete(e, rowDataValue, rowIndex)}
         >
           <CustomTooltip title={'Delete'}>
@@ -461,6 +516,49 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
   };
 
   /**
+   * Renders checkbox if conditions are met
+   * @param {IAnyObject} rowDataValue - The data of the row
+   * @param {number} rowIndex - The index of the row
+   */
+  const handleShowCheckbox = (rowDataValue: IAnyObject, rowIndex: number) => {
+    return (
+      !actionFormatter?.hideActiveToggle?.(rowDataValue) &&
+      isActiveToggle && (
+        <Form
+          onSubmit={() => {}}
+          initialValues={{ isActive: rowDataValue.active }}
+          render={({ handleSubmit }: FormRenderProps<any>) => {
+            return (
+              <form onSubmit={handleSubmit}>
+                <div className='mt-0dot5 pe-0dot5'>
+                  <Field
+                    name='isActive'
+                    type='checkbox'
+                    render={({ input }) => (
+                      <Checkbox
+                        switchCheckbox={true}
+                        label=''
+                        size='small'
+                        checked={rowDataValue.active}
+                        onChange={(e) => {
+                          input.onChange(e);
+                          if (onActivateClick) {
+                            onActivateClick({ ...rowDataValue, isActive: e.target.checked });
+                          }
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+              </form>
+            );
+          }}
+        />
+      )
+    );
+  };
+
+  /**
    * Renders custom popup if conditions are met
    */
   const handleCustomPopup = () => {
@@ -486,6 +584,7 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
         <thead>
           <tr>
             {handleShowColumnHeaders(columnsDef)}
+            {handleShowPeersupervisorHeader()}
             {handleShowActionHeader(isAction())}
           </tr>
         </thead>
@@ -507,12 +606,14 @@ const CustomTable: React.FC<ICustomTableProps> = (props) => {
                           {column.cellFormatter ? column.cellFormatter(rowDataItem, column) : rowDataItem[column.name]}
                         </td>
                       ))}
+                    {handleShowPeersupervisorHeader() && <td>{handlePeersupervisorInput(rowDataItem, rowIndex)}</td>}
                     {isAction() && (
                       <td key={rowIndex} className='text-center'>
-                        <div className='d-inline-flex'>
+                        <div className='d-inline-flex align-items-center'>
                           {handleShowEditIcon(rowDataItem, rowIndex)}
                           {handleShowActivateIcon(rowDataItem, rowIndex)}
                           {handleShowCustomIcon(rowDataItem, rowIndex)}
+                          {handleShowCheckbox(rowDataItem, rowIndex)}
                           {handleShowDeleteIcon(rowDataItem, rowIndex)}
                         </div>
                       </td>

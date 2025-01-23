@@ -38,15 +38,18 @@ export const columnDef = [
   },
   {
     id: 5,
-    name: 'gender',
-    label: 'GENDER',
-    width: '7%'
-  },
-  {
-    id: 6,
     name: 'phoneNumber',
     label: 'CONTACT NUMBER',
     width: '15%',
     cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
+  }
+];
+
+export const chwColumnDef = [
+  {
+    id: 1,
+    name: 'name',
+    label: 'Name',
+    cellFormatter: formatName
   }
 ];

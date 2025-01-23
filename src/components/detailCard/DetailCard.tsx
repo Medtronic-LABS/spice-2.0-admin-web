@@ -158,7 +158,7 @@ const DetailCard = ({
         <div
           className={`d-flex justify-content-between ${buttonLabel && onButtonClick ? 'justify-content-lg-end' : ''}  ${
             isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'
-          } ${buttonLabel && isSearch && isFilter ? '' : ''} flex-grow-md-0 ${styles.buttonContainer}`}
+          } flex-grow-md-0 ${styles.buttonContainer}`}
         >
           {renderSearchBar()}
 

@@ -33,6 +33,10 @@ export interface IModalProps {
   size?: IModalSize;
   isDeactivateModal?: boolean;
   showCloseBtn?: boolean;
+  handleCustomButton?: () => void;
+  customButtonLabel?: string;
+  formChangeValues?: any;
+  handleFormChange?: (data: any) => void;
 }
 
 /**
@@ -54,6 +58,8 @@ const ModalForm = React.memo(
     deactivateLabel,
     handleForceSubmit = false,
     handleFormSubmit,
+    handleCustomButton,
+    customButtonLabel,
     handleDeactivate,
     initialValues = {},
     hideFooterButton = false,
@@ -135,6 +141,11 @@ const ModalForm = React.memo(
                             onClick={() => handleCancel()}
                           >
                             {cancelText}
+                          </button>
+                        )}
+                        {customButtonLabel && (
+                          <button type='button' className='btn secondary-btn me-0dot5' onClick={handleCustomButton}>
+                            {customButtonLabel}
                           </button>
                         )}
                         <button

@@ -38,7 +38,7 @@ const renderWorkflowByModuleType = (
   selectedState?: any,
   form?: any,
   mentalHealthSelection?: () => any,
-  pregnancyCheckTimeout?: any
+  pregnancyCheckTimeoutRef?: any
 ) => {
   const {
     WORKFLOW_MODULE: { clinical },
@@ -62,7 +62,7 @@ const renderWorkflowByModuleType = (
    * @param {any} selectedValue - The selected workflow value
    */
   const onClickWorkflow = (selectedValue: any) => {
-    pregnancyCheckTimeout = setTimeout(() => {
+    const pregancyTimeOut = setTimeout(() => {
       const isPregnancy = selectedValue?.workflowName === pregnancy;
       const isPregnancyAnc = selectedValue?.workflowName === pregnancyAnc;
       const selectedClinicalWFs: number[] = form?.getState().values.healthFacility.clinicalWorkflows;
@@ -78,7 +78,9 @@ const renderWorkflowByModuleType = (
         }
       }
     }, 0);
-
+    if (pregnancyCheckTimeoutRef) {
+      pregnancyCheckTimeoutRef.current = pregancyTimeOut;
+    }
     if ([substanceAbuse, suicideScreener, phq4].includes(selectedValue?.workflowName || '') && mentalHealthSelection) {
       mentalHealthSelection();
     }
@@ -269,7 +271,7 @@ const Workflows: React.FC<IWorkflowsProps> = ({
         { phq4Selected, setPhq4Selected },
         form,
         mentalHealthSelection,
-        pregnancyCheckTimeout.current
+        pregnancyCheckTimeout
       )}
       {renderWorkflowByModuleType(workflows, customized)}
       {(isCommunity ? formClinicalWFsLength === 0 : formClinicalWFsLength === 0 && formCustomizedWFsLength === 0) && (

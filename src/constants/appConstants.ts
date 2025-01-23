@@ -48,7 +48,8 @@ const APPCONSTANTS = {
     REGION_ADMIN: 'REGION_ADMIN',
     DISTRICT_ADMIN: 'DISTRICT_ADMIN',
     CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN',
-    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN'
+    HEALTH_FACILITY_ADMIN: 'HEALTH_FACILITY_ADMIN',
+    PEER_SUPERVISOR: 'PEER_SUPERVISOR'
   },
   ALL_ROLES: {
     SUPER_USER: 'SUPER_USER',
@@ -259,6 +260,11 @@ const APPCONSTANTS = {
     CHANGE_PASSWORD: 'Change Password',
     SEND_EMAIL: 'Send Email'
   },
+  USER_ACTIVATED: 'User activated successfully.',
+  USER_DEACTIVATED: 'User deactivated successfully.',
+  USER_STATUS_UPDATE_FAILED: 'Unable to update user status. Please try after sometime.',
+  PEER_SUPERVISOR_DEACTIVATION:
+    'There are users assigned to this role, kindly reassign the users to another peer supervisor before deactivating this role.',
   // Admin
   ADMIN_DETAILS_CREATE_SUCCESS: 'Admin details created successfully.',
   ADMIN_DETAILS_UPDATE_SUCCESS: 'Admin details updated successfully.',

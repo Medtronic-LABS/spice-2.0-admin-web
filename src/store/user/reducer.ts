@@ -1,7 +1,6 @@
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import * as USERTYPES from './actionTypes';
-
 import { IUserState, IUser, ITermsAndConditions } from './types';
 
 const userInitialStateGetter = (): IUser => ({
@@ -52,7 +51,13 @@ const initialStateGetter = {
   lockedUsers: [],
   totalLockedUsers: 0,
   termsAndConditions: {} as ITermsAndConditions,
-  isTermsConditionsLoading: false
+  isTermsConditionsLoading: false,
+  chwList: [],
+  chwListLoading: false,
+  chwListError: null,
+  chwListTotal: 0,
+  reassignCHWLoading: false,
+  reassignCHWError: null
 };
 
 const userReducer = (state: IUserState = initialStateGetter, action = {} as any) => {
@@ -319,6 +324,51 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
     case USERTYPES.FETCH_COUNTRY_LIST_REQUEST:
     case USERTYPES.FETCH_COUNTRY_LIST_FAILURE:
     case USERTYPES.FETCH_CULTURE_LIST_FAILURE:
+    case USERTYPES.FETCH_CHW_LIST_REQUEST:
+      return {
+        ...state,
+        chwListLoading: true,
+        chwListError: null
+      };
+    case USERTYPES.FETCH_CHW_LIST_SUCCESS:
+      return {
+        ...state,
+        chwList: action.payload.data,
+        chwListTotal: action.payload.total,
+        chwListLoading: false,
+        chwListError: null
+      };
+    case USERTYPES.FETCH_CHW_LIST_FAILURE:
+      return {
+        ...state,
+        chwListLoading: false,
+        chwListError: action.payload
+      };
+    case USERTYPES.CLEAR_CHW_LIST:
+      return {
+        ...state,
+        chwList: [],
+        chwListTotal: 0,
+        chwListError: null
+      };
+    case USERTYPES.REASSIGN_CHW_REQUEST:
+      return {
+        ...state,
+        reassignCHWLoading: true,
+        reassignCHWError: null
+      };
+    case USERTYPES.REASSIGN_CHW_SUCCESS:
+      return {
+        ...state,
+        reassignCHWLoading: false,
+        reassignCHWError: null
+      };
+    case USERTYPES.REASSIGN_CHW_FAILURE:
+      return {
+        ...state,
+        reassignCHWLoading: false,
+        reassignCHWError: action.payload
+      };
     default:
       return {
         ...state
