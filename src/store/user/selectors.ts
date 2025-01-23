@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 
 import { AppState } from '../rootReducer';
 import { IUserState } from './types';
+import { IUserState } from './types';
 
 const getIsLoggedIn = (state: AppState) => state.user.isLoggedIn;
 const getIsLoggingIn = (state: AppState) => state.user.loggingIn;
@@ -36,10 +37,8 @@ const getLockedUsersLoading = (state: AppState) => state.user.islockedUsersLoadi
 const getDesignationList = (state: AppState) => state.user.designationList;
 const getIsTACLoading = (state: AppState) => state.user.isTermsConditionsLoading;
 const getTermsConditions = (state: AppState) => state.user.termsAndConditions;
+
 const userStateSelector = (state: { user: IUserState }) => state.user;
-const getSyncLoading = (state: AppState) => state.user.syncLoading;
-const getLastSyncDate = (state: AppState) => state.user.lastSyncDate;
-const getSyncError = (state: AppState) => state.user.syncError;
 
 export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
 export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
@@ -84,14 +83,3 @@ export const chwListErrorSelector = createSelector(userStateSelector, (user) => 
 export const chwListTotalSelector = createSelector(userStateSelector, (user) => user.chwListTotal);
 export const reassignCHWLoadingSelector = createSelector(userStateSelector, (user) => user.reassignCHWLoading);
 export const reassignCHWErrorSelector = createSelector(userStateSelector, (user) => user.reassignCHWError);
-
-// Memoized selectors
-export const syncLoadingSelector = createSelector(getSyncLoading, (loading) => loading);
-export const lastSyncDateSelector = createSelector(getLastSyncDate, (lastSyncDate) => lastSyncDate);
-export const syncErrorSelector = createSelector(getSyncError, (error) => error);
-
-export const syncStatusSelector = createSelector([getSyncLoading, getSyncError], (loading, error) => ({
-  loading,
-  error,
-  isSuccess: !loading && !error
-}));

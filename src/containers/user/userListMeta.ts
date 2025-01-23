@@ -52,3 +52,12 @@ export const columnDef = ({ healthFacilityModuleName }: { healthFacilityModuleNa
     }
   ];
 };
+
+export const chwColumnDef = [
+  {
+    id: 1,
+    name: 'name',
+    label: 'Name',
+    cellFormatter: formatName
+  }
+];

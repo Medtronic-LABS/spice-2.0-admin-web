@@ -2,6 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import styles from './Checkbox.module.scss';
 
 interface ICheckboxProps {
+interface ICheckboxProps {
   label?: string;
   switchCheckbox?: boolean;
   readOnly?: boolean;
@@ -9,8 +10,19 @@ interface ICheckboxProps {
   name?: string;
   checked?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  size?: 'small' | 'default';
+  name?: string;
+  checked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+const Checkbox = ({
+  label,
+  readOnly,
+  switchCheckbox,
+  size = 'default',
+  ...inputProps
+}: ICheckboxProps & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>) => {
 const Checkbox = ({
   label,
   readOnly,
@@ -29,12 +41,15 @@ const Checkbox = ({
 
   return (
     <label
-      className={`d-inline-flex align-items-center m-0 ${styles.checkboxLabel} ${switchCheckbox && ' h-100'} ${
-        switchCheckbox && styles.clSwitch
-      } ${readOnly ? styles.disabled : ''} ${size === 'small' ? styles.small : ''}`}
+      className={`d-inline-flex align-items-center ${styles.checkboxLabel} ${
+        switchCheckbox && 'pt-1dot75 pb-1dot5 h-100'
+      } ${switchCheckbox && styles.clSwitch} ${readOnly ? styles.disabled : ''} ${
+        size === 'small' ? styles.small : ''
+      }`}
       data-testid='checkbox'
     >
       <div className={`${switchCheckbox && 'd-inline-flex align-items-center'}`}>
+        {label && switchCheckbox && <span className={styles.checkboxLabelText}>{label}</span>}
         {label && switchCheckbox && <span className={styles.checkboxLabelText}>{label}</span>}
         <div className={switchCheckbox ? '' : styles.checkboxWrapper}>
           <input

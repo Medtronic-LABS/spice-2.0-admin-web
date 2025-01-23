@@ -179,11 +179,22 @@ interface IModalPopupTypes {
   deactivateLabel?: string;
   customButtonLabel?: string;
   handleCustomButton?: () => void;
-  WarningMessage?: string;
-  syncDate?: string;
 }
 
-const ConfirmationModalPopup: React.FC<IModalPopupTypes> = ({
+/**
+ * ConfirmationModalPopup component for displaying a confirmation dialog
+ * @param {IModalPopupTypes} props - The component props
+ * @param {boolean} props.isOpen - Whether the modal is open
+ * @param {string} props.popupTitle - The title of the modal
+ * @param {string} props.cancelText - The text for the cancel button
+ * @param {string} props.submitText - The text for the submit button
+ * @param {string} [props.submitTestId] - The test ID for the submit button
+ * @param {() => void} props.handleCancel - Function to handle cancel action
+ * @param {() => void} props.handleSubmit - Function to handle submit action
+ * @param {IModalSize} props.popupSize - The size of the modal
+ * @param {string} [props.confirmationMessage] - The confirmation message to display
+ */
+const ConfirmationModalPopup = ({
   isOpen,
   popupTitle,
   confirmationMessage,
@@ -191,13 +202,11 @@ const ConfirmationModalPopup: React.FC<IModalPopupTypes> = ({
   submitText,
   handleCancel,
   handleSubmit,
-  popupSize,
-  submitTestId,
+  popupSize = 'modal-md',
+  confirmationMessage = '',
   customButtonLabel,
-  handleCustomButton,
-  WarningMessage,
-  syncDate
-}) => {
+  handleCustomButton
+}: IModalPopupTypes) => {
   return (
     <ModalForm
       show={isOpen}
@@ -211,15 +220,7 @@ const ConfirmationModalPopup: React.FC<IModalPopupTypes> = ({
       customButtonLabel={customButtonLabel}
       handleCustomButton={handleCustomButton}
     >
-      <div>
-        {Boolean(WarningMessage) && (
-          <>
-            <SyncDateDisplay syncDate={syncDate || ''} />
-            <hr />
-          </>
-        )}
-        <p className='text-center'>{confirmationMessage}</p>
-      </div>
+      <p className='text-center p-1'>{confirmationMessage}</p>
     </ModalForm>
   );
 };

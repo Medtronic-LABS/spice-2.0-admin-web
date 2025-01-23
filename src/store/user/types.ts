@@ -54,6 +54,7 @@ export interface IUserFormProps {
     isReportSuperAdmin?: boolean;
     isAdminForm?: boolean;
   };
+  isPeerSupervisor?: boolean;
 }
 
 export interface IOrganizations {
@@ -431,9 +432,6 @@ export interface IUserState {
   chwListTotal: number;
   reassignCHWLoading: boolean;
   reassignCHWError: Error | null;
-  syncLoading: boolean;
-  syncError: Error | null;
-  lastSyncDate: string | null;
 }
 
 export interface ILoginFailurePayload {
@@ -885,9 +883,11 @@ export interface ICHWUser {
 
 export interface IReassignCHWRequest {
   type: typeof USER_TYPES.REASSIGN_CHW_REQUEST;
-  data: IReassignCHWPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
+  payload: {
+    data: IReassignCHWPayload;
+    successCb?: () => void;
+    failureCb?: (error: Error) => void;
+  };
 }
 
 export interface IReassignCHWItem {
@@ -898,16 +898,6 @@ export interface IReassignCHWItem {
 export interface IReassignCHWPayload {
   reassignUserList: IReassignCHWItem[];
   deactivateUserId: number | null;
-}
-
-export interface IOfflineSyncPayload {
-  userId: number;
-}
-
-export interface IOfflineSyncRequest {
-  data: IOfflineSyncPayload;
-  successCb?: (data: { lastSyncDate: string }) => void;
-  failureCb?: (error: Error) => void;
 }
 
 export type UserActions =
@@ -993,5 +983,4 @@ export type UserActions =
   | IUpdateTermsConditionsSuccess
   | IUpdateTermsConditionsFailure
   | IUpdateUserStatusRequest
-  | IReassignCHWRequest
-  | IOfflineSyncRequest;
+  | IReassignCHWRequest;

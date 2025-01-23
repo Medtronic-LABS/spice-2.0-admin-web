@@ -9,6 +9,13 @@ interface IUserStatusPayload {
   tenantIds: number[];
 }
 
+interface IUserStatusPayload {
+  id: number;
+  appTypes: string[];
+  countryId: string;
+  tenantIds: number[];
+}
+
 export const login = (username: string, password: string) => {
   const data = new FormData();
   data.append('username', username);
@@ -223,12 +230,5 @@ export const reasignCHW = (data: any) =>
   axios({
     method: 'POST',
     url: '/user-service/user/reassign-chw',
-    data
-  });
-
-export const offlineSyncDetails = (data: any) =>
-  axios({
-    method: 'POST',
-    url: '/user-service/user/offline-sync-details',
     data
   });

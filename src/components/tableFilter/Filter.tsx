@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ReactComponent as FilterListIcon } from '../../assets/images/filter-icon.svg';
-import { ReactComponent as Close } from '../../assets/images/close.svg';
 import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';

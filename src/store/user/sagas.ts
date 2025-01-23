@@ -14,6 +14,8 @@ import {
   IFetchTermsConditionsRequest,
   IUpdateTermsConditionsRequest,
   IFetchCHWListRequest
+  IUpdateTermsConditionsRequest,
+  IFetchCHWListRequest
 } from './types';
 import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -28,6 +30,7 @@ import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
 import localStorageService from '../../global/localStorageServices';
 import { setLabelName } from '../common/actions';
+import { activateUser, deactivateUser, assignPeerSupervisor, reasignCHW } from '../../services/userAPI';
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
@@ -483,11 +486,9 @@ function* updateUserStatusSaga({ payload }: any): SagaIterator {
       id,
       appTypes,
       countryId,
-      tenantIds: tenantId ? [tenantId] : [],
-      villageIds: payload?.villageIds,
-      supervisorId: payload?.peerSupervisorId
+      tenantIds: [tenantId]
     };
-    yield call(isActive ? activateUser : deactivateUser, apiPayload);
+    yield call(!isActive ? activateUser : deactivateUser, apiPayload);
     if (successCb) {
       successCb();
     }
@@ -524,38 +525,21 @@ function* fetchCHWListSaga({ payload }: IFetchCHWListRequest) {
   }
 }
 
-function* reassignCHWSaga(payload: any) {
+function* reassignCHWSaga({ payload }: any) {
   try {
-    const { data: data1 } = payload.data;
-    const { data: data2 } = payload;
-    yield call(reasignCHW, data1 || data2);
-    if (data1) {
-      payload.data.successCb?.();
-    } else {
-      payload.successCb?.();
+    yield call(reasignCHW, payload.data.data ? payload.data.data : payload.data);
+    yield put({
+      type: USERTYPES.REASSIGN_CHW_SUCCESS
+    });
+
+    if (payload.successCb) {
+      yield call(payload.successCb);
     }
-    yield put(userActions.reassignCHWSuccess());
   } catch (error) {
-    if (error instanceof Error) {
-      payload?.failureCb(error);
-      yield put(userActions.reassignCHWFailure(error));
-    }
-  }
-}
-
-function* offlineSyncSaga({ payload }: { payload: IOfflineSyncRequest }): SagaIterator {
-  const { data, successCb, failureCb } = payload;
-
-  try {
-    const { data: lastSyncDate } = yield call(userService.offlineSyncDetails, data);
-    yield put(userActions.offlineSyncSuccess(lastSyncDate));
-    if (successCb) {
-      successCb(lastSyncDate);
-    }
-    yield put(userActions.offlineSyncSuccess(lastSyncDate));
-  } catch (e: any) {
-    failureCb?.(e);
-    yield put(userActions.offlineSyncFailure(e as Error));
+    yield put({
+      type: USERTYPES.REASSIGN_CHW_FAILURE,
+      payload: error
+    });
   }
 }
 
@@ -585,7 +569,6 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.UPDATE_USER_STATUS_REQUEST, updateUserStatusSaga)]);
   yield all([takeLatest(USERTYPES.FETCH_CHW_LIST_REQUEST, fetchCHWListSaga)]);
   yield all([takeLatest(USERTYPES.REASSIGN_CHW_REQUEST, reassignCHWSaga)]);
-  yield all([takeLatest(USERTYPES.OFFLINE_SYNC_REQUEST as any, offlineSyncSaga)]);
 }
 
 export default userSaga;

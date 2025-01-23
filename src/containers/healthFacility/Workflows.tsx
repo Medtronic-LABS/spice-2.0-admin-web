@@ -82,7 +82,6 @@ const renderWorkflowByModuleType = (
     if (pregnancyCheckTimeoutRef) {
       pregnancyCheckTimeoutRef.current = pregancyTimeOut;
     }
-
     if ([substanceAbuse, suicideScreener, phq4].includes(selectedValue?.workflowName || '') && mentalHealthSelection) {
       mentalHealthSelection();
     }

@@ -75,9 +75,9 @@ import {
   IUpdateTermsConditionsFailure,
   IUpdateTermsConditionsRequest,
   IUpdateTermsConditionsSuccess,
-  IUpdateUserFailure,
-  IUpdateUserSuccess,
-  IUser
+  IUpdateTermsConditionsFailure,
+  IUpdateUserStatusRequest,
+  IFetchCHWListRequest
 } from './types';
 
 export const loginRequest = ({
@@ -575,14 +575,6 @@ export const updateTermsAndConditionsFailure = (error: any): IUpdateTermsConditi
   error
 });
 
-export const reassignCHWSuccess = (): any => ({
-  type: USER_TYPES.REASSIGN_CHW_SUCCESS
-});
-export const reassignCHWFailure = (error: any): any => ({
-  type: USER_TYPES.REASSIGN_CHW_FAILURE,
-  error
-});
-
 export const updateUserStatus = (payload: {
   id: number;
   isActive: boolean;
@@ -591,7 +583,7 @@ export const updateUserStatus = (payload: {
   appTypes: string[];
   successCb?: () => void;
   failureCb?: (error: any) => void;
-}): any => ({
+}): IUpdateUserStatusRequest => ({
   type: USER_TYPES.UPDATE_USER_STATUS_REQUEST,
   payload
 });
@@ -619,22 +611,9 @@ export const clearCHWList = () => ({
 
 export const reassignCHWRequest = (data: any, successCb?: () => void, failureCb?: (error: Error) => void): any => ({
   type: USER_TYPES.REASSIGN_CHW_REQUEST,
-  data,
-  successCb,
-  failureCb
-});
-
-export const offlineSyncRequest = (payload: IOfflineSyncRequest) => ({
-  type: USER_TYPES.OFFLINE_SYNC_REQUEST,
-  payload
-});
-
-export const offlineSyncSuccess = (data: any) => ({
-  type: USER_TYPES.OFFLINE_SYNC_SUCCESS,
-  data
-});
-
-export const offlineSyncFailure = (error: Error) => ({
-  type: USER_TYPES.OFFLINE_SYNC_FAILURE,
-  payload: error
+  payload: {
+    data,
+    successCb,
+    failureCb
+  }
 });
