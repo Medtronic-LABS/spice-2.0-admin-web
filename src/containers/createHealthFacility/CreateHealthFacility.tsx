@@ -13,7 +13,12 @@ import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
-import { clearAllDependentData, createHFRequest, fetchWorkflowListRequest } from '../../store/healthFacility/actions';
+import {
+  clearAllDependentData,
+  clearHFList,
+  createHFRequest,
+  fetchWorkflowListRequest
+} from '../../store/healthFacility/actions';
 import {
   healthFacilityLoadingSelector,
   workflowListSelector,
@@ -143,6 +148,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   };
 
   const onCreateSuccess = useCallback(() => {
+    dispatch(clearHFList());
     toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS);
     setSubmittedData({
       ...submittedData,
@@ -151,7 +157,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     });
     formInstance.current.change('healthFacility', {});
     onGotoList();
-  }, [PAGENUMBER.DETAILS, onGotoList, submittedData]);
+  }, [PAGENUMBER.DETAILS, dispatch, onGotoList, submittedData]);
 
   const onCreateFailure = useCallback(
     (e: Error) => {

@@ -30,6 +30,8 @@ import { getAppTypeSelector, roleSelector } from '../../store/user/selectors';
 import { fileDownload } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import styles from './Region.module.scss';
+import { clearChiefdomList } from '../../store/chiefdom/actions';
+import { clearDistrictList } from '../../store/district/actions';
 const Region = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -86,6 +88,8 @@ const Region = (): React.ReactElement => {
         file,
         appTypes: appTypes[0],
         successCb: (_) => {
+          dispatch(clearChiefdomList());
+          dispatch(clearDistrictList());
           fetchRegionDetails(); // Fetch updated region details after successful upload
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.REGION_UPLOAD_SUCCESS);
           setUploadClicked(false); // Reset upload button state
