@@ -29,7 +29,7 @@ const MOCK_DATA_CONSTANTS = {
   },
   MOCK_LOGIN_REQUEST: {
     username: 'testuser@test.com',
-    password: 'Spice123',
+    pass: 'Spice123',
     rememberMe: false,
     countryId: 1
   },
@@ -41,7 +41,7 @@ const MOCK_DATA_CONSTANTS = {
     lastName: 'User',
     userId: '1',
     role: 'SUPER_USER',
-    roleDetail: { name: 'SUPER_USER' },
+    roleDetail: { name: 'SUPER_USER', suiteAccessName: 'admin' },
     tenantId: '1',
     formDataId: 1,
     country: {
@@ -50,7 +50,13 @@ const MOCK_DATA_CONSTANTS = {
       phoneNumberCode: '+21',
       unitMeasurement: null,
       regionCode: '',
-      tenantId: 1
+      tenantId: 1,
+      displayValues: {
+        region: {
+          s: 'region',
+          p: 'regions'
+        }
+      }
     },
     suiteAccess: ['admin'],
     organizations: [{ formDataId: 1 }],
@@ -63,7 +69,7 @@ const MOCK_DATA_CONSTANTS = {
         firstName: 'Test',
         lastName: 'User',
         id: '1',
-        roles: [{ name: 'SUPER_USER' }],
+        roles: [{ name: 'SUPER_USER', suiteAccessName: 'admin' }],
         tenantId: '1',
         country: {
           id: 1,
@@ -71,8 +77,15 @@ const MOCK_DATA_CONSTANTS = {
           phoneNumberCode: '+21',
           unitMeasurement: null,
           regionCode: '',
-          tenantId: 1
+          tenantId: 1,
+          displayValues: {
+            region: {
+              s: 'region',
+              p: 'regions'
+            }
+          }
         },
+        // appTypes: [APPCONSTANTS.appTypes.community],
         suiteAccess: ['admin'],
         organizations: [{ formDataId: 1 }]
       }

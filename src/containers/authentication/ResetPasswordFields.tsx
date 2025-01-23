@@ -133,7 +133,7 @@ export const ResetPasswordFields = ({
   return (
     <>
       {adminPasswordChange && (
-        <div className={styles.togglePassword}>
+        <div className={styles.togglePassword} data-testid='old-password-field'>
           <Field
             name='oldPassword'
             type={isShowOldPassword ? 'text' : 'password'}
@@ -162,7 +162,7 @@ export const ResetPasswordFields = ({
           />
         </div>
       )}
-      <div className={styles.togglePassword}>
+      <div className={styles.togglePassword} data-testid='new-password-field'>
         <Field
           name='newPassword'
           type={isShowPassword ? 'text' : 'password'}
@@ -191,7 +191,7 @@ export const ResetPasswordFields = ({
         />
       </div>
       {!adminPasswordChange && (
-        <div className={styles.togglePassword}>
+        <div className={styles.togglePassword} data-testid='confirm-password-field'>
           <Field
             name='confirmPassword'
             type={isShowConfirmPassword ? 'text' : 'password'}

@@ -14,9 +14,8 @@ import {
 import toastCenter from '../../../utils/toastCenter';
 import { HF_SUMMARY } from '../../../tests/mockData/healthFacilityConstants';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/chiefdomDataConstants';
-import { getAdminPayload } from '../../../utils/commonUtils';
 import '@testing-library/jest-dom/extend-expect';
-
+import { getAdminPayload } from '../../../utils/formatObjectUtils';
 const { ROLES } = APPCONSTANTS;
 
 const MockUserForm = jest.fn(() => <div data-testid='user-form'>User Form</div>);
@@ -76,8 +75,35 @@ const initialState = {
   },
   chiefdom: {
     chiefdomList: [FETCH_CHIEFDOM_LIST_RESPONSE_PAYLOAD]
+  },
+  common: {
+    labelName: {
+      region: {
+        s: 'Region',
+        p: 'Regions'
+      },
+      healthFacility: {
+        s: 'Health Facility',
+        p: 'Health Facilities'
+      },
+      district: {
+        s: 'County',
+        p: 'Counties'
+      },
+      chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+    }
   }
 };
+
+jest.mock('../../../components/button/IconButton.svg', () => ({
+  ReactComponent: 'IconButton'
+}));
+
+jest.mock('../../../utils/formatObjectUtils', () => ({
+  __esModule: true,
+  getAdminPayload: jest.fn()
+}));
+
 describe('MyProfile', () => {
   afterEach(() => {
     jest.clearAllMocks();

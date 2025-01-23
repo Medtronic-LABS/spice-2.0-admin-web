@@ -159,6 +159,45 @@ describe('formatObjectUtils', () => {
       expect(result[0].district).toEqual({ id: 1 });
       expect(result[0].chiefdom).toEqual({ id: 2 });
     });
+
+    it('should handle countrycode, designation,reportUserOrganization, insightUserOrganization, isRegionAdmin with tenantId and id', () => {
+      const user = {
+        ...mockUser,
+        id: 1,
+        countryCode: '+1',
+        designation: { id: 1, name: 'Doctor' },
+        reportUserOrganization: [{ id: 1, tenantId: 123 }],
+        insightUserOrganization: [{ id: 2, tenantId: 456 }],
+        roles: [{ name: APPCONSTANTS.ROLES.REGION_ADMIN }]
+      };
+      const result = getAdminPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community],
+        tenantId: 123
+      });
+      expect(result[0].countryCode).toEqual('+1');
+      expect(result[0].designation).toEqual({ id: 1, name: 'Doctor' });
+      expect(result[0].id).toBe(1);
+    });
+
+    it('should handle hfAdmin with culture', () => {
+      const user = {
+        ...mockUser,
+        id: 1,
+        culture: 'en-US',
+        roles: [{ name: APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN }],
+        tenantId: 123
+      };
+      const result = getAdminPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].culture).toEqual('en-US');
+      expect(result[0].tenantId).toBe(123);
+      expect(result[0].id).toBe(1);
+    });
   });
 
   describe('getUserPayload', () => {
@@ -412,6 +451,24 @@ describe('formatObjectUtils', () => {
       expect(result[0].redRisk).toBeUndefined();
       expect(result[0].culture).toBe('en-US');
     });
+
+    it('should handle timezone, designation, reportUserOrganization, insightUserOrganization and id', () => {
+      const user = {
+        ...mockUser,
+        id: 1,
+        timezone: { id: 1, name: 'UTC' },
+        designation: { id: 1, name: 'Doctor' },
+        reportUserOrganization: [{ id: 1, tenantId: 123 }],
+        insightUserOrganization: [{ id: 2, tenantId: 456 }]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].timezone).toEqual({ id: 1, name: 'UTC' });
+      expect(result[0].designation).toEqual({ id: 1, name: 'Doctor' });
+    });
   });
 
   describe('formatHealthFacility', () => {
@@ -455,6 +512,48 @@ describe('formatObjectUtils', () => {
         linkedSupervisorIds: [123],
         linkedVillageIds: [123],
         customizedWorkflowIds: [{ id: 123 }],
+        clinicalWorkflowIds: [{ id: 123 }]
+      };
+      const result = formatHealthFacility(mockHf, 1, [APPCONSTANTS.appTypes.community]);
+      expect(result).toEqual(expected);
+    });
+
+    it('should handle health facility payload without city name, peersupervisor, linked villages, customized workflows', () => {
+      const mockHf = {
+        id: 1,
+        name: 'Test HF',
+        type: { name: 'Type' },
+        phuFocalPersonName: 'Test Name',
+        phuFocalPersonNumber: '1234567890',
+        address: 'Test Address',
+        district: { id: 1 },
+        chiefdom: { id: 2, tenantId: 456 },
+        language: { name: 'Test Language' },
+        country: { id: 1 },
+        tenantId: 123,
+        clinicalWorkflows: [{ id: 123 }]
+      };
+      const expected = {
+        id: 1,
+        appTypes: [APPCONSTANTS.appTypes.community],
+        name: 'Test HF',
+        type: 'Type',
+        phuFocalPersonName: 'Test Name',
+        phuFocalPersonNumber: '1234567890',
+        cityName: null,
+        address: 'Test Address',
+        district: { id: 1 },
+        chiefdom: { id: 2, tenantId: 456 },
+        latitude: undefined,
+        longitude: undefined,
+        postalCode: undefined,
+        country: { id: 1 },
+        language: 'Test Language',
+        parentTenantId: 456,
+        tenantId: 123,
+        linkedSupervisorIds: [],
+        linkedVillageIds: [],
+        customizedWorkflowIds: [],
         clinicalWorkflowIds: [{ id: 123 }]
       };
       const result = formatHealthFacility(mockHf, 1, [APPCONSTANTS.appTypes.community]);

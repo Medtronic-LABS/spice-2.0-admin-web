@@ -1588,7 +1588,7 @@ const UserForm = ({
                 {isSPICE &&
                   (isEdit
                     ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
-                      (!isCommunity && isSiteUser)
+                      (!isCommunity && isSiteUser && !isHF)
                     : showSpiceHFRef.current[index] && (!isEdit || isReportOrInsightUser)) && (
                     <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                       <Field

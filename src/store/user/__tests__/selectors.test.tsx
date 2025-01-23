@@ -21,7 +21,10 @@ import {
   communityListSelector,
   timezoneListSelector,
   designationListSelector,
-  countryIdSelector
+  countryIdSelector,
+  countryListSelector,
+  isTACLoadingSelector,
+  termsAndConditionsSelector
 } from '../selectors';
 
 const initialState: any = {
@@ -125,4 +128,16 @@ test('designationListSelector should return  from state', () => {
 
 test('countryIdSelector should return  from state', () => {
   expect(countryIdSelector(initialState)).toEqual(initialState.user.country);
+});
+
+test('countryListSelector should return  from state', () => {
+  expect(countryListSelector(initialState)).toEqual(initialState.user.countryList);
+});
+
+test('isTACLoadingSelector should return  from state', () => {
+  expect(isTACLoadingSelector(initialState)).toEqual(initialState.user.isTermsConditionsLoading);
+});
+
+test('termsAndConditionsSelector should return  from state', () => {
+  expect(termsAndConditionsSelector(initialState)).toEqual(initialState.user.termsAndConditions);
 });

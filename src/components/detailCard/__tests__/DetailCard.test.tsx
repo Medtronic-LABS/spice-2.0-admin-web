@@ -2,6 +2,10 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DetailCard from '../DetailCard';
 
+jest.mock('../../button/IconButton.svg', () => ({
+  ReactComponent: 'IconButton'
+}));
+
 describe('DetailCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();

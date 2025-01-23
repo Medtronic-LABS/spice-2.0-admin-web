@@ -923,4 +923,59 @@ describe('userReducer', () => {
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
+
+  it('should handle CLEAR_APP_TYPE', () => {
+    const initialState: any = {
+      user: { appTypes: ['COMMUNITY', 'NON_COMMUNITY'] }
+    };
+    const action: any = {
+      type: USERTYPES.CLEAR_APP_TYPE
+    };
+    const expectedState = {
+      user: { appTypes: [] }
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_TERMS_CONDITIONS_REQUEST', () => {
+    const initialState: any = {
+      isTermsConditionsLoading: false
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_TERMS_CONDITIONS_REQUEST
+    };
+    const expectedState = {
+      isTermsConditionsLoading: true
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_TERMS_CONDITIONS_SUCCESS', () => {
+    const initialState: any = {
+      isTermsConditionsLoading: true,
+      termsAndConditions: null
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_TERMS_CONDITIONS_SUCCESS,
+      payload: { id: 1, content: 'test' }
+    };
+    const expectedState = {
+      isTermsConditionsLoading: false,
+      termsAndConditions: { id: 1, content: 'test' }
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_TERMS_CONDITIONS_FAILURE', () => {
+    const initialState: any = {
+      isTermsConditionsLoading: true
+    };
+    const action: any = {
+      type: USERTYPES.FETCH_TERMS_CONDITIONS_FAILURE
+    };
+    const expectedState = {
+      isTermsConditionsLoading: false
+    };
+    expect(userReducer(initialState, action)).toEqual(expectedState);
+  });
 });

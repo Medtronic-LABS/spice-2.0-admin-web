@@ -15,7 +15,9 @@ import {
   fetchTimezoneList,
   fetchCommunityListRequest,
   fetchDesignationListRequest,
-  unlockUsers
+  unlockUsers,
+  fetchTermsConditionsSaga,
+  updateTermsConditionsSaga
 } from '../sagas';
 import { runSaga } from 'redux-saga';
 import * as userService from '../../../services/userAPI';
@@ -24,6 +26,7 @@ import * as ACTION_TYPES from '../actionTypes';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/userDataConstants';
 import { AxiosResponse } from 'axios';
 import * as userActions from '../actions';
+import * as commonActions from '../../common/actions';
 import localStorageServices from '../../../global/localStorageServices';
 import APPCONSTANTS from '../../../constants/appConstants';
 
@@ -53,7 +56,8 @@ jest.mock('react-redux', () => ({
   useSelector: jest.fn().mockImplementation((selector) => selector(mockState))
 }));
 
-const loginRequestMockData = MOCK_DATA_CONSTANTS.MOCK_LOGIN_REQUEST;
+let loginRequestMockData: any = MOCK_DATA_CONSTANTS.MOCK_LOGIN_REQUEST;
+loginRequestMockData.password = loginRequestMockData.pass;
 const loggedInUserMockData = MOCK_DATA_CONSTANTS.LOGGED_IN_USER_DATA;
 const token = MOCK_DATA_CONSTANTS.MOCK_TOKEN;
 const userTenantID = MOCK_DATA_CONSTANTS.MOCK_USER_TENANT_ID;
@@ -87,7 +91,8 @@ describe('User Saga', () => {
       const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
       const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
         return Promise.resolve({
-          headers: { authorization: token, Tenantid: userTenantID }
+          headers: { authorization: token, Tenantid: userTenantID },
+          data: { isTermsAndConditionsAccepted: true }
         } as AxiosResponse);
       });
       const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
@@ -104,6 +109,8 @@ describe('User Saga', () => {
         login,
         {
           ...loginRequestMockData,
+          successCb: jest.fn(),
+          failureCb: jest.fn(),
           type: ACTION_TYPES.LOGIN_REQUEST
         }
       ).toPromise();
@@ -112,6 +119,7 @@ describe('User Saga', () => {
       expect(fetchLoggedInUserSpy).toHaveBeenCalled();
       expect(dispatched).toEqual([
         userActions.addUserTenantID(userTenantID),
+        commonActions.setLabelName(country.displayValues as any),
         userActions.loginSuccess({ ...loginSuccessResponseMockData, appTypes } as any)
       ]);
     });
@@ -123,7 +131,8 @@ describe('User Saga', () => {
       const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
       const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
         return Promise.resolve({
-          headers: { authorization: token, Tenantid: userTenantID }
+          headers: { authorization: token, Tenantid: userTenantID },
+          data: { isTermsAndConditionsAccepted: true }
         } as AxiosResponse);
       });
       const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
@@ -148,6 +157,7 @@ describe('User Saga', () => {
       expect(fetchLoggedInUserSpy).toHaveBeenCalled();
       expect(dispatched).toEqual([
         userActions.addUserTenantID(userTenantID),
+        commonActions.setLabelName(country.displayValues as any),
         userActions.loginSuccess({
           ...loginSuccessResponseMockData,
           appTypes: [APPCONSTANTS.appTypes.community],
@@ -163,7 +173,8 @@ describe('User Saga', () => {
       const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
       const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
         return Promise.resolve({
-          headers: { authorization: token, Tenantid: userTenantID }
+          headers: { authorization: token, Tenantid: userTenantID },
+          data: { isTermsAndConditionsAccepted: true }
         } as AxiosResponse);
       });
       const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
@@ -186,9 +197,117 @@ describe('User Saga', () => {
       expect(fetchLoggedInUserSpy).toHaveBeenCalled();
       expect(dispatched).toEqual([
         userActions.addUserTenantID(userTenantID),
+        commonActions.setLabelName(country.displayValues as any),
         userActions.loginSuccess({
           ...loginSuccessResponseMockData,
           appTypes: [APPCONSTANTS.appTypes.community]
+        } as any)
+      ]);
+    });
+
+    it(`Adds user tenant id and encrypted token to store and
+      logs in successfully without displayValues and admin suite access`, async () => {
+      const { username, password } = loginRequestMockData;
+      const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
+      const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
+      const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
+        return Promise.resolve({
+          headers: { authorization: token, Tenantid: userTenantID },
+          data: { isTermsAndConditionsAccepted: true }
+        } as AxiosResponse);
+      });
+      const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
+        return Promise.resolve({
+          ...loggedInUserMockData,
+          data: {
+            entity: {
+              ...loggedInUserMockData.data.entity,
+              country: { ...loggedInUserMockData.data.entity.country, displayValues: null },
+              roles: [{ name: 'ADMIN', suiteAccessName: 'cfr' }]
+            }
+          }
+        } as AxiosResponse);
+      });
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        login,
+        {
+          ...loginRequestMockData,
+          type: ACTION_TYPES.LOGIN_REQUEST
+        }
+      ).toPromise();
+
+      expect(loginUserSpy).toHaveBeenCalledWith(username, hashedPassword);
+      expect(fetchLoggedInUserSpy).toHaveBeenCalled();
+      expect(dispatched).toEqual([
+        userActions.addUserTenantID(userTenantID),
+        userActions.loginSuccess({
+          ...loginSuccessResponseMockData,
+          role: 'ADMIN',
+          roleDetail: { name: 'ADMIN', suiteAccessName: 'cfr' },
+          country: { ...loggedInUserMockData.data.entity.country, displayValues: null },
+          appTypes: [APPCONSTANTS.appTypes.community]
+        } as any)
+      ]);
+    });
+
+    it(`Adds user tenant id and encrypted token to store and
+      logs in successfully without appTypes and roles`, async () => {
+      const { username, password } = loginRequestMockData;
+      const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
+      const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
+      const loginUserSpy = jest.spyOn(userService, 'login').mockImplementation(() => {
+        return Promise.resolve({
+          headers: { authorization: token, Tenantid: userTenantID },
+          data: { isTermsAndConditionsAccepted: true }
+        } as AxiosResponse);
+      });
+      const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
+        return Promise.resolve({
+          ...loggedInUserMockData,
+          data: {
+            entity: {
+              ...loggedInUserMockData.data.entity,
+              country: { ...loggedInUserMockData.data.entity.country },
+              roles: [],
+              appTypes: []
+            }
+          }
+        } as AxiosResponse);
+      });
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => ({
+            ...mockState,
+            user: {
+              ...mockState.user,
+              appTypes: []
+            }
+          })
+        },
+        login,
+        {
+          ...loginRequestMockData,
+          type: ACTION_TYPES.LOGIN_REQUEST
+        }
+      ).toPromise();
+
+      expect(loginUserSpy).toHaveBeenCalledWith(username, hashedPassword);
+      expect(fetchLoggedInUserSpy).toHaveBeenCalled();
+      expect(dispatched).toEqual([
+        userActions.addUserTenantID(userTenantID),
+        commonActions.setLabelName(country.displayValues as any),
+        userActions.loginSuccess({
+          ...loginSuccessResponseMockData,
+          appTypes: [],
+          role: '',
+          roleDetail: undefined
         } as any)
       ]);
     });
@@ -330,7 +449,7 @@ describe('User Saga', () => {
 
   // fetchLoggedInUser
   describe('Fetch Logged in user', () => {
-    it('Fetches details of the user who is logged in', async () => {
+    it('Fetches details of the logged in user', async () => {
       const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
         return Promise.resolve({
           data: {
@@ -358,25 +477,27 @@ describe('User Saga', () => {
         fetchLoggedInUser
       ).toPromise();
       expect(fetchLoggedInUserSpy).toHaveBeenCalledWith();
-      const payload = {
-        email,
-        firstName,
-        lastName,
-        userId: id,
-        role: roles[0].name,
-        roleDetail: roles[0],
-        tenantId,
-        formDataId: organizations[0]?.formDataId,
-        appTypes,
-        country,
-        suiteAccess,
-        countryId: undefined,
-        organizations
-      };
-      expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
+      expect(dispatched).toEqual([
+        commonActions.setLabelName(country.displayValues as any),
+        userActions.fetchLoggedInUserSuccess({
+          email,
+          firstName,
+          lastName,
+          userId: id,
+          role: roles[0].name,
+          roleDetail: roles[0],
+          tenantId,
+          formDataId: organizations[0]?.formDataId,
+          appTypes,
+          country,
+          suiteAccess,
+          countryId: undefined,
+          organizations
+        } as any)
+      ]);
     });
 
-    it('Fetches details of the user who is logged in with appTypes inside country', async () => {
+    it('Fetch details of the logged in user with appTypes inside country', async () => {
       const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
         return Promise.resolve({
           data: {
@@ -392,8 +513,7 @@ describe('User Saga', () => {
                 appTypes
               },
               organizations,
-              suiteAccess,
-              appTypes
+              suiteAccess
             }
           }
         } as AxiosResponse);
@@ -422,7 +542,8 @@ describe('User Saga', () => {
           phoneNumberCode: '+21',
           regionCode: '',
           tenantId: 1,
-          unitMeasurement: null
+          unitMeasurement: null,
+          displayValues: country.displayValues
         },
         suiteAccess,
         countryId: undefined,
@@ -430,7 +551,10 @@ describe('User Saga', () => {
         appTypes,
         tenantId: '1'
       };
-      expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
+      expect(dispatched).toEqual([
+        commonActions.setLabelName(country.displayValues as any),
+        userActions.fetchLoggedInUserSuccess(payload as any)
+      ]);
     });
 
     it('Fetches details of the user who is logged in without tenantId and tenantId inside country', async () => {
@@ -480,6 +604,136 @@ describe('User Saga', () => {
         suiteAccess,
         countryId: undefined,
         organizations
+      };
+      expect(dispatched).toEqual([
+        commonActions.setLabelName(country.displayValues as any),
+        userActions.fetchLoggedInUserSuccess(payload as any)
+      ]);
+    });
+
+    it('Fetch details of the logged in user without country Id and displayValues', async () => {
+      const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
+        return Promise.resolve({
+          data: {
+            entity: {
+              username: email,
+              firstName,
+              lastName,
+              id,
+              roles: [{ name: 'ADMIN', suiteAccessName: 'cfr' }],
+              tenantId,
+              country: {
+                ...country,
+                appTypes: null,
+                id: null,
+                displayValues: null
+              },
+              organizations,
+              suiteAccess
+            }
+          }
+        } as AxiosResponse);
+      });
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchLoggedInUser
+      ).toPromise();
+      expect(fetchLoggedInUserSpy).toHaveBeenCalledWith();
+      const payload = {
+        email,
+        firstName,
+        lastName,
+        userId: id,
+        role: 'ADMIN',
+        roleDetail: { name: 'ADMIN', suiteAccessName: 'cfr' },
+        formDataId: organizations[0]?.formDataId,
+        country: {
+          appTypes: null,
+          id: null,
+          name: 'Sierra Leone',
+          phoneNumberCode: '+21',
+          regionCode: '',
+          tenantId: 1,
+          unitMeasurement: null,
+          displayValues: null
+        },
+        suiteAccess,
+        countryId: undefined,
+        organizations,
+        appTypes,
+        tenantId: '1'
+      };
+      expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
+    });
+
+    it('Fetch details of the logged in user without apptypes in store and roles in API response', async () => {
+      const fetchLoggedInUserSpy = jest.spyOn(userService, 'fetchLoggedInUser').mockImplementation(() => {
+        return Promise.resolve({
+          data: {
+            entity: {
+              username: email,
+              firstName,
+              lastName,
+              id,
+              tenantId,
+              roles: [{ suiteAccessName: 'cfr' }],
+              country: {
+                ...country,
+                appTypes: null,
+                id: null,
+                displayValues: null
+              },
+              organizations,
+              suiteAccess
+            }
+          }
+        } as AxiosResponse);
+      });
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => ({
+            ...mockState,
+            user: {
+              ...mockState.user,
+              user: {
+                ...mockState.user.user,
+                appTypes: []
+              }
+            }
+          })
+        },
+        fetchLoggedInUser
+      ).toPromise();
+      expect(fetchLoggedInUserSpy).toHaveBeenCalledWith();
+      const payload = {
+        email,
+        firstName,
+        lastName,
+        userId: id,
+        role: '',
+        roleDetail: { suiteAccessName: 'cfr' },
+        formDataId: organizations[0]?.formDataId,
+        country: {
+          appTypes: null,
+          id: null,
+          name: 'Sierra Leone',
+          phoneNumberCode: '+21',
+          regionCode: '',
+          tenantId: 1,
+          unitMeasurement: null,
+          displayValues: null
+        },
+        suiteAccess,
+        countryId: undefined,
+        organizations,
+        appTypes: [],
+        tenantId: '1'
       };
       expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
     });
@@ -1360,6 +1614,141 @@ describe('User Saga', () => {
 
       expect(userService.unlockUsers).toHaveBeenCalledWith('1');
       expect(dispatched).not.toEqual([userActions.unlockUsersFailure()]);
+    });
+  });
+
+  // fetchTermsConditionsSaga
+  describe('Fetch Terms Conditions', () => {
+    it('fetchTermsConditionsSaga success', async () => {
+      jest.spyOn(userService, 'fetchTermsConditionsAPI').mockImplementation(() => {
+        return Promise.resolve({
+          data: {
+            entity: []
+          }
+        } as AxiosResponse);
+      });
+
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchTermsConditionsSaga,
+        { countryId: 1, successCB: jest.fn(), type: ACTION_TYPES.FETCH_TERMS_CONDITIONS_REQUEST }
+      ).toPromise();
+
+      expect(userService.fetchTermsConditionsAPI).toHaveBeenCalledWith(1);
+      expect(dispatched).toEqual([userActions.fetchTermsAndConditionsSuccess([] as any)]);
+    });
+
+    it('fetchTermsConditionsSaga failure', async () => {
+      jest.spyOn(userService, 'fetchTermsConditionsAPI').mockImplementation(() => {
+        return Promise.reject(new Error('Error'));
+      });
+
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchTermsConditionsSaga,
+        { countryId: 1, successCB: jest.fn(), type: ACTION_TYPES.FETCH_TERMS_CONDITIONS_REQUEST }
+      ).toPromise();
+
+      expect(userService.fetchTermsConditionsAPI).toHaveBeenCalledWith(1);
+      expect(dispatched).toEqual([userActions.fetchTermsAndConditionsFailure(new Error('Error'))]);
+    });
+  });
+
+  describe('Update Terms Conditions', () => {
+    it('updateTermsConditionsSaga success', async () => {
+      jest.spyOn(userService, 'updateTermsConditionsAPI').mockImplementation(() => {
+        return Promise.resolve({
+          data: {
+            entity: []
+          }
+        } as AxiosResponse);
+      });
+
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        updateTermsConditionsSaga,
+        {
+          userId: 1,
+          isTermsAndConditionAccepted: true,
+          successCB: jest.fn(),
+          failureCB: jest.fn(),
+          type: ACTION_TYPES.UPDATE_TERMS_CONDITIONS_REQUEST
+        }
+      ).toPromise();
+
+      expect(userService.updateTermsConditionsAPI).toHaveBeenCalledWith({
+        userId: 1,
+        isTermsAndConditionAccepted: true
+      });
+      expect(dispatched).toEqual([userActions.updateTermsAndConditionsSuccess()]);
+    });
+
+    it('updateTermsConditionsSaga failure with instance of error', async () => {
+      jest.spyOn(userService, 'updateTermsConditionsAPI').mockImplementation(() => {
+        return Promise.reject(new Error('Error'));
+      });
+
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        updateTermsConditionsSaga,
+        {
+          userId: 1,
+          isTermsAndConditionAccepted: true,
+          successCB: jest.fn(),
+          failureCB: jest.fn(),
+          type: ACTION_TYPES.UPDATE_TERMS_CONDITIONS_REQUEST
+        }
+      ).toPromise();
+
+      expect(userService.updateTermsConditionsAPI).toHaveBeenCalledWith({
+        userId: 1,
+        isTermsAndConditionAccepted: true
+      });
+      expect(dispatched).toEqual([userActions.updateTermsAndConditionsFailure(new Error('Error'))]);
+    });
+
+    it('updateTermsConditionsSaga failure without instance of error', async () => {
+      jest.spyOn(userService, 'updateTermsConditionsAPI').mockImplementation(() => {
+        return Promise.reject('Error');
+      });
+
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        updateTermsConditionsSaga,
+        {
+          userId: 1,
+          isTermsAndConditionAccepted: true,
+          successCB: jest.fn(),
+          failureCB: jest.fn(),
+          type: ACTION_TYPES.UPDATE_TERMS_CONDITIONS_REQUEST
+        }
+      ).toPromise();
+
+      expect(userService.updateTermsConditionsAPI).toHaveBeenCalledWith({
+        userId: 1,
+        isTermsAndConditionAccepted: true
+      });
+      expect(dispatched).toEqual([userActions.updateTermsAndConditionsFailure('Error')]);
     });
   });
 });

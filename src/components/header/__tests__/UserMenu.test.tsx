@@ -42,12 +42,29 @@ const initialState = {
       tenantId: '789',
       appTypes: [APP_TYPE.NON_COMMUNITY]
     }
+  },
+  common: {
+    defaultValues: {
+      region: {
+        s: 'Region',
+        p: 'Regions'
+      },
+      healthFacility: {
+        s: 'Health Facility',
+        p: 'Health Facilities'
+      },
+      district: {
+        s: 'County',
+        p: 'Counties'
+      },
+      chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+    }
   }
 };
 
 describe('UserMenu Component', () => {
-  const districtSName = 'District';
-  const chiefdomSName = 'Chiefdom';
+  const districtSName = 'County';
+  const chiefdomSName = 'Sub County';
 
   const store = mockStore(initialState);
 
@@ -147,6 +164,11 @@ describe('UserMenu Component', () => {
           ...initialState.user.user,
           suiteAccess: []
         }
+      },
+      common: {
+        defaultValues: {
+          ...initialState.common.defaultValues
+        }
       }
     });
     const { queryByText, unmount } = render(
@@ -233,6 +255,11 @@ describe('UserMenu Component', () => {
         user: {
           ...initialState.user.user,
           appTypes: [APP_TYPE.COMMUNITY]
+        }
+      },
+      common: {
+        defaultValues: {
+          ...initialState.common.defaultValues
         }
       }
     });

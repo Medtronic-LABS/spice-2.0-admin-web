@@ -29,15 +29,30 @@ describe('App Component', () => {
     process.env.REACT_APP_GA_TRACKING_ID = 'G-12345ABCDE';
   });
 
-  const store = mockStore({
+  const initialState = {
     user: {
       isLoggedIn: true
     },
     common: {
-      sideMenu: { list: [] },
-      labelName: null
+      labelName: {
+        region: {
+          s: 'Region',
+          p: 'Regions'
+        },
+        healthFacility: {
+          s: 'Health Facility',
+          p: 'Health Facilities'
+        },
+        district: {
+          s: 'County',
+          p: 'Counties'
+        },
+        chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+      }
     }
-  });
+  };
+
+  const store = mockStore(initialState);
 
   describe('App', () => {
     test('should render header without errors', () => {
@@ -69,8 +84,7 @@ describe('App Component', () => {
           isLoggedIn: false
         },
         common: {
-          sideMenu: { list: [] },
-          labelName: null
+          ...initialState.common
         }
       });
       const { queryByTestId } = render(

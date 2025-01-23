@@ -60,7 +60,8 @@ const HF_USERS_REQUEST = {
   searchTerm: '',
   roleNames: ['CHP'],
   isSiteUsers: true,
-  tenantIds: [1]
+  tenantIds: [1],
+  tenantBased: false
 };
 
 const HF_USER = {

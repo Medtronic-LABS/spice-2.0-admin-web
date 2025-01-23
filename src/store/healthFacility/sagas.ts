@@ -77,7 +77,8 @@ import {
   validateLinkedRestrictionsSuccess,
   validateLinkedRestrictionsFailure,
   fetchCityListSuccess,
-  setAssignedHFListForHFAdmin
+  setAssignedHFListForHFAdmin,
+  fetchCityListFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -452,7 +453,7 @@ export function* fetchCityListSagaRequest({
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
-      yield put(fetchVillagesListFailure(e));
+      yield put(fetchCityListFailure(e));
     }
   }
 }

@@ -23,7 +23,8 @@ import {
   peerSupervisorValidationSagaRequest,
   fetchHealthFacilityDashboardList,
   fetchUnlinkedVillagesSagaRequest,
-  fetchVillagesListUserLinkedSagaRequest
+  fetchVillagesListUserLinkedSagaRequest,
+  fetchCityListSagaRequest
 } from '../sagas';
 import * as hfService from '../../../services/healthFacilityAPI';
 import * as hfActions from '../actions';
@@ -69,10 +70,14 @@ const hfDashboardList = HF_MOCK_DATA.HF_DASHBOARD_LIST;
 
 describe('HF sagas', () => {
   describe('Fetch Health Facility List: FETCH_HEALTH_FACILITY_LIST_REQUEST', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
     const testFetchHealthFacilityList = async (
       healthFacilityListDataPayload: any,
       totalCount: number,
-      limit: number = 10
+      limit: number = 10,
+      forHFAdmin: boolean = false
     ) => {
       const successCb = jest.fn();
       const fetchHFListSpy = jest.spyOn(hfService, 'fetchHealthFacilityList').mockImplementation(
@@ -89,6 +94,7 @@ describe('HF sagas', () => {
         fetchHealthFacilityList,
         {
           ...hfListRequestPayload,
+          forHFAdmin,
           limit,
           successCb,
           type: ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_REQUEST
@@ -99,13 +105,23 @@ describe('HF sagas', () => {
         ...hfListRequestPayload
       });
       expect(successCb).toHaveBeenCalled();
-      expect(dispatched).toEqual([
-        hfActions.fetchHFListSuccess({
-          healthFacilityList: (healthFacilityListDataPayload as any) || [],
-          total: totalCount,
-          limit
-        })
-      ]);
+      if (forHFAdmin) {
+        expect(dispatched).toEqual([
+          hfActions.setAssignedHFListForHFAdmin({
+            healthFacilityList: (healthFacilityListDataPayload as any) || [],
+            total: totalCount,
+            limit
+          } as any)
+        ]);
+      } else {
+        expect(dispatched).toEqual([
+          hfActions.fetchHFListSuccess({
+            healthFacilityList: (healthFacilityListDataPayload as any) || [],
+            total: totalCount,
+            limit
+          })
+        ]);
+      }
     };
 
     it('Fetch all health facility list and dispatch success with data', async () => {
@@ -114,6 +130,10 @@ describe('HF sagas', () => {
 
     it('Fetch all health facility list and dispatch success with empty data', async () => {
       await testFetchHealthFacilityList(undefined, 0);
+    });
+
+    it('Fetch all health facility list for HF Admin and dispatch success with data', async () => {
+      await testFetchHealthFacilityList(hfListDataPayload, 10, 10, true);
     });
 
     const testFetchHealthFacilityFailure = async (error: Error | string) => {
@@ -535,6 +555,7 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
+      expect(hfPeerSupervisorSpy).toHaveBeenCalledWith(tenantIds, appTypes);
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchPeerSupervisorListSuccess({
@@ -563,6 +584,7 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
+      expect(hfPeerSupervisorSpy).toHaveBeenCalledWith(tenantIds, appTypes);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchPeerSupervisorListFailure(error)]);
     });
@@ -581,7 +603,44 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchWorkflowListSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_WORKFLOW_LIST_REQUEST,
+          countryId,
+          successCb
+        }
+      ).toPromise();
+      expect(hfWorkflowSpy).toHaveBeenCalledWith({ countryId });
+      expect(successCb).toHaveBeenCalled();
+      expect(dispatched).toEqual([
+        hfActions.fetchWorkflowListSuccess({
+          list: hfWorkflowList
+        })
+      ]);
+    });
+    it('Fetch workflow list with more than one app type and dispatch success', async () => {
+      const countryId = 1;
+      const successCb = jest.fn();
+      const hfWorkflowSpy = jest.spyOn(hfService, 'fetchWorkflowList').mockImplementation(
+        () =>
+          Promise.resolve({
+            data: { entityList: hfWorkflowList }
+          }) as AxiosPromise
+      );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => ({
+            ...mockState,
+            user: {
+              ...mockState.user,
+              user: { ...mockState.user.user, appTypes: ['COMMUNITY', 'NON_COMMUNITY'] }
+            }
+          })
         },
         fetchWorkflowListSagaRequest,
         {
@@ -598,7 +657,6 @@ describe('HF sagas', () => {
       //   })
       // ]);
     });
-
     it('Fetch workflow list and dispatch failure', async () => {
       const error = new Error('Failed to fetch workflow list');
       const failureCb = jest.fn();
@@ -607,7 +665,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchWorkflowListSagaRequest,
         {
@@ -731,7 +790,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchVillagesListFromHFSagaRequest,
         {
@@ -742,7 +802,7 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId);
+      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, mockState.user.user.appTypes);
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchVillagesListFromHFSuccess({
@@ -761,7 +821,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchVillagesListFromHFSagaRequest,
         {
@@ -772,7 +833,7 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId);
+      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, mockState.user.user.appTypes);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchVillagesListFromHFFailure(error)]);
     });
@@ -790,7 +851,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchHFUserList,
         {
@@ -800,7 +862,8 @@ describe('HF sagas', () => {
         }
       ).toPromise();
       expect(fetchHFUsersListSpy).toHaveBeenCalledWith({
-        ...hfUsersRequest
+        ...hfUsersRequest,
+        appTypes: mockState.user.user.appTypes
       });
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
@@ -821,7 +884,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchHFUserList,
         {
@@ -831,7 +895,8 @@ describe('HF sagas', () => {
         }
       ).toPromise();
       expect(fetchHFUsersListSpy).toHaveBeenCalledWith({
-        ...hfUsersRequest
+        ...hfUsersRequest,
+        appTypes: mockState.user.user.appTypes
       });
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchHFUserListFailure(error)]);
@@ -851,7 +916,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchDistrictListSagaRequest,
         {
@@ -860,7 +926,7 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(fetchDistrictListSpy).toHaveBeenCalledWith(1);
+      expect(fetchDistrictListSpy).toHaveBeenCalledWith(1, mockState.user.user.appTypes);
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchDistrictListSuccess({ list: hfDistrictList, total: hfDistrictList.length })
@@ -876,7 +942,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchDistrictListSagaRequest,
         {
@@ -885,7 +952,7 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(fetchDistrictListSpy).toHaveBeenCalledWith(1);
+      expect(fetchDistrictListSpy).toHaveBeenCalledWith(1, mockState.user.user.appTypes);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchDistrictListFailure(error)]);
     });
@@ -904,7 +971,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchChiefdomListSagaRequest,
         {
@@ -914,7 +982,11 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(chiefdomSpy).toHaveBeenCalledWith(hfChiefDomRequest.countryId, hfChiefDomRequest.districtId);
+      expect(chiefdomSpy).toHaveBeenCalledWith(
+        hfChiefDomRequest.countryId,
+        hfChiefDomRequest.districtId,
+        mockState.user.user.appTypes
+      );
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchChiefdomListSuccess({ list: hfChiefdomList, total: hfChiefdomList.length })
@@ -928,7 +1000,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchChiefdomListSagaRequest,
         {
@@ -938,7 +1011,11 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(chiefdomSpy).toHaveBeenCalledWith(hfChiefDomRequest.countryId, hfChiefDomRequest.districtId);
+      expect(chiefdomSpy).toHaveBeenCalledWith(
+        hfChiefDomRequest.countryId,
+        hfChiefDomRequest.districtId,
+        mockState.user.user.appTypes
+      );
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchChiefdomListFailure(error)]);
     });
@@ -957,7 +1034,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchVillagesListSagaRequest,
         {
@@ -971,7 +1049,8 @@ describe('HF sagas', () => {
       expect(hfVillageListSpy).toHaveBeenCalledWith(
         hfVillageRequest.countryId,
         hfVillageRequest.districtId,
-        hfVillageRequest.chiefdomId
+        hfVillageRequest.chiefdomId,
+        mockState.user.user.appTypes
       );
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
@@ -979,7 +1058,7 @@ describe('HF sagas', () => {
       ]);
     });
 
-    it('Fetch village list and dispatch success', async () => {
+    it('Fetch village list and dispatch failure', async () => {
       const error = new Error('Failed to fetch village list');
       const failureCb = jest.fn();
       const hfVillageListSpy = jest
@@ -988,7 +1067,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchVillagesListSagaRequest,
         {
@@ -1002,10 +1082,62 @@ describe('HF sagas', () => {
       expect(hfVillageListSpy).toHaveBeenCalledWith(
         hfVillageRequest.countryId,
         hfVillageRequest.districtId,
-        hfVillageRequest.chiefdomId
+        hfVillageRequest.chiefdomId,
+        mockState.user.user.appTypes
       );
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchVillagesListFailure(error)]);
+    });
+  });
+
+  describe('Fetch City List for Health Facility: FETCH_CITY_LIST_REQUEST_FOR_HF', () => {
+    it('Fetch city list and dispatch success', async () => {
+      const successCb = jest.fn();
+      const hfCityListSpy = jest.spyOn(hfService, 'fetchCityList').mockImplementation(
+        () =>
+          Promise.resolve({
+            data: { entity: [] }
+          }) as unknown as AxiosPromise
+      );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchCityListSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_CITY_LIST_REQUEST_FOR_HF,
+          searchTerm: '',
+          appTypes: mockState.user.user.appTypes,
+          successCb
+        }
+      ).toPromise();
+      expect(hfCityListSpy).toHaveBeenCalledWith('', mockState.user.user.appTypes);
+      expect(successCb).toHaveBeenCalled();
+      expect(dispatched).toEqual([hfActions.fetchCityListSuccess()]);
+    });
+
+    it('Fetch city list and dispatch failure', async () => {
+      const error = new Error('Failed to fetch city list');
+      const failureCb = jest.fn();
+      const hfCityListSpy = jest.spyOn(hfService, 'fetchCityList').mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchCityListSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_CITY_LIST_REQUEST_FOR_HF,
+          searchTerm: '',
+          appTypes: mockState.user.user.appTypes,
+          successCb: jest.fn(),
+          failureCb
+        }
+      ).toPromise();
+      expect(hfCityListSpy).toHaveBeenCalledWith('', mockState.user.user.appTypes);
+      expect(failureCb).toHaveBeenCalled();
+      expect(dispatched).toEqual([hfActions.fetchCityListFailure(error)]);
     });
   });
 
@@ -1219,7 +1351,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchUnlinkedVillagesSagaRequest,
         {
@@ -1231,7 +1364,13 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(unlinkedVillageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, healthFacilityId);
+      expect(unlinkedVillageListHF).toHaveBeenCalledWith(
+        countryId,
+        districtId,
+        chiefdomId,
+        mockState.user.user.appTypes,
+        healthFacilityId
+      );
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchUnlinkedVillagesListSuccess({ list: villagesListFromHF as any, total: 2 })
@@ -1251,7 +1390,8 @@ describe('HF sagas', () => {
       const dispatched: any = [];
       await runSaga(
         {
-          dispatch: (action) => dispatched.push(action)
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
         },
         fetchUnlinkedVillagesSagaRequest,
         {
@@ -1263,63 +1403,68 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(unlinkedVillageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, healthFacilityId);
+      expect(unlinkedVillageListHF).toHaveBeenCalledWith(
+        countryId,
+        districtId,
+        chiefdomId,
+        mockState.user.user.appTypes,
+        healthFacilityId
+      );
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchUnlinkedVillagesListFailure(error)]);
     });
-
-    describe('Fetch Villages List for Health Facility: FETCH_VILLAGES_LIST_USER_LINKED', () => {
-      const tenantIds = [1];
-      const userId = 1;
-      const successCb = jest.fn();
-      const failureCb = jest.fn();
-      it('Fetch villages list and dispatch success', async () => {
-        const villageListHF = jest
-          .spyOn(hfService, 'fetchVillagesListfromHF')
-          .mockImplementation(() => Promise.resolve({ data: { entity: villagesListFromHF } }) as AxiosPromise);
-        const dispatched: any = [];
-        await runSaga(
-          {
-            dispatch: (action) => dispatched.push(action)
-          },
-          fetchVillagesListUserLinkedSagaRequest,
-          {
-            type: ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED,
-            tenantIds,
-            userId,
-            successCb
-          }
-        ).toPromise();
-        expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
-        expect(successCb).toHaveBeenCalledWith({ list: villagesListFromHF as any, hfTenantIds: tenantIds });
-        expect(dispatched).toEqual([
-          hfActions.fetchVillagesListFromHFSuccess({
-            data: { list: villagesListFromHF as any, hfTenantIds: tenantIds }
-          })
-        ]);
-      });
-      it('Fetch villages list and dispatch success', async () => {
-        const error = new Error('Failed to fetch villages list');
-        const villageListHF = jest
-          .spyOn(hfService, 'fetchVillagesListfromHF')
-          .mockImplementation(() => Promise.reject(error));
-        const dispatched: any = [];
-        await runSaga(
-          {
-            dispatch: (action) => dispatched.push(action)
-          },
-          fetchVillagesListUserLinkedSagaRequest,
-          {
-            type: ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED,
-            tenantIds,
-            userId,
-            failureCb
-          }
-        ).toPromise();
-        expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
-        expect(failureCb).toHaveBeenCalled();
-        expect(dispatched).toEqual([hfActions.fetchVillagesListFromHFFailure(error)]);
-      });
+  });
+  describe('Fetch Villages List for Health Facility: FETCH_VILLAGES_LIST_USER_LINKED', () => {
+    const tenantIds = [1];
+    const userId = 1;
+    const successCb = jest.fn();
+    const failureCb = jest.fn();
+    it('Fetch villages list and dispatch success', async () => {
+      const villageListHF = jest
+        .spyOn(hfService, 'fetchVillagesListfromHF')
+        .mockImplementation(() => Promise.resolve({ data: { entity: villagesListFromHF } }) as AxiosPromise);
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchVillagesListUserLinkedSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED,
+          tenantIds,
+          userId,
+          successCb
+        }
+      ).toPromise();
+      expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
+      expect(successCb).toHaveBeenCalledWith({ list: villagesListFromHF as any, hfTenantIds: tenantIds });
+      expect(dispatched).toEqual([
+        hfActions.fetchVillagesListFromHFSuccess({
+          data: { list: villagesListFromHF as any, hfTenantIds: tenantIds }
+        })
+      ]);
+    });
+    it('Fetch villages list and dispatch success', async () => {
+      const error = new Error('Failed to fetch villages list');
+      const villageListHF = jest
+        .spyOn(hfService, 'fetchVillagesListfromHF')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchVillagesListUserLinkedSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_VILLAGES_LIST_USER_LINKED,
+          tenantIds,
+          userId,
+          failureCb
+        }
+      ).toPromise();
+      expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
+      expect(failureCb).toHaveBeenCalled();
+      expect(dispatched).toEqual([hfActions.fetchVillagesListFromHFFailure(error)]);
     });
   });
 });
