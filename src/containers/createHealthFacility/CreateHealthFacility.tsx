@@ -149,6 +149,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   };
 
   const onCreateSuccess = useCallback(() => {
+    dispatch(clearHFList());
     toastCenter.success(
       APPCONSTANTS.SUCCESS,
       formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_CREATION_SUCCESS, healthFacilitySName)
@@ -160,8 +161,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     });
     formInstance.current.change('healthFacility', {});
     onGotoList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PAGENUMBER.DETAILS, onGotoList, submittedData]);
+  }, [PAGENUMBER.DETAILS, dispatch, onGotoList, submittedData]);
 
   const onCreateFailure = useCallback(
     (e: Error) => {
