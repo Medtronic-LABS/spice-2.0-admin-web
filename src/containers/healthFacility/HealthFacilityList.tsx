@@ -23,6 +23,7 @@ import {
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   updateHFStatusRequest,
+  updateHFStatusRequest,
   validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
 import { fetchDistrictsByCountryIdRequest } from '../../store/district/actions';
@@ -42,6 +43,7 @@ import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDet
 import { chiefdomListSelector as getAllChiefdomsSelector } from '../../store/healthFacility/selectors';
 import { fetchChiefdomListRequest, clearChiefdomList } from '../../store/healthFacility/actions';
 import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
+import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
 
 /**
  * Interface for modal state
@@ -419,6 +421,29 @@ const HealthFacilityList = (): React.ReactElement => {
     setFilters(newFilters);
   };
 
+  const [openConfirmationModal, setOpenConfirmationModal] = useState({
+    isOpen: false,
+    userData: {} as IHealthFacility
+  });
+
+  const handleHFChangeStatusSubmit = (data?: any) => {
+    dispatch(
+      updateHFStatusRequest({
+        id: openConfirmationModal.userData.id,
+        tenantId: Number(openConfirmationModal.userData.tenantId),
+        successCb: (newdata: any) => {
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_SUCCESS);
+          fetchList({});
+          setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility });
+        },
+        failureCb: (e) => {
+          setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility });
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, e.message));
+        }
+      })
+    );
+  };
+
   return (
     <>
       {loading && <Loader />}
@@ -510,6 +535,11 @@ const HealthFacilityList = (): React.ReactElement => {
               healthFacilitySName
             )}
             deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE, healthFacilitySName)}
+            isActiveToggle={true}
+            isActiveKey='isActive'
+            onActivateClick={(rowData: any) => {
+              setOpenConfirmationModal({ isOpen: true, userData: rowData });
+            }}
           />
         </DetailCard>
       </div>
@@ -528,7 +558,7 @@ const HealthFacilityList = (): React.ReactElement => {
       <ConfirmationModalPopup
         isOpen={openConfirmationModal.isOpen}
         popupTitle='Deactivate Health Facility'
-        cancelText='Cancel'
+        cancelText='Canel'
         submitText='Submit'
         handleCancel={() => setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility })}
         handleSubmit={handleHFChangeStatusSubmit}

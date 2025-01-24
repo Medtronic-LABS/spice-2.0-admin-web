@@ -99,7 +99,11 @@ import {
   IFetchCityListFailure,
   ISetAssignedHFListForHFAdminPayload,
   ISetAssignedHFListForHFAdmin,
-  IClearAssignedHFListForHFAdmin
+  IClearAssignedHFListForHFAdmin,
+  IFetchAllHFListSuccess,
+  IFetchHFStatusRequest,
+  IFetchHFStatusSuccess,
+  IFetchHFStatusFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 import { IClearChiefdomList } from '../chiefdom/types';

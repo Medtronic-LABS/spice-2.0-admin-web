@@ -243,7 +243,6 @@ export interface IHFUserGet {
     formDataId: number;
   }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
-  deactivateUserId?: number;
 }
 
 export interface IUserRole {
@@ -274,7 +273,6 @@ export interface IHFUserPost {
   villageIds?: number[];
   timezone?: { id: number; name?: string };
   redRisk?: boolean;
-  deactivateUserId?: number;
 }
 
 export interface IOptionsResponse {
@@ -925,4 +923,7 @@ export type HealthFacilityActions =
   | IFetchCityListSuccess
   | ISetAssignedHFListForHFAdmin
   | IClearAssignedHFListForHFAdmin
+  | IFetchHFStatusRequest
+  | IFetchHFStatusSuccess
+  | IFetchHFStatusFailure
   | IClearChiefdomList;

@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { useState, useRef } from 'react';
-import { ReactComponent as EditIcon } from '../../assets/images/edit.svg';
-import styles from './CustomTable.module.scss';
-import Loader from '../loader/Loader';
+import React, { useRef, useState } from 'react';
+import { Field } from 'react-final-form';
 import { ReactComponent as DeleteIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as EditIcon } from '../../assets/images/edit.svg';
 import { ReactComponent as ActivateIcon } from '../../assets/images/icon-activate.svg';
@@ -13,10 +11,8 @@ import SelectInput from '../formFields/SelectInput';
 import Loader from '../loader/Loader';
 import Pagination from '../Pagination';
 import CustomTooltip from '../tooltip';
-import Checkbox from '../formFields/Checkbox';
-import { Field, Form, FormRenderProps } from 'react-final-form';
-import SelectInput from '../formFields/SelectInput';
-import { IPeerSupervisor } from '../../store/healthFacility/types';
+import ConfirmationModalPopup from './ConfirmationModalPopup';
+import styles from './CustomTable.module.scss';
 
 export interface IAnyObject {
   [key: string]: any;
@@ -442,6 +438,7 @@ const CustomTable = (props: ICustomTableProps) => {
         className={rowDataValue.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
         data-testid='custom-icon'
         onClick={(e) => handleCustomIconClick(e, rowDataValue, rowIndex, isPopupNeeded)}
+        style={{ display: rowDataValue[isActiveKey || 'active'] ? 'block' : 'none' }}
       >
         <CustomTooltip title={customTitle}>
           <CustomIcon style={customIconStyle} aria-labelledby={'custom-icon'} />
@@ -465,6 +462,7 @@ const CustomTable = (props: ICustomTableProps) => {
         <div
           data-testid='delete-icon'
           className={styles.deleteIcon}
+          style={{ display: rowDataValue?.[isActiveKey || 'active'] ? 'block' : 'none' }}
           onClick={(e) => handleDelete(e, rowDataValue, rowIndex)}
         >
           <CustomTooltip title={'Delete'}>
@@ -523,36 +521,20 @@ const CustomTable = (props: ICustomTableProps) => {
     return (
       !actionFormatter?.hideActiveToggle?.(rowDataValue) &&
       isActiveToggle && (
-        <Form
-          onSubmit={() => {}}
-          initialValues={{ isActive: rowDataValue.active }}
-          render={({ handleSubmit }: FormRenderProps<any>) => {
-            return (
-              <form onSubmit={handleSubmit}>
-                <div className='mt-0dot5 pe-0dot5'>
-                  <Field
-                    name='isActive'
-                    type='checkbox'
-                    render={({ input }) => (
-                      <Checkbox
-                        switchCheckbox={true}
-                        label=''
-                        size='small'
-                        checked={rowDataValue.active}
-                        onChange={(e) => {
-                          input.onChange(e);
-                          if (onActivateClick) {
-                            onActivateClick({ ...rowDataValue, isActive: e.target.checked });
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-              </form>
-            );
-          }}
-        />
+        <div className='mt-0dot5 pe-0dot5' onClick={(e) => e.stopPropagation()}>
+          <Checkbox
+            switchCheckbox={true}
+            label=''
+            size='small'
+            checked={rowDataValue?.[isActiveKey || 'active']}
+            onChange={(e) => {
+              e.stopPropagation();
+              if (onActivateClick) {
+                onActivateClick({ ...rowDataValue, isActive: e.target.checked, event: e });
+              }
+            }}
+          />
+        </div>
       )
     );
   };

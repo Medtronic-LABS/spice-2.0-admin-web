@@ -78,7 +78,9 @@ import {
   validateLinkedRestrictionsFailure,
   fetchCityListSuccess,
   setAssignedHFListForHFAdmin,
-  fetchCityListFailure
+  fetchCityListFailure,
+  updateHFStatusSuccess,
+  updateHFStatusFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,

@@ -176,6 +176,10 @@ const APPCONSTANTS = {
   CHIEFDOM_ADMIN_CREATE_SUCCESS: 'Module_Name admin created successfully.',
   CHIEFDOM_ADMIN_CREATE_FAIL: 'Unable to create module_name admin. Please try after sometime.',
   // HF
+  HEALTH_FACILITY_DEACTIVATE_CONFIRMATION:
+    'There are users linked to this health facility, are you sure you want to deactivate this health facility?',
+  HEALTH_FACILITY_DEACTIVATE_SUCCESS: 'Health facility deactivated successfully',
+  HEALTH_FACILITY_DEACTIVATE_FAILURE: 'Unable to deactivate the Health facility. Please try after sometime',
   HEALTH_FACILITY_LIST_FETCH_ERROR: 'Unable to load module_name. Please try after sometime.', //
   HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load module_name users. Please try after sometime.',
   HEALTH_FACILITY_DETAILS_UPDATE_ERROR: 'Unable to update module_name details. Please try after sometime.',
