@@ -35,7 +35,8 @@ export const SiteUserForm = (props: any) => {
     isHFAdminSelected,
     isHFCreate,
     isEdit,
-    isProfile
+    isProfile,
+    isCHW
   } = props;
   const { form, formName } = formDetails;
   const isHFSelected =
@@ -85,6 +86,7 @@ export const SiteUserForm = (props: any) => {
                 labelKey='description'
                 valueKey='id'
                 options={timezoneList || []}
+                // disabled={isChw}
                 loadingOptions={isTimezoneListLoading}
                 error={isError(meta)}
                 isModel={true}
@@ -106,7 +108,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
-                disabled={true}
+                disabled={isCHW}
                 options={filterByAppTypes(cultureList, appTypes) || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}

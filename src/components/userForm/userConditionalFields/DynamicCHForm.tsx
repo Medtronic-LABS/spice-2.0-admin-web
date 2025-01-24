@@ -26,7 +26,6 @@ export const DynamicCHForm = ({
       supervisor: { label, error: supervisorError }
     }
   } = useAppTypeConfigs();
-
   return (
     <>
       {showVillages && (

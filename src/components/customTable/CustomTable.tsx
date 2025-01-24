@@ -364,12 +364,7 @@ const CustomTable = (props: ICustomTableProps) => {
       isEdit &&
       (!actionFormatter?.hideEditIcon ||
         (actionFormatter?.hideEditIcon && !actionFormatter?.hideEditIcon(rowDataValue))) && (
-        <div
-          className={styles.editIcon}
-          data-testid='edit-icon'
-          onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}
-          style={{ display: rowDataValue.active ? 'block' : 'none' }}
-        >
+        <div className={styles.editIcon} data-testid='edit-icon' onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}>
           <CustomTooltip title={'Edit'}>
             <EditIcon aria-labelledby={'edit-icon'} />
           </CustomTooltip>
@@ -441,7 +436,6 @@ const CustomTable = (props: ICustomTableProps) => {
         className={rowDataValue.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
         data-testid='custom-icon'
         onClick={(e) => handleCustomIconClick(e, rowDataValue, rowIndex, isPopupNeeded)}
-        style={{ display: rowDataValue.active ? 'block' : 'none' }}
       >
         <CustomTooltip title={customTitle}>
           <CustomIcon style={customIconStyle} aria-labelledby={'custom-icon'} />
@@ -465,7 +459,6 @@ const CustomTable = (props: ICustomTableProps) => {
         <div
           data-testid='delete-icon'
           className={styles.deleteIcon}
-          style={{ display: rowDataValue.active ? 'block' : 'none' }}
           onClick={(e) => handleDelete(e, rowDataValue, rowIndex)}
         >
           <CustomTooltip title={'Delete'}>

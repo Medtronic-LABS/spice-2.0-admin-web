@@ -26,6 +26,7 @@ import {
   fetchHFUserListRequest,
   fetchPeerSupervisorListRequest,
   fetchUserDetailRequest,
+  fetchVillagesListUserLinked,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
 import {
@@ -37,15 +38,14 @@ import {
   peerSupervisorListSelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
+import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole, IVillages } from '../../store/healthFacility/types';
 import {
   changePassword,
   fetchCHWListRequest,
   fetchUserRolesAction,
   forgotPasswordRequest,
   updateUserStatus,
-  reassignCHWRequest,
-  clearCHWList
+  reassignCHWRequest
 } from '../../store/user/actions';
 import {
   countryIdSelector,
@@ -117,7 +117,6 @@ const UserList = (): React.ReactElement => {
   const email = useSelector(emailSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
-  const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
@@ -129,6 +128,12 @@ const UserList = (): React.ReactElement => {
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
   const [peerSupervisors, setPeerSupervisors] = useState<IPeerSupervisor[]>([]);
+  const [isOpenCHWUserModal, setIsOpenCHWUserModal] = useState<IUserModalState>({
+    isOpen: false,
+    isEdit: false,
+    isSupervisor: false
+  });
+
   // State management for user activation/deactivation
   const [openConfirmationModal, setOpenConfirmationModal] = useState<{
     isOpen: boolean;
@@ -275,6 +280,7 @@ const UserList = (): React.ReactElement => {
    */
   const handleCancelClick = () => {
     setIsOpenUserModal({ isOpen: false, isEdit: true });
+    setIsOpenCHWUserModal({ isOpen: false, isEdit: false });
     userForEdit.current = { users: [] as IHFUserGet[] };
     fetchList(); // get list of HF for filter dropdown, while closing the modal
   };
@@ -289,13 +295,12 @@ const UserList = (): React.ReactElement => {
     toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
-    fetchList(); // get list of HF for filter dropdown, while submitting the edited user
     setOpenConfirmationModal({ isOpen: false, userData: {} });
     setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
-    dispatch(clearCHWList());
     setIsOpenCHWListModal({ isOpen: false });
+    handlePeerSupervisorModalCancel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpenUserModal.isEdit, refreshHFUserList]);
+  }, [isOpenUserModal.isEdit, refreshHFUserList, isOpenPeerSupervisorModal.isEdit]);
 
   /**
    * Common submit handler for user add and edit
@@ -378,17 +383,18 @@ const UserList = (): React.ReactElement => {
         );
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       countryIdValue,
       tenantId,
       healthFacilityId,
       rolesGrouped?.SPICE,
       appTypes,
+      openConfirmationModal.userData,
+      openConfirmationModal.roleId,
       onSubmitHandler,
       isOpenUserModal.isEdit,
-      siteUserSuccess,
-      openConfirmationModal.roleId,
-      openConfirmationModal.userData
+      siteUserSuccess
     ]
   );
 
@@ -400,14 +406,19 @@ const UserList = (): React.ReactElement => {
     return (
       <UserForm
         form={form as FormApi<any>}
-        initialEditValue={userForEdit.current.users[0]}
+        initialEditValue={userForEdit.current.users[0] ?? openConfirmationModal.userData}
         disableOptions={true}
-        isEdit={isOpenUserModal.isEdit}
+        isEdit={isOpenUserModal.isEdit || isOpenCHWUserModal.isEdit}
         countryId={countryIdValue}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
         isSiteUser={true}
         appTypes={appTypes}
+        isCHW={
+          (openConfirmationModal?.userData?.roles?.some((chwRole: { name: string }) => chwRole?.name === 'CHW') &&
+            !openConfirmationModal?.userData?.active) ||
+          false
+        }
       />
     );
   };
@@ -640,6 +651,28 @@ const UserList = (): React.ReactElement => {
     [dispatch]
   );
 
+  const activeCHWList = (data: any) => {
+    dispatch(
+      updateUserStatus({
+        ...data.users[0],
+        id: data.users[0].id,
+        tenantId: data.users[0].tenantId,
+        isActive: true,
+        countryId: countryIdValue,
+        villageIds: data?.users[0]?.villages?.map((village: any) => village.id),
+        peerSupervisorId: data?.users[0]?.supervisor?.id,
+        appTypes,
+        successCb: () => {
+          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_ACTIVATED);
+          setOpenConfirmationModal({ isOpen: false, userData: {} });
+          refreshHFUserList();
+        },
+        failureCb: (e) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.USER_STATUS_UPDATE_FAILED));
+        }
+      })
+    );
+  };
   /**
    * Handles user activation/deactivation with special handling for Peer Supervisors
    *
@@ -664,6 +697,7 @@ const UserList = (): React.ReactElement => {
       },
       CHWData: any
     ) => {
+      const isChw = data.roles.some((ischwRole: { name: string }) => ischwRole.name === 'CHW') && !data.active;
       const peerSupervisorRoleId = getPeerSupervisorRoleId(data);
       const isPeerSupervisor = Boolean(peerSupervisorRoleId); // will be true if role ID is found
       const parentOrganizationId: number = getParentOrganizationId(data);
@@ -711,18 +745,21 @@ const UserList = (): React.ReactElement => {
           if (isDeactivatingPeerSupervisor) {
             handleReassignClick(data);
             setOpenConfirmationModal({ isOpen: false, userData: data });
+          } else if (isChw) {
+            setOpenConfirmationModal({ isOpen: false, userData: data });
+            setIsOpenCHWUserModal({ isOpen: true, isEdit: true });
           } else {
             dispatch(
               updateUserStatus({
                 id: data.id,
-                isActive: data.active,
+                isActive: !data.active,
                 tenantId: data.tenantId,
                 countryId: countryIdValue,
                 appTypes,
                 successCb: () => {
                   toastCenter.success(
                     APPCONSTANTS.SUCCESS,
-                    data.active ? APPCONSTANTS.USER_ACTIVATED : APPCONSTANTS.USER_DEACTIVATED
+                    !data.active ? APPCONSTANTS.USER_ACTIVATED : APPCONSTANTS.USER_DEACTIVATED
                   );
                   setOpenConfirmationModal({ isOpen: false, userData: {} });
                   refreshHFUserList();
@@ -745,7 +782,6 @@ const UserList = (): React.ReactElement => {
   // Add handler for peer supervisor modal cancel
   const handlePeerSupervisorModalCancel = () => {
     setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
-    fetchList(); // Refresh the list if needed
   };
 
   // Add peer supervisor form renderer
@@ -753,7 +789,7 @@ const UserList = (): React.ReactElement => {
     return (
       <UserForm
         form={form as FormApi<any>}
-        initialEditValue={{}}
+        initialEditValue={openConfirmationModal.userData}
         disableOptions={true}
         defaultSelectedRole={APPCONSTANTS.ROLES.PEER_SUPERVISOR}
         isEdit={isOpenPeerSupervisorModal.isEdit}
@@ -788,13 +824,13 @@ const UserList = (): React.ReactElement => {
      * @param formData - Object containing peer supervisor assignments
      * @returns Formatted payload for the API
      */
-    const constructReassignPayload = (formDataValue: any) => {
+    const constructReassignPayload = () => {
       // Extract assignments from form data
-      const reassignUserList = Object.keys(formDataValue)
+      const reassignUserList = Object.keys(formData)
         .filter((key) => key.startsWith('peersupervisor-'))
         .map((key) => {
           const chwId = key.split('peersupervisor-')[1]; // Extract CHW ID from field name
-          const peerSupervisor = formDataValue[key]; // Get selected peer supervisor data
+          const peerSupervisor = formData[key]; // Get selected peer supervisor data
 
           return {
             chwId: Number(chwId),
@@ -807,25 +843,24 @@ const UserList = (): React.ReactElement => {
         deactivateUserId: openConfirmationModal.userData.id
       };
     };
-
     // Construct and validate payload
-    const payload = constructReassignPayload(formData);
+    const payload = constructReassignPayload();
     // Validate if we have any assignments
     if (!payload.reassignUserList.length || chwList.length !== payload.reassignUserList.length) {
       toastCenter.error(APPCONSTANTS.ERROR, 'Please select peer supervisors for All CHWs');
       return;
     }
-
     // Dispatch reassign action
     dispatch(
       reassignCHWRequest(
         payload,
         () => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, 'CHWs reassigned successfully');
+          toastCenter.success(APPCONSTANTS.SUCCESS, 'CHWs Reassigned successfully');
           setOpenConfirmationModal({ isOpen: false, userData: {} });
-          fetchList();
-          refreshHFUserList();
           setIsOpenCHWListModal({ isOpen: false });
+          handlePeerSupervisorModalCancel();
+          setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
+          refreshHFUserList();
         },
         (error) => {
           toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, 'Failed to reassign CHWs'));
@@ -836,7 +871,7 @@ const UserList = (): React.ReactElement => {
 
   return (
     <>
-      {(hfUserLoading || hfUserDetailLoading || loading || changePasswordLoading) && <Loader />}
+      {(hfUserDetailLoading || loading || changePasswordLoading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add User'
@@ -895,9 +930,9 @@ const UserList = (): React.ReactElement => {
             customIconStyle={{ width: 18 }}
             isActiveToggle={true}
             actionFormatter={{
-              hideEditIcon: (rowData: any) => rowData.username === email,
-              hideDeleteIcon: (rowData: any) => rowData.username === email,
-              hideCustomIcon: (rowData: any) => rowData.username === email,
+              hideEditIcon: (rowData: any) => rowData.username === email || !rowData.active,
+              hideDeleteIcon: (rowData: any) => rowData.username === email || !rowData.active,
+              hideCustomIcon: (rowData: any) => rowData.username === email || !rowData.active,
               hideActiveToggle: (rowData: any) => rowData.username === email
             }}
             onActivateClick={(rowData: any) => getCHWList(rowData)}
@@ -912,6 +947,16 @@ const UserList = (): React.ReactElement => {
           handleCancel={handleCancelClick}
           handleFormSubmit={handleEditSubmit}
           initialValues={{ users: userForEdit.current }}
+          render={userFormRenderer}
+          mutators={{ ...arrayMutators }}
+        />
+        <ModalForm
+          show={isOpenCHWUserModal.isOpen}
+          title={`CHW Activate`}
+          cancelText='Cancel'
+          submitText='Submit'
+          handleCancel={handleCancelClick}
+          handleFormSubmit={activeCHWList}
           render={userFormRenderer}
           mutators={{ ...arrayMutators }}
         />
@@ -949,7 +994,7 @@ const UserList = (): React.ReactElement => {
           submitText='Submit'
           handleCancel={handlePeerSupervisorModalCancel}
           handleFormSubmit={handleEditSubmit}
-          initialValues={{}}
+          initialValues={openConfirmationModal.userData.organizations}
           render={peerSupervisorFormRenderer}
           mutators={{ ...arrayMutators }}
         />

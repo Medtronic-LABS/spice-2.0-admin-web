@@ -20,9 +20,10 @@ interface IProps {
   formName: string;
   index: number;
   countryCode: string;
+  disabled: boolean;
 }
 
-const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode }: IProps) => {
+const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode, disabled }: IProps) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -160,6 +161,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
               setNetworkError(false);
               input.onChange(event);
             }}
+            disabled={disabled}
             lowerCase={true}
             showLoader={loading}
             label='Phone Number'

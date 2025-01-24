@@ -474,9 +474,11 @@ function* updateUserStatusSaga({ payload }: any): SagaIterator {
       id,
       appTypes,
       countryId,
-      tenantIds: [tenantId]
+      tenantIds: [tenantId],
+      villageIds: payload?.villageIds,
+      supervisorId: payload?.peerSupervisorId
     };
-    yield call(!isActive ? activateUser : deactivateUser, apiPayload);
+    yield call(isActive ? activateUser : deactivateUser, apiPayload);
     if (successCb) {
       successCb();
     }
@@ -513,21 +515,14 @@ function* fetchCHWListSaga({ payload }: IFetchCHWListRequest) {
   }
 }
 
-function* reassignCHWSaga({ payload }: any) {
+function* reassignCHWSaga(payload: any) {
   try {
-    yield call(reasignCHW, payload.data.data ? payload.data.data : payload.data);
-    yield put({
-      type: USERTYPES.REASSIGN_CHW_SUCCESS
-    });
-
-    if (payload.successCb) {
-      yield call(payload.successCb);
-    }
+    yield call(reasignCHW, payload.data.data ?? payload.data);
+    payload.successCb?.() ?? payload.data.successCb();
+    yield put(userActions.reassignCHWSuccess());
   } catch (error) {
-    yield put({
-      type: USERTYPES.REASSIGN_CHW_FAILURE,
-      payload: error
-    });
+    payload?.failureCb() ?? payload.data.failureCb?.(error);
+    yield put(userActions.reassignCHWFailure(error));
   }
 }
 
