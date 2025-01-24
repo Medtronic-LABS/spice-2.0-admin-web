@@ -474,7 +474,7 @@ function* updateUserStatusSaga({ payload }: any): SagaIterator {
       id,
       appTypes,
       countryId,
-      tenantIds: [tenantId],
+      tenantIds: tenantId && tenantId.length ? [tenantId] : [],
       villageIds: payload?.villageIds,
       supervisorId: payload?.peerSupervisorId
     };

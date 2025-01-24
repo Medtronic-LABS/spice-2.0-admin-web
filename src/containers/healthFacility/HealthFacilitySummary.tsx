@@ -641,8 +641,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
               confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_CONFIRMATION}
               deleteTitle={APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE}
               actionFormatter={{
-                hideEditIcon: (rowData: any) => isHideActionIcons(rowData),
-                hideDeleteIcon: (rowData: any) => isHideActionIcons(rowData)
+                hideEditIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active,
+                hideDeleteIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active
               }}
             />
           </DetailCard>

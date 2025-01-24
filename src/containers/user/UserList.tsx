@@ -26,7 +26,6 @@ import {
   fetchHFUserListRequest,
   fetchPeerSupervisorListRequest,
   fetchUserDetailRequest,
-  fetchVillagesListUserLinked,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
 import {
@@ -34,11 +33,10 @@ import {
   healthFacilityListUsersTotalSelector,
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
-  healthFacilityUsersLoadingSelector,
   peerSupervisorListSelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole, IVillages } from '../../store/healthFacility/types';
+import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
   changePassword,
   fetchCHWListRequest,
@@ -292,7 +290,28 @@ const UserList = (): React.ReactElement => {
     const successMessage = isOpenUserModal.isEdit
       ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
       : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
-    toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
+
+    if (!openConfirmationModal.userData.id) {
+      toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
+    }
+    refreshHFUserList();
+    setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
+    setOpenConfirmationModal({ isOpen: false, userData: {} });
+    setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
+    setIsOpenCHWListModal({ isOpen: false });
+    handlePeerSupervisorModalCancel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpenUserModal.isEdit, refreshHFUserList, isOpenPeerSupervisorModal.isEdit]);
+
+  /**
+   * Handler function for success callback for add user and edit user
+   */
+  const siteActivateUserSuccess = useCallback(() => {
+    const successMessage = 'User Reassigned Successfully';
+
+    if (!openConfirmationModal.userData.id) {
+      toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
+    }
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
     setOpenConfirmationModal({ isOpen: false, userData: {} });
@@ -337,7 +356,6 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [appTypes, dispatch, peerSupervisors]
   );
-
   /**
    * Handler for edit user form submit.
    */
@@ -358,9 +376,10 @@ const UserList = (): React.ReactElement => {
         const payload: any = {
           ...data,
           deactivateUserId: openConfirmationModal.userData.id,
-          roleIds: [getPeerSupervisorRoleId(openConfirmationModal.userData) || 0]
+          roleIds: [getPeerSupervisorRoleId(openConfirmationModal.userData) || 0],
+          tenantId: openConfirmationModal.userData.tenantId
         };
-        onSubmitHandler(payload, reassignCHWRequest, siteUserSuccess, (e) => {
+        onSubmitHandler(payload, reassignCHWRequest, siteActivateUserSuccess, (e) => {
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR));
         });
       } else {
@@ -665,6 +684,7 @@ const UserList = (): React.ReactElement => {
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_ACTIVATED);
           setOpenConfirmationModal({ isOpen: false, userData: {} });
+          handleCancelClick();
           refreshHFUserList();
         },
         failureCb: (e) => {

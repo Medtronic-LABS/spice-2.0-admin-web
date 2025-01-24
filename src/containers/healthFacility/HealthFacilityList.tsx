@@ -512,7 +512,7 @@ const HealthFacilityList = (): React.ReactElement => {
             confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION}
             deleteTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE}
             isActiveToggle={true}
-            isActiveKey='isActive'
+            isActiveKey='active'
             onActivateClick={(rowData: any) => {
               setOpenConfirmationModal({ isOpen: true, userData: rowData });
             }}
@@ -534,7 +534,7 @@ const HealthFacilityList = (): React.ReactElement => {
       <ConfirmationModalPopup
         isOpen={openConfirmationModal.isOpen}
         popupTitle='Deactivate Health Facility'
-        cancelText='Canel'
+        cancelText='Cancel'
         submitText='Submit'
         handleCancel={() => setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility })}
         handleSubmit={handleHFChangeStatusSubmit}

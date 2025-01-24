@@ -1574,75 +1574,73 @@ const UserForm = ({
                     }
                   />
                 </div>
-                {(isPeerSupervisor ||
-                  (isSPICE &&
-                    (isEdit
-                      ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
-                        (!isCommunity && isSiteUser)
-                      : showSpiceHFRef.current[index] && !isEdit))) && (
-                  // (isPeerSupervisor && (
-                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
-                    <Field
-                      name={`${name}.${NAMING_VARIABLES.healthFacility}`}
-                      type='text'
-                      validate={required}
-                      disabled={isCHW}
-                      render={({ input, meta }) => {
-                        return (
-                          <SelectInput
-                            {...(input as any)}
-                            label='Assigned Health Facility'
-                            errorLabel='assigned health facility'
-                            labelKey='name'
-                            valueKey='id'
-                            options={newHFList}
-                            loadingOptions={hfLoading}
-                            error={isError(meta)}
-                            isModel={true}
-                            disabled={isProfile}
-                            onChange={(hf: IHealthFacility) => {
-                              emailDisabledFn('', index, false);
-                              const formData = form.getState()?.values?.users?.[index];
-                              const supervisorFieldData = `${formName}[${index}].supervisor`;
-                              const villagesFieldData = `${formName}[${index}].villages`;
+                {isSPICE &&
+                  (isEdit
+                    ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
+                      (!isCommunity && isSiteUser)
+                    : showSpiceHFRef.current[index] && !isEdit) && (
+                    <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
+                      <Field
+                        name={`${name}.${NAMING_VARIABLES.healthFacility}`}
+                        type='text'
+                        validate={required}
+                        disabled={isCHW}
+                        render={({ input, meta }) => {
+                          return (
+                            <SelectInput
+                              {...(input as any)}
+                              label='Assigned Health Facility'
+                              errorLabel='assigned health facility'
+                              labelKey='name'
+                              valueKey='id'
+                              options={newHFList}
+                              loadingOptions={hfLoading}
+                              error={isError(meta)}
+                              isModel={true}
+                              disabled={isProfile}
+                              onChange={(hf: IHealthFacility) => {
+                                emailDisabledFn('', index, false);
+                                const formData = form.getState()?.values?.users?.[index];
+                                const supervisorFieldData = `${formName}[${index}].supervisor`;
+                                const villagesFieldData = `${formName}[${index}].villages`;
 
-                              form.change(supervisorFieldData, null);
-                              if (autoFetched[index] && formData?.selectedVillages?.length) {
-                                form.change(villagesFieldData, [
-                                  ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
-                                ]);
-                              } else {
-                                form.change(villagesFieldData, []);
-                              }
+                                form.change(supervisorFieldData, null);
+                                if (autoFetched[index] && formData?.selectedVillages?.length) {
+                                  form.change(villagesFieldData, [
+                                    ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
+                                  ]);
+                                } else {
+                                  form.change(villagesFieldData, []);
+                                }
 
-                              if (showVillage[index]) {
-                                fetchSupervisorList(
-                                  formData?.organizations
-                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                        (v: any) => v
-                                      )
-                                    : [hf.tenantId],
-                                  index
-                                );
-                                fetchVillagesList(
-                                  formData?.organizations
-                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                        (v: any) => v
-                                      )
-                                    : [hf.tenantId],
-                                  formData?.id,
-                                  index
-                                );
-                              }
+                                if (showVillage[index]) {
+                                  fetchSupervisorList(
+                                    formData?.organizations
+                                      ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                          (v: any) => v
+                                        )
+                                      : [hf.tenantId],
+                                    index
+                                  );
+                                  fetchVillagesList(
+                                    formData?.organizations
+                                      ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                          (v: any) => v
+                                        )
+                                      : [hf.tenantId],
+                                    formData?.id,
+                                    index
+                                  );
+                                }
 
-                              input.onChange(hf);
-                            }}
-                          />
-                        );
-                      }}
-                    />
-                  </div>
-                )}
+                                input.onChange(hf);
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
                 {isReports && showReportHFRef.current[index] && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
