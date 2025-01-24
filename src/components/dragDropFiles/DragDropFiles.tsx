@@ -3,7 +3,10 @@ import { ReactComponent as UploadIcon } from '../../assets/images/upload_blue.sv
 import toastCenter from '../../utils/toastCenter';
 import styles from './DragDropFiles.module.scss';
 
-const acceptableFileFormat = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+const acceptableFileFormat = [
+  'application/wps-office.xlsx',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+];
 
 interface IProps {
   onUploadSubmit: (file: any) => void;
@@ -62,7 +65,13 @@ const DragDropFiles = (props: IProps) => {
           <label className='link' htmlFor='file_input_id'>
             Browse
           </label>
-          <input type='file' id='file_input_id' name='file' accept={acceptableFileFormat[0]} onChange={uploadHandler} />
+          <input
+            type='file'
+            id='file_input_id'
+            name='file'
+            accept={acceptableFileFormat.join(',')}
+            onChange={uploadHandler}
+          />
           {' file'}
         </p>
         {file && (

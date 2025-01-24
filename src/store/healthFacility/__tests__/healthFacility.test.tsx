@@ -203,7 +203,7 @@ describe('HF sagas', () => {
       expect(dispatched).toEqual([hfActions.createHFSuccess()]);
     });
 
-    it('Create health facility and dispatches failure', async () => {
+    it('Create health facility and dispatches failure with instance of ApiError', async () => {
       const failureCb = jest.fn();
       const error = new ApiError('Failed to create health facility');
       const createHFSpy = jest.spyOn(hfService, 'createHealthFacility').mockImplementation(() => Promise.reject(error));
@@ -222,6 +222,26 @@ describe('HF sagas', () => {
       expect(createHFSpy).toHaveBeenCalledWith(hfListDataPayload[0]);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.createHFFailure(error)]);
+    });
+
+    it('Create health facility and dispatches failure without instance of ApiError', async () => {
+      const failureCb = jest.fn();
+      const error = 'Failed to create health facility';
+      const createHFSpy = jest.spyOn(hfService, 'createHealthFacility').mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        createHealthFacilityRequest,
+        {
+          type: ACTION_TYPES.CREATE_HEALTH_FACILITY_REQUEST,
+          data: hfListDataPayload[0] as any,
+          failureCb
+        }
+      ).toPromise();
+      expect(createHFSpy).toHaveBeenCalledWith(hfListDataPayload[0]);
+      expect(failureCb).not.toHaveBeenCalled();
     });
   });
 

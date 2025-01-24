@@ -189,10 +189,10 @@ const Region = (): React.ReactElement => {
           displayValues
         }: any) => {
           const {
-            healthFacility: { s: healthFacilitySName },
-            district: { s: ncDistrictName },
-            chiefdom: { s: ncChiefdomName }
-          } = displayValues;
+            healthFacility: { s: healthFacilitySName = 'Health facility' } = {},
+            district: { s: ncDistrictName = 'County' } = {},
+            chiefdom: { s: ncChiefdomName = 'Sub County' } = {}
+          } = displayValues || {};
           return {
             title: name,
             detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
