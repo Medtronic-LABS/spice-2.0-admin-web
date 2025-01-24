@@ -96,7 +96,11 @@ import {
   IClearHFWorkflowList,
   IFetchCityListRequest,
   IFetchCityListSuccess,
-  IFetchCityListFailure
+  IFetchCityListFailure,
+  IFetchAllHFListSuccess,
+  IFetchHFStatusRequest,
+  IFetchHFStatusSuccess,
+  IFetchHFStatusFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 import { IClearChiefdomList } from '../chiefdom/types';
@@ -130,6 +134,10 @@ export const fetchHFListRequest = ({
 
 export const fetchHFListSuccess = (payload: IFetchHFListSuccessPayload): IFetchHFListSuccess => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_LIST_SUCCESS,
+  payload
+});
+export const fetchAllHFListSuccess = (payload: IFetchHFListSuccessPayload): IFetchAllHFListSuccess => ({
+  type: HF_TYPES.FETCH_ALL_HEALTH_FACILITY_LIST_SUCCESS,
   payload
 });
 
@@ -737,4 +745,26 @@ export const fetchCountryListFailure = (): IFetchCountryListFailure => ({
 
 export const clearHFDropdown = () => ({
   type: HF_TYPES.CLEAR_HF_DROPDOWN_OPTIONS
+});
+
+export const updateHFStatusRequest = ({
+  id,
+  tenantId,
+  successCb,
+  failureCb
+}: Omit<IFetchHFStatusRequest, 'type'>): IFetchHFStatusRequest => ({
+  type: HF_TYPES.HF_STATUS_CHANGE_REQUEST,
+  id,
+  tenantId,
+  successCb,
+  failureCb
+});
+
+export const updateHFStatusSuccess = (): IFetchHFStatusSuccess => ({
+  type: HF_TYPES.HF_STATUS_CHANGE_SUCCESS
+});
+
+export const updateHFStatusFailure = (error: Error): IFetchHFStatusFailure => ({
+  type: HF_TYPES.HF_STATUS_CHANGE_FAILURE,
+  error
 });

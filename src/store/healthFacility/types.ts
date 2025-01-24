@@ -8,6 +8,8 @@ export interface IHealthFacilityState {
   loading: boolean;
   healthFacilityList: IHealthFacility[];
   hfTotal: number;
+  allHealthFacilityList: IHealthFacility[];
+  allHfTotal: number;
   healthFacilityUserList: IHFUserGet[];
   hfUser: IHFUserGet;
   hfUserDetailLoading: boolean;
@@ -82,6 +84,7 @@ export interface IHealthFacility {
   longitude: string;
   postalCode: string;
   language: string;
+  isActive?: boolean;
   tenantId: number | string;
   peerSupervisors?: IPeerSupervisor[];
   linkedVillages: IVillages[];
@@ -190,6 +193,10 @@ export interface IFetchHFListSuccess {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_SUCCESS;
   payload: IFetchHFListSuccessPayload;
 }
+export interface IFetchAllHFListSuccess {
+  type: typeof ACTION_TYPES.FETCH_ALL_HEALTH_FACILITY_LIST_SUCCESS;
+  payload: IFetchHFListSuccessPayload;
+}
 
 export interface IFetchHFListFailure {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_LIST_FAILURE;
@@ -219,7 +226,6 @@ export interface IHFUserGet {
     formDataId: number;
   }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
-  deactivateUserId?: number;
 }
 
 export interface IUserRole {
@@ -250,7 +256,6 @@ export interface IHFUserPost {
   villageIds?: number[];
   timezone?: { id: number; name?: string };
   redRisk?: boolean;
-  deactivateUserId?: number;
 }
 
 export interface IOptionsResponse {
@@ -798,9 +803,27 @@ export type IFetchCultureListSuccessPayload = ICulture[];
 
 export type IFetchCountryListSuccessPayload = ICountryCode[];
 
+export interface IFetchHFStatusRequest {
+  type: typeof ACTION_TYPES.HF_STATUS_CHANGE_REQUEST;
+  id: number;
+  tenantId: number;
+  successCb?: (data: any) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchHFStatusSuccess {
+  type: typeof ACTION_TYPES.HF_STATUS_CHANGE_SUCCESS;
+}
+
+export interface IFetchHFStatusFailure {
+  type: typeof ACTION_TYPES.HF_STATUS_CHANGE_FAILURE;
+  error: Error;
+}
+
 export type HealthFacilityActions =
   | IFetchHFListRequest
   | IFetchHFListSuccess
+  | IFetchAllHFListSuccess
   | IFetchHFListFailure
   | ICreateHFRequest
   | ICreateHFSuccess
@@ -880,4 +903,7 @@ export type HealthFacilityActions =
   | IFetchCityListRequest
   | IFetchCityListFailure
   | IFetchCityListSuccess
+  | IFetchHFStatusRequest
+  | IFetchHFStatusSuccess
+  | IFetchHFStatusFailure
   | IClearChiefdomList;

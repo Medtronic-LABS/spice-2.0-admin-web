@@ -8,7 +8,8 @@ import {
   ICreateHFRequestPayload,
   IHFUserPost,
   IHealthFacilityPost,
-  IDeleteHFPayload
+  IDeleteHFPayload,
+  IFetchHFStatusRequest
 } from '../store/healthFacility/types';
 
 export const fetchHealthFacilityList = ({
@@ -213,4 +214,14 @@ export const fetchCityList = (searchTerm: string, appTypes: string[]) =>
     url: '/admin-service/healthfacility/list-cities',
     method: 'POST',
     data: { searchTerm, appTypes }
+  });
+
+export const fetchHFDeactivate = ({ id, tenantId }: IFetchHFStatusRequest) =>
+  axios({
+    method: 'POST',
+    url: 'admin-service/healthfacility/deactivate',
+    data: {
+      id,
+      tenantId
+    }
   });

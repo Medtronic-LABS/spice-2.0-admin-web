@@ -11,6 +11,7 @@ import {
 
 export const initialState: IHealthFacilityState = {
   hfTotal: 0,
+  allHfTotal: 0,
   loading: false,
   healthFacility: {
     id: 0,
@@ -35,6 +36,7 @@ export const initialState: IHealthFacilityState = {
   hfTypes: [],
   hfTypesLoading: false,
   healthFacilityList: [] as IHealthFacility[],
+  allHealthFacilityList: [] as IHealthFacility[],
   healthFacilityUserList: [],
   hfUser: {} as IHFUserGet,
   hfUserDetailLoading: false,
@@ -109,6 +111,13 @@ const healthFacilityReducer = (
         hfTotal: action.payload.total || 0,
         healthFacilityList: action.payload.healthFacilityList || []
       };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_ALL_HEALTH_FACILITY_LIST_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        allHfTotal: action.payload.total || 0,
+        allHealthFacilityList: action.payload.healthFacilityList || []
+      };
     case HEALTH_FACILITY_ACTION_TYPES.FETCH_HEALTH_FACILITY_USER_LIST_SUCCESS:
       return {
         ...state,
@@ -128,6 +137,8 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.HF_STATUS_CHANGE_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.HF_STATUS_CHANGE_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_FAILURE:
       return {
@@ -170,6 +181,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.HF_STATUS_CHANGE_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST:
       return {
         ...state,

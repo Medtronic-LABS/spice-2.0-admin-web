@@ -27,7 +27,8 @@ import {
   IPeerSupervisorValidation,
   IFetchVillagesListUserLinked,
   IWorkflow,
-  IFetchCityListRequest
+  IFetchCityListRequest,
+  IFetchHFStatusRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -75,7 +76,9 @@ import {
   fetchUnlinkedVillagesListFailure,
   validateLinkedRestrictionsSuccess,
   validateLinkedRestrictionsFailure,
-  fetchCityListSuccess
+  fetchCityListSuccess,
+  updateHFStatusSuccess,
+  updateHFStatusFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -102,7 +105,8 @@ import {
   LINKED_RESTRICTIONS_VALIDATION_REQUEST,
   FETCH_UNLINKED_VILLAGES_REQUEST,
   FETCH_VILLAGES_LIST_USER_LINKED,
-  FETCH_CITY_LIST_REQUEST_FOR_HF
+  FETCH_CITY_LIST_REQUEST_FOR_HF,
+  HF_STATUS_CHANGE_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
@@ -712,6 +716,30 @@ export function* fetchHealthFacilityDashboardList({
 }
 
 /*
+  Worker Saga: Fired on FETCH_HF_DASHBOARD_LIST_REQUEST action
+*/
+export function* fetchHFChangeStatusSagaRequest({
+  id,
+  tenantId,
+  successCb,
+  failureCb
+}: IFetchHFStatusRequest): SagaIterator {
+  try {
+    const { data } = yield call(hfService.fetchHFDeactivate as any, {
+      id,
+      tenantId
+    });
+    successCb?.(data);
+    yield put(updateHFStatusSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(updateHFStatusFailure(e));
+    }
+  }
+}
+
+/*
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
 */
@@ -741,6 +769,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
   yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchHealthFacilityDashboardList)]);
   yield all([takeLatest(FETCH_UNLINKED_VILLAGES_REQUEST, fetchUnlinkedVillagesSagaRequest)]);
+  yield all([takeLatest(HF_STATUS_CHANGE_REQUEST, fetchHFChangeStatusSagaRequest)]);
 }
 
 export default healthFacilitySaga;
