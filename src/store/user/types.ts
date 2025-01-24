@@ -55,6 +55,7 @@ export interface IUserFormProps {
     isAdminForm?: boolean;
   };
   isPeerSupervisor?: boolean;
+  isCHW?: boolean;
 }
 
 export interface IOrganizations {
@@ -883,11 +884,9 @@ export interface ICHWUser {
 
 export interface IReassignCHWRequest {
   type: typeof USER_TYPES.REASSIGN_CHW_REQUEST;
-  payload: {
-    data: IReassignCHWPayload;
-    successCb?: () => void;
-    failureCb?: (error: Error) => void;
-  };
+  data: IReassignCHWPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
 }
 
 export interface IReassignCHWItem {

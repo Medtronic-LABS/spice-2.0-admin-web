@@ -575,6 +575,14 @@ export const updateTermsAndConditionsFailure = (error: any): IUpdateTermsConditi
   error
 });
 
+export const reassignCHWSuccess = (): any => ({
+  type: USER_TYPES.REASSIGN_CHW_SUCCESS
+});
+export const reassignCHWFailure = (error: any): any => ({
+  type: USER_TYPES.REASSIGN_CHW_FAILURE,
+  error
+});
+
 export const updateUserStatus = (payload: {
   id: number;
   isActive: boolean;
@@ -583,7 +591,7 @@ export const updateUserStatus = (payload: {
   appTypes: string[];
   successCb?: () => void;
   failureCb?: (error: any) => void;
-}): IUpdateUserStatusRequest => ({
+}): any => ({
   type: USER_TYPES.UPDATE_USER_STATUS_REQUEST,
   payload
 });
@@ -611,9 +619,7 @@ export const clearCHWList = () => ({
 
 export const reassignCHWRequest = (data: any, successCb?: () => void, failureCb?: (error: Error) => void): any => ({
   type: USER_TYPES.REASSIGN_CHW_REQUEST,
-  payload: {
-    data,
-    successCb,
-    failureCb
-  }
+  data,
+  successCb,
+  failureCb
 });

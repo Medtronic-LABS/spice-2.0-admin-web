@@ -128,7 +128,8 @@ const UserForm = ({
   parentOrgId,
   ignoreTenantId,
   userFormParams = {},
-  isPeerSupervisor = false
+  isPeerSupervisor = false,
+  isCHW = false
 }: IUserFormProps): React.ReactElement => {
   const {
     isRegionCreate = false,
@@ -1056,8 +1057,8 @@ const UserForm = ({
                           valueKey='groupName'
                           options={suiteAccess || []}
                           placeholder=''
-                          disabled={isProfile}
-                          isDisabled={isProfile}
+                          disabled={isProfile || isCHW}
+                          isDisabled={isProfile || isCHW}
                           loadingOptions={isRolesLoading}
                           isShowLabel={true}
                           error={isError(meta)}
@@ -1605,6 +1606,7 @@ const UserForm = ({
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
                       type='text'
                       validate={required}
+                      disabled={isCHW}
                       render={({ input, meta }) => {
                         return (
                           <SelectInput

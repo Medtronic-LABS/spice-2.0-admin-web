@@ -36,7 +36,8 @@ export const SiteUserForm = (props: any) => {
     isHFCreate,
     isEdit,
     isProfile,
-    reportUserOnlyInAdminList // cfr user only from admin list
+    reportUserOnlyInAdminList, // cfr user only from admin list,
+    isCHW
   } = props;
   const { form, formName } = formDetails;
   const isHFSelected =
@@ -111,7 +112,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
-                disabled={true}
+                disabled={isCHW}
                 options={filterByAppTypes(cultureList, appTypes) || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
