@@ -32,7 +32,6 @@ import {
   fetchPeerSupervisorListRequest,
   fetchPeerSupervisorListRequest,
   fetchUserDetailRequest,
-  fetchVillagesListUserLinked,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
 import {
@@ -40,11 +39,10 @@ import {
   healthFacilityListUsersTotalSelector,
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
-  healthFacilityUsersLoadingSelector,
   peerSupervisorListSelector,
   userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole, IVillages } from '../../store/healthFacility/types';
+import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
   changePassword,
   fetchCHWListRequest,
@@ -365,7 +363,6 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [appTypes, dispatch, peerSupervisors]
   );
-
   /**
    * Handler for edit user form submit.
    */
@@ -386,9 +383,10 @@ const UserList = (): React.ReactElement => {
         const payload: any = {
           ...data,
           deactivateUserId: openConfirmationModal.userData.id,
-          roleIds: [getPeerSupervisorRoleId(openConfirmationModal.userData) || 0]
+          roleIds: [getPeerSupervisorRoleId(openConfirmationModal.userData) || 0],
+          tenantId: openConfirmationModal.userData.tenantId
         };
-        onSubmitHandler(payload, reassignCHWRequest, siteUserSuccess, (e) => {
+        onSubmitHandler(payload, reassignCHWRequest, siteActivateUserSuccess, (e) => {
           toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR));
         });
       } else {
@@ -733,6 +731,7 @@ const UserList = (): React.ReactElement => {
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_ACTIVATED);
           setOpenConfirmationModal({ isOpen: false, userData: {} });
+          handleCancelClick();
           refreshHFUserList();
         },
         failureCb: (e) => {

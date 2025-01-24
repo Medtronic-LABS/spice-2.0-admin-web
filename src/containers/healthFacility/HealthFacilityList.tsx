@@ -536,7 +536,7 @@ const HealthFacilityList = (): React.ReactElement => {
             )}
             deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE, healthFacilitySName)}
             isActiveToggle={true}
-            isActiveKey='isActive'
+            isActiveKey='active'
             onActivateClick={(rowData: any) => {
               setOpenConfirmationModal({ isOpen: true, userData: rowData });
             }}
@@ -558,7 +558,7 @@ const HealthFacilityList = (): React.ReactElement => {
       <ConfirmationModalPopup
         isOpen={openConfirmationModal.isOpen}
         popupTitle='Deactivate Health Facility'
-        cancelText='Canel'
+        cancelText='Cancel'
         submitText='Submit'
         handleCancel={() => setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility })}
         handleSubmit={handleHFChangeStatusSubmit}
