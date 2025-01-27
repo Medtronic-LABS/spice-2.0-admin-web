@@ -40,7 +40,8 @@ import {
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
   peerSupervisorListSelector,
-  userDetailLoadingSelector
+  userDetailLoadingSelector,
+  healthFacilityUsersLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
@@ -49,7 +50,8 @@ import {
   fetchUserRolesAction,
   forgotPasswordRequest,
   updateUserStatus,
-  reassignCHWRequest
+  reassignCHWRequest,
+  offlineSyncRequest
 } from '../../store/user/actions';
 import {
   countryIdSelector,
@@ -100,6 +102,7 @@ interface ICHWListModal {
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const healthFacilityUserListLoading = useSelector(healthFacilityUsersLoadingSelector);
   const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState<IUserModalState>({
@@ -137,6 +140,7 @@ const UserList = (): React.ReactElement => {
     isEdit: false,
     isSupervisor: false
   });
+  const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
 
   // State management for user activation/deactivation
   const [openConfirmationModal, setOpenConfirmationModal] = useState<{
@@ -151,6 +155,8 @@ const UserList = (): React.ReactElement => {
     handleCustomButton?: () => void;
     onConfirm?: () => void;
     onCancel?: () => void;
+    WarningMessage?: string;
+    syncDate?: string | null;
   }>({ isOpen: false, userData: {} });
   const {
     appTypes,
@@ -363,6 +369,23 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [appTypes, dispatch, peerSupervisors]
   );
+
+  const handleSync = (user: any) => {
+    const payload = {
+      data: {
+        userId: user.id
+      },
+      successCb: (syncData: { lastSyncDate: string }) => {
+        handleActivateClick(user, [], syncData?.lastSyncDate);
+      },
+      failureCb: (error: Error) => {
+        toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, 'Failed to sync data'));
+      }
+    };
+
+    dispatch(offlineSyncRequest(payload as any));
+  };
+
   /**
    * Handler for edit user form submit.
    */
@@ -708,7 +731,7 @@ const UserList = (): React.ReactElement => {
           skip: 0,
           userId: userData.id,
           successCb: (CHWData: any) => {
-            handleActivateClick(userData, CHWData.entityList);
+            handleActivateClick(userData, CHWData.entityList, null);
           }
         })
       );
@@ -716,6 +739,20 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch]
   );
+
+  const handleActivateToggle = (data: any) => {
+    const isCHW = data?.roles?.some((ischwRole: { name: string }) => ischwRole.name === 'CHW');
+    const isPeerSupervisor = getPeerSupervisorRoleId(data);
+    const isDeactivatingPeerSupervisor = data.active && isPeerSupervisor;
+    const isChwActivate = isCHW && !data.active;
+    if (isCHW && data.active) {
+      handleSync(data);
+    } else if (isChwActivate || isDeactivatingPeerSupervisor) {
+      getCHWList(data);
+    } else {
+      handleActivateClick(data, [], null);
+    }
+  };
 
   const activeCHWList = (data: any) => {
     dispatch(
@@ -762,9 +799,11 @@ const UserList = (): React.ReactElement => {
         roles: [{ name: string; id: number }];
         organizations: any[];
       },
-      CHWData: any
+      CHWData: any,
+      lastSyncDate: string | null
     ) => {
-      const isChw = data.roles.some((ischwRole: { name: string }) => ischwRole.name === 'CHW') && !data.active;
+      const isCHW = data.roles.some((ischwRole: { name: string }) => ischwRole.name === 'CHW');
+      const isChwActivate = isCHW && !data.active;
       const peerSupervisorRoleId = getPeerSupervisorRoleId(data);
       const isPeerSupervisor = Boolean(peerSupervisorRoleId); // will be true if role ID is found
       const parentOrganizationId: number = getParentOrganizationId(data);
@@ -773,7 +812,8 @@ const UserList = (): React.ReactElement => {
       const MESSAGES = {
         PEER_SUPERVISOR_DEACTIVATION: APPCONSTANTS.PEER_SUPERVISOR_DEACTIVATION,
         STANDARD_CONFIRMATION: (willActivate: boolean) =>
-          `Are you sure you want to ${willActivate ? 'deactivate' : 'activate'} this user?`
+          `Are you sure you want to ${willActivate ? 'deactivate' : 'activate'} this user?`,
+        OFFLINE_SYNC_MESSAGE: `Are you sure you want to deactivate this user?`
       };
 
       const BUTTON_TEXT = {
@@ -790,14 +830,16 @@ const UserList = (): React.ReactElement => {
           submit: 'Yes'
         }
       };
-      const deactivationMessage = isDeactivatingPeerSupervisor
-        ? MESSAGES.PEER_SUPERVISOR_DEACTIVATION
-        : MESSAGES.STANDARD_CONFIRMATION(data.active);
+      const deactivationMessage =
+        isCHW && data.active
+          ? MESSAGES.OFFLINE_SYNC_MESSAGE
+          : isDeactivatingPeerSupervisor
+          ? MESSAGES.PEER_SUPERVISOR_DEACTIVATION
+          : MESSAGES.STANDARD_CONFIRMATION(data.active);
 
       const { cancel: cancelText, submit: submitText } = isDeactivatingPeerSupervisor
         ? BUTTON_TEXT.PEER_SUPERVISOR
         : BUTTON_TEXT.STANDARD;
-
       setOpenConfirmationModal({
         isOpen: true,
         userData: data,
@@ -808,11 +850,13 @@ const UserList = (): React.ReactElement => {
         customButtonLabel: isDeactivatingPeerSupervisor ? BUTTON_TEXT.PEER_SUPERVISOR.customButtonLabel : '',
         handleCustomButton: BUTTON_TEXT.PEER_SUPERVISOR.handleCustomButton,
         message: deactivationMessage,
+        WarningMessage: isCHW && data.active ? deactivationMessage : '',
+        syncDate: lastSyncDate,
         onConfirm: () => {
           if (isDeactivatingPeerSupervisor) {
             handleReassignClick(data);
             setOpenConfirmationModal({ isOpen: false, userData: data });
-          } else if (isChw) {
+          } else if (isChwActivate) {
             setOpenConfirmationModal({ isOpen: false, userData: data });
             setIsOpenCHWUserModal({ isOpen: true, isEdit: true });
           } else {
@@ -1003,7 +1047,8 @@ const UserList = (): React.ReactElement => {
               hideCustomIcon: (rowData: any) => handleIconHandler(rowData) || !rowData.active,
               hideActiveToggle: (rowData: any) => rowData.username === email
             }}
-            onActivateClick={(rowData: any) => getCHWList(rowData)}
+            // onActivateClick={(rowData: any) => getCHWList(rowData)}
+            onActivateClick={(rowData: any) => handleActivateToggle(rowData)}
             handleCustomIconClicked={handleReassignSubmit}
           />
         </DetailCard>
@@ -1043,6 +1088,8 @@ const UserList = (): React.ReactElement => {
         </ModalForm>
         <ConfirmationModalPopup
           isOpen={openConfirmationModal.isOpen}
+          WarningMessage={openConfirmationModal?.WarningMessage || ''}
+          syncDate={openConfirmationModal?.syncDate || ''}
           popupTitle={openConfirmationModal.title || ''}
           cancelText={openConfirmationModal.cancelText || ''}
           submitText={openConfirmationModal.submitText || ''}
@@ -1051,9 +1098,9 @@ const UserList = (): React.ReactElement => {
             openConfirmationModal.onConfirm?.();
           }}
           customButtonLabel={openConfirmationModal.customButtonLabel || ''}
-          handleCustomButton={openConfirmationModal.handleCustomButton}
+          handleCustomButton={openConfirmationModal.handleCustomButton || (() => {})}
           popupSize='modal-md'
-          confirmationMessage={openConfirmationModal.message}
+          confirmationMessage={openConfirmationModal.message || ''}
         />
         <ModalForm
           show={isOpenPeerSupervisorModal.isOpen}

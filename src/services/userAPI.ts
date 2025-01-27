@@ -232,3 +232,10 @@ export const reasignCHW = (data: any) =>
     url: '/user-service/user/reassign-chw',
     data
   });
+
+export const offlineSyncDetails = (data: any) =>
+  axios({
+    method: 'POST',
+    url: '/user-service/user/offline-sync-details',
+    data
+  });

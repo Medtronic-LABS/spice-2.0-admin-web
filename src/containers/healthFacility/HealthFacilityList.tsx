@@ -536,6 +536,7 @@ const HealthFacilityList = (): React.ReactElement => {
             )}
             deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE, healthFacilitySName)}
             isActiveToggle={true}
+            customIconStyle={{ width: 18 }}
             isActiveKey='active'
             onActivateClick={(rowData: any) => {
               setOpenConfirmationModal({ isOpen: true, userData: rowData });
