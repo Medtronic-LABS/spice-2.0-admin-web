@@ -347,10 +347,7 @@ const UserForm = ({
               .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
               .map((org: any) => org.id)
           : [],
-        culture:
-          !isCultureListLoading &&
-          showCulture &&
-          cultureList?.find((culture: { id: any }) => culture.id === initialEditValue?.culture.id),
+        culture: showCulture && initialEditValue?.culture,
         district:
           initialEditValue?.organizations?.filter(
             (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
@@ -759,7 +756,7 @@ const UserForm = ({
   );
 
   /**
-   * Effect hook to fetch village and supervisor lists based on the initial edit data.
+   * Effect hook to fetch village and supervisor lists based on the initial edit data. ***
    */
   useEffect(() => {
     if (isEdit && showVillage[0] && !isProfile) {
