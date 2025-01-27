@@ -512,6 +512,7 @@ const HealthFacilityList = (): React.ReactElement => {
             confirmationTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION}
             deleteTitle={APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE}
             isActiveToggle={true}
+            customIconStyle={{ width: 18 }}
             isActiveKey='active'
             onActivateClick={(rowData: any) => {
               setOpenConfirmationModal({ isOpen: true, userData: rowData });

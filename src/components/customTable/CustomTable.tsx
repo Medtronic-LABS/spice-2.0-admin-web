@@ -521,7 +521,7 @@ const CustomTable = (props: ICustomTableProps) => {
     return (
       !actionFormatter?.hideActiveToggle?.(rowDataValue) &&
       isActiveToggle && (
-        <div className='mt-0dot5 pe-0dot5' onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()}>
           <Checkbox
             switchCheckbox={true}
             label=''

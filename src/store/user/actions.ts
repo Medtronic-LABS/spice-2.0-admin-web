@@ -70,7 +70,8 @@ import {
   IUpdateTermsConditionsSuccess,
   IUpdateTermsConditionsFailure,
   IUpdateUserStatusRequest,
-  IFetchCHWListRequest
+  IFetchCHWListRequest,
+  IOfflineSyncRequest
 } from './types';
 
 export const loginRequest = ({
@@ -624,4 +625,19 @@ export const reassignCHWRequest = (data: any, successCb?: () => void, failureCb?
   data,
   successCb,
   failureCb
+});
+
+export const offlineSyncRequest = (payload: IOfflineSyncRequest) => ({
+  type: USER_TYPES.OFFLINE_SYNC_REQUEST,
+  payload
+});
+
+export const offlineSyncSuccess = (data: any) => ({
+  type: USER_TYPES.OFFLINE_SYNC_SUCCESS,
+  data
+});
+
+export const offlineSyncFailure = (error: Error) => ({
+  type: USER_TYPES.OFFLINE_SYNC_FAILURE,
+  payload: error
 });

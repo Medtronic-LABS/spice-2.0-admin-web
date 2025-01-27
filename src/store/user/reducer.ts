@@ -57,7 +57,10 @@ const initialStateGetter = {
   chwListError: null,
   chwListTotal: 0,
   reassignCHWLoading: false,
-  reassignCHWError: null
+  reassignCHWError: null,
+  syncLoading: false,
+  lastSyncDate: null,
+  syncError: null
 };
 
 const userReducer = (state: IUserState = initialStateGetter, action = {} as any) => {
@@ -368,6 +371,25 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         ...state,
         reassignCHWLoading: false,
         reassignCHWError: action.payload
+      };
+    case USERTYPES.OFFLINE_SYNC_REQUEST:
+      return {
+        ...state,
+        syncLoading: true,
+        syncError: null
+      };
+    case USERTYPES.OFFLINE_SYNC_SUCCESS:
+      return {
+        ...state,
+        lastSyncDate: action.payload,
+        syncLoading: false,
+        syncError: null
+      };
+    case USERTYPES.OFFLINE_SYNC_FAILURE:
+      return {
+        ...state,
+        syncLoading: false,
+        syncError: action.payload
       };
     default:
       return {

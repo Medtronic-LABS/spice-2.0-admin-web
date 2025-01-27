@@ -433,6 +433,9 @@ export interface IUserState {
   chwListTotal: number;
   reassignCHWLoading: boolean;
   reassignCHWError: Error | null;
+  syncLoading: boolean;
+  syncError: Error | null;
+  lastSyncDate: string | null;
 }
 
 export interface ILoginFailurePayload {
@@ -904,6 +907,16 @@ export interface IReassignCHWPayload {
   deactivateUserId: number | null;
 }
 
+export interface IOfflineSyncPayload {
+  userId: number;
+}
+
+export interface IOfflineSyncRequest {
+  data: IOfflineSyncPayload;
+  successCb?: (data: { lastSyncDate: string }) => void;
+  failureCb?: (error: Error) => void;
+}
+
 export type UserActions =
   | ILoginRequest
   | ILoginSuccess
@@ -989,4 +1002,5 @@ export type UserActions =
   | IUpdateTermsConditionsSuccess
   | IUpdateTermsConditionsFailure
   | IUpdateUserStatusRequest
-  | IReassignCHWRequest;
+  | IReassignCHWRequest
+  | IOfflineSyncRequest;

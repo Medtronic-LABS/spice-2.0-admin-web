@@ -2,11 +2,13 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
+import * as healthFacilityActions from '../healthFacility/actions';
 import {
   IFetchLockedUsersRequest,
   IFetchUserByIdRequest,
   IFetchUserRolesRequest,
   ILoginRequest,
+  IOfflineSyncRequest,
   IUnlockUsersRequest,
   IUpdateUserRequest,
   IUser,
@@ -474,7 +476,7 @@ function* updateUserStatusSaga({ payload }: any): SagaIterator {
       id,
       appTypes,
       countryId,
-      tenantIds: tenantId && tenantId.length ? [tenantId] : [],
+      tenantIds: tenantId ? [tenantId] : [],
       villageIds: payload?.villageIds,
       supervisorId: payload?.peerSupervisorId
     };
@@ -526,6 +528,22 @@ function* reassignCHWSaga(payload: any) {
   }
 }
 
+function* offlineSyncSaga({ payload }: { payload: IOfflineSyncRequest }): SagaIterator {
+  const { data, successCb, failureCb } = payload;
+
+  try {
+    const { data: lastSyncDate } = yield call(userService.offlineSyncDetails, data);
+    yield put(userActions.offlineSyncSuccess(lastSyncDate));
+    if (successCb) {
+      successCb(lastSyncDate);
+    }
+    yield put(userActions.offlineSyncSuccess(lastSyncDate));
+  } catch (e: any) {
+    failureCb?.(e);
+    yield put(userActions.offlineSyncFailure(e as Error));
+  }
+}
+
 /*
   Starts worker saga on latest dispatched `LOGIN_REQUEST` action.
   Allows concurrent increments.
@@ -552,6 +570,7 @@ function* userSaga() {
   yield all([takeLatest(USERTYPES.UPDATE_USER_STATUS_REQUEST, updateUserStatusSaga)]);
   yield all([takeLatest(USERTYPES.FETCH_CHW_LIST_REQUEST, fetchCHWListSaga)]);
   yield all([takeLatest(USERTYPES.REASSIGN_CHW_REQUEST, reassignCHWSaga)]);
+  yield all([takeLatest(USERTYPES.OFFLINE_SYNC_REQUEST as any, offlineSyncSaga)]);
 }
 
 export default userSaga;
