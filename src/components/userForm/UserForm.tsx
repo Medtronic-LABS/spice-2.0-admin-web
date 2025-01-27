@@ -230,11 +230,11 @@ const UserForm = ({
         villages: [],
         supervisor: '',
         organizations: [],
-        culture: showCulture ? cultureList : undefined,
+        culture: showCulture ? null : undefined,
         country: ''
       }
     ],
-    [cultureList, showCulture]
+    [showCulture]
   );
 
   // new hook related state and ref
@@ -350,7 +350,7 @@ const UserForm = ({
         culture:
           !isCultureListLoading &&
           showCulture &&
-          cultureList?.find((culture: { id: any }) => culture.id === initialEditValue?.cultureId),
+          cultureList?.find((culture: { id: any }) => culture.id === initialEditValue?.culture.id),
         district:
           initialEditValue?.organizations?.filter(
             (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
