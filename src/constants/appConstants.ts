@@ -110,6 +110,7 @@ const APPCONSTANTS = {
   SUCCESS: 'Success',
   PASSWORD_RESET_EMAIL_SENT_MESSAGE:
     'You will receive the email notification to reset the password if your account exists in our system.',
+  NO_LAST_SYNC_DETAILS_AVAILABLE: 'No last sync details available for this user',
   OOPS: 'Oops',
   ERROR: 'Error',
   // REGION

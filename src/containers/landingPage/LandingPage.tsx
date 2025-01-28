@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { useHistory } from 'react-router';
@@ -16,6 +17,7 @@ import localStorageServices from '../../global/localStorageServices';
 import { clearSideMenu } from '../../store/common/actions';
 import { clearAppType } from '../../store/user/actions';
 import { SUPER_ADMIN, SUPER_USER } from '../../routes';
+import { trackGoogleAnalyticsEvent } from '../../utils/analytics';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -105,21 +107,39 @@ const LandingPage = (): React.ReactElement => {
   }, []);
 
   /**
-   * Renders the content of a suite card
+   * Tracks suite selection in Google Analytics
+   * @param {ISpiceSuite} suite - The selected suite
+   * @param {boolean} isExternalLink - Whether the suite opens in new tab
+   */
+  const trackSuiteSelection = (suite: ISpiceSuite) => {
+    trackGoogleAnalyticsEvent('click_spice', 'landing_page', window.location.pathname, {
+      suite_id: suite.id,
+      suite_name: suite.name,
+      user_role: role
+    });
+  };
+
+  /**
+   * Renders the content of a suite card with click tracking
    * @param {ISpiceSuite} data - The suite data to render
    * @returns {React.ReactNode} The rendered card content
    */
   const renderCardContent = (data: ISpiceSuite) => {
     const { name, icon: IconComponent } = data;
+
+    const handleClick = () => {
+      trackSuiteSelection(data);
+    };
+
     return (
-      <>
+      <div onClick={handleClick}>
         <div className='row p-2'>
           <IconComponent className={styles.cardIcon} aria-labelledby={`${name} logo`} />
         </div>
         <div className={`row ${styles.reportCardText} pb-1`}>
           <p>{name}</p>
         </div>
-      </>
+      </div>
     );
   };
 

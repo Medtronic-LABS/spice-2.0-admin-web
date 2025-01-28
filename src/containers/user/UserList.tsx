@@ -34,8 +34,7 @@ import {
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
   peerSupervisorListSelector,
-  userDetailLoadingSelector,
-  healthFacilityUsersLoadingSelector
+  userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
@@ -96,7 +95,6 @@ interface ICHWListModal {
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId, healthFacilityId } = useParams<IMatchParams>();
-  const healthFacilityUserListLoading = useSelector(healthFacilityUsersLoadingSelector);
   const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState<IUserModalState>({
@@ -134,7 +132,6 @@ const UserList = (): React.ReactElement => {
     isEdit: false,
     isSupervisor: false
   });
-  const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
 
   // State management for user activation/deactivation
   const [openConfirmationModal, setOpenConfirmationModal] = useState<{

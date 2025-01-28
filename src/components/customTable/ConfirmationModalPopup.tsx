@@ -1,6 +1,7 @@
 import React from 'react';
 import './ConfirmationModalPopup.scss';
 import ModalForm, { IModalSize } from '../modal/ModalForm';
+import APPCONSTANTS from '../../constants/appConstants';
 
 interface ISyncDateDisplayProps {
   syncDate: string;
@@ -129,7 +130,7 @@ const SyncDateDisplay: React.FC<ISyncDateDisplayProps> = ({ syncDate, warningDay
       statusClass: lastSyncStatusClass,
       dateText: detailedLastSyncTimeAgo,
       timeAgo: `Last synced ${detailedLastSyncTimeAgo}`,
-      showWarning: daysDifference > warningDays,
+      showWarning: false,
       syncFullDate: lastSyncFullDate,
       detailedTimeAgo: detailedLastSyncTimeAgo
     };
@@ -155,8 +156,8 @@ const SyncDateDisplay: React.FC<ISyncDateDisplayProps> = ({ syncDate, warningDay
         <div className='sync-warning-alert'>
           {timeAgo === 'Never synced' && (
             <div className='warning-content'>
-              <span className='warning-icon warning-text'>⚠️ Warning: </span>
-              <span className='warning-text'>No last sync details available for this user</span>
+              <span className='warning-icon warning-text'>⚠️</span>
+              <span className='warning-text'>{APPCONSTANTS.NO_LAST_SYNC_DETAILS_AVAILABLE}</span>
             </div>
           )}
         </div>
