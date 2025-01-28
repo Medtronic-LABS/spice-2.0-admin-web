@@ -1,0 +1,32 @@
+@import '../../styles/variables';
+
+.landingPageContainer {
+  min-height: 100%;
+  padding: 4rem 2rem;
+  .customCard {
+    margin: 0 0 2rem 0;
+    max-width: 17%;
+    padding: 1rem 0 1rem 0;
+    background: $primary-background;
+    text-align: center;
+    box-shadow: 0px 0px 12px rgb(0 0 0 / 10%);
+    border-radius: 16px;
+    border: none;
+    .cardIcon {
+      height: 12vh;
+    }
+    .reportCardText {
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--medium-blue);
+    }
+  }
+  .customCard:not(:first-child) {
+    margin: 0 0 2rem 3rem;
+  }
+}
+
+.card-icon {
+    height: 70;
+    width: 60;
+}

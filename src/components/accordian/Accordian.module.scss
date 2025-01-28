@@ -1,0 +1,11 @@
+$header-border-color: var(--black-30);
+
+.headerBorder {
+  border-bottom: 1px solid $header-border-color;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.headerBorderonHide {
+  border-radius: inherit;
+}
