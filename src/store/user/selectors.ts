@@ -1,0 +1,74 @@
+import { createSelector } from 'reselect';
+
+import { AppState } from '../rootReducer';
+
+const getIsLoggedIn = (state: AppState) => state.user.isLoggedIn;
+const getIsLoggingIn = (state: AppState) => state.user.loggingIn;
+const getIsLoggingOut = (state: AppState) => state.user.loggingOut;
+const getAppType = (state: AppState) => state.user.user?.appTypes;
+const getUserData = (state: AppState) => state.user.user;
+const getFirstName = (state: AppState) => state.user.user?.firstName;
+const getLastName = (state: AppState) => state.user.user?.lastName;
+const getEmail = (state: AppState) => state.user.user?.email;
+const getFormDataId = (state: AppState) => state.user.user?.formDataId;
+const getTenantId = (state: AppState) => state.user.user?.tenantId;
+const getRole = (state: AppState) => state.user.user?.role;
+const getRoleDetail = (state: AppState) => state.user.user?.roleDetail;
+const getUserSuiteAccess = (state: AppState) => state.user.user?.suiteAccess;
+const getUserId = (state: AppState) => state.user.user?.userId;
+const getLoading = (state: AppState) => state.user.loading;
+const getIsResetPasswordLoading = (state: AppState) => state.user.isResetPasswordLoading;
+const getInitializing = (state: AppState) => state.user.initializing;
+const getShowLoader = (state: AppState) => state.user.showLoader;
+const getUserRoles = (state: AppState) => state.user.userRoles;
+const getIsUserRolesLoading = (state: AppState) => state.user.isRolesLoading;
+const getIsPasswordSet = (state: AppState) => state.user.isPasswordSet;
+const getTimezoneList = (state: AppState) => state.user.timezoneList;
+const getCountry = (state: AppState) => state.user.user?.country;
+const getCountryList = (state: AppState) => state.user.countryList;
+const getCultureList = (state: AppState) => state.user.cultureList;
+const getCultureListLoading = (state: AppState) => state.user.cultureListLoading;
+const getLockedUsers = (state: AppState) => state.user.lockedUsers;
+const getLockedUsersCount = (state: AppState) => state.user.totalLockedUsers;
+const getcommunityList = (state: AppState) => state.user.communityList;
+const getLockedUsersLoading = (state: AppState) => state.user.islockedUsersLoading;
+const getDesignationList = (state: AppState) => state.user.designationList;
+const getIsTACLoading = (state: AppState) => state.user.isTermsConditionsLoading;
+const getTermsConditions = (state: AppState) => state.user.termsAndConditions;
+
+export const getIsLoggedInSelector = createSelector(getIsLoggedIn, (isLoggedIn) => isLoggedIn);
+export const getIsLoggingInSelector = createSelector(getIsLoggingIn, (loggingIn) => loggingIn);
+export const getIsLoggingOutSelector = createSelector(getIsLoggingOut, (loggingOut) => loggingOut);
+export const getAppTypeSelector = createSelector(getAppType, (appTypes) => appTypes);
+export const firstNameSelector = createSelector(getFirstName, (firstName) => firstName);
+export const lastNameSelector = createSelector(getLastName, (lastName) => lastName);
+export const emailSelector = createSelector(getEmail, (email) => email);
+export const formDataIdSelector = createSelector(getFormDataId, (formDataId) => formDataId);
+export const tenantIdSelector = createSelector(getTenantId, (tenantId) => tenantId);
+export const userIdSelector = createSelector(getUserId, (userId) => userId);
+export const loadingSelector = createSelector(getLoading, (loading) => loading);
+export const resetPasswordLoadingSelector = createSelector(getIsResetPasswordLoading, (loading) => loading);
+export const initializingSelector = createSelector(getInitializing, (initializing) => initializing);
+export const roleSelector = createSelector(getRole, (role) => role);
+export const roleDetailSelector = createSelector(getRoleDetail, (detail) => detail);
+export const getUserSuiteAccessSelector = createSelector(getUserSuiteAccess, (suites) => suites);
+export const showLoaderSelector = createSelector(getShowLoader, (loading) => loading);
+export const userDataSelector = createSelector(getUserData, (user) => user);
+export const userRolesSelector = createSelector(getUserRoles, (roles) => roles);
+export const isUserRolesLoading = createSelector(getIsUserRolesLoading, (loading) => loading);
+export const isPasswordSetSelector = createSelector(getIsPasswordSet, (passwordSet) => passwordSet);
+export const timezoneListSelector = createSelector(getTimezoneList, (timezoneList) => timezoneList);
+export const countryIdSelector = createSelector(getCountry, (country) => country);
+export const cultureListSelector = createSelector(getCultureList, (cultureList) => cultureList);
+export const communityListSelector = createSelector(getcommunityList, (communityList) => communityList);
+export const cultureListLoadingSelector = createSelector(
+  getCultureListLoading,
+  (cultureListLoading) => cultureListLoading
+);
+export const countryListSelector = createSelector(getCountryList, (countryList) => countryList);
+export const lockedUsers = createSelector(getLockedUsers, (users) => users);
+export const lockedUsersCount = createSelector(getLockedUsersCount, (total) => total);
+export const isLockedUserLoading = createSelector(getLockedUsersLoading, (loading) => loading);
+export const designationListSelector = createSelector(getDesignationList, (designationList) => designationList);
+export const isTACLoadingSelector = createSelector(getIsTACLoading, (loading) => loading);
+export const termsAndConditionsSelector = createSelector(getTermsConditions, (tac) => tac);
