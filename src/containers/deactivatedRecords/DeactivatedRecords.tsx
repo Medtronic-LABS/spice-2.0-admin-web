@@ -129,11 +129,7 @@ const DeactivatedRecords = (): React.ReactElement => {
   return (
     <div className='row g-0dot625'>
       <div className='col-12'>
-        <DetailCard
-          header={`Deactivated ${deactivatedRecordsCount > 1 ? districtPName : districtSName}`}
-          isSearch={true}
-          onSearch={handleSearch}
-        >
+        <DetailCard header={`Deactivated ${districtPName}`} isSearch={true} onSearch={handleSearch}>
           <CustomTable
             loading={loading}
             rowData={deactivatedRecords}
