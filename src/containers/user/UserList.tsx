@@ -40,8 +40,7 @@ import {
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
   peerSupervisorListSelector,
-  userDetailLoadingSelector,
-  healthFacilityUsersLoadingSelector
+  userDetailLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
@@ -140,7 +139,6 @@ const UserList = (): React.ReactElement => {
     isEdit: false,
     isSupervisor: false
   });
-  const hfUserLoading = useSelector(healthFacilityUsersLoadingSelector);
 
   // State management for user activation/deactivation
   const [openConfirmationModal, setOpenConfirmationModal] = useState<{
