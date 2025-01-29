@@ -181,7 +181,6 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         ...state,
         isResetPasswordLoading: false
       };
-    case USERTYPES.CHANGE_PASSWORD_FAILURE:
     case USERTYPES.CHANGE_OWN_PASSWORD_FAILURE:
     case USERTYPES.CHANGE_OWN_PASSWORD_SUCCESS:
     case USERTYPES.USER_FORGOT_PASSWORD_SUCCESS:
@@ -248,7 +247,6 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
     case USERTYPES.UPDATE_PASSWORD_REQUEST:
     case USERTYPES.CREATE_PASSWORD_REQUEST:
     case USERTYPES.UNLOCK_USERS_REQUEST:
-    case USERTYPES.CHANGE_PASSWORD_REQUEST:
       return {
         ...state,
         loading: true
@@ -268,7 +266,6 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
     case USERTYPES.UNLOCK_USERS_SUCCESS:
     case USERTYPES.UNLOCK_USERS_FAILURE:
     case USERTYPES.CHANGE_PASSWORD_FAIL:
-    case USERTYPES.CHANGE_PASSWORD_SUCCESS:
     case USERTYPES.UPDATE_PASSWORD_FAIL:
     case USERTYPES.UPDATE_PASSWORD_SUCCESS:
     case USERTYPES.CREATE_PASSWORD_SUCCESS:

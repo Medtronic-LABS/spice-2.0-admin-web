@@ -518,7 +518,8 @@ describe('formatObjectUtils', () => {
       expect(result).toEqual(expected);
     });
 
-    it('should handle health facility payload without city name, peersupervisor, linked villages, customized workflows', () => {
+    it(`should handle health facility payload without
+      city name, peersupervisor, linked villages, customized workflows`, () => {
       const mockHf = {
         id: 1,
         name: 'Test HF',

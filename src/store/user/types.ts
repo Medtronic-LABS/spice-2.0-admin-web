@@ -293,15 +293,6 @@ export interface IChangePasswordReq {
   };
 }
 
-export interface IChangePasswordSuccess {
-  type: typeof USER_TYPES.CHANGE_PASSWORD_SUCCESS;
-}
-
-export interface IChangePasswordFail {
-  type: typeof USER_TYPES.CHANGE_PASSWORD_FAILURE;
-  error: any;
-}
-
 export interface IChangeOwnPasswordReq {
   type: typeof USER_TYPES.CHANGE_OWN_PASSWORD_REQUEST;
   data: {
@@ -539,11 +530,6 @@ export interface IResetPasswordSuccess {
 
 export interface IResetPasswordFail {
   type: typeof USER_TYPES.RESET_PASSWORD_FAILURE;
-  error: any;
-}
-
-export interface IChangePasswordFail {
-  type: typeof USER_TYPES.CHANGE_PASSWORD_FAILURE;
   error: any;
 }
 
@@ -948,8 +934,6 @@ export type UserActions =
   | IUpdateUserSuccess
   | IUpdateUserFailure
   | IChangePasswordReq
-  | IChangePasswordSuccess
-  | IChangePasswordFail
   | IChangeOwnPasswordReq
   | IChangeOwnPasswordSuccess
   | IChangeOwnPasswordFail

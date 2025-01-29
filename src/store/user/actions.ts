@@ -1,7 +1,14 @@
 import * as USER_TYPES from './actionTypes';
 import {
   IAddUserTenantId,
-  IChangeOwnPasswordFail,
+  IFetchUserRolesRequest,
+  IFetchUserRolesSuccess,
+  IFetchUserByIdRequest,
+  IFetchUserByIdSuccess,
+  IFetchUserByIdFailure,
+  IUpdateUserSuccess,
+  IUpdateUserFailure,
+  IChangePasswordReq,
   IChangeOwnPasswordReq,
   IChangeOwnPasswordSuccess,
   IChangePasswordFail,
@@ -236,15 +243,6 @@ export const changePassword = (data: {
 }): IChangePasswordReq => ({
   type: USER_TYPES.CHANGE_PASSWORD_REQUEST,
   data
-});
-
-export const changePasswordSuccess = (): IChangePasswordSuccess => ({
-  type: USER_TYPES.CHANGE_PASSWORD_SUCCESS
-});
-
-export const changePasswordFail = (error: any): IChangePasswordFail => ({
-  type: USER_TYPES.CHANGE_PASSWORD_FAILURE,
-  error
 });
 
 export const changeOwnPassword = (data: {

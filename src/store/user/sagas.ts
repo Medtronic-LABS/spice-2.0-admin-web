@@ -282,11 +282,9 @@ export function* changePassword(action: IActionProps) {
   const { userId, password, successCB, failureCb } = action.data;
   try {
     yield call(userService.changePasswordReq, { userId, newPassword: password });
-    yield put(userActions.changePasswordSuccess());
     successCB();
   } catch (e: any) {
     failureCb?.(e);
-    yield put(userActions.changePasswordFail(e));
   }
 }
 

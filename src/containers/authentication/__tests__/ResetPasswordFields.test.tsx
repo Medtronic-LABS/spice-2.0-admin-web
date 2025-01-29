@@ -25,6 +25,7 @@ describe('ResetPasswordFields', () => {
   const renderComponent = (props = defaultProps) => {
     return render(
       <Form
+        /* tslint:disable:no-empty */
         onSubmit={() => {}}
         render={({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>

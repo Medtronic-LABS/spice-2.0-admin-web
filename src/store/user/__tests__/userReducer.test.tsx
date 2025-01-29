@@ -277,37 +277,6 @@ describe('userReducer', () => {
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
-
-  it('should handle CHANGE_PASSWORD_FAILURE', () => {
-    const initialState: any = {
-      isLoggedIn: true,
-      errorMessage: null
-    };
-    const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_FAILURE
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
-
-  it('should handle CHANGE_PASSWORD_SUCCESS', () => {
-    const initialState: any = {
-      isLoggedIn: true,
-      errorMessage: null
-    };
-    const action: any = {
-      type: USERTYPES.CHANGE_PASSWORD_SUCCESS
-    };
-    const expectedState = {
-      ...initialState,
-      loading: false,
-      showLoader: true
-    };
-    expect(userReducer(initialState, action)).toEqual(expectedState);
-  });
   it('should handle CHANGE_OWN_PASSWORD_FAILURE', () => {
     const initialState: any = {
       isLoggedIn: true,
