@@ -2,7 +2,6 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
 import * as USERTYPES from './actionTypes';
-import * as healthFacilityActions from '../healthFacility/actions';
 import {
   IFetchLockedUsersRequest,
   IFetchUserByIdRequest,
@@ -519,12 +518,20 @@ function* fetchCHWListSaga({ payload }: IFetchCHWListRequest) {
 
 function* reassignCHWSaga(payload: any) {
   try {
-    yield call(reasignCHW, payload.data.data ?? payload.data);
-    payload.successCb?.() ?? payload.data.successCb();
+    const { data: data1 } = payload.data;
+    const { data: data2 } = payload;
+    yield call(reasignCHW, data1 || data2);
+    if (data1) {
+      payload.data.successCb?.();
+    } else {
+      payload.successCb?.();
+    }
     yield put(userActions.reassignCHWSuccess());
   } catch (error) {
-    payload?.failureCb() ?? payload.data.failureCb?.(error);
-    yield put(userActions.reassignCHWFailure(error));
+    if (error instanceof Error) {
+      payload?.failureCb(error);
+      yield put(userActions.reassignCHWFailure(error));
+    }
   }
 }
 

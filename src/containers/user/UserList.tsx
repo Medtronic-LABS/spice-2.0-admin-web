@@ -34,7 +34,8 @@ import {
   healthFacilityLoadingSelector,
   healthFacilityUserListSelector,
   peerSupervisorListSelector,
-  userDetailLoadingSelector
+  userDetailLoadingSelector,
+  healthFacilityUsersLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
@@ -95,6 +96,7 @@ interface ICHWListModal {
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { tenantId, healthFacilityId } = useParams<IMatchParams>();
+  const healthFacilityUserListLoading = useSelector(healthFacilityUsersLoadingSelector);
   const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState<IUserModalState>({
@@ -931,7 +933,7 @@ const UserList = (): React.ReactElement => {
 
   return (
     <>
-      {(hfUserDetailLoading || loading || changePasswordLoading) && <Loader />}
+      {(hfUserDetailLoading || loading || changePasswordLoading || healthFacilityUserListLoading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add User'
@@ -1046,7 +1048,12 @@ const UserList = (): React.ReactElement => {
             openConfirmationModal.onConfirm?.();
           }}
           customButtonLabel={openConfirmationModal.customButtonLabel || ''}
-          handleCustomButton={openConfirmationModal.handleCustomButton || (() => {})}
+          handleCustomButton={
+            openConfirmationModal.handleCustomButton ||
+            (() => {
+              //
+            })
+          }
           popupSize='modal-md'
           confirmationMessage={openConfirmationModal.message || ''}
         />

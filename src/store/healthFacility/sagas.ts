@@ -301,11 +301,11 @@ export function* fetchHFUserList({
       appTypes: yield select((state: AppState) => state.user?.user?.appTypes)
     });
     const payload = { users: hfUsers || [], total, limit };
-    yield put(fetchHFUserListSuccess(payload));
     successCb?.(hfUsers, total);
+    yield put(fetchHFUserListSuccess(payload));
   } catch (e) {
+    failureCb?.(e as any);
     if (e instanceof Error) {
-      failureCb?.(e);
       yield put(fetchHFUserListFailure(e));
     }
   }
