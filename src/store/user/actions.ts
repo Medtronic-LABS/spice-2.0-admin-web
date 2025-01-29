@@ -1,6 +1,7 @@
 import * as USER_TYPES from './actionTypes';
 import {
   IAddUserTenantId,
+  IChangeOwnPasswordFail,
   IFetchUserRolesRequest,
   IFetchUserRolesSuccess,
   IFetchUserByIdRequest,
@@ -75,10 +76,9 @@ import {
   IUpdateTermsConditionsFailure,
   IUpdateTermsConditionsRequest,
   IUpdateTermsConditionsSuccess,
-  IUpdateTermsConditionsFailure,
-  IUpdateUserStatusRequest,
-  IFetchCHWListRequest,
-  IOfflineSyncRequest
+  IUpdateUserFailure,
+  IUpdateUserSuccess,
+  IUser
 } from './types';
 
 export const loginRequest = ({

@@ -354,7 +354,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                             }}
                           >
                             {/* <Close aria-label='close' /> */}
-                            Reset All
+                            Reset
                           </label>
                         )}
                       </li>
