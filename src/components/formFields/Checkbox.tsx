@@ -29,7 +29,7 @@ const Checkbox = ({
 
   return (
     <label
-      className={`d-inline-flex align-items-center ${styles.checkboxLabel} ${switchCheckbox && ' h-100'} ${
+      className={`d-inline-flex align-items-center m-0 ${styles.checkboxLabel} ${switchCheckbox && ' h-100'} ${
         switchCheckbox && styles.clSwitch
       } ${readOnly ? styles.disabled : ''} ${size === 'small' ? styles.small : ''}`}
       data-testid='checkbox'
