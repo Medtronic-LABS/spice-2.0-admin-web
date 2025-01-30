@@ -230,11 +230,11 @@ const UserForm = ({
         villages: [],
         supervisor: '',
         organizations: [],
-        culture: showCulture ? null : undefined,
+        culture: showCulture ? cultureList[0] : undefined,
         country: ''
       }
     ],
-    [showCulture]
+    [cultureList, showCulture]
   );
 
   // new hook related state and ref
