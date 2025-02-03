@@ -50,6 +50,8 @@ import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDet
 interface IMatchParams {
   healthFacilityId: string;
   tenantId: string;
+  districtId: string;
+  chiefdomId: string;
 }
 
 interface ISummaryUsersState {
@@ -66,7 +68,7 @@ interface IModalState {
 
 const HealthFacilitySummary = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { healthFacilityId, tenantId } = useParams<IMatchParams>();
+  const { healthFacilityId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
   const healthFacility = useSelector(healthFacilitySelector);
   const loading = useSelector(healthFacilityLoadingSelector);
   const countryId = useSelector(countryIdSelector);
@@ -188,6 +190,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         userBased: !(role === APPCONSTANTS.ROLES.SUPER_ADMIN || role === APPCONSTANTS.ROLES.SUPER_USER),
         tenantBased: true,
         isSiteUsers: null,
+        isFacilityUsersOnly: healthFacilityId || districtId || chiefdomId ? true : false,
         successCb: turnOffUsersTableLoading,
         failureCb: (e: Error) => {
           turnOffUsersTableLoading();

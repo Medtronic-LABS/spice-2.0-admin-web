@@ -41,6 +41,9 @@ import { filterByAppTypes } from '../../utils/commonUtils';
 
 interface IMatchParams {
   tenantId: string;
+  healthFacilityId: string;
+  districtId: string;
+  chiefdomId: string;
 }
 
 /**
@@ -49,7 +52,7 @@ interface IMatchParams {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId } = useParams<IMatchParams>();
+  const { tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
   const countryId = useSelector(countryIdSelector);
@@ -103,13 +106,25 @@ const UserList = (): React.ReactElement => {
           searchTerm: listParams.searchTerm,
           roleNames: selectedRole || [],
           isSiteUsers: false,
+          isFacilityUsersOnly: healthFacilityId || districtId || chiefdomId ? true : false,
           tenantId,
           failureCb: (e: Error) => {
             toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_LIST_FETCH_ERROR));
           }
         })
       ),
-    [dispatch, countryIdValue, listParams.page, listParams.rowsPerPage, listParams.searchTerm, selectedRole, tenantId]
+    [
+      dispatch,
+      countryIdValue,
+      listParams.page,
+      listParams.rowsPerPage,
+      listParams.searchTerm,
+      selectedRole,
+      healthFacilityId,
+      districtId,
+      chiefdomId,
+      tenantId
+    ]
   );
 
   /**

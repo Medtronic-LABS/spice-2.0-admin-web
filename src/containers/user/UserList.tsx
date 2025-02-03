@@ -92,9 +92,7 @@ interface ICHWListModal {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId, healthFacilityId } = useParams<IMatchParams>();
-  const healthFacilityUserListLoading = useSelector(healthFacilityUsersLoadingSelector);
-  const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
+  const { tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState<IUserModalState>({
     isOpen: false,
@@ -167,6 +165,7 @@ const UserList = (): React.ReactElement => {
         searchTerm: listParams.searchTerm,
         roleNames: selectedRole || [],
         isSiteUsers: true,
+        isFacilityUsersOnly: healthFacilityId || districtId || chiefdomId ? true : false,
         tenantBased: role === HEALTH_FACILITY_ADMIN,
         tenantId,
         tenantIds: role === HEALTH_FACILITY_ADMIN || role === CHIEFDOM_ADMIN ? [tenantId] : selectedFacility || [],
