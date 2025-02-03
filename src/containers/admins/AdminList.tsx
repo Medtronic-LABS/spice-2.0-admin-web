@@ -38,7 +38,6 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './adminListMeta';
 import { filterByAppTypes } from '../../utils/commonUtils';
-import { redRisk } from '../../constants/roleConstants';
 
 interface IMatchParams {
   tenantId: string;
@@ -63,7 +62,6 @@ const UserList = (): React.ReactElement => {
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const {
-    isCommunity,
     appTypes,
     healthFacility: { s: healthFacilitySName },
     district: { s: districtSName },
@@ -372,19 +370,7 @@ const UserList = (): React.ReactElement => {
    * Don't show icons if user has mob roles in it
    * Don't show icon for logged in user
    */
-  const actionIconViewer = (rowData: {
-    roles: Array<{ suiteAccessName: string; displayName: string; name: string }>;
-    username: string;
-  }) => {
-    const isMobUser =
-      !isCommunity &&
-      rowData?.roles.some(
-        (role: { suiteAccessName: string; displayName: string; name: string }) =>
-          role.suiteAccessName === APPCONSTANTS.SPICE_ROLE_SUITE_ACCESS.mob &&
-          (role.displayName !== null || role.name !== redRisk)
-      );
-    return isMobUser || rowData.username === email;
-  };
+  const actionIconViewer = (rowData: { username: string }) => rowData.username === email;
 
   return (
     <>

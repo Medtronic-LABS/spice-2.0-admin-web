@@ -117,6 +117,15 @@ export const getUserPayload = ({
         : []
       ).map(({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId)
     };
+
+    const isSpiceExists = user?.roles?.some(
+      (role: { groupName: string }) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice
+    );
+    // if spice doesn't exists in user, then remove tenantId
+    if (!isSpiceExists) {
+      userPayload.tenantId = undefined;
+    }
+
     // add id for edit
     if (user?.id) {
       userPayload.id = Number(user.id);
@@ -210,6 +219,15 @@ export const getAdminPayload = ({
     if (payloadTenantId) {
       userPayload.tenantId = payloadTenantId;
     }
+
+    const isSpiceExists = user?.roles?.some(
+      (role: { groupName: string }) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice
+    );
+    // if spice doesn't exists in user, then remove tenantId
+    if (!isSpiceExists) {
+      userPayload.tenantId = undefined;
+    }
+
     // add district only for HF, chiefdom, district except from summary page
     if ((isHFAdmin || isChiefdomAdmin || isDistrictAdmin) && user?.district && !isFromSummaryOrProfilePage) {
       userPayload.district = user?.district;
