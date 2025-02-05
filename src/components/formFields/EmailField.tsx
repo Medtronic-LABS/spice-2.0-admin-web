@@ -29,7 +29,8 @@ const EmailField = forwardRef(
       ignoreTenantId,
       isHF = false,
       isHFCreate = false,
-      isSiteUser = false
+      isSiteUser = false,
+      tenantId
     }: {
       isEdit: boolean | undefined;
       name: string;
@@ -46,6 +47,7 @@ const EmailField = forwardRef(
       isHF: boolean;
       isHFCreate: boolean;
       isSiteUser: boolean;
+      tenantId?: number | undefined;
     },
     ref
   ) => {
@@ -167,7 +169,8 @@ const EmailField = forwardRef(
           const emailFetchPayload = isCommunity
             ? {
                 email,
-                appTypes
+                appTypes,
+                tenantId
               }
             : {
                 appTypes,

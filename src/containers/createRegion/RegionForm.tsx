@@ -8,11 +8,8 @@ import {
   required,
   validateText,
   minLength,
-  validateCountryCode,
-  convertToCaptilize
+  validateCountryCode
 } from '../../utils/validation';
-import styles from '../workflow/WorkflowForm.module.scss';
-import Checkbox from '../../components/formFields/Checkbox';
 import { useDispatch } from 'react-redux';
 import { clearAppType, setAppType } from '../../store/user/actions';
 import localStorageServices from '../../global/localStorageServices';
@@ -31,8 +28,6 @@ const appTypes = [
 const RegionForm = (): React.ReactElement => {
   const form = useForm();
   const dispatch = useDispatch();
-  const appTypesError = required(form?.getState()?.values.region?.appTypes);
-  const appTypesTouched = form?.getState()?.touched?.['region.appTypes'];
 
   useEffect(() => {
     if (
@@ -55,6 +50,8 @@ const RegionForm = (): React.ReactElement => {
   useEffect(() => {
     dispatch(clearAppType());
     localStorageServices.deleteItem(APP_TYPE_NAME);
+    form.change(`region.appTypes`, [appTypes[0]._id]);
+    handleAppTypeClick();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -102,31 +99,6 @@ const RegionForm = (): React.ReactElement => {
             />
           )}
         />
-      </div>
-      <div className='col-12 col-md-6'>
-        <div className='mb-0dot5 input-field-label'>
-          App Type
-          <span className='input-asterisk'>*</span>
-        </div>
-        <div className='row'>
-          {appTypes.map((forms) => {
-            return (
-              <div key={forms.name} className='col-sm-6 col-12'>
-                <Field
-                  name={'region.appTypes'}
-                  key={forms.name}
-                  validate={composeValidators(required)}
-                  type='checkbox'
-                  value={forms._id}
-                  render={({ input }) => (
-                    <Checkbox label={convertToCaptilize(forms.name)} {...input} onClick={handleAppTypeClick} />
-                  )}
-                />
-              </div>
-            );
-          })}
-          {appTypesTouched && appTypesError && <p className={`${styles.error} ms-1`}>Please select an app type</p>}
-        </div>
       </div>
     </div>
   );

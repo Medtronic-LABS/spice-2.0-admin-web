@@ -5,11 +5,10 @@ import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
 import RegionFormIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
-import UserForm, { IUserFormValues } from '../../components/userForm/UserForm';
+import { IUserFormValues } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -18,7 +17,6 @@ import { createRegionRequest } from '../../store/region/actions';
 import { AppState } from '../../store/rootReducer';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import RegionForm from './RegionForm';
-import { getAdminPayload } from '../../utils/formatObjectUtils';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 
 export interface IRegionFormValues {
@@ -78,7 +76,7 @@ const CreateRegion: React.FC = () => {
       const data = {
         ...region,
         name: region.name?.trim(),
-        users: getAdminPayload({ userFormData: users, appTypes, isFromList: false })
+        users: []
       };
       dispatch(
         createRegionRequest({
@@ -118,20 +116,9 @@ const CreateRegion: React.FC = () => {
           return (
             <form onSubmit={handleSubmit}>
               <div className='row g-1dot25'>
-                <div className='col-lg-6 col-12'>
+                <div className='col-lg-12 col-12'>
                   <FormContainer label={`${regionSName} Details`} icon={RegionFormIcon}>
                     <RegionForm />
-                  </FormContainer>
-                </div>
-                <div className='col-lg-6 col-12'>
-                  <FormContainer label={`${regionSName} Admin`} icon={RegionAdminFormIcon}>
-                    <UserForm
-                      form={form}
-                      defaultSelectedRole={APPCONSTANTS.ROLES.REGION_ADMIN}
-                      enableAutoPopulate={true}
-                      appTypes={appTypes}
-                      userFormParams={{ isRegionCreate: true, isAdminForm: true }}
-                    />
                   </FormContainer>
                 </div>
               </div>

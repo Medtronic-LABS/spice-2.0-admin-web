@@ -110,8 +110,9 @@ const SelectInput = ({
   // To auto select if only 1 option is available
   useEffect(() => {
     if (options && options.length === 1 && name && (required || isMandatoryAutoPopulate) && autoSelect) {
+      const value = isMulti ? (autoSelectValue ? [autoSelectValue] : [options[0]]) : autoSelectValue || options[0];
       setTimeout(() => {
-        change(name, autoSelectValue || options[0]);
+        change(name, value);
       }, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

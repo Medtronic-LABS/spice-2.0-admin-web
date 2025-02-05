@@ -49,7 +49,7 @@ export interface IRegionPayload {
   name: string;
   countryCode: string;
   appTypes: string[];
-  users: Array<{
+  users?: Array<{
     firstName: string;
     lastName: string;
     username: string;
