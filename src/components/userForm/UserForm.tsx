@@ -1514,6 +1514,7 @@ const UserForm = ({
                         ? form.getState()?.values?.users?.[0]?.healthfacility?.tenantId
                         : ignoreTenantId
                     }
+                    tenantId={tenantId ? Number(tenantId) : undefined}
                   />
                 </div>
                 <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-8' : 'col-12'} `}>
