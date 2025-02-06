@@ -80,8 +80,6 @@ values that are specific to your environment.***
 
 ## .env description
 
-`REACT_APP_VERSION`: This variable could be used to specify the current version of the application.
-
 `REACT_APP_BASE_URL`: This variable could be used to specify the base URL of the API that the application is consuming.
 
 `REACT_APP_PASSWORD_HASH_KEY`: This variable could be used to store the password hash key that is used to hash passwords.
