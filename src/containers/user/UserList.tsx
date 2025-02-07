@@ -695,11 +695,10 @@ const UserList = (): React.ReactElement => {
     const isCHW = data?.roles?.some((ischwRole: { name: string }) => ischwRole.name === 'CHW');
     const isPeerSupervisor = getPeerSupervisorRoleId(data);
     const isDeactivatingPeerSupervisor = data.active && isPeerSupervisor;
-    const isChwActivate = isCHW && !data.active;
-    if (isCHW && data.active) {
-      handleSync(data);
-    } else if (isChwActivate || isDeactivatingPeerSupervisor) {
+    if (!!isDeactivatingPeerSupervisor) {
       getCHWList(data);
+    } else if (isCHW && data.active) {
+      handleSync(data);
     } else {
       handleActivateClick(data, [], null);
     }
@@ -781,12 +780,10 @@ const UserList = (): React.ReactElement => {
           submit: 'Yes'
         }
       };
-      const deactivationMessage =
-        isCHW && data.active
-          ? MESSAGES.OFFLINE_SYNC_MESSAGE
-          : isDeactivatingPeerSupervisor
-          ? MESSAGES.PEER_SUPERVISOR_DEACTIVATION
-          : MESSAGES.STANDARD_CONFIRMATION(data.active);
+
+      const deactivationMessage = isDeactivatingPeerSupervisor
+        ? MESSAGES.PEER_SUPERVISOR_DEACTIVATION
+        : MESSAGES.STANDARD_CONFIRMATION(data.active);
 
       const { cancel: cancelText, submit: submitText } = isDeactivatingPeerSupervisor
         ? BUTTON_TEXT.PEER_SUPERVISOR
@@ -997,7 +994,6 @@ const UserList = (): React.ReactElement => {
               hideCustomIcon: (rowData: any) => rowData.username === email || !rowData.active,
               hideActiveToggle: (rowData: any) => rowData.username === email
             }}
-            // onActivateClick={(rowData: any) => getCHWList(rowData)}
             onActivateClick={(rowData: any) => handleActivateToggle(rowData)}
             handleCustomIconClicked={handleReassignSubmit}
           />
