@@ -1,0 +1,20 @@
+.mapcontainer {
+  max-width: 100%;
+  .leaflet-container {
+    border-radius: 5px;
+    width: 100% !important;
+    // margin: 0;
+  }
+}
+
+.closeIcon {
+  float: right;
+  position: relative;
+  right: 8px;
+  margin: 1px -0.5rem 0px 0.5rem !important;
+  cursor: pointer;
+  border: 1px solid var(--black-45);
+  border-radius: 5px;
+  padding: 0rem 0.3rem !important;
+  font-size: 11px;
+}

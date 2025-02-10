@@ -7,6 +7,7 @@ import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import SelectInput from '../../components/formFields/SelectInput';
 import TextInput from '../../components/formFields/TextInput';
+import MapWrapper from '../../components/map/MapContainer';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -45,6 +46,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { ICity, IObjectData, IVillages } from '../../store/healthFacility/types';
 import { countryIdSelector } from '../../store/user/selectors';
+import { filterByAppTypes } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   composeValidators,
@@ -58,7 +60,7 @@ import {
   validateName
 } from '../../utils/validation';
 import Workflows from '../healthFacility/Workflows';
-import { filterByAppTypes } from '../../utils/commonUtils';
+import './HealthFacilityDetails.scss';
 
 interface IAddUserFormProps {
   formName: string;
@@ -333,6 +335,43 @@ const HealthFacilityDetailsForm = ({
     [fetchCityList]
   );
 
+  // map
+  const { latitude = '', longitude = '' } = form.getState().values[formName];
+  const [position, setPosition] = useState<{
+    latitude: number | any;
+    longitude: number | any;
+  }>({
+    latitude,
+    longitude
+  });
+
+  // Temporary state for inputs
+  const [tempPosition, setTempPosition] = useState({
+    latitude: position.latitude,
+    longitude: position.longitude
+  });
+
+  const tempPositionState = { tempPosition, setTempPosition };
+  const positionState = { position, setPosition };
+  const [showMap, setShowMap] = useState(!!latitude && !!longitude);
+
+  const handleSubmit = (lat?: string, long?: string) => {
+    // Update the main position state
+    if (tempPosition.latitude !== '' && tempPosition.longitude !== '') {
+      setPosition({
+        latitude: parseFloat(tempPosition.latitude || lat),
+        longitude: parseFloat(tempPosition.longitude || long)
+      });
+    }
+  };
+
+  const labelRender = () => (
+    <label className={`closeIcon`} onClick={() => setShowMap(!showMap)}>
+      {/* <Close aria-label='close' /> */}
+      {showMap ? 'Hide' : 'Show'} Map
+    </label>
+  );
+
   return (
     <>
       {isNextClicked ? (
@@ -526,38 +565,7 @@ const HealthFacilityDetailsForm = ({
               )}
             />
           </div>
-          <div className={columnStyle}>
-            <Field
-              name={`${formName}.latitude`}
-              type='text'
-              validate={composeValidators(required, validateLatitude)}
-              parse={normalizeFloatingNumber}
-              render={({ input, meta }) => (
-                <TextInput
-                  {...input}
-                  label='Latitude'
-                  errorLabel='latitude'
-                  error={(meta.touched && meta.error) || undefined}
-                />
-              )}
-            />
-          </div>
-          <div className={columnStyle}>
-            <Field
-              name={`${formName}.longitude`}
-              type='text'
-              validate={composeValidators(required, validateLongitude)}
-              parse={normalizeFloatingNumber}
-              render={({ input, meta }) => (
-                <TextInput
-                  {...input}
-                  label='Longitude'
-                  errorLabel='longitude'
-                  error={(meta.touched && meta.error) || undefined}
-                />
-              )}
-            />
-          </div>
+
           <div className={columnStyle}>
             <Field
               name={`${formName}.postalCode`}
@@ -659,6 +667,70 @@ const HealthFacilityDetailsForm = ({
               }}
             />
           </div>
+          <span className='col-12 d-lg-none' />
+          <div className={'col-12 col-md-6 col-lg-3 align-self-start'}>
+            <Field
+              name={`${formName}.latitude`}
+              type='text'
+              validate={composeValidators(required, validateLatitude)}
+              parse={normalizeFloatingNumber}
+              render={({ input, meta }) => (
+                <TextInput
+                  {...input}
+                  label='Latitude'
+                  errorLabel='latitude'
+                  value={tempPosition.latitude}
+                  error={(meta.touched && meta.error) || undefined}
+                  onChange={(e) => {
+                    setShowMap(!!tempPosition.longitude && !!e.target.value && !validateLatitude(e.target.value));
+                    setTempPosition({ ...tempPosition, latitude: e.target.value });
+                    input.onChange(e);
+                  }}
+                  onBlur={(e) => {
+                    setShowMap(!!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value));
+                    setTempPosition({ ...tempPosition, latitude: e.target.value });
+                    handleSubmit(e.target.value, tempPosition.longitude);
+                    input.onBlur(e);
+                  }}
+                  labelRender={labelRender}
+                />
+              )}
+            />
+          </div>
+          <div className={'col-12 col-md-6 col-lg-3 align-self-start'}>
+            <Field
+              name={`${formName}.longitude`}
+              type='text'
+              validate={composeValidators(required, validateLongitude)}
+              parse={normalizeFloatingNumber}
+              render={({ input, meta }) => (
+                <TextInput
+                  {...input}
+                  label='Longitude'
+                  errorLabel='longitude'
+                  value={tempPosition.longitude}
+                  error={(meta.touched && meta.error) || undefined}
+                  onChange={(e) => {
+                    setShowMap(!!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value));
+                    setTempPosition({ ...tempPosition, longitude: e.target.value });
+                    input.onChange(e);
+                  }}
+                  onBlur={(e) => {
+                    setShowMap(!!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value));
+                    setTempPosition({ ...tempPosition, longitude: e.target.value });
+                    handleSubmit(tempPosition.latitude, e.target.value);
+                    input.onBlur(e);
+                  }}
+                  labelRender={labelRender}
+                />
+              )}
+            />
+          </div>
+          {showMap && (
+            <div className={'mapcontainer col-12 '}>
+              <MapWrapper positionState={positionState} tempPositionState={tempPositionState} />
+            </div>
+          )}
         </div>
       )}
     </>

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { convertToCaptilize, convertToLowerCase } from '../../utils/validation';
-import styles from './TextInput.module.scss';
 import CustomTooltip from '../tooltip';
+import styles from './TextInput.module.scss';
 
 interface ITextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -15,6 +15,8 @@ interface ITextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   capitalize?: boolean;
   lowerCase?: boolean;
   onlyAsterisk?: boolean;
+  labelRender?: (ref?: HTMLDivElement | null) => React.ReactElement;
+  children?: React.ReactElement;
 }
 
 const TextInput = ({
@@ -30,6 +32,8 @@ const TextInput = ({
   removeErrorContainer = false,
   capitalize = false,
   lowerCase = false,
+  labelRender,
+  children,
   ...props
 }: ITextInputProps) => {
   const InputElement = (
@@ -51,14 +55,16 @@ const TextInput = ({
       aria-label={props.name}
     />
   );
+  const ref = useRef<HTMLDivElement>(null);
   return (
-    <div className={`${styles.textInput} ${error ? styles.danger : ''}`} data-testid='text-input'>
+    <div ref={ref} className={`${styles.textInput} ${error ? styles.danger : ''}`} data-testid='text-input'>
       {isShowLabel && (
         <>
           <label htmlFor={props.name}>
             {label}
             {(required || onlyAsterisk) && <span className='input-asterisk'>*</span>}
           </label>
+          {labelRender ? labelRender(ref.current) : children}
           <br />
         </>
       )}
