@@ -12,9 +12,6 @@ import {
   IChangePasswordReq,
   IChangeOwnPasswordReq,
   IChangeOwnPasswordSuccess,
-  IChangePasswordFail,
-  IChangePasswordReq,
-  IChangePasswordSuccess,
   ICreatePasswordFail,
   ICreatePasswordReq,
   ICreatePasswordSuccess,
@@ -36,11 +33,6 @@ import {
   IFetchUserByEmail,
   IFetchUserByEmailFail,
   IFetchUserByEmailSuccess,
-  IFetchUserByIdFailure,
-  IFetchUserByIdRequest,
-  IFetchUserByIdSuccess,
-  IFetchUserRolesRequest,
-  IFetchUserRolesSuccess,
   IForgotPasswordFailure,
   IForgotPasswordReq,
   IForgotPasswordSuccess,
@@ -76,8 +68,6 @@ import {
   IUpdateTermsConditionsFailure,
   IUpdateTermsConditionsRequest,
   IUpdateTermsConditionsSuccess,
-  IUpdateUserFailure,
-  IUpdateUserSuccess,
   IUser
 } from './types';
 

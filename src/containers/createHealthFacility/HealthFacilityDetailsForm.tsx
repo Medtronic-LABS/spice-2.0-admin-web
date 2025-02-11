@@ -582,7 +582,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='language'
                   labelKey='name'
                   valueKey='id'
-                  disabled={true}
+                  disabled={isCommunity}
                   options={filterByAppTypes(languages, appTypes)}
                   loadingOptions={languageLoading}
                   error={(meta.touched && meta.error) || undefined}
@@ -669,17 +669,21 @@ const HealthFacilityDetailsForm = ({
                   value={tempPosition.latitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
-                    setShowMap(!!tempPosition.longitude && !!e.target.value && !validateLatitude(e.target.value));
+                    setShowMap(
+                      isCommunity && !!tempPosition.longitude && !!e.target.value && !validateLatitude(e.target.value)
+                    );
                     setTempPosition({ ...tempPosition, latitude: e.target.value });
                     input.onChange(e);
                   }}
                   onBlur={(e) => {
-                    setShowMap(!!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value));
+                    setShowMap(
+                      isCommunity && !!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value)
+                    );
                     setTempPosition({ ...tempPosition, latitude: e.target.value });
                     handleSubmit(e.target.value, tempPosition.longitude);
                     input.onBlur(e);
                   }}
-                  labelRender={labelRender}
+                  labelRender={isCommunity ? labelRender : undefined}
                 />
               )}
             />
@@ -698,17 +702,21 @@ const HealthFacilityDetailsForm = ({
                   value={tempPosition.longitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
-                    setShowMap(!!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value));
+                    setShowMap(
+                      isCommunity && !!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value)
+                    );
                     setTempPosition({ ...tempPosition, longitude: e.target.value });
                     input.onChange(e);
                   }}
                   onBlur={(e) => {
-                    setShowMap(!!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value));
+                    setShowMap(
+                      isCommunity && !!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value)
+                    );
                     setTempPosition({ ...tempPosition, longitude: e.target.value });
                     handleSubmit(tempPosition.latitude, e.target.value);
                     input.onBlur(e);
                   }}
-                  labelRender={labelRender}
+                  labelRender={isCommunity ? labelRender : undefined}
                 />
               )}
             />

@@ -19,22 +19,19 @@ import {
   fetchHFListRequest,
   fetchHFSummaryRequest,
   fetchHFTypesRequest,
-  fetchHFTypesRequest,
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
   updateHFStatusRequest,
-  updateHFStatusRequest,
   validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
-import { fetchDistrictsByCountryIdRequest } from '../../store/district/actions';
-import { fetchDistrictsByCountryIdRequest } from '../../store/district/actions';
+import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
 import {
   healthFacilityListSelector,
   healthFacilityListTotalSelector,
   healthFacilityLoadingSelector,
   hfTypesSelector
 } from '../../store/healthFacility/selectors';
-import { getAllDistrictListSelector } from '../../store/district/selectors';
+import { getDistrictListSelector } from '../../store/district/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { roleSelector } from '../../store/user/selectors';
 import { formatHealthFacility } from '../../utils/formatObjectUtils';
@@ -76,11 +73,13 @@ const HealthFacilityList = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
   const hfTypesList = useSelector(hfTypesSelector);
-  const districtList = useSelector(getAllDistrictListSelector);
+  // const districtList = useSelector(getAllDistrictListSelector);
+  const districtList = useSelector(getDistrictListSelector);
   const chiefdomList = useSelector(getAllChiefdomsSelector);
   const countryId = useCountryId();
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const {
+    isCommunity,
     appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
@@ -141,14 +140,16 @@ const HealthFacilityList = (): React.ReactElement => {
     setFilters({ ...filters, chiefdomIds: [] });
     if (!districtList.length) {
       dispatch(
-        fetchDistrictsByCountryIdRequest({
-          data: { countryId },
+        fetchDistrictListRequest({
+          countryId,
+          tenantId,
+          isActive: true,
           failureCb: (e) =>
             toastCenter.error(
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
-                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, chiefdomSName)
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
               )
             )
         })
@@ -179,6 +180,7 @@ const HealthFacilityList = (): React.ReactElement => {
   useEffect(() => {
     return () => {
       dispatch(clearHFList());
+      dispatch(clearDistrictList());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -432,7 +434,10 @@ const HealthFacilityList = (): React.ReactElement => {
         id: openConfirmationModal.userData.id,
         tenantId: Number(openConfirmationModal.userData.tenantId),
         successCb: (newdata: any) => {
-          toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_SUCCESS);
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_SUCCESS, healthFacilitySName)
+          );
           fetchList({});
           setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility });
         },
@@ -470,23 +475,23 @@ const HealthFacilityList = (): React.ReactElement => {
             },
             {
               id: 2,
-              name: 'District',
+              name: districtSName,
               key: 'districtIds',
               isFacility: false,
               isGeneric: true,
               isSearchable: true,
-              placeholder: 'Search District',
+              placeholder: `Search ${districtSName}`,
               data: districtList,
               isShow: true
             },
             {
               id: 3,
-              name: 'Chiefdom',
+              name: chiefdomSName,
               key: 'chiefdomIds',
               isFacility: false,
               isGeneric: true,
               isSearchable: true,
-              placeholder: 'Search Chiefdom',
+              placeholder: `Search ${chiefdomSName}`,
               data: chiefdomList,
               isShow: true
             }
@@ -535,7 +540,7 @@ const HealthFacilityList = (): React.ReactElement => {
               healthFacilitySName
             )}
             deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE, healthFacilitySName)}
-            isActiveToggle={true}
+            isActiveToggle={isCommunity}
             customIconStyle={{ width: 18 }}
             isActiveKey='active'
             onActivateClick={(rowData: any) => {
@@ -563,7 +568,10 @@ const HealthFacilityList = (): React.ReactElement => {
         submitText='Submit'
         handleCancel={() => setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility })}
         handleSubmit={handleHFChangeStatusSubmit}
-        confirmationMessage={APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_CONFIRMATION}
+        confirmationMessage={formatUserToastMsg(
+          APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_CONFIRMATION,
+          healthFacilitySName
+        )}
         popupSize='modal-md'
       />
     </>

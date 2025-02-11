@@ -101,7 +101,8 @@ const MedicationForm = ({
   const {
     medication: {
       categories: { available: isCategories }
-    }
+    },
+    isCommunity
   } = useAppTypeConfigs();
 
   const initialValue = useMemo<Array<Partial<IMedicationDataFormValues>>>(
@@ -372,7 +373,7 @@ const MedicationForm = ({
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label='SNOMED Code'
+              label={`${isCommunity ? 'SNOMED' : ''} Code`}
               errorLabel='code'
               error={(meta.touched && meta.error) || undefined}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -404,7 +405,7 @@ const MedicationForm = ({
           render={({ input, meta }) => (
             <TextInput
               {...input}
-              label='SNOMED URL'
+              label={`${isCommunity ? 'SNOMED' : ''} URL`}
               errorLabel='url'
               error={(meta.touched && meta.error) || undefined}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

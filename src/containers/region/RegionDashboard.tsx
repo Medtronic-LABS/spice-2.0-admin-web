@@ -189,7 +189,7 @@ const Region = (): React.ReactElement => {
           displayValues
         }: any) => {
           const {
-            healthFacility: { s: healthFacilitySName = 'Health facility' } = {},
+            healthFacility: { s: healthFacilitySName = 'Health Facility' } = {},
             district: { s: ncDistrictName = 'County' } = {},
             chiefdom: { s: ncChiefdomName = 'Sub County' } = {}
           } = displayValues || {};

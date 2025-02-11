@@ -3,6 +3,7 @@ import { Field } from 'react-final-form';
 import TextInput from '../../components/formFields/TextInput';
 import { composeValidators, containsOnlyLettersAndNumbers, minLength, required } from '../../utils/validation';
 import { FormApi } from 'final-form';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 /**
  * Interface for LabtestModalForm props
@@ -20,6 +21,7 @@ interface ILabtestModalFormProps {
  * @returns {React.ReactElement} The rendered form fields
  */
 const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): React.ReactElement => {
+  const { isCommunity } = useAppTypeConfigs();
   return (
     <>
       <div className='row gx-1dot25'>
@@ -49,7 +51,7 @@ const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): Rea
             render={({ input, meta }) => (
               <TextInput
                 {...input}
-                label='SNOMED Code'
+                label={`${isCommunity ? 'SNOMED ' : ''}Code`}
                 errorLabel='code'
                 error={(meta.touched && meta.error) || undefined}
               />
@@ -65,7 +67,7 @@ const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): Rea
             render={({ input, meta }) => (
               <TextInput
                 {...input}
-                label='SNOMED URL'
+                label={`${isCommunity ? 'SNOMED ' : ''} URL`}
                 errorLabel='url'
                 error={(meta.touched && meta.error) || undefined}
               />

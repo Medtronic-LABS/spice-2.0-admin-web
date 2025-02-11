@@ -14,8 +14,6 @@ import {
   IFetchTermsConditionsRequest,
   IUpdateTermsConditionsRequest,
   IFetchCHWListRequest
-  IUpdateTermsConditionsRequest,
-  IFetchCHWListRequest
 } from './types';
 import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';

@@ -52,7 +52,6 @@ interface IFilteredData {
   isShow: boolean;
   filterCount?: number;
   placeholder?: string;
-  placeholder?: string;
 }
 
 /**
@@ -107,9 +106,9 @@ const DetailCard = ({
    * @param filteredData - Data for the filter component.
    * @returns React.ReactElement | null
    */
-  const renderFilter = (isFacility: boolean, filteredData: IFilteredData, isGeneric: boolean = false) => {
+  const renderFilter = (isFacility: boolean, filteredData: IFilteredData, isGeneric: boolean = false, id: number) => {
     return isFilter ? (
-      <div className='d-flex mt-auto'>
+      <div className='d-flex mt-auto' key={id}>
         <Filter
           filterData={filteredData}
           isFacility={isFacility}
@@ -164,7 +163,7 @@ const DetailCard = ({
           {renderSearchBar()}
 
           {onFilterData?.map(
-            (data: IFilteredData) => data.data && renderFilter(data.isFacility, data, data?.isGeneric)
+            (data: IFilteredData) => data.data && renderFilter(data.isFacility, data, data?.isGeneric, data.id)
           )}
           <div className='d-flex'>
             {renderCustomIcon()}

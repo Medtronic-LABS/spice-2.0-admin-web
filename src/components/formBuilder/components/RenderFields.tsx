@@ -17,6 +17,7 @@ import { unitsSelector } from '../../../store/labTest/selectors';
 import { useSelector } from 'react-redux';
 import TextInputArray from './fieldUI/TextInputArray';
 import Questionnaire from './fieldUI/Questionnaire';
+import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
 
 interface IMatchParams {
   form: string;
@@ -103,6 +104,7 @@ interface IComponentProps {
   urlRef?: React.MutableRefObject<string>;
   input?: any;
   isCustomizationForm?: boolean;
+  isCommunity?: boolean;
 }
 
 /**
@@ -334,7 +336,8 @@ export const TextFieldComponent = ({
   hashFieldIdsWithFieldName,
   hashFieldIdsWithTitle,
   isFieldNameChangable,
-  isCustomizationForm
+  isCustomizationForm,
+  isCommunity = false
 }: IComponentProps) => {
   /**
    * Parse function for the text field
@@ -464,6 +467,9 @@ export const TextFieldComponent = ({
   if (fieldName === 'fieldName') {
     capitalize = true;
   }
+  if (!isCommunity && (fieldName === 'code' || fieldName === 'url')) {
+    inputProps.label = inputProps?.label?.replace('SNOMED', '');
+  }
   if (inputProps?.type === 'number' && obj.inputType !== InputTypes.DECIMAL) {
     parseFn = (value: any) => (value !== '' ? parseInt(value, 10) : value);
   }
@@ -549,6 +555,7 @@ const RenderFields = ({
   const codeRef = useRef('');
   const urlRef = useRef('');
   const { form: formType } = useParams<IMatchParams>();
+  const { isCommunity } = useAppTypeConfigs();
   // Toggle text field component to select component on disable mode
   inputProps = {
     ...inputProps,
@@ -744,6 +751,7 @@ const RenderFields = ({
           urlRef={urlRef}
           input={input}
           isCustomizationForm={isCustomizationForm}
+          isCommunity={isCommunity}
         />
       );
     }

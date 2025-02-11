@@ -2,7 +2,6 @@ import { createSelector } from 'reselect';
 
 import { AppState } from '../rootReducer';
 import { IUserState } from './types';
-import { IUserState } from './types';
 
 const getIsLoggedIn = (state: AppState) => state.user.isLoggedIn;
 const getIsLoggingIn = (state: AppState) => state.user.loggingIn;

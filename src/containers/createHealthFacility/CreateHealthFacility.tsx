@@ -161,7 +161,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     });
     formInstance.current.change('healthFacility', {});
     onGotoList();
-  }, [PAGENUMBER.DETAILS, dispatch, onGotoList, submittedData]);
+  }, [PAGENUMBER.DETAILS, dispatch, healthFacilitySName, onGotoList, submittedData]);
 
   const onCreateFailure = useCallback(
     (e: Error) => {

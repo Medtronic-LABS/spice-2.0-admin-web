@@ -3,7 +3,6 @@ import { ReactComponent as FilterListIcon } from '../../assets/images/filter-ico
 import styles from './Filter.module.scss';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
-import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IFilteredData {
   isShow: any;
@@ -269,11 +268,9 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   /**
    * Filters options based on the search term.
    */
-  const filteredOptions = filterData?.data
-    .filter((option) => {
-      return option?.name?.toLowerCase().includes(searchTerm?.toLowerCase());
-    })
-    .sort((a: any, b: any) => (a.name.trim() > b.name.trim() ? 1 : -1));
+  const filteredOptions = filterData?.data.filter((option) => {
+    return option?.name?.toLowerCase().includes(searchTerm?.toLowerCase());
+  });
   /**
    * Formats health facility data into a string.
    * @param {IHFUserGet} user - The health facility user data.
@@ -307,60 +304,64 @@ const TableFilter: React.FC<ITableFilterProps> = ({
             <div className={`text-secondary ${styles.arrow} ${isOpen ? styles.open : ''}`} />
           </div>
           {isOpen && (
-            <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded p-0dot5`}>
+            <div ref={dropdownRef} className={`${styles.selectDropdown} border rounded`}>
               {filterData.isSearchable && (
-                <input
-                  type='text'
-                  placeholder={placeholder ?? 'Search Facility'}
-                  className='form-control mb-1'
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                />
+                <div className={`${styles.searchContainer}`}>
+                  <input
+                    type='text'
+                    placeholder={placeholder}
+                    className='form-control'
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                  />
+                </div>
               )}
               {
                 <ul className='list-unstyled mb-0'>
-                  {[...(selectAllOption ? [selectAllOption] : []), ...(filteredOptions || [undefined])].map((option) =>
-                    filteredOptions.length ? (
-                      <li
-                        key={option.id}
-                        className={`${styles.selectOption} ${
-                          option.value === '*' ? styles.selectAllLi : ''
-                        } px-1 py-0dot5 d-flex ${selectedOptionsIds.includes(option.id) && styles.selectedDropdown}`}
-                      >
-                        <label className='d-flex align-items-center fs-6'>
-                          <input
-                            type='checkbox'
-                            value={option.id}
-                            checked={selectedOptionsIds.includes(option.id)}
-                            onChange={() => handleSelectChange(option)}
-                            ref={(input) => {
-                              if (input) {
-                                input.indeterminate =
-                                  option.value === '*' &&
-                                  !!selectedOptions.length &&
-                                  selectedOptions.length < filteredOptions.length;
-                              }
-                            }}
-                            className='mr-2'
-                          />
-                          {(!isFacility ? option.displayName : option.name) || option.name}{' '}
-                          {formatHealthFacility(option)}
-                        </label>
-                        {option.value === '*' && !!selectedOptions.length && (
-                          <label
-                            className={` ${styles.closeIcon}`}
-                            onClick={() => {
-                              isAllSelected.current = true;
-                              handleSelectChange(selectAllOptionData as any);
-                            }}
-                          >
-                            {/* <Close aria-label='close' /> */}
-                            Reset
+                  {filteredOptions?.length ? (
+                    [...(selectAllOption ? [selectAllOption] : []), ...(filteredOptions || [undefined])].map(
+                      (option) => (
+                        <li
+                          key={option.id}
+                          className={`${styles.selectOption} ${
+                            option.value === '*' ? styles.selectAllLi : ''
+                          } px-1 py-0dot5 d-flex ${selectedOptionsIds.includes(option.id) && styles.selectedDropdown}`}
+                        >
+                          <label className='d-flex align-items-center fs-6'>
+                            <input
+                              type='checkbox'
+                              value={option.id}
+                              checked={selectedOptionsIds.includes(option.id)}
+                              onChange={() => handleSelectChange(option)}
+                              ref={(input) => {
+                                if (input) {
+                                  input.indeterminate =
+                                    option.value === '*' &&
+                                    !!selectedOptions.length &&
+                                    selectedOptions.length < filteredOptions.length;
+                                }
+                              }}
+                              className='mr-2'
+                            />
+                            {(!isFacility ? option.displayName : option.name) || option.name}{' '}
+                            {formatHealthFacility(option)}
                           </label>
-                        )}
-                      </li>
-                    ) : (
-                      <li>No results found</li>
+                          {option.value === '*' && !!selectedOptions.length && (
+                            <label
+                              className={`${styles.closeIcon}`}
+                              onClick={() => {
+                                isAllSelected.current = true;
+                                handleSelectChange(selectAllOptionData as any);
+                              }}
+                            >
+                              {/* <Close aria-label="close" /> */}
+                              Reset
+                            </label>
+                          )}
+                        </li>
+                      )
                     )
+                  ) : (
+                    <li className={`${styles.noResults}`}>No results found</li>
                   )}
                 </ul>
               }

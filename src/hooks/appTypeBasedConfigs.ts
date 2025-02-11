@@ -68,7 +68,7 @@ const NON_COMMUNITY = {
   },
   userList: { filters: { available: true } },
   medication: { categories: { available: true } },
-  filterComponent: { filterIcon: { available: false } }
+  filterComponent: { filterIcon: { available: true } }
 };
 
 const noAppTypes = {

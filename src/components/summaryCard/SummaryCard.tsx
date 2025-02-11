@@ -133,6 +133,7 @@ const SummaryCard = ({
             className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
             data-testid='summary-elements'
             key={i}
+            style={linkStyle}
           >
             <div className='primary-title lh-1dot375'>{value}</div>
             <div className={`subtle-small-text ${disableEllipsis ? '' : 'text-ellipsis'}`}>{label}</div>

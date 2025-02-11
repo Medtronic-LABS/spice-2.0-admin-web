@@ -1,9 +1,7 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useParams } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
@@ -11,8 +9,6 @@ import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
-import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
-import APPCONSTANTS from '../../constants/appConstants';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
 import { villageBasedRoles } from '../../constants/roleConstants';
@@ -30,7 +26,6 @@ import {
   fetchHFListRequest,
   fetchHFUserListRequest,
   fetchPeerSupervisorListRequest,
-  fetchPeerSupervisorListRequest,
   fetchUserDetailRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
@@ -41,7 +36,8 @@ import {
   healthFacilityUserListSelector,
   peerSupervisorListSelector,
   userDetailLoadingSelector,
-  healthFacilityUsersLoadingSelector
+  healthFacilityUsersLoadingSelector,
+  peerSupervisorLoadingSelector
 } from '../../store/healthFacility/selectors';
 import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
 import {
@@ -65,7 +61,7 @@ import { getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { chwColumnDef, columnDef } from './userListMeta';
-import { filterByAppTypes, filterHFByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
+import { filterHFByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 import Radio from '../../components/formFields/Radio';
 import { Field } from 'react-final-form';
 import './UserList.scss';
@@ -129,6 +125,7 @@ const UserList = (): React.ReactElement => {
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const chwList = useSelector(chwListSelector);
+  const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
   const [selectedFacility, setSelectedFacility] = useState<string[]>();
@@ -140,6 +137,11 @@ const UserList = (): React.ReactElement => {
     isEdit: false,
     isSupervisor: false
   });
+
+  const { pathname } = useLocation();
+  const currentModule: ModuleNames = pathname.split('/')[1];
+
+  const [allRoles, setAllRoles] = useState([] as IRoles[]);
 
   // State management for user activation/deactivation
   const [openConfirmationModal, setOpenConfirmationModal] = useState<{
@@ -162,7 +164,8 @@ const UserList = (): React.ReactElement => {
     userList: {
       filters: { available: showFilters }
     },
-    healthFacility: { s: healthFacilitySname, p: healthFacilityPname }
+    healthFacility: { s: healthFacilitySname, p: healthFacilityPname },
+    isCommunity
   } = useAppTypeConfigs();
   /**
    * useCallback hook to refresh the user list.
@@ -524,7 +527,7 @@ const UserList = (): React.ReactElement => {
   const userPasswordChangeUI = () => {
     return (
       <>
-        {!appTypes.includes('NON_COMMUNITY') && (
+        {isCommunity && (
           <div className='col-12'>
             <Field
               name='userPreference.passwordChange'
@@ -547,11 +550,7 @@ const UserList = (): React.ReactElement => {
             />
           </div>
         )}
-        <div
-          className={`password-fields-wrapper ${
-            selectedOption === CHANGE_PASSWORD || appTypes.includes('NON_COMMUNITY') ? 'show' : ''
-          }`}
-        >
+        <div className={`password-fields-wrapper ${selectedOption === CHANGE_PASSWORD || !isCommunity ? 'show' : ''}`}>
           <ResetPasswordFields
             email={openModal.userData.username}
             setSubmitEnabled={setSubmitEnabled}
@@ -584,7 +583,7 @@ const UserList = (): React.ReactElement => {
   }) => {
     setChangePasswordLoading(true);
 
-    if (formValues.userPreference.passwordChange === CHANGE_PASSWORD) {
+    if (formValues?.userPreference?.passwordChange === CHANGE_PASSWORD || !isCommunity) {
       if (!formValues.newPassword) {
         setChangePasswordLoading(false);
         return;
@@ -656,30 +655,13 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { pathname } = useLocation();
-  const currentModule: ModuleNames = pathname.split('/')[1];
-
-  const [allRoles, setAllRoles] = useState([] as IRoles[]);
-  /**
-   * Memoized value to filter REPORTS user roles based on certain conditions for filter dropdown
-   */
-  const roleCFRList = useMemo(() => {
-    return filterByAppTypes(rolesGrouped?.REPORTS || [], appTypes);
-  }, [appTypes, rolesGrouped?.REPORTS]);
-
-  /**
-   * Memoized value to filter INSIGHTS user roles based on certain conditions for filter dropdown
-   */
-  const roleInsightsList = useMemo(() => {
-    return filterByAppTypes(rolesGrouped?.INSIGHTS || [], appTypes);
-  }, [appTypes, rolesGrouped?.INSIGHTS]);
-
   /**
    * Icon Handler for edit, password reset and delete
    * Don't show icons if user has admin roles in it
    * Don't show icon for logged in user
    */
-  const handleIconHandler = (rowData: { username: string }) => rowData.username === email;
+  const handleIconHandler = ({ username, active }: { username: string; active: boolean }) =>
+    username === email || (isCommunity && !active);
 
   /**
    * Calls Hook to get SPICE, REPORTS and INSIGHTS user roles based on certain conditions for filter dropdown
@@ -805,8 +787,7 @@ const UserList = (): React.ReactElement => {
       const isChwActivate = isCHW && !data.active;
       const peerSupervisorRoleId = getPeerSupervisorRoleId(data);
       const isPeerSupervisor = Boolean(peerSupervisorRoleId); // will be true if role ID is found
-      const parentOrganizationId: number = getParentOrganizationId(data);
-      fetchSupervisorList([parentOrganizationId], 0);
+
       const isDeactivatingPeerSupervisor = data.active && isPeerSupervisor && CHWData.length;
       const MESSAGES = {
         PEER_SUPERVISOR_DEACTIVATION: APPCONSTANTS.PEER_SUPERVISOR_DEACTIVATION,
@@ -854,7 +835,11 @@ const UserList = (): React.ReactElement => {
         onConfirm: () => {
           if (isDeactivatingPeerSupervisor) {
             handleReassignClick(data);
-            setOpenConfirmationModal({ isOpen: false, userData: data });
+            if (!peerSupervisorList.list.length) {
+              const parentOrganizationId: number = getParentOrganizationId(data);
+              fetchSupervisorList([parentOrganizationId], 0);
+            }
+            // setOpenConfirmationModal({ isOpen: false, userData: data });
           } else if (isChwActivate) {
             setOpenConfirmationModal({ isOpen: false, userData: data });
             setIsOpenCHWUserModal({ isOpen: true, isEdit: true });
@@ -981,7 +966,11 @@ const UserList = (): React.ReactElement => {
 
   return (
     <>
-      {(hfUserDetailLoading || loading || changePasswordLoading || healthFacilityUserListLoading) && <Loader />}
+      {(hfUserDetailLoading ||
+        loading ||
+        changePasswordLoading ||
+        healthFacilityUserListLoading ||
+        peerSupervisorLoading) && <Loader />}
       <div className='col-12'>
         <DetailCard
           buttonLabel='Add User'
@@ -1002,10 +991,13 @@ const UserList = (): React.ReactElement => {
           onFilterData={[
             {
               id: 1,
-              name: 'Filter by Facility',
+              name: `Filter by ${healthFacilitySname}`,
+              placeholder: `Search ${healthFacilitySname}`,
               isFacility: true,
               isSearchable: true,
-              data: filterHFByAppTypes(appTypes, healthFacilityList),
+              data: filterHFByAppTypes(appTypes, healthFacilityList)?.sort((a: any, b: any) =>
+                a.name.localeCompare(b.name)
+              ),
               isShow: role !== HEALTH_FACILITY_ADMIN,
               filterCount: selectedFacility?.length
             },
@@ -1014,7 +1006,6 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Role',
               isFacility: false,
               isSearchable: false,
-              data: [...(spiceUserRole || []), ...(roleCFRList || []), ...(roleInsightsList || [])],
               data: [...(allRoles || [])],
               isShow: true,
               filterCount: selectedRole?.length
@@ -1039,11 +1030,11 @@ const UserList = (): React.ReactElement => {
             customTitle='Change Password'
             isCustom={true}
             customIconStyle={{ width: 18 }}
-            isActiveToggle={true}
+            isActiveToggle={isCommunity} // show activate/deactivate toggle only for community
             actionFormatter={{
-              hideEditIcon: (rowData: any) => handleIconHandler(rowData) || !rowData.active,
-              hideDeleteIcon: (rowData: any) => handleIconHandler(rowData) || !rowData.active,
-              hideCustomIcon: (rowData: any) => handleIconHandler(rowData) || !rowData.active,
+              hideEditIcon: (rowData: any) => handleIconHandler(rowData),
+              hideDeleteIcon: (rowData: any) => handleIconHandler(rowData),
+              hideCustomIcon: (rowData: any) => handleIconHandler(rowData),
               hideActiveToggle: (rowData: any) => rowData.username === email
             }}
             // onActivateClick={(rowData: any) => getCHWList(rowData)}
@@ -1092,7 +1083,10 @@ const UserList = (): React.ReactElement => {
           popupTitle={openConfirmationModal.title || ''}
           cancelText={openConfirmationModal.cancelText || ''}
           submitText={openConfirmationModal.submitText || ''}
-          handleCancel={() => setOpenConfirmationModal({ isOpen: false, userData: {} })}
+          handleCancel={() => {
+            setOpenConfirmationModal({ isOpen: false, userData: {} });
+            dispatch(clearSupervisorList());
+          }}
           handleSubmit={() => {
             openConfirmationModal.onConfirm?.();
           }}

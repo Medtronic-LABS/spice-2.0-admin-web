@@ -155,7 +155,8 @@ const SelectInput = ({
           '&:focus': {
             color: optionProps.isDisabled ? '#e6e6e6 !important' : '#212529',
             backgroundColor: optionProps.isDisabled ? '#e6e6e6 !important' : '#deebff'
-          }
+          },
+          overflowWrap: 'break-word'
         };
       }
     };

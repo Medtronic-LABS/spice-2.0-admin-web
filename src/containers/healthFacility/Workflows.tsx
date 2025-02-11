@@ -39,7 +39,6 @@ const renderWorkflowByModuleType = (
   form?: any,
   mentalHealthSelection?: () => any,
   pregnancyCheckTimeoutRef?: any
-  pregnancyCheckTimeoutRef?: any
 ) => {
   const {
     WORKFLOW_MODULE: { clinical },

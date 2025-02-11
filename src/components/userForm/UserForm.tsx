@@ -93,7 +93,6 @@ export interface IUserFormValues {
   country: { countryCode: string };
   isHF?: boolean;
   isPeerSupervisor?: boolean;
-  isPeerSupervisor?: boolean;
 }
 
 export interface IDisabledRoles {
@@ -323,12 +322,14 @@ const UserForm = ({
   }, [countryId, healthFacilityList, healthFacilityList.length, showFilters]);
 
   useEffect(() => {
-    if (countryId && !isRegionCreate && !isCreateDistrict && !isCreateChiefdom && !isChiefdom && !isHFCreate) {
-      // af
-      getHFListFn();
-    }
-    if ((isCommunity || !isHFCreate) && (isFromAdminList || countryId)) {
-      // sl
+    if (
+      countryId &&
+      !isRegionCreate &&
+      !isCreateDistrict &&
+      !isCreateChiefdom &&
+      !isChiefdom &&
+      (isCommunity || !isHFCreate)
+    ) {
       getHFListFn();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1768,6 +1769,7 @@ const UserForm = ({
                   isHFCreate={isHFCreate}
                   isEdit={isEdit}
                   reportUserOnlyInAdminList={isReportOrInsightUser}
+                  isCommunity={isCommunity}
                 />
                 {actionButtons(fields, index, isLastChild, emailFieldRef)}
               </div>

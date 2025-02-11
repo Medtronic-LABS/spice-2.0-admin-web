@@ -1,6 +1,6 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
@@ -37,7 +37,6 @@ import { getAdminPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './adminListMeta';
-import { filterByAppTypes } from '../../utils/commonUtils';
 
 interface IMatchParams {
   tenantId: string;
@@ -75,7 +74,7 @@ const UserList = (): React.ReactElement => {
   const { pathname } = useLocation();
   const currentModule: ModuleNames = pathname.split('/')[1];
 
-  const spiceRoles = useRef<IRoles[]>([]);
+  const [allRoles, setAllRoles] = useState([] as IRoles[]);
 
   const { getRoleOptions } = useRoleOptions({
     isHF: false,
@@ -85,13 +84,19 @@ const UserList = (): React.ReactElement => {
     allRoles: rolesGrouped,
     currentModule,
     roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
-      spiceRoles.current = spiceRoleOptions;
+      setAllRoles(
+        [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
+          a.displayName.localeCompare(b.displayName)
+        )
+      );
     }
   });
 
   useEffect(() => {
-    getRoleOptions();
-  }, [getRoleOptions]);
+    if (!allRoles.length) {
+      getRoleOptions();
+    }
+  }, [getRoleOptions, allRoles]);
 
   /**
    * useCallback hook to refresh the admin list.
@@ -367,20 +372,6 @@ const UserList = (): React.ReactElement => {
   };
 
   /**
-   * Memoized value to filter REPORTS user roles based on certain conditions for filter dropdown
-   */
-  const roleCFRList = useMemo(() => {
-    return filterByAppTypes(rolesGrouped?.REPORTS || [], appTypes);
-  }, [appTypes, rolesGrouped?.REPORTS]);
-
-  /**
-   * Memoized value to filter INSIGHTS user roles based on certain conditions for filter dropdown
-   */
-  const roleInsightsList = useMemo(() => {
-    return filterByAppTypes(rolesGrouped?.INSIGHTS || [], appTypes);
-  }, [appTypes, rolesGrouped?.INSIGHTS]);
-
-  /**
    * Icon Handler for edit, password reset and delete
    * Don't show icons if user has mob roles in it
    * Don't show icon for logged in user
@@ -396,7 +387,7 @@ const UserList = (): React.ReactElement => {
           header='Admins'
           isSearch={true}
           onSearch={handleSearch}
-          searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL}
+          searchPlaceholder={APPCONSTANTS.SEARCH_BY_NAME_EMAIL_PHONE}
           onButtonClick={handleAddUserClick}
           isFilter={true}
           setSelectedRole={setSelectedRole}
@@ -406,7 +397,7 @@ const UserList = (): React.ReactElement => {
               name: 'Filter by Admin',
               isFacility: false,
               isSearchable: false,
-              data: [...spiceRoles.current, ...roleCFRList, ...roleInsightsList],
+              data: [...(allRoles || [])],
               isShow: true,
               filterCount: selectedRole?.length
             }
