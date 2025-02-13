@@ -281,7 +281,7 @@ export interface IOptionsResponse {
 }
 
 export interface ICreateHFRequestPayload extends IHealthFacilityPost {
-  users: IHFUserPost[];
+  users?: IHFUserPost[];
 }
 
 export interface IHealthFacilitySummary {

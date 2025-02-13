@@ -57,7 +57,7 @@ const MapWrapper = ({ positionState, tempPositionState, showMarkerPopup = false 
     <>
       <MapContainer
         className='ds-block m-auto'
-        style={{ height: '400px', width: '700px' }}
+        style={{ height: '250px', width: '700px' }}
         center={[tempPosition.latitude, tempPosition.longitude]}
         zoom={7}
         scrollWheelZoom={false}
@@ -67,7 +67,7 @@ const MapWrapper = ({ positionState, tempPositionState, showMarkerPopup = false 
         <DraggableMarker
           isDraggable={true}
           onChange={updateInputValue}
-          position={position}
+          position={tempPosition}
           showPopup={showMarkerPopup}
           setPosition={setPosition}
           onMarkerDragEnd={handleMarkerDragEnd}

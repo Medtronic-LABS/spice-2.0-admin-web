@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
 import SiteAddUserIcon from '../../assets/images/avatar-o.svg';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
+import RightArrowIcon from '../../assets/images/right-arrow.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import UserForm, { IDisabledRoles } from '../../components/userForm/UserForm';
@@ -31,6 +32,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import Workflows from '../healthFacility/Workflows';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import { formatUserToastMsg } from '../../utils/commonUtils';
+import IconButton from '../../components/button/IconButton';
 
 interface IMatchParams {
   regionId?: string;
@@ -67,6 +69,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       users: [] as IHFUserGet[],
       appTypes: [] as string[]
     },
+    addUserClicked: false,
     isSubmitClicked: false,
     pageNumber: 1
   });
@@ -82,7 +85,12 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   const {
     isCommunity,
     appTypes,
-    healthFacility: { s: healthFacilitySName }
+    healthFacility: { s: healthFacilitySName },
+    hfCreate: {
+      user: {
+        optional: { available: userOptional }
+      }
+    }
   } = useAppTypeConfigs();
 
   useEffect(() => {
@@ -103,20 +111,6 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
   useEffect(() => {
     dispatch(clearAllDependentData());
   }, [dispatch]);
-
-  /**
-   * Handler for form cancel
-   */
-  const onCancel = () => {
-    if (submittedData.pageNumber === PAGENUMBER.DETAILS) {
-      onGotoList();
-    } else {
-      setSubmittedData({
-        ...submittedData,
-        pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
-      });
-    }
-  };
 
   const onGotoList = useCallback(() => {
     const url = ((regionId && PROTECTED_ROUTES.healthFacilityByRegion) ||
@@ -208,8 +202,28 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         appTypes: selectedAppTypes
       },
       isSubmitClicked: true,
+      addUserClicked: submittedData.addUserClicked,
       pageNumber: submittedData.pageNumber + 1
     });
+  };
+
+  /**
+   * Handler for form cancel
+   */
+  const onCancel = () => {
+    if (submittedData.pageNumber === PAGENUMBER.DETAILS) {
+      onGotoList();
+    } else {
+      setSubmittedData({
+        ...submittedData,
+        data: {
+          ...submittedData.data,
+          users: formInstance.current.getState().values.users
+        },
+        addUserClicked: submittedData.pageNumber - 1 > PAGENUMBER.WORKFLOW,
+        pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
+      });
+    }
   };
 
   useEffect(() => {
@@ -271,13 +285,16 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       } else if (healthFacility.defaultTrueWorkflows?.length) {
         clinicalWFs = healthFacility.defaultTrueWorkflows;
       }
-      const postUserData = getUserPayload({
-        appTypes,
-        userFormData: users,
-        countryId,
-        isHFCreate: true,
-        spiceRolesGroup: rolesGrouped?.SPICE
-      });
+      const postUserData =
+        submittedData.addUserClicked || !userOptional
+          ? getUserPayload({
+              appTypes,
+              userFormData: users,
+              countryId,
+              isHFCreate: true,
+              spiceRolesGroup: rolesGrouped?.SPICE
+            })
+          : undefined;
       const postData = {
         ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId, appTypes),
         users: postUserData
@@ -297,7 +314,11 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       case PAGENUMBER.USER:
       case PAGENUMBER.DETAILS:
       default:
-        setSubmittedData((prev) => ({ ...prev, isSubmitClicked: false }));
+        if (!submittedData.addUserClicked && userOptional) {
+          handleSubmitPage();
+        } else {
+          setSubmittedData((prev) => ({ ...prev, isSubmitClicked: false }));
+        }
         break;
     }
   }, [
@@ -307,14 +328,15 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     PAGENUMBER.WORKFLOW,
     appTypes,
     countryId,
+    userOptional,
     dispatch,
-    isCommunity,
     onCreateFailure,
     onCreateSuccess,
     regionId,
     rolesGrouped?.SPICE,
     submittedData,
-    workflows
+    workflows,
+    isCommunity
   ]);
 
   const [disabledRoleState, setDisabledRoles] = useState<IDisabledRoles[]>([]);
@@ -342,7 +364,35 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
           );
         case PAGENUMBER.WORKFLOW:
           return (
-            <FormContainer label='Workflows Involved' required={true} icon={SiteDetailsIcon}>
+            <FormContainer
+              label='Workflows Involved'
+              required={true}
+              icon={SiteDetailsIcon}
+              headerStyles={{
+                'justify-content': 'space-between'
+              }}
+              headerRender={() =>
+                userOptional ? (
+                  <IconButton
+                    customIcon={RightArrowIcon}
+                    label='Add User'
+                    isEdit={false}
+                    className='formContainer'
+                    customBtnElmOrder={['text', 'img']}
+                    customBtnWidth='14'
+                    handleClick={() => {
+                      setSubmittedData({
+                        ...submittedData,
+                        addUserClicked: true,
+                        pageNumber: submittedData.pageNumber + 1
+                      });
+                    }}
+                  />
+                ) : (
+                  <></>
+                )
+              }
+            >
               <Workflows formName='healthFacility' form={form} />
             </FormContainer>
           );
@@ -351,25 +401,27 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         case PAGENUMBER.USER:
         default:
           return (
-            <div className='col-12'>
-              <FormContainer label='Add User' icon={SiteAddUserIcon}>
-                <UserForm
-                  countryId={countryId}
-                  form={form}
-                  enableAutoPopulate={true}
-                  entityName='healthFacility'
-                  data={submittedData.data?.users}
-                  autoFetchedState={{ autoFetch, setAutoFetchState }}
-                  parentOrgId={selectedchiefdomTenantId || tenantId}
-                  ignoreTenantId={''}
-                  isSiteUser={true}
-                  disabledRolesState={{ disabledRoles: disabledRoleState, setDisabledRoles }}
-                  appTypes={submittedData.data?.appTypes || []}
-                  fetchHFListForReports={false}
-                  userFormParams={{ isHF: true, isHFCreate: true }}
-                />
-              </FormContainer>
-            </div>
+            (submittedData.addUserClicked || !userOptional) && (
+              <div className='col-12'>
+                <FormContainer label='Add User' icon={SiteAddUserIcon}>
+                  <UserForm
+                    countryId={countryId}
+                    form={form}
+                    enableAutoPopulate={true}
+                    entityName='healthFacility'
+                    data={submittedData.data?.users}
+                    autoFetchedState={{ autoFetch, setAutoFetchState }}
+                    parentOrgId={selectedchiefdomTenantId || tenantId}
+                    ignoreTenantId={''}
+                    isSiteUser={true}
+                    disabledRolesState={{ disabledRoles: disabledRoleState, setDisabledRoles }}
+                    appTypes={submittedData.data?.appTypes || []}
+                    fetchHFListForReports={false}
+                    userFormParams={{ isHF: true, isHFCreate: true }}
+                  />
+                </FormContainer>
+              </div>
+            )
           );
       }
     },
@@ -379,9 +431,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       PAGENUMBER.SUBMIT,
       PAGENUMBER.USER,
       healthFacilitySName,
-      submittedData.data?.healthFacility,
-      submittedData.data?.users,
-      submittedData.data?.appTypes,
+      submittedData,
+      userOptional,
       countryId,
       autoFetch,
       selectedchiefdomTenantId,
@@ -408,7 +459,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
               <div className='row g-1dot25'>{renderByPage(submittedData.pageNumber, form)}</div>
               <div className='col-12 mt-1dot25 d-flex'>
                 <button type='button' className='btn secondary-btn me-0dot625 px-1dot125 ms-auto' onClick={onCancel}>
-                  {submittedData.pageNumber === PAGENUMBER.DETAILS ? 'Cancel' : 'Back'}
+                  {[PAGENUMBER.DETAILS].includes(submittedData.pageNumber) ? 'Cancel' : 'Back'}
                 </button>
                 <button
                   type='submit'
@@ -420,7 +471,11 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                       : formClinicalWFsLength === 0 && formCustomizedWFsLength === 0)
                   }
                 >
-                  {[PAGENUMBER.USER, PAGENUMBER.SUBMIT].includes(submittedData.pageNumber) ? 'Submit' : 'Next'}
+                  {[PAGENUMBER.USER, PAGENUMBER.SUBMIT, userOptional ? PAGENUMBER.WORKFLOW : undefined]
+                    .filter((p) => p)
+                    .includes(submittedData.pageNumber)
+                    ? 'Submit'
+                    : 'Next'}
                 </button>
               </div>
               {(loading || isWorkflowLoading) && <Loader isFullScreen={true} className='translate-x-minus50' />}

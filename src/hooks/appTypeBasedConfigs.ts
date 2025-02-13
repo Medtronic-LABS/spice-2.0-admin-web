@@ -28,8 +28,13 @@ const COMMUNITY = {
     { value: 'Non-Binary', label: 'Non-Binary' }
   ],
   hfDetails: {
-    supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' }
+    supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' },
+    map: { available: true }
   },
+  hfCreate: {
+    user: { optional: { available: true } }
+  },
+
   user: {
     timezone: { available: false },
     culture: { available: true },
@@ -53,7 +58,11 @@ const NON_COMMUNITY = {
     { value: 'Female', label: 'Female' }
   ],
   hfDetails: {
-    supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' }
+    supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' },
+    map: { available: false }
+  },
+  hfCreate: {
+    user: { optional: { available: false } }
   },
   user: {
     timezone: { available: true },

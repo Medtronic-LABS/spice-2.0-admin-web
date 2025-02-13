@@ -115,7 +115,8 @@ const HealthFacilityDetailsForm = ({
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     hfDetails: {
-      supervisor: { s: supervisorSName }
+      supervisor: { s: supervisorSName },
+      map: { available: mapAvailable }
     },
     healthFacility: { s: healthFacilitySName },
     isCommunity
@@ -132,6 +133,27 @@ const HealthFacilityDetailsForm = ({
     clinicalWorkflows: form?.getState()?.values?.healthFacility?.clinicalWorkflows || [],
     customizedWorkflows: form?.getState()?.values?.healthFacility?.customizedWorkflows || []
   });
+
+  // map variables
+  const { latitude = '', longitude = '' } = form.getState().values[formName];
+  const [position, setPosition] = useState<{
+    latitude: number | any;
+    longitude: number | any;
+  }>({
+    latitude,
+    longitude
+  });
+
+  // Temporary state for inputs
+  const [tempPosition, setTempPosition] = useState({
+    latitude: position.latitude,
+    longitude: position.longitude
+  });
+
+  const tempPositionState = { tempPosition, setTempPosition };
+  const positionState = { position, setPosition };
+  const [showMap, setShowMap] = useState(!!latitude && !!longitude);
+
   useEffect(() => {
     if (!isEdit && chiefdomId && Number(chiefdom?.id) !== Number(chiefdomId)) {
       dispatch(
@@ -322,26 +344,6 @@ const HealthFacilityDetailsForm = ({
     [fetchCityList]
   );
 
-  // map
-  const { latitude = '', longitude = '' } = form.getState().values[formName];
-  const [position, setPosition] = useState<{
-    latitude: number | any;
-    longitude: number | any;
-  }>({
-    latitude,
-    longitude
-  });
-
-  // Temporary state for inputs
-  const [tempPosition, setTempPosition] = useState({
-    latitude: position.latitude,
-    longitude: position.longitude
-  });
-
-  const tempPositionState = { tempPosition, setTempPosition };
-  const positionState = { position, setPosition };
-  const [showMap, setShowMap] = useState(!!latitude && !!longitude);
-
   const handleSubmit = (lat?: string, long?: string) => {
     // Update the main position state
     if (tempPosition.latitude !== '' && tempPosition.longitude !== '') {
@@ -352,12 +354,28 @@ const HealthFacilityDetailsForm = ({
     }
   };
 
+  // to update the values to form
+  useEffect(() => {
+    if (tempPosition.latitude && tempPosition.longitude) {
+      form.change(`${formName}.latitude`, tempPosition.latitude);
+      form.change(`${formName}.longitude`, tempPosition.longitude);
+    }
+  }, [form, formName, tempPosition]);
+
   const labelRender = () => (
     <label className={`closeIcon`} onClick={() => setShowMap(!showMap)}>
-      {/* <Close aria-label='close' /> */}
       {showMap ? 'Hide' : 'Show'} Map
     </label>
   );
+
+  type ICheckName = 'lat' | 'long';
+
+  // function: showing map, setting latlong and form change values
+  const latlongChangeFn = (value: any, geoLocation: { lat: string; long: string }, checkName: ICheckName) => {
+    setShowMap(!!geoLocation[checkName] && !!value && !validateLongitude(value));
+    setTempPosition({ latitude: geoLocation.lat, longitude: geoLocation.long });
+    handleSubmit(geoLocation.lat, geoLocation.long);
+  };
 
   return (
     <>
@@ -669,21 +687,14 @@ const HealthFacilityDetailsForm = ({
                   value={tempPosition.latitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
-                    setShowMap(
-                      isCommunity && !!tempPosition.longitude && !!e.target.value && !validateLatitude(e.target.value)
-                    );
-                    setTempPosition({ ...tempPosition, latitude: e.target.value });
+                    latlongChangeFn(e.target.value, { lat: e.target.value, long: tempPosition.longitude }, 'long');
                     input.onChange(e);
                   }}
                   onBlur={(e) => {
-                    setShowMap(
-                      isCommunity && !!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value)
-                    );
-                    setTempPosition({ ...tempPosition, latitude: e.target.value });
-                    handleSubmit(e.target.value, tempPosition.longitude);
+                    latlongChangeFn(e.target.value, { lat: e.target.value, long: tempPosition.longitude }, 'long');
                     input.onBlur(e);
                   }}
-                  labelRender={isCommunity ? labelRender : undefined}
+                  labelRender={mapAvailable ? labelRender : undefined}
                 />
               )}
             />
@@ -702,26 +713,19 @@ const HealthFacilityDetailsForm = ({
                   value={tempPosition.longitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
-                    setShowMap(
-                      isCommunity && !!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value)
-                    );
-                    setTempPosition({ ...tempPosition, longitude: e.target.value });
+                    latlongChangeFn(e.target.value, { lat: tempPosition.latitude, long: e.target.value }, 'lat');
                     input.onChange(e);
                   }}
                   onBlur={(e) => {
-                    setShowMap(
-                      isCommunity && !!tempPosition.latitude && !!e.target.value && !validateLongitude(e.target.value)
-                    );
-                    setTempPosition({ ...tempPosition, longitude: e.target.value });
-                    handleSubmit(tempPosition.latitude, e.target.value);
+                    latlongChangeFn(e.target.value, { lat: tempPosition.latitude, long: e.target.value }, 'lat');
                     input.onBlur(e);
                   }}
-                  labelRender={isCommunity ? labelRender : undefined}
+                  labelRender={mapAvailable ? labelRender : undefined}
                 />
               )}
             />
           </div>
-          {showMap && (
+          {showMap && mapAvailable && (
             <div className={'mapcontainer col-12 '}>
               <MapWrapper positionState={positionState} tempPositionState={tempPositionState} />
             </div>

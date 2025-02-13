@@ -269,7 +269,7 @@ const Region = (): React.ReactElement => {
           <div className='row gx-1dot25 gy-1dot25'>
             {parsedData.map((summaryProps: ISummaryCardProps, i: number) => (
               <div key={`region-${i}`} className='col-lg-6 col-12 mx-lg-0 mx-auto'>
-                <SummaryCard {...summaryProps} disableImg={true} linkStyle={{ minWidth: '150px' }} />
+                <SummaryCard {...summaryProps} disableImg={true} linkStyle={{ minWidth: '100px' }} />
               </div>
             ))}
           </div>

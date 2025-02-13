@@ -20,6 +20,9 @@
   &:focus {
     box-shadow: none;
   }
+  &:focus-visible {
+    color: $app-primary-color;
+  }
 }
 
 .input-field-label {

@@ -29,7 +29,9 @@ $summary-element-hover-background: rgb(248, 248, 248);
     overflow: hidden;
   }
   .title {
-    width: 6.5rem;
+    min-width: 6rem;
+    max-width: 6.5rem;
+    text-wrap: auto;
   }
   .moveForward {
     cursor: pointer;

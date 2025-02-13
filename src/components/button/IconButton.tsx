@@ -3,12 +3,15 @@ import { ReactComponent as EditIcon } from '../../assets/images/edit.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus.svg';
 import styles from './IconButton.module.scss';
 
+type IElmOrder = 'img' | 'text';
 interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   isEdit?: boolean;
   customIcon?: any;
+  customBtnWidth?: string;
   buttonCustomStyle?: any;
   buttonCustomClass?: any;
+  customBtnElmOrder?: IElmOrder[];
   handleClick: () => void;
 }
 
@@ -23,6 +26,8 @@ const IconButton = ({
   isEdit,
   customIcon,
   type = 'button',
+  customBtnWidth,
+  customBtnElmOrder = ['img', 'text'],
   buttonCustomStyle = {},
   buttonCustomClass = '',
   handleClick,
@@ -33,9 +38,10 @@ const IconButton = ({
       return (
         <img
           src={customIcon}
-          className={`${styles.btnImgSpacing} ${buttonCustomClass ? '' : styles.btnImgFilter} ${
-            buttonCustomStyle ? '' : styles.btnImgFilter
-          }`}
+          className={`${styles.btnImgSpacing}  m-0 m${customBtnElmOrder[0] === 'img' ? 'e' : 's'}-0dot375 order-${
+            customBtnElmOrder[0] === 'img' ? '1' : '2'
+          } ${buttonCustomClass ? '' : styles.btnImgFilter} ${buttonCustomStyle ? '' : styles.btnImgFilter}`}
+          style={{ width: `${customBtnWidth ? customBtnWidth + 'px' : 'auto'}` }}
           alt='custom-icon'
         />
       );
@@ -71,7 +77,10 @@ const IconButton = ({
       data-testid='detail-card-button'
     >
       {buttonIconElmt()}
-      <span style={buttonCustomStyle?.textStyle} className={styles.btnLabel + ' ' + buttonCustomClass}>
+      <span
+        style={buttonCustomStyle?.textStyle}
+        className={`${styles.btnLabel} ${buttonCustomClass} order-${customBtnElmOrder[0] === 'img' ? '2' : '1'}`}
+      >
         {label}
       </span>
     </button>
