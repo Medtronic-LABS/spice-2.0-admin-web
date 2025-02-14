@@ -162,7 +162,9 @@ const UserList = (): React.ReactElement => {
   const {
     appTypes,
     userList: {
-      filters: { available: showFilters }
+      filters: { available: showFilters },
+      activeToogle: { available: showActiveToggle },
+      passwordPreference: { available: showPasswordPreference }
     },
     healthFacility: { s: healthFacilitySname, p: healthFacilityPname },
     isCommunity
@@ -527,7 +529,7 @@ const UserList = (): React.ReactElement => {
   const userPasswordChangeUI = () => {
     return (
       <>
-        {isCommunity && (
+        {showPasswordPreference && (
           <div className='col-12'>
             <Field
               name='userPreference.passwordChange'
@@ -550,7 +552,11 @@ const UserList = (): React.ReactElement => {
             />
           </div>
         )}
-        <div className={`password-fields-wrapper ${selectedOption === CHANGE_PASSWORD || !isCommunity ? 'show' : ''}`}>
+        <div
+          className={`password-fields-wrapper ${
+            selectedOption === CHANGE_PASSWORD || !showPasswordPreference ? 'show' : ''
+          }`}
+        >
           <ResetPasswordFields
             email={openModal.userData.username}
             setSubmitEnabled={setSubmitEnabled}
@@ -583,7 +589,7 @@ const UserList = (): React.ReactElement => {
   }) => {
     setChangePasswordLoading(true);
 
-    if (formValues?.userPreference?.passwordChange === CHANGE_PASSWORD || !isCommunity) {
+    if (formValues?.userPreference?.passwordChange === CHANGE_PASSWORD || !showPasswordPreference) {
       if (!formValues.newPassword) {
         setChangePasswordLoading(false);
         return;
@@ -1030,7 +1036,7 @@ const UserList = (): React.ReactElement => {
             customTitle='Change Password'
             isCustom={true}
             customIconStyle={{ width: 18 }}
-            isActiveToggle={isCommunity} // show activate/deactivate toggle only for community
+            isActiveToggle={showActiveToggle} // show activate/deactivate toggle only for community
             actionFormatter={{
               hideEditIcon: (rowData: any) => handleIconHandler(rowData),
               hideDeleteIcon: (rowData: any) => handleIconHandler(rowData),

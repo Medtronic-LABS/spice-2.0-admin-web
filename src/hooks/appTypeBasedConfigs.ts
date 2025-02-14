@@ -29,7 +29,12 @@ const COMMUNITY = {
   ],
   hfDetails: {
     supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' },
-    map: { available: true }
+    phuFocalPersonName: { label: 'PHU Focal Person Name', error: 'PHU focal person name' },
+    phuFocalPersonNumber: { label: 'PHU Focal Person Number', error: 'PHU focal person number' },
+    map: { available: true },
+    language: { disabled: true },
+    linkedVillages: { required: true },
+    city: { isCityVillage: true, isRequired: true }
   },
   hfCreate: {
     user: { optional: { available: true } }
@@ -37,7 +42,7 @@ const COMMUNITY = {
 
   user: {
     timezone: { available: false },
-    culture: { available: true },
+    culture: { available: true, disabled: true },
     redrisk: { available: false },
     designation: { available: false },
     community: { available: false },
@@ -46,7 +51,11 @@ const COMMUNITY = {
       error: 'select peer supervisor'
     }
   },
-  userList: { filters: { available: true } },
+  userList: {
+    filters: { available: true },
+    activeToogle: { available: true },
+    passwordPreference: { available: true }
+  },
   medication: { categories: { available: false } },
   filterComponent: { filterIcon: { available: true } }
 };
@@ -59,14 +68,19 @@ const NON_COMMUNITY = {
   ],
   hfDetails: {
     supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' },
-    map: { available: false }
+    phuFocalPersonName: { label: 'Facility Incharge', error: 'facility incharge' },
+    phuFocalPersonNumber: { label: 'Facility Incharge No', error: 'facility incharge no' },
+    map: { available: false },
+    language: { disabled: false },
+    linkedVillages: { required: false },
+    city: { isCityVillage: false, isRequired: false }
   },
   hfCreate: {
     user: { optional: { available: false } }
   },
   user: {
     timezone: { available: true },
-    culture: { available: true },
+    culture: { available: true, disabled: false },
     redrisk: { available: true },
     designation: { available: true },
     community: { available: true },
@@ -75,7 +89,11 @@ const NON_COMMUNITY = {
       error: 'Community health assistant'
     }
   },
-  userList: { filters: { available: true } },
+  userList: {
+    filters: { available: true },
+    activeToogle: { available: false },
+    passwordPreference: { available: false }
+  },
   medication: { categories: { available: true } },
   filterComponent: { filterIcon: { available: true } }
 };

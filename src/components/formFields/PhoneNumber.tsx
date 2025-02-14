@@ -46,7 +46,6 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
   const regionDetails = useSelector(getRegionDetailsSelector);
 
   const isValidPhoneNumber = (phoneNumber?: string, checkSameNumberAgain?: boolean) => {
-    console.log('regionDetails.name--->', regionDetails.name);
     return (
       phoneNumber &&
       !validateMobile(phoneNumber, SL_REGION.includes(regionDetails.name)) &&

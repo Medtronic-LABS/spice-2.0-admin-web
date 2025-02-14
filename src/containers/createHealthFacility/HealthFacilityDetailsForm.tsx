@@ -116,7 +116,12 @@ const HealthFacilityDetailsForm = ({
     chiefdom: { s: chiefdomSName },
     hfDetails: {
       supervisor: { s: supervisorSName },
-      map: { available: mapAvailable }
+      map: { available: mapAvailable },
+      phuFocalPersonName: { label: phuFocalPersonNameLabel, error: phuFocalPersonNameError },
+      phuFocalPersonNumber: { label: phuFocalPersonNumberLabel, error: phuFocalPersonNumberError },
+      language: { disabled: isLanguageDisabled },
+      linkedVillages: { required: isLinkedVillagesRequired },
+      city: { isCityVillage, isRequired: isCityRequired }
     },
     healthFacility: { s: healthFacilitySName },
     isCommunity
@@ -371,7 +376,7 @@ const HealthFacilityDetailsForm = ({
   type ICheckName = 'lat' | 'long';
 
   // function: showing map, setting latlong and form change values
-  const latlongChangeFn = (value: any, geoLocation: { lat: string; long: string }, checkName: ICheckName) => {
+  const latlongChangeFn = (value: any = '', geoLocation: { lat: string; long: string }, checkName: ICheckName) => {
     setShowMap(!!geoLocation[checkName] && !!value && !validateLongitude(value));
     setTempPosition({ latitude: geoLocation.lat, longitude: geoLocation.long });
     handleSubmit(geoLocation.lat, geoLocation.long);
@@ -441,8 +446,8 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label={isCommunity ? 'PHU Focal Person Name' : 'Facility Incharge'}
-                  errorLabel={isCommunity ? 'PHU focal person name' : 'facility incharge'}
+                  label={phuFocalPersonNameLabel}
+                  errorLabel={phuFocalPersonNameError}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
                 />
@@ -458,8 +463,8 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label={isCommunity ? 'PHU Focal Person Number' : 'Facility Incharge No'}
-                  errorLabel={isCommunity ? 'PHU focal person number' : 'facility incharge no'}
+                  label={phuFocalPersonNumberLabel}
+                  errorLabel={phuFocalPersonNumberError}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
                 />
@@ -545,24 +550,24 @@ const HealthFacilityDetailsForm = ({
           </div>
           <div className={columnStyle}>
             <Field
-              required={isCommunity ? true : false}
+              required={isCityRequired}
               name={`${formName}.city`}
               type='text'
-              validate={isCommunity ? required : undefined}
+              validate={isCityRequired ? required : undefined}
               render={({ input, meta }) => (
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label={isCommunity ? 'City/Village' : 'City'}
-                  errorLabel={isCommunity ? 'city/village' : 'city'}
+                  label={isCityVillage ? 'City/Village' : 'City'}
+                  errorLabel={isCityVillage ? 'city/village' : 'city'}
                   labelKey='name'
-                  valueKey={isCommunity ? 'id' : 'value'}
-                  options={isCommunity ? villagesList : cityList}
-                  loadingOptions={isCommunity ? villagesLoading : cityLoading}
-                  error={(isCommunity && meta.touched && meta.error) || undefined}
-                  required={isCommunity ? true : false}
+                  valueKey={isCityVillage ? 'id' : 'value'}
+                  options={isCityVillage ? villagesList : cityList}
+                  loadingOptions={isCityVillage ? villagesLoading : cityLoading}
+                  error={(isCityVillage && meta.touched && meta.error) || undefined}
+                  required={isCityRequired}
                   onInput={(value) => {
-                    if (!isCommunity) {
+                    if (!isCityVillage) {
                       fetchCityListDebounce(value);
                     }
                   }}
@@ -600,7 +605,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='language'
                   labelKey='name'
                   valueKey='id'
-                  disabled={isCommunity}
+                  disabled={isLanguageDisabled}
                   options={filterByAppTypes(languages, appTypes)}
                   loadingOptions={languageLoading}
                   error={(meta.touched && meta.error) || undefined}
@@ -641,7 +646,7 @@ const HealthFacilityDetailsForm = ({
             <Field
               name={`${formName}.linkedVillages`}
               type='text'
-              validate={isCommunity ? required : undefined}
+              validate={isLinkedVillagesRequired ? required : undefined}
               render={({ input, meta }) => {
                 return (
                   <MultiSelect
@@ -650,7 +655,7 @@ const HealthFacilityDetailsForm = ({
                     errorLabel='linked villages'
                     labelKey='name'
                     valueKey='id'
-                    required={isCommunity ? true : false}
+                    required={isLinkedVillagesRequired}
                     isShowLabel={true}
                     isSelectAll={true}
                     placeholder=''
@@ -660,7 +665,7 @@ const HealthFacilityDetailsForm = ({
                     isMulti={true}
                     options={unlinkedVillagesList}
                     loading={unlinkedVillagesLoading}
-                    error={(isCommunity && meta.touched && meta.error) || undefined}
+                    error={(isLinkedVillagesRequired && meta.touched && meta.error) || undefined}
                     controlStyles={{
                       borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
                       '&:focus-visible': {
@@ -687,11 +692,13 @@ const HealthFacilityDetailsForm = ({
                   value={tempPosition.latitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
-                    latlongChangeFn(e.target.value, { lat: e.target.value, long: tempPosition.longitude }, 'long');
+                    const validOnChangeLat = normalizeFloatingNumber(e.target.value) || '';
+                    latlongChangeFn(validOnChangeLat, { lat: validOnChangeLat, long: tempPosition.longitude }, 'long');
                     input.onChange(e);
                   }}
                   onBlur={(e) => {
-                    latlongChangeFn(e.target.value, { lat: e.target.value, long: tempPosition.longitude }, 'long');
+                    const validOnBlurLat = normalizeFloatingNumber(e.target.value) || '';
+                    latlongChangeFn(validOnBlurLat, { lat: validOnBlurLat, long: tempPosition.longitude }, 'long');
                     input.onBlur(e);
                   }}
                   labelRender={mapAvailable ? labelRender : undefined}
@@ -713,11 +720,13 @@ const HealthFacilityDetailsForm = ({
                   value={tempPosition.longitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
-                    latlongChangeFn(e.target.value, { lat: tempPosition.latitude, long: e.target.value }, 'lat');
+                    const validOnChangeLong = normalizeFloatingNumber(e.target.value) || '';
+                    latlongChangeFn(validOnChangeLong, { lat: tempPosition.latitude, long: validOnChangeLong }, 'lat');
                     input.onChange(e);
                   }}
                   onBlur={(e) => {
-                    latlongChangeFn(e.target.value, { lat: tempPosition.latitude, long: e.target.value }, 'lat');
+                    const validOnBlurLong = normalizeFloatingNumber(e.target.value) || '';
+                    latlongChangeFn(validOnBlurLong, { lat: tempPosition.latitude, long: validOnBlurLong }, 'lat');
                     input.onBlur(e);
                   }}
                   labelRender={mapAvailable ? labelRender : undefined}

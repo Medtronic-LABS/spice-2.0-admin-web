@@ -68,7 +68,7 @@ export const useRoleOptions = ({
               return false;
             }
 
-            if (isCommunity && currentModule !== regionSname.toLowerCase()) {
+            if (isCommunity && (currentModule !== regionSname.toLowerCase() || isHFCreate)) {
               return !reportAdminRole.includes(role.name);
             }
             return true;

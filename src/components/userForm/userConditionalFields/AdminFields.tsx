@@ -36,8 +36,7 @@ export const SiteUserForm = (props: any) => {
     isHFCreate,
     isEdit,
     isProfile,
-    reportUserOnlyInAdminList, // cfr user only from admin list,
-    isCommunity
+    reportUserOnlyInAdminList // cfr user only from admin list,
   } = props;
   const { form, formName } = formDetails;
   const isHFSelected =
@@ -56,7 +55,7 @@ export const SiteUserForm = (props: any) => {
     appTypes,
     user: {
       timezone: { available: isTimezoneAvailable },
-      culture: { available: isCultureAvailable },
+      culture: { available: isCultureAvailable, disabled: isCultureDisabled },
       redrisk: { available: isRedRisk }
     },
     district: { s: districtSName },
@@ -111,7 +110,7 @@ export const SiteUserForm = (props: any) => {
                 required={false}
                 labelKey='name'
                 valueKey='id'
-                disabled={isCommunity}
+                disabled={isCultureDisabled}
                 options={filterByAppTypes(cultureList, appTypes) || []}
                 loadingOptions={isCultureListLoading}
                 error={isError(meta)}
