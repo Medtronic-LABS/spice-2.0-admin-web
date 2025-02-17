@@ -12,6 +12,7 @@ export const superAdminRole = 'SUPER_ADMIN';
 export const redRisk = 'RED_RISK_USER';
 export const peerSupervisor = 'PEER_SUPERVISOR';
 export const hf4ReportUser = 'HF4_REPORT_USER';
+export const PHUIncharge = 'PHU_INCHARGE';
 
 // COMMUNITY
 export const onlyCHWRoles = ['CHW'];
@@ -26,7 +27,9 @@ export const reportAndFacilityAdmin = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN'];
 export const reportAdminRole = ['REPORT_ADMIN'];
 export const onlyHF4UserRole = [hf4ReportUser];
 export const facilityReportAdminRole = ['FACILITY_REPORT_ADMIN'];
-export const facilityPlusHF4ReportUserRole = [hf4ReportUser, 'FACILITY_REPORT_ADMIN'];
+export const PHUInchargeRole = ['PHU_INCHARGE'];
+export const PHUInchargePlusFacilityReportAdmin = [PHUIncharge, 'FACILITY_REPORT_ADMIN'];
+export const facilityPlusHF4PlusPHU = [PHUIncharge, hf4ReportUser, 'FACILITY_REPORT_ADMIN'];
 // INSIGHTS
 export const allInsightRoles = ['INSIGHTS_USER', 'INSIGHTS_DEVELOPER'];
 export const insightUserRole = ['INSIGHTS_USER'];

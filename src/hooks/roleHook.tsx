@@ -12,7 +12,7 @@ import {
   chaRole,
   CHPARoles,
   chwPeerRoles,
-  facilityPlusHF4ReportUserRole,
+  facilityPlusHF4PlusPHU,
   facilityReportAdminRole,
   hf4ReportUser,
   hfAdminRole,
@@ -33,7 +33,9 @@ import {
   superAdminRole,
   superAdminRoles,
   urlBased,
-  villageBasedRoles
+  villageBasedRoles,
+  PHUInchargeRole,
+  PHUInchargePlusFacilityReportAdmin
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
@@ -217,7 +219,7 @@ export const useRoleMeta = ({
       // show report hf list condition
       if (currentSuite === REPORTS) {
         showFields.isShowReportHFList =
-          !!roles.length && roles.some((userRole: IRoles) => facilityPlusHF4ReportUserRole.includes(userRole.name));
+          !!roles.length && roles.some((userRole: IRoles) => facilityPlusHF4PlusPHU.includes(userRole.name));
       }
       // show insight hf list condition
       if (currentSuite === INSIGHTS) {
@@ -276,9 +278,9 @@ export const useRoleMeta = ({
             return [reportRoles.name];
           }
           // if the report roles are not present in the allRoles array, return the facilityPlusHF4ReportUserRole
-          return facilityPlusHF4ReportUserRole;
+          return facilityPlusHF4PlusPHU;
         }
-        return facilityPlusHF4ReportUserRole;
+        return facilityPlusHF4PlusPHU;
       };
 
       const getValidSpiceRoleForAllAFRoles = () => {
@@ -336,7 +338,7 @@ export const useRoleMeta = ({
           },
           disabledREPORTSRoles: {
             suite: REPORTS,
-            validReportRoles: isCommunity ? facilityReportAdminRole : reportAndFacilityAdmin
+            validReportRoles: isCommunity ? PHUInchargePlusFacilityReportAdmin : reportAndFacilityAdmin
           },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
@@ -378,6 +380,16 @@ export const useRoleMeta = ({
             validSpiceRoles: chwPeerRoles
           },
           disabledREPORTSRoles: { suite: REPORTS, validReportRoles: onlyHF4UserRole },
+          disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
+        },
+        {
+          selectedRoles: PHUInchargeRole,
+          selectedSuite: REPORTS,
+          disabledSPICERoles: {
+            suite: SPICE,
+            validSpiceRoles: getValidSpiceRolesForFacilityReportAdminSelect()
+          },
+          disabledREPORTSRoles: { suite: REPORTS, validReportRoles: PHUInchargeRole },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
         {

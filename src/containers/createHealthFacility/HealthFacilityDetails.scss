@@ -1,5 +1,6 @@
 .mapcontainer {
   max-width: 100%;
+  z-index: 0;
   .leaflet-container {
     border-radius: 5px;
     width: 100% !important;

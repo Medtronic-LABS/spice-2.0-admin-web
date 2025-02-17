@@ -1410,7 +1410,7 @@ const UserForm = ({
                         return (
                           <MultiSelect
                             {...(input as any)}
-                            label='Insights'
+                            label='Insights Role'
                             errorLabel='Please select at least one role.'
                             labelKey='displayName'
                             valueKey='id'
@@ -1437,7 +1437,7 @@ const UserForm = ({
                             mandatoryOptions={mandatoryInsightsRole ? mandatoryInsightsRole : []}
                             disabledOptions={disabledRoles.current?.[index]?.INSIGHTS || []}
                             loading={isRolesLoading}
-                            error={isError(meta) && !reportRoles?.length}
+                            error={isError(meta) && !insightRoles?.length}
                             onChange={(values: any) => {
                               const currentAllRoles = [
                                 ...(Array.isArray(spiceRole) ? spiceRole : [spiceRole]),
