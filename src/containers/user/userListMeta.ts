@@ -8,7 +8,13 @@ import { formatRoles } from '../../utils/commonUtils';
  */
 const formatName = (user: IHFUserGet) => `${user.firstName} ${user.lastName}`;
 
-export const columnDef = ({ healthFacilityModuleName }: { healthFacilityModuleName: string }) => {
+export const columnDef = ({
+  healthFacilityModuleName,
+  isCommunity
+}: {
+  healthFacilityModuleName: string;
+  isCommunity: boolean;
+}) => {
   return [
     {
       id: 1,
@@ -41,7 +47,8 @@ export const columnDef = ({ healthFacilityModuleName }: { healthFacilityModuleNa
       id: 5,
       name: 'gender',
       label: 'GENDER',
-      width: '7%'
+      width: '7%',
+      isHideColumn: isCommunity
     },
     {
       id: 6,

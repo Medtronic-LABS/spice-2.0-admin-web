@@ -1020,7 +1020,9 @@ const UserList = (): React.ReactElement => {
         >
           <CustomTable
             rowData={hfUserList}
-            columnsDef={columnDef({ healthFacilityModuleName: healthFacilitySname })}
+            columnsDef={columnDef({ healthFacilityModuleName: healthFacilitySname, isCommunity }).filter(
+              (column) => !column.isHideColumn
+            )}
             isDelete={true}
             isEdit={true}
             onRowEdit={openEditModal}

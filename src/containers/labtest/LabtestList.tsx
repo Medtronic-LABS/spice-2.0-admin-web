@@ -23,6 +23,7 @@ import ModalForm from '../../components/modal/ModalForm';
 import LabtestModalForm from './LabtestModalForm';
 import { camelCase } from 'lodash';
 import { decodeURIText } from '../../utils/commonUtils';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
 interface IMatchParams {
   regionId: string;
@@ -75,6 +76,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
   });
 
   const { regionId, tenantId } = useParams<IMatchParams>();
+  const { isCommunity } = useAppTypeConfigs();
 
   /**
    * Fetches lab test details
@@ -244,6 +246,29 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     }
   };
 
+  const columns = [
+    {
+      id: 1,
+      name: 'testName',
+      label: 'NAME',
+      width: '140px'
+    },
+    {
+      id: 2,
+      name: 'displayOrder',
+      label: 'DISPLAY ORDER',
+      width: '125px',
+      isHideColumn: isCommunity
+    },
+    {
+      id: 3,
+      name: 'updated_at',
+      label: 'UPDATED ON',
+      width: '125px',
+      cellFormatter: formatUpdatedAt
+    }
+  ];
+
   return (
     <>
       {loading && <Loader />}
@@ -261,27 +286,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
                 ...labTestRowData,
                 testName: labTestRowData.testName ? decodeURIText(labTestRowData.testName) : ''
               }))}
-              columnsDef={[
-                {
-                  id: 1,
-                  name: 'testName',
-                  label: 'NAME',
-                  width: '140px'
-                },
-                {
-                  id: 2,
-                  name: 'displayOrder',
-                  label: 'DISPLAY ORDER',
-                  width: '125px'
-                },
-                {
-                  id: 3,
-                  name: 'updated_at',
-                  label: 'UPDATED ON',
-                  width: '125px',
-                  cellFormatter: formatUpdatedAt
-                }
-              ]}
+              columnsDef={columns.filter((column) => !column.isHideColumn)}
               isEdit={true}
               isDelete={true}
               onCustomConfirmed={(data) => onNextClicked(data, true)}
