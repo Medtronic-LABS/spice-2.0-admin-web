@@ -997,8 +997,8 @@ const UserList = (): React.ReactElement => {
           onFilterData={[
             {
               id: 1,
-              name: `Filter by ${healthFacilitySname}`,
-              placeholder: `Search ${healthFacilitySname}`,
+              name: `Filter by ${isCommunity ? 'Facility' : healthFacilitySname}`,
+              placeholder: `Search ${isCommunity ? 'Facility' : healthFacilitySname}`,
               isFacility: true,
               isSearchable: true,
               data: filterHFByAppTypes(appTypes, healthFacilityList)?.sort((a: any, b: any) =>
