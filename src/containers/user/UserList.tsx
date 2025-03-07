@@ -169,6 +169,7 @@ const UserList = (): React.ReactElement => {
     healthFacility: { s: healthFacilitySname, p: healthFacilityPname },
     isCommunity
   } = useAppTypeConfigs();
+
   /**
    * useCallback hook to refresh the user list.
    */
@@ -682,11 +683,10 @@ const UserList = (): React.ReactElement => {
     allRoles: rolesGrouped,
     currentModule,
     roleOptionsFn: ({ spiceRoleOptions, reportRoleOptions: newReportRoles, insightRoleOptions }) => {
-      setAllRoles(
-        [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
-          a.displayName > b.displayName ? 1 : -1
-        )
+      const allNewRoles = [...spiceRoleOptions, ...newReportRoles, ...insightRoleOptions].sort((a: any, b: any) =>
+        a.displayName > b.displayName ? 1 : -1
       );
+      setAllRoles(allNewRoles);
     }
   });
 

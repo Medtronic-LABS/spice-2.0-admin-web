@@ -45,6 +45,7 @@ const COMMUNITY = {
     culture: { available: true, disabled: true },
     redrisk: { available: false },
     designation: { available: false },
+    dhisId: { available: true },
     community: { available: false },
     supervisor: {
       label: 'Select Peer Supervisor',
@@ -83,6 +84,7 @@ const NON_COMMUNITY = {
     culture: { available: true, disabled: false },
     redrisk: { available: true },
     designation: { available: true },
+    dhisId: { available: false },
     community: { available: true },
     supervisor: {
       label: 'Community Health Assistant',

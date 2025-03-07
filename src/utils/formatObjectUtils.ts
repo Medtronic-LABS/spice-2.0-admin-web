@@ -108,6 +108,7 @@ export const getUserPayload = ({
       timezone: user?.timezone?.id ? user?.timezone : null,
       district: user?.district,
       chiefdom: user?.chiefdom,
+      userUnitId: user?.userUnitId,
       designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null,
       reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization) ? user.reportUserOrganization : []).map(
         ({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId

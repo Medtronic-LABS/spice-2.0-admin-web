@@ -11,6 +11,7 @@ import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../c
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
+import { useRoleOptions } from '../../hooks/roleOptionsHook';
 import { REGION_ADMIN, REPORT_ADMIN, SUPER_ADMIN, SUPER_USER } from '../../routes';
 import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import { chiefdomListSelector, chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
@@ -79,7 +80,6 @@ import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import useUserFormUtils, { filterRolesByAppTypeFn } from './userFormUtils';
-import { useRoleOptions } from '../../hooks/roleOptionsHook';
 
 export interface IUserFormValues {
   email: string;
@@ -207,7 +207,8 @@ const UserForm = ({
     user: {
       culture: { available: showCulture },
       designation: { available: isDesignationListShow },
-      community: { available: isCommunityListShow }
+      community: { available: isCommunityListShow },
+      dhisId: { available: showDHISId }
     },
     district: { s: districtSName },
     healthFacility: { s: healthfacilitySName },
@@ -1338,6 +1339,21 @@ const UserForm = ({
                               isModel={true}
                             />
                           );
+                        }}
+                      />
+                    </div>
+                  )}
+                {isSPICE &&
+                  showDHISId &&
+                  // only show for CHW user
+                  isCHWCHPUser[0] && (
+                    <div className='col-sm-6 col-12'>
+                      <Field
+                        name={`${name}.userUnitId`}
+                        type='text'
+                        validate={required}
+                        render={({ input, meta }) => {
+                          return <TextInput {...input} label='DHIS ID' errorLabel='dhis id' error={isError(meta)} />;
                         }}
                       />
                     </div>
