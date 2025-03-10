@@ -444,6 +444,13 @@ export const useRoleMeta = ({
 
       let roleChangesConfig: IRoleChangesConfig = {} as IRoleChangesConfig;
 
+      // check for any CHW role
+      const hasCHWRole = allRoles.some((roleValue: IRoles) => {
+        // Check if the role is a CHW role
+        return villageBasedRoles.includes(roleValue.name);
+      });
+
+      // Process other role-specific changes
       allRoles.forEach((roleValue: IRoles) => {
         const foundAllRoles =
           rolesMeta.find((newRoles) => newRoles.selectedRoles.includes(roleValue.name)) || ({} as IRoleMeta);
@@ -453,6 +460,7 @@ export const useRoleMeta = ({
           disabledREPORTSRoles: findDisabledRoles(foundAllRoles.disabledREPORTSRoles || {}),
           disabledINSIGHTSRoles: findDisabledRoles(foundAllRoles.disabledINSIGHTSRoles || {})
         };
+
         if ((disabledAllRoles.disabledSPICERoles || []).length) {
           newDisabledRoles[SPICE] = [
             ...new Set([...newDisabledRoles[SPICE], ...(disabledAllRoles.disabledSPICERoles || [])])
@@ -464,8 +472,24 @@ export const useRoleMeta = ({
         if ((disabledAllRoles.disabledINSIGHTSRoles || []).length) {
           newDisabledRoles[INSIGHTS] = disabledAllRoles.disabledINSIGHTSRoles || [];
         }
-        // to set other role specific changes like hf field, supervisor, villages, etc
-        roleChangesConfig = roleSpecificChanges([roleValue], roleValue.groupName || '', index);
+        // Get role specific changes
+        const currentRoleChanges = roleSpecificChanges([roleValue], roleValue.groupName || '', index);
+
+        roleChangesConfig = {
+          ...roleChangesConfig,
+          showFields: {
+            isShowVillages:
+              roleChangesConfig.showFields?.isShowVillages || currentRoleChanges.showFields.isShowVillages,
+            isShowSpiceHFList:
+              roleChangesConfig.showFields?.isShowSpiceHFList || currentRoleChanges.showFields.isShowSpiceHFList,
+            isShowReportHFList:
+              roleChangesConfig.showFields?.isShowReportHFList || currentRoleChanges.showFields.isShowReportHFList,
+            isShowInsightHFList:
+              roleChangesConfig.showFields?.isShowInsightHFList || currentRoleChanges.showFields.isShowInsightHFList
+          },
+          isCHAUser: roleChangesConfig.isCHAUser || currentRoleChanges.isCHAUser,
+          isCHWCHPUser: hasCHWRole // Use the hasCHWRole value instead
+        };
       });
 
       const newDRoles = [...allDisabledRoles];
@@ -475,9 +499,9 @@ export const useRoleMeta = ({
       const newChaStatus = [...isCHAStatus];
       newChaStatus[index] = roleChangesConfig.isCHAUser;
 
-      // isCHP Status
+      // Update CHW/CHP status based on hasCHWRole
       const newCHWCHPStatus = [...isCHWCHPStatus];
-      newCHWCHPStatus[index] = roleChangesConfig.isCHWCHPUser;
+      newCHWCHPStatus[index] = hasCHWRole;
 
       const newShowVillage = [...showVillagesState];
       newShowVillage[index] = roleChangesConfig.showFields?.isShowVillages;

@@ -455,9 +455,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
       isUserEdit ? updateHFUserRequest : createHFUserRequest,
       healthfacilityUserSuccess,
       (e: Error) => {
-        if (isUserEdit) {
-          setHFUserModal(false);
-        }
         fetchFailure(
           e,
           isUserEdit

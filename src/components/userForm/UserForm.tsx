@@ -504,6 +504,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].mandatorySuiteAccess`, userData.mandatorySuiteAccess || '');
         form.change(`${formName}[${index}].role`, filteredUserRoles || []);
         form.change(`${formName}[${index}].roles`, userData.roles || []);
+        form.change(`${formName}[${index}].userUnitId`, userData.userUnitId || null);
         form.change(`${formName}[${index}].reportRoles`, userData.reportRoles || []);
         form.change(`${formName}[${index}].insightRoles`, userData.insightRoles || []);
         form.change(`${formName}[${index}].selectedInsightRoles`, userData.insightRoles || []);
