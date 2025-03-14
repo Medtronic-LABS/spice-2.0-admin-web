@@ -57,7 +57,7 @@ const COMMUNITY = {
     activeToogle: { available: true },
     passwordPreference: { available: true }
   },
-  medication: { categories: { available: false } },
+  medication: { categories: { available: true }, groups: { available: true } },
   filterComponent: { filterIcon: { available: true } }
 };
 
@@ -96,7 +96,7 @@ const NON_COMMUNITY = {
     activeToogle: { available: false },
     passwordPreference: { available: false }
   },
-  medication: { categories: { available: true } },
+  medication: { categories: { available: true }, groups: { available: false } },
   filterComponent: { filterIcon: { available: true } }
 };
 

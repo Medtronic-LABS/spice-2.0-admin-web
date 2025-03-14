@@ -33,8 +33,11 @@ import {
   FETCH_MEDICATION_CLASSIFICATIONS_REQUEST,
   FETCH_MEDICATION_DOSAGE_FORM,
   UPDATE_MEDICATION_REQUEST,
-  VALIDATE_MEDICATION
+  VALIDATE_MEDICATION,
+  FETCH_MEDICATION_GROUPS_REQUEST
 } from './actionTypes';
+import { getMedicationGroups } from '../../services/medicationAPI';
+import { fetchMedicationGroupsSuccess, fetchMedicationGroupsFailure } from './actions';
 
 /*
   Worker Saga: Fired on FETCH_MEDICATIONS_LIST_REQUEST action
@@ -181,6 +184,15 @@ export function* validateMedication({ data, successCb, failureCb }: IValidateMed
   }
 }
 
+function* fetchMedicationGroupsSaga(): SagaIterator {
+  try {
+    const response = yield call(medicationService.getMedicationGroups);
+    yield put(fetchMedicationGroupsSuccess(response.data));
+  } catch (error: any) {
+    yield put(fetchMedicationGroupsFailure(error.message));
+  }
+}
+
 /*
   Starts worker saga on latest dispatched specific action.
   Allows concurrent increments.
@@ -194,6 +206,7 @@ function* medicationSaga() {
   yield all([takeLatest(UPDATE_MEDICATION_REQUEST, updateMedication)]);
   yield all([takeLatest(DELETE_MEDICATION_REQUEST, deleteMedication)]);
   yield all([takeLatest(VALIDATE_MEDICATION, validateMedication)]);
+  yield all([takeLatest(FETCH_MEDICATION_GROUPS_REQUEST, fetchMedicationGroupsSaga)]);
 }
 
 export default medicationSaga;

@@ -47,12 +47,14 @@ export interface IMedicationState {
   brandsLoading: boolean;
   dosageFormsLoading: boolean;
   categoryLoading: boolean;
+  groupsLoading: boolean;
   total: number;
   list: IMedicationList[];
   classifications: IClassification[];
   brands: IList[];
   dosageForms: IList[];
   categoryList: IList[];
+  groups: IMedicationGroup[];
   error: string | null | Error;
 }
 
@@ -247,6 +249,25 @@ export interface IValidateMedication {
   failureCb?: (error: Error) => void;
 }
 
+export interface IMedicationGroup {
+  id: number;
+  name: string;
+  displayOrder: number;
+}
+
+export interface IFetchMedicationGroupsRequest {
+  type: typeof ACTION_TYPES.FETCH_MEDICATION_GROUPS_REQUEST;
+}
+
+export interface IFetchMedicationGroupsSuccess {
+  type: typeof ACTION_TYPES.FETCH_MEDICATION_GROUPS_SUCCESS;
+  payload: { groups: IMedicationGroup[] };
+}
+
+export interface IFetchMedicationGroupsFailure {
+  type: typeof ACTION_TYPES.FETCH_MEDICATION_GROUPS_FAILURE;
+}
+
 export type MedicationActions =
   | IFetchMedicationListReq
   | IFetchMedicationListSuccess
@@ -274,4 +295,7 @@ export type MedicationActions =
   | IDeleteMedicationRequest
   | IDeleteMedicationSuccess
   | IDeleteMedicationFailure
-  | IValidateMedication;
+  | IValidateMedication
+  | IFetchMedicationGroupsRequest
+  | IFetchMedicationGroupsSuccess
+  | IFetchMedicationGroupsFailure;

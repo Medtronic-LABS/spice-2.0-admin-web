@@ -12,6 +12,8 @@ const getClassificationsLoading = (state: AppState) => state.medication.classifi
 const getBrandsLoading = (state: AppState) => state.medication.brandsLoading;
 const getDosageFormsLoading = (state: AppState) => state.medication.dosageFormsLoading;
 const getCategoryFormsLoading = (state: AppState) => state.medication.categoryLoading;
+const getMedicationGroups = (state: AppState) => state.medication.groups;
+const getMedicationGroupsLoading = (state: AppState) => state.medication.groupsLoading;
 
 export const getMedicationLoadingSelector = createSelector(getLoading, (loading) => loading);
 export const getMedicationListSelector = createSelector(getMedicationList, (list) => list);
@@ -39,4 +41,10 @@ export const getDosageFormsLoadingSelector = createSelector(
 export const getCategoryLoadingSelector = createSelector(
   getCategoryFormsLoading,
   (categoryFormsLoading) => categoryFormsLoading
+);
+
+export const getMedicationGroupsSelector = createSelector(getMedicationGroups, (groups) => groups);
+export const getMedicationGroupsLoadingSelector = createSelector(
+  getMedicationGroupsLoading,
+  (groupsLoading) => groupsLoading
 );

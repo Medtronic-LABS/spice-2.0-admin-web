@@ -13,7 +13,9 @@ export const initialState: IMedicationState = {
   brands: [],
   dosageForms: [],
   categoryList: [],
-  categoryLoading: false
+  categoryLoading: false,
+  groups: [],
+  groupsLoading: false
 };
 
 const medicationReducer = (state = initialState, action = {} as MedicationActions): IMedicationState => {
@@ -120,6 +122,22 @@ const medicationReducer = (state = initialState, action = {} as MedicationAction
         ...state,
         categoryList: action.payload.categoryList,
         categoryLoading: false
+      };
+    case MEDICATION_TYPES.FETCH_MEDICATION_GROUPS_REQUEST:
+      return {
+        ...state,
+        groupsLoading: true
+      };
+    case MEDICATION_TYPES.FETCH_MEDICATION_GROUPS_SUCCESS:
+      return {
+        ...state,
+        groups: action.payload.groups,
+        groupsLoading: false
+      };
+    case MEDICATION_TYPES.FETCH_MEDICATION_GROUPS_FAILURE:
+      return {
+        ...state,
+        groupsLoading: false
       };
     default:
       return { ...state };

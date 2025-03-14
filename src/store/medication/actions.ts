@@ -21,7 +21,8 @@ import {
   IDeleteMedicationFailure,
   IValidateMedication,
   IFetchBrandReq,
-  IFetchCategorySuccessPayload
+  IFetchCategorySuccessPayload,
+  IMedicationGroup
 } from './types';
 
 export const fetchMedicationListReq = ({
@@ -198,4 +199,18 @@ export const validateMedication = ({
   data,
   successCb,
   failureCb
+});
+
+export const fetchMedicationGroupsRequest = () => ({
+  type: MEDICATION_TYPES.FETCH_MEDICATION_GROUPS_REQUEST
+});
+
+export const fetchMedicationGroupsSuccess = (groups: IMedicationGroup[]) => ({
+  type: MEDICATION_TYPES.FETCH_MEDICATION_GROUPS_SUCCESS,
+  payload: { groups }
+});
+
+export const fetchMedicationGroupsFailure = (error: string) => ({
+  type: MEDICATION_TYPES.FETCH_MEDICATION_GROUPS_FAILURE,
+  payload: error
 });

@@ -72,3 +72,9 @@ export const deleteMedication = (data: IDeleteMedicationRequestPayload) =>
     url: 'admin-service/medication/remove',
     data
   });
+
+export const getMedicationGroups = () =>
+  axios({
+    method: 'GET',
+    url: '/admin-service/medication/group-list'
+  });

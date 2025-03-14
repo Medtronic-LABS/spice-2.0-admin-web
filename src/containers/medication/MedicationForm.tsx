@@ -24,9 +24,16 @@ import {
   getMedicationCategorySelector,
   getMedicationClassificationsSelector,
   getMedicationDosageFormsSelector,
-  getMedicationLoadingSelector
+  getMedicationLoadingSelector,
+  getMedicationGroupsSelector,
+  getMedicationGroupsLoadingSelector
 } from '../../store/medication/selectors';
-import { fetchCategoryForms, fetchClassifications, fetchDosageForms } from '../../store/medication/actions';
+import {
+  fetchCategoryForms,
+  fetchClassifications,
+  fetchDosageForms,
+  fetchMedicationGroupsRequest
+} from '../../store/medication/actions';
 import { IList } from '../../store/medication/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
@@ -98,13 +105,15 @@ const MedicationForm = ({
   const isClassificationsLoading = useSelector(getClassificationsLoadingSelector);
   const isDosageFormsLoading = useSelector(getDosageFormsLoadingSelector);
   const isCategoryFormOptionsLoading = useSelector(getCategoryLoadingSelector);
+  const isGroupListLoading = useSelector(getMedicationGroupsLoadingSelector);
+  const groupList = useSelector(getMedicationGroupsSelector);
   const {
     medication: {
-      categories: { available: isCategories }
+      categories: { available: isCategories },
+      groups: { available: isGroupList }
     },
     isCommunity
   } = useAppTypeConfigs();
-
   const initialValue = useMemo<Array<Partial<IMedicationDataFormValues>>>(
     () => [
       {
@@ -127,6 +136,9 @@ const MedicationForm = ({
     }
     if (isCategories) {
       dispatch(fetchCategoryForms());
+    }
+    if (isGroupList) {
+      dispatch(fetchMedicationGroupsRequest());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, countryId, dosageFormOptions && dosageFormOptions.length]);
@@ -557,6 +569,38 @@ const MedicationForm = ({
   };
 
   /**
+   * Renders the Category Form select input field
+   * @param {string} name - The base name for the field, used to construct the full field name
+   * @param {number} index - The index of the current medication form in the array of forms
+   * @returns {React.ReactNode} The rendered Category Form select input field
+   */
+  const renderGroupForm = (name: string, index: number): React.ReactNode => {
+    return (
+      <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
+        <Field
+          name={`${name}.group`}
+          type='text'
+          validate={required}
+          render={(props) => (
+            <SelectInput
+              {...(props as any)}
+              label='Group'
+              errorLabel='group'
+              labelKey='name'
+              valueKey='id'
+              required={false}
+              options={groupList}
+              loadingOptions={isGroupListLoading}
+              onChange={(value) => detectFieldChange(value, index)}
+              isModel={initialEditValue ? true : false}
+            />
+          )}
+        />
+      </div>
+    );
+  };
+
+  /**
    * Effect hook to set brand options when classification options or initial edit data change
    */
   useEffect(() => {
@@ -600,6 +644,7 @@ const MedicationForm = ({
                     {renderBrand(name, index)}
                     {renderDosageForm(name, index)}
                     {isCategories && renderCategoryForm(name, index)}
+                    {isGroupList && renderGroupForm(name, index)}
                   </div>
                   {renderActionIcons(fields, index, isFirstChild, isLastChild)}
                 </div>
