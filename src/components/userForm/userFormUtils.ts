@@ -81,7 +81,7 @@ const useUserFormUtils = () => {
         groupName: r.groupName,
         id: r.groupName
       })) || [];
-    const suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()] || [];
+    const suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];
     const spiceRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'SPICE') || [];
     const reportRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'REPORTS') || [];
     const insightRoles = (values?.roles || []).filter((r: IRoles) => r.groupName === 'INSIGHTS') || [];

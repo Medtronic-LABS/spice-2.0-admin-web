@@ -474,9 +474,9 @@ const UserForm = ({
     };
     userData.suiteAccess = userData.roles[0];
     userData.role = (userData.roles || []).filter((r: IRoles) => r.groupName === userData.suiteAccess.groupName) || [];
-    if (isRoleExists(userData.role, [SUPER_ADMIN, SUPER_USER, REPORT_ADMIN])) {
+    if (isRoleExists(userData.roles, [SUPER_ADMIN, SUPER_USER, REPORT_ADMIN])) {
       emailDisabledFn(APPCONSTANTS.SUPER_ADMIN_USER_EXCEPTION_HF_CREATE.replace('Super', 'Super/Report'), index);
-    } else if (isCHPCHWSelected(userData.role) && isHFCreate) {
+    } else if (isCHPCHWSelected(userData.roles) && isHFCreate) {
       emailDisabledFn(APPCONSTANTS.CHP_USER_EXCEPTION_HF_CREATE, index);
     } else {
       form.change(`${formName}[${index}].countryCode`, '');
@@ -1116,6 +1116,7 @@ const UserForm = ({
                                 form.change((suiteFormName as any)[r].hfList, []);
                                 if (r === SPICE) {
                                   form.change(`${formName}[${index}].designation`, null);
+                                  form.change(`${formName}[${index}].userUnitId`, null);
                                   // to remove HF4User while removing the SPICE suite
                                   const selectedReportRoles = form.getState().values[formName][index].reportRoles || [];
                                   const isHF4Selected = selectedReportRoles.some(
@@ -1235,6 +1236,7 @@ const UserForm = ({
                                 // Other than chw/chp role village must be clear
                                 form.batch(() => {
                                   form.change(`${formName}[${index}].villages`, {});
+                                  form.change(`${formName}[${index}].userUnitId`, {});
                                 });
                               }
                               // clear designation whenever role gets update
@@ -1354,7 +1356,7 @@ const UserForm = ({
                         type='text'
                         validate={required}
                         render={({ input, meta }) => {
-                          return <TextInput {...input} label='DHIS ID' errorLabel='dhis id' error={isError(meta)} />;
+                          return <TextInput {...input} label='DHIS2 ID' errorLabel='dhis2 id' error={isError(meta)} />;
                         }}
                       />
                     </div>

@@ -231,9 +231,9 @@ const APPCONSTANTS = {
     non_community: 'NON_COMMUNITY'
   },
   // USER
-  CHW_USER_EXCEPTION_HF_CREATE: 'CHW user should not be created in Health facility create',
-  CHP_USER_EXCEPTION_HF_CREATE: 'CHP/CHW user should not be created in Health facility create',
-  SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin should not be added.',
+  CHW_USER_EXCEPTION_HF_CREATE: 'CHW user must not be created in Health facility create',
+  CHP_USER_EXCEPTION_HF_CREATE: 'CHP/CHW user must not be created in Health facility create',
+  SUPER_ADMIN_USER_EXCEPTION_HF_CREATE: 'Existing Super Admin must not be added.',
   PROFILE_DETAIL_ERROR: 'Unable to fetch user details.  Please try after sometime.',
   USER_DETAILS_CREATE_SUCCESS: 'User details created successfully.',
   USER_DETAILS_UPDATE_SUCCESS: 'User details updated successfully.',

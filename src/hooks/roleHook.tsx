@@ -307,8 +307,19 @@ export const useRoleMeta = ({
         }
         return [...allHierarchyAdmins, ...allAFSingleRoles, ...CHPARoles];
       };
+
+      // get valid report roles
+      const getValidReportRoles = (fullRoles: IRoles[], isCommunityCheck: boolean) => {
+        const isReportRoles = fullRoles.filter((role) => role.groupName === 'REPORTS');
+        return isCommunityCheck
+          ? isReportRoles.length
+            ? PHUInchargePlusFacilityReportAdmin.filter((role) => isReportRoles.some((r) => r.name === role))
+            : PHUInchargePlusFacilityReportAdmin
+          : reportAndFacilityAdmin;
+      };
+
       // all roles condition
-      const rolesMeta: IRoleMeta[] = [
+      const rolesMeta = [
         {
           selectedRoles: onlyCHWRoles,
           selectedSuite: SPICE,
@@ -338,7 +349,7 @@ export const useRoleMeta = ({
           },
           disabledREPORTSRoles: {
             suite: REPORTS,
-            validReportRoles: isCommunity ? PHUInchargePlusFacilityReportAdmin : reportAndFacilityAdmin
+            validReportRoles: getValidReportRoles(allRoles, isCommunity)
           },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
