@@ -1235,8 +1235,8 @@ const UserForm = ({
                               } else {
                                 // Other than chw/chp role village must be clear
                                 form.batch(() => {
-                                  form.change(`${formName}[${index}].villages`, {});
-                                  form.change(`${formName}[${index}].userUnitId`, {});
+                                  form.change(`${formName}[${index}].villages`, null);
+                                  form.change(`${formName}[${index}].userUnitId`, null);
                                 });
                               }
                               // clear designation whenever role gets update
