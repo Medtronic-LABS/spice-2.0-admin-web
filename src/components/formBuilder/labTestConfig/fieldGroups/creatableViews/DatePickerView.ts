@@ -5,8 +5,8 @@ import { IComponentConfig, IFieldViewType } from '../../../types/ComponentConfig
 
 export interface IDatePickerFields extends IBaseFields {
   isDefault?: boolean;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string | null;
+  endDate?: string | null;
   disableFutureDate?: boolean;
   minDays?: number | null;
   maxDays?: number | null;
@@ -27,8 +27,8 @@ const getEmptyData = (): IDatePickerFields => ({
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   isDefault: false,
   disableFutureDate: false,
-  minDays: null,
-  maxDays: null
+  startDate: null,
+  endDate: null
 });
 
 const customizableFieldMeta: IBaseFieldMeta = {
@@ -37,7 +37,9 @@ const customizableFieldMeta: IBaseFieldMeta = {
   isMandatory: {},
   disableFutureDate: {},
   minDays: {},
-  maxDays: {}
+  maxDays: {},
+  startDate: {},
+  endDate: {}
 };
 
 /**

@@ -191,6 +191,8 @@ const LabTestCustomizationLayout = () => {
     dateView.isMandatory = true;
     dateView.disableFutureDate = true;
     dateView.orderId = 1;
+    delete dateView.startDate;
+    delete dateView.endDate;
     formValues[id][dateView.id] = dateView;
     setCollapsedGroup(resetCollapsedCalculation(Object.keys(formValues)));
     setFormData(formValues);

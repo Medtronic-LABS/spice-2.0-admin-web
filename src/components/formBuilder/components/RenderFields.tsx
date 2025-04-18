@@ -56,6 +56,7 @@ const getComponentsByFieldName = (
   if (!isNew && (fieldName === 'fieldName' || fieldName === 'inputType')) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
+
   if (
     obj.fieldName === 'TestedOn' &&
     obj.orderId === 1 &&
@@ -63,7 +64,7 @@ const getComponentsByFieldName = (
   ) {
     inputProps = { ...inputProps, ...{ disabled: true } };
   }
-  if (['maxDays'].includes(fieldName) && obj?.disableFutureDate) {
+  if (['maxDays', 'endDate'].includes(fieldName) && obj?.disableFutureDate) {
     inputProps = { ...inputProps, disabled: true };
   }
   // disable fields for customization
@@ -127,19 +128,6 @@ export const CheckboxComponent = ({
     },
     [fieldName, obj]
   );
-
-  /**
-   * Handles the disable future date logic
-   */
-  useEffect(() => {
-    if (obj?.disableFutureDate) {
-      // For old records
-      if (!obj.minDays) {
-        form.change(`${name}.minDays`, null);
-      }
-      form.change(`${name}.maxDays`, null);
-    }
-  }, [obj?.disableFutureDate, obj.minDays, form, name]);
 
   /**
    * Checks the checkbox change

@@ -34,6 +34,7 @@ const DatePickerWrapper = ({
             {...(input as any)}
             label={inputProps?.label}
             isShowLabel={true}
+            disabled={inputProps?.disabled}
             errorLabel={inputProps?.label?.toLowerCase()}
             onChange={(date: Date) => {
               const selectedDate = convertDate(date);

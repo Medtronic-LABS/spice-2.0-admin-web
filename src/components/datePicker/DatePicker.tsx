@@ -17,6 +17,7 @@ interface IDatePickerProps {
   error?: string;
   errorLabel?: string;
   onChange?: (date: any) => void;
+  disabled?: boolean;
 }
 
 /**
@@ -29,6 +30,7 @@ const DatePickerComponent = ({
   isShowLabel = false,
   required = false,
   value,
+  disabled,
   error,
   errorLabel,
   todayButton,
@@ -57,7 +59,7 @@ const DatePickerComponent = ({
   };
 
   return (
-    <div className='datePicker'>
+    <div className={`datePicker ${disabled ? 'disabled' : ''}`}>
       {isShowLabel && (
         <>
           <label className='mb-0dot5 fs-0dot875 lh-1dot25'>
@@ -67,6 +69,7 @@ const DatePickerComponent = ({
         </>
       )}
       <DatePicker
+        disabled={disabled}
         dateFormat='dd/MM/yyyy'
         calendarClassName='datePickerInput'
         icon={<CalendarIcon aria-labelledby={'calendar-icon'} />}
@@ -87,7 +90,7 @@ const DatePickerComponent = ({
           prevMonthButtonDisabled: boolean;
           nextMonthButtonDisabled: boolean;
         }) => (
-          <div className='datePickerHeader'>
+          <div className={`datePickerHeader`}>
             <button
               className={`monthBtn decreaseBtn`}
               onClick={(event) => {

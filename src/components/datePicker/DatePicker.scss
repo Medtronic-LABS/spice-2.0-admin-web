@@ -113,3 +113,15 @@
     }
   }
 }
+
+.disabled {
+  & .react-datepicker__input-container {
+    svg {
+      cursor: not-allowed !important;
+    }
+    input {
+      cursor: not-allowed !important;
+      pointer-events: all !important;
+    }
+  }
+}

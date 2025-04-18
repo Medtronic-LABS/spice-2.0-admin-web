@@ -10,7 +10,8 @@ import DATE_PICKER_CONFIG from '../labTestConfig/fieldGroups/creatableViews/Date
 
 export const creatableViews = [
   { label: 'Text', value: 'EditText' },
-  { label: 'Dropdown', value: 'Spinner' }
+  { label: 'Dropdown', value: 'Spinner' },
+  { label: 'Date', value: 'DatePicker' }
 ];
 
 /**
