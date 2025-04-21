@@ -1,18 +1,18 @@
-import styles from './AddMedication.module.scss';
-import { RouteComponentProps } from 'react-router';
-import MedicationForm, { ICheckDuplicateValidation, IMedicationDataFormValues } from './MedicationForm';
-import { Form, FormRenderProps } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
-import FormContainer from '../../components/formContainer/FormContainer';
 import { Tools } from 'final-form';
-import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import APPCONSTANTS from '../../constants/appConstants';
+import arrayMutators from 'final-form-arrays';
 import { useState } from 'react';
-import MedicationFormIcon from '../../assets/images/info-grey.svg';
-import { PROTECTED_ROUTES } from '../../constants/route';
-import { createMedicationRequest, validateMedication } from '../../store/medication/actions';
+import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import { RouteComponentProps } from 'react-router';
+import MedicationFormIcon from '../../assets/images/info-grey.svg';
+import FormContainer from '../../components/formContainer/FormContainer';
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { createMedicationRequest, validateMedication } from '../../store/medication/actions';
+import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import styles from './AddMedication.module.scss';
+import MedicationForm, { ICheckDuplicateValidation, IMedicationDataFormValues } from './MedicationForm';
 
 export interface IMedicationFormValues {
   medication: IMedicationDataFormValues[];
@@ -51,7 +51,8 @@ const AddMedication = (props: Props): React.ReactElement => {
 
   const {
     medication: {
-      categories: { available: isCategories }
+      categories: { available: isCategories, isMandatory: isCategoryMandatory },
+      groups: { available: isGroup }
     }
   } = useAppTypeConfigs();
 
@@ -118,10 +119,12 @@ const AddMedication = (props: Props): React.ReactElement => {
         name: currentRecord?.name,
         dosageFormId: currentRecord?.dosage_form.id,
         dosageFormName: currentRecord?.dosage_form.name,
-        category: {
-          id: currentRecord?.category?.id,
-          name: currentRecord?.category?.name
-        },
+        category: isCategoryMandatory
+          ? {
+              id: currentRecord?.category?.id,
+              name: currentRecord?.category?.name
+            }
+          : undefined,
         tenantId
       };
       dispatch(
@@ -269,12 +272,15 @@ const AddMedication = (props: Props): React.ReactElement => {
       },
       dosageFormId: medicationData.dosage_form.id,
       dosageFormName: medicationData.dosage_form.name,
-      category: isCategories
-        ? {
-            id: medicationData?.category?.id,
-            name: medicationData?.category?.name
-          }
-        : undefined
+      category:
+        isCategories && medicationData?.category?.id
+          ? {
+              id: medicationData.category.id,
+              name: medicationData.category.name
+            }
+          : undefined,
+      groupName: isGroup && medicationData?.group?.name ? medicationData.group.name : undefined,
+      groupId: isGroup && medicationData?.group?.id ? medicationData.group.id : undefined
     }));
 
     dispatch(

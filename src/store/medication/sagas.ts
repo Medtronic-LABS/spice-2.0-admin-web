@@ -1,13 +1,5 @@
 import { SagaIterator } from 'redux-saga';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
-import {
-  ICreateMedicationRequest,
-  IDeleteMedicationRequest,
-  IFetchClassificationsReq,
-  IFetchMedicationListReq,
-  IUpdateMedicationReq,
-  IValidateMedication
-} from './types';
 import * as medicationService from '../../services/medicationAPI';
 import {
   createMedicationFailure,
@@ -20,6 +12,8 @@ import {
   fetchClassificationsSuccess,
   fetchDosageFormsFailure,
   fetchDosageFormsSuccess,
+  fetchMedicationGroupsFailure,
+  fetchMedicationGroupsSuccess,
   fetchMedicationlistFail,
   fetchMedicationListSuccess,
   updateMedicationFail,
@@ -29,15 +23,21 @@ import {
   CREATE_MEDICATION_REQUEST,
   DELETE_MEDICATION_REQUEST,
   FETCH_CATEGORY_FORM,
-  FETCH_MEDICATIONS_LIST_REQUEST,
   FETCH_MEDICATION_CLASSIFICATIONS_REQUEST,
   FETCH_MEDICATION_DOSAGE_FORM,
+  FETCH_MEDICATION_GROUPS_REQUEST,
+  FETCH_MEDICATIONS_LIST_REQUEST,
   UPDATE_MEDICATION_REQUEST,
-  VALIDATE_MEDICATION,
-  FETCH_MEDICATION_GROUPS_REQUEST
+  VALIDATE_MEDICATION
 } from './actionTypes';
-import { getMedicationGroups } from '../../services/medicationAPI';
-import { fetchMedicationGroupsSuccess, fetchMedicationGroupsFailure } from './actions';
+import {
+  ICreateMedicationRequest,
+  IDeleteMedicationRequest,
+  IFetchClassificationsReq,
+  IFetchMedicationListReq,
+  IUpdateMedicationReq,
+  IValidateMedication
+} from './types';
 
 /*
   Worker Saga: Fired on FETCH_MEDICATIONS_LIST_REQUEST action
@@ -186,8 +186,10 @@ export function* validateMedication({ data, successCb, failureCb }: IValidateMed
 
 function* fetchMedicationGroupsSaga(): SagaIterator {
   try {
-    const response = yield call(medicationService.getMedicationGroups);
-    yield put(fetchMedicationGroupsSuccess(response.data));
+    const {
+      data: { entityList: groups }
+    } = yield call(medicationService.getMedicationGroups);
+    yield put(fetchMedicationGroupsSuccess(groups));
   } catch (error: any) {
     yield put(fetchMedicationGroupsFailure(error.message));
   }

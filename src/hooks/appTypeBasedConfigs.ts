@@ -4,6 +4,7 @@ import { APP_TYPE } from '../constants/appConstants';
 import { countryIdSelector, getAppTypeSelector } from '../store/user/selectors';
 import { labelNameSelector } from '../store/common/selectors';
 
+// Common labels shared across app types
 const commonLabels = {
   region: {
     s: 'Region',
@@ -20,6 +21,17 @@ const commonLabels = {
   chiefdom: { s: 'Sub County', p: 'Sub Counties' }
 };
 
+// Community-specific label overrides
+const communityLabelOverrides = {
+  ...commonLabels,
+  district: {
+    s: 'District',
+    p: 'Districts'
+  },
+  chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' }
+};
+
+// Configuration for COMMUNITY app type
 const COMMUNITY = {
   isCommunity: true,
   GENDER_OPTIONS: [
@@ -57,10 +69,11 @@ const COMMUNITY = {
     activeToogle: { available: true },
     passwordPreference: { available: true }
   },
-  medication: { categories: { available: true }, groups: { available: true } },
+  medication: { categories: { available: true, isMandatory: false }, groups: { available: true } },
   filterComponent: { filterIcon: { available: true } }
 };
 
+// Configuration for NON_COMMUNITY app type
 const NON_COMMUNITY = {
   isCommunity: false,
   GENDER_OPTIONS: [
@@ -96,10 +109,11 @@ const NON_COMMUNITY = {
     activeToogle: { available: false },
     passwordPreference: { available: false }
   },
-  medication: { categories: { available: true }, groups: { available: false } },
+  medication: { categories: { available: true, isMandatory: true }, groups: { available: true } },
   filterComponent: { filterIcon: { available: true } }
 };
 
+// Fallback configuration when no app types are defined
 const noAppTypes = {
   ...COMMUNITY,
   GENDER_OPTIONS: [
@@ -109,8 +123,9 @@ const noAppTypes = {
 };
 
 /**
- * Custom hook to get the label base on the appType.
- * @return {string}
+ * Custom hook to get the application configuration based on the current app type.
+ * Returns different configurations for COMMUNITY vs NON_COMMUNITY app types.
+ * @return {Object} Configuration object with app type specific settings
  */
 const useAppTypeConfigs = () => {
   const appTypesFromUser = useSelector(getAppTypeSelector);
@@ -118,16 +133,7 @@ const useAppTypeConfigs = () => {
   const nonCommunityLabelNames = useSelector(labelNameSelector);
   const labelNames =
     nonCommunityLabelNames && Object.keys(nonCommunityLabelNames).length ? nonCommunityLabelNames : commonLabels;
-  const communityLabelNames = useMemo(() => {
-    return {
-      ...commonLabels,
-      district: {
-        s: 'District',
-        p: 'Districts'
-      },
-      chiefdom: { s: 'Chiefdom', p: 'Chiefdoms' }
-    };
-  }, []);
+
   const appTypes = useMemo(() => {
     // use app types from user object for super admin
     if (appTypesFromUser && appTypesFromUser.length) {
@@ -143,8 +149,8 @@ const useAppTypeConfigs = () => {
     () =>
       Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY)
         ? { ...NON_COMMUNITY, appTypes, ...labelNames }
-        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}), ...communityLabelNames },
-    [appTypes, communityLabelNames, labelNames]
+        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}), ...communityLabelOverrides },
+    [appTypes, labelNames]
   );
 };
 export default useAppTypeConfigs;

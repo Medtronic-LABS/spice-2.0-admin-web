@@ -1,11 +1,8 @@
 # SPICE
 
-> Project SPICE
+**Project SPICE** — Bootstrapped with **Create React App**
 
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
-
-Below you will find some information on how to perform common tasks.
-You can find the most recent version of this guide [here](https://github.com/facebook/create-react-app/blob/master/README.md).
+> **Note:** [Create React App (CRA)](https://create-react-app.dev/) is no longer actively maintained. While this project was originally scaffolded using CRA, we recommend using [Vite](https://vitejs.dev/) for all **new React projects** going forward due to its superior performance, simplicity, and modern tooling.
 
 ## Getting Started
 

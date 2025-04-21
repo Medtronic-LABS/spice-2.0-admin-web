@@ -1,22 +1,15 @@
+import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
-import DetailCard from '../../components/detailCard/DetailCard';
-import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
-import { PROTECTED_ROUTES } from '../../constants/route';
+import CustomTable from '../../components/customTable/CustomTable';
+import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
-import MedicationForm, { IMedicationDataFormValues } from './MedicationForm';
-import arrayMutators from 'final-form-arrays';
+import APPCONSTANTS from '../../constants/appConstants';
+import { PROTECTED_ROUTES } from '../../constants/route';
+import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
-import CustomTable from '../../components/customTable/CustomTable';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  getMedicationClassificationsSelector,
-  getMedicationDosageFormsSelector,
-  getMedicationListCountSelector,
-  getMedicationListSelector,
-  getMedicationLoadingSelector
-} from '../../store/medication/selectors';
 import {
   deleteMedication,
   fetchClassifications,
@@ -24,8 +17,15 @@ import {
   fetchMedicationListReq,
   updateMedication
 } from '../../store/medication/actions';
+import {
+  getMedicationClassificationsSelector,
+  getMedicationDosageFormsSelector,
+  getMedicationListCountSelector,
+  getMedicationListSelector,
+  getMedicationLoadingSelector
+} from '../../store/medication/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import { getAppTypeSelector } from '../../store/user/selectors';
+import MedicationForm, { IMedicationDataFormValues } from './MedicationForm';
 
 /**
  * MedicationList component
@@ -35,12 +35,17 @@ import { getAppTypeSelector } from '../../store/user/selectors';
 const MedicationList = (): React.ReactElement => {
   // Custom hook for table pagination
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const appTypes = useSelector(getAppTypeSelector);
   // State for controlling the medication edit modal
   const [isOpenMedicationModal, setOpenMedicationModal] = useState(false);
   const [medicationInitialValues, setMedicationInitialValues] = useState({});
   const [filters, setFilters] = useState<any>({ classificationIds: [], brandIds: [], dosageFormIds: [] });
   const dispatch = useDispatch();
+  const {
+    medication: {
+      categories: { available: isCategory },
+      groups: { available: isGroup }
+    }
+  } = useAppTypeConfigs();
 
   // Selectors for medication data from Redux store
   const medicationList = useSelector(getMedicationListSelector);
@@ -136,6 +141,7 @@ const MedicationList = (): React.ReactElement => {
       classification: value.classificationId
         ? { id: value.classificationId, name: value.classificationName }
         : undefined,
+      group: value.groupId ? { id: value.groupId, name: value.groupName } : undefined,
       dosage_form: value.dosageFormId ? { id: value.dosageFormId, name: value.dosageFormName } : undefined
     };
     setMedicationInitialValues(editValue);
@@ -192,9 +198,9 @@ const MedicationList = (): React.ReactElement => {
       brandName: data?.brand.name,
       dosageFormId: data?.dosage_form.id,
       dosageFormName: data?.dosage_form.name,
-      ...(appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
-        ? {}
-        : { category: { id: data?.category?.id, name: data?.category?.name } }),
+      category: isCategory && data?.category?.id ? { id: data.category.id, name: data.category.name } : undefined,
+      groupName: isGroup && data?.group?.name ? data.group.name : undefined,
+      groupId: isGroup && data?.group?.id ? data.group.id : undefined,
       name: data?.name,
       id: data?.id,
       codeDetails

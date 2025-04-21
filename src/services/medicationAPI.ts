@@ -75,6 +75,6 @@ export const deleteMedication = (data: IDeleteMedicationRequestPayload) =>
 
 export const getMedicationGroups = () =>
   axios({
-    method: 'GET',
+    method: 'POST',
     url: '/admin-service/medication/group-list'
   });

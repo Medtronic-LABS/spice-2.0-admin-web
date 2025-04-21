@@ -175,6 +175,8 @@ export interface IMedicationPayload {
   dosageFormId: string;
   dosageFormName: string;
   category?: IList;
+  groupId?: string;
+  groupName?: string;
   id?: string;
 }
 

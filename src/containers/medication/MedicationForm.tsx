@@ -45,6 +45,7 @@ export interface IMedicationDataFormValues {
   codeDetails: ICodeDetails;
   dosage_form: IList;
   category: IList;
+  group?: IList;
   country: string | IList;
 }
 
@@ -109,7 +110,7 @@ const MedicationForm = ({
   const groupList = useSelector(getMedicationGroupsSelector);
   const {
     medication: {
-      categories: { available: isCategories },
+      categories: { available: isCategories, isMandatory: isCategoryMandatory },
       groups: { available: isGroupList }
     },
     isCommunity
@@ -130,8 +131,10 @@ const MedicationForm = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialEditData = useMemo<Array<Partial<IMedicationDataFormValues>>>(() => [{ ...initialEditValue }], []);
   useEffect(() => {
-    dispatch(fetchClassifications({ countryId: Number(countryId) }));
-    if (dosageFormOptions && !dosageFormOptions.length) {
+    if (!classificationOptions.length) {
+      dispatch(fetchClassifications({ countryId: Number(countryId) }));
+    }
+    if (!dosageFormOptions.length) {
       dispatch(fetchDosageForms());
     }
     if (isCategories) {
@@ -140,8 +143,7 @@ const MedicationForm = ({
     if (isGroupList) {
       dispatch(fetchMedicationGroupsRequest());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, dosageFormOptions && dosageFormOptions.length]);
+  }, [dispatch, countryId, classificationOptions.length, dosageFormOptions.length, isCategories, isGroupList]);
 
   /**
    * Resets the brand field when classification changes
@@ -548,7 +550,7 @@ const MedicationForm = ({
         <Field
           name={`${name}.category`}
           type='text'
-          validate={required}
+          validate={isCategoryMandatory ? required : undefined}
           render={(props) => (
             <SelectInput
               {...(props as any)}
@@ -556,6 +558,7 @@ const MedicationForm = ({
               errorLabel='category'
               labelKey='name'
               valueKey='id'
+              required={isCategoryMandatory}
               options={categoryList}
               loadingOptions={isCategoryFormOptionsLoading}
               error={(props.meta.touched && props.meta.error) || undefined}
@@ -569,10 +572,10 @@ const MedicationForm = ({
   };
 
   /**
-   * Renders the Category Form select input field
+   * Renders the Group select input field for medication
    * @param {string} name - The base name for the field, used to construct the full field name
    * @param {number} index - The index of the current medication form in the array of forms
-   * @returns {React.ReactNode} The rendered Category Form select input field
+   * @returns {React.ReactNode} The rendered Group select input field
    */
   const renderGroupForm = (name: string, index: number): React.ReactNode => {
     return (
@@ -580,7 +583,6 @@ const MedicationForm = ({
         <Field
           name={`${name}.group`}
           type='text'
-          validate={required}
           render={(props) => (
             <SelectInput
               {...(props as any)}
