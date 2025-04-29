@@ -67,7 +67,6 @@ const getComponentsByFieldName = (
   if (['maxDays', 'endDate'].includes(fieldName) && obj?.disableFutureDate) {
     inputProps = { ...inputProps, disabled: true };
   }
-  // disable fields for customization
   if (isCustomizationForm && !isWorkFlowCustomization) {
     if (
       (obj?.isNeededDefault && ['isMandatory', 'visibility', 'isEnabled'].includes(fieldName)) ||

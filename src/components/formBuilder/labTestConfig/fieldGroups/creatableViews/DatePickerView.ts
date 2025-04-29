@@ -8,6 +8,8 @@ export interface IDatePickerFields extends IBaseFields {
   startDate?: string | null;
   endDate?: string | null;
   disableFutureDate?: boolean;
+  resource?: string;
+  inputType: number;
   minDays?: number | null;
   maxDays?: number | null;
 }
@@ -22,10 +24,12 @@ const getEmptyData = (): IDatePickerFields => ({
   title: '',
   fieldName: '',
   family: '',
+  inputType: 4,
   isMandatory: false,
   isEnabled: true,
   visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
   isDefault: false,
+  resource: '',
   disableFutureDate: false,
   startDate: null,
   endDate: null
@@ -36,6 +40,8 @@ const customizableFieldMeta: IBaseFieldMeta = {
   fieldName: {},
   isMandatory: {},
   disableFutureDate: {},
+  resource: {},
+  inputType: { disabled: true },
   minDays: {},
   maxDays: {},
   startDate: {},

@@ -17,6 +17,7 @@ export const InputTypes = {
   PHONE_NUMBER: 3,
   NUMBER: 2,
   DECIMAL: 8192,
+  DATE: 4,
   DEFAULT: -1
 };
 
@@ -29,6 +30,7 @@ export const unitMeasurementOptions = [
 export const resourceOptions: IResourceOptions = {
   [InputTypes.DECIMAL]: [{ label: 'Quantity', key: 'Quantity' }],
   [InputTypes.NUMBER]: [{ label: 'Quantity', key: 'Quantity' }],
+  [InputTypes.DATE]: [{ label: 'Date', key: 'Date' }],
   [InputTypes.DEFAULT]: [{ label: 'String', key: 'String' }]
 };
 
@@ -106,6 +108,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
     options: [
       { key: InputTypes.NUMBER, label: 'Number' },
       { key: InputTypes.DECIMAL, label: 'Decimal values' },
+      { key: InputTypes.DATE, label: 'Date' },
       { key: InputTypes.DEFAULT, label: 'Text' }
     ],
     required: true,

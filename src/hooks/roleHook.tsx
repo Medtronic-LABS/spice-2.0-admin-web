@@ -34,7 +34,7 @@ import {
   superAdminRoles,
   urlBased,
   villageBasedRoles,
-  PHUInchargeRole,
+  // PHUInchargeRole,
   PHUInchargePlusFacilityReportAdmin
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
@@ -393,16 +393,17 @@ export const useRoleMeta = ({
           disabledREPORTSRoles: { suite: REPORTS, validReportRoles: onlyHF4UserRole },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
-        {
-          selectedRoles: PHUInchargeRole,
-          selectedSuite: REPORTS,
-          disabledSPICERoles: {
-            suite: SPICE,
-            validSpiceRoles: getValidSpiceRolesForFacilityReportAdminSelect()
-          },
-          disabledREPORTSRoles: { suite: REPORTS, validReportRoles: PHUInchargeRole },
-          disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
-        },
+        // due to DHIS code revert
+        // {
+        //   selectedRoles: PHUInchargeRole,
+        //   selectedSuite: REPORTS,
+        //   disabledSPICERoles: {
+        //     suite: SPICE,
+        //     validSpiceRoles: getValidSpiceRolesForFacilityReportAdminSelect()
+        //   },
+        //   disabledREPORTSRoles: { suite: REPORTS, validReportRoles: PHUInchargeRole },
+        //   disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
+        // },
         {
           selectedRoles: insightUserRole,
           selectedSuite: INSIGHTS,

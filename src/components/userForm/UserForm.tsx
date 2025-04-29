@@ -207,8 +207,8 @@ const UserForm = ({
     user: {
       culture: { available: showCulture },
       designation: { available: isDesignationListShow },
-      community: { available: isCommunityListShow },
-      dhisId: { available: showDHISId }
+      community: { available: isCommunityListShow }
+      // dhisId: { available: showDHISId } // due to DHIS code revert
     },
     district: { s: districtSName },
     healthFacility: { s: healthfacilitySName },
@@ -1346,7 +1346,8 @@ const UserForm = ({
                       />
                     </div>
                   )}
-                {isSPICE &&
+                {/* reverted the code */}
+                {/* {isSPICE &&
                   showDHISId &&
                   // only show for CHW user
                   isCHWCHPUser[0] && (
@@ -1360,7 +1361,7 @@ const UserForm = ({
                         }}
                       />
                     </div>
-                  )}
+                  )} */}
                 {isReports && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
