@@ -48,6 +48,7 @@ import ConfirmationModalPopup from '../../components/customTable/ConfirmationMod
 interface IModalState {
   data?: any;
   isOpen: boolean;
+  isActivating: boolean;
   isNextClicked: boolean;
 }
 
@@ -73,7 +74,6 @@ const HealthFacilityList = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
   const hfTypesList = useSelector(hfTypesSelector);
-  // const districtList = useSelector(getAllDistrictListSelector);
   const districtList = useSelector(getDistrictListSelector);
   const chiefdomList = useSelector(getAllChiefdomsSelector);
   const countryId = useCountryId();
@@ -91,6 +91,7 @@ const HealthFacilityList = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
     isOpen: false,
+    isActivating: false,
     data: {} as IHealthFacilityForm,
     isNextClicked: false
   });
@@ -113,6 +114,7 @@ const HealthFacilityList = (): React.ReactElement => {
           searchTerm: listParams.searchTerm,
           userBased: !isSuperUser,
           tenantIds: [tenantId],
+          includesDisabled: true,
           healthFacilityTypes: healthFacilityTypes ?? filters.healthFacilityTypes,
           districtIds: districtIds ?? filters.districtIds,
           chiefdomIds: chiefdomIds ?? filters.chiefdomIds,
@@ -175,7 +177,7 @@ const HealthFacilityList = (): React.ReactElement => {
   useEffect(() => {
     fetchList({ ...filters });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchList, filters.districtIds, filters.chiefdomIds, filters.healthFacilityTypes, listParams]);
+  }, [fetchList, listParams]);
 
   useEffect(() => {
     return () => {
@@ -220,6 +222,7 @@ const HealthFacilityList = (): React.ReactElement => {
       setEditHFDetailsModal({
         ...editHealthFacilityModal,
         isOpen: true,
+        isActivating: true,
         data: {
           ...hfDetails,
           type: { id: hfDetails.type, name: hfDetails.type },
@@ -248,11 +251,13 @@ const HealthFacilityList = (): React.ReactElement => {
     if (editHealthFacilityModal.isNextClicked && !isFromCloseBtn) {
       setEditHFDetailsModal({
         ...editHealthFacilityModal,
+        isActivating: false,
         isNextClicked: !editHealthFacilityModal.isNextClicked,
         isOpen: true
       });
     } else {
       setEditHFDetailsModal({
+        isActivating: false,
         isOpen: false,
         isNextClicked: false,
         data: {}
@@ -534,7 +539,7 @@ const HealthFacilityList = (): React.ReactElement => {
             count={healthFacilityCount}
             onRowEdit={openEditDialogue}
             handlePageChange={handlePage}
-            handleRowClick={handleRowClick}
+            handleRowClick={(rowData) => (rowData.active ? handleRowClick(rowData) : undefined)}
             confirmationTitle={formatUserToastMsg(
               APPCONSTANTS.HEALTH_FACILITY_DELETE_CONFIRMATION,
               healthFacilitySName
@@ -544,14 +549,24 @@ const HealthFacilityList = (): React.ReactElement => {
             customIconStyle={{ width: 18 }}
             isActiveKey='active'
             onActivateClick={(rowData: any) => {
-              setOpenConfirmationModal({ isOpen: true, userData: rowData });
+              if (rowData.active) {
+                setOpenConfirmationModal({ isOpen: true, userData: rowData });
+              } else {
+                openEditDialogue(rowData);
+              }
+            }}
+            isRowDisabledStyle={true}
+            fixedIconPositions={true}
+            actionFormatter={{
+              hideEditIcon: (rowData: any) => !rowData.active
             }}
           />
         </DetailCard>
       </div>
+      {/* edit modal */}
       <ModalForm
         show={editHealthFacilityModal.isOpen}
-        title={`Edit ${healthFacilitySName}`}
+        title={`${editHealthFacilityModal.isActivating ? 'Activate' : 'Edit'} ${healthFacilitySName}`}
         cancelText={editHealthFacilityModal?.isNextClicked ? 'Back' : 'Cancel'}
         submitText={editHealthFacilityModal?.isNextClicked ? 'Submit' : 'Next'}
         handleCancel={closeHealthFacilityEditModal}

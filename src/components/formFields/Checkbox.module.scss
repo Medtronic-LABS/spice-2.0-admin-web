@@ -93,13 +93,16 @@
     border-radius: 6.25rem;
     width: 2.375rem;
     height: 0.9375rem;
-    background-color: var(--checkbox-un-selected-bar-color);
+    background-color: $checkbox-switcher-unselected;
     position: relative;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     vertical-align: middle;
     cursor: pointer;
+    &:hover {
+      background-color: $checkbox-switcher-unselected-hover;
+    }
 
     &:before {
       content: '';
@@ -180,7 +183,10 @@
     }
 
     input[type='checkbox']:checked + .switcher {
-      background-color: var(--medium-blue-20) !important;
+      background-color: $checkbox-switcher-selected !important;
+      &:hover {
+        background-color: $checkbox-switcher-selected-hover !important;
+      }
 
       &:before {
         left: 100% !important;

@@ -181,6 +181,7 @@ export interface IFetchHFListRequest {
   districtIds?: number[] | string[];
   chiefdomIds?: number[] | string[];
   forHFAdmin?: boolean;
+  includesDisabled?: boolean;
   successCb?: (data: IFetchHFListSuccessPayload) => void;
   failureCb?: (error: Error) => void;
 }

@@ -18,6 +18,10 @@
       text-transform: uppercase;
     }
     tr {
+      &.disabled {
+        background-color: $table-row-disabled-background-color !important;
+        cursor: auto !important;
+      }
       > {
         :first-child {
           padding-left: 1.25rem;
@@ -45,6 +49,9 @@
       color: var(--primary-title-text-color);
       padding: 0.5rem;
     }
+  }
+  .iconHidden {
+    visibility: hidden;
   }
   .iconHover {
     align-items: center;

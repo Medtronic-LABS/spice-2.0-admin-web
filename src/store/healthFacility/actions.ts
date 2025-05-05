@@ -119,6 +119,7 @@ export const fetchHFListRequest = ({
   chiefdomIds,
   userBased,
   forHFAdmin,
+  includesDisabled,
   successCb,
   failureCb
 }: Omit<IFetchHFListRequest, 'type'>): IFetchHFListRequest => ({
@@ -133,6 +134,7 @@ export const fetchHFListRequest = ({
   chiefdomIds,
   userBased,
   forHFAdmin,
+  includesDisabled,
   successCb,
   failureCb
 });

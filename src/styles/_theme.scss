@@ -19,11 +19,13 @@
   --medium-blue-120: #1e1098;
   --medium-blue-140: #160c72;
   --grey: #deddd8;
+  --grey-2: #d6d6d4;
   --green: #00a372;
   --off-white: #fcfbf8;
   --burnt-orange: #c35721;
   --light-grey-bg: #bfbfbf;
   --light-grey: #dfdfdf;
+  --light-grey-2: #eaeaea;
   --light-grey-blur: #dfdfdfd4;
   --disabled-grey: #808080;
   --option-disabled: #e6e6e6;
@@ -83,8 +85,12 @@
 
   // switchbox
   --checkbox-selection-color: var(--medium-blue);
-  --checkbox-un-selected-bar-color: var(--grey);
+  --checkbox-un-selected-bar-color: var(--grey-2);
   --checkbox-un-selected-circle-color: var(--white-100);
+  --checkbox-switcher-selected: var(--medium-blue-20);
+  --checkbox-switcher-selected: #d7d2fd;
+  --checkbox-switcher-selected-hover: #{darken(#d7d2fd, 10%)};
+  --checkbox-switcher-un-selected-hover: #{darken(#d6d6d4, 15%)};
 
   //error
   --primary-error-color: var(--red) !important;

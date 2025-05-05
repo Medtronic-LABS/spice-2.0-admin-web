@@ -70,6 +70,34 @@
     border-radius: 5px;
     padding: 0rem 0.4rem;
     font-size: 12px;
+    background-color: var(--off-white);
+  }
+}
+
+.hoverContainer {
+  display: block;
+  width: 100%;
+  background-color: var(--theme-color);
+  .hoverValue {
+    display: block;
+  }
+  .hoverX {
+    display: none;
+  }
+  &:hover {
+    .hoverX {
+      &::before {
+        content: 'X';
+      }
+      transition: content 2s;
+      display: block;
+    }
+    .hoverValue {
+      display: none;
+    }
+    width: fit-content;
+    background-color: var(--danger-color);
+    transition: background-color 1s, width 2s, content 2s;
   }
 }
 

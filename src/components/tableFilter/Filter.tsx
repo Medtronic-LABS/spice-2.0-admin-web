@@ -282,6 +282,11 @@ const TableFilter: React.FC<ITableFilterProps> = ({
   const getSelectValueFn = () => {
     return selectedOptions.length >= filteredOptions.length ? filteredOptions.length : selectedOptions.length;
   };
+
+  const handleReset = () => {
+    isAllSelected.current = true;
+    handleSelectChange(selectAllOptionData as any);
+  };
   return (
     <>
       {filterData.isShow && (
@@ -293,7 +298,10 @@ const TableFilter: React.FC<ITableFilterProps> = ({
           >
             <div className='d-flex align-items-center'>
               {selectedOptions.length && showCountIcon && getSelectValueFn() > 0 ? (
-                <span className='  badge rounded-pill bg-primary'>{getSelectValueFn()}</span>
+                <span className={`badge rounded-pill ${styles.hoverContainer}`}>
+                  <span className={`${styles.hoverValue}`}>{getSelectValueFn()}</span>
+                  <span className={`${styles.hoverX}`}>{}</span>
+                </span>
               ) : (
                 <FilterListIcon />
               )}
@@ -346,14 +354,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
                             {formatHealthFacility(option)}
                           </label>
                           {option.value === '*' && !!selectedOptions.length && (
-                            <label
-                              className={`${styles.closeIcon}`}
-                              onClick={() => {
-                                isAllSelected.current = true;
-                                handleSelectChange(selectAllOptionData as any);
-                              }}
-                            >
-                              {/* <Close aria-label="close" /> */}
+                            <label className={`${styles.closeIcon}`} onClick={handleReset}>
                               Reset
                             </label>
                           )}

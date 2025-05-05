@@ -52,6 +52,7 @@ $main-content-max-width: 1280px;
 //table
 $table-head-background: var(--off-white);
 $table-head-color: var(--black-45);
+$table-row-disabled-background-color: var(--light-grey-2);
 
 // side menu
 $side-menu-border: var(--black-30);
@@ -69,3 +70,9 @@ $today-highlight-color: var(--light-blue);
 $today-highlight-hover-color: var(--medium-light-blue);
 $selected-date-hover-color: var(--medium-blue-140);
 $date-range-color: var(--medium-light-blue);
+
+// checkbox
+$checkbox-switcher-selected: var(--checkbox-switcher-selected);
+$checkbox-switcher-unselected: var(--checkbox-un-selected-bar-color);
+$checkbox-switcher-selected-hover: var(--checkbox-switcher-selected-hover);
+$checkbox-switcher-unselected-hover: var(--checkbox-switcher-un-selected-hover);

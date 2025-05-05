@@ -40,6 +40,7 @@ interface ICustomTableProps {
   customTitle?: string;
   CustomIcon?: any;
   customIconStyle?: any;
+  fixedIconPositions?: boolean;
   page?: number;
   count?: number;
   isActiveKey?: string;
@@ -63,6 +64,7 @@ interface ICustomTableProps {
   rowsPerPage?: number;
   deleteTitle?: string;
   activateTitle?: string;
+  isRowDisabledStyle?: boolean;
   handleRowClick?: (data: any) => void;
   handleCustomIconClicked?: (data: any) => void;
 }
@@ -115,7 +117,9 @@ const CustomTable = (props: ICustomTableProps) => {
     deleteTitle,
     activateTitle,
     handleRowClick,
-    peerSupervisorList = []
+    peerSupervisorList = [],
+    isRowDisabledStyle = false,
+    fixedIconPositions = false
   } = props;
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -343,10 +347,10 @@ const CustomTable = (props: ICustomTableProps) => {
    * Determines the row style
    * @param {boolean} isLastChild - Whether the row is the last child
    */
-  const handleRowStyle = (isLastChild: boolean) => {
+  const handleRowStyle = (isLastChild: boolean, rowDataItem: IAnyObject) => {
     return `${showRowHover || handleRowClick ? styles.showRowHover : ''} ${
       count && count < (rowsPerPage || 10) && isLastChild ? '' : styles.showDivider
-    }`;
+    } ${isRowDisabledStyle && !rowDataItem[isActiveKey || 'active'] ? styles.disabled : ''}`;
   };
 
   /**
@@ -362,11 +366,16 @@ const CustomTable = (props: ICustomTableProps) => {
    * @param {number} rowIndex - The index of the row
    */
   const handleShowEditIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
+    const isShowEditIcon =
+      !actionFormatter?.hideEditIcon || (actionFormatter?.hideEditIcon && !actionFormatter?.hideEditIcon(rowDataValue));
     return (
       isEdit &&
-      (!actionFormatter?.hideEditIcon ||
-        (actionFormatter?.hideEditIcon && !actionFormatter?.hideEditIcon(rowDataValue))) && (
-        <div className={styles.editIcon} data-testid='edit-icon' onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}>
+      (!fixedIconPositions ? isShowEditIcon : true) && (
+        <div
+          className={`${styles.editIcon} ${!isShowEditIcon && fixedIconPositions ? styles.iconHidden : ''}`}
+          data-testid='edit-icon'
+          onClick={(e) => handleEdit(e, rowDataValue, rowIndex)}
+        >
           <CustomTooltip title={'Edit'}>
             <EditIcon aria-labelledby={'edit-icon'} />
           </CustomTooltip>
@@ -431,11 +440,16 @@ const CustomTable = (props: ICustomTableProps) => {
    * @param {number} rowIndex - The index of the row
    */
   const handleShowCustomIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
-    return isCustom &&
-      (!actionFormatter?.hideCustomIcon ||
-        (actionFormatter?.hideCustomIcon && !actionFormatter?.hideCustomIcon(rowDataValue))) ? (
+    const isShowCustomIcon =
+      !actionFormatter?.hideCustomIcon ||
+      (actionFormatter?.hideCustomIcon && !actionFormatter?.hideCustomIcon(rowDataValue));
+    return isCustom && (!fixedIconPositions ? isShowCustomIcon : true) ? (
       <div
-        className={rowDataValue.isCustomIconInvisible ? `${styles.customIcon} invisible` : styles.customIcon}
+        className={
+          rowDataValue.isCustomIconInvisible
+            ? `${styles.customIcon} invisible`
+            : styles.customIcon + ` ${!isShowCustomIcon && fixedIconPositions ? styles.iconHidden : ''}`
+        }
         data-testid='custom-icon'
         onClick={(e) => handleCustomIconClick(e, rowDataValue, rowIndex, isPopupNeeded)}
       >
@@ -454,13 +468,15 @@ const CustomTable = (props: ICustomTableProps) => {
    * @param {number} rowIndex - The index of the row
    */
   const handleShowDeleteIcon = (rowDataValue: IAnyObject, rowIndex: number) => {
+    const isShowDeleteIcon =
+      !actionFormatter?.hideDeleteIcon ||
+      (actionFormatter?.hideDeleteIcon && !actionFormatter?.hideDeleteIcon(rowDataValue));
     return (
       isDelete &&
-      (!actionFormatter?.hideDeleteIcon ||
-        (actionFormatter?.hideDeleteIcon && !actionFormatter?.hideDeleteIcon(rowDataValue))) && (
+      (!fixedIconPositions ? isShowDeleteIcon : true) && (
         <div
           data-testid='delete-icon'
-          className={styles.deleteIcon}
+          className={`${styles.deleteIcon} ${!isShowDeleteIcon && fixedIconPositions ? styles.iconHidden : ''}`}
           onClick={(e) => handleDelete(e, rowDataValue, rowIndex)}
         >
           <CustomTooltip title={'Delete'}>
@@ -576,7 +592,7 @@ const CustomTable = (props: ICustomTableProps) => {
                   <tr
                     key={rowDataItem.id || rowIndex}
                     onClick={() => navigateToDetail(rowDataItem)}
-                    className={handleRowStyle(isLastChild)}
+                    className={handleRowStyle(isLastChild, rowDataItem)}
                     data-testid={`row-${rowDataItem.id || rowIndex}`}
                   >
                     {columnsDef &&

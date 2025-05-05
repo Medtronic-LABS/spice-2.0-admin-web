@@ -22,7 +22,8 @@ export const fetchHealthFacilityList = ({
   tenantIds = [],
   healthFacilityTypes = [],
   districtIds = [],
-  chiefdomIds = []
+  chiefdomIds = [],
+  includesDisabled = false
 }: IFetchHFListRequest) =>
   axios({
     method: 'POST',
@@ -38,7 +39,8 @@ export const fetchHealthFacilityList = ({
       userBased,
       tenantBased,
       searchTerm: searchTerm || '',
-      ...(tenantIds.length ? { tenantIds } : {})
+      ...(tenantIds.length ? { tenantIds } : {}),
+      ...(includesDisabled ? { includesDisabled } : {})
     }
   });
 
