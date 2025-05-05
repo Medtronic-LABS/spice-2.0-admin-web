@@ -194,7 +194,7 @@ export function validateFullName(name: string) {
 /**
  * To check whether mobile number contains valid digits and pattern
  * @param mobileNo mobile number string
- * @param isSl boolean to indicate if Sri Lankan validation should be applied
+ * @param isSl boolean to indicate if Sierra Leone validation should be applied
  * @returns {string} error message or empty string
  */
 export function validateMobile(mobileNo: string, isSl: boolean): string {
@@ -204,17 +204,17 @@ export function validateMobile(mobileNo: string, isSl: boolean): string {
 
   if (typeof isSl === 'boolean' && isSl) {
     // For SL:
-    // Check if the number starts with zero
-    if (mobileNo.startsWith('0')) {
-      return 'Please enter a valid ';
+    // Check if the number starts with- 0, 2, 3, 7, 8, 9
+    if (!/^[023789]/.test(mobileNo)) {
+      return 'Please enter a valid1 ';
     }
-    // 1. Check if number has 8-10 digits
-    const digitCheck = /^\d{8,10}$/;
+    // 1. Check if number has 8 digits
+    const digitCheck = /^\d{8}$/;
     // 2. Check for 5 or more consecutive same digits
     const repeatingDigitsCheck = /(\d)\1{4,}/;
 
     // Number is invalid if:
-    // - it doesn't have 8-10 digits OR
+    // - it doesn't have 8 digits OR
     // - it has 5 or more consecutive same digits
     if (!digitCheck.test(mobileNo) || repeatingDigitsCheck.test(mobileNo)) {
       return 'Please enter a valid ';
@@ -248,7 +248,7 @@ export function validateEntityName(value: string) {
 }
 
 /**
- * To verify if the values is less than the max value
+ * To verify if the value is less than the max value
  * @param max Input number
  */
 export function checkIfLessThan(max: number) {
@@ -260,7 +260,7 @@ export function checkIfLessThan(max: number) {
 }
 
 /**
- * To verify if the values is greater than the min value
+ * To verify if the value is greater than the min value
  * @param min Input number
  */
 export function checkIfGreater(min: number) {
@@ -280,14 +280,14 @@ export function validateCountryCode(code: string) {
  * To restrict phone to enter 10 characters
  * @param value
  */
-export function normalizePhone(value: any) {
+export function normalizePhone(value: any, name?: string, maxLen = 10) {
   // while using parse it returns empty string to an object when no value is entered in the input.
   // Implemented to get undefined.
   if (!value) {
     return undefined;
   }
   const onlyNums = value.replace(/[^\d]/g, '');
-  return onlyNums.slice(0, 10);
+  return onlyNums.slice(0, maxLen);
 }
 
 export function normalizeFloatingNumber(value: any) {

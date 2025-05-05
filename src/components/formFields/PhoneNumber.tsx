@@ -144,7 +144,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
         validateIfNumberExist,
         validateDuplication
       )}
-      parse={normalizePhone}
+      parse={(value) => normalizePhone(value, '', 8)}
       render={({ input, meta }: FieldRenderProps<string>) => {
         return (
           <TextInput
