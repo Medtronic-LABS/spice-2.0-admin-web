@@ -36,6 +36,7 @@ import {
 } from '../../store/medication/actions';
 import { IList } from '../../store/medication/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import MultiSelect from '../../components/multiSelect/MultiSelect';
 
 export interface IMedicationDataFormValues {
   id?: number;
@@ -45,7 +46,7 @@ export interface IMedicationDataFormValues {
   codeDetails: ICodeDetails;
   dosage_form: IList;
   category: IList;
-  group?: IList;
+  groups?: IList[];
   country: string | IList;
 }
 
@@ -581,20 +582,25 @@ const MedicationForm = ({
     return (
       <div className={`${disableOptions ? 'col-6' : 'col-12 col-sm-6 col-lg-3'}`}>
         <Field
-          name={`${name}.group`}
+          name={`${name}.groups`}
           type='text'
-          render={(props) => (
-            <SelectInput
-              {...(props as any)}
+          render={({ input, meta }) => (
+            <MultiSelect
+              {...(input as any)}
               label='Group'
               errorLabel='group'
               labelKey='name'
               valueKey='id'
               required={false}
-              options={groupList}
+              isShowLabel={true}
+              isSelectAll={true}
+              isDefaultSelected={true}
+              placeholder=''
+              menuPlacement={'auto'}
+              isModel={true}
+              isMulti={true}
+              options={groupList || []}
               loadingOptions={isGroupListLoading}
-              onChange={(value) => detectFieldChange(value, index)}
-              isModel={initialEditValue ? true : false}
             />
           )}
         />

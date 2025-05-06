@@ -39,6 +39,7 @@ export interface IMedicationList {
     id: string;
     name: string;
   };
+  groups: IList[];
 }
 
 export interface IMedicationState {
@@ -175,8 +176,7 @@ export interface IMedicationPayload {
   dosageFormId: string;
   dosageFormName: string;
   category?: IList;
-  groupId?: string;
-  groupName?: string;
+  groups?: IList[];
   id?: string;
 }
 

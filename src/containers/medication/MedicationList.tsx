@@ -141,7 +141,6 @@ const MedicationList = (): React.ReactElement => {
       classification: value.classificationId
         ? { id: value.classificationId, name: value.classificationName }
         : undefined,
-      group: value.groupId ? { id: value.groupId, name: value.groupName } : undefined,
       dosage_form: value.dosageFormId ? { id: value.dosageFormId, name: value.dosageFormName } : undefined
     };
     setMedicationInitialValues(editValue);
@@ -199,8 +198,7 @@ const MedicationList = (): React.ReactElement => {
       dosageFormId: data?.dosage_form.id,
       dosageFormName: data?.dosage_form.name,
       category: isCategory && data?.category?.id ? { id: data.category.id, name: data.category.name } : undefined,
-      groupName: isGroup && data?.group?.name ? data.group.name : undefined,
-      groupId: isGroup && data?.group?.id ? data.group.id : undefined,
+      groups: isGroup && data?.groups.length ? data.groups : undefined,
       name: data?.name,
       id: data?.id,
       codeDetails
