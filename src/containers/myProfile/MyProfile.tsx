@@ -171,15 +171,18 @@ const MyProfile = (): React.ReactElement => {
       {loading && <Loader />}
       <DetailCard buttonLabel='Edit My Profile' isEdit={true} header='My Profile' onButtonClick={handleEditClick}>
         <div className='row gy-1 mt-0dot25 mb-1dot25 mx-0dot5'>
-          {lableData.map(({ label, value, colClassName }) =>
-            label === 'Timezone' && isCommunity ? (
-              <></>
-            ) : (
-              <div key={label} className={colClassName || 'col-lg-4 col-sm-6'}>
-                <div className='charcoal-grey-text'>{label}</div>
-                <div className='primary-title text-ellipsis'>{value || '--'}</div>
-              </div>
-            )
+          {lableData.map(
+            ({ label, value, colClassName }) =>
+              !(label === 'Timezone' && isCommunity) && (
+                <div key={label} className={colClassName || 'col-lg-4 col-sm-6'}>
+                  <div key={label + '1'} className='charcoal-grey-text'>
+                    {label}
+                  </div>
+                  <div key={label + '2'} className='primary-title text-ellipsis'>
+                    {value || '--'}
+                  </div>
+                </div>
+              )
           )}
         </div>
       </DetailCard>

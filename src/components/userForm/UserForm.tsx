@@ -1607,7 +1607,7 @@ const UserForm = ({
                     name={name}
                     formName={formName}
                     index={index}
-                    disabled={isCHW}
+                    disabled={isCHW && !isProfile}
                     countryCode={
                       isRegionCreate
                         ? form.getState().values?.users[index]?.countryCode

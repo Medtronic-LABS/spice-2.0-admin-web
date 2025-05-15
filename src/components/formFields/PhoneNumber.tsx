@@ -1,4 +1,4 @@
-import { Field, FieldRenderProps } from 'react-final-form';
+import { Field, FieldMetaState, FieldRenderProps } from 'react-final-form';
 import { composeValidators, normalizePhone, required, validateMobile } from '../../utils/validation';
 import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
@@ -11,6 +11,7 @@ import { IHFUserGet } from '../../store/healthFacility/types';
 import { validatePhoneNumber } from '../../services/userAPI';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { useSelector } from 'react-redux';
+import { errorMsgs } from '../../constants/erroMsgs';
 
 interface IProps {
   id: number;
@@ -134,6 +135,28 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentphoneNumber, countryCode]);
 
+  // error functions
+  const getErrorMsg = (meta: FieldMetaState<string>) => {
+    if (isNetworkError) {
+      return 'Phone number is not validated.';
+    } else {
+      return (meta.touched && (meta.error || '')) || undefined;
+    }
+  };
+  const getErrorLabel = (meta: FieldMetaState<string>) => {
+    if (
+      alreadyExistError === meta.error ||
+      isNetworkError ||
+      !meta.error ||
+      meta.error === ' ' ||
+      meta.error === errorMsgs.PH_NO_STARTS_WITH_ERROR
+    ) {
+      return '';
+    } else {
+      return 'phone number';
+    }
+  };
+
   return (
     <Field
       name={`${name}.${fieldName}`}
@@ -170,14 +193,8 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
             lowerCase={true}
             showLoader={loading}
             label='Phone Number'
-            errorLabel={
-              alreadyExistError === meta.error || isNetworkError || !meta.error || meta.error === ' '
-                ? ''
-                : 'phone number'
-            }
-            error={
-              (isNetworkError ? 'Phone number is not validated.' : meta.touched && (meta.error || '')) || undefined
-            }
+            errorLabel={getErrorLabel(meta)}
+            error={getErrorMsg(meta)}
             helpertext={
               isNetworkError ? (
                 <div>

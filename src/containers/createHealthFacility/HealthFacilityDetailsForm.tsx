@@ -1,6 +1,6 @@
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Field } from 'react-final-form';
+import { Field, FieldMetaState } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
@@ -9,7 +9,7 @@ import SelectInput from '../../components/formFields/SelectInput';
 import TextInput from '../../components/formFields/TextInput';
 import MapWrapper from '../../components/map/MapContainer';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
-import APPCONSTANTS from '../../constants/appConstants';
+import APPCONSTANTS, { SL_REGION } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
@@ -60,6 +60,8 @@ import {
 } from '../../utils/validation';
 import Workflows from '../healthFacility/Workflows';
 import './HealthFacilityDetails.scss';
+import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { errorMsgs } from '../../constants/erroMsgs';
 
 interface IAddUserFormProps {
   formName: string;
@@ -109,6 +111,7 @@ const HealthFacilityDetailsForm = ({
   const languageLoading = useSelector(cultureLoadingSelector);
   const columnStyle = `${isEdit ? 'col-sm-6 col-md-4' : 'col-md-6 col-lg-3'} col-12`;
   const country = useSelector(countryIdSelector);
+  const regionDetails = useSelector(getRegionDetailsSelector);
   const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
   const {
     appTypes,
@@ -382,6 +385,14 @@ const HealthFacilityDetailsForm = ({
     handleSubmit(geoLocation.lat, geoLocation.long);
   };
 
+  const getErrorLabel = (meta: FieldMetaState<string>) => {
+    if (meta.error === errorMsgs.PH_NO_STARTS_WITH_ERROR) {
+      return '';
+    } else {
+      return phuFocalPersonNumberError;
+    }
+  };
+
   return (
     <>
       {isNextClicked ? (
@@ -458,13 +469,15 @@ const HealthFacilityDetailsForm = ({
             <Field
               name={`${formName}.phuFocalPersonNumber`}
               type='text'
-              validate={composeValidators(required, validateMobile)}
-              parse={normalizePhone}
+              validate={composeValidators(required, (value: string) =>
+                validateMobile(value, SL_REGION.includes(regionDetails.name))
+              )}
+              parse={(value) => normalizePhone(value, '', 8)}
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
                   label={phuFocalPersonNumberLabel}
-                  errorLabel={phuFocalPersonNumberError}
+                  errorLabel={getErrorLabel(meta)}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
                 />

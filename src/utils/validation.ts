@@ -1,4 +1,5 @@
 import APPCONSTANTS from '../constants/appConstants';
+import { errorMsgs } from '../constants/erroMsgs';
 
 export const isEmpty = (value: string | undefined | null) =>
   value === undefined || value === null || value === '' || value.length === 0;
@@ -205,8 +206,8 @@ export function validateMobile(mobileNo: string, isSl: boolean): string {
   if (typeof isSl === 'boolean' && isSl) {
     // For SL:
     // Check if the number starts with- 0, 2, 3, 7, 8, 9
-    if (!/^[023789]/.test(mobileNo)) {
-      return 'Please enter a valid1 ';
+    if (!/^[23789]/.test(mobileNo)) {
+      return errorMsgs.PH_NO_STARTS_WITH_ERROR;
     }
     // 1. Check if number has 8 digits
     const digitCheck = /^\d{8}$/;
