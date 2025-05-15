@@ -103,7 +103,10 @@ import {
   IFetchAllHFListSuccess,
   IFetchHFStatusRequest,
   IFetchHFStatusSuccess,
-  IFetchHFStatusFailure
+  IFetchHFStatusFailure,
+  IActivateHFRequest,
+  IActivateHFSuccess,
+  IActivateHFFailure
 } from '../healthFacility/types';
 import ApiError from '../../global/ApiError';
 import { IClearChiefdomList } from '../chiefdom/types';
@@ -373,6 +376,25 @@ export const updateHFDetailsSuccess = (): IUpdateHFDetailsSuccess => ({
 
 export const updateHFDetailsFailure = (error: Error): IUpdateHFDetailsFailure => ({
   type: HF_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_FAILURE,
+  error
+});
+export const activateHFRequest = ({
+  data,
+  successCb,
+  failureCb
+}: Omit<IActivateHFRequest, 'type'>): IActivateHFRequest => ({
+  type: HF_TYPES.ACTIVATE_HEALTH_FACILITY_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const activateHFSuccess = (): IActivateHFSuccess => ({
+  type: HF_TYPES.ACTIVATE_HEALTH_FACILITY_SUCCESS
+});
+
+export const activateHFFailure = (error: Error): IActivateHFFailure => ({
+  type: HF_TYPES.ACTIVATE_HEALTH_FACILITY_FAILURE,
   error
 });
 

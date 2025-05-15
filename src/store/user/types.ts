@@ -55,7 +55,7 @@ export interface IUserFormProps {
     isAdminForm?: boolean;
   };
   isPeerSupervisor?: boolean;
-  isCHW?: boolean;
+  isActivating?: boolean;
 }
 
 export interface IOrganizations {
@@ -854,19 +854,6 @@ export interface IUpdateTermsConditionsFailure {
   error: any;
 }
 
-export interface IUpdateUserStatusRequest {
-  type: typeof USER_TYPES.UPDATE_USER_STATUS_REQUEST;
-  payload: {
-    id: number;
-    isActive: boolean;
-    tenantId: number;
-    countryId: number;
-    appTypes: string[];
-    successCb?: () => void;
-    failureCb?: (error: any) => void;
-  };
-}
-
 // Payload Types
 export interface IFetchCHWListRequest {
   type: typeof USER_TYPES.FETCH_CHW_LIST_REQUEST;
@@ -884,6 +871,29 @@ export interface ICHWUser {
   name: string;
   email: string;
   phoneNumber: string;
+}
+
+export interface IUpdateUserStatusPayload {
+  id: number;
+  isActive: boolean;
+  tenantId: number;
+  countryId: number;
+  appTypes: string[];
+  successCb?: () => void;
+  failureCb?: (error: any) => void;
+}
+
+export interface IUpdateUserStatusRequest {
+  type: typeof USER_TYPES.UPDATE_USER_STATUS_REQUEST;
+  payload: IUpdateUserStatusPayload;
+}
+
+export interface IUpdateUserStatusSuccess {
+  type: typeof USER_TYPES.UPDATE_USER_STATUS_SUCCESS;
+}
+export interface IUpdateUserStatusFailure {
+  type: typeof USER_TYPES.UPDATE_USER_STATUS_FAILURE;
+  error: any;
 }
 
 export interface IReassignCHWRequest {
@@ -996,5 +1006,7 @@ export type UserActions =
   | IUpdateTermsConditionsSuccess
   | IUpdateTermsConditionsFailure
   | IUpdateUserStatusRequest
+  | IUpdateUserStatusSuccess
+  | IUpdateUserStatusFailure
   | IReassignCHWRequest
   | IOfflineSyncRequest;

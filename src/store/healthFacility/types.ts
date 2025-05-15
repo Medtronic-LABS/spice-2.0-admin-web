@@ -75,6 +75,7 @@ export interface IFetchHFDashboardListRequest {
 export interface IHealthFacility {
   id: number;
   name: string;
+  active?: boolean;
   type: string;
   phuFocalPersonName: string;
   phuFocalPersonNumber: string;
@@ -438,6 +439,22 @@ export interface IUpdateHFDetailsSuccess {
 
 export interface IUpdateHFDetailsFailure {
   type: typeof ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_FAILURE;
+  error: Error;
+}
+
+export interface IActivateHFRequest {
+  type: typeof ACTION_TYPES.ACTIVATE_HEALTH_FACILITY_REQUEST;
+  data: { id: number; tenantId: number; linkedVillageIds: number[] };
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IActivateHFSuccess {
+  type: typeof ACTION_TYPES.ACTIVATE_HEALTH_FACILITY_SUCCESS;
+}
+
+export interface IActivateHFFailure {
+  type: typeof ACTION_TYPES.ACTIVATE_HEALTH_FACILITY_FAILURE;
   error: Error;
 }
 
@@ -867,6 +884,9 @@ export type HealthFacilityActions =
   | IUpdateHFDetailsRequest
   | IUpdateHFDetailsSuccess
   | IUpdateHFDetailsFailure
+  | IActivateHFRequest
+  | IActivateHFSuccess
+  | IActivateHFFailure
   | IUpdateHFUserRequest
   | IUpdateHFUserSuccess
   | IUpdateHFUserFailure

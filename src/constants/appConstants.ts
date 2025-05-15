@@ -183,6 +183,8 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_USERS_FETCH_ERROR: 'Unable to load module_name users. Please try after sometime.',
   HEALTH_FACILITY_DETAILS_UPDATE_ERROR: 'Unable to update module_name details. Please try after sometime.',
   HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS: 'Module_name details updated successfully.',
+  HEALTH_FACILITY_ACTIVATE_ERROR: 'Unable to activate module_name. Please try after sometime.',
+  HEALTH_FACILITY_ACTIVATE_SUCCESS: 'Module_name activated successfully.',
   HEALTH_FACILITY_DETAILS_FETCH_ERROR: 'Unable to load module_name details. Please try after sometime.',
   HEALTH_FACILITY_SUMMARY_UPDATE_ERROR: 'Unable to update module_name summary details. Please try after sometime.',
   HEALTH_FACILITY_CREATION_SUCCESS: 'Module_name created successfully',

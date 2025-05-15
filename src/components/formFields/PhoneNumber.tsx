@@ -21,7 +21,7 @@ interface IProps {
   formName: string;
   index: number;
   countryCode: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode, disabled }: IProps) => {

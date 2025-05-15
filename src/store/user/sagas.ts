@@ -484,17 +484,23 @@ function* updateUserStatusSaga({ payload }: any): SagaIterator {
       id,
       appTypes,
       countryId,
-      tenantIds: tenantId ? [tenantId] : [],
+      tenantId: undefined,
+      tenantIds: undefined,
       villageIds: payload?.villageIds,
       supervisorId: payload?.peerSupervisorId
     };
+    apiPayload[`tenantId${isActive ? '' : 's'}`] = isActive ? tenantId : [tenantId];
     yield call(isActive ? activateUser : deactivateUser, apiPayload);
     if (successCb) {
       successCb();
     }
+    yield put(userActions.updateUserStatusSuccess());
   } catch (error) {
-    if (payload.failureCb) {
-      payload.failureCb(error);
+    if (error instanceof Error) {
+      if (payload.failureCb) {
+        payload.failureCb(error);
+      }
+      yield put(userActions.updateUserStatusFailure(error));
     }
   }
 }

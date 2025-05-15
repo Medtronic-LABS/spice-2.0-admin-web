@@ -28,7 +28,8 @@ import {
   IFetchVillagesListUserLinked,
   IWorkflow,
   IFetchCityListRequest,
-  IFetchHFStatusRequest
+  IFetchHFStatusRequest,
+  IActivateHFRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -80,7 +81,9 @@ import {
   setAssignedHFListForHFAdmin,
   fetchCityListFailure,
   updateHFStatusSuccess,
-  updateHFStatusFailure
+  updateHFStatusFailure,
+  activateHFSuccess,
+  activateHFFailure
 } from './actions';
 import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
@@ -108,7 +111,8 @@ import {
   FETCH_UNLINKED_VILLAGES_REQUEST,
   FETCH_VILLAGES_LIST_USER_LINKED,
   FETCH_CITY_LIST_REQUEST_FOR_HF,
-  HF_STATUS_CHANGE_REQUEST
+  HF_STATUS_CHANGE_REQUEST,
+  ACTIVATE_HEALTH_FACILITY_REQUEST
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
@@ -256,6 +260,22 @@ export function* updateHFDetailsRequest({ data, successCb, failureCb }: IUpdateH
     if (e instanceof Error) {
       failureCb?.(e);
       yield put(updateHFDetailsFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on ACTIVATE_HEALTH_FACILITY_REQUEST action
+*/
+export function* activateHFRequest({ data, successCb, failureCb }: IActivateHFRequest): SagaIterator {
+  try {
+    yield call(hfService.activateHF as any, data);
+    successCb?.();
+    yield put(activateHFSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(activateHFFailure(e));
     }
   }
 }
@@ -760,6 +780,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(DELETE_HEALTH_FACILITY_REQUEST, deleteHFRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_SUMMARY_REQUEST, fetchHFSummaryRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_DETAILS_REQUEST, updateHFDetailsRequest)]);
+  yield all([takeLatest(ACTIVATE_HEALTH_FACILITY_REQUEST, activateHFRequest)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_USER_LIST_REQUEST, fetchHFUserList)]);
   yield all([takeLatest(FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST, fetchUserDetailRequest)]);
   yield all([takeLatest(DELETE_HEALTH_FACILITY_USER_REQUEST, deleteHFUserRequest)]);

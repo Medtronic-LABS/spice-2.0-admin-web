@@ -76,6 +76,21 @@ export const updateHFDetails = (data: IHealthFacilityPost) =>
     data
   });
 
+export const activateHF = ({
+  id,
+  tenantId,
+  linkedVillageIds
+}: {
+  id: number;
+  tenantId: number;
+  linkedVillageIds: number[];
+}) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/healthfacility/activate',
+    data: { id, tenantId, linkedVillageIds }
+  });
+
 export const fetchHealthFacilityTypes = () =>
   axios({
     method: 'POST',

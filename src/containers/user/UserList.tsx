@@ -78,6 +78,7 @@ export interface IUserModalState {
   isOpen: boolean;
   isEdit: boolean;
   isSupervisor?: boolean;
+  isActivating?: boolean;
 }
 
 // Separate states for each modal
@@ -135,7 +136,8 @@ const UserList = (): React.ReactElement => {
   const [isOpenCHWUserModal, setIsOpenCHWUserModal] = useState<IUserModalState>({
     isOpen: false,
     isEdit: false,
-    isSupervisor: false
+    isSupervisor: false,
+    isActivating: false
   });
 
   const { pathname } = useLocation();
@@ -146,6 +148,7 @@ const UserList = (): React.ReactElement => {
   // State management for user activation/deactivation
   const [openConfirmationModal, setOpenConfirmationModal] = useState<{
     isOpen: boolean;
+    isActivating: boolean;
     userData: any;
     roleId?: number;
     title?: string;
@@ -158,7 +161,7 @@ const UserList = (): React.ReactElement => {
     onCancel?: () => void;
     WarningMessage?: string;
     syncDate?: string | null;
-  }>({ isOpen: false, userData: {} });
+  }>({ isOpen: false, isActivating: false, userData: {} });
   const {
     appTypes,
     userList: {
@@ -296,7 +299,7 @@ const UserList = (): React.ReactElement => {
    */
   const handleCancelClick = () => {
     setIsOpenUserModal({ isOpen: false, isEdit: true });
-    setIsOpenCHWUserModal({ isOpen: false, isEdit: false });
+    setIsOpenCHWUserModal({ isOpen: false, isEdit: false, isActivating: false });
     userForEdit.current = { users: [] as IHFUserGet[] };
     fetchList(); // get list of HF for filter dropdown, while closing the modal
   };
@@ -314,7 +317,7 @@ const UserList = (): React.ReactElement => {
     }
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
-    setOpenConfirmationModal({ isOpen: false, userData: {} });
+    setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
     setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
     setIsOpenCHWListModal({ isOpen: false });
     handlePeerSupervisorModalCancel();
@@ -332,7 +335,7 @@ const UserList = (): React.ReactElement => {
     }
     refreshHFUserList();
     setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
-    setOpenConfirmationModal({ isOpen: false, userData: {} });
+    setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
     setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
     setIsOpenCHWListModal({ isOpen: false });
     handlePeerSupervisorModalCancel();
@@ -480,11 +483,7 @@ const UserList = (): React.ReactElement => {
         userFormParams={{
           isReportSuperAdmin
         }}
-        isCHW={
-          (openConfirmationModal?.userData?.roles?.some((chwRole: { name: string }) => chwRole?.name === 'CHW') &&
-            !openConfirmationModal?.userData?.active) ||
-          false
-        }
+        isActivating={openConfirmationModal.isActivating || isOpenCHWUserModal.isActivating}
       />
     );
   };
@@ -754,7 +753,7 @@ const UserList = (): React.ReactElement => {
         appTypes,
         successCb: () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.USER_ACTIVATED);
-          setOpenConfirmationModal({ isOpen: false, userData: {} });
+          setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
           handleCancelClick();
           refreshHFUserList();
         },
@@ -828,6 +827,7 @@ const UserList = (): React.ReactElement => {
         : BUTTON_TEXT.STANDARD;
       setOpenConfirmationModal({
         isOpen: true,
+        isActivating: !data.active,
         userData: data,
         roleId: getPeerSupervisorRoleId(data),
         title: `${data.active ? 'Deactivate' : 'Activate'} User`,
@@ -847,8 +847,8 @@ const UserList = (): React.ReactElement => {
             }
             // setOpenConfirmationModal({ isOpen: false, userData: data });
           } else if (isChwActivate) {
-            setOpenConfirmationModal({ isOpen: false, userData: data });
-            setIsOpenCHWUserModal({ isOpen: true, isEdit: true });
+            setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: data });
+            setIsOpenCHWUserModal({ isOpen: true, isEdit: true, isActivating: true });
           } else {
             dispatch(
               updateUserStatus({
@@ -862,7 +862,8 @@ const UserList = (): React.ReactElement => {
                     APPCONSTANTS.SUCCESS,
                     !data.active ? APPCONSTANTS.USER_ACTIVATED : APPCONSTANTS.USER_DEACTIVATED
                   );
-                  setOpenConfirmationModal({ isOpen: false, userData: {} });
+                  userForEdit.current = { users: [] };
+                  setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
                   refreshHFUserList();
                 },
                 failureCb: (e) => {
@@ -957,7 +958,7 @@ const UserList = (): React.ReactElement => {
         payload,
         () => {
           toastCenter.success(APPCONSTANTS.SUCCESS, 'CHWs Reassigned successfully');
-          setOpenConfirmationModal({ isOpen: false, userData: {} });
+          setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
           setIsOpenCHWListModal({ isOpen: false });
           handlePeerSupervisorModalCancel();
           setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
@@ -1092,7 +1093,7 @@ const UserList = (): React.ReactElement => {
           cancelText={openConfirmationModal.cancelText || ''}
           submitText={openConfirmationModal.submitText || ''}
           handleCancel={() => {
-            setOpenConfirmationModal({ isOpen: false, userData: {} });
+            setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
             dispatch(clearSupervisorList());
           }}
           handleSubmit={() => {

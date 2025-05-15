@@ -6,14 +6,8 @@ interface IUserStatusPayload {
   id: number;
   appTypes: string[];
   countryId: string;
-  tenantIds: number[];
-}
-
-interface IUserStatusPayload {
-  id: number;
-  appTypes: string[];
-  countryId: string;
-  tenantIds: number[];
+  tenantIds?: number[];
+  tenantId?: number;
 }
 
 export const login = (username: string, password: string) => {

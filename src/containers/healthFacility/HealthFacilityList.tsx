@@ -14,6 +14,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
 import {
+  activateHFRequest,
   clearHFList,
   clearHFWorkflowList,
   fetchHFListRequest,
@@ -222,7 +223,7 @@ const HealthFacilityList = (): React.ReactElement => {
       setEditHFDetailsModal({
         ...editHealthFacilityModal,
         isOpen: true,
-        isActivating: true,
+        isActivating: !hfDetails?.active,
         data: {
           ...hfDetails,
           type: { id: hfDetails.type, name: hfDetails.type },
@@ -278,15 +279,19 @@ const HealthFacilityList = (): React.ReactElement => {
         form={form}
         isEdit={true}
         data={{ ...editHealthFacilityModal.data }}
+        isActivating={editHealthFacilityModal.isActivating}
         isNextClicked={editHealthFacilityModal.isNextClicked}
       />
     );
   };
 
-  const hfUpdateSuccess = () => {
+  const hfUpdateActivateSuccess = (isActivating = false) => {
     toastCenter.success(
       APPCONSTANTS.SUCCESS,
-      formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DETAILS_UPDATE_SUCCESS, healthFacilitySName)
+      formatUserToastMsg(
+        APPCONSTANTS[`HEALTH_FACILITY_${isActivating ? 'DETAILS_UPDATE' : 'ACTIVATE'}_SUCCESS`],
+        healthFacilitySName
+      )
     );
     fetchList({});
     closeHealthFacilityEditModal(true);
@@ -349,11 +354,21 @@ const HealthFacilityList = (): React.ReactElement => {
    * @param {any} healthFacility - The health facility data
    */
   const handleHealthFacilityDetailsSubmit = ({ healthFacility }: any) => {
-    if (!editHealthFacilityModal.isNextClicked) {
+    const linkedVillagesIds = [
+      ...new Set((healthFacility.linkedVillages || []).map((obj: any) => Number(obj?.id)))
+    ] as number[];
+    if (editHealthFacilityModal.isActivating) {
+      dispatch(
+        activateHFRequest({
+          data: { id: healthFacility.id, tenantId: healthFacility.tenantId, linkedVillageIds: linkedVillagesIds },
+          successCb: hfUpdateActivateSuccess,
+          failureCb: (e) => {
+            fetchFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_ACTIVATE_ERROR, healthFacilitySName));
+          }
+        })
+      );
+    } else if (!editHealthFacilityModal.isNextClicked) {
       const peerIdsSet = new Set((healthFacility.peerSupervisors || []).map((obj: any) => obj.id));
-      const linkedVillagesIds = [
-        ...new Set((healthFacility.linkedVillages || []).map((obj: any) => Number(obj?.id)))
-      ] as number[];
       const missingIds = [];
       for (const supervisor of editHealthFacilityModal.data.peerSupervisors) {
         if (!peerIdsSet.has(supervisor.id)) {
@@ -367,7 +382,7 @@ const HealthFacilityList = (): React.ReactElement => {
         dispatch(
           updateHFDetailsRequest({
             data: postData,
-            successCb: hfUpdateSuccess,
+            successCb: hfUpdateActivateSuccess,
             failureCb: (e) => {
               fetchFailure(
                 e,
@@ -438,7 +453,7 @@ const HealthFacilityList = (): React.ReactElement => {
       updateHFStatusRequest({
         id: openConfirmationModal.userData.id,
         tenantId: Number(openConfirmationModal.userData.tenantId),
-        successCb: (newdata: any) => {
+        successCb: () => {
           toastCenter.success(
             APPCONSTANTS.SUCCESS,
             formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_SUCCESS, healthFacilitySName)
@@ -453,6 +468,11 @@ const HealthFacilityList = (): React.ReactElement => {
       })
     );
   };
+
+  const editPopupSubmitBtn = () =>
+    editHealthFacilityModal?.isNextClicked || editHealthFacilityModal.isActivating ? 'Submit' : 'Next';
+  const editPopupCancelBtn = () =>
+    editHealthFacilityModal?.isNextClicked && !editHealthFacilityModal.isActivating ? 'Back' : 'Cancel';
 
   return (
     <>
@@ -567,8 +587,8 @@ const HealthFacilityList = (): React.ReactElement => {
       <ModalForm
         show={editHealthFacilityModal.isOpen}
         title={`${editHealthFacilityModal.isActivating ? 'Activate' : 'Edit'} ${healthFacilitySName}`}
-        cancelText={editHealthFacilityModal?.isNextClicked ? 'Back' : 'Cancel'}
-        submitText={editHealthFacilityModal?.isNextClicked ? 'Submit' : 'Next'}
+        cancelText={editPopupCancelBtn()}
+        submitText={editPopupSubmitBtn()}
         handleCancel={closeHealthFacilityEditModal}
         handleFormSubmit={handleHealthFacilityDetailsSubmit}
         initialValues={{ healthFacility: editHealthFacilityModal.data }}

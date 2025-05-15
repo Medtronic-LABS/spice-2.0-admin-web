@@ -262,6 +262,7 @@ const MultiSelect = (props: any): React.ReactElement => {
     control: (baseStyles: any, state: ControlProps<unknown, false, GroupBase<unknown>>) => ({
       ...baseStyles,
       ...newProps.controlStyles,
+      backgroundColor: props.isDisabled ? '#fcfbf8' : baseStyles.backgroundColor,
       boxShadow: state.isFocused ? 'inset 0px 4px 8px rgba(0,0,0, 0.1) !important' : 'none',
       borderColor: newProps.error ? 'red !important' : state.isFocused ? '#595959' : '#8c8c8c',
       '&:hover': {
@@ -329,6 +330,7 @@ const MultiSelect = (props: any): React.ReactElement => {
           onInputChange={onInputChange}
           onKeyDown={onKeyDown}
           required={null}
+          isDisabled={props.isDisabled}
           options={[allOption, ...newProps.options]}
           placeholder={newProps.placeholder || ''}
           menuPortalTarget={props.isModel ? document.body.getElementsByClassName('modal-show')[0] : false}
@@ -367,6 +369,7 @@ const MultiSelect = (props: any): React.ReactElement => {
       <ReactSelect
         {...newProps}
         required={null}
+        isDisabled={props.isDisabled}
         inputValue={selectInput}
         onInputChange={onInputChange}
         components={{

@@ -30,9 +30,15 @@ interface IMapContainer {
       }>
     >;
   };
+  disableMarker?: boolean;
 }
 
-const MapWrapper = ({ positionState, tempPositionState, showMarkerPopup = false }: IMapContainer) => {
+const MapWrapper = ({
+  positionState,
+  tempPositionState,
+  showMarkerPopup = false,
+  disableMarker = false
+}: IMapContainer) => {
   const { position, setPosition } = positionState;
   const { tempPosition, setTempPosition } = tempPositionState;
 
@@ -65,7 +71,7 @@ const MapWrapper = ({ positionState, tempPositionState, showMarkerPopup = false 
         <UpdateMapCenter center={[tempPosition.latitude, tempPosition.longitude]} />
         <TileLayer attribution='' url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
         <DraggableMarker
-          isDraggable={true}
+          isDraggable={!disableMarker}
           onChange={updateInputValue}
           position={tempPosition}
           showPopup={showMarkerPopup}

@@ -128,7 +128,7 @@ const UserForm = ({
   ignoreTenantId,
   userFormParams = {},
   isPeerSupervisor = false,
-  isCHW = false
+  isActivating = false
 }: IUserFormProps): React.ReactElement => {
   const {
     isRegionCreate = false,
@@ -1060,8 +1060,8 @@ const UserForm = ({
                           valueKey='groupName'
                           options={suiteAccess || []}
                           placeholder=''
-                          disabled={isProfile || isCHW}
-                          isDisabled={isProfile || isCHW}
+                          disabled={isProfile || isActivating}
+                          isDisabled={isProfile || isActivating}
                           loadingOptions={isRolesLoading}
                           isShowLabel={true}
                           error={isError(meta)}
@@ -1492,7 +1492,7 @@ const UserForm = ({
                         maxLength={APPCONSTANTS.FIRST_NAME_LENGTH}
                         capitalize={true}
                         error={isError(meta)}
-                        disabled={isCHW}
+                        disabled={isActivating}
                       />
                     )}
                   />
@@ -1510,7 +1510,7 @@ const UserForm = ({
                         maxLength={APPCONSTANTS.LAST_NAME_LENGTH}
                         capitalize={true}
                         error={isError(meta)}
-                        disabled={isCHW}
+                        disabled={isActivating}
                       />
                     )}
                   />
@@ -1523,7 +1523,7 @@ const UserForm = ({
                     name={name}
                     isEdit={isEdit}
                     form={form}
-                    isDisabled={autoFetched[index] || isCHW}
+                    isDisabled={autoFetched[index] || isActivating}
                     entityName={entityName}
                     clearEmail={clearEmail}
                     enableAutoPopulate={enableAutoPopulate}
@@ -1553,7 +1553,7 @@ const UserForm = ({
                         fieldLabel='Gender'
                         errorLabel='gender'
                         options={GENDER_OPTIONS}
-                        disabled={isCHW}
+                        disabled={isActivating}
                       />
                     )}
                   />
@@ -1589,7 +1589,7 @@ const UserForm = ({
                           labelKey='phoneNumberCode'
                           valueKey='id'
                           appendPlus={true}
-                          disabled={isCHW}
+                          disabled={isActivating}
                           options={countryList || []}
                           loadingOptions={isCountryListLoading}
                           error={isError(meta)}
@@ -1607,7 +1607,7 @@ const UserForm = ({
                     name={name}
                     formName={formName}
                     index={index}
-                    disabled={isCHW && !isProfile}
+                    disabled={isActivating && !isProfile}
                     countryCode={
                       isRegionCreate
                         ? form.getState().values?.users[index]?.countryCode
@@ -1627,7 +1627,7 @@ const UserForm = ({
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
                       type='text'
                       validate={required}
-                      disabled={isCHW}
+                      disabled={isActivating}
                       render={({ input, meta }) => {
                         return (
                           <SelectInput
@@ -1767,7 +1767,7 @@ const UserForm = ({
                 />
                 <SiteUserForm
                   isAdminForm={isAdminForm}
-                  isCHW={isCHW}
+                  isCHW={isActivating}
                   index={index}
                   name={name}
                   autoFetched={autoFetched}

@@ -68,7 +68,11 @@ import {
   IUpdateTermsConditionsFailure,
   IUpdateTermsConditionsRequest,
   IUpdateTermsConditionsSuccess,
-  IUser
+  IUser,
+  IUpdateUserStatusFailure,
+  IUpdateUserStatusSuccess,
+  IUpdateUserStatusRequest,
+  IUpdateUserStatusPayload
 } from './types';
 
 export const loginRequest = ({
@@ -574,17 +578,18 @@ export const reassignCHWFailure = (error: any): any => ({
   error
 });
 
-export const updateUserStatus = (payload: {
-  id: number;
-  isActive: boolean;
-  tenantId: number;
-  countryId: number;
-  appTypes: string[];
-  successCb?: () => void;
-  failureCb?: (error: any) => void;
-}): any => ({
+export const updateUserStatus = (payload: IUpdateUserStatusPayload): IUpdateUserStatusRequest => ({
   type: USER_TYPES.UPDATE_USER_STATUS_REQUEST,
   payload
+});
+
+export const updateUserStatusSuccess = (): IUpdateUserStatusSuccess => ({
+  type: USER_TYPES.UPDATE_USER_STATUS_SUCCESS
+});
+
+export const updateUserStatusFailure = (error: Error): IUpdateUserStatusFailure => ({
+  type: USER_TYPES.UPDATE_USER_STATUS_FAILURE,
+  error
 });
 
 export const fetchCHWListRequest = ({

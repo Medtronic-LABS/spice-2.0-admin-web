@@ -244,6 +244,7 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         ...state,
         isTermsConditionsLoading: false
       };
+    case USERTYPES.UPDATE_USER_STATUS_REQUEST:
     case USERTYPES.UPDATE_PASSWORD_REQUEST:
     case USERTYPES.CREATE_PASSWORD_REQUEST:
     case USERTYPES.UNLOCK_USERS_REQUEST:
@@ -263,6 +264,8 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         totalLockedUsers: action.payload.totalCount,
         isLockedUserLoading: false
       };
+    case USERTYPES.UPDATE_USER_STATUS_SUCCESS:
+    case USERTYPES.UPDATE_USER_STATUS_FAILURE:
     case USERTYPES.UNLOCK_USERS_SUCCESS:
     case USERTYPES.UNLOCK_USERS_FAILURE:
     case USERTYPES.CHANGE_PASSWORD_FAIL:

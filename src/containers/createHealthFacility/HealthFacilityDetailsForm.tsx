@@ -70,6 +70,7 @@ interface IAddUserFormProps {
   isEdit?: boolean;
   data?: any;
   isNextClicked?: boolean;
+  isActivating?: boolean;
   isHFCreate?: boolean;
 }
 
@@ -91,6 +92,7 @@ const HealthFacilityDetailsForm = ({
   isEdit = false,
   data = {},
   isNextClicked,
+  isActivating,
   isHFCreate
 }: IAddUserFormProps): React.ReactElement => {
   const dispatch = useDispatch();
@@ -417,7 +419,7 @@ const HealthFacilityDetailsForm = ({
                   {...input}
                   label={`${healthFacilitySName} Name`}
                   errorLabel={`${healthFacilitySName.toLowerCase()} name`}
-                  disabled={isEdit}
+                  disabled={isEdit || isActivating}
                   capitalize={true}
                   error={(meta.touched && meta.error) || undefined}
                 />
@@ -438,6 +440,7 @@ const HealthFacilityDetailsForm = ({
                     errorLabel='type'
                     labelKey='name'
                     valueKey='id'
+                    disabled={isActivating}
                     defaultValue={filteredHFTypes?.find(
                       (type: IObjectData) => type.name === (data.type?.name || data.type)
                     )}
@@ -460,6 +463,7 @@ const HealthFacilityDetailsForm = ({
                   label={phuFocalPersonNameLabel}
                   errorLabel={phuFocalPersonNameError}
                   capitalize={true}
+                  disabled={isActivating}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}
@@ -479,6 +483,7 @@ const HealthFacilityDetailsForm = ({
                   label={phuFocalPersonNumberLabel}
                   errorLabel={getErrorLabel(meta)}
                   capitalize={true}
+                  disabled={isActivating}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}
@@ -495,6 +500,7 @@ const HealthFacilityDetailsForm = ({
                   label='Address'
                   errorLabel='address'
                   capitalize={true}
+                  disabled={isActivating}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}
@@ -510,7 +516,7 @@ const HealthFacilityDetailsForm = ({
                   <SelectInput
                     {...(input as any)}
                     {...(meta as any)}
-                    disabled={Boolean(isEdit || chiefdomId || districtId)}
+                    disabled={Boolean(isEdit || chiefdomId || districtId || isActivating)}
                     label={districtSName}
                     errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
@@ -541,7 +547,7 @@ const HealthFacilityDetailsForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  disabled={Boolean(isEdit || chiefdomId)}
+                  disabled={Boolean(isEdit || chiefdomId || isActivating)}
                   label={chiefdomSName}
                   errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
@@ -575,6 +581,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel={isCityVillage ? 'city/village' : 'city'}
                   labelKey='name'
                   valueKey={isCityVillage ? 'id' : 'value'}
+                  disabled={isActivating}
                   options={isCityVillage ? villagesList : cityList}
                   loadingOptions={isCityVillage ? villagesLoading : cityLoading}
                   error={(isCityVillage && meta.touched && meta.error) || undefined}
@@ -600,7 +607,7 @@ const HealthFacilityDetailsForm = ({
                   {...input}
                   label='Facility ID'
                   errorLabel='facility id'
-                  disabled={isEdit}
+                  disabled={isEdit || isActivating}
                   error={(meta.touched && meta.error) || undefined}
                 />
               )}
@@ -618,7 +625,7 @@ const HealthFacilityDetailsForm = ({
                   errorLabel='language'
                   labelKey='name'
                   valueKey='id'
-                  disabled={isLanguageDisabled}
+                  disabled={isLanguageDisabled || isActivating}
                   options={filterByAppTypes(languages, appTypes)}
                   loadingOptions={languageLoading}
                   error={(meta.touched && meta.error) || undefined}
@@ -640,6 +647,7 @@ const HealthFacilityDetailsForm = ({
                   isShowLabel={true}
                   isSelectAll={true}
                   menuPlacement={'auto'}
+                  isDisabled={isActivating}
                   placeholder=''
                   isModel={true}
                   isMulti={true}
@@ -702,6 +710,7 @@ const HealthFacilityDetailsForm = ({
                   {...input}
                   label='Latitude'
                   errorLabel='latitude'
+                  disabled={isActivating}
                   value={tempPosition.latitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
@@ -730,6 +739,7 @@ const HealthFacilityDetailsForm = ({
                   {...input}
                   label='Longitude'
                   errorLabel='longitude'
+                  disabled={isActivating}
                   value={tempPosition.longitude}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(e) => {
@@ -749,7 +759,11 @@ const HealthFacilityDetailsForm = ({
           </div>
           {showMap && mapAvailable && (
             <div className={'mapcontainer col-12 '}>
-              <MapWrapper positionState={positionState} tempPositionState={tempPositionState} />
+              <MapWrapper
+                positionState={positionState}
+                tempPositionState={tempPositionState}
+                disableMarker={isActivating}
+              />
             </div>
           )}
         </div>
