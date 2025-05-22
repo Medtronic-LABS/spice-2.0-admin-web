@@ -11,7 +11,7 @@ import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
-import { villageBasedRoles } from '../../constants/roleConstants';
+import { onlyCHWRoles, villageBasedRoles } from '../../constants/roleConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleOptions } from '../../hooks/roleOptionsHook';
@@ -1039,14 +1039,17 @@ const UserList = (): React.ReactElement => {
             customTitle='Change Password'
             isCustom={true}
             customIconStyle={{ width: 18 }}
-            isActiveToggle={showActiveToggle} // show activate/deactivate toggle only for community
+            showActivateHeader={showActiveToggle}
+            showActiveToggle={(rowData) => {
+              const isCHW = (rowData.roles || []).some((newRole: IRoles) => newRole.name === onlyCHWRoles[0]);
+              return showActiveToggle && !isCHW;
+            }} // show activate/deactivate toggle only for community
             actionFormatter={{
               hideEditIcon: (rowData: any) => handleIconHandler(rowData),
               hideDeleteIcon: (rowData: any) => handleIconHandler(rowData),
               hideCustomIcon: (rowData: any) => handleIconHandler(rowData),
               hideActiveToggle: (rowData: any) => rowData.username === email
             }}
-            // onActivateClick={(rowData: any) => getCHWList(rowData)}
             onActivateClick={(rowData: any) => handleActivateToggle(rowData)}
             handleCustomIconClicked={handleReassignSubmit}
           />

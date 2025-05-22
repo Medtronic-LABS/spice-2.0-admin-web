@@ -348,31 +348,34 @@ const UserForm = ({
    * @returns An array containing the initial edit data object
    */
   const initialEditData = useMemo<Array<Partial<any>>>(
-    () => [
-      {
-        ...initialEditValue,
-        ...formUserData(initialEditValue),
-        hfTenantIds: isEdit
-          ? (initialEditValue?.organizations || [])
-              .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
-              .map((org: any) => org.id)
-          : [],
-        culture: showCulture && initialEditValue?.culture,
-        district:
-          initialEditValue?.organizations?.filter(
-            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
-          ) || '',
-        chiefdom:
-          initialEditValue?.organizations?.filter(
-            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.chiefdom
-          ) || '',
-        healthfacility:
-          initialEditValue?.organizations?.filter(
-            (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.healthFacility
-          ) || '',
-        countryCode: { phoneNumberCode: initialEditValue?.countryCode, id: initialEditValue?.countryCode }
-      }
-    ],
+    () => {
+      return [
+        {
+          ...initialEditValue,
+          ...formUserData(initialEditValue),
+          selectedVillages: initialEditValue?.villages,
+          hfTenantIds: isEdit
+            ? (initialEditValue?.organizations || [])
+                .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
+                .map((org: any) => org.id)
+            : [],
+          culture: showCulture && initialEditValue?.culture,
+          district:
+            initialEditValue?.organizations?.filter(
+              (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.district
+            ) || '',
+          chiefdom:
+            initialEditValue?.organizations?.filter(
+              (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.chiefdom
+            ) || '',
+          healthfacility:
+            initialEditValue?.organizations?.filter(
+              (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.healthFacility
+            ) || '',
+          countryCode: { phoneNumberCode: initialEditValue?.countryCode, id: initialEditValue?.countryCode }
+        }
+      ];
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [cultureList, initialEditValue, districtList, chiefdomList, isCultureListLoading, isEdit]
   );
@@ -1621,7 +1624,6 @@ const UserForm = ({
                       ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
                         (!isCommunity && isSiteUser && !isHF)
                       : showSpiceHFRef.current[index] && (!isEdit || isReportOrInsightUser)))) && (
-                  // (isPeerSupervisor && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1753,6 +1755,7 @@ const UserForm = ({
                   form={form}
                   isProfile={isProfile}
                   name={name}
+                  isActivating={isActivating}
                   peerSupervisors={peerSupervisors}
                   peerSupervisorLoading={peerSupervisorLoading}
                   autoFetched={autoFetched}

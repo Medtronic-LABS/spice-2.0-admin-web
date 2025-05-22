@@ -3,6 +3,12 @@
 .customTable {
   overflow-x: auto;
   width: 100%;
+  .toggleContainer {
+    label {
+      margin: 0 !important;
+      margin-right: 5px !important;
+    }
+  }
   table {
     border-collapse: collapse;
     table-layout: fixed;

@@ -309,6 +309,7 @@ export function* fetchHFUserList({
   searchTerm,
   roleNames,
   isSiteUsers,
+  includesDisabled,
   isFacilityUsersOnly,
   tenantBased,
   tenantIds,
@@ -327,6 +328,7 @@ export function* fetchHFUserList({
       roleNames,
       isSiteUsers,
       isFacilityUsersOnly,
+      includesDisabled,
       tenantBased,
       tenantIds,
       appTypes: yield select((state: AppState) => state.user?.user?.appTypes)

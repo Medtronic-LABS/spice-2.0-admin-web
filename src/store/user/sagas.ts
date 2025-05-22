@@ -487,7 +487,8 @@ function* updateUserStatusSaga({ payload }: any): SagaIterator {
       tenantId: undefined,
       tenantIds: undefined,
       villageIds: payload?.villageIds,
-      supervisorId: payload?.peerSupervisorId
+      supervisorId: payload?.peerSupervisorId,
+      healthFacilityId: Number(payload?.healthFacilityId)
     };
     apiPayload[`tenantId${isActive ? '' : 's'}`] = isActive ? tenantId : [tenantId];
     yield call(isActive ? activateUser : deactivateUser, apiPayload);

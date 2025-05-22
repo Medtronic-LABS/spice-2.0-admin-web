@@ -565,7 +565,7 @@ const HealthFacilityList = (): React.ReactElement => {
               healthFacilitySName
             )}
             deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DELETE_TITLE, healthFacilitySName)}
-            isActiveToggle={isCommunity}
+            showActiveToggle={() => isCommunity}
             customIconStyle={{ width: 18 }}
             isActiveKey='active'
             onActivateClick={(rowData: any) => {

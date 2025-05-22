@@ -33,7 +33,8 @@ interface ICustomTableProps {
   actionFormatter?: IActionFormatter;
   isDelete: boolean;
   isActivate?: boolean;
-  isActiveToggle?: boolean;
+  showActivateHeader?: boolean;
+  showActiveToggle?: (data: any) => boolean;
   isAssignSupervisor?: boolean;
   peerSupervisorList?: IPeerSupervisor[];
   isCustom?: boolean;
@@ -92,7 +93,8 @@ const CustomTable = (props: ICustomTableProps) => {
     actionFormatter,
     isDelete,
     isActivate = false,
-    isActiveToggle = false,
+    showActivateHeader = false,
+    showActiveToggle,
     isAssignSupervisor = false,
     isCustom = false,
     customTitle = '',
@@ -289,7 +291,7 @@ const CustomTable = (props: ICustomTableProps) => {
    * @returns {boolean} True if any action is enabled, false otherwise
    */
   const isAction = () => {
-    return isEdit || isDelete || isActivate || isCustom || isActiveToggle;
+    return isEdit || isDelete || isActivate || isCustom || showActivateHeader;
   };
 
   /**
@@ -329,7 +331,7 @@ const CustomTable = (props: ICustomTableProps) => {
   const handleShowActionHeader = (actions: boolean) => {
     return (
       actions && (
-        <th className='text-center' style={{ width: isActiveToggle ? '180px' : '80px' }}>
+        <th className='text-center' style={{ width: showActivateHeader ? '180px' : '80px' }}>
           Actions
         </th>
       )
@@ -534,8 +536,8 @@ const CustomTable = (props: ICustomTableProps) => {
   const handleShowCheckbox = (rowDataValue: IAnyObject, rowIndex: number) => {
     return (
       !actionFormatter?.hideActiveToggle?.(rowDataValue) &&
-      isActiveToggle && (
-        <div onClick={(e) => e.stopPropagation()}>
+      showActiveToggle?.(rowDataValue) && (
+        <div className={styles.toggleContainer} onClick={(e) => e.stopPropagation()}>
           <Checkbox
             switchCheckbox={true}
             label=''

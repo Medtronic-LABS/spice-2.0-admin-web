@@ -879,6 +879,9 @@ export interface IUpdateUserStatusPayload {
   tenantId: number;
   countryId: number;
   appTypes: string[];
+  healthFacilityId?: number;
+  villageIds?: number[];
+  peerSupervisorId?: number;
   successCb?: () => void;
   failureCb?: (error: any) => void;
 }

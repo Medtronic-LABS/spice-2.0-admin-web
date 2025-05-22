@@ -1,8 +1,8 @@
 import { Field } from 'react-final-form';
+import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
 import { required } from '../../../utils/validation';
 import SelectInput from '../../formFields/SelectInput';
 import MultiSelect from '../../multiSelect/MultiSelect';
-import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
 
 export const DynamicCHForm = ({
   index,
@@ -17,6 +17,7 @@ export const DynamicCHForm = ({
   isError,
   isChaUser,
   isChpUser,
+  isActivating,
   communityList,
   isHFCreate,
   showVillages
@@ -60,6 +61,10 @@ export const DynamicCHForm = ({
               validate={(value) => required(Array.isArray(value) ? value : [])}
               render={({ input, meta }) => {
                 const mandatoryVillages = form.getState().values.users[index].selectedVillages || [];
+                // const allVillages = form.getState().values.users[index].villages || [];
+                // const currentHFVillages = allVillages.filter(
+                //   (v: any) => !(mandatoryVillages || []).some((mv: any) => mv.id === v.id)
+                // );
                 return (
                   <MultiSelect
                     {...(input as any)}
@@ -77,11 +82,11 @@ export const DynamicCHForm = ({
                     isModel={true}
                     isMulti={true}
                     isOptionDisabled={(option: any) => {
-                      return autoFetched[index]
+                      return autoFetched[index] || isActivating
                         ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
                         : null;
                     }}
-                    mandatoryOptions={autoFetched[index] ? mandatoryVillages : []}
+                    mandatoryOptions={autoFetched[index] || isActivating ? mandatoryVillages : []}
                     options={villages[index] || []}
                     loadingOptions={villagesLoading}
                     error={isError(meta)}

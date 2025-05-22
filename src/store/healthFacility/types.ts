@@ -510,6 +510,7 @@ export interface IFetchHFUserListRequest {
   isFacilityUsersOnly?: boolean | null;
   tenantIds?: string[];
   appTypes?: string[];
+  includesDisabled?: boolean;
   successCb?: (data: IHFUserGet[], total: number) => void;
   failureCb?: (error: Error) => void;
 }

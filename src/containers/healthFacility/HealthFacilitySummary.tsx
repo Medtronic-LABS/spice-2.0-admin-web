@@ -46,6 +46,9 @@ import { formatRoles, formatUserToastMsg } from '../../utils/commonUtils';
 import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
+import { onlyCHWRoles } from '../../constants/roleConstants';
+import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
+import { offlineSyncRequest, updateUserStatus } from '../../store/user/actions';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -97,7 +100,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName },
-    hfDetails: { supervisor: supervisorLabel }
+    hfDetails: { supervisor: supervisorLabel },
+    userList: {
+      activeToogle: { available: showActiveToggle }
+    }
   } = useAppTypeConfigs();
   const lableData = useMemo(
     () => [
@@ -183,6 +189,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       fetchHFUserListRequest({
         countryId: countryIdValue,
         tenantIds: [tenantId],
+        includesDisabled: true,
         roleNames: [], // Fetch users with any role
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
@@ -551,15 +558,15 @@ const HealthFacilitySummary = (): React.ReactElement => {
     return `${user.firstName} ${user.lastName}`;
   };
 
-  const userFormRender = (form?: FormApi<any>) => {
+  const userFormRender = (form?: FormApi<any>, ref?: any) => {
     return (
       <UserForm
         form={form as FormApi<any>}
-        countryId={countryIdValue}
         initialEditValue={hfUserForEdit.current.users[0]}
         disableOptions={true}
-        isEdit={isHFUserEdit}
+        isEdit={isHFUserEdit || isOpenCHWUserModal.isActivating}
         entityName='healthFacility'
+        countryId={countryIdValue}
         isSiteUser={true}
         enableAutoPopulate={true}
         hfTenantId={Number(tenantId)}
@@ -567,6 +574,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         ignoreTenantId={tenantId}
         appTypes={appTypes}
         userFormParams={{ isHF: true }}
+        isActivating={isOpenCHWUserModal.isActivating}
       />
     );
   };
@@ -580,6 +588,85 @@ const HealthFacilitySummary = (): React.ReactElement => {
     role === HEALTH_FACILITY_ADMIN &&
     (rowData?.defaultRoleName === HEALTH_FACILITY_ADMIN ||
       rowData.roles?.some((r: { name: string }) => r?.name === HEALTH_FACILITY_ADMIN));
+
+  const [isOpenCHWUserModal, setOpenCHWUserModal] = useState({ isOpen: false, isActivating: false, data: {} });
+  const [openConfirmationModal, setOpenConfirmationModal] = useState({
+    isOpen: false,
+    isActive: false,
+    lastSyncDate: ''
+  });
+
+  const handleSync = (user: any) => {
+    const payload = {
+      data: {
+        userId: user.id
+      },
+      successCb: (syncData: { lastSyncDate: string }) => {
+        hfUserForEdit.current = { users: [{ ...user, selectedVillages: user.villages }] };
+        setOpenConfirmationModal({
+          isOpen: true,
+          isActive: user.active,
+          lastSyncDate: syncData?.lastSyncDate
+        });
+      },
+      failureCb: (error: Error) => {
+        toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, 'Failed to sync data'));
+      }
+    };
+
+    dispatch(offlineSyncRequest(payload as any));
+  };
+
+  const handleActivateToggle = (data: any) => {
+    handleSync(data);
+  };
+
+  const changeCHWStatus = (data: any) => {
+    const newData = data.id ? data : data.users[0];
+    dispatch(
+      updateUserStatus({
+        ...newData,
+        id: newData.id,
+        tenantId: newData.tenantId,
+        isActive: !newData.active,
+        countryId: countryIdValue,
+        healthFacilityId,
+        villageIds: newData?.villages?.map((village: any) => village.id),
+        peerSupervisorId: newData?.supervisor?.id,
+        appTypes,
+        successCb: () => {
+          toastCenter.success(
+            APPCONSTANTS.SUCCESS,
+            APPCONSTANTS[!newData.active ? 'USER_ACTIVATED' : 'USER_DEACTIVATED']
+          );
+          cancelPopupModal();
+          refreshHFUserList();
+        },
+        failureCb: (e: any) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.ERROR, APPCONSTANTS.USER_STATUS_UPDATE_FAILED));
+        }
+      })
+    );
+  };
+
+  const cancelPopupModal = () => {
+    hfUserForEdit.current = { users: [] };
+    setOpenConfirmationModal({ isOpen: false, isActive: false, lastSyncDate: '' });
+    setOpenCHWUserModal({ isOpen: false, isActivating: false, data: {} });
+  };
+
+  const confirmationSubmit = () => {
+    if (hfUserForEdit.current.users[0].active) {
+      changeCHWStatus(hfUserForEdit.current.users[0]);
+    } else {
+      setOpenConfirmationModal({
+        isOpen: false,
+        isActive: openConfirmationModal.isActive,
+        lastSyncDate: ''
+      });
+      setOpenCHWUserModal({ isOpen: true, isActivating: true, data: hfUserForEdit.current.users[0] });
+    }
+  };
 
   return (
     <>
@@ -638,7 +725,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   width: '20%',
                   cellFormatter: formatName
                 },
-                { id: 2, name: 'role', label: 'ROLE', width: '20%', cellFormatter: formatRoles },
+                { id: 2, name: 'role', label: 'ROLE', width: '17%', cellFormatter: formatRoles },
                 { id: 3, name: 'username', label: 'EMAIL ID', width: '20%' },
                 { id: 4, name: 'gender', label: 'GENDER', width: '9%' },
                 {
@@ -662,10 +749,17 @@ const HealthFacilitySummary = (): React.ReactElement => {
                 healthFacilitySName
               )}
               deleteTitle={formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_TITLE, healthFacilitySName)}
+              showActivateHeader={true}
+              showActiveToggle={(data: any) => {
+                const isCHW = (data.roles || []).some((newRole: any) => newRole.name === onlyCHWRoles[0]);
+                return showActiveToggle && isCHW;
+              }}
               actionFormatter={{
                 hideEditIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active,
-                hideDeleteIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active
+                hideDeleteIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active,
+                hideCustomIcon: (rowData: any) => isHideActionIcons(rowData) || !rowData.active
               }}
+              onActivateClick={(rowData: any) => handleActivateToggle(rowData)}
             />
           </DetailCard>
         </div>
@@ -691,6 +785,31 @@ const HealthFacilitySummary = (): React.ReactElement => {
           initialValues={hfUserForEdit.current}
           render={userFormRender}
           mutators={{ ...arrayMutators }}
+        />
+        <ModalForm
+          show={isOpenCHWUserModal.isOpen}
+          title={`CHW Activate`}
+          cancelText='Cancel'
+          submitText='Submit'
+          handleCancel={cancelPopupModal}
+          handleFormSubmit={changeCHWStatus}
+          initialValues={hfUserForEdit.current}
+          render={userFormRender}
+          mutators={{ ...arrayMutators }}
+        />
+        <ConfirmationModalPopup
+          isOpen={openConfirmationModal.isOpen}
+          WarningMessage={openConfirmationModal.isActive ? 'Deactivate' : 'Activate'}
+          syncDate={openConfirmationModal?.lastSyncDate || ''}
+          popupTitle={openConfirmationModal.isActive ? 'Deactivate' : 'Activate'}
+          cancelText='Cancel'
+          submitText='Ok'
+          handleCancel={cancelPopupModal}
+          handleSubmit={confirmationSubmit}
+          popupSize='modal-md'
+          confirmationMessage={`Are you sure you want to ${
+            openConfirmationModal.isActive ? 'deactivate' : 'activate'
+          } this user?`}
         />
       </div>
     </>
