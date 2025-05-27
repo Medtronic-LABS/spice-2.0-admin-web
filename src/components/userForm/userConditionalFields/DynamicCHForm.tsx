@@ -54,17 +54,55 @@ export const DynamicCHForm = ({
               )}
             />
           </div>
+          {autoFetched[index] && showVillages && (
+            <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
+              <Field
+                name={`${name}.existingVillages`}
+                type='text'
+                validate={(value) => required(Array.isArray(value) ? value : [])}
+                render={({ input }) => {
+                  const mandatoryVillages = form.getState().values.users[index].selectedVillages || [];
+                  return (
+                    <MultiSelect
+                      {...(input as any)}
+                      label='Existing Villages'
+                      labelKey='name'
+                      valueKey='id'
+                      required={true}
+                      isShowLabel={true}
+                      isSelectAll={true}
+                      isDefaultSelected={true}
+                      placeholder=''
+                      menuPlacement={'auto'}
+                      isDisabled={false}
+                      isModel={true}
+                      isMulti={true}
+                      isOptionDisabled={(option: any) => {
+                        return autoFetched[index] || isActivating
+                          ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
+                          : null;
+                      }}
+                      mandatoryOptions={autoFetched[index] || isActivating ? mandatoryVillages : []}
+                      options={mandatoryVillages || []}
+                      loadingOptions={villagesLoading}
+                    />
+                  );
+                }}
+              />
+            </div>
+          )}
           <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
             <Field
               name={`${name}.villages`}
               type='text'
               validate={(value) => required(Array.isArray(value) ? value : [])}
               render={({ input, meta }) => {
-                const mandatoryVillages = form.getState().values.users[index].selectedVillages || [];
-                // const allVillages = form.getState().values.users[index].villages || [];
-                // const currentHFVillages = allVillages.filter(
-                //   (v: any) => !(mandatoryVillages || []).some((mv: any) => mv.id === v.id)
-                // );
+                const currentFormValue = form.getState().values.users[index];
+                const allVillages = villages[index];
+                const selectedVillages = currentFormValue?.selectedVillages || [];
+                const currentHFVillages = (allVillages || []).filter(
+                  (v: any) => !(selectedVillages || []).some((mv: any) => mv.id === v.id)
+                );
                 return (
                   <MultiSelect
                     {...(input as any)}
@@ -81,13 +119,7 @@ export const DynamicCHForm = ({
                     isDisabled={isProfile}
                     isModel={true}
                     isMulti={true}
-                    isOptionDisabled={(option: any) => {
-                      return autoFetched[index] || isActivating
-                        ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
-                        : null;
-                    }}
-                    mandatoryOptions={autoFetched[index] || isActivating ? mandatoryVillages : []}
-                    options={villages[index] || []}
+                    options={currentHFVillages || []}
                     loadingOptions={villagesLoading}
                     error={isError(meta)}
                   />

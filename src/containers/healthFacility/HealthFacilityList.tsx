@@ -434,7 +434,7 @@ const HealthFacilityList = (): React.ReactElement => {
       ...newFilters,
       [name]: option,
       ...(name === 'healthFacilityTypes' && { healthFacilityTypes }),
-      skip: 0
+      skip: null
     };
     if (!newFilters.districtIds.length) {
       newFilters.chiefdomIds = [];
@@ -458,7 +458,7 @@ const HealthFacilityList = (): React.ReactElement => {
             APPCONSTANTS.SUCCESS,
             formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_DEACTIVATE_SUCCESS, healthFacilitySName)
           );
-          fetchList({});
+          fetchList({ ...filters });
           setOpenConfirmationModal({ isOpen: false, userData: {} as IHealthFacility });
         },
         failureCb: (e) => {

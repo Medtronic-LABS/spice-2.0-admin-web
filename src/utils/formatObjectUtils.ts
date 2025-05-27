@@ -103,7 +103,10 @@ export const getUserPayload = ({
       tenantId: payloadTenantId,
       supervisorId: Number(user.supervisor?.id) || null,
       roleIds: [...new Set(roleIds)],
-      villageIds: (Array.isArray(user?.villages) ? user.villages : []).map(({ id }: { id: number }) => id),
+      villageIds: (Array.isArray([...user?.villages, ...(user?.existingVillages || [])])
+        ? [...user?.villages, ...(user?.existingVillages || [])]
+        : []
+      ).map(({ id }: { id: number }) => id),
       village: user?.village,
       timezone: user?.timezone?.id ? user?.timezone : null,
       district: user?.district,

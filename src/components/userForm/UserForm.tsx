@@ -329,6 +329,7 @@ const UserForm = ({
       !isCreateDistrict &&
       !isCreateChiefdom &&
       !isChiefdom &&
+      !isHF &&
       (isCommunity || !isHFCreate)
     ) {
       getHFListFn();
@@ -528,7 +529,7 @@ const UserForm = ({
         form.change(`${formName}[${index}].reportUserOrganization`, userData.reportUserOrganization || null);
         form.change(`${formName}[${index}].insightUserOrganization`, userData.insightUserOrganization || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
-        form.change(`${formName}[${index}].villages`, userData.villages || []);
+        form.change(`${formName}[${index}].existingVillages`, userData.villages || []);
         form.change(`${formName}[${index}].organizations`, userData.organizations || []);
         form.change(`${formName}[${index}].selectedVillages`, userData.selectedVillages || []);
         form.change(`${formName}[${index}].timezone`, userData.timezone || []);

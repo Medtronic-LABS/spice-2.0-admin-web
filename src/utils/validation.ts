@@ -22,12 +22,6 @@ export function required(value: any) {
   }
 }
 
-export function requiredVillagefornewHF(value: any, callBack?: (value: any) => string | undefined) {
-  if (callBack) {
-    return callBack(value);
-  }
-  return undefined;
-}
 /**
  * To check whether email is valid or not
  * @param email email string
