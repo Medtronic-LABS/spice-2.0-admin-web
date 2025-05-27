@@ -100,9 +100,9 @@ export const DynamicCHForm = ({
                 const currentFormValue = form.getState().values.users[index];
                 const allVillages = villages[index];
                 const selectedVillages = currentFormValue?.selectedVillages || [];
-                const currentHFVillages = (allVillages || []).filter(
-                  (v: any) => !(selectedVillages || []).some((mv: any) => mv.id === v.id)
-                );
+                const currentHFVillages = autoFetched[index]
+                  ? (allVillages || []).filter((v: any) => !(selectedVillages || []).some((mv: any) => mv.id === v.id))
+                  : allVillages;
                 return (
                   <MultiSelect
                     {...(input as any)}

@@ -298,10 +298,7 @@ const TableFilter: React.FC<ITableFilterProps> = ({
           >
             <div className='d-flex align-items-center'>
               {selectedOptions.length && showCountIcon && getSelectValueFn() > 0 ? (
-                <span className={`badge rounded-pill ${styles.hoverContainer}`}>
-                  <span className={`${styles.hoverValue}`}>{getSelectValueFn()}</span>
-                  <span className={`${styles.hoverX}`}>{}</span>
-                </span>
+                <span className='  badge rounded-pill bg-primary'>{getSelectValueFn()}</span>
               ) : (
                 <FilterListIcon />
               )}

@@ -329,7 +329,6 @@ const UserForm = ({
       !isCreateDistrict &&
       !isCreateChiefdom &&
       !isChiefdom &&
-      !isHF &&
       (isCommunity || !isHFCreate)
     ) {
       getHFListFn();
@@ -1645,19 +1644,12 @@ const UserForm = ({
                             isModel={true}
                             disabled={isProfile}
                             onChange={(hf: IHealthFacility) => {
-                              emailDisabledFn('', index, false);
+                              if (!autoFetched[index]) {
+                                emailDisabledFn('', index, false);
+                              }
                               const formData = form.getState()?.values?.users?.[index];
                               const supervisorFieldData = `${formName}[${index}].supervisor`;
-                              const villagesFieldData = `${formName}[${index}].villages`;
-
                               form.change(supervisorFieldData, null);
-                              if (autoFetched[index] && formData?.selectedVillages?.length) {
-                                form.change(villagesFieldData, [
-                                  ...(Array.isArray(formData?.selectedVillages) ? formData.selectedVillages : [])
-                                ]);
-                              } else {
-                                form.change(villagesFieldData, []);
-                              }
 
                               if (showVillage[index]) {
                                 fetchSupervisorList(
