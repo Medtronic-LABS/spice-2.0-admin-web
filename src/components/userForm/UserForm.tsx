@@ -779,7 +779,7 @@ const UserForm = ({
    */
   useEffect(() => {
     if ((isEdit || isActivating) && showVillage[0] && !isProfile) {
-      const tenantIds = [...initialEditData[0].hfTenantIds, tenantId].filter((v: number) => v);
+      const tenantIds = [...initialEditData[0].hfTenantIds, isHF ? tenantId : undefined].filter((v: number) => v);
       if (isHF) {
         fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
       }

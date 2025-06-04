@@ -627,7 +627,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       updateUserStatus({
         ...newData,
         id: newData.id,
-        tenantId: newData.tenantId,
+        tenantId,
         isActive: !newData.active,
         countryId: countryIdValue,
         healthFacilityId,
