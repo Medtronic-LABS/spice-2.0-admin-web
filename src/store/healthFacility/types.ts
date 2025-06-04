@@ -135,6 +135,7 @@ export interface IVillages {
   chiefdomId: string;
   countryId: string;
   districtId: string;
+  healthFacilityId?: number;
 }
 
 export interface ICity {

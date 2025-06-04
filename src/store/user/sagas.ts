@@ -533,9 +533,9 @@ function* fetchCHWListSaga({ payload }: IFetchCHWListRequest) {
 }
 
 function* reassignCHWSaga(payload: any) {
+  const { data: data1 } = payload.data;
+  const { data: data2 } = payload;
   try {
-    const { data: data1 } = payload.data;
-    const { data: data2 } = payload;
     yield call(reasignCHW, data1 || data2);
     if (data1) {
       payload.data.successCb?.();
@@ -545,7 +545,11 @@ function* reassignCHWSaga(payload: any) {
     yield put(userActions.reassignCHWSuccess());
   } catch (error) {
     if (error instanceof Error) {
-      payload?.failureCb(error);
+      if (data1) {
+        payload.data?.failureCb?.(error);
+      } else {
+        payload?.failureCb?.(error);
+      }
       yield put(userActions.reassignCHWFailure(error));
     }
   }

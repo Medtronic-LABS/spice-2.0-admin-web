@@ -56,12 +56,7 @@ import {
   userRolesSelector
 } from '../../store/user/selectors';
 import { IRoles, IUser, IUserFormProps } from '../../store/user/types';
-import {
-  filterHFByAppTypes,
-  formatCountryCode,
-  formatUserToastMsg,
-  removeRedRiskFromRoleArray
-} from '../../utils/commonUtils';
+import { formatCountryCode, formatUserToastMsg, removeRedRiskFromRoleArray } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   composeValidators,
@@ -349,11 +344,22 @@ const UserForm = ({
    */
   const initialEditData = useMemo<Array<Partial<any>>>(
     () => {
+      const currentVillages: IVillages[] = [];
+      const existingVillages: IVillages[] = [];
+      (initialEditValue?.villages || []).forEach((village: IVillages) => {
+        if (Number(village?.healthFacilityId) === Number(healthFacilityId)) {
+          currentVillages.push(village);
+        } else {
+          existingVillages.push(village);
+        }
+      });
       return [
         {
           ...initialEditValue,
           ...formUserData(initialEditValue),
           selectedVillages: initialEditValue?.villages,
+          existingVillages: isEdit && !isHF ? [] : existingVillages,
+          villages: isEdit && !isHF ? initialEditValue?.villages : currentVillages,
           hfTenantIds: isEdit
             ? (initialEditValue?.organizations || [])
                 .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
@@ -462,7 +468,7 @@ const UserForm = ({
     setClearEmail(true);
     if (isAutoPopulate) {
       form.change(`${formName}[${index}].username`, '');
-      toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
+      // toastCenter.error(...getErrorToastArgs(new Error(), APPCONSTANTS.OOPS, errorMsg));
     }
   };
 
@@ -529,7 +535,6 @@ const UserForm = ({
         form.change(`${formName}[${index}].insightUserOrganization`, userData.insightUserOrganization || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
         form.change(`${formName}[${index}].existingVillages`, userData.villages || []);
-        form.change(`${formName}[${index}].organizations`, userData.organizations || []);
         form.change(`${formName}[${index}].selectedVillages`, userData.selectedVillages || []);
         form.change(`${formName}[${index}].timezone`, userData.timezone || []);
         form.change(`${formName}[${index}].culture`, userData.culture || null);
@@ -553,7 +558,7 @@ const UserForm = ({
   };
 
   const getHFLists = (selectedAppTypes: string[]) => {
-    setNewHFList(filterHFByAppTypes(selectedAppTypes, healthFacilityList));
+    setNewHFList(healthFacilityList);
   };
 
   useEffect(() => {
@@ -773,9 +778,11 @@ const UserForm = ({
    * Effect hook to fetch village and supervisor lists based on the initial edit data. ***
    */
   useEffect(() => {
-    if (isEdit && showVillage[0] && !isProfile) {
-      const tenantIds = [...initialEditData[0].hfTenantIds].filter((v: number) => v);
-      fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
+    if ((isEdit || isActivating) && showVillage[0] && !isProfile) {
+      const tenantIds = [...initialEditData[0].hfTenantIds, tenantId].filter((v: number) => v);
+      if (isHF) {
+        fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
+      }
       fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1230,7 +1237,7 @@ const UserForm = ({
                                   ...(initialEditData[index]?.hfTenantIds || []),
                                   Number(form.getState().values?.users?.[0]?.healthfacility?.tenantId) ||
                                     (healthFacilityId && tenantId ? Number(tenantId) : undefined),
-                                  ...((fetchedData.current[index] || {}).organizations || []).map((v: any) => v.id),
+                                  ...((fetchedData.current?.[index] || {}).organizations || []).map((v: any) => v.id),
                                   isHF ? Number(hfTenantId) : undefined
                                 ].filter((v: number | undefined) => v);
                                 fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', index);
@@ -1660,15 +1667,7 @@ const UserForm = ({
                                     : [hf.tenantId],
                                   index
                                 );
-                                fetchVillagesList(
-                                  formData?.organizations
-                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
-                                        (v: any) => v
-                                      )
-                                    : [hf.tenantId],
-                                  formData?.id,
-                                  index
-                                );
+                                fetchVillagesList([Number(hf.tenantId)], formData?.id, index);
                               }
 
                               input.onChange(hf);
@@ -1746,8 +1745,10 @@ const UserForm = ({
                 <DynamicCHForm
                   index={index}
                   form={form}
-                  isProfile={isProfile}
                   name={name}
+                  isHF={isHF}
+                  isEdit={isEdit}
+                  isProfile={isProfile}
                   isActivating={isActivating}
                   peerSupervisors={peerSupervisors}
                   peerSupervisorLoading={peerSupervisorLoading}

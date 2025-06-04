@@ -64,6 +64,7 @@ const EmailField = forwardRef(
 
     const [loading, setLoading] = useState(false);
     const errorValue = useRef<string>('');
+    const errorCode = useRef<number | null>(null);
     const [isNetworkError, setNetworkError] = useState(false);
     const lastCheckedEmail = useRef<string>(currentEmail.current);
     const alreadyExistError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_ERR_MSG;
@@ -195,6 +196,9 @@ const EmailField = forwardRef(
               newError = differentOrgError;
             } else if (e.statusCode === 412) {
               newError = siteAdminError;
+            } else if (e.statusCode === 409) {
+              errorCode.current = e.statusCode;
+              newError = e.message;
             } else {
               newError = alreadyExistError;
             }
@@ -261,7 +265,8 @@ const EmailField = forwardRef(
               label='Email ID'
               errorLabel={
                 [alreadyExistError, cfrError, differentOrgError, siteAdminError, ' '].includes(meta.error) ||
-                isNetworkError
+                isNetworkError ||
+                errorCode.current === 409
                   ? ''
                   : 'email ID'
               }

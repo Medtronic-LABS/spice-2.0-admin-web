@@ -3,12 +3,16 @@ import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
 import { required } from '../../../utils/validation';
 import SelectInput from '../../formFields/SelectInput';
 import MultiSelect from '../../multiSelect/MultiSelect';
+import { useParams } from 'react-router-dom';
+import { IMatchParams } from '../../../containers/user/UserList';
 
 export const DynamicCHForm = ({
   index,
   form,
-  isProfile,
   name,
+  isHF,
+  isEdit,
+  isProfile,
   peerSupervisors,
   peerSupervisorLoading,
   autoFetched,
@@ -27,6 +31,9 @@ export const DynamicCHForm = ({
       supervisor: { label, error: supervisorError }
     }
   } = useAppTypeConfigs();
+  const { healthFacilityId } = useParams<IMatchParams>();
+  const mandatoryVillages = form.getState().values.users[index].existingVillages || [];
+
   return (
     <>
       {showVillages && (
@@ -54,14 +61,13 @@ export const DynamicCHForm = ({
               )}
             />
           </div>
-          {autoFetched[index] && showVillages && (
+          {(autoFetched[index] || (isEdit && isHF)) && showVillages && !!mandatoryVillages.length && (
             <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
               <Field
                 name={`${name}.existingVillages`}
                 type='text'
                 validate={(value) => required(Array.isArray(value) ? value : [])}
                 render={({ input }) => {
-                  const mandatoryVillages = form.getState().values.users[index].selectedVillages || [];
                   return (
                     <MultiSelect
                       {...(input as any)}
@@ -78,11 +84,11 @@ export const DynamicCHForm = ({
                       isModel={true}
                       isMulti={true}
                       isOptionDisabled={(option: any) => {
-                        return autoFetched[index] || isActivating
+                        return autoFetched[index] || isActivating || isEdit
                           ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
                           : null;
                       }}
-                      mandatoryOptions={autoFetched[index] || isActivating ? mandatoryVillages : []}
+                      mandatoryOptions={autoFetched[index] || isActivating || isEdit ? mandatoryVillages : []}
                       options={mandatoryVillages || []}
                       loadingOptions={villagesLoading}
                     />
@@ -97,12 +103,18 @@ export const DynamicCHForm = ({
               type='text'
               validate={(value) => required(Array.isArray(value) ? value : [])}
               render={({ input, meta }) => {
+                const hfTenantId = isHF ? healthFacilityId : form.getState().values.users[index]?.healthfacility?.id;
                 const currentFormValue = form.getState().values.users[index];
                 const allVillages = villages[index];
                 const selectedVillages = currentFormValue?.selectedVillages || [];
-                const currentHFVillages = autoFetched[index]
-                  ? (allVillages || []).filter((v: any) => !(selectedVillages || []).some((mv: any) => mv.id === v.id))
-                  : allVillages;
+                const currentHFVillages =
+                  autoFetched[index] || isEdit
+                    ? (allVillages || []).filter((v: any) =>
+                        v.healthFacilityId && hfTenantId
+                          ? Number(v.healthFacilityId) === Number(hfTenantId)
+                          : !(selectedVillages || []).some((mv: any) => mv.id === v.id)
+                      )
+                    : allVillages;
                 return (
                   <MultiSelect
                     {...(input as any)}
@@ -116,7 +128,7 @@ export const DynamicCHForm = ({
                     isDefaultSelected={true}
                     placeholder=''
                     menuPlacement={'auto'}
-                    isDisabled={isProfile}
+                    isDisabled={isProfile || (!isHF && isEdit)}
                     isModel={true}
                     isMulti={true}
                     options={currentHFVillages || []}
