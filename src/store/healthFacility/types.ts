@@ -735,6 +735,8 @@ export interface IWorkflow {
   name: string;
   isActive?: boolean;
   default?: boolean;
+  readOnly?: boolean;
+  hasInitialValue?: boolean;
   coreType?: string;
   workflowId?: string;
   moduleType?: string;

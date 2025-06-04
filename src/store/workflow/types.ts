@@ -45,6 +45,8 @@ export interface IClinicalWorkflow {
   name: string;
   isActive?: boolean;
   default?: boolean;
+  readOnly?: boolean;
+  hasInitialValue?: boolean;
   isDeleted?: boolean;
   coreType?: string;
   workflowId?: string;

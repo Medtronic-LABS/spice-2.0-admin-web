@@ -35,6 +35,7 @@ interface IWorkflowsProps {
 const renderWorkflowByModuleType = (
   clinicalWorkflows: IWorkflow[],
   moduleType: string,
+  isCommunity: boolean,
   selectedState?: any,
   form?: any,
   mentalHealthSelection?: () => any,
@@ -116,10 +117,10 @@ const renderWorkflowByModuleType = (
                             <Checkbox
                               {...input}
                               label={convertToCaptilize(workflow.name)}
-                              disabled={workflow.default || checkPhq4Condition(workflow)}
+                              disabled={workflow[isCommunity ? 'readOnly' : 'default'] || checkPhq4Condition(workflow)}
                               readOnly={moduleType === clinical && checkPhq4Condition(workflow)}
                               onClick={() => onClickWorkflow(workflow)}
-                              checked={input.checked || workflow.default}
+                              checked={input.checked || workflow[isCommunity ? 'readOnly' : 'default']}
                             />
                           );
                         }}
@@ -166,18 +167,21 @@ const Workflows: React.FC<IWorkflowsProps> = ({
    * @param {string} moduleType - The module type
    * @returns {number | null} The workflow ID or null
    */
-  const getHFWorkflowIds = useCallback((hfWorkflows: any[], workflow: IWorkflow, moduleType: string) => {
-    if (workflow.moduleType === moduleType) {
-      if (hfWorkflows.length) {
-        return workflow.id;
-      } else {
-        if (workflow?.default) {
+  const getHFWorkflowIds = useCallback(
+    (hfWorkflows: any[], workflow: IWorkflow, moduleType: string) => {
+      if (workflow.moduleType === moduleType) {
+        if (hfWorkflows.length) {
           return workflow.id;
+        } else {
+          if (workflow?.[isCommunity ? 'readOnly' : 'default']) {
+            return workflow.id;
+          }
         }
       }
-    }
-    return null;
-  }, []);
+      return null;
+    },
+    [isCommunity]
+  );
 
   const mentalHealthTimeout = useRef<any>(null);
   const pregnancyCheckTimeout = useRef<any>(null);
@@ -223,8 +227,9 @@ const Workflows: React.FC<IWorkflowsProps> = ({
             .filter(Boolean);
         };
         const defaultWorkflows =
-          workflows?.filter((workflow) => workflow.moduleType === clinical && workflow.default)?.map((wf) => wf.id) ||
-          [];
+          workflows
+            ?.filter((workflow) => workflow.moduleType === clinical && workflow[isCommunity ? 'readOnly' : 'default'])
+            ?.map((wf) => wf.id) || [];
         // Preserve existing workflows if they exist
         const existingClinicalWorkflows = form.getState()?.values.healthFacility?.clinicalWorkflows || [];
         const existingCustomizedWorkflows = form.getState()?.values.healthFacility?.customizedWorkflows || [];
@@ -268,12 +273,13 @@ const Workflows: React.FC<IWorkflowsProps> = ({
       {renderWorkflowByModuleType(
         workflows,
         clinical,
+        isCommunity,
         { phq4Selected, setPhq4Selected },
         form,
         mentalHealthSelection,
         pregnancyCheckTimeout
       )}
-      {renderWorkflowByModuleType(workflows, customized)}
+      {renderWorkflowByModuleType(workflows, customized, isCommunity)}
       {(isCommunity ? formClinicalWFsLength === 0 : formClinicalWFsLength === 0 && formCustomizedWFsLength === 0) && (
         <div className='col-sm-6 col-12'>
           <div className='mb-0dot5 input-field-label text-danger'>Select atleast one workflows</div>

@@ -247,9 +247,11 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                   clinicalWorkflows:
                     formInstance.current.getState().values.healthFacility?.clinicalWorkflows ||
                     (isCommunity
-                      ? flows.map((v: any) => v?.id)
+                      ? flows.filter((flow) => flow.hasInitialValue)?.map((v: any) => v?.id)
                       : flows.filter((flow) => flow.default)?.map((f) => f?.id)),
-                  defaultTrueWorkflows: flows.filter((flow) => flow.default)?.map((f) => f?.id)
+                  defaultTrueWorkflows: flows
+                    .filter((flow) => flow[isCommunity ? 'readOnly' : 'default'])
+                    ?.map((f) => f?.id)
                 },
                 users
               },
