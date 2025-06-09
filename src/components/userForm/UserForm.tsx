@@ -1628,7 +1628,9 @@ const UserForm = ({
                 {(isPeerSupervisor ||
                   (isSPICE &&
                     (isEdit
-                      ? (showSpiceHFRef.current[index] && !(mandatoryRoles || []).length && (spiceRole || []).length) ||
+                      ? ((mandatoryRoles || []).length
+                          ? !isCHPCHWSelected(mandatoryRoles) && showSpiceHFRef.current[index]
+                          : showSpiceHFRef.current[index] && (spiceRole || []).length) ||
                         (!isCommunity && isSiteUser && !isHF)
                       : showSpiceHFRef.current[index] && (!isEdit || isReportOrInsightUser)))) && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
