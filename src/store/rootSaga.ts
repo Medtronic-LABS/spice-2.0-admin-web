@@ -9,6 +9,7 @@ import districtSaga from './district/sagas';
 import chiefdomSaga from './chiefdom/sagas';
 import programSaga from './program/sagas';
 import commonSaga from './common/sagas';
+import { chwHouseholdRegistrationSaga } from './chwHouseholdRegistration/sagas';
 
 export function* rootSaga() {
   yield all([fork(userSaga)]);
@@ -21,4 +22,5 @@ export function* rootSaga() {
   yield all([fork(chiefdomSaga)]);
   yield all([fork(programSaga)]);
   yield all([fork(commonSaga)]);
+  yield all([fork(chwHouseholdRegistrationSaga)]);
 }

@@ -52,6 +52,7 @@ import ProgramForm from './containers/program/CreateProgram';
 import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
 import WorkflowFormCustomization from './containers/workflow/WorkflowFormCustomization';
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
+import CHWHouseholdRegistrationDashboard from './containers/chwHouseholdRegistration/CHWHouseholdRegistrationDashboard';
 import PrivacyPolicy from './containers/privacyPolicy/PrivacyPolicy';
 interface IRoute {
   path: string;
@@ -211,15 +212,9 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       authorisedRoles: CDA_HFA
     },
     {
-      path: PROTECTED_ROUTES.createChiefdomByDistrict,
+      path: PROTECTED_ROUTES.chwHouseholdRegistrationDashboard,
       exact: true,
-      component: CreateChiefdom,
-      authorisedRoles: SU_SA_RA_DA
-    },
-    {
-      path: PROTECTED_ROUTES.healthFacilityDashboard,
-      exact: true,
-      component: HealthFacilityDashboard,
+      component: CHWHouseholdRegistrationDashboard,
       authorisedRoles: CDA_HFA
     },
     {
