@@ -1,0 +1,29 @@
+.chw-household-chart {
+  .chart-title {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .achievement-indicator {
+    display: flex;
+    align-items: center;
+    
+    .achievement-percentage {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--green);
+    }
+    
+    .achievement-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+  }
+
+  .chart-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}

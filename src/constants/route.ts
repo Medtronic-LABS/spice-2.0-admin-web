@@ -52,6 +52,7 @@ export const PROTECTED_ROUTES = {
 
   // AF
   healthFacilityDashboard: '/health-facility',
+  chwHouseholdRegistrationDashboard: '/health-facility/chw-household-registration',
   healthFacilitySummary: '/health-facility/:healthFacilityId/:tenantId',
   healthFacilityByRegion: '/region/:regionId/:tenantId/health-facility',
   healthFacilityByDistrict: '/district/:districtId/:tenantId/health-facility',
