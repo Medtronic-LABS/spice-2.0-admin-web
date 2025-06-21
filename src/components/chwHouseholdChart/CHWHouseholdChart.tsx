@@ -6,7 +6,7 @@ import {
   BarElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { IHouseholdRegistrationData } from '../../store/chwHouseholdRegistration/types';
@@ -77,7 +77,7 @@ const CHWHouseholdChart: React.FC<ICHWHouseholdChartProps> = ({ data, overallAch
       },
       tooltip: {
         callbacks: {
-          afterLabel: function(context: any) {
+          afterLabel: (context: any) => {
             const dataIndex = context.dataIndex;
             const achievement = data[dataIndex]?.achievement || 0;
             return `Achievement: ${achievement.toFixed(1)}%`;
@@ -124,12 +124,12 @@ const CHWHouseholdChart: React.FC<ICHWHouseholdChartProps> = ({ data, overallAch
   };
 
   return (
-    <div className="chw-household-chart">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="chart-title mb-0">Month Wise Household Registration of a CHW</h4>
-        <div className="achievement-indicator">
-          <span className="achievement-percentage">{overallAchievement}%</span>
-          <span className="achievement-label ms-2">Target</span>
+    <div className='chw-household-chart'>
+      <div className='d-flex justify-content-between align-items-center mb-3'>
+        <h4 className='chart-title mb-0'>Month Wise Household Registration of a CHW</h4>
+        <div className='achievement-indicator'>
+          <span className='achievement-percentage'>{overallAchievement}%</span>
+          <span className='achievement-label ms-2'>Target</span>
         </div>
       </div>
       <div style={{ height: '400px', width: '100%' }}>

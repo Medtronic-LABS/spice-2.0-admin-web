@@ -21,11 +21,13 @@ export const selectHouseholdRegistrationError = createSelector(
 export const selectOverallAchievement = createSelector(
   [selectHouseholdRegistrationData],
   (data) => {
-    if (!data.length) return 0;
-    
+    if (!data.length) {
+      return 0;
+    }
+
     const totalRegistered = data.reduce((sum, item) => sum + item.registered, 0);
     const totalTarget = data.reduce((sum, item) => sum + item.target, 0);
-    
+
     return totalTarget > 0 ? Math.round((totalRegistered / totalTarget) * 100) : 0;
   }
 );

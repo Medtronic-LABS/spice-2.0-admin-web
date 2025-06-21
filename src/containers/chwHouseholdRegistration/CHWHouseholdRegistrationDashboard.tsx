@@ -13,7 +13,7 @@ import { fetchHouseholdRegistrationRequest } from '../../store/chwHouseholdRegis
 
 const CHWHouseholdRegistrationDashboard: React.FC = () => {
   const dispatch = useDispatch();
-  
+
   const householdData = useSelector(selectHouseholdRegistrationData);
   const loading = useSelector(selectHouseholdRegistrationLoading);
   const error = useSelector(selectHouseholdRegistrationError);
@@ -21,11 +21,9 @@ const CHWHouseholdRegistrationDashboard: React.FC = () => {
 
   const fetchData = useCallback(() => {
     dispatch(fetchHouseholdRegistrationRequest({
-      successCb: (data) => {
-        console.log('CHW household registration data fetched successfully:', data);
+      successCb: () => {
       },
-      failureCb: (error) => {
-        console.error('Failed to fetch CHW household registration data:', error);
+      failureCb: () => {
       }
     }));
   }, [dispatch]);
@@ -40,10 +38,10 @@ const CHWHouseholdRegistrationDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="py-1dot5">
-        <div className="row">
-          <div className="col-12">
-            <div className="alert alert-danger" role="alert">
+      <div className='py-1dot5'>
+        <div className='row'>
+          <div className='col-12'>
+            <div className='alert alert-danger' role='alert'>
               Error loading household registration data: {error}
             </div>
           </div>
@@ -53,25 +51,25 @@ const CHWHouseholdRegistrationDashboard: React.FC = () => {
   }
 
   return (
-    <div className="py-1dot5">
-      <div className="row">
-        <div className="col-12 mb-1dot25">
-          <h4 className="page-title mb-0">CHW Household Registration Dashboard</h4>
+    <div className='py-1dot5'>
+      <div className='row'>
+        <div className='col-12 mb-1dot25'>
+          <h4 className='page-title mb-0'>CHW Household Registration Dashboard</h4>
         </div>
       </div>
-      
-      <div className="row">
-        <div className="col-12">
-          <div className="card">
-            <div className="card-body">
+
+      <div className='row'>
+        <div className='col-12'>
+          <div className='card'>
+            <div className='card-body'>
               {householdData.length > 0 ? (
-                <CHWHouseholdChart 
-                  data={householdData} 
+                <CHWHouseholdChart
+                  data={householdData}
                   overallAchievement={overallAchievement}
                 />
               ) : (
-                <div className="text-center py-5">
-                  <p className="text-muted">No household registration data available</p>
+                <div className='text-center py-5'>
+                  <p className='text-muted'>No household registration data available</p>
                 </div>
               )}
             </div>
