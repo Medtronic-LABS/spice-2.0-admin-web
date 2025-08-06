@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
+import { COMEMR, hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
@@ -362,8 +362,8 @@ const UserForm = ({
           villages: isEdit && !isHF ? initialEditValue?.villages : currentVillages,
           hfTenantIds: isEdit
             ? (initialEditValue?.organizations || [])
-                .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
-                .map((org: any) => org.id)
+              .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
+              .map((org: any) => org.id)
             : [],
           culture: showCulture && initialEditValue?.culture,
           district:
@@ -420,7 +420,7 @@ const UserForm = ({
           suiteAccess: defaultSelectedRole ? [getSpiceGroupName(suiteAccess)] : [],
           countryCode:
             form.getState()?.values?.region?.phoneNumberCode?.length &&
-            !form?.getState()?.errors?.region?.phoneNumberCode
+              !form?.getState()?.errors?.region?.phoneNumberCode
               ? form.getState()?.values?.region?.phoneNumberCode
               : undefined
         });
@@ -605,26 +605,26 @@ const UserForm = ({
             isFormInvalid
               ? undefined
               : () => {
-                  idRefs.current.push(new Date().getTime());
-                  const dataToPush = { ...initialValue[0] };
-                  if (isAdminForm && defaultSelectedRole) {
-                    const defaultAddAdminRole = appTypeBasedRoles.SPICE?.find(
-                      (spiceRole: IRoles) => spiceRole.name === defaultSelectedRole
-                    );
-                    dataToPush.role = [defaultAddAdminRole];
-                    dataToPush.roles = [defaultAddAdminRole];
-                    const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
-                    dataToPush.suiteAccess = [getSpiceGroupName(suiteAccess)];
-                  }
-                  if (
-                    isRegionCreate &&
-                    !form?.getState()?.errors?.region?.phoneNumberCode &&
-                    form.getState()?.values?.region?.phoneNumberCode?.length
-                  ) {
-                    dataToPush.countryCode = form.getState()?.values?.region?.phoneNumberCode;
-                  }
-                  fields.push(dataToPush);
+                idRefs.current.push(new Date().getTime());
+                const dataToPush = { ...initialValue[0] };
+                if (isAdminForm && defaultSelectedRole) {
+                  const defaultAddAdminRole = appTypeBasedRoles.SPICE?.find(
+                    (spiceRole: IRoles) => spiceRole.name === defaultSelectedRole
+                  );
+                  dataToPush.role = [defaultAddAdminRole];
+                  dataToPush.roles = [defaultAddAdminRole];
+                  const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
+                  dataToPush.suiteAccess = [getSpiceGroupName(suiteAccess)];
                 }
+                if (
+                  isRegionCreate &&
+                  !form?.getState()?.errors?.region?.phoneNumberCode &&
+                  form.getState()?.values?.region?.phoneNumberCode?.length
+                ) {
+                  dataToPush.countryCode = form.getState()?.values?.region?.phoneNumberCode;
+                }
+                fields.push(dataToPush);
+              }
           }
         >
           <PlusIcon className='me-0dot5' aria-labelledby='plus-icon' aria-label='plus-icon' />
@@ -797,6 +797,10 @@ const UserForm = ({
     if (isEdit) {
       const initialEditDataWithoutRedrisk = initialEditData.map((editData) => ({
         ...editData,
+        suiteAccess: editData?.suiteAccess
+          ? editData.suiteAccess.map((suiteData: any) => {
+            return { ...suiteData, label: suiteData.groupName === SPICE ? COMEMR : suiteData.groupName };
+          }) : [],
         role: removeRedRiskFromRoleArray(editData?.role)
       }));
       setAutoFetchData(initialEditDataWithoutRedrisk);
@@ -1064,9 +1068,9 @@ const UserForm = ({
                       render={({ input, meta }) => (
                         <MultiSelect
                           {...(input as any)}
-                          label='SPICE Suite Access'
+                          label='Suite Access'
                           errorLabel='suite access'
-                          labelKey='groupName'
+                          labelKey='label'
                           valueKey='groupName'
                           options={suiteAccess || []}
                           placeholder=''
@@ -1160,7 +1164,7 @@ const UserForm = ({
                         return isSiteUser || isHFCreate ? (
                           <MultiSelect
                             {...(input as any)}
-                            label='SPICE Role'
+                            label='ComEMR Role'
                             errorLabel='Please select at least one role.'
                             labelKey='displayName'
                             valueKey='id'
@@ -1236,7 +1240,7 @@ const UserForm = ({
                                 const tenantIds = [
                                   ...(initialEditData[index]?.hfTenantIds || []),
                                   Number(form.getState().values?.users?.[0]?.healthfacility?.tenantId) ||
-                                    (healthFacilityId && tenantId ? Number(tenantId) : undefined),
+                                  (healthFacilityId && tenantId ? Number(tenantId) : undefined),
                                   ...((fetchedData.current?.[index] || {}).organizations || []).map((v: any) => v.id),
                                   isHF ? Number(hfTenantId) : undefined
                                 ].filter((v: number | undefined) => v);
@@ -1258,7 +1262,7 @@ const UserForm = ({
                           <SelectInput
                             {...(input as any)}
                             autoSelect={false} // for admins prevent autoselect
-                            label={'SPICE Role'}
+                            label={'ComEMR Role'}
                             errorLabel='Please select role.'
                             labelKey='displayName'
                             valueKey='id'
@@ -1629,57 +1633,57 @@ const UserForm = ({
                   (isSPICE &&
                     (isEdit
                       ? ((mandatoryRoles || []).length
-                          ? !isCHPCHWSelected(mandatoryRoles) && showSpiceHFRef.current[index]
-                          : showSpiceHFRef.current[index] && (spiceRole || []).length) ||
-                        (!isCommunity && isSiteUser && !isHF)
+                        ? !isCHPCHWSelected(mandatoryRoles) && showSpiceHFRef.current[index]
+                        : showSpiceHFRef.current[index] && (spiceRole || []).length) ||
+                      (!isCommunity && isSiteUser && !isHF)
                       : showSpiceHFRef.current[index] && (!isEdit || isReportOrInsightUser)))) && (
-                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
-                    <Field
-                      name={`${name}.${NAMING_VARIABLES.healthFacility}`}
-                      type='text'
-                      validate={required}
-                      disabled={isActivating}
-                      render={({ input, meta }) => {
-                        return (
-                          <SelectInput
-                            {...(input as any)}
-                            label={`Assigned ${healthfacilitySName}`}
-                            errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
-                            labelKey='name'
-                            valueKey='id'
-                            options={newHFList}
-                            loadingOptions={hfLoading}
-                            error={isError(meta)}
-                            isModel={true}
-                            disabled={isProfile}
-                            onChange={(hf: IHealthFacility) => {
-                              if (!autoFetched[index]) {
-                                emailDisabledFn('', index, false);
-                              }
-                              const formData = form.getState()?.values?.users?.[index];
-                              const supervisorFieldData = `${formName}[${index}].supervisor`;
-                              form.change(supervisorFieldData, null);
+                    <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
+                      <Field
+                        name={`${name}.${NAMING_VARIABLES.healthFacility}`}
+                        type='text'
+                        validate={required}
+                        disabled={isActivating}
+                        render={({ input, meta }) => {
+                          return (
+                            <SelectInput
+                              {...(input as any)}
+                              label={`Assigned ${healthfacilitySName}`}
+                              errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
+                              labelKey='name'
+                              valueKey='id'
+                              options={newHFList}
+                              loadingOptions={hfLoading}
+                              error={isError(meta)}
+                              isModel={true}
+                              disabled={isProfile}
+                              onChange={(hf: IHealthFacility) => {
+                                if (!autoFetched[index]) {
+                                  emailDisabledFn('', index, false);
+                                }
+                                const formData = form.getState()?.values?.users?.[index];
+                                const supervisorFieldData = `${formName}[${index}].supervisor`;
+                                form.change(supervisorFieldData, null);
 
-                              if (showVillage[index]) {
-                                fetchSupervisorList(
-                                  formData?.organizations
-                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                                if (showVillage[index]) {
+                                  fetchSupervisorList(
+                                    formData?.organizations
+                                      ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
                                         (v: any) => v
                                       )
-                                    : [hf.tenantId],
-                                  index
-                                );
-                                fetchVillagesList([Number(hf.tenantId)], formData?.id, index);
-                              }
+                                      : [hf.tenantId],
+                                    index
+                                  );
+                                  fetchVillagesList([Number(hf.tenantId)], formData?.id, index);
+                                }
 
-                              input.onChange(hf);
-                            }}
-                          />
-                        );
-                      }}
-                    />
-                  </div>
-                )}
+                                input.onChange(hf);
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
                 {isReports && showReportHFRef.current[index] && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field

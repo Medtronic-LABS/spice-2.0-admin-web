@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
-import { villageBasedRoles } from '../../constants/roleConstants';
+import { COMEMR, SPICE, villageBasedRoles } from '../../constants/roleConstants';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 import { removeRedRiskFromRoleArray } from '../../utils/commonUtils';
@@ -56,6 +56,7 @@ const useUserFormUtils = () => {
     Object.keys(rolesGrouped || {})
       .map((userRole: any) => ({
         groupName: userRole,
+        label: userRole === SPICE ? COMEMR : userRole,
         id: userRole
       }))
       .sort((a, b) => (a.groupName > b.groupName ? 1 : -1));
@@ -79,6 +80,7 @@ const useUserFormUtils = () => {
     const allSuiteAccess =
       rolesWithoutRedRisk.map((r: IRoles) => ({
         groupName: r.groupName,
+        label: r.groupName === SPICE ? COMEMR : r.groupName,
         id: r.groupName
       })) || [];
     const suiteAccess = [...new Map(allSuiteAccess.map((item: any) => [item.groupName, item])).values()];

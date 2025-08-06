@@ -1,4 +1,5 @@
 export const SPICE = 'SPICE';
+export const COMEMR = 'COMEMR';
 export const REPORTS = 'REPORTS';
 export const INSIGHTS = 'INSIGHTS';
 
