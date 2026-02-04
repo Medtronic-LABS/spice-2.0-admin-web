@@ -6,7 +6,7 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import 'jest-canvas-mock';
 import { configure } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import Adapter from '@cfaester/enzyme-adapter-react-18';
 
 global.React = React;
 configure({ adapter: new Adapter() });

@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import SelectInput from '../../../components/formFields/SelectInput';
 import ConsentForm, { IProps } from '../ConsentForm';
-import { waitFor } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 
 jest.mock('../../../components/editor/WysiwygEditor.tsx', () => {
   return jest.fn(() => null);
@@ -68,18 +68,32 @@ describe('ConsentForm', () => {
   it('should enable the submit button when isDistrict is true and form type is selected', () => {
     const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
     const selectInput = wrapper.find(SelectInput);
-    selectInput.prop('input').onChange({ name: 'Screening', id: 0 });
+    
+    act(() => {
+      selectInput.prop('input').onChange({ name: 'Screening', id: 0 });
+    });
+    
     wrapper.update();
     const submitButton = wrapper.find('button.primary-btn');
     expect(submitButton).toHaveLength(1);
     expect(submitButton.prop('disabled')).toBe(false);
   });
   it('handle onClick handleSubmit', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
-    const selectInput: any = wrapper.find('button.primary-btn').props();
-    selectInput.onClick('test');
-    waitFor(() => {
-      expect(selectInput.onClick('test')).toHaveBeenCalled();
+    const wrapper = mount(<ConsentForm {...props} isDistrict={true} editorContent="test content" />);
+    const selectInput = wrapper.find(SelectInput);
+    
+    // First select a form type to enable the submit button
+    act(() => {
+      selectInput.prop('input').onChange({ name: 'Screening', id: 0 });
     });
+    wrapper.update();
+    
+    // Now click the submit button
+    const submitButton = wrapper.find('button.primary-btn');
+    act(() => {
+      submitButton.simulate('click');
+    });
+    
+    expect(mockSubmitConsentForm).toHaveBeenCalledWith('test content');
   });
 });

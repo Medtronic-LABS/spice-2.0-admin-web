@@ -112,10 +112,16 @@ describe('ProgramForm', () => {
         }
       },
       user: {
-        user: { country: { id: 1, name: 'Test' } }
+        user: {
+          country: { id: 1, name: 'Test', appTypes: [] },
+          appTypes: []
+        }
       },
       healthFacility: {
         healthFacilityList: []
+      },
+      common: {
+        labelName: null
       }
     });
     wrapper = mount(

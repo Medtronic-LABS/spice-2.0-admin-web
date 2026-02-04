@@ -42,7 +42,7 @@ describe('Medication Sagas', () => {
         fetchMedicationList,
         { ...medicationListRequestPayload, type: ACTION_TYPES.FETCH_MEDICATIONS_LIST_REQUEST }
       ).toPromise();
-      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined);
+      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined, undefined, undefined, undefined);
       expect(dispatched).toEqual([
         medicationActions.fetchMedicationListSuccess({ list: medicationListDataPayload as any, total: 10 })
       ]);
@@ -63,7 +63,7 @@ describe('Medication Sagas', () => {
         fetchMedicationList,
         { ...medicationListRequestPayload, type: ACTION_TYPES.FETCH_MEDICATIONS_LIST_REQUEST }
       ).toPromise();
-      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined);
+      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined, undefined, undefined, undefined);
       expect(dispatched).toEqual([medicationActions.fetchMedicationListSuccess({ list: [] as any, total: 10 })]);
     });
 
@@ -81,7 +81,7 @@ describe('Medication Sagas', () => {
         fetchMedicationList,
         { ...medicationListRequestPayload, failureCb, type: ACTION_TYPES.FETCH_MEDICATIONS_LIST_REQUEST }
       ).toPromise();
-      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined);
+      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined, undefined, undefined, undefined);
       expect(failureCb).toHaveBeenCalledWith(error);
       expect(dispatched).toEqual([medicationActions.fetchMedicationlistFail(error)]);
     });
@@ -100,7 +100,7 @@ describe('Medication Sagas', () => {
         fetchMedicationList,
         { ...medicationListRequestPayload, failureCb, type: ACTION_TYPES.FETCH_MEDICATIONS_LIST_REQUEST }
       ).toPromise();
-      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined);
+      expect(fetchMedicationListSpy).toHaveBeenCalledWith(0, 10, 2, undefined, undefined, undefined, undefined);
       expect(failureCb).not.toHaveBeenCalledWith(error);
       expect(dispatched).not.toEqual([medicationActions.fetchMedicationlistFail(error as any)]);
     });

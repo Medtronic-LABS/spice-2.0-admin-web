@@ -8,21 +8,21 @@ describe('DatePickerView Configuration', () => {
 
       expect(result.id).toMatch(/\d+DatePicker$/);
 
-      expect(result).toEqual(
-        expect.objectContaining({
-          viewType: 'DatePicker',
-          title: '',
-          fieldName: '',
-          family: '',
-          isMandatory: false,
-          isEnabled: true,
-          visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
-          isDefault: false,
-          disableFutureDate: false,
-          minDays: null,
-          maxDays: null
-        })
-      );
+      expect(result).toMatchObject({
+        viewType: 'DatePicker',
+        title: '',
+        fieldName: '',
+        family: '',
+        isMandatory: false,
+        isEnabled: true,
+        visibility: APPCONSTANTS.VALIDITY_OPTIONS.visible.key,
+        isDefault: false,
+        disableFutureDate: false,
+        inputType: 4,
+        resource: '',
+        startDate: null,
+        endDate: null
+      });
     });
   });
 
@@ -33,8 +33,12 @@ describe('DatePickerView Configuration', () => {
         fieldName: {},
         isMandatory: {},
         disableFutureDate: {},
+        resource: {},
+        inputType: { disabled: true },
         minDays: {},
-        maxDays: {}
+        maxDays: {},
+        startDate: {},
+        endDate: {}
       });
     });
   });

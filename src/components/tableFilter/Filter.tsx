@@ -181,13 +181,16 @@ const TableFilter: React.FC<ITableFilterProps> = ({
         const selectedFilterOptions = prev.includes(option.id)
           ? prev.filter((id: any) => id !== option.id)
           : [...prev, option.id];
-        const selectedAllIndex = selectedFilterOptions?.indexOf(selectAllLabel);
+        const selectedAllId = selectAllOptionData.id;
+        const selectedAllIndex = selectedFilterOptions?.indexOf(selectedAllId);
         if (selectedFilterOptions?.length === filterData?.data?.length && selectedAllIndex === -1) {
-          selectedFilterOptions.push(selectAllLabel);
+          selectedFilterOptions.push(selectedAllId);
           isAllSelected.current = true;
         } else if (selectedAllIndex > -1) {
           isAllSelected.current = false;
           selectedFilterOptions.splice(selectedAllIndex, 1);
+        } else if (selectedFilterOptions?.length < filterData?.data?.length) {
+          isAllSelected.current = false;
         }
         return selectedFilterOptions;
       });

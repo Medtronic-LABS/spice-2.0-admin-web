@@ -25,11 +25,27 @@ jest.mock('../TextInput', () => ({
 const mockStore = configureStore([]);
 const store = mockStore({
   region: {
-    regionDetails: {
+    detail: {
       appTypes: [],
       id: 1,
       name: 'Sierra Leone',
       tenantId: 1
+    }
+  },
+  user: {
+    user: {
+      appTypes: [],
+      country: {
+        appTypes: []
+      }
+    }
+  },
+  common: {
+    labelName: {
+      region: { s: 'Region', p: 'Regions' },
+      healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+      district: { s: 'County', p: 'Counties' },
+      chiefdom: { s: 'Sub County', p: 'Sub Counties' }
     }
   }
 });
@@ -100,7 +116,7 @@ describe('PhoneNumberField', () => {
     );
 
     const inputField = screen.getByTestId('input');
-    fireEvent.change(inputField, { target: { value: '1234567890' } });
+    fireEvent.change(inputField, { target: { value: '21234567' } });
     await waitFor(() => {
       fireEvent.blur(inputField);
     });

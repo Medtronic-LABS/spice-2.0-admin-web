@@ -1,18 +1,36 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import RegionCustomization, { findCurrentFormType, FormTypes } from '../RegionCustomization';
 
 jest.mock('../../assets/images/edit.svg', () => ({
-  ReactComponent: 'editSvg'
+  ReactComponent: () => <svg data-testid='edit-icon' />
 }));
 
+const mockStore = configureStore([]);
+
 describe('RegionCustomization', () => {
+  const store = mockStore({
+    user: {
+      user: {
+        country: { id: 1, appTypes: [] },
+        appTypes: []
+      }
+    },
+    common: {
+      labelName: null
+    }
+  });
+
   const renderComponent = () =>
     render(
-      <Router>
-        <RegionCustomization />
-      </Router>
+      <Provider store={store}>
+        <Router>
+          <RegionCustomization />
+        </Router>
+      </Provider>
     );
   it('should render the RegionCustomization component', () => {
     renderComponent();

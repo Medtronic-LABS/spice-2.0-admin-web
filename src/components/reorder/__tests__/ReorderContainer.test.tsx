@@ -81,7 +81,7 @@ describe('ReorderContainer', () => {
     });
   });
 
-  it('should remove items and update order correctly', () => {
+  it('should remove items and update order correctly', async () => {
     let contextValue: any;
 
     render(
@@ -95,29 +95,37 @@ describe('ReorderContainer', () => {
       </ReorderContainer>
     );
 
-    waitFor(() => {
+    act(() => {
       contextValue.initItem('item1', 0, 100);
       contextValue.initItem('item2', 1, 150);
       contextValue.initItem('item3', 2, 200);
     });
 
-    waitFor(() => {
+    await waitFor(() => {
+      expect(contextValue.order).toHaveProperty('item1', 0);
+      expect(contextValue.order).toHaveProperty('item2', 1);
+      expect(contextValue.order).toHaveProperty('item3', 2);
+    });
+
+    act(() => {
       contextValue.removeItem('item2');
     });
 
-    expect(contextValue.order).toEqual({
-      item1: 0,
-      item3: 1
-    });
+    await waitFor(() => {
+      expect(contextValue.order).toEqual({
+        item1: 0,
+        item3: 1
+      });
 
-    expect(contextValue.height).toEqual({
-      item1: 100,
-      item3: 200
-    });
+      expect(contextValue.height).toEqual({
+        item1: 100,
+        item3: 200
+      });
 
-    expect(mockOnReorder).toHaveBeenCalledWith({
-      item1: 0,
-      item3: 1
+      expect(mockOnReorder).toHaveBeenCalledWith({
+        item1: 0,
+        item3: 1
+      });
     });
   });
 });

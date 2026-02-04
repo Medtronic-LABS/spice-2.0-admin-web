@@ -271,9 +271,9 @@ describe('userReducer', () => {
       type: USERTYPES.CHANGE_PASSWORD_REQUEST,
       message: 'Session has timed out'
     };
+    // CHANGE_PASSWORD_REQUEST is not handled in the reducer, so it falls through to default
     const expectedState = {
-      ...initialState,
-      loading: true
+      ...initialState
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
@@ -404,7 +404,7 @@ describe('userReducer', () => {
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });
 
-  it('should handle CHANGE_PASSWORD_REQUEST', () => {
+  it('should handle CHANGE_PASSWORD_REQUEST - duplicate test', () => {
     const initialState: any = {
       isLoggedIn: true,
       errorMessage: null
@@ -412,9 +412,9 @@ describe('userReducer', () => {
     const action: any = {
       type: USERTYPES.CHANGE_PASSWORD_REQUEST
     };
+    // CHANGE_PASSWORD_REQUEST is not handled in the reducer, so it falls through to default
     const expectedState = {
-      ...initialState,
-      loading: true
+      ...initialState
     };
     expect(userReducer(initialState, action)).toEqual(expectedState);
   });

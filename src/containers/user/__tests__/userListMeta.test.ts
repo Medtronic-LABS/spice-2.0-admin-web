@@ -2,6 +2,7 @@ import { columnDef } from '../userListMeta';
 import { IHFUserGet } from '../../../store/healthFacility/types';
 
 describe('Column Definitions and Formatting Functions', () => {
+  const columns = columnDef({ healthFacilityModuleName: 'HEALTH FACILITY', isCommunity: false });
   const user: IHFUserGet = {
     firstName: 'John',
     lastName: 'Doe',
@@ -38,27 +39,27 @@ describe('Column Definitions and Formatting Functions', () => {
   };
 
   it('formats the full name correctly in the name column', () => {
-    const nameFormatter = columnDef.find((col: { name: string }) => col.name === 'name')?.cellFormatter;
+    const nameFormatter = columns.find((col: { name: string }) => col.name === 'name')?.cellFormatter;
     const result = nameFormatter?.(user);
     expect(result).toBe('John Doe');
   });
 
   it('formats roles correctly in the role column', () => {
-    const roleFormatter = columnDef.find((col: { name: string }) => col.name === 'role')?.cellFormatter;
+    const roleFormatter = columns.find((col: { name: string }) => col.name === 'role')?.cellFormatter;
     const result = roleFormatter?.(user);
     expect(result).toBe('Admin,Manager');
   });
 
   it('formats phone number correctly in the phoneNumber column', () => {
-    const phoneFormatter = columnDef.find((col: { name: string }) => col.name === 'phoneNumber')?.cellFormatter;
+    const phoneFormatter = columns.find((col: { name: string }) => col.name === 'phoneNumber')?.cellFormatter;
     const result = phoneFormatter?.(user);
     expect(result).toBe('+1 123-456-7890');
   });
 
   it('verifies the column configuration', () => {
-    expect(columnDef).toHaveLength(6);
+    expect(columns).toHaveLength(6);
 
-    const [nameCol, emailCol, roleCol, healthFacilityCol, genderCol, phoneCol] = columnDef;
+    const [nameCol, emailCol, roleCol, healthFacilityCol, genderCol, phoneCol] = columns;
 
     expect(nameCol.name).toBe('name');
     expect(nameCol.label).toBe('Name');

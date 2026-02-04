@@ -50,8 +50,13 @@ describe('DeactivatedRecords component', () => {
     user: {
       user: {
         role: 'REGION_ADMIN',
-        tenantId: 1
+        tenantId: 1,
+        country: { id: 1, appTypes: [] },
+        appTypes: []
       }
+    },
+    common: {
+      labelName: null
     }
   });
 
@@ -79,8 +84,13 @@ describe('DeactivatedRecords component', () => {
       user: {
         user: {
           role: 'SUPER_ADMIN',
-          tenantId: 1
+          tenantId: 1,
+          country: { id: 1, appTypes: [] },
+          appTypes: []
         }
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -91,7 +101,7 @@ describe('DeactivatedRecords component', () => {
         </Router>
       </Provider>
     );
-    expect(getByText(`Deactivated ${districtSName}`)).toBeInTheDocument();
+    expect(getByText(`Deactivated ${districtPName}`)).toBeInTheDocument();
   });
 
   it('should call fetchDetails functions', async () => {

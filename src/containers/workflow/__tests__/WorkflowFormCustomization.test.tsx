@@ -145,6 +145,15 @@ const initialState = {
   },
   labtest: {
     units: []
+  },
+  user: {
+    user: {
+      country: { id: 1, appTypes: [] },
+      appTypes: []
+    }
+  },
+  common: {
+    labelName: null
   }
 };
 describe('WorkflowFormCustomization', () => {

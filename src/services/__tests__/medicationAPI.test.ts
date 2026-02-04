@@ -26,17 +26,23 @@ describe('Medication APIs', () => {
     const skip = 0;
     const limit = 10;
     const countryId = '1';
+    const classificationIds: number[] = [];
+    const brandIds: number[] = [];
+    const dosageFormIds: number[] = [];
     const search = 'test';
 
     mockAxios.onPost('/admin-service/medication/list').reply(200, {});
 
-    await getMedicationList(skip, limit, countryId, search);
+    await getMedicationList(skip, limit, countryId, classificationIds, brandIds, dosageFormIds, search);
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/medication/list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       skip,
       limit,
       countryId: Number(countryId),
+      classificationIds,
+      brandIds,
+      dosageFormIds,
       searchTerm: 'test'
     });
   });
@@ -45,16 +51,22 @@ describe('Medication APIs', () => {
     const skip = 0;
     const limit = 10;
     const countryId = '1';
+    const classificationIds: number[] = [];
+    const brandIds: number[] = [];
+    const dosageFormIds: number[] = [];
 
     mockAxios.onPost('/admin-service/medication/list').reply(200, {});
 
-    await getMedicationList(skip, limit, countryId);
+    await getMedicationList(skip, limit, countryId, classificationIds, brandIds, dosageFormIds);
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/medication/list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       skip,
       limit,
-      countryId: Number(countryId)
+      countryId: Number(countryId),
+      classificationIds,
+      brandIds,
+      dosageFormIds
     });
   });
 

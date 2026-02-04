@@ -7,6 +7,14 @@ import configureStore from 'redux-mock-store';
 import MedicationList from '../MedicationList';
 import { APP_TYPE } from '../../../constants/appConstants';
 
+// Mock toastCenter
+jest.mock('../../../utils/toastCenter', () => ({
+  error: jest.fn(),
+  success: jest.fn(),
+  __esModule: true,
+  default: { error: jest.fn(), success: jest.fn() }
+}));
+
 // Mock the required modules
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -17,6 +25,19 @@ jest.mock('react-router', () => ({
   useHistory: () => ({
     push: jest.fn()
   })
+}));
+
+// Mock SVG icons
+jest.mock('../../../assets/images/filter-icon.svg', () => ({
+  ReactComponent: () => <svg data-testid='filter-icon' />
+}));
+
+// Mock toastCenter
+jest.mock('../../../utils/toastCenter', () => ({
+  error: jest.fn(),
+  success: jest.fn(),
+  __esModule: true,
+  default: { error: jest.fn(), success: jest.fn() }
 }));
 
 const mockStore = configureStore([]);
@@ -42,10 +63,18 @@ describe('MedicationList Component', () => {
           }
         ],
         loading: false,
-        listCount: 1
+        listCount: 1,
+        classifications: [],
+        dosageForms: []
       },
       user: {
-        appTypes: [APP_TYPE.COMMUNITY]
+        user: {
+          appTypes: [APP_TYPE.COMMUNITY],
+          country: { id: 1, appTypes: [APP_TYPE.COMMUNITY] }
+        }
+      },
+      common: {
+        labelName: null
       }
     });
   });
@@ -65,10 +94,18 @@ describe('MedicationList Component', () => {
       medication: {
         list: [],
         loading: true,
-        listCount: 0
+        listCount: 0,
+        classifications: [],
+        dosageForms: []
       },
       user: {
-        appTypes: [APP_TYPE.COMMUNITY]
+        user: {
+          appTypes: [APP_TYPE.COMMUNITY],
+          country: { id: 1, appTypes: [APP_TYPE.COMMUNITY] }
+        }
+      },
+      common: {
+        labelName: null
       }
     });
     renderComponent();

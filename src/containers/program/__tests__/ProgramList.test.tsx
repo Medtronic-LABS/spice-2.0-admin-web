@@ -16,6 +16,11 @@ jest.mock('../../../utils/toastCenter', () => ({
   getErrorToastArgs: jest.fn().mockImplementation((error, title, message) => [title, message])
 }));
 
+// Mock SVG icons
+jest.mock('../../../assets/images/plus.svg', () => ({
+  ReactComponent: () => <svg data-testid='plus-icon' />
+}));
+
 // Mock react-router-dom hooks
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -87,6 +92,15 @@ describe('ProgramList Component', () => {
         programDetails: null,
         programDetailsLoading: false,
         programDetailsError: null
+      },
+      user: {
+        user: {
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -114,6 +128,15 @@ describe('ProgramList Component', () => {
         programs: [],
         loading: true,
         total: 0
+      },
+      user: {
+        user: {
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
+      },
+      common: {
+        labelName: null
       }
     });
 

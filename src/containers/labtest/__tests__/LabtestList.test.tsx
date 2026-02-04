@@ -13,8 +13,8 @@ jest.mock('../../../utils/toastCenter', () => ({
   default: { error: jest.fn(), success: jest.fn() }
 }));
 
-jest.mock('../../assets/images/edit.svg', () => ({
-  ReactComponent: () => <svg data-testid='edit-icon' />
+jest.mock('../../../assets/images/account-customize.svg', () => ({
+  ReactComponent: () => <svg data-testid='customize-icon' />
 }));
 
 const mockStore = configureStore([]);
@@ -52,7 +52,16 @@ describe('LabTestList Component', () => {
       labtest: {
         labTests: mockLabTests,
         loading: false,
-        count: 2
+        total: 2
+      },
+      user: {
+        user: {
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -96,7 +105,16 @@ describe('LabTestList Component', () => {
       labtest: {
         labTests: [],
         loading: true,
-        count: 0
+        total: 0
+      },
+      user: {
+        user: {
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
+      },
+      common: {
+        labelName: null
       }
     });
     render(

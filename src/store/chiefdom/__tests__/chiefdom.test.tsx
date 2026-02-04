@@ -161,7 +161,7 @@ describe('Fetch Chiefdom List in Dashboard', () => {
         type: ACTION_TYPES.FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST
       }
     ).toPromise();
-    expect(fetchChiefdomDashboardListSpy).toHaveBeenCalledWith('4', null, 0, undefined, 'Sample');
+    expect(fetchChiefdomDashboardListSpy).toHaveBeenCalledWith('4', null, 0, undefined, undefined, 'Sample');
     const payload = {
       chiefdomDashboardList: fetchDashboardChiefdomsResponseMockData,
       total: 10,
@@ -179,7 +179,7 @@ describe('Fetch Chiefdom List in Dashboard', () => {
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action),
-        getState: () => ({ user: { user: { tenantId: '4' } } })
+        getState: () => ({ user: { user: { tenantId: '4', appTypes: undefined } } })
       },
       fetchChiefdomDashboardList,
       {
@@ -187,7 +187,7 @@ describe('Fetch Chiefdom List in Dashboard', () => {
         type: ACTION_TYPES.FETCH_CHIEFDOM_DASHBOARD_LIST_REQUEST
       }
     ).toPromise();
-    expect(fetchChiefdomDashboardListSpy).toHaveBeenCalledWith('4', null, 0, undefined, 'Sample');
+    expect(fetchChiefdomDashboardListSpy).toHaveBeenCalledWith('4', null, 0, undefined, undefined, 'Sample');
     expect(dispatched).toEqual([chiefdomActions.fetchChiefdomDashboardListFailure(error)]);
   });
 });

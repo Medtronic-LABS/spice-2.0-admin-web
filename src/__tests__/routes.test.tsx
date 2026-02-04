@@ -13,6 +13,20 @@ jest.mock('../utils/routeUtil', () => ({
   decryptData: jest.fn()
 }));
 
+// Mock react-leaflet to avoid ES module issues
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
+  TileLayer: () => <div data-testid="tile-layer" />,
+  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
+  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  useMap: () => ({
+    setView: jest.fn(),
+    getCenter: () => ({ lat: 0, lng: 0 })
+  }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+
 jest.mock('../../../assets/images/app-logo.svg', () => ({
   ReactComponent: 'Logo'
 }));
@@ -65,12 +79,15 @@ describe('AppRoutes', () => {
     expect(screen.queryByText('Admin')).not.toBeInTheDocument(); // Ensure protected routes are not rendered
   });
 
-  it('should render protected routes when logged in', () => {
+  it('should render protected routes when logged in', async () => {
     const localStore = mockStore({
       user: {
         ...initialState.user,
         isLoggedIn: true,
-        suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR]
+        user: {
+          ...initialState.user.user,
+          suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR]
+        }
       }
     });
 
@@ -83,8 +100,8 @@ describe('AppRoutes', () => {
     );
 
     // Ensure LandingPage component is rendered
-    waitFor(() => {
-      expect(screen.getByText('ADMIN')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Admin')).toBeInTheDocument();
       expect(screen.queryByText('Login')).not.toBeInTheDocument();
     });
   });
@@ -121,11 +138,19 @@ describe('AppRoutes', () => {
 
   it('should redirect to the next URL when logged in and next parameter is present', async () => {
     const nextUrl = '/dashboard';
-    // Mock the URLSearchParams
-    const mockURLSearchParams = jest.fn(() => ({
-      get: jest.fn().mockReturnValue(nextUrl)
-    }));
-    global.URLSearchParams = mockURLSearchParams as any;
+    
+    // Mock URLSearchParams to return the next parameter when get('next') is called
+    const originalURLSearchParams = global.URLSearchParams;
+    global.URLSearchParams = jest.fn().mockImplementation(() => {
+      return {
+        get: jest.fn((key) => {
+          if (key === 'next') {
+            return nextUrl;
+          }
+          return null;
+        })
+      } as any;
+    });
 
     const localStore = mockStore({
       user: {
@@ -151,5 +176,8 @@ describe('AppRoutes', () => {
     });
 
     expect(screen.getByTestId('loader')).toBeInTheDocument();
+    
+    // Restore original URLSearchParams
+    global.URLSearchParams = originalURLSearchParams;
   });
 });

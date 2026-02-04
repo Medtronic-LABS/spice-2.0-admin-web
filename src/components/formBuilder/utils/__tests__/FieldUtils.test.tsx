@@ -13,7 +13,8 @@ describe('FieldUtils', () => {
     it('should contain correct view options', () => {
       expect(creatableViews).toEqual([
         { label: 'Text', value: 'EditText' },
-        { label: 'Dropdown', value: 'Spinner' }
+        { label: 'Dropdown', value: 'Spinner' },
+        { label: 'Date', value: 'DatePicker' }
       ]);
     });
   });

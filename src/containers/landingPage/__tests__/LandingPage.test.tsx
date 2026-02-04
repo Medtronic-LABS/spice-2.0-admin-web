@@ -10,6 +10,18 @@ import { goToUrl } from '../../../utils/routeUtil';
 import { HOME_PAGE_BY_ROLE } from '../../../constants/route';
 import { createMemoryHistory } from 'history';
 
+// Mock react-leaflet and leaflet CSS to avoid ESM issues pulled via routes
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
+  useMap: () => ({ setView: jest.fn(), getCenter: () => ({ lat: 0, lng: 0 }) }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+jest.mock('leaflet/dist/leaflet.css', () => ({}));
+
 // Mock assets
 jest.mock('../../../assets/images/admin.svg', () => ({
   ReactComponent: () => <div>AdminPortalLogo</div>
@@ -34,8 +46,12 @@ const initialState = {
     user: {
       role: APPCONSTANTS.ROLES.SUPER_ADMIN,
       suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN, APPCONSTANTS.SUITE_ACCESS.CFR],
-      appTypes: [APP_TYPE.COMMUNITY]
+      appTypes: [APP_TYPE.COMMUNITY],
+      country: { id: 1, appTypes: [APP_TYPE.COMMUNITY] }
     }
+  },
+  common: {
+    labelName: null
   },
   regionCom: {
     detail: {

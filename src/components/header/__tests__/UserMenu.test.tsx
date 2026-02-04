@@ -8,6 +8,21 @@ import APPCONSTANTS, { APP_TYPE } from '../../../constants/appConstants';
 import '@testing-library/jest-dom/extend-expect';
 import { CHANGE_OWN_PASSWORD_REQUEST } from '../../../store/user/actionTypes';
 
+jest.mock('leaflet/dist/leaflet.css', () => ({}));
+
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
+  TileLayer: () => <div data-testid="tile-layer" />,
+  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
+  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  useMap: () => ({
+    setView: jest.fn(),
+    getCenter: () => ({ lat: 0, lng: 0 })
+  }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+
 const { ROLES, SUITE_ACCESS } = APPCONSTANTS;
 
 jest.mock('../../../containers/authentication/ResetPasswordFields', () => ({
@@ -40,7 +55,10 @@ const initialState = {
       suiteAccess: [SUITE_ACCESS.ADMIN],
       formDataId: '456',
       tenantId: '789',
-      appTypes: [APP_TYPE.NON_COMMUNITY]
+      appTypes: [APP_TYPE.NON_COMMUNITY],
+      country: {
+        appTypes: []
+      }
     }
   },
   common: {
@@ -57,6 +75,12 @@ const initialState = {
         s: 'County',
         p: 'Counties'
       },
+      chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+    },
+    labelName: {
+      region: { s: 'Region', p: 'Regions' },
+      healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+      district: { s: 'County', p: 'Counties' },
       chiefdom: { s: 'Sub County', p: 'Sub Counties' }
     }
   }
@@ -162,12 +186,18 @@ describe('UserMenu Component', () => {
       user: {
         user: {
           ...initialState.user.user,
-          suiteAccess: []
+          suiteAccess: [],
+          country: {
+            appTypes: []
+          }
         }
       },
       common: {
         defaultValues: {
           ...initialState.common.defaultValues
+        },
+        labelName: {
+          ...initialState.common.labelName
         }
       }
     });
@@ -254,12 +284,18 @@ describe('UserMenu Component', () => {
       user: {
         user: {
           ...initialState.user.user,
-          appTypes: [APP_TYPE.COMMUNITY]
+          appTypes: [APP_TYPE.COMMUNITY],
+          country: {
+            appTypes: []
+          }
         }
       },
       common: {
         defaultValues: {
           ...initialState.common.defaultValues
+        },
+        labelName: {
+          ...initialState.common.labelName
         }
       }
     });

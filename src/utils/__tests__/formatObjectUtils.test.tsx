@@ -98,7 +98,7 @@ describe('formatObjectUtils', () => {
       const testCases = [
         {
           role: APPCONSTANTS.ROLES.SUPER_ADMIN,
-          expectedTenantId: null
+          expectedTenantId: undefined
         },
         {
           role: APPCONSTANTS.ROLES.REGION_ADMIN,
@@ -125,7 +125,7 @@ describe('formatObjectUtils', () => {
       testCases.forEach(({ role, expectedTenantId, ...additionalProps }) => {
         const userWithRole = {
           ...mockUser,
-          roles: [{ name: role }],
+          roles: [{ name: role, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
           ...additionalProps
         };
 
@@ -168,7 +168,7 @@ describe('formatObjectUtils', () => {
         designation: { id: 1, name: 'Doctor' },
         reportUserOrganization: [{ id: 1, tenantId: 123 }],
         insightUserOrganization: [{ id: 2, tenantId: 456 }],
-        roles: [{ name: APPCONSTANTS.ROLES.REGION_ADMIN }]
+        roles: [{ name: APPCONSTANTS.ROLES.REGION_ADMIN, groupName: APPCONSTANTS.spiceRoleGrouped.spice }]
       };
       const result = getAdminPayload({
         userFormData: [user],
@@ -179,6 +179,7 @@ describe('formatObjectUtils', () => {
       expect(result[0].countryCode).toEqual('+1');
       expect(result[0].designation).toEqual({ id: 1, name: 'Doctor' });
       expect(result[0].id).toBe(1);
+      expect(result[0].tenantId).toBe(123);
     });
 
     it('should handle hfAdmin with culture', () => {
@@ -186,7 +187,7 @@ describe('formatObjectUtils', () => {
         ...mockUser,
         id: 1,
         culture: 'en-US',
-        roles: [{ name: APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN }],
+        roles: [{ name: APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
         tenantId: 123
       };
       const result = getAdminPayload({
@@ -225,7 +226,7 @@ describe('formatObjectUtils', () => {
           gender: 'Male',
           username: 'johndoe',
           phoneNumber: '123-456-7890',
-          roles: [{ id: 1 }, { id: 2 }],
+          roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }, { id: 2, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
           redRisk: true,
           tenantId: 123
         }
@@ -324,7 +325,8 @@ describe('formatObjectUtils', () => {
           gender: 'Male',
           username: 'adminuser',
           phoneNumber: '123-456-7890',
-          tenantId: 123
+          tenantId: 123,
+          roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }]
         }
       ];
       const result = getUserPayload({
@@ -353,7 +355,7 @@ describe('formatObjectUtils', () => {
           lastName: 'User',
           phoneNumber: '123-456-7890',
           redRisk: null,
-          roleIds: [],
+          roleIds: [1],
           supervisorId: null,
           tenantId: 123,
           timezone: null,
@@ -407,17 +409,17 @@ describe('formatObjectUtils', () => {
       const testCases = [
         {
           desc: 'user tenantId',
-          user: { ...mockUser, tenantId: 111 },
+          user: { ...mockUser, tenantId: 111, roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }] },
           expectedTenantId: 111
         },
         {
           desc: 'healthfacility tenantId',
-          user: { ...mockUser, healthfacility: { tenantId: 222 } },
+          user: { ...mockUser, healthfacility: { tenantId: 222 }, roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }] },
           expectedTenantId: 222
         },
         {
           desc: 'URL tenantId',
-          user: mockUser,
+          user: { ...mockUser, roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }] },
           tenantId: 333,
           expectedTenantId: 333
         }

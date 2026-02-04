@@ -34,11 +34,15 @@ describe('CreateProgram', () => {
       },
       user: {
         user: {
-          country: { id: 1, name: 'Test' }
+          country: { id: 1, name: 'Test', appTypes: [] },
+          appTypes: []
         }
       },
       healthFacility: {
         healthFacilityList: []
+      },
+      common: {
+        labelName: null
       }
     });
     const history = createMemoryHistory({ initialEntries: ['/create-program'] });

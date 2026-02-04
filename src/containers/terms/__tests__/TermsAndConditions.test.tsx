@@ -13,6 +13,18 @@ jest.mock('../../../components/editor/WysiwygEditor', () => ({
   default: () => <div data-testid='text-editor'>Mock Editor</div>
 }));
 
+// Mock react-leaflet and leaflet CSS to avoid ESM issues
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
+  useMap: () => ({ setView: jest.fn(), getCenter: () => ({ lat: 0, lng: 0 }) }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+jest.mock('leaflet/dist/leaflet.css', () => ({}));
+
 const mockStore = configureStore();
 
 const defaultState = {
@@ -20,7 +32,9 @@ const defaultState = {
     user: {
       role: 'USER',
       countryId: { id: 1 },
+      country: { id: 1, appTypes: [] },
       userId: '123',
+      appTypes: [],
       termsAndConditions: {
         formInput: '<p>Test Terms</p>',
         countryId: 1
@@ -36,7 +50,10 @@ const defaultState = {
   district: { loading: false },
   region: { loading: false },
   chiefdom: { loading: false },
-  healthFacility: { loading: false }
+  healthFacility: { loading: false },
+  common: {
+    labelName: null
+  }
 };
 describe('TermsAndConditions', () => {
   const store = mockStore(defaultState);
@@ -121,7 +138,11 @@ describe('TermsAndConditions', () => {
       user: {
         ...defaultState.user,
         isTermsConditionsLoading: true
-      }
+      },
+      district: { loading: false },
+      region: { loading: false },
+      chiefdom: { loading: false },
+      healthFacility: { loading: false }
     };
     const localStore = mockStore(loadingState);
 

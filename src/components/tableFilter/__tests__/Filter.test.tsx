@@ -1,10 +1,33 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import TableFilter from '../Filter';
 
 jest.mock('../../../assets/images/filter-icon.svg', () => ({
-  ReactComponent: 'FilterIcon'
+  ReactComponent: () => <svg data-testid="filter-icon" />
 }));
+
+const mockStore = configureStore([]);
+const store = mockStore({
+  user: {
+    user: {
+      appTypes: [],
+      country: {
+        appTypes: []
+      }
+    }
+  },
+  common: {
+    labelName: {
+      region: { s: 'Region', p: 'Regions' },
+      healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+      district: { s: 'County', p: 'Counties' },
+      chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+    }
+  }
+});
 
 describe('TableFilter Component', () => {
   const mockSetSelectedRole = jest.fn();
@@ -16,52 +39,80 @@ describe('TableFilter Component', () => {
       name: 'Test Filter',
       isSearchable: true,
       data: [
-        { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }] },
-        { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }] }
+        { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }], displayName: 'Org 1' },
+        { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }], displayName: 'Org 2' }
       ]
     },
     isFacility: false,
     setSelectedRole: mockSetSelectedRole,
     setSelectedFacility: mockSetSelectedFacility,
-    filterCount: 2
+    filterCount: 2,
+    placeholder: 'Search Facility'
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('renders correctly when isShow is true', () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     expect(screen.getByText('Test Filter')).toBeInTheDocument();
   });
 
   it('does not render when isShow is false', () => {
-    render(<TableFilter {...{ ...defaultProps, filterData: { ...defaultProps.filterData, isShow: false } }} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...{ ...defaultProps, filterData: { ...defaultProps.filterData, isShow: false } }} />
+      </Provider>
+    );
     expect(screen.queryByText('Test Filter')).not.toBeInTheDocument();
   });
 
   it('opens dropdown when clicked', () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
     expect(screen.getByPlaceholderText('Search Facility')).toBeInTheDocument();
   });
 
   it('handles search functionality', async () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
     const searchInput = screen.getByPlaceholderText('Search Facility');
     fireEvent.input(searchInput, { target: { value: 'Option 1' } });
-    jest.advanceTimersByTime(300);
+    await act(() => {
+      jest.advanceTimersByTime(300);
+    });
 
     await waitFor(() => {
-      expect(screen.getByText('Org 1')).toBeInTheDocument();
-      expect(screen.queryByText('Org 2')).not.toBeInTheDocument();
+      expect(screen.getByText(/Org 1/)).toBeInTheDocument();
+      expect(screen.queryByText(/Org 2/)).not.toBeInTheDocument();
     });
   });
 
   it('handles select all for roles', async () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
     const selectAllCheckbox = screen.getByLabelText('Select all');
@@ -83,14 +134,18 @@ describe('TableFilter Component', () => {
       filterData: {
         ...defaultProps.filterData,
         data: [
-          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }] },
-          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }] },
-          { id: 3, name: 'Option 3', tenantId: 'tenant3', organizations: [{ name: 'Org 3' }] }
+          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }], displayName: 'Org 1' },
+          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }], displayName: 'Org 2' },
+          { id: 3, name: 'Option 3', tenantId: 'tenant3', organizations: [{ name: 'Org 3' }], displayName: 'Org 3' }
         ]
       }
     };
 
-    render(<TableFilter {...multipleOptionsProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...multipleOptionsProps} />
+      </Provider>
+    );
 
     fireEvent.click(screen.getByText('Test Filter'));
     const selectAllCheckbox = screen.getByLabelText('Select all');
@@ -103,7 +158,11 @@ describe('TableFilter Component', () => {
   });
 
   it('handles select all for facilities', async () => {
-    render(<TableFilter {...{ ...defaultProps, isFacility: true }} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...{ ...defaultProps, isFacility: true }} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
     const selectAllCheckbox = screen.getByLabelText('Select all');
@@ -125,14 +184,18 @@ describe('TableFilter Component', () => {
       filterData: {
         ...defaultProps.filterData,
         data: [
-          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }] },
-          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }] },
-          { id: 3, name: 'Option 3', tenantId: 'tenant3', organizations: [{ name: 'Org 3' }] }
+          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }], displayName: 'Org 1' },
+          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }], displayName: 'Org 2' },
+          { id: 3, name: 'Option 3', tenantId: 'tenant3', organizations: [{ name: 'Org 3' }], displayName: 'Org 3' }
         ]
       }
     };
 
-    render(<TableFilter {...multipleOptionsProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...multipleOptionsProps} />
+      </Provider>
+    );
 
     fireEvent.click(screen.getByText('Test Filter'));
     const selectAllCheckbox = screen.getByLabelText('Select all');
@@ -145,17 +208,25 @@ describe('TableFilter Component', () => {
   });
 
   it('handles individual selection for roles', () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
-    const option1Checkbox = screen.getByLabelText('Org 1');
+    const option1Checkbox = screen.getByLabelText(/Org 1/);
     fireEvent.click(option1Checkbox);
 
     expect(mockSetSelectedRole).toHaveBeenCalled();
   });
 
   it('handles individual selection for facilities', () => {
-    render(<TableFilter {...{ ...defaultProps, isFacility: true }} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...{ ...defaultProps, isFacility: true }} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
     const option1Checkbox = screen.getByLabelText('Option 1 Org 1');
@@ -165,7 +236,11 @@ describe('TableFilter Component', () => {
   });
 
   it('closes dropdown when clicking outside', () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
     expect(screen.getByPlaceholderText('Search Facility')).toBeInTheDocument();
@@ -176,7 +251,11 @@ describe('TableFilter Component', () => {
   });
 
   it('displays no results message when search has no matches', async () => {
-    render(<TableFilter {...defaultProps} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...defaultProps} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
     const searchInput = screen.getByPlaceholderText('Search Facility');
@@ -189,13 +268,15 @@ describe('TableFilter Component', () => {
 
   it('handles adding and removing facility tenant IDs', async () => {
     render(
-      <TableFilter
-        {...{
-          ...defaultProps,
-          isFacility: true,
-          setSelectedFacility: mockSetSelectedFacility
-        }}
-      />
+      <Provider store={store}>
+        <TableFilter
+          {...{
+            ...defaultProps,
+            isFacility: true,
+            setSelectedFacility: mockSetSelectedFacility
+          }}
+        />
+      </Provider>
     );
     fireEvent.click(screen.getByText('Test Filter'));
     const option1Checkbox = screen.getByLabelText('Option 1 Org 1');
@@ -217,16 +298,18 @@ describe('TableFilter Component', () => {
 
   it('handles adding and removing role names', async () => {
     render(
-      <TableFilter
-        {...{
-          ...defaultProps,
-          isFacility: false,
-          setSelectedRole: mockSetSelectedRole
-        }}
-      />
+      <Provider store={store}>
+        <TableFilter
+          {...{
+            ...defaultProps,
+            isFacility: false,
+            setSelectedRole: mockSetSelectedRole
+          }}
+        />
+      </Provider>
     );
     fireEvent.click(screen.getByText('Test Filter'));
-    const option1Checkbox = screen.getByLabelText('Org 1');
+    const option1Checkbox = screen.getByLabelText(/Org 1/);
     fireEvent.click(option1Checkbox);
 
     expect(mockSetSelectedRole).toHaveBeenLastCalledWith(expect.any(Function));
@@ -243,7 +326,7 @@ describe('TableFilter Component', () => {
     expect(resultRemove).toEqual([]);
   });
 
-  it('automatically selects "Select all" when all options are individually selected', () => {
+  it('automatically selects "Select all" when all options are individually selected', async () => {
     const props = {
       ...defaultProps,
       isFacility: false,
@@ -251,23 +334,31 @@ describe('TableFilter Component', () => {
       filterData: {
         ...defaultProps.filterData,
         data: [
-          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }] },
-          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }] }
+          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }], displayName: 'Org 1' },
+          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }], displayName: 'Org 2' }
         ]
       }
     };
 
-    render(<TableFilter {...props} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...props} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
-    fireEvent.click(screen.getByLabelText('Org 1'));
-    fireEvent.click(screen.getByLabelText('Org 2'));
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText(/Org 1/));
+      fireEvent.click(screen.getByLabelText(/Org 2/));
+    });
 
-    const selectAllCheckbox = screen.getByLabelText('Select all') as HTMLInputElement;
-    expect(selectAllCheckbox.checked).toBe(true);
+    await waitFor(() => {
+      const selectAllCheckbox = screen.getByLabelText('Select all') as HTMLInputElement;
+      expect(selectAllCheckbox.checked).toBe(true);
+    }, { timeout: 1000 });
   });
 
-  it('automatically unselects "Select all" when any option is unselected', () => {
+  it('automatically unselects "Select all" when any option is unselected', async () => {
     const props = {
       ...defaultProps,
       isFacility: false,
@@ -275,20 +366,35 @@ describe('TableFilter Component', () => {
       filterData: {
         ...defaultProps.filterData,
         data: [
-          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }] },
-          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }] }
+          { id: 1, name: 'Option 1', tenantId: 'tenant1', organizations: [{ name: 'Org 1' }], displayName: 'Org 1' },
+          { id: 2, name: 'Option 2', tenantId: 'tenant2', organizations: [{ name: 'Org 2' }], displayName: 'Org 2' }
         ]
       }
     };
 
-    render(<TableFilter {...props} />);
+    render(
+      <Provider store={store}>
+        <TableFilter {...props} />
+      </Provider>
+    );
     fireEvent.click(screen.getByText('Test Filter'));
 
-    fireEvent.click(screen.getByLabelText('Select all'));
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Select all'));
+    });
 
-    fireEvent.click(screen.getByLabelText('Org 1'));
+    await waitFor(() => {
+      const selectAllCheckbox = screen.getByLabelText('Select all') as HTMLInputElement;
+      expect(selectAllCheckbox.checked).toBe(true);
+    });
 
-    const selectAllCheckbox = screen.getByLabelText('Select all') as HTMLInputElement;
-    expect(selectAllCheckbox.checked).toBe(false);
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText(/Org 1/));
+    });
+
+    await waitFor(() => {
+      const selectAllCheckbox = screen.getByLabelText('Select all') as HTMLInputElement;
+      expect(selectAllCheckbox.checked).toBe(false);
+    }, { timeout: 500 });
   });
 });

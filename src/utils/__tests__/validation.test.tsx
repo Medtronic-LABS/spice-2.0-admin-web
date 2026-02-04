@@ -668,19 +668,19 @@ describe('Validation', () => {
 
   describe('mobile validation', () => {
     it('should return error message when number starts with 0', () => {
-      const input = '0123456789';
+      const input = '01234567';
       const result = validateMobile(input, true);
-      expect(result).toBe('Please enter a valid ');
+      expect(result).toBe('Must start with 2, 3, 7, 8, or 9.');
     });
 
-    it('should return empty string for valid SL number not starting with 0', () => {
-      const input = '123456789';
+    it('should return empty string for valid SL number starting with valid digit', () => {
+      const input = '21234567';
       const result = validateMobile(input, true);
       expect(result).toBe('');
     });
 
     it('should return error for SL number with 5 consecutive same digits', () => {
-      const input = '111110000';
+      const input = '22222345';
       const result = validateMobile(input, true);
       expect(result).toBe('Please enter a valid ');
     });
@@ -688,23 +688,23 @@ describe('Validation', () => {
 
   describe('mobile validation', () => {
     it('should return error for numbers with 5 or more consecutive same digits', () => {
-      expect(validateMobile('111110000', true)).toBe('Please enter a valid ');
-      expect(validateMobile('777777890', true)).toBe('Please enter a valid ');
-      expect(validateMobile('123444444', true)).toBe('Please enter a valid ');
+      expect(validateMobile('22222345', true)).toBe('Please enter a valid ');
+      expect(validateMobile('77777890', true)).toBe('Please enter a valid ');
+      expect(validateMobile('23444445', true)).toBe('Please enter a valid ');
     });
 
     it('should accept numbers with less than 5 consecutive same digits', () => {
-      expect(validateMobile('11112222', true)).toBe('');
-      expect(validateMobile('123333456', true)).toBe('');
-      expect(validateMobile('999912345', true)).toBe('');
+      expect(validateMobile('22223345', true)).toBe('');
+      expect(validateMobile('23333456', true)).toBe('');
+      expect(validateMobile('99991234', true)).toBe('');
     });
 
     it('should validate number length for SL numbers', () => {
-      expect(validateMobile('1234567', true)).toBe('Please enter a valid ');
-      expect(validateMobile('12345678', true)).toBe('');
-      expect(validateMobile('123456789', true)).toBe('');
-      expect(validateMobile('1234567890', true)).toBe('');
-      expect(validateMobile('12345678901', true)).toBe('Please enter a valid ');
+      expect(validateMobile('2123456', true)).toBe('Please enter a valid ');
+      expect(validateMobile('21234567', true)).toBe('');
+      expect(validateMobile('212345678', true)).toBe('Please enter a valid ');
+      expect(validateMobile('2123456789', true)).toBe('Please enter a valid ');
+      expect(validateMobile('21234567890', true)).toBe('Please enter a valid ');
     });
   });
 });

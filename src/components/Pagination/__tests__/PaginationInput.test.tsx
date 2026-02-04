@@ -11,6 +11,10 @@ describe('PaginationInput', () => {
     onChange: jest.fn()
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('calls onPagination when Enter key is pressed and input value is valid', () => {
     const { getByRole, unmount } = render(<PaginationInput {...props} />);
     const input = getByRole('textbox');

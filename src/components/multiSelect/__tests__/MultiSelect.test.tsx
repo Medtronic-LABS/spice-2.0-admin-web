@@ -330,7 +330,7 @@ describe('MultiSelect', () => {
 
   it('handles "Select All" option correctly', () => {
     renderMultiSelect({
-      selectAll: true,
+      isSelectAll: true,
       options: mockOptions
     });
     const lastCall = mockChildComponent.mock.calls[mockChildComponent.mock.calls.length - 1][0];
@@ -339,9 +339,9 @@ describe('MultiSelect', () => {
     expect(filterOption({ value: '*', label: 'Select All' }, '')).toBe(true);
   });
 
-  it('hides "Select All" option when selectAll is false', () => {
+  it('hides "Select All" option when isSelectAll is false', () => {
     renderMultiSelect({
-      selectAll: false,
+      isSelectAll: false,
       options: mockOptions
     });
     const lastCall = mockChildComponent.mock.calls[mockChildComponent.mock.calls.length - 1][0];

@@ -7,18 +7,31 @@ import DistrictSummary from '../DistrictSummary';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
 
 const mockStore = configureMockStore();
+
+// Mock react-leaflet to avoid ESM issues in Jest
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
+  useMap: () => ({
+    setView: jest.fn(),
+    getCenter: () => ({ lat: 0, lng: 0 })
+  }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+
+jest.mock('leaflet/dist/leaflet.css', () => ({}));
+
 jest.mock('../../../assets/images/edit.svg', () => ({
   ReactComponent: 'EditIcon'
 }));
 
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useState: jest.fn().mockReturnValue([true, jest.fn()])
-}));
-
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useState: jest.fn(() => [{ name: '', id: -1 }, jest.fn()])
+// Mock UserForm to avoid pulling in heavy formBuilder/labtest dependencies
+jest.mock('../../../components/userForm/UserForm', () => ({
+  __esModule: true,
+  default: () => <div>UserFormMock</div>
 }));
 
 jest.mock('../../../constants/appConstants', () => ({
@@ -77,7 +90,9 @@ describe('District Summary', () => {
       user: {
         user: {
           role: 'SUPER_ADMIN',
-          countryId: '1'
+          countryId: '1',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
         },
         timezoneList: [
           {
@@ -94,6 +109,12 @@ describe('District Summary', () => {
             countryCode: '232'
           }
         ]
+      },
+      healthFacility: {
+        loading: false
+      },
+      common: {
+        labelName: null
       }
     });
 
@@ -159,7 +180,14 @@ describe('District Summary', () => {
       index: 0
     });
     const openEditModal = CustomTable.prop('onRowEdit');
-    openEditModal();
+    // Provide minimal admin data to avoid undefined errors inside openEditModal
+    openEditModal({
+      roles: [],
+      countryCode: '',
+      phoneNumber: '',
+      firstName: '',
+      lastName: ''
+    });
     expect(wrapper.find('CustomTable')).toHaveLength(1);
   });
 

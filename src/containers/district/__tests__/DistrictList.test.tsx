@@ -18,7 +18,8 @@ const store = mockStore({
   },
   user: {
     user: {
-      appTypes: []
+      appTypes: [],
+      country: { id: 1, appTypes: [] }
     }
   },
   common: {
@@ -43,6 +44,15 @@ const matchProps = {
     }
   }
 };
+
+// Mock SVG imports
+jest.mock('../../../assets/images/plus.svg', () => ({
+  ReactComponent: () => <svg data-testid="plus-icon">Plus Icon</svg>
+}));
+
+jest.mock('../../../assets/images/edit.svg', () => ({
+  ReactComponent: () => <svg data-testid="edit-icon">Edit Icon</svg>
+}));
 
 jest.mock('../../../components/modal/ModalForm', () => () => null);
 

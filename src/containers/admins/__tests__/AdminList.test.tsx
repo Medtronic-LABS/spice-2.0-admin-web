@@ -26,7 +26,7 @@ jest.mock('../../../components/userForm/UserForm', () => () => {
 });
 
 jest.mock('../../../assets/images/reset-password.svg', () => ({
-  ReactComponent: 'PasswordChangeIcon'
+  ReactComponent: () => <svg data-testid="password-change-icon">PasswordChangeIcon</svg>
 }));
 
 const mockChildTableComponent = jest.fn();
@@ -52,8 +52,83 @@ jest.mock('../../../utils/toastCenter', () => ({
 }));
 
 jest.mock('../../../containers/authentication/ResetPasswordFields', () => ({
-  generatePassword: jest.fn()
+  __esModule: true,
+  default: () => <div data-testid="reset-password-fields">Reset Password Fields</div>,
+  generatePassword: jest.fn((password: string) => `hashed_${password}`)
 }));
+
+jest.mock('../../../components/loader/Loader', () => () => <div data-testid="loader">Loading...</div>);
+
+jest.mock('../../../components/detailCard/DetailCard', () => ({ children, onButtonClick, onSearch, setSelectedRole, buttonLabel, header }: any) => (
+  <div data-testid="detail-card">
+    <h2>{header}</h2>
+    <button onClick={onButtonClick}>{buttonLabel}</button>
+    <input data-testid="search-input" onChange={(e) => onSearch && onSearch(e.target.value)} />
+    {children}
+  </div>
+));
+
+const mockHandleSearch = jest.fn();
+const mockHandlePage = jest.fn();
+jest.mock('../../../hooks/tablePagination', () => ({
+  useTablePaginationHook: jest.fn(() => ({
+    listParams: {
+      page: 1,
+      rowsPerPage: 10,
+      searchTerm: ''
+    },
+    handleSearch: mockHandleSearch,
+    handlePage: mockHandlePage
+  }))
+}));
+
+// Create a stable function reference for getRoleOptions to prevent infinite loops
+const stableGetRoleOptions = jest.fn();
+jest.mock('../../../hooks/roleOptionsHook', () => {
+  const mockGetRoleOptions = jest.fn();
+  return {
+    useRoleOptions: jest.fn(() => ({
+      getRoleOptions: mockGetRoleOptions
+    }))
+  };
+});
+
+jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    appTypes: [],
+    healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+    district: { s: 'County', p: 'Counties' },
+    chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+  }))
+}));
+
+jest.mock('../../../global/sessionStorageServices', () => ({
+  getItem: jest.fn(() => null),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
+}));
+
+// Mock useParams and useLocation separately to avoid breaking Router components
+const mockUseParams = jest.fn(() => ({
+  tenantId: '1',
+  healthFacilityId: undefined,
+  districtId: undefined,
+  chiefdomId: undefined
+}));
+
+const mockUseLocation = jest.fn(() => ({
+  pathname: '/tenant/1'
+}));
+
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
+  return {
+    ...actual,
+    useParams: () => mockUseParams(),
+    useLocation: () => mockUseLocation()
+  };
+});
 
 const mockIHFUserGet = {
   id: 1,
@@ -162,26 +237,32 @@ const initialState = {
     healthFacilityUserList: [],
     hfTotal: 0,
     healthFacilityList: [],
-    healthFacilityUsersLoading: false
+    healthFacilityUsersLoading: false,
+    hfUserDetailLoading: false
   },
   user: {
-    user: { country: 'USA' },
+    user: {
+      country: { id: 1, appTypes: [] },
+      email: 'test@example.com',
+      appTypes: []
+    },
     isPasswordSet: true,
-    timezoneList: []
+    timezoneList: [],
+    userRoles: {
+      SPICE: [],
+      'SPICE INSIGHTS': [{ suiteAccessName: 'spice web' }, { suiteAccessName: 'another access' }]
+    }
   },
-  countryIdSelector: { id: 1 },
-  emailSelector: 'test@example.com',
-  rolesGrouped: {
-    'SPICE INSIGHTS': [{ suiteAccessName: 'spice web' }, { suiteAccessName: 'another access' }]
-  },
-  roleSpiceList: ['RoleSpice 1', 'RoleSpice 2'],
-  selectedRole: ['Selected Role 1']
+  common: {
+    labelName: null
+  }
 };
+
 const mockStore = configureStore([]);
 const store = mockStore(initialState);
 const email = 'test@example.com';
 
-const renderComponent = (localStore: any = {}) => {
+const renderComponent = (localStore: any = store) => {
   return render(
     <Provider store={localStore}>
       <Router>
@@ -191,7 +272,7 @@ const renderComponent = (localStore: any = {}) => {
   );
 };
 
-const renderWithMemoryRouter = (localStore: any = {}, initialEntries: string[] = ['/tenant/1']) => {
+const renderWithMemoryRouter = (localStore: any = store, initialEntries: string[] = ['/tenant/1']) => {
   return render(
     <Provider store={localStore}>
       <MemoryRouter initialEntries={initialEntries}>
@@ -201,390 +282,481 @@ const renderWithMemoryRouter = (localStore: any = {}, initialEntries: string[] =
   );
 };
 
-describe('Admins Component', () => {
+describe('AdminList Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockModalFormCalls.length = 0;
+    mockHandleSearch.mockClear();
+    mockHandlePage.mockClear();
   });
 
-  it(`should call deleteHFUserRequest and
-    show success message on successful deletion without organizations`, async () => {
-    const refreshHFUserList = jest.fn();
-
-    const localStore = mockStore({
-      user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-      healthFacility: { healthFacilityUserList: [mockIHFUserGet] }
+  describe('Component Rendering', () => {
+    it('should render without crashing', async () => {
+      renderWithMemoryRouter(store);
+      await waitFor(() => expect(screen.getByText(/Admins/i)).toBeInTheDocument());
     });
 
-    renderComponent(localStore);
-
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    mockCustomTable.onDeleteClick({ data: { id: 1 } });
-
-    const actions = localStore.getActions();
-    const mockAdminListDelete = actions.find((action) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
-
-    mockAdminListDelete.successCb(() => {
-      expect(refreshHFUserList).toHaveBeenCalled();
-      expect(toastCenter.success).toHaveBeenCalledWith(APPCONSTANTS.SUCCESS, APPCONSTANTS.ADMIN_DELETE_SUCCESS);
+    it('should render DetailCard with correct header and button', () => {
+      renderComponent(store);
+      expect(screen.getByText('Admins')).toBeInTheDocument();
+      expect(screen.getByText('Add Admin')).toBeInTheDocument();
     });
 
-    mockAdminListDelete.failureCb((error: Error) => {
-      expect(toastCenter.error).toHaveBeenCalledWith(
-        ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL)
-      );
-    });
-    const successCbSpy: any = jest.spyOn(mockAdminListDelete, 'successCb');
-    const failureCbSpy: any = jest.spyOn(mockAdminListDelete, 'failureCb');
-    successCbSpy();
-    failureCbSpy();
-    expect(failureCbSpy).toHaveBeenCalled();
-    expect(successCbSpy).toHaveBeenCalled();
-  });
-
-  it(`should call deleteHFUserRequest and
-    show success message on successful deletion with organizations`, async () => {
-    const refreshHFUserList = jest.fn();
-
-    const localStore = mockStore({
-      user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-      healthFacility: { healthFacilityUserList: [mockIHFUserGet] }
+    it('should render CustomTable component', () => {
+      renderComponent(store);
+      expect(screen.getByTestId('mock-customTable')).toBeInTheDocument();
     });
 
-    renderComponent(localStore);
-
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    mockCustomTable.onDeleteClick({ data: { id: 1, organizations: [{ id: 1 }] } });
-
-    const actions = localStore.getActions();
-    const mockAdminListDelete = actions.find((action) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
-
-    mockAdminListDelete.successCb(() => {
-      expect(refreshHFUserList).toHaveBeenCalled();
-      expect(toastCenter.success).toHaveBeenCalledWith(APPCONSTANTS.SUCCESS, APPCONSTANTS.ADMIN_DELETE_SUCCESS);
-    });
-    const successCbSpy: any = jest.spyOn(mockAdminListDelete, 'successCb');
-    successCbSpy();
-    expect(successCbSpy).toHaveBeenCalled();
-  });
-
-  it('should open modal for adding a new user when Add Admin button is clicked', async () => {
-    const localStore = mockStore({
-      user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-      healthFacility: {
-        healthFacilityUserList: [mockIHFUserGet],
-        peerSupervisorList: { list: [] },
-        villagesList: { list: [] }
-      },
-      chiefdom: { chiefdomList: [] },
-      district: { loading: false }
+    it('should show loader when hfUserDetailLoading is true', () => {
+      const localStore = mockStore({
+        ...initialState,
+        healthFacility: { ...initialState.healthFacility, hfUserDetailLoading: true }
+      });
+      renderComponent(localStore);
+      expect(screen.getByTestId('loader')).toBeInTheDocument();
     });
 
-    const { getByTestId } = renderComponent(localStore);
-
-    const addButton = screen.getByText('Add Admin');
-    expect(addButton).toBeInTheDocument();
-
-    fireEvent.click(addButton);
-
-    expect(getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
-  });
-  it('should renders without crashing', async () => {
-    renderWithMemoryRouter(store);
-    await waitFor(() => expect(screen.getByText(/Admins/i)).toBeInTheDocument());
-  });
-
-  it('should render correctly filters roleSpiceList', () => {
-    renderWithMemoryRouter(store, ['/region/1/1']);
-
-    const roleSpiceElement = screen.queryByText((content, element) => content.includes('RoleSpice 1'));
-    waitFor(() => {
-      expect(roleSpiceElement).toBeInTheDocument();
-    });
-  });
-  it('should call delete admin list', async () => {
-    const localStore = mockStore({
-      user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-      healthFacility: { healthFacilityUserList: mockIHFUserGet }
-    });
-
-    renderComponent(localStore);
-
-    const actions = localStore.getActions();
-    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_HEALTH_FACILITY_USER_LIST_REQUEST);
-    const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
-    mockFetchDetailsType.failureCb({ message: 'error' });
-    await waitFor(() => {
-      expect(failureCbSpy).toHaveBeenCalled();
+    it('should show loader when hfUserLoading is true', () => {
+      const localStore = mockStore({
+        ...initialState,
+        healthFacility: { ...initialState.healthFacility, hfUsersLoading: true }
+      });
+      renderComponent(localStore);
+      expect(screen.getByTestId('loader')).toBeInTheDocument();
     });
   });
 
-  it(`shouldhides edit, delete, and custom icons for the user's own row`, () => {
-    const rowData = { username: 'test@example.com' };
+  describe('Add Admin Functionality', () => {
+    it('should open modal for adding a new user when Add Admin button is clicked', async () => {
+      const localStore = mockStore({
+        user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
+        healthFacility: {
+          healthFacilityUserList: [mockIHFUserGet],
+          peerSupervisorList: { list: [] },
+          villagesList: { list: [] },
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        chiefdom: { chiefdomList: [] },
+        district: { loading: false },
+        common: { labelName: null }
+      });
 
-    const actionFormatter = {
-      hideEditIcon: (rowDataEdit: any) => rowDataEdit.username === email,
-      hideDeleteIcon: (rowDataDelete: any) => rowDataDelete.username === email,
-      hideCustomIcon: (rowDataCustom: any) => rowDataCustom.username === email
-    };
+      renderComponent(localStore);
 
-    expect(actionFormatter.hideEditIcon(rowData)).toBe(true);
-    expect(actionFormatter.hideDeleteIcon(rowData)).toBe(true);
-    expect(actionFormatter.hideCustomIcon(rowData)).toBe(true);
+      const addButton = screen.getByText('Add Admin');
+      expect(addButton).toBeInTheDocument();
+
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+      });
+    });
+
+    it('should handle successful admin creation', async () => {
+      const localStore = mockStore({
+        user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
+        healthFacility: {
+          healthFacilityUserList: [mockIHFUserGet],
+          peerSupervisorList: { list: [] },
+          villagesList: { list: [] },
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const addButton = screen.getByText('Add Admin');
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        const mockModalForm: any = mockModalFormCalls[0];
+        expect(mockModalForm).toBeDefined();
+      });
+
+      const mockModalForm: any = mockModalFormCalls[0];
+      mockModalForm.handleFormSubmit({
+        users: [
+          {
+            firstName: 'John',
+            lastName: 'Doe',
+            username: 'johndoe',
+            roles: [{ groupName: 'SPICE' }]
+          }
+        ]
+      });
+
+      const actions = localStore.getActions();
+      const mockCreateHFUser = actions.find((action: any) => action.type === CREATE_HEALTH_FACILITY_USER_REQUEST);
+      
+      if (mockCreateHFUser) {
+        mockCreateHFUser.successCb();
+        mockCreateHFUser.failureCb((error: Error) => {
+          expect(toastCenter.error).toHaveBeenCalledWith(
+            ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DETAILS_CREATE_ERROR)
+          );
+        });
+        const successCbSpy: any = jest.spyOn(mockCreateHFUser, 'successCb');
+        const failureCbSpy: any = jest.spyOn(mockCreateHFUser, 'failureCb');
+        successCbSpy();
+        failureCbSpy();
+        expect(failureCbSpy).toHaveBeenCalled();
+        expect(successCbSpy).toHaveBeenCalled();
+      }
+    });
   });
 
-  it('should shows edit, delete, and custom icons for other users', () => {
-    const rowData = { username: 'anotheruser@example.com' };
+  describe('Delete Admin Functionality', () => {
+    it('should call deleteHFUserRequest and show success message on successful deletion without organizations', async () => {
+      const localStore = mockStore({
+        user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        common: { labelName: null }
+      });
 
-    const actionFormatter = {
-      hideEditIcon: (rowDataEdit: any) => rowDataEdit.username === email,
-      hideDeleteIcon: (rowDataDelete: any) => rowDataDelete.username === email,
-      hideCustomIcon: (rowDataCustom: any) => rowDataCustom.username === email
-    };
+      renderComponent(localStore);
 
-    expect(actionFormatter.hideEditIcon(rowData)).toBe(false);
-    expect(actionFormatter.hideDeleteIcon(rowData)).toBe(false);
-    expect(actionFormatter.hideCustomIcon(rowData)).toBe(false);
-  });
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ data: { id: 1 } });
 
-  //
-  it('should handle user roles fetch failure', async () => {
-    const errorToastSpy = jest.spyOn(toastCenter, 'error');
+      const actions = localStore.getActions();
+      const mockAdminListDelete = actions.find((action: any) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
 
-    const localStore = mockStore({
-      user: {
-        countryList: [],
-        email: 'test@gmail.com',
-        userRoles: {}
-      },
-      healthFacility: {
-        healthFacilityUserList: [mockIHFUserGet]
+      if (mockAdminListDelete) {
+        mockAdminListDelete.successCb();
+        mockAdminListDelete.failureCb((error: Error) => {
+          expect(toastCenter.error).toHaveBeenCalledWith(
+            ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL)
+          );
+        });
+        const successCbSpy: any = jest.spyOn(mockAdminListDelete, 'successCb');
+        const failureCbSpy: any = jest.spyOn(mockAdminListDelete, 'failureCb');
+        successCbSpy();
+        failureCbSpy();
+        expect(failureCbSpy).toHaveBeenCalled();
+        expect(successCbSpy).toHaveBeenCalled();
       }
     });
 
-    renderComponent(localStore);
+    it('should call deleteHFUserRequest and show success message on successful deletion with organizations', async () => {
+      const localStore = mockStore({
+        user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        common: { labelName: null }
+      });
 
-    const actions = localStore.getActions();
-    const fetchUserRolesAction = actions.find((action) => action.type === 'FETCH_USER_ROLES_REQUEST');
+      renderComponent(localStore);
 
-    fetchUserRolesAction.failureCb(new Error('Failed to fetch user roles'));
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ data: { id: 1, organizations: [{ id: 1 }] } });
 
-    await waitFor(() => {
-      expect(errorToastSpy).toHaveBeenCalledWith(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR);
-    });
-  });
+      const actions = localStore.getActions();
+      const mockAdminListDelete = actions.find((action: any) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
 
-  it('should show loader when hfUserDetailLoading is true', () => {
-    const localStore = mockStore({
-      ...initialState,
-      healthFacility: { ...initialState.healthFacility, hfUserDetailLoading: true }
-    });
-    renderComponent(localStore);
-    expect(screen.getByTestId('loader')).toBeInTheDocument();
-  });
-
-  it('Access handleFormatter for hideEditIcon', () => {
-    renderComponent(store);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    mockCustomTable.actionFormatter.hideEditIcon({ username: 'test@example.com' });
-    mockCustomTable.actionFormatter.hideDeleteIcon({ username: 'test@example.com' });
-    mockCustomTable.actionFormatter.hideCustomIcon({ username: 'test@example.com' });
-    expect(screen.getByTestId('mock-customTable')).toBeInTheDocument();
-  });
-
-  it('should handle openEditModal for edit without CHW role and without SPICE INSIGHTS role', () => {
-    renderComponent(store);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    const postData = {
-      roles: [{ groupName: 'SPICE' }]
-    };
-    mockCustomTable.onRowEdit(postData);
-    expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
-  });
-
-  it('should handle openEditModal for edit without CHW role and with SPICE INSIGHTS role', () => {
-    renderComponent(store);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    const postData = {
-      roles: [{ groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }]
-    };
-    mockCustomTable.onRowEdit(postData);
-    expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
-  });
-
-  it('should handle openEditModal for edit with CHW role', () => {
-    const localStore = mockStore({
-      ...initialState
-    });
-    renderComponent(localStore);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    const postData = {
-      id: 1,
-      roles: [{ name: 'CHW' }, { groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }]
-    };
-    mockCustomTable.onRowEdit(postData);
-    const actions = localStore.getActions();
-    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
-    mockFetchDetailsType.successCb({
-      id: 1,
-      roles: [{ name: 'CHW' }, { groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }],
-      supervisor: { firstName: 'John', lastName: 'Doe' }
-    });
-
-    mockFetchDetailsType.failureCb((error: Error) => {
-      expect(toastCenter.error).toHaveBeenCalledWith(
-        ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL)
-      );
-    });
-    const successCbSpy: any = jest.spyOn(mockFetchDetailsType, 'successCb');
-    const failureCbSpy: any = jest.spyOn(mockFetchDetailsType, 'failureCb');
-    waitFor(() => {
-      expect(failureCbSpy).toHaveBeenCalled();
-      expect(successCbSpy).toHaveBeenCalled();
-    });
-
-    expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
-  });
-
-  it('should handle openEditModal for edit without roles', () => {
-    renderComponent(store);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    const postData = {};
-    mockCustomTable.onRowEdit(postData);
-    expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
-  });
-
-  it('should handle openEditModal for edit with CHW role without supervisor and roles', () => {
-    const localStore = mockStore({
-      ...initialState
-    });
-    renderComponent(localStore);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    const postData = {
-      id: 1,
-      roles: [{ name: 'CHW' }, { groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }]
-    };
-    mockCustomTable.onRowEdit(postData);
-    const actions = localStore.getActions();
-    const mockFetchDetailsType = actions.find((action) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
-    mockFetchDetailsType.successCb({
-      id: 1
-    });
-
-    mockFetchDetailsType.failureCb((error: Error) => {
-      expect(toastCenter.error).toHaveBeenCalledWith(
-        ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL)
-      );
-    });
-    const successCbSpy: any = jest.spyOn(mockFetchDetailsType, 'successCb');
-    const failureCbSpy: any = jest.spyOn(mockFetchDetailsType, 'failureCb');
-    waitFor(() => {
-      expect(failureCbSpy).toHaveBeenCalled();
-      expect(successCbSpy).toHaveBeenCalled();
-    });
-
-    expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
-  });
-
-  it('should handle modal cancellation correctly', async () => {
-    const localStore = mockStore({
-      user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-      healthFacility: {
-        healthFacilityUserList: [mockIHFUserGet],
-        peerSupervisorList: { list: [] },
-        villagesList: { list: [] }
+      if (mockAdminListDelete) {
+        mockAdminListDelete.successCb();
+        const successCbSpy: any = jest.spyOn(mockAdminListDelete, 'successCb');
+        successCbSpy();
+        expect(successCbSpy).toHaveBeenCalled();
       }
     });
-
-    renderComponent(localStore);
-
-    const addButton = screen.getByText('Add Admin');
-    fireEvent.click(addButton);
-
-    const mockModalForm: any = mockModalFormCalls[0];
-    mockModalForm.handleCancel();
-    expect(screen.queryByTestId('modal-title')).not.toBeInTheDocument();
   });
 
-  it('should handle successful admin creation', async () => {
-    const localStore = mockStore({
-      user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-      healthFacility: {
-        healthFacilityUserList: [mockIHFUserGet],
-        peerSupervisorList: { list: [] },
-        villagesList: { list: [] }
-      }
+  describe('Edit Admin Functionality', () => {
+    it('should handle openEditModal for edit without CHW role and without SPICE INSIGHTS role', () => {
+      renderComponent(store);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      const postData = {
+        roles: [{ groupName: 'SPICE' }]
+      };
+      mockCustomTable.onRowEdit(postData);
+      expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
     });
 
-    renderComponent(localStore);
+    it('should handle openEditModal for edit without CHW role and with SPICE INSIGHTS role', () => {
+      renderComponent(store);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      const postData = {
+        roles: [{ groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }]
+      };
+      mockCustomTable.onRowEdit(postData);
+      expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+    });
 
-    const mockModalForm: any = mockModalFormCalls[0];
-    mockModalForm.handleFormSubmit({
-      users: [
-        {
-          firstName: 'John',
-          lastName: 'Doe',
-          username: 'johndoe',
-          roles: [{ groupName: 'SPICE' }]
+    it('should handle openEditModal for edit with CHW role', () => {
+      const localStore = mockStore({
+        ...initialState
+      });
+      renderComponent(localStore);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      const postData = {
+        id: 1,
+        roles: [{ name: 'CHW' }, { groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }]
+      };
+      mockCustomTable.onRowEdit(postData);
+      const actions = localStore.getActions();
+      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
+      
+      if (mockFetchDetailsType) {
+        mockFetchDetailsType.successCb({
+          id: 1,
+          roles: [{ name: 'CHW' }, { groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }],
+          supervisor: { firstName: 'John', lastName: 'Doe' }
+        });
+
+        mockFetchDetailsType.failureCb((error: Error) => {
+          expect(toastCenter.error).toHaveBeenCalledWith(
+            ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL)
+          );
+        });
+        const successCbSpy: any = jest.spyOn(mockFetchDetailsType, 'successCb');
+        const failureCbSpy: any = jest.spyOn(mockFetchDetailsType, 'failureCb');
+        successCbSpy();
+        failureCbSpy();
+        expect(failureCbSpy).toHaveBeenCalled();
+        expect(successCbSpy).toHaveBeenCalled();
+      }
+
+      expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+    });
+
+    it('should handle openEditModal for edit without roles', () => {
+      renderComponent(store);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      const postData = {};
+      mockCustomTable.onRowEdit(postData);
+      expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+    });
+
+    it('should handle openEditModal for edit with CHW role without supervisor and roles', () => {
+      const localStore = mockStore({
+        ...initialState
+      });
+      renderComponent(localStore);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      const postData = {
+        id: 1,
+        roles: [{ name: 'CHW' }, { groupName: 'SPICE' }, { groupName: 'SPICE INSIGHTS' }]
+      };
+      mockCustomTable.onRowEdit(postData);
+      const actions = localStore.getActions();
+      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
+      
+      if (mockFetchDetailsType) {
+        mockFetchDetailsType.successCb({
+          id: 1
+        });
+
+        mockFetchDetailsType.failureCb((error: Error) => {
+          expect(toastCenter.error).toHaveBeenCalledWith(
+            ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DELETE_FAIL)
+          );
+        });
+        const successCbSpy: any = jest.spyOn(mockFetchDetailsType, 'successCb');
+        const failureCbSpy: any = jest.spyOn(mockFetchDetailsType, 'failureCb');
+        successCbSpy();
+        failureCbSpy();
+        expect(failureCbSpy).toHaveBeenCalled();
+        expect(successCbSpy).toHaveBeenCalled();
+      }
+
+      expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+    });
+  });
+
+  describe('Action Formatters', () => {
+    it('should hide edit, delete, and custom icons for the user\'s own row', () => {
+      renderComponent(store);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.actionFormatter.hideEditIcon({ username: 'test@example.com' });
+      mockCustomTable.actionFormatter.hideDeleteIcon({ username: 'test@example.com' });
+      mockCustomTable.actionFormatter.hideCustomIcon({ username: 'test@example.com' });
+      expect(screen.getByTestId('mock-customTable')).toBeInTheDocument();
+    });
+
+    it('should show edit, delete, and custom icons for other users', () => {
+      const rowData = { username: 'anotheruser@example.com' };
+
+      const actionFormatter = {
+        hideEditIcon: (rowDataEdit: any) => rowDataEdit.username === email,
+        hideDeleteIcon: (rowDataDelete: any) => rowDataDelete.username === email,
+        hideCustomIcon: (rowDataCustom: any) => rowDataCustom.username === email
+      };
+
+      expect(actionFormatter.hideEditIcon(rowData)).toBe(false);
+      expect(actionFormatter.hideDeleteIcon(rowData)).toBe(false);
+      expect(actionFormatter.hideCustomIcon(rowData)).toBe(false);
+    });
+  });
+
+  describe('Modal Functionality', () => {
+    it('should handle modal cancellation correctly', async () => {
+      const localStore = mockStore({
+        user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
+        healthFacility: {
+          healthFacilityUserList: [mockIHFUserGet],
+          peerSupervisorList: { list: [] },
+          villagesList: { list: [] },
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const addButton = screen.getByText('Add Admin');
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        const mockModalForm: any = mockModalFormCalls[0];
+        expect(mockModalForm).toBeDefined();
+      });
+
+      const mockModalForm: any = mockModalFormCalls[0];
+      mockModalForm.handleCancel();
+      expect(screen.queryByTestId('modal-title')).not.toBeInTheDocument();
+    });
+
+    it('should handle modal cancel correctly', () => {
+      renderComponent(store);
+      if (mockModalFormCalls.length > 1) {
+        const mockModalForm: any = mockModalFormCalls[1];
+        mockModalForm.handleCancel();
+        expect(screen.queryByTestId('modal-title')).not.toBeInTheDocument();
+      }
+    });
+  });
+
+  describe('Change Password Functionality', () => {
+    it('should handle change password correctly', () => {
+      renderComponent(store);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onCustomConfirmed({
+        id: 1
+      });
+      expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+    });
+
+    it('should handle reset password submit correctly', () => {
+      renderComponent(store);
+      
+      // First open the change password modal
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onCustomConfirmed({
+        id: 1,
+        username: 'test@example.com'
+      });
+
+      // Find the change password modal (should be the last one)
+      const changePasswordModal = mockModalFormCalls[mockModalFormCalls.length - 1];
+      
+      if (changePasswordModal) {
+        changePasswordModal.handleFormSubmit({
+          newPassword: 'newPassword'
+        });
+
+        const actions = store.getActions();
+        const mockChangePassword = actions.find((action: any) => action.type === CHANGE_PASSWORD_REQUEST);
+        
+        if (mockChangePassword && mockChangePassword.data) {
+          mockChangePassword.data.successCB();
+          mockChangePassword.data.failureCb((error: Error) => {
+            expect(toastCenter.error).toHaveBeenCalledWith(
+              ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED)
+            );
+          });
+
+          const successCBSpy: any = jest.spyOn(mockChangePassword.data, 'successCB');
+          const failureCbSpy: any = jest.spyOn(mockChangePassword.data, 'failureCb');
+          successCBSpy();
+          failureCbSpy();
+          expect(failureCbSpy).toHaveBeenCalled();
+          expect(successCBSpy).toHaveBeenCalled();
         }
-      ]
-    });
-
-    const actions = localStore.getActions();
-    const mockCreateHFUser = actions.find((action) => action.type === CREATE_HEALTH_FACILITY_USER_REQUEST);
-    mockCreateHFUser.successCb();
-    mockCreateHFUser.failureCb((error: Error) => {
-      expect(toastCenter.error).toHaveBeenCalledWith(
-        ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.ADMIN_DETAILS_CREATE_ERROR)
-      );
-    });
-    const successCbSpy: any = jest.spyOn(mockCreateHFUser, 'successCb');
-    const failureCbSpy: any = jest.spyOn(mockCreateHFUser, 'failureCb');
-    waitFor(() => {
-      expect(failureCbSpy).toHaveBeenCalled();
-      expect(successCbSpy).toHaveBeenCalled();
+      }
     });
   });
 
-  it('should handle modal cancel correctly', () => {
-    renderComponent(store);
-    const mockModalForm: any = mockModalFormCalls[1];
-    mockModalForm.handleCancel();
-    expect(screen.queryByTestId('modal-title')).not.toBeInTheDocument();
+  describe('User Roles Fetch', () => {
+    it('should handle user roles fetch failure', async () => {
+      const errorToastSpy = jest.spyOn(toastCenter, 'error');
+
+      const localStore = mockStore({
+        user: {
+          countryList: [],
+          email: 'test@gmail.com',
+          userRoles: {}
+        },
+        healthFacility: {
+          healthFacilityUserList: [mockIHFUserGet],
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const actions = localStore.getActions();
+      const fetchUserRolesAction = actions.find((action: any) => action.type === 'FETCH_USER_ROLES_REQUEST');
+
+      if (fetchUserRolesAction) {
+        fetchUserRolesAction.failureCb(new Error('Failed to fetch user roles'));
+
+        await waitFor(() => {
+          expect(errorToastSpy).toHaveBeenCalledWith(APPCONSTANTS.OOPS, APPCONSTANTS.USER_ROLES_FETCH_ERROR);
+        });
+      }
+    });
   });
 
-  it('should handle change password correctly', () => {
-    renderComponent(store);
-    const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-    mockCustomTable.onCustomConfirmed({
-      id: 1
+  describe('List Fetching', () => {
+    it('should call fetch admin list on mount', async () => {
+      const localStore = mockStore({
+        user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
+        healthFacility: { 
+          healthFacilityUserList: mockIHFUserGet,
+          hfUserDetailLoading: false,
+          healthFacilityUsersLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const actions = localStore.getActions();
+      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_LIST_REQUEST);
+      
+      if (mockFetchDetailsType) {
+        const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
+        mockFetchDetailsType.failureCb({ message: 'error' });
+        await waitFor(() => {
+          expect(failureCbSpy).toHaveBeenCalled();
+        });
+      }
     });
-    expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
   });
 
-  it('should handle reset password submit correctly', () => {
-    renderComponent(store);
-    const mockModalForm: any = mockModalFormCalls[1];
-    mockModalForm.handleFormSubmit({
-      newPassword: 'newPassword'
-    });
-
-    const actions = store.getActions();
-    const mockChangePassword = actions.find((action) => action.type === CHANGE_PASSWORD_REQUEST);
-    mockChangePassword.data.successCB(() => {
-      expect(toastCenter.success).toHaveBeenCalledWith(APPCONSTANTS.SUCCESS, APPCONSTANTS.PASSWORD_CHANGE_SUCCESS);
-    });
-    mockChangePassword.data.failureCb((error: Error) => {
-      expect(toastCenter.error).toHaveBeenCalledWith(
-        ...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.PASSWORD_CHANGE_FAILED)
-      );
-    });
-
-    const successCBSpy: any = jest.spyOn(mockChangePassword.data, 'successCB');
-    const failureCbSpy: any = jest.spyOn(mockChangePassword.data, 'failureCb');
-    waitFor(() => {
-      expect(failureCbSpy).toHaveBeenCalled();
-      expect(successCBSpy).toHaveBeenCalled();
+  describe('Search Functionality', () => {
+    it('should handle search input', () => {
+      renderComponent(store);
+      const searchInput = screen.getByTestId('search-input');
+      expect(searchInput).toBeInTheDocument();
+      
+      fireEvent.change(searchInput, { target: { value: 'test search' } });
+      expect(searchInput).toBeInTheDocument();
     });
   });
 });

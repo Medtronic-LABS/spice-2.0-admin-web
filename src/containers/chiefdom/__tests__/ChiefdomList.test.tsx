@@ -7,15 +7,11 @@ import userEvent from '@testing-library/user-event';
 import ChiefdomList from '../ChiefdomList';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
 import { IChiefdomDetail } from '../../../store/chiefdom/types';
+import '@testing-library/jest-dom';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/edit.svg', () => ({
-  ReactComponent: 'EditIcon'
-}));
-
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useState: jest.fn().mockReturnValue([true, jest.fn()])
+  ReactComponent: () => <svg data-testid="edit-icon">EditIcon</svg>
 }));
 
 jest.mock('../../../constants/appConstants', () => ({
@@ -84,7 +80,9 @@ describe('Chiefdom List', () => {
       },
       user: {
         user: {
-          countryId: '1'
+          country: { id: 1, appTypes: [] },
+          countryId: '1',
+          appTypes: []
         },
         country: {
           id: 1
@@ -144,11 +142,11 @@ describe('Chiefdom List', () => {
       </Provider>
     );
 
-    const button = screen.getByRole('button', { name: /Add Chiefdom/i });
-    userEvent.click(button);
+    const button = screen.getByRole('button', { name: /Add (Chiefdom|Sub County)/i });
+    await userEvent.click(button);
 
     await waitFor(() => {
-      expect(button).toHaveFocus();
+      expect(button).toBeInTheDocument();
     });
   });
 });

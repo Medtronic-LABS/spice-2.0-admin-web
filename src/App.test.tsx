@@ -5,6 +5,21 @@ import configureStore from 'redux-mock-store';
 import App from './App';
 
 const mockStore = configureStore();
+
+// Mock react-leaflet to avoid ES module issues
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
+  TileLayer: () => <div data-testid="tile-layer" />,
+  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
+  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  useMap: () => ({
+    setView: jest.fn(),
+    getCenter: () => ({ lat: 0, lng: 0 })
+  }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
@@ -19,10 +34,24 @@ jest.mock('react-ga4', () => ({
 }));
 
 jest.mock('./assets/images/app-logo.svg', () => ({
-  ReactComponent: 'Logo'
+  ReactComponent: () => <div>Logo</div>
 }));
 
 jest.mock('./components/header/Header', () => () => <div data-testid='header'>Mock Header</div>);
+
+jest.mock('./hooks/appTypeBasedConfigs', () => ({
+  __esModule: true,
+  default: () => ({
+    isCommunity: false,
+    appTypes: []
+  })
+}));
+
+jest.mock('./containers/terms/TermsAndConditions', () => () => <div data-testid='terms-and-conditions'>Terms and Conditions</div>);
+
+jest.mock('./components/errorBoundary/ErrorBoundary', () => ({ children }: any) => <div data-testid='error-boundary'>{children}</div>);
+
+jest.mock('./components/breadcrumb/Breadcrumb', () => () => <div data-testid='breadcrumb'>Breadcrumb</div>);
 
 describe('App Component', () => {
   beforeAll(() => {
@@ -32,6 +61,52 @@ describe('App Component', () => {
   const initialState = {
     user: {
       isLoggedIn: true
+    },
+    region: {
+      regions: [],
+      total: 0,
+      loading: false,
+      loadingMore: false,
+      error: null,
+      detail: {
+        id: '',
+        tenantId: '',
+        name: '',
+        list: [],
+        appTypes: [],
+        total: 0
+      },
+      isClientRegistryEnabled: undefined,
+      file: {},
+      uploading: false,
+      downloading: false
+    },
+    district: {
+      district: {
+        name: '',
+        id: '',
+        tenantId: '',
+        maxNoOfUsers: '',
+        users: [],
+        updatedAt: '',
+        country: {
+          countryCode: '',
+          tenantId: '',
+          id: ''
+        }
+      },
+      districtList: [],
+      allDistricts: [],
+      districtOptions: [],
+      admins: [],
+      total: 0,
+      loading: false,
+      dashboardList: [],
+      clinicalWorkflows: [],
+      clinicalWorkflowsCount: 0,
+      loadingMore: false,
+      loadingOptions: false,
+      error: null
     },
     common: {
       labelName: {
@@ -82,6 +157,12 @@ describe('App Component', () => {
       const localStore = mockStore({
         user: {
           isLoggedIn: false
+        },
+        region: {
+          ...initialState.region
+        },
+        district: {
+          ...initialState.district
         },
         common: {
           ...initialState.common

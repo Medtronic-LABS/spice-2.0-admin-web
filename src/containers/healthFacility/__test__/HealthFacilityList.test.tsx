@@ -13,11 +13,24 @@ import { FETCH_HEALTH_FACILITY_LIST_REQUEST } from '../../../store/healthFacilit
 // Mock store setup
 const mockStore = configureStore([]);
 let store: any;
-jest.mock('../../assets/images/edit.svg', () => ({
-  ReactComponent: () => <svg data-testid='edit-icon' />
+
+// Mock react-leaflet to avoid ES module issues
+jest.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
+  TileLayer: () => <div data-testid="tile-layer" />,
+  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
+  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  useMap: () => ({ setView: jest.fn(), getCenter: () => ({ lat: 0, lng: 0 }) }),
+  useMapEvent: jest.fn(),
+  useMapEvents: jest.fn()
+}));
+jest.mock('leaflet/dist/leaflet.css', () => ({}));
+
+jest.mock('../../../assets/images/edit.svg', () => ({
+  ReactComponent: () => <svg data-testid="edit-icon" />
 }));
 jest.mock('../../../components/userForm/UserForm', () => () => {
-  return <div data-testid='mock-userForm'>userForm</div>;
+  return <div data-testid="mock-userForm">userForm</div>;
 });
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -30,12 +43,21 @@ describe('HealthFacilityList Component', () => {
   beforeEach(() => {
     store = mockStore({
       healthFacility: {
-        list: [],
-        total: 0,
-        loading: false
+        healthFacilityList: [],
+        hfTotal: 0,
+        loading: false,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
+      },
+      district: {
+        districtList: []
       },
       common: {
         labelName: null
@@ -59,11 +81,20 @@ describe('HealthFacilityList Component', () => {
   test('should call edit and show success message on successful deletion', async () => {
     const localStore = mockStore({
       healthFacility: {
-        healthFacilityList: mockHealthFacilityList
+        healthFacilityList: mockHealthFacilityList,
+        hfTotal: mockHealthFacilityList?.length ?? 0,
+        loading: false,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
       },
+      district: { districtList: [] },
       common: {
         labelName: null
       }
@@ -88,11 +119,20 @@ describe('HealthFacilityList Component', () => {
   it('navigates to the correct route on row click', () => {
     const localStore = mockStore({
       healthFacility: {
-        healthFacilityList: mockHealthFacilityList
+        healthFacilityList: mockHealthFacilityList,
+        hfTotal: mockHealthFacilityList?.length ?? 0,
+        loading: false,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
       },
+      district: { districtList: [] },
       common: {
         labelName: null
       }
@@ -124,11 +164,20 @@ describe('HealthFacilityList Component', () => {
   it('should admin List fetch with failure cb', async () => {
     const localStore = mockStore({
       healthFacility: {
-        healthFacilityList: mockHealthFacilityList
+        healthFacilityList: mockHealthFacilityList,
+        hfTotal: mockHealthFacilityList?.length ?? 0,
+        loading: false,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
       },
+      district: { districtList: [] },
       common: {
         labelName: null
       }
@@ -157,11 +206,19 @@ describe('HealthFacilityList Component', () => {
     const localStore = mockStore({
       healthFacility: {
         healthFacilityList: [],
-        loading: true
+        hfTotal: 0,
+        loading: true,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
       },
+      district: { districtList: [] },
       common: {
         labelName: null
       }
@@ -180,15 +237,23 @@ describe('HealthFacilityList Component', () => {
   it('does not render the Loader when loading is false', () => {
     const localStore = mockStore({
       healthFacility: {
-        healthFacilityList: mockHealthFacilityList
+        healthFacilityList: mockHealthFacilityList,
+        hfTotal: mockHealthFacilityList?.length ?? 0,
+        loading: false,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
       },
+      district: { districtList: [] },
       common: {
         labelName: null
-      },
-      loading: false
+      }
     });
 
     render(
@@ -200,15 +265,23 @@ describe('HealthFacilityList Component', () => {
     );
     expect(screen.queryByTestId('loader')).toBeNull(); // Asserts Loader is not in the DOM
   });
-  // Inside your test:
   it('should create health facility', async () => {
     const localStore = mockStore({
       healthFacility: {
-        healthFacilityList: mockHealthFacilityList
+        healthFacilityList: mockHealthFacilityList,
+        hfTotal: mockHealthFacilityList?.length ?? 0,
+        loading: false,
+        hfTypes: [],
+        chiefdomList: []
       },
       user: {
-        role: 'SUPER_ADMIN'
+        user: {
+          role: 'SUPER_ADMIN',
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
       },
+      district: { districtList: [] },
       common: {
         labelName: null
       }
@@ -221,7 +294,7 @@ describe('HealthFacilityList Component', () => {
       </Provider>
     );
 
-    const createButton = screen.getByText('Add Health Facility');
+    const createButton = screen.getByTestId('detail-card-button');
     fireEvent.click(createButton);
   });
 });

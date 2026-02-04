@@ -73,8 +73,9 @@ describe('MedicationForm Component', () => {
   it('renders the form with initial fields', () => {
     renderComponent();
     expect(screen.getByText('Medication Name')).toBeInTheDocument();
-    expect(screen.getByText('Code')).toBeInTheDocument();
-    expect(screen.getByText('URL')).toBeInTheDocument();
+    // Component labels use SNOMED terminology
+    expect(screen.getByText('SNOMED Code')).toBeInTheDocument();
+    expect(screen.getByText('SNOMED URL')).toBeInTheDocument();
     expect(screen.getByText('Classification')).toBeInTheDocument();
     expect(screen.getByText('Brand')).toBeInTheDocument();
     expect(screen.getByText('Dosage Form')).toBeInTheDocument();

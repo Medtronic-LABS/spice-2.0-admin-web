@@ -1,8 +1,30 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Form } from 'react-final-form';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import EmailField from '../EmailField';
 import { fetchUserByEmail } from '../../../services/userAPI';
 import ApiError from '../../../global/ApiError';
+
+const mockStore = configureStore([]);
+const store = mockStore({
+  user: {
+    user: {
+      appTypes: [],
+      country: {
+        appTypes: []
+      }
+    }
+  },
+  common: {
+    labelName: {
+      region: { s: 'Region', p: 'Regions' },
+      healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+      district: { s: 'County', p: 'Counties' },
+      chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+    }
+  }
+});
 
 jest.mock('../../../services/userAPI');
 const mockFetchUserByEmail = fetchUserByEmail as jest.MockedFunction<typeof fetchUserByEmail>;
@@ -56,7 +78,11 @@ describe('EmailField', () => {
 
   const renderEmailField = (props = {}) => {
     // tslint:disable-next-line:no-empty
-    return render(<Form onSubmit={() => {}}>{() => <EmailField {...defaultProps} {...props} />}</Form>);
+    return render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}}>{() => <EmailField {...defaultProps} {...props} />}</Form>
+      </Provider>
+    );
   };
 
   it('renders email field correctly', () => {
@@ -168,7 +194,11 @@ describe('EmailField', () => {
     const ref: any = { current: null };
 
     // tslint:disable-next-line:no-empty
-    render(<Form onSubmit={() => {}}>{() => <EmailField {...localProps} ref={ref} />}</Form>);
+    render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}}>{() => <EmailField {...localProps} ref={ref} />}</Form>
+      </Provider>
+    );
 
     ref.current.resetEmailField();
 

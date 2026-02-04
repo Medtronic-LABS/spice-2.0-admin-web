@@ -14,6 +14,11 @@ jest.mock('../../../store/workflow/actions', () => ({
   resetClinicalWorkflow: jest.fn()
 }));
 
+// Mock SVG icons
+jest.mock('../../../assets/images/plus.svg', () => ({
+  ReactComponent: () => <svg data-testid='plus-icon' />
+}));
+
 const renderComponent = (store: any) =>
   render(
     <Provider store={store}>
@@ -27,7 +32,20 @@ describe('WorkflowCustomization', () => {
   let store: any;
 
   beforeEach(() => {
-    store = configureStore({ reducer: rootReducer });
+    store = configureStore({
+      reducer: rootReducer,
+      preloadedState: {
+        user: {
+          user: {
+            country: { id: 1, appTypes: [] },
+            appTypes: []
+          }
+        },
+        common: {
+          labelName: null
+        }
+      }
+    });
     jest.clearAllMocks();
   });
 
@@ -42,21 +60,24 @@ describe('WorkflowCustomization', () => {
   it('opens the modal when "Add Workflow" is clicked', () => {
     renderComponent(store);
 
-    const addWorkflowButton = screen.getByRole('button', { name: /Add Workflow/i });
-    fireEvent.click(addWorkflowButton);
+    const addWorkflowButtons = screen.getAllByRole('button', { name: /Add Workflow/i });
+    fireEvent.click(addWorkflowButtons[0]);
 
-    expect(screen.getByText(/Add Account Workflow/i)).toBeInTheDocument();
+    // Check for modal title specifically
+    expect(screen.getByTestId('modal-title')).toHaveTextContent('Add Workflow');
   });
 
   it('closes the modal when "Cancel" is clicked', () => {
     renderComponent(store);
 
-    const addWorkflowButton = screen.getByRole('button', { name: /Add Workflow/i });
-    fireEvent.click(addWorkflowButton);
+    const addWorkflowButtons = screen.getAllByRole('button', { name: /Add Workflow/i });
+    fireEvent.click(addWorkflowButtons[0]);
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     fireEvent.click(cancelButton);
 
-    expect(screen.queryByText(/Add Account Workflow/i)).not.toBeInTheDocument();
+    // Check that modal title is no longer in document (button text will still be there)
+    const modalTitle = screen.queryByTestId('modal-title');
+    expect(modalTitle).not.toBeInTheDocument();
   });
 });

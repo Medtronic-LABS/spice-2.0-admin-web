@@ -1,19 +1,40 @@
 import { render, screen } from '@testing-library/react';
 import { Form } from 'react-final-form';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import RegionForm from '../RegionForm';
 
+const mockStore = configureStore([]);
+
 describe('RegionForm', () => {
+  const store = mockStore({
+    healthFacility: {
+      countryList: []
+    },
+    user: {
+      user: {
+        country: { id: 1, appTypes: [] },
+        appTypes: []
+      }
+    },
+    common: {
+      labelName: null
+    }
+  });
+
   const renderComponent = () => {
     return render(
-      /* tslint:disable-next-line:no-empty */
-      <Form onSubmit={() => {}}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <RegionForm />
-            <button type='submit'>Submit</button>
-          </form>
-        )}
-      </Form>
+      <Provider store={store}>
+        {/* tslint:disable-next-line:no-empty */}
+        <Form onSubmit={() => {}}>
+          {({ handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <RegionForm />
+              <button type='submit'>Submit</button>
+            </form>
+          )}
+        </Form>
+      </Provider>
     );
   };
 
@@ -30,6 +51,6 @@ describe('RegionForm', () => {
 
   it('renders country code input field', () => {
     const { container } = renderComponent();
-    expect(container.querySelector(`input[name="region.countryCode"]`)).toBeInTheDocument();
+    expect(container.querySelector(`input[name="region.phoneNumberCode"]`)).toBeInTheDocument();
   });
 });

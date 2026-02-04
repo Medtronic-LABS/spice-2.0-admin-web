@@ -75,6 +75,22 @@ describe('RenderFields', () => {
   const store = mockStore({
     labtest: {
       units: []
+    },
+    user: {
+      user: {
+        appTypes: [],
+        country: {
+          appTypes: []
+        }
+      }
+    },
+    common: {
+      labelName: {
+        region: { s: 'Region', p: 'Regions' },
+        healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+        district: { s: 'County', p: 'Counties' },
+        chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+      }
     }
   });
 
@@ -174,6 +190,22 @@ describe('RenderFields', () => {
       },
       workflow: {
         formMeta: []
+      },
+      user: {
+        user: {
+          appTypes: [],
+          country: {
+            appTypes: []
+          }
+        }
+      },
+      common: {
+        labelName: {
+          region: { s: 'Region', p: 'Regions' },
+          healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+          district: { s: 'County', p: 'Counties' },
+          chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+        }
       }
     });
     render(
@@ -743,6 +775,22 @@ describe('RenderFields', () => {
     const localStore = mockStore({
       labtest: {
         units: undefined
+      },
+      user: {
+        user: {
+          appTypes: [],
+          country: {
+            appTypes: []
+          }
+        }
+      },
+      common: {
+        labelName: {
+          region: { s: 'Region', p: 'Regions' },
+          healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+          district: { s: 'County', p: 'Counties' },
+          chiefdom: { s: 'Sub County', p: 'Sub Counties' }
+        }
       }
     });
     const props = {

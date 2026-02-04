@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import { Form } from 'react-final-form';
 import Workflows from '../Workflows';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { IWorkflow } from '../../../store/healthFacility/types';
@@ -61,7 +62,9 @@ const mockFormApi: Partial<FormApi<any, Partial<any>>> = {
 const renderWithStore = (store: any, form: FormApi<any, Partial<any>>, formName: string) =>
   render(
     <Provider store={store}>
-      <Workflows form={form} formName={formName} />
+      <Form onSubmit={() => {}} initialValues={{ healthFacility: { workflows: [], clinicalWorkflows: [], customizedWorkflows: [] } }}>
+        {({ form: formInstance }) => <Workflows form={formInstance || form} formName={formName} />}
+      </Form>
     </Provider>
   );
 
@@ -76,8 +79,17 @@ describe('Workflows Component', () => {
   beforeEach(() => {
     store = mockStore({
       healthFacility: {
-        workflowList: workflows,
+        clinicalWorkflowList: workflows,
         workflowLoading: false
+      },
+      user: {
+        user: {
+          country: { id: 1, appTypes: [] },
+          appTypes: []
+        }
+      },
+      common: {
+        labelName: null
       }
     });
   });
@@ -85,25 +97,16 @@ describe('Workflows Component', () => {
   it('should render clinical workflows', () => {
     renderWithStore(store, mockFormApi as FormApi<any, Partial<any>>, 'testForm');
 
-    // Check if the clinical workflows are rendered
-    const clinicalWorkflowTitle = screen.getByText(APPCONSTANTS.CLINICAL_WORKFLOW);
+    // Check if the clinical workflows are rendered - component renders "Clinical Workflows involved"
+    const clinicalWorkflowTitle = screen.getByText(/Clinical Workflows involved/i);
     expect(clinicalWorkflowTitle).toBeInTheDocument();
   });
 
   it('should show error message when no clinical workflow is selected', () => {
-    // Mock form state to trigger error
-    mockFormApi.getState = jest.fn(() => ({
-      ...mockFormState,
-      values: {
-        healthFacility: {
-          workflows: [] // No workflows selected
-        }
-      }
-    }));
-
     renderWithStore(store, mockFormApi as FormApi<any, Partial<any>>, 'testForm');
 
-    const errorMessage = screen.getByText('Please select a clinical workflow');
+    // Component renders "Select atleast one workflows" when no workflows are selected
+    const errorMessage = screen.getByText(/Select atleast one workflows/i);
     expect(errorMessage).toBeInTheDocument();
   });
 });

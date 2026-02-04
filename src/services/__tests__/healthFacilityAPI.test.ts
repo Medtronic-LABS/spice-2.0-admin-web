@@ -55,7 +55,18 @@ describe('Health Facility APIs', () => {
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('admin-service/healthfacility/list');
-    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(params);
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
+      limit: 10,
+      skip: 10,
+      countryId: 1,
+      tenantIds: ['1'],
+      healthFacilityTypes: [],
+      districtIds: [],
+      chiefdomIds: [],
+      userBased: false,
+      tenantBased: false,
+      searchTerm: 'example'
+    });
   });
 
   it('fetchHealthFacilityList sends a POST request to admin-service/healthfacility/list with correct data without search and skip', async () => {
@@ -75,10 +86,16 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('admin-service/healthfacility/list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
-      ...params,
-      skip: null,
       limit: null,
-      tenantIds: []
+      skip: null,
+      countryId: 1,
+      tenantIds: [],
+      healthFacilityTypes: [],
+      districtIds: [],
+      chiefdomIds: [],
+      userBased: false,
+      tenantBased: false,
+      searchTerm: ''
     });
   });
 

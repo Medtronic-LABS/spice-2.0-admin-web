@@ -40,11 +40,18 @@ describe('RegionFormCustomization', () => {
       ]
     },
     user: {
+      user: {
+        country: { id: 1, appTypes: [] },
+        appTypes: []
+      },
       cultureList: [
-        { id: 1, name: 'English' },
-        { id: 2, name: 'Spanish' }
+        { id: 1, name: 'English', appTypes: ['NON_COMMUNITY'] },
+        { id: 2, name: 'Spanish', appTypes: ['COMMUNITY'] }
       ],
       cultureListLoading: false
+    },
+    common: {
+      labelName: null
     }
   };
 

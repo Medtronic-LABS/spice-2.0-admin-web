@@ -1002,11 +1002,12 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(chiefdomSpy).toHaveBeenCalledWith(
-        hfChiefDomRequest.countryId,
-        hfChiefDomRequest.districtId,
-        mockState.user.user.appTypes
-      );
+      expect(chiefdomSpy).toHaveBeenCalledWith({
+        countryId: hfChiefDomRequest.countryId,
+        districtId: hfChiefDomRequest.districtId,
+        appTypes: mockState.user.user.appTypes,
+        districtIds: undefined
+      });
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchChiefdomListSuccess({ list: hfChiefdomList, total: hfChiefdomList.length })
@@ -1031,11 +1032,12 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(chiefdomSpy).toHaveBeenCalledWith(
-        hfChiefDomRequest.countryId,
-        hfChiefDomRequest.districtId,
-        mockState.user.user.appTypes
-      );
+      expect(chiefdomSpy).toHaveBeenCalledWith({
+        countryId: hfChiefDomRequest.countryId,
+        districtId: hfChiefDomRequest.districtId,
+        appTypes: mockState.user.user.appTypes,
+        districtIds: undefined
+      });
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchChiefdomListFailure(error)]);
     });
