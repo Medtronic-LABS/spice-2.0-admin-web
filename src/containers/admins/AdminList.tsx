@@ -10,8 +10,8 @@ import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
-import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import useCountryId from '../../hooks/useCountryId';
 import { useRoleOptions } from '../../hooks/roleOptionsHook';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import {
@@ -39,6 +39,7 @@ import ResetPasswordFields, { generatePassword } from '../authentication/ResetPa
 import { columnDef } from './adminListMeta';
 
 interface IMatchParams {
+  regionId?: string;
   tenantId: string;
   healthFacilityId: string;
   districtId: string;
@@ -51,11 +52,10 @@ interface IMatchParams {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const { regionId, tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const countryIdValue = useCountryId({ regionId });
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [isOpenUserModal, setIsOpenUserModal] = useState({ isOpen: false, isEdit: false });
-  const countryId = useSelector(countryIdSelector);
-  const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const email = useSelector(emailSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
@@ -105,7 +105,7 @@ const UserList = (): React.ReactElement => {
     () =>
       dispatch(
         fetchHFUserListRequest({
-          countryId: countryIdValue,
+          countryId: String(countryIdValue),
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
@@ -185,7 +185,7 @@ const UserList = (): React.ReactElement => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appTypes, countryId, dispatch, refreshHFUserList]
+    [appTypes, countryIdValue, dispatch, refreshHFUserList]
   );
 
   /**

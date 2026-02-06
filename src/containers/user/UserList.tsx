@@ -12,8 +12,8 @@ import ModalForm from '../../components/modal/ModalForm';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
 import { onlyCHWRoles, villageBasedRoles } from '../../constants/roleConstants';
-import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import useCountryId from '../../hooks/useCountryId';
 import { useRoleOptions } from '../../hooks/roleOptionsHook';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN } from '../../routes';
@@ -50,7 +50,6 @@ import {
   offlineSyncRequest
 } from '../../store/user/actions';
 import {
-  countryIdSelector,
   emailSelector,
   roleSelector,
   userRolesSelector,
@@ -98,7 +97,8 @@ interface ICHWListModal {
  */
 const UserList = (): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const { tenantId, regionId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const countryIdValue = useCountryId({ regionId });
   const healthFacilityUserListLoading = useSelector(healthFacilityUsersLoadingSelector);
   const { SEND_EMAIL, CHANGE_PASSWORD } = APPCONSTANTS.PASSWORD_VALUES;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -115,8 +115,6 @@ const UserList = (): React.ReactElement => {
     isOpen: false
   });
   const [selectedOption, setSelectedOption] = useState('');
-  const countryId = useSelector(countryIdSelector);
-  const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const role = useSelector(roleSelector);
   const email = useSelector(emailSelector);
   const rolesGrouped = useSelector(userRolesSelector);
@@ -179,7 +177,7 @@ const UserList = (): React.ReactElement => {
   const refreshHFUserList = useCallback(() => {
     return dispatch(
       fetchHFUserListRequest({
-        countryId: countryIdValue,
+        countryId: String(countryIdValue),
         skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
         limit: listParams.rowsPerPage,
         searchTerm: listParams.searchTerm,

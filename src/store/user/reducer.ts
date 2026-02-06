@@ -109,7 +109,10 @@ const userReducer = (state: IUserState = initialStateGetter, action = {} as any)
         initializing: false,
         loggingIn: false,
         isLoggedIn: true,
-        user: action.payload
+        user: {
+          ...state.user,
+          ...action.payload
+        }
       };
     case USERTYPES.FETCH_LOGGED_IN_USER_FAILURE:
       return {

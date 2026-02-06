@@ -2,17 +2,17 @@ import { useEffect } from 'react';
 import { FormApi } from 'final-form';
 import { Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import TextInput from '../../components/formFields/TextInput';
 import SelectInput from '../../components/formFields/SelectInput';
 import Checkbox from '../../components/formFields/Checkbox';
 import { healthFacilityListSelector, healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 import { IProgramFormValues } from '../../store/program/types';
 import { composeValidators, required, minLength, validateEntityName } from '../../utils/validation';
-import { countryIdSelector } from '../../store/user/selectors';
-import sessionStorageServices from '../../global/sessionStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
 import { clearHFList, fetchHFListRequest } from '../../store/healthFacility/actions';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import useCountryId from '../../hooks/useCountryId';
 
 /**
  * Interface for ProgramForm props
@@ -30,9 +30,9 @@ interface IProgramFormProps {
  */
 const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const { tenantId, isEdit = false } = props;
-  const countryId = useSelector(countryIdSelector);
+  const { regionId } = useParams<{ regionId?: string }>();
+  const countryIdValue = useCountryId({ regionId });
   const healthFacilityList = useSelector(healthFacilityListSelector);
-  const countryIdValue = countryId?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID);
   const dispatch = useDispatch();
   const hfListLoading = useSelector(healthFacilityLoadingSelector);
   const {

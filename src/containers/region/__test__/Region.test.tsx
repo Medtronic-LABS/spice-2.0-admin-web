@@ -1,21 +1,45 @@
-import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Route } from 'react-router-dom';
 import Region from '../Region';
 import { mockRegionDetailList } from '../../../tests/mockData/regionDataConstants';
 import APPCONSTANTS from '../../../constants/appConstants';
+import * as regionActions from '../../../store/region/actions';
 
-// Mock the action creators and toast utility
+// Mock the action creators to return plain objects (required by redux-mock-store)
 jest.mock('../../../store/region/actions', () => ({
-  downloadFileRequest: jest.fn(),
-  fetchCountryDetailReq: jest.fn(),
-  regionDetailsRequest: jest.fn(),
-  uploadFileRequest: jest.fn()
+  downloadFileRequest: jest.fn((payload: any) => ({ type: 'DOWNLOAD_FILE_REQUEST', ...payload })),
+  fetchCountryDetailReq: jest.fn((payload: any) => ({ type: 'FETCH_COUNTRY_DETAILS_REQUEST', ...payload })),
+  regionDetailsRequest: jest.fn((payload: any) => ({ type: 'FETCH_REGION_DETAIL_REQUEST', ...payload })),
+  uploadFileRequest: jest.fn((payload: any) => ({ type: 'UPLOAD_FILE_REQUEST', ...payload }))
 }));
 jest.mock('../../../utils/toastCenter', () => ({
   success: jest.fn(),
   error: jest.fn()
+}));
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: () => ({ regionId: '1', tenantId: '2' })
+}));
+
+jest.mock('../../../hooks/appTypeBasedConfigs', () => () => ({
+  isCommunity: false,
+  region: { s: 'Region', p: 'Regions' },
+  district: { s: 'County', p: 'Counties' },
+  chiefdom: { s: 'Sub County', p: 'Sub Counties' },
+  healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
+  village: { s: 'Village', p: 'Villages' }
+}));
+
+jest.mock('../../../hooks/tablePagination', () => ({
+  useTablePaginationHook: () => ({
+    listParams: { page: 1, rowsPerPage: 10, searchTerm: '' },
+    handleSearch: jest.fn(),
+    handlePage: jest.fn()
+  })
 }));
 
 // Define the initial state based on the store definition
@@ -32,7 +56,7 @@ const initialState = {
       name: 'Kenya',
       list: mockRegionDetailList,
       appTypes: [],
-      total: 0
+      total: mockRegionDetailList.length
     },
     isClientRegistryEnabled: undefined,
     file: {},
@@ -40,7 +64,10 @@ const initialState = {
     downloading: false
   },
   user: {
-    role: 'ADMIN'
+    user: {
+      role: 'ADMIN',
+      appTypes: []
+    }
   },
   common: {
     labelName: null
@@ -52,7 +79,7 @@ const mockStore = configureStore([]);
 const getMockStore = (stateOverrides: any) => mockStore({ ...initialState, ...stateOverrides });
 
 // Helper function to render the component with necessary providers
-const renderWithProviders = (ui: any, { store }: any) => {
+const renderWithProviders = (ui: React.ReactElement, { store }: { store: any }) => {
   return render(
     <Provider store={store}>
       <BrowserRouter>{ui}</BrowserRouter>
@@ -66,10 +93,10 @@ jest.mock('../../../components/dragDropFiles/DragDropFiles', () => ({
   default: () => <div data-testid='drag-drop-files'>Mock DragDropFiles</div>
 }));
 
-jest.mock('../../../../assets/images/download.svg', () => ({
+jest.mock('../../../assets/images/download.svg', () => ({
   default: () => <div data-testid='download-icon'>Mock Download Icon</div>
 }));
-jest.mock('../../../../assets/images/upload_blue.svg', () => ({
+jest.mock('../../../assets/images/upload_blue.svg', () => ({
   default: () => <div data-testid='upload-icon'>Mock Upload Icon</div>
 }));
 
@@ -78,6 +105,7 @@ describe('Region Component', () => {
   beforeEach(() => {
     store = getMockStore({});
     store.dispatch = jest.fn();
+    jest.clearAllMocks();
   });
 
   it('renders loading indicator when loading', () => {
@@ -86,18 +114,115 @@ describe('Region Component', () => {
     expect(getByTestId('loader')).toBeInTheDocument();
   });
 
+  it('renders Loader when uploading is true', () => {
+    store = getMockStore({ region: { ...initialState.region, uploading: true } });
+    const { getByTestId } = renderWithProviders(<Region />, { store });
+    expect(getByTestId('loader')).toBeInTheDocument();
+  });
+
   it('fetches region details on mount', () => {
     renderWithProviders(<Region />, { store });
     expect(screen.getByText('Region')).toBeInTheDocument();
   });
+
+  it('dispatches regionDetailsRequest when regionId is present on mount', () => {
+    renderWithProviders(<Region />, { store });
+    expect(regionActions.regionDetailsRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        countryId: 1,
+        failureCb: expect.any(Function)
+      })
+    );
+  });
+
+  it('dispatches fetchCountryDetailReq when regionId and tenantId present and no regionDetailsId', () => {
+    store = getMockStore({
+      region: {
+        ...initialState.region,
+        detail: { ...initialState.region.detail, id: undefined }
+      }
+    });
+    renderWithProviders(<Region />, { store });
+    expect(regionActions.fetchCountryDetailReq).toHaveBeenCalledWith({
+      id: '1',
+      tenantId: '2'
+    });
+  });
+
+  it('dispatches regionDetailsRequest with failureCb in payload', () => {
+    renderWithProviders(<Region />, { store });
+    const call = (regionActions.regionDetailsRequest as jest.Mock).mock.calls[0][0];
+    expect(call).toHaveProperty('failureCb');
+    expect(typeof call.failureCb).toBe('function');
+  });
+
   it('fetches without region details on mount', () => {
-    store = getMockStore({ region: { ...initialState.region, detail: { list: [] } } });
+    store = getMockStore({
+      region: {
+        ...initialState.region,
+        detail: { ...initialState.region.detail, list: [], total: 0 }
+      }
+    });
     const { getByTestId } = renderWithProviders(<Region />, { store });
     expect(getByTestId('drag-drop-files')).toBeInTheDocument();
   });
-  it('readonly region details on mount', () => {
-    store = getMockStore({ region: { ...initialState.region, user: { role: APPCONSTANTS.ROLES.REGION_ADMIN } } });
-    const { getByTestId } = renderWithProviders(<Region />, { store });
-    screen.debug(undefined, Infinity);
+
+  it('hides Download and Upload when user role is REGION_ADMIN (read-only)', () => {
+    store = getMockStore({
+      user: { user: { role: APPCONSTANTS.ROLES.REGION_ADMIN, appTypes: [] } }
+    });
+    renderWithProviders(<Region />, { store });
+    expect(screen.queryByText('Download')).not.toBeInTheDocument();
+    expect(screen.queryByText('Upload')).not.toBeInTheDocument();
+  });
+
+  it('dispatches downloadFileRequest when Download button is clicked', () => {
+    renderWithProviders(<Region />, { store });
+    const buttons = screen.getAllByTestId('detail-card-button');
+    const downloadButton = buttons.find((btn) => btn.textContent?.includes('Download')) ?? buttons[1];
+    fireEvent.click(downloadButton);
+    expect(regionActions.downloadFileRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        countryId: 1,
+        successCb: expect.any(Function),
+        failureCb: expect.any(Function)
+      })
+    );
+  });
+
+  it('opens upload modal when Upload is clicked', async () => {
+    renderWithProviders(<Region />, { store });
+    const buttons = screen.getAllByTestId('detail-card-button');
+    const uploadButton = buttons.find((btn) => btn.textContent?.includes('Upload')) ?? buttons[0];
+    fireEvent.click(uploadButton);
+    await waitFor(() => {
+      expect(screen.getByText('Upload Region Data')).toBeInTheDocument();
+    });
+  });
+
+  it('closes upload modal when close icon is clicked', async () => {
+    renderWithProviders(<Region />, { store });
+    const buttons = screen.getAllByTestId('detail-card-button');
+    const uploadButton = buttons.find((btn) => btn.textContent?.includes('Upload')) ?? buttons[0];
+    fireEvent.click(uploadButton);
+    await waitFor(() => {
+      expect(screen.getByText('Upload Region Data')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByAltText('close'));
+    await waitFor(() => {
+      expect(screen.queryByText('Upload Region Data')).not.toBeInTheDocument();
+    });
+  });
+
+  it('renders table with expected column headers', () => {
+    renderWithProviders(<Region />, { store });
+    expect(screen.getByRole('columnheader', { name: 'County' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Sub County' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Village' })).toBeInTheDocument();
+  });
+
+  it('does not render Loader when loading and uploading are false', () => {
+    renderWithProviders(<Region />, { store });
+    expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
   });
 });

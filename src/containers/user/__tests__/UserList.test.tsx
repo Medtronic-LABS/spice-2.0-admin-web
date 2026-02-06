@@ -12,7 +12,10 @@ import {
   FETCH_HEALTH_FACILITY_USER_LIST_REQUEST,
   CREATE_HEALTH_FACILITY_USER_REQUEST,
   UPDATE_HEALTH_FACILITY_USER_REQUEST,
-  FETCH_HEALTH_FACILITY_LIST_REQUEST
+  FETCH_HEALTH_FACILITY_LIST_REQUEST,
+  CLEAR_HEALTH_FACILITY_LIST,
+  CLEAR_PEER_SUPERVISOR_LIST,
+  CLEAR_VILLAGES_LIST_FROM_HF
 } from '../../../store/healthFacility/actionTypes';
 import {
   CHANGE_PASSWORD_REQUEST,
@@ -366,6 +369,20 @@ describe('UserList Component', () => {
       });
       renderComponent(localStore);
       expect(screen.getByTestId('loader')).toBeInTheDocument();
+    });
+
+    it('should show loader when healthFacilityUsersLoading (hfUsersLoading) is true', () => {
+      const localStore = mockStore({
+        ...initialState,
+        healthFacility: { ...initialState.healthFacility, hfUsersLoading: true }
+      });
+      renderComponent(localStore);
+      expect(screen.getByTestId('loader')).toBeInTheDocument();
+    });
+
+    it('does not render Loader when all loading states are false', () => {
+      renderComponent(store);
+      expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
     });
   });
 
@@ -817,6 +834,24 @@ describe('UserList Component', () => {
   });
 
   describe('List Fetching', () => {
+    it('should dispatch fetchHFUserListRequest with failureCb in payload on mount', () => {
+      const localStore = mockStore({
+        ...initialState,
+        user: {
+          ...initialState.user,
+          user: { country: { id: 1, appTypes: [] }, email: 'test@example.com', role: 'SUPER_ADMIN', appTypes: [] }
+        }
+      });
+      renderComponent(localStore);
+      const actions = localStore.getActions();
+      const fetchUserListAction = actions.find(
+        (action: any) => action.type === FETCH_HEALTH_FACILITY_USER_LIST_REQUEST
+      );
+      expect(fetchUserListAction).toBeDefined();
+      expect(fetchUserListAction).toHaveProperty('failureCb');
+      expect(typeof fetchUserListAction.failureCb).toBe('function');
+    });
+
     it('should call fetch user list on mount', async () => {
       const localStore = mockStore({
         user: { 
@@ -963,6 +998,27 @@ describe('UserList Component', () => {
           expect(successCbSpy).toHaveBeenCalled();
         }
       }
+    });
+  });
+
+  describe('Cleanup on unmount', () => {
+    it('should dispatch clearSupervisorList and clearVillageHFList on unmount', () => {
+      const localStore = mockStore(initialState);
+      const { unmount } = renderComponent(localStore);
+      unmount();
+      const actions = localStore.getActions();
+      const types = actions.map((a: any) => a.type);
+      expect(types).toContain(CLEAR_PEER_SUPERVISOR_LIST);
+      expect(types).toContain(CLEAR_VILLAGES_LIST_FROM_HF);
+    });
+
+    it('should dispatch clearHFList on unmount', () => {
+      const localStore = mockStore(initialState);
+      const { unmount } = renderComponent(localStore);
+      unmount();
+      const actions = localStore.getActions();
+      const types = actions.map((a: any) => a.type);
+      expect(types).toContain(CLEAR_HEALTH_FACILITY_LIST);
     });
   });
 

@@ -86,10 +86,10 @@ export interface IUser {
   roleDetail: any;
   tenantId: string;
   formDataId: string;
-  country: any;
+  country?: any;
   countryId: any;
   suiteAccess: string[];
-  appTypes: string[];
+  appTypes?: string[];
   organizations?: IOrganizations[] | [];
   isTermsConditionsLoading?: boolean;
   termsAndConditions?: ITermsAndConditions;

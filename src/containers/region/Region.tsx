@@ -49,7 +49,8 @@ const Region = (): React.ReactElement => {
     region: { s: regionSName },
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
-    healthFacility: { s: healthFacilitySName }
+    healthFacility: { s: healthFacilitySName },
+    village: { s: villageSName }
   } = useAppTypeConfigs();
 
   // Check if the current user role is Region Admin to set read-only access
@@ -176,7 +177,7 @@ const Region = (): React.ReactElement => {
     {
       id: 3,
       name: 'villagename',
-      label: 'VILLAGE'
+      label: villageSName
     }
   ];
 
@@ -213,18 +214,7 @@ const Region = (): React.ReactElement => {
             >
               <CustomTable
                 rowData={regionDetails.list ?? []}
-                columnsDef={
-                  isCommunity
-                    ? [
-                        ...fields,
-                        {
-                          id: 4,
-                          name: 'villagetype',
-                          label: 'VILLAGE TYPE'
-                        }
-                      ]
-                    : fields
-                }
+                columnsDef={fields}
                 isEdit={false}
                 isDelete={false}
                 page={listParams.page}

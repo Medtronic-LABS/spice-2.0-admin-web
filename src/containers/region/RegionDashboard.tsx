@@ -56,10 +56,6 @@ const Region = (): React.ReactElement => {
     region: { s: regionSName, p: regionPName }
   } = useAppTypeConfigs();
 
-  // for community
-  const cChiefdomName = 'Chiefdom';
-  const cDistrictName = 'District';
-
   const { isLastPage, loadMore, resetPage } = useLoadMorePagination({
     total: regionsCount,
     itemsPerPage: APPCONSTANTS.REGIONS_PER_PAGE,
@@ -188,11 +184,17 @@ const Region = (): React.ReactElement => {
           appTypes,
           displayValues
         }: any) => {
-          const {
-            healthFacility: { s: healthFacilitySName = 'Health Facility' } = {},
-            district: { s: ncDistrictName = 'County' } = {},
-            chiefdom: { s: ncChiefdomName = 'Sub County' } = {}
-          } = displayValues || {};
+          // When displayValues exist use them; when absent use app-type defaults (prefer non-community when both)
+          const preferNonCommunity = appTypes?.includes(APP_TYPE.NON_COMMUNITY);
+          const defaultDistrict = preferNonCommunity ? 'County' : 'District';
+          const defaultChiefdom = preferNonCommunity ? 'Sub County' : 'Chiefdom';
+          const defaultHealthFacility = 'Health Facility';
+
+          const healthFacilitySName =
+            displayValues?.healthFacility?.s ?? defaultHealthFacility;
+          const districtLabel = displayValues?.district?.s ?? defaultDistrict;
+          const chiefdomLabel = displayValues?.chiefdom?.s ?? defaultChiefdom;
+
           return {
             title: name,
             detailRoute: PROTECTED_ROUTES.regionSummary.replace(':regionId', regionId).replace(':tenantId', tenantId),
@@ -203,7 +205,7 @@ const Region = (): React.ReactElement => {
               {
                 type: 'number',
                 value: Number(districtCount) ? appendZeroBefore(districtCount, 2) : '-',
-                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? ncDistrictName : cDistrictName,
+                label: districtLabel,
                 disableEllipsis: true,
                 route: PROTECTED_ROUTES.districtByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
                 onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes, displayValues }),
@@ -212,7 +214,7 @@ const Region = (): React.ReactElement => {
               {
                 type: 'number',
                 value: Number(chiefdomCount) ? appendZeroBefore(chiefdomCount, 2) : '-',
-                label: appTypes.includes(APP_TYPE.NON_COMMUNITY) ? ncChiefdomName : cChiefdomName,
+                label: chiefdomLabel,
                 route: PROTECTED_ROUTES.chiefdomByRegion.replace(':regionId', regionId).replace(':tenantId', tenantId),
                 onClick: () => onDashboardExit({ id: regionId, name, tenantId, appTypes, displayValues }),
                 appType: appTypes

@@ -26,7 +26,6 @@ import { IActionProps } from '../../typings/global';
 import { error, success } from '../../utils/toastCenter';
 import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
-import localStorageService from '../../global/localStorageServices';
 import { setLabelName } from '../common/actions';
 import { activateUser, deactivateUser, assignPeerSupervisor, reasignCHW } from '../../services/userAPI';
 
@@ -54,7 +53,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
           lastName,
           id: userId,
           roles: allRoles,
-          appTypes,
           tenantId,
           country,
           organizations,
@@ -63,8 +61,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       }
     } = yield call(userService.fetchLoggedInUser);
     sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
-    sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
-    sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, country?.id);
     if (country?.displayValues) {
       yield put(setLabelName(country.displayValues));
     }
@@ -73,7 +69,6 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
     );
     updateRememberMe(username, password, rememberMe);
-    const oldAppTypes = yield select((state: AppState) => state.user.user.appTypes);
     const payload: IUser = {
       email,
       firstName,
@@ -82,16 +77,11 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       role: spiceAdminRole?.name || allRoles[0]?.name || '',
       roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
-      appTypes: appTypes || country?.appTypes || oldAppTypes || [],
-      country,
       suiteAccess,
       formDataId: organizations[0]?.formDataId,
       countryId: undefined,
       organizations
     };
-    if ((payload.appTypes || []).length) {
-      localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(payload.appTypes)}`);
-    }
     successCb?.(payload);
     yield put(userActions.loginSuccess(payload));
   } catch (e: any) {
@@ -152,9 +142,7 @@ export function* fetchLoggedInUser(): SagaIterator {
           lastName,
           id: userId,
           roles: allRoles,
-          appTypes,
           tenantId,
-          country,
           organizations,
           suiteAccess
         }
@@ -163,20 +151,10 @@ export function* fetchLoggedInUser(): SagaIterator {
     if (tenantId) {
       sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
     }
-    if (country?.tenantId) {
-      sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, country?.tenantId);
-    }
-    if (country?.id) {
-      sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, country?.id);
-    }
-    if (country?.displayValues) {
-      yield put(setLabelName(country.displayValues));
-    }
     const { ADMIN } = APPCONSTANTS.SUITE_ACCESS;
     const spiceAdminRole = allRoles?.find(
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
     );
-    const oldAppTypes = yield select((state: AppState) => state.user?.user?.appTypes);
     const payload: IUser = {
       email,
       firstName,
@@ -186,15 +164,10 @@ export function* fetchLoggedInUser(): SagaIterator {
       roleDetail: spiceAdminRole || allRoles[0],
       tenantId,
       formDataId: organizations[0]?.formDataId,
-      appTypes: appTypes || country?.appTypes || oldAppTypes || [],
-      country,
       suiteAccess,
       countryId: undefined,
       organizations
     };
-    if ((payload.appTypes || []).length) {
-      localStorageService.setItem(APP_TYPE_NAME, `${JSON.stringify(payload.appTypes)}`);
-    }
     yield put(userActions.fetchLoggedInUserSuccess(payload));
   } catch (e: any) {
     sessionStorageServices.clearAllItem();

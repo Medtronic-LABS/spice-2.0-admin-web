@@ -22,7 +22,26 @@ describe('useCountryId', () => {
     jest.clearAllMocks();
   });
 
-  it('should return countryId from Redux store if available', () => {
+  it('should return countryId from regionId param when provided', () => {
+    (useSelector as jest.Mock).mockReturnValue({ id: '123' });
+    (sessionStorageServices.getItem as jest.Mock).mockReturnValue('456');
+
+    const { result } = renderHook(() => useCountryId({ regionId: '789' }));
+
+    expect(result.current).toBe(789);
+  });
+
+  it('should prefer regionId over Redux store and sessionStorage', () => {
+    (useSelector as jest.Mock).mockReturnValue({ id: '123' });
+    (sessionStorageServices.getItem as jest.Mock).mockReturnValue('456');
+
+    const { result } = renderHook(() => useCountryId({ regionId: '999' }));
+
+    expect(result.current).toBe(999);
+    expect(sessionStorageServices.getItem).not.toHaveBeenCalled();
+  });
+
+  it('should return countryId from Redux store when no regionId is passed', () => {
     (useSelector as jest.Mock).mockReturnValue({ id: '123' });
 
     const { result } = renderHook(() => useCountryId());
@@ -31,7 +50,15 @@ describe('useCountryId', () => {
     expect(sessionStorageServices.getItem).not.toHaveBeenCalled();
   });
 
-  it('should return countryId from sessionStorage if not available in Redux store', () => {
+  it('should return countryId from Redux store when params is undefined', () => {
+    (useSelector as jest.Mock).mockReturnValue({ id: 42 });
+
+    const { result } = renderHook(() => useCountryId(undefined));
+
+    expect(result.current).toBe(42);
+  });
+
+  it('should return countryId from sessionStorage when not available in Redux store', () => {
     (useSelector as jest.Mock).mockReturnValue(undefined);
     (sessionStorageServices.getItem as jest.Mock).mockReturnValue('456');
 
@@ -41,7 +68,7 @@ describe('useCountryId', () => {
     expect(sessionStorageServices.getItem).toHaveBeenCalledWith(APPCONSTANTS.COUNTRY_ID);
   });
 
-  it('should return 0 if countryId is not available in both Redux store and sessionStorage', () => {
+  it('should return 0 when countryId is not available in Redux store or sessionStorage', () => {
     (useSelector as jest.Mock).mockReturnValue(undefined);
     (sessionStorageServices.getItem as jest.Mock).mockReturnValue(null);
 
@@ -49,5 +76,22 @@ describe('useCountryId', () => {
 
     expect(result.current).toBe(0);
     expect(sessionStorageServices.getItem).toHaveBeenCalledWith(APPCONSTANTS.COUNTRY_ID);
+  });
+
+  it('should return 0 when regionId is "0"', () => {
+    (useSelector as jest.Mock).mockReturnValue({ id: '123' });
+
+    const { result } = renderHook(() => useCountryId({ regionId: '0' }));
+
+    expect(result.current).toBe(0);
+  });
+
+  it('should return NaN when regionId is non-numeric and no fallback available', () => {
+    (useSelector as jest.Mock).mockReturnValue(undefined);
+    (sessionStorageServices.getItem as jest.Mock).mockReturnValue(null);
+
+    const { result } = renderHook(() => useCountryId({ regionId: 'abc' }));
+
+    expect(result.current).toBe(NaN);
   });
 });

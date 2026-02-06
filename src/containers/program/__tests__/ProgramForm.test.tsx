@@ -17,6 +17,7 @@ import { IProgramFormValues } from '../../../store/program/types';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { mount, ReactWrapper } from 'enzyme';
+import { MemoryRouter, Route } from 'react-router-dom';
 
 const mockStore = configureMockStore();
 
@@ -126,17 +127,21 @@ describe('ProgramForm', () => {
     });
     wrapper = mount(
       <Provider store={store}>
-        <Form
-          onSubmit={() => {
-            //
-          }}
-        >
-          {({ handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <ProgramForm form={mockFormApi} tenantId={mockTenantId} />
-            </form>
-          )}
-        </Form>
+        <MemoryRouter initialEntries={['/region/1/1/program/create']}>
+          <Route path='/region/:regionId/:tenantId/program/create'>
+            <Form
+              onSubmit={() => {
+                //
+              }}
+            >
+              {({ handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                  <ProgramForm form={mockFormApi} tenantId={mockTenantId} />
+                </form>
+              )}
+            </Form>
+          </Route>
+        </MemoryRouter>
       </Provider>
     );
 

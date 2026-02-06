@@ -77,7 +77,8 @@ const HealthFacilityList = (): React.ReactElement => {
   const hfTypesList = useSelector(hfTypesSelector);
   const districtList = useSelector(getDistrictListSelector);
   const chiefdomList = useSelector(getAllChiefdomsSelector);
-  const countryId = useCountryId();
+  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
+  const countryId = useCountryId({ regionId });
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const {
     isCommunity,
@@ -86,8 +87,6 @@ const HealthFacilityList = (): React.ReactElement => {
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName, p: healthFacilityPName }
   } = useAppTypeConfigs();
-
-  const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
 
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const [editHealthFacilityModal, setEditHFDetailsModal] = useState<IModalState>({
@@ -114,7 +113,7 @@ const HealthFacilityList = (): React.ReactElement => {
           limit: listParams.rowsPerPage,
           searchTerm: listParams.searchTerm,
           userBased: !isSuperUser,
-          tenantIds: [tenantId],
+          tenantIds: [],
           includesDisabled: true,
           healthFacilityTypes: healthFacilityTypes ?? filters.healthFacilityTypes,
           districtIds: districtIds ?? filters.districtIds,

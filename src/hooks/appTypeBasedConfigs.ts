@@ -70,7 +70,8 @@ const COMMUNITY = {
     passwordPreference: { available: true }
   },
   medication: { categories: { available: true, isMandatory: false }, groups: { available: true } },
-  filterComponent: { filterIcon: { available: true } }
+  filterComponent: { filterIcon: { available: true } },
+  village: { s: 'Village', p: 'Villages' }
 };
 
 // Configuration for NON_COMMUNITY app type
@@ -110,7 +111,8 @@ const NON_COMMUNITY = {
     passwordPreference: { available: false }
   },
   medication: { categories: { available: true, isMandatory: true }, groups: { available: true } },
-  filterComponent: { filterIcon: { available: true } }
+  filterComponent: { filterIcon: { available: true } },
+  village: { s: 'Village', p: 'Villages' }
 };
 
 // Fallback configuration when no app types are defined
@@ -130,9 +132,7 @@ const noAppTypes = {
 const useAppTypeConfigs = () => {
   const appTypesFromUser = useSelector(getAppTypeSelector);
   const userCountry = useSelector(countryIdSelector);
-  const nonCommunityLabelNames = useSelector(labelNameSelector);
-  const labelNames =
-    nonCommunityLabelNames && Object.keys(nonCommunityLabelNames).length ? nonCommunityLabelNames : commonLabels;
+  const labelNamesFromStore = useSelector(labelNameSelector);
 
   const appTypes = useMemo(() => {
     // use app types from user object for super admin
@@ -145,12 +145,29 @@ const useAppTypeConfigs = () => {
     return [];
   }, [appTypesFromUser, userCountry]);
 
-  return useMemo(
-    () =>
-      Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY)
-        ? { ...NON_COMMUNITY, appTypes, ...labelNames }
-        : { ...COMMUNITY, appTypes, ...(!appTypes || !appTypes.length ? noAppTypes : {}), ...communityLabelOverrides },
-    [appTypes, labelNames]
-  );
+  return useMemo(() => {
+    const hasDisplayValues =
+      labelNamesFromStore && Object.keys(labelNamesFromStore).length > 0;
+    // When both community and non-community exist, prefer non-community
+    const preferNonCommunity =
+      Array.isArray(appTypes) && appTypes.includes(APP_TYPE.NON_COMMUNITY);
+    // When displayValues present use them; when absent use app-type defaults (prefer non-community when both)
+    const resolvedLabelNames = hasDisplayValues
+      ? labelNamesFromStore
+      : preferNonCommunity
+        ? commonLabels
+        : communityLabelOverrides;
+
+    const baseConfig = preferNonCommunity ? NON_COMMUNITY : COMMUNITY;
+    const noAppTypesOverrides =
+      !appTypes || !appTypes.length ? noAppTypes : {};
+
+    return {
+      ...baseConfig,
+      ...noAppTypesOverrides,
+      appTypes,
+      ...resolvedLabelNames
+    };
+  }, [appTypes, labelNamesFromStore]);
 };
 export default useAppTypeConfigs;

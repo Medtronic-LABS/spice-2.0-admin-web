@@ -120,7 +120,19 @@ describe('User Saga', () => {
       expect(dispatched).toEqual([
         userActions.addUserTenantID(userTenantID),
         commonActions.setLabelName(country.displayValues as any),
-        userActions.loginSuccess({ ...loginSuccessResponseMockData, appTypes } as any)
+        userActions.loginSuccess({
+          email,
+          firstName,
+          lastName,
+          userId: id,
+          role: roles[0].name,
+          roleDetail: roles[0],
+          tenantId,
+          suiteAccess,
+          formDataId: organizations[0]?.formDataId,
+          countryId: undefined,
+          organizations
+        } as any)
       ]);
     });
 
@@ -159,9 +171,17 @@ describe('User Saga', () => {
         userActions.addUserTenantID(userTenantID),
         commonActions.setLabelName(country.displayValues as any),
         userActions.loginSuccess({
-          ...loginSuccessResponseMockData,
-          appTypes: [APPCONSTANTS.appTypes.community],
-          country: { ...country, appTypes }
+          email,
+          firstName,
+          lastName,
+          userId: id,
+          role: roles[0].name,
+          roleDetail: roles[0],
+          tenantId,
+          suiteAccess,
+          formDataId: organizations[0]?.formDataId,
+          countryId: undefined,
+          organizations
         } as any)
       ]);
     });
@@ -199,8 +219,17 @@ describe('User Saga', () => {
         userActions.addUserTenantID(userTenantID),
         commonActions.setLabelName(country.displayValues as any),
         userActions.loginSuccess({
-          ...loginSuccessResponseMockData,
-          appTypes: [APPCONSTANTS.appTypes.community]
+          email,
+          firstName,
+          lastName,
+          userId: id,
+          role: roles[0].name,
+          roleDetail: roles[0],
+          tenantId,
+          suiteAccess,
+          formDataId: organizations[0]?.formDataId,
+          countryId: undefined,
+          organizations
         } as any)
       ]);
     });
@@ -246,11 +275,17 @@ describe('User Saga', () => {
       expect(dispatched).toEqual([
         userActions.addUserTenantID(userTenantID),
         userActions.loginSuccess({
-          ...loginSuccessResponseMockData,
+          email,
+          firstName,
+          lastName,
+          userId: id,
           role: 'ADMIN',
           roleDetail: { name: 'ADMIN', suiteAccessName: 'cfr' },
-          country: { ...loggedInUserMockData.data.entity.country, displayValues: null },
-          appTypes: [APPCONSTANTS.appTypes.community]
+          tenantId,
+          suiteAccess,
+          formDataId: organizations[0]?.formDataId,
+          countryId: undefined,
+          organizations
         } as any)
       ]);
     });
@@ -304,10 +339,17 @@ describe('User Saga', () => {
         userActions.addUserTenantID(userTenantID),
         commonActions.setLabelName(country.displayValues as any),
         userActions.loginSuccess({
-          ...loginSuccessResponseMockData,
-          appTypes: [],
+          email,
+          firstName,
+          lastName,
+          userId: id,
           role: '',
-          roleDetail: undefined
+          roleDetail: undefined,
+          tenantId,
+          suiteAccess,
+          formDataId: organizations[0]?.formDataId,
+          countryId: undefined,
+          organizations
         } as any)
       ]);
     });
@@ -478,7 +520,6 @@ describe('User Saga', () => {
       ).toPromise();
       expect(fetchLoggedInUserSpy).toHaveBeenCalledWith();
       expect(dispatched).toEqual([
-        commonActions.setLabelName(country.displayValues as any),
         userActions.fetchLoggedInUserSuccess({
           email,
           firstName,
@@ -488,8 +529,6 @@ describe('User Saga', () => {
           roleDetail: roles[0],
           tenantId,
           formDataId: organizations[0]?.formDataId,
-          appTypes,
-          country,
           suiteAccess,
           countryId: undefined,
           organizations
@@ -534,27 +573,13 @@ describe('User Saga', () => {
         userId: id,
         role: roles[0].name,
         roleDetail: roles[0],
+        tenantId: '1',
         formDataId: organizations[0]?.formDataId,
-        country: {
-          appTypes,
-          id: 1,
-          name: 'Sierra Leone',
-          phoneNumberCode: '+21',
-          regionCode: '',
-          tenantId: 1,
-          unitMeasurement: null,
-          displayValues: country.displayValues
-        },
         suiteAccess,
         countryId: undefined,
-        organizations,
-        appTypes,
-        tenantId: '1'
+        organizations
       };
-      expect(dispatched).toEqual([
-        commonActions.setLabelName(country.displayValues as any),
-        userActions.fetchLoggedInUserSuccess(payload as any)
-      ]);
+      expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
     });
 
     it('Fetches details of the user who is logged in without tenantId and tenantId inside country', async () => {
@@ -596,19 +621,11 @@ describe('User Saga', () => {
         roleDetail: roles[0],
         tenantId: undefined,
         formDataId: organizations[0]?.formDataId,
-        appTypes,
-        country: {
-          ...country,
-          tenantId: undefined
-        },
         suiteAccess,
         countryId: undefined,
         organizations
       };
-      expect(dispatched).toEqual([
-        commonActions.setLabelName(country.displayValues as any),
-        userActions.fetchLoggedInUserSuccess(payload as any)
-      ]);
+      expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
     });
 
     it('Fetch details of the logged in user without country Id and displayValues', async () => {
@@ -650,22 +667,11 @@ describe('User Saga', () => {
         userId: id,
         role: 'ADMIN',
         roleDetail: { name: 'ADMIN', suiteAccessName: 'cfr' },
+        tenantId: '1',
         formDataId: organizations[0]?.formDataId,
-        country: {
-          appTypes: null,
-          id: null,
-          name: 'Sierra Leone',
-          phoneNumberCode: '+21',
-          regionCode: '',
-          tenantId: 1,
-          unitMeasurement: null,
-          displayValues: null
-        },
         suiteAccess,
         countryId: undefined,
-        organizations,
-        appTypes,
-        tenantId: '1'
+        organizations
       };
       expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
     });
@@ -718,22 +724,11 @@ describe('User Saga', () => {
         userId: id,
         role: '',
         roleDetail: { suiteAccessName: 'cfr' },
+        tenantId: '1',
         formDataId: organizations[0]?.formDataId,
-        country: {
-          appTypes: null,
-          id: null,
-          name: 'Sierra Leone',
-          phoneNumberCode: '+21',
-          regionCode: '',
-          tenantId: 1,
-          unitMeasurement: null,
-          displayValues: null
-        },
         suiteAccess,
         countryId: undefined,
-        organizations,
-        appTypes: [],
-        tenantId: '1'
+        organizations
       };
       expect(dispatched).toEqual([userActions.fetchLoggedInUserSuccess(payload as any)]);
     });

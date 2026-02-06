@@ -5,23 +5,28 @@ import sessionStorageServices from '../global/sessionStorageServices';
 import APPCONSTANTS from '../constants/appConstants';
 // import { getRegionDetailSelector } from '../store/region_com/selectors';
 
+export interface UseCountryIdParams {
+  regionId?: string;
+}
+
 /**
  * Custom hook to get the current country ID.
- * @return {number} The country ID from the Redux store or session storage
+ * When on a region-scoped route, pass regionId from URL so API calls use that context.
+ * @param params - Optional URL params: regionId, districtId, chiefdomId. When regionId is present, it is used as countryId.
+ * @return {number} The country ID from URL (regionId), or from Redux store or session storage
  */
-const useCountryId = () => {
+const useCountryId = (params?: UseCountryIdParams) => {
   const country = useSelector(countryIdSelector);
-  // const appTypes = useSelector(getAppTypeSelector);
-  // const communityCountryId = useSelector(getRegionDetailSelector)?.id;
+  const { regionId } = params || {};
 
-  return useMemo(
-    () =>
-      // (Array.isArray(appTypes) && appTypes.length === 1 && appTypes[0] === APP_TYPE.COMMUNITY
-      //   ? Number(communityCountryId)
-      // :
-      Number(country?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID)),
-    [country?.id]
-  );
+  return useMemo(() => {
+    if (regionId) {
+      return Number(regionId);
+    }
+    return (
+      Number(country?.id) || Number(sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID))
+    );
+  }, [country?.id, regionId]);
 };
 
 export default useCountryId;

@@ -9,21 +9,11 @@ import store from './store';
 import * as serviceWorker from './serviceWorker';
 import { setupInterceptors } from './global/interceptors';
 import ErrorBoundary from './components/errorBoundary/ErrorBoundary';
-import localStorageService from './global/localStorageServices';
-import APPCONSTANTS, { APP_TYPE_NAME } from './constants/appConstants';
-import { setAppType } from './store/user/actions';
-import { jsonParse } from './utils/commonUtils';
+import APPCONSTANTS from './constants/appConstants';
 import sessionStorageServices from './global/sessionStorageServices';
 import { fetchCountryDetailReq } from './store/region/actions';
 
 setupInterceptors(store);
-
-const storedData = localStorageService.getItem(APP_TYPE_NAME);
-const appTypes = jsonParse(storedData) || [];
-
-if (!!appTypes && appTypes.length) {
-  store.dispatch(setAppType(appTypes));
-}
 
 if (sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID)) {
   store.dispatch(fetchCountryDetailReq({ id: sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID) }));
