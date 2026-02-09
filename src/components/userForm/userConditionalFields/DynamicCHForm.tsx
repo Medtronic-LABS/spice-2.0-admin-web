@@ -15,8 +15,6 @@ export const DynamicCHForm = ({
   isHF,
   isEdit,
   isProfile,
-  peerSupervisors,
-  peerSupervisorLoading,
   autoFetched,
   villagesLoading,
   villages,
@@ -28,11 +26,6 @@ export const DynamicCHForm = ({
   isHFCreate,
   showVillages
 }: any) => {
-  const {
-    user: {
-      supervisor: { label, error: supervisorError }
-    }
-  } = useAppTypeConfigs();
   const { isCHPCHWSelected } = useUserFormUtils();
   const { healthFacilityId } = useParams<IMatchParams>();
 
@@ -70,27 +63,6 @@ export const DynamicCHForm = ({
     const selectedRoles = formValues?.selectedRoles || [];
     return isEdit && isCHPCHWSelected(selectedRoles);
   }, [isEdit, isCHPCHWSelected, formValues?.selectedRoles]);
-
-  // Memoize the supervisor field render function
-  const renderSupervisorField = useCallback(
-    ({ input, meta }: any) => (
-      <SelectInput
-        {...input}
-        {...meta}
-        label={label}
-        errorLabel={supervisorError}
-        labelKey='name'
-        valueKey='id'
-        disabled={isProfile}
-        menuPlacement={'auto'}
-        options={peerSupervisors[index]}
-        loadingOptions={peerSupervisorLoading}
-        error={isError(meta)}
-        isModel={true}
-      />
-    ),
-    [index, isError, isProfile, label, peerSupervisorLoading, peerSupervisors, supervisorError]
-  );
 
   // Memoize the existing villages field render function
   const renderExistingVillagesField = useCallback(
@@ -172,9 +144,6 @@ export const DynamicCHForm = ({
 
   return (
     <>
-      <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
-        <Field name={`${name}.supervisor`} type='text' validate={required} render={renderSupervisorField} />
-      </div>
       {(autoFetched[index] || (isEdit && isHF)) && showVillages && !!mandatoryVillages.length && (
         <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
           <Field

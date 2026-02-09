@@ -752,6 +752,7 @@ describe('HF sagas', () => {
 
   describe('Fetch Health Facility Types: FETCH_HEALTH_FACILITY_TYPES_REQUEST', () => {
     it('Fetch health facility types and dispatch success', async () => {
+      const countryId = 1;
       const successCb = jest.fn();
       const hfTypesSpy = jest.spyOn(hfService, 'fetchHealthFacilityTypes').mockImplementation(
         () =>
@@ -767,15 +768,17 @@ describe('HF sagas', () => {
         fetchHFTypesSaga,
         {
           type: ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST,
+          countryId,
           successCb
         }
       ).toPromise();
-      expect(hfTypesSpy).toHaveBeenCalledWith();
+      expect(hfTypesSpy).toHaveBeenCalledWith(countryId);
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchHFTypesSuccess(hfTypeList)]);
     });
 
     it('Fetch health facility types and dispatch failure', async () => {
+      const countryId = 1;
       const error = new Error('Failed to HF types and dispatch failure');
       const failureCb = jest.fn();
       const hfTypesSpy = jest
@@ -789,10 +792,11 @@ describe('HF sagas', () => {
         fetchHFTypesSaga,
         {
           type: ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST,
+          countryId,
           failureCb
         }
       ).toPromise();
-      expect(hfTypesSpy).toHaveBeenCalledWith();
+      expect(hfTypesSpy).toHaveBeenCalledWith(countryId);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchHFTypesFailure(error)]);
     });
@@ -1173,7 +1177,8 @@ describe('HF sagas', () => {
         {
           dispatch: (action) => dispatched.push(action)
         },
-        fetchCultureList
+        fetchCultureList,
+        { type: ACTION_TYPES.FETCH_CULTURE_LIST_REQUEST }
       ).toPromise();
       expect(hfCultureListSpy).toHaveBeenCalledWith();
       expect(dispatched).toEqual([hfActions.fetchCultureListSuccess(hfCultureList)]);
@@ -1189,7 +1194,8 @@ describe('HF sagas', () => {
         {
           dispatch: (action) => dispatched.push(action)
         },
-        fetchCultureList
+        fetchCultureList,
+        { type: ACTION_TYPES.FETCH_CULTURE_LIST_REQUEST }
       ).toPromise();
       expect(hfCultureListSpy).toHaveBeenCalledWith();
       expect(dispatched).toEqual([hfActions.fetchCultureListFailure()]);

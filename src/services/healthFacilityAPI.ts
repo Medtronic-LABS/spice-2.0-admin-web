@@ -91,10 +91,10 @@ export const activateHF = ({
     data: { id, tenantId, linkedVillageIds }
   });
 
-export const fetchHealthFacilityTypes = () =>
+export const fetchHealthFacilityTypes = (countryId: number) =>
   axios({
-    method: 'POST',
-    url: '/admin-service/healthfacility-types'
+    method: 'GET',
+    url: `/admin-service/healthfacility-types-by-country/${countryId}`
   });
 
 export const addHFUser = (data: IHFUserPayLoad) =>

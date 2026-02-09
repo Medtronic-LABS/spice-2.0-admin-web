@@ -40,11 +40,8 @@ const COMMUNITY = {
     { value: 'Non-Binary', label: 'Non-Binary' }
   ],
   hfDetails: {
-    supervisor: { s: 'Linked Peer Supervisor', p: 'Linked Peer Supervisors' },
-    phuFocalPersonName: { label: 'PHU Focal Person Name', error: 'PHU focal person name' },
-    phuFocalPersonNumber: { label: 'PHU Focal Person Number', error: 'PHU focal person number' },
     map: { available: true },
-    language: { disabled: true },
+    language: { disabled: false },
     linkedVillages: { required: true },
     city: { isCityVillage: true, isRequired: true }
   },
@@ -54,15 +51,11 @@ const COMMUNITY = {
 
   user: {
     timezone: { available: false },
-    culture: { available: true, disabled: true },
+    culture: { available: true, disabled: false },
     redrisk: { available: false },
     designation: { available: false },
     dhisId: { available: true },
-    community: { available: false },
-    supervisor: {
-      label: 'Select Peer Supervisor',
-      error: 'select peer supervisor'
-    }
+    community: { available: false }
   },
   userList: {
     filters: { available: true },
@@ -82,9 +75,6 @@ const NON_COMMUNITY = {
     { value: 'Female', label: 'Female' }
   ],
   hfDetails: {
-    supervisor: { s: 'Linked Community Health Assistant', p: 'Linked Community Health Assistants' },
-    phuFocalPersonName: { label: 'Facility Incharge', error: 'facility incharge' },
-    phuFocalPersonNumber: { label: 'Facility Incharge No', error: 'facility incharge no' },
     map: { available: false },
     language: { disabled: false },
     linkedVillages: { required: false },
@@ -99,11 +89,7 @@ const NON_COMMUNITY = {
     redrisk: { available: true },
     designation: { available: true },
     dhisId: { available: false },
-    community: { available: true },
-    supervisor: {
-      label: 'Community Health Assistant',
-      error: 'Community health assistant'
-    }
+    community: { available: true }
   },
   userList: {
     filters: { available: true },

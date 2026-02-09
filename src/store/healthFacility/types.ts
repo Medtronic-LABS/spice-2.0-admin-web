@@ -77,8 +77,8 @@ export interface IHealthFacility {
   name: string;
   active?: boolean;
   type: string;
-  phuFocalPersonName: string;
-  phuFocalPersonNumber: string;
+  phuFocalPersonName?: string;
+  phuFocalPersonNumber?: string;
   address: string;
   district: IDistrict;
   chiefdom: IChiefdom;
@@ -113,8 +113,8 @@ export interface IHealthFacilityPost {
   appTypes: string[];
   name: string;
   type: string;
-  phuFocalPersonName: string;
-  phuFocalPersonNumber: string;
+  phuFocalPersonName?: string;
+  phuFocalPersonNumber?: string;
   address: string;
   district: IDistrict;
   chiefdom: IChiefdom;
@@ -462,6 +462,7 @@ export interface IActivateHFFailure {
 
 export interface IFetchHFTypesRequest {
   type: typeof ACTION_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST;
+  countryId: number;
   successCb?: (data: IObjectData[]) => void;
   failureCb?: (error: Error) => void;
 }
@@ -808,6 +809,7 @@ export interface ICountryCode {
 
 export interface IFetchCultureListRequest {
   type: typeof ACTION_TYPES.FETCH_CULTURE_LIST_REQUEST;
+  failureCb?: (error: Error) => void;
 }
 
 export interface IFetchCultureListSuccess {

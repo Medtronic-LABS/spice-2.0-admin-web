@@ -203,6 +203,7 @@ const APPCONSTANTS = {
   HEALTH_FACILITY_DELETE_TITLE: 'Delete Module_Name',
 
   FETCH_CITY_LIST_FAILURE: 'Unable to load city list. Please try after sometime',
+  FETCH_CULTURE_LIST_FAILURE: 'Unable to load language/culture list. Please try again after sometime.',
   CLINICAL_WORKFLOW_FETCH_FAILURE: 'Unable to load the clinical workflows. Please try after sometime.',
   WORKFLOW_SELECT_ERROR_MESSAGE: 'Please select workflow',
   CUSTOMIZED_WORKFLOW: 'Customized Workflow',

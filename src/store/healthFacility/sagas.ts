@@ -29,7 +29,8 @@ import {
   IWorkflow,
   IFetchCityListRequest,
   IFetchHFStatusRequest,
-  IActivateHFRequest
+  IActivateHFRequest,
+  IFetchCultureListRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -283,11 +284,11 @@ export function* activateHFRequest({ data, successCb, failureCb }: IActivateHFRe
 /*
   Worker Saga: Fired on FETCH_HEALTH_FACILITY_TYPES_REQUEST action
 */
-export function* fetchHFTypesSaga({ successCb, failureCb }: IFetchHFTypesRequest): SagaIterator {
+export function* fetchHFTypesSaga({ countryId, successCb, failureCb }: IFetchHFTypesRequest): SagaIterator {
   try {
     const {
       data: { entity: list }
-    } = yield call(hfService.fetchHealthFacilityTypes as any);
+    } = yield call(hfService.fetchHealthFacilityTypes as any, countryId);
     successCb?.(list);
     yield put(fetchHFTypesSuccess(list));
   } catch (e) {
@@ -684,13 +685,16 @@ export function* validateLinkedRestrictionsSagaRequest({
 /*
   Worker Saga: Fired on FETCH_CULTURE_LIST_REQUEST action
 */
-export function* fetchCultureList(): SagaIterator {
+export function* fetchCultureList(action: IFetchCultureListRequest): SagaIterator {
   try {
     const {
       data: { entity: cultureList }
     } = yield call(hfService.fetchCultureList);
     yield put(fetchCultureListSuccess(cultureList || []));
   } catch (e) {
+    if (action?.failureCb && typeof action.failureCb === 'function') {
+      action.failureCb(e as Error);
+    }
     yield put(fetchCultureListFailure());
   }
 }

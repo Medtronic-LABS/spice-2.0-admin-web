@@ -99,8 +99,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
     appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
+    village: { s: villageSName, p: villagePName },
     healthFacility: { s: healthFacilitySName },
-    hfDetails: { supervisor: supervisorLabel },
     userList: {
       activeToogle: { available: showActiveToggle }
     }
@@ -109,30 +109,16 @@ const HealthFacilitySummary = (): React.ReactElement => {
     () => [
       { label: `${healthFacilitySName} Name`, value: healthFacility?.name },
       { label: `${healthFacilitySName} Type`, value: healthFacility?.type },
-      {
-        label: `${isCommunity ? 'PHU Focal Person Name' : 'Facility Incharge'}`,
-        value: healthFacility?.phuFocalPersonName
-      },
-      {
-        label: `${isCommunity ? 'PHU Focal Person No' : 'Facility Incharge No'}`,
-        value: healthFacility?.phuFocalPersonNumber
-      },
       { label: districtSName, value: healthFacility?.district?.name },
       { label: chiefdomSName, value: healthFacility?.chiefdom?.name },
       { label: 'Address', value: healthFacility?.address },
-      { label: 'City/Village', value: healthFacility?.cityName },
+      { label: villageSName, value: healthFacility?.cityName },
       { label: 'Latitude', value: healthFacility?.latitude },
       { label: 'Longitude', value: healthFacility?.longitude },
-      { label: 'Facility ID', value: healthFacility?.postalCode },
+      { label: 'Facility ID (Postal Code)', value: healthFacility?.postalCode },
       { label: 'Language', value: healthFacility?.language },
       {
-        label: supervisorLabel,
-        value: healthFacility?.peerSupervisors,
-        subKey: 'name',
-        style: { col: 'col-12', subCol: 'col-3 pe-1dot25' }
-      },
-      {
-        label: 'Linked Villages',
+        label: `Linked ${villagePName}`,
         value: healthFacility?.linkedVillages,
         subKey: 'name',
         style: { col: 'col-12', subCol: 'col-3 pe-1dot25' }
@@ -687,7 +673,9 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   key={typeof label === 'string' ? label : index}
                   className={`${style?.col ? style.col : 'col-lg-4 col-sm-6'}`}
                 >
-                  <div className='fs-0dot875 charcoal-grey-text'>{typeof label === 'string' ? label : label.s}</div>
+                  <div className='fs-0dot875 charcoal-grey-text'>
+                    {typeof label === 'string' ? label : (label as { s?: string })?.s ?? ''}
+                  </div>
                   {Array.isArray(value) ? (
                     <ol className='row'>
                       {[...value].map((data: IPeerSupervisor | IVillages) => (

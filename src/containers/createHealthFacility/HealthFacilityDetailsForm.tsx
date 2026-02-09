@@ -1,6 +1,6 @@
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Field, FieldMetaState } from 'react-final-form';
+import { Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
@@ -9,7 +9,7 @@ import SelectInput from '../../components/formFields/SelectInput';
 import TextInput from '../../components/formFields/TextInput';
 import MapWrapper from '../../components/map/MapContainer';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
-import APPCONSTANTS, { SL_REGION } from '../../constants/appConstants';
+import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
@@ -22,12 +22,10 @@ import { fetchDistrictDetailReq, fetchDistrictListRequest } from '../../store/di
 import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
 import {
   clearHFFormData,
-  clearSupervisorList,
   clearVillageList,
   fetchCityListRequest,
   fetchCultureListRequest,
   fetchHFTypesRequest,
-  fetchPeerSupervisorListRequest,
   fetchUnlinkedVillagesRequest,
   fetchVillagesListRequest
 } from '../../store/healthFacility/actions';
@@ -36,8 +34,6 @@ import {
   cultureLoadingSelector,
   hfTypesLoadingSelector,
   hfTypesSelector,
-  peerSupervisorListSelector,
-  peerSupervisorLoadingSelector,
   unlinkedVillagesListSelector,
   unlinkedVillagesLoadingSelector,
   villagesListSelector,
@@ -54,14 +50,11 @@ import {
   normalizePhone,
   required,
   validateLatitude,
-  validateLongitude,
-  validateMobile,
-  validateName
+  validateLongitude
 } from '../../utils/validation';
 import Workflows from '../healthFacility/Workflows';
 import './HealthFacilityDetails.scss';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
-import { errorMsgs } from '../../constants/erroMsgs';
 
 interface IAddUserFormProps {
   formName: string;
@@ -99,8 +92,6 @@ const HealthFacilityDetailsForm = ({
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const hfTypesList = useSelector(hfTypesSelector);
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
-  const peerSupervisorList = useSelector(peerSupervisorListSelector);
-  const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
   const unlinkedVillagesList = useSelector(unlinkedVillagesListSelector);
   const unlinkedVillagesLoading = useSelector(unlinkedVillagesLoadingSelector);
   const districtList = useSelector(getDistrictListSelector);
@@ -119,11 +110,9 @@ const HealthFacilityDetailsForm = ({
     appTypes,
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
+    village: { s: villageSName, p: villagePName },
     hfDetails: {
-      supervisor: { s: supervisorSName },
       map: { available: mapAvailable },
-      phuFocalPersonName: { label: phuFocalPersonNameLabel, error: phuFocalPersonNameError },
-      phuFocalPersonNumber: { label: phuFocalPersonNumberLabel, error: phuFocalPersonNumberError },
       language: { disabled: isLanguageDisabled },
       linkedVillages: { required: isLinkedVillagesRequired },
       city: { isCityVillage, isRequired: isCityRequired }
@@ -217,16 +206,29 @@ const HealthFacilityDetailsForm = ({
   // Culture list fetch
   useEffect(() => {
     if (!languages.length) {
-      dispatch(fetchCultureListRequest());
+      dispatch(
+        fetchCultureListRequest({
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.FETCH_CULTURE_LIST_FAILURE)
+            )
+        })
+      );
     }
   }, [dispatch, languages.length]);
 
   // Health Facility Types fetch
   useEffect(() => {
-    if (!hfTypesList.length) {
-      dispatch(fetchHFTypesRequest({}));
+    if (!hfTypesList.length && countryId) {
+      const validCountryId = Number(countryId);
+      if (isNaN(validCountryId) || validCountryId <= 0) {
+        console.error('Invalid country ID for fetching health facility types');
+        toastCenter.error(APPCONSTANTS.ERROR, 'Unable to fetch health facility types: Invalid country');
+        return;
+      }
+      dispatch(fetchHFTypesRequest({ countryId: validCountryId }));
     }
-  }, [dispatch, hfTypesList.length]);
+  }, [dispatch, hfTypesList.length, countryId]);
 
   // District fetch
   useEffect(() => {
@@ -234,15 +236,6 @@ const HealthFacilityDetailsForm = ({
       dispatch(fetchDistrictListRequest({ countryId, tenantId, isActive: true }));
     }
   }, [countryId, dispatch, isEdit, tenantId]);
-
-  // Peer Supervisor fetch
-  useEffect(() => {
-    const selectedTenantId = form.getState().values?.healthFacility?.chiefdom?.tenantId;
-    if (selectedTenantId) {
-      dispatch(fetchPeerSupervisorListRequest({ tenantIds: [selectedTenantId], appTypes }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values?.healthFacility?.chiefdom?.tenantId]);
 
   // Chiefdom fetch
   useEffect(() => {
@@ -387,14 +380,6 @@ const HealthFacilityDetailsForm = ({
     handleSubmit(geoLocation.lat, geoLocation.long);
   };
 
-  const getErrorLabel = (meta: FieldMetaState<string>) => {
-    if (meta.error === errorMsgs.PH_NO_STARTS_WITH_ERROR) {
-      return '';
-    } else {
-      return phuFocalPersonNumberError;
-    }
-  };
-
   return (
     <>
       {isNextClicked ? (
@@ -452,43 +437,6 @@ const HealthFacilityDetailsForm = ({
               }}
             />
           </div>
-          <div className={columnStyle}>
-            <Field
-              name={`${formName}.phuFocalPersonName`}
-              type='text'
-              validate={composeValidators(required, validateName)}
-              render={({ input, meta }) => (
-                <TextInput
-                  {...input}
-                  label={phuFocalPersonNameLabel}
-                  errorLabel={phuFocalPersonNameError}
-                  capitalize={true}
-                  disabled={isActivating}
-                  error={(meta.touched && meta.error) || undefined}
-                />
-              )}
-            />
-          </div>
-          <div className={`${columnStyle} ${isEdit && !isCommunity ? 'col-md-5' : ''}`}>
-            <Field
-              name={`${formName}.phuFocalPersonNumber`}
-              type='text'
-              validate={composeValidators(required, (value: string) =>
-                validateMobile(value, SL_REGION.includes(regionDetails.name))
-              )}
-              parse={(value) => normalizePhone(value, '', 8)}
-              render={({ input, meta }) => (
-                <TextInput
-                  {...input}
-                  label={phuFocalPersonNumberLabel}
-                  errorLabel={getErrorLabel(meta)}
-                  capitalize={true}
-                  disabled={isActivating}
-                  error={(meta.touched && meta.error) || undefined}
-                />
-              )}
-            />
-          </div>
           <div className={`col-12 ${isEdit ? (isCommunity ? 'col-md-8' : 'col-md-7') : 'col-lg-6'}`}>
             <Field
               name={`${formName}.address`}
@@ -526,11 +474,9 @@ const HealthFacilityDetailsForm = ({
                     error={(meta.touched && meta.error) || undefined}
                     onChange={(value: any) => {
                       form.change(`${formName}.chiefdom`, undefined);
-                      form.change(`${formName}.peerSupervisors`, undefined);
                       form.change(`${formName}.linkedVillages`, undefined);
                       form.change(`${formName}.city`, undefined);
                       dispatch(clearVillageList());
-                      dispatch(clearSupervisorList());
                       input.onChange(value);
                     }}
                   />
@@ -556,7 +502,6 @@ const HealthFacilityDetailsForm = ({
                   loadingOptions={chiefdomLoading}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(value: any) => {
-                    form.change(`${formName}.peerSupervisors`, undefined);
                     form.change(`${formName}.city`, undefined);
                     form.change(`${formName}.linkedVillages`, undefined);
                     // clear hf for reports while changing chiefdom
@@ -577,8 +522,8 @@ const HealthFacilityDetailsForm = ({
                 <SelectInput
                   {...(input as any)}
                   {...(meta as any)}
-                  label={isCityVillage ? 'City/Village' : 'City'}
-                  errorLabel={isCityVillage ? 'city/village' : 'city'}
+                  label={isCityVillage ? villageSName : 'City'}
+                  errorLabel={isCityVillage ? villageSName.toLowerCase() : 'city'}
                   labelKey='name'
                   valueKey={isCityVillage ? 'id' : 'value'}
                   disabled={isActivating}
@@ -605,8 +550,8 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label='Facility ID'
-                  errorLabel='facility id'
+                  label='Facility ID (Postal Code)'
+                  errorLabel='facility id (postal code)'
                   disabled={isEdit || isActivating}
                   error={(meta.touched && meta.error) || undefined}
                 />
@@ -636,35 +581,6 @@ const HealthFacilityDetailsForm = ({
           </div>
           <div className={columnStyle}>
             <Field
-              name={`${formName}.peerSupervisors`}
-              type='text'
-              render={({ input, meta }) => (
-                <MultiSelect
-                  {...(input as any)}
-                  label={supervisorSName}
-                  labelKey='name'
-                  valueKey='id'
-                  isShowLabel={true}
-                  isSelectAll={true}
-                  menuPlacement={'auto'}
-                  isDisabled={isActivating}
-                  placeholder=''
-                  isModel={true}
-                  isMulti={true}
-                  options={peerSupervisorList.list}
-                  loading={peerSupervisorLoading}
-                  controlStyles={{
-                    borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',
-                    '&:focus-visible': {
-                      borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c'
-                    }
-                  }}
-                />
-              )}
-            />
-          </div>
-          <div className={columnStyle}>
-            <Field
               name={`${formName}.linkedVillages`}
               type='text'
               validate={isLinkedVillagesRequired ? required : undefined}
@@ -672,8 +588,8 @@ const HealthFacilityDetailsForm = ({
                 return (
                   <MultiSelect
                     {...(input as any)}
-                    label='Linked Villages'
-                    errorLabel='linked villages'
+                    label={`Linked ${villagePName}`}
+                    errorLabel={`Linked ${villagePName}`}
                     labelKey='name'
                     valueKey='id'
                     required={isLinkedVillagesRequired}

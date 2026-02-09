@@ -302,7 +302,7 @@ describe('HealthFacilityList Component', () => {
       </Provider>
     );
 
-    expect(fetchHFTypesRequestSpy).toHaveBeenCalledWith({});
+    expect(fetchHFTypesRequestSpy).toHaveBeenCalledWith({ countryId: 1 });
   });
 
   it('dispatches fetchDistrictListRequest when districtList is empty on mount', () => {

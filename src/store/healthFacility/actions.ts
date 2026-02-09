@@ -316,10 +316,12 @@ export const fetchUserDetailFailure = (error: Error): IFetchUserDetailFailure =>
 });
 
 export const fetchHFTypesRequest = ({
+  countryId,
   failureCb,
   successCb
 }: Omit<IFetchHFTypesRequest, 'type'>): IFetchHFTypesRequest => ({
   type: HF_TYPES.FETCH_HEALTH_FACILITY_TYPES_REQUEST,
+  countryId,
   failureCb,
   successCb
 });
@@ -761,8 +763,11 @@ export const clearHealthFacilityDetail = () => ({
   type: HF_TYPES.CLEAR_HEALTH_FACILITY_DETAIL
 });
 
-export const fetchCultureListRequest = (): IFetchCultureListRequest => ({
-  type: HF_TYPES.FETCH_CULTURE_LIST_REQUEST
+export const fetchCultureListRequest = (
+  params?: { failureCb?: (error: Error) => void }
+): IFetchCultureListRequest => ({
+  type: HF_TYPES.FETCH_CULTURE_LIST_REQUEST,
+  ...(params && { failureCb: params.failureCb })
 });
 
 export const fetchCultureListSuccess = (payload: IFetchCultureListSuccessPayload): IFetchCultureListSuccess => ({

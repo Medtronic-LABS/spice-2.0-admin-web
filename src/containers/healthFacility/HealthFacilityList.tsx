@@ -136,8 +136,8 @@ const HealthFacilityList = (): React.ReactElement => {
   );
 
   useEffect(() => {
-    if (!hfTypesList.length) {
-      dispatch(fetchHFTypesRequest({}));
+    if (!hfTypesList.length && countryId) {
+      dispatch(fetchHFTypesRequest({ countryId }));
     }
     setFilters({ ...filters, chiefdomIds: [] });
     if (!districtList.length) {

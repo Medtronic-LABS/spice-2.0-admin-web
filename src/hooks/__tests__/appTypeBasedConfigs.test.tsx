@@ -62,10 +62,6 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.district).toEqual({ s: 'District', p: 'Districts' });
     expect(result.current.chiefdom).toEqual({ s: 'Chiefdom', p: 'Chiefdoms' });
     expect(result.current.GENDER_OPTIONS).toHaveLength(3);
-    expect(result.current.hfDetails.supervisor).toEqual({
-      s: 'Linked Peer Supervisor',
-      p: 'Linked Peer Supervisors'
-    });
     expect(result.current.hfDetails.map.available).toBe(true);
     expect(result.current.user.dhisId.available).toBe(true);
   });
@@ -80,10 +76,6 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.district).toEqual({ s: 'County', p: 'Counties' });
     expect(result.current.chiefdom).toEqual({ s: 'Sub County', p: 'Sub Counties' });
     expect(result.current.GENDER_OPTIONS).toHaveLength(2);
-    expect(result.current.hfDetails.supervisor).toEqual({
-      s: 'Linked Community Health Assistant',
-      p: 'Linked Community Health Assistants'
-    });
     expect(result.current.hfDetails.map.available).toBe(false);
     expect(result.current.user.dhisId.available).toBe(false);
   });
@@ -152,10 +144,10 @@ describe('useAppTypeConfigs', () => {
 
     const { result } = renderHook(() => useAppTypeConfigs());
 
-    expect(result.current.hfDetails.phuFocalPersonName.label).toBe('PHU Focal Person Name');
     expect(result.current.hfDetails.linkedVillages.required).toBe(true);
     expect(result.current.hfDetails.city.isRequired).toBe(true);
-    expect(result.current.user.supervisor.label).toBe('Select Peer Supervisor');
+    expect(result.current.hfDetails.city.isCityVillage).toBe(true);
+    expect(result.current.hfDetails.map.available).toBe(true);
   });
 
   it('should return NON_COMMUNITY hfDetails when appTypes includes NON_COMMUNITY', () => {
@@ -163,10 +155,10 @@ describe('useAppTypeConfigs', () => {
 
     const { result } = renderHook(() => useAppTypeConfigs());
 
-    expect(result.current.hfDetails.phuFocalPersonName.label).toBe('Facility Incharge');
     expect(result.current.hfDetails.linkedVillages.required).toBe(false);
     expect(result.current.hfDetails.city.isRequired).toBe(false);
-    expect(result.current.user.supervisor.label).toBe('Community Health Assistant');
+    expect(result.current.hfDetails.city.isCityVillage).toBe(false);
+    expect(result.current.hfDetails.map.available).toBe(false);
   });
 
   it('should include userList and medication config', () => {

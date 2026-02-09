@@ -271,14 +271,15 @@ describe('Health Facility APIs', () => {
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(data);
   });
 
-  it(`fetchHealthFacilityTypes sends a POST request
-    to /admin-service/healthfacility-types with correct data`, async () => {
-    mockAxios.onPost('/admin-service/healthfacility-types').reply(200, {});
+  it(`fetchHealthFacilityTypes sends a GET request
+    to admin-service/healthfacility-types-by-country/{countryId}`, async () => {
+    const countryId = 1;
+    mockAxios.onGet(`admin-service/healthfacility-types-by-country/${countryId}`).reply(200, {});
 
-    await fetchHealthFacilityTypes();
+    await fetchHealthFacilityTypes(countryId);
 
-    expect(mockAxios.history.post.length).toBe(1);
-    expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility-types');
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe(`/admin-service/healthfacility-types-by-country/${countryId}`);
   });
 
   it('fetchHFUserDetail sends a POST request to /user-service/user/details with correct data', async () => {
