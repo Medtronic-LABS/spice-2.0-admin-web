@@ -26,7 +26,7 @@ export const columnDef = ({
     {
       id: 2,
       name: 'username',
-      label: 'Email ID',
+      label: 'Username',
       width: '21%'
     },
     {

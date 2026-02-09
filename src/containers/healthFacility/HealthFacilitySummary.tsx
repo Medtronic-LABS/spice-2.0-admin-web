@@ -716,7 +716,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
                   cellFormatter: formatName
                 },
                 { id: 2, name: 'role', label: 'ROLE', width: '17%', cellFormatter: formatRoles },
-                { id: 3, name: 'username', label: 'EMAIL ID', width: '20%' },
+                { id: 3, name: 'username', label: 'USERNAME', width: '20%' },
                 { id: 4, name: 'gender', label: 'GENDER', width: '9%' },
                 {
                   id: 5,

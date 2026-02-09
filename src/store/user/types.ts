@@ -776,6 +776,7 @@ export interface IUserPayload {
   gender: string;
   username: string;
   phoneNumber: string;
+  email: string;
   userUnitId?: string;
   culture?: string;
   countryCode?: string;

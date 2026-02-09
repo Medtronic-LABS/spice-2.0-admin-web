@@ -41,7 +41,34 @@ export const updateUser = (payload: IUpdateUserDetail) =>
     url: '/user-service/user/update',
     data: payload
   });
-
+  export const fetchUserByUsername = ({
+    username,
+    tenantId,
+    parentOrganizationId,
+    ignoreTenantId,
+    isSiteUsers,
+    appTypes
+  }: {
+    appTypes: string[];
+    username: string;
+    tenantId?: number | undefined;
+    parentOrganizationId?: string;
+    ignoreTenantId?: string;
+    isSiteUsers?: boolean;
+  }) =>
+    axios({
+      method: 'POST',
+      url: '/user-service/user/validate-user',
+      data: {
+        email: '',
+        appTypes,
+        username,
+        parentOrganizationId,
+        ignoreTenantId,
+        isSiteUsers,
+        tenantId
+      }
+    });
 export const fetchUserByEmail = ({
   email,
   tenantId,

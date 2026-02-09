@@ -67,6 +67,7 @@ import {
   validateName
 } from '../../utils/validation';
 import EmailField from '../formFields/EmailField';
+import UsernameField from '../formFields/UsernameField';
 import PhoneNumberField from '../formFields/PhoneNumber';
 import Radio from '../formFields/Radio';
 import SelectInput from '../formFields/SelectInput';
@@ -668,7 +669,7 @@ const UserForm = ({
    * @param {any} emailFieldRef - The ref object for the email field
    * @returns {React.ReactElement} The rendered action buttons
    */
-  const actionButtons = (fields: any, index: number, isLastChild: boolean, emailFieldRef: any) =>
+  const actionButtons = (fields: any, index: number, isLastChild: boolean, emailFieldRef: any, usernameFieldRef: any) =>
     !disableOptions && (
       <div className={`col-12 d-flex justify-content-between mt-0dot5 ${isLastChild ? '' : 'mb-2'}`}>
         {handleShowAddIcon(isLastChild, fields, index)}
@@ -680,6 +681,7 @@ const UserForm = ({
             newAutoFetched[index] = false;
             setAutoFetched(newAutoFetched);
             emailFieldRef.current?.resetEmailField?.();
+            usernameFieldRef.current?.resetUsernameField?.();
             resetAdminForm(fields, index);
           }}
         >
@@ -1038,6 +1040,7 @@ const UserForm = ({
         fields.map((name: string, index: number) => {
           const isLastChild = (fields?.length || 0) === index + 1;
           const emailFieldRef = React.createRef<{ resetEmailField?: () => void }>();
+          const usernameFieldRef = React.createRef<{ resetUsernameField?: () => void }>();
           // SUITE options
           const suiteAccess = getSuiteAccessList(appTypeBasedRoles);
           const {
@@ -1530,6 +1533,34 @@ const UserForm = ({
                   />
                 </div>
                 <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-12'} `}>
+                  <UsernameField
+                    ref={usernameFieldRef}
+                    formName={formName}
+                    index={index}
+                    name={name}
+                    isEdit={isEdit}
+                    form={form}
+                    isDisabled={autoFetched[index] || isActivating}
+                    entityName={entityName}
+                    clearEmail={clearEmail}
+                    enableAutoPopulate={enableAutoPopulate}
+                    isHF={isHF}
+                    isHFCreate={isHFCreate}
+                    isSiteUser={isSiteUser}
+                    onFindExistingUser={(user: IUser) => autoPopulateUserData(user, index)}
+                    parentOrgId={
+                      isSiteUser && !parentOrgId
+                        ? form.getState()?.values?.users?.[0]?.healthfacility?.chiefdom?.tenantId
+                        : parentOrgId
+                    }
+                    ignoreTenantId={
+                      isSiteUser && !ignoreTenantId
+                        ? form.getState()?.values?.users?.[0]?.healthfacility?.tenantId
+                        : ignoreTenantId
+                    }
+                  />
+                </div>
+                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-12'} `}>
                   <EmailField
                     ref={emailFieldRef}
                     formName={formName}
@@ -1794,7 +1825,7 @@ const UserForm = ({
                   reportUserOnlyInAdminList={isReportOrInsightUser}
                   isCommunity={isCommunity}
                 />
-                {actionButtons(fields, index, isLastChild, emailFieldRef)}
+                {actionButtons(fields, index, isLastChild, emailFieldRef, usernameFieldRef)}
               </div>
               {divider(isLastChild)}
             </span>

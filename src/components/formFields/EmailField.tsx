@@ -239,7 +239,7 @@ const EmailField = forwardRef(
 
     return (
       <Field
-        name={`${name}.username`}
+        name={`${name}.email`}
         type='text'
         validate={composeValidators(required, validateEmail, validateIsEmailExist, validateDuplication)}
         render={({ input, meta }: FieldRenderProps<string>) => {

@@ -97,6 +97,7 @@ export const getUserPayload = ({
       gender: user.gender,
       username: user.username,
       phoneNumber: user.phoneNumber,
+      email: user.email,
       culture: user?.culture || null,
       countryCode: user?.countryCode?.phoneNumberCode || null,
       country: { id: Number(countryId) },
