@@ -54,7 +54,7 @@ describe('EmailField', () => {
   const mockForm: any = {
     getState: () => ({
       values: {
-        users: [{ email: 'test@example.com' }]
+        users: [{ email: 'test@example.com', username: 'testuser' }]
       }
     }),
     change: jest.fn()

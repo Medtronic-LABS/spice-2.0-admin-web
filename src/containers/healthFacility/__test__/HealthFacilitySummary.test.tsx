@@ -259,7 +259,7 @@ describe('HealthFacilitySummary', () => {
     renderComponent();
     expect(screen.getByText('NAME')).toBeInTheDocument();
     expect(screen.getByText('ROLE')).toBeInTheDocument();
-    expect(screen.getByText('EMAIL ID')).toBeInTheDocument();
+    expect(screen.getByText('USERNAME')).toBeInTheDocument();
     expect(screen.getByText('GENDER')).toBeInTheDocument();
     expect(screen.getByText('CONTACT NUMBER')).toBeInTheDocument();
   });

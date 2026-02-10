@@ -9,6 +9,7 @@ import {
   fetchLockedUsers,
   fetchTimezoneList,
   fetchUserByEmail,
+  fetchUserByUsername,
   fetchUserById,
   forgotPassword,
   getUsername,
@@ -154,6 +155,27 @@ describe('User APIs', () => {
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       email,
       parentOrganizationId: parentOrgId,
+      appTypes
+    });
+  });
+
+  it('fetchUserByUsername sends a POST request to /user-service/user/validate-user with correct data', async () => {
+    const username = 'testuser';
+    const parentOrgId = '456';
+    const ignoreTenantId = '789';
+    const appTypes: string[] = [];
+
+    mockAxios.onPost('/user-service/user/validate-user').reply(200, {});
+
+    await fetchUserByUsername({ username, appTypes, parentOrganizationId: parentOrgId, ignoreTenantId });
+
+    expect(mockAxios.history.post.length).toBe(1);
+    expect(mockAxios.history.post[0].url).toBe('/user-service/user/validate-user');
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
+      email: '',
+      username,
+      parentOrganizationId: parentOrgId,
+      ignoreTenantId,
       appTypes
     });
   });

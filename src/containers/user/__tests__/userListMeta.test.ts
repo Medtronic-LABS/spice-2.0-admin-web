@@ -67,7 +67,7 @@ describe('Column Definitions and Formatting Functions', () => {
     expect(nameCol.cellFormatter).toBeDefined();
 
     expect(emailCol.name).toBe('username');
-    expect(emailCol.label).toBe('Email ID');
+    expect(emailCol.label).toBe('Username');
     expect(emailCol.width).toBe('21%');
 
     expect(roleCol.name).toBe('role');
