@@ -159,7 +159,10 @@ export interface IRegionDetailList {
   villagecode: string | null;
   villagename: string;
   villageid: number;
-  villagetype: string | null;
+  villagetype?: string | null;
+  subvillagecode?: string | null;
+  subvillagename?: string | null;
+  subvillageid?: number;
 }
 export interface IRegionDetail {
   id: string;

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
+import IconButton from '../../components/button/IconButton';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import DragDropFiles from '../../components/dragDropFiles/DragDropFiles';
@@ -20,12 +21,13 @@ import {
   uploadFileRequest
 } from '../../store/region/actions';
 import {
+  getIsDownloadingSelector,
   getIsUploadingSelector,
   getLoadingSelector,
   getRegionDetailsSelector,
   getRegionIdSelector
 } from '../../store/region/selectors';
-import { IMatchParams } from '../../store/region/types';
+import { IMatchParams, IRegionDetailList } from '../../store/region/types';
 import { getAppTypeSelector, roleSelector } from '../../store/user/selectors';
 import { fileDownload, formatUserToastMsg } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
@@ -40,6 +42,7 @@ const Region = (): React.ReactElement => {
   const role = useSelector(roleSelector);
   const loading = useSelector(getLoadingSelector);
   const uploading = useSelector(getIsUploadingSelector);
+  const downloading = useSelector(getIsDownloadingSelector);
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
   const appTypes = useSelector(getAppTypeSelector);
@@ -50,7 +53,8 @@ const Region = (): React.ReactElement => {
     district: { s: districtSName },
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName },
-    village: { s: villageSName }
+    village: { s: villageSName },
+    subvillage: { s: subVillageSName }
   } = useAppTypeConfigs();
 
   // Check if the current user role is Region Admin to set read-only access
@@ -66,7 +70,7 @@ const Region = (): React.ReactElement => {
         countryId: Number(regionId),
         appTypes,
         successCb: (data) => {
-          const filename = regionDetails.name;
+          const filename = regionDetails?.name ?? `template-${regionId}`;
           // Initiating file download with appropriate file type (Excel sheet)
           fileDownload(data, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           toastCenter.success(
@@ -178,16 +182,22 @@ const Region = (): React.ReactElement => {
       id: 3,
       name: 'villagename',
       label: villageSName
+    },
+    {
+      id: 4,
+      name: 'subvillagename',
+      label: subVillageSName,
+      cellFormatter: (data: IRegionDetailList) => data.subvillagename || '-'
     }
   ];
 
   return (
     <>
-      {(loading || uploading) && <Loader />}
+      {(loading || uploading || downloading) && <Loader />}
       <div className={` row g-0dot625 position-relative h-100`}>
         {!loading && Array.isArray(regionDetails.list) && !regionDetails.list.length ? (
           <div
-            className={`${dragDropStyles.dragDropContainer} d-flex justify-content-center align-items-center`}
+            className={`${dragDropStyles.dragDropContainer} d-flex flex-column justify-content-center align-items-center`}
             onDragOver={(e) => e.preventDefault()}
             draggable={false}
             onDrop={(event: React.DragEvent<HTMLDivElement>) => {
@@ -195,6 +205,16 @@ const Region = (): React.ReactElement => {
               event.preventDefault();
             }}
           >
+            {!isReadOnly && (
+              <div className='mb-3'>
+                <IconButton
+                  customIcon={DownloadIcon}
+                  label='Download Template'
+                  disabled={downloading}
+                  handleClick={onDownloadClick}
+                />
+              </div>
+            )}
             <DragDropFiles onUploadSubmit={onSubmit} />
           </div>
         ) : (

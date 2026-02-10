@@ -64,7 +64,8 @@ const COMMUNITY = {
   },
   medication: { categories: { available: true, isMandatory: false }, groups: { available: true } },
   filterComponent: { filterIcon: { available: true } },
-  village: { s: 'Village', p: 'Villages' }
+  village: { s: 'Village', p: 'Villages' },
+  subvillage: { s: 'Sub Village', p: 'Sub Villages' }
 };
 
 // Configuration for NON_COMMUNITY app type
@@ -98,7 +99,8 @@ const NON_COMMUNITY = {
   },
   medication: { categories: { available: true, isMandatory: true }, groups: { available: true } },
   filterComponent: { filterIcon: { available: true } },
-  village: { s: 'Village', p: 'Villages' }
+  village: { s: 'Village', p: 'Villages' },
+  subvillage: { s: 'Sub Village', p: 'Sub Villages' }
 };
 
 // Fallback configuration when no app types are defined

@@ -31,7 +31,8 @@ jest.mock('../../../hooks/appTypeBasedConfigs', () => () => ({
   district: { s: 'County', p: 'Counties' },
   chiefdom: { s: 'Sub County', p: 'Sub Counties' },
   healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
-  village: { s: 'Village', p: 'Villages' }
+  village: { s: 'Village', p: 'Villages' },
+  subvillage: { s: 'Subvillage', p: 'Subvillages' }
 }));
 
 jest.mock('../../../hooks/tablePagination', () => ({
@@ -116,6 +117,12 @@ describe('Region Component', () => {
 
   it('renders Loader when uploading is true', () => {
     store = getMockStore({ region: { ...initialState.region, uploading: true } });
+    const { getByTestId } = renderWithProviders(<Region />, { store });
+    expect(getByTestId('loader')).toBeInTheDocument();
+  });
+
+  it('renders Loader when downloading is true', () => {
+    store = getMockStore({ region: { ...initialState.region, downloading: true } });
     const { getByTestId } = renderWithProviders(<Region />, { store });
     expect(getByTestId('loader')).toBeInTheDocument();
   });
@@ -219,10 +226,65 @@ describe('Region Component', () => {
     expect(screen.getByRole('columnheader', { name: 'County' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Sub County' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Village' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Subvillage' })).toBeInTheDocument();
   });
 
-  it('does not render Loader when loading and uploading are false', () => {
+  it('does not render Loader when loading, uploading and downloading are false', () => {
     renderWithProviders(<Region />, { store });
     expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+  });
+
+  it('shows Download Template button when region list is empty and user is not read-only', () => {
+    store = getMockStore({
+      region: {
+        ...initialState.region,
+        detail: { ...initialState.region.detail, list: [], total: 0 }
+      }
+    });
+    renderWithProviders(<Region />, { store });
+    expect(screen.getByText('Download Template')).toBeInTheDocument();
+  });
+
+  it('dispatches downloadFileRequest when Download Template button is clicked in empty state', () => {
+    store = getMockStore({
+      region: {
+        ...initialState.region,
+        detail: { ...initialState.region.detail, list: [], total: 0 }
+      }
+    });
+    renderWithProviders(<Region />, { store });
+    fireEvent.click(screen.getByText('Download Template'));
+    expect(regionActions.downloadFileRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        countryId: 1,
+        successCb: expect.any(Function),
+        failureCb: expect.any(Function)
+      })
+    );
+  });
+
+  it('hides Download Template button when region list is empty and user role is REGION_ADMIN', () => {
+    store = getMockStore({
+      user: { user: { role: APPCONSTANTS.ROLES.REGION_ADMIN, appTypes: [] } },
+      region: {
+        ...initialState.region,
+        detail: { ...initialState.region.detail, list: [], total: 0 }
+      }
+    });
+    renderWithProviders(<Region />, { store });
+    expect(screen.queryByText('Download Template')).not.toBeInTheDocument();
+  });
+
+  it('disables Download Template button when downloading is true', () => {
+    store = getMockStore({
+      region: {
+        ...initialState.region,
+        detail: { ...initialState.region.detail, list: [], total: 0 },
+        downloading: true
+      }
+    });
+    renderWithProviders(<Region />, { store });
+    const downloadTemplateButton = screen.getByText('Download Template').closest('button');
+    expect(downloadTemplateButton).toBeDisabled();
   });
 });
