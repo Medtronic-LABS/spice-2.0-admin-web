@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { COMEMR, hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
+import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
@@ -801,7 +801,7 @@ const UserForm = ({
         ...editData,
         suiteAccess: editData?.suiteAccess
           ? editData.suiteAccess.map((suiteData: any) => {
-            return { ...suiteData, label: suiteData.groupName === SPICE ? COMEMR : suiteData.groupName };
+            return { ...suiteData, label: suiteData.groupName === SPICE ? SPICE : suiteData.groupName };
           }) : [],
         role: removeRedRiskFromRoleArray(editData?.role)
       }));
@@ -1167,7 +1167,7 @@ const UserForm = ({
                         return isSiteUser || isHFCreate ? (
                           <MultiSelect
                             {...(input as any)}
-                            label='ComEMR Role'
+                            label='SPICE Role'
                             errorLabel='Please select at least one role.'
                             labelKey='displayName'
                             valueKey='id'
@@ -1265,7 +1265,7 @@ const UserForm = ({
                           <SelectInput
                             {...(input as any)}
                             autoSelect={false} // for admins prevent autoselect
-                            label={'ComEMR Role'}
+                            label={'SPICE Role'}
                             errorLabel='Please select role.'
                             labelKey='displayName'
                             valueKey='id'

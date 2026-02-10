@@ -18,7 +18,7 @@ const PrivacyPolicy = () => {
         <div className={styles.privacyText}>
           <p>
             This Privacy Statement tells you how we protect and use information that we gather through MEDTRONIC LABS
-            ComEMR Mobile Application (the “Application” or “App”). This Privacy Statement is intended for a global
+            SPICE Mobile Application (the “Application” or “App”). This Privacy Statement is intended for a global
             audience.
           </p>
           <p>
@@ -28,7 +28,7 @@ const PrivacyPolicy = () => {
           <p>
             Except as written in any other disclaimers, policies, terms of use, or other notices in an Application, this
             Privacy Statement is a complete agreement between you and MEDTRONIC LABS with respect to your use of the
-            Application. By using MEDTRONIC LABS ComEMR Mobile Application (the “Application” or “App”), you agree to the
+            Application. By using MEDTRONIC LABS SPICE Mobile Application (the “Application” or “App”), you agree to the
             terms of the most recent version of this Privacy Statement. You may be subject to additional terms that may
             apply when you access particular services or materials on certain areas in this Application, or by following
             a link from this Application.
