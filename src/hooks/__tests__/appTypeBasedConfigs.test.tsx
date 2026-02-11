@@ -62,7 +62,7 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.district).toEqual({ s: 'District', p: 'Districts' });
     expect(result.current.chiefdom).toEqual({ s: 'Chiefdom', p: 'Chiefdoms' });
     expect(result.current.village).toEqual({ s: 'Village', p: 'Villages' });
-    expect(result.current.subvillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
+    expect(result.current.subVillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
     expect(result.current.GENDER_OPTIONS).toHaveLength(3);
     expect(result.current.hfDetails.map.available).toBe(true);
     expect(result.current.user.dhisId.available).toBe(true);
@@ -78,7 +78,7 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.district).toEqual({ s: 'County', p: 'Counties' });
     expect(result.current.chiefdom).toEqual({ s: 'Sub County', p: 'Sub Counties' });
     expect(result.current.village).toEqual({ s: 'Village', p: 'Villages' });
-    expect(result.current.subvillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
+    expect(result.current.subVillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
     expect(result.current.GENDER_OPTIONS).toHaveLength(2);
     expect(result.current.hfDetails.map.available).toBe(false);
     expect(result.current.user.dhisId.available).toBe(false);
@@ -94,7 +94,7 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.isCommunity).toBe(false);
     expect(result.current.district).toEqual({ s: 'County', p: 'Counties' });
     expect(result.current.chiefdom).toEqual({ s: 'Sub County', p: 'Sub Counties' });
-    expect(result.current.subvillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
+    expect(result.current.subVillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
   });
 
   it('should use country appTypes when user appTypes is empty and country has appTypes', () => {
@@ -120,7 +120,7 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.appTypes).toEqual([]);
     expect(result.current.GENDER_OPTIONS).toHaveLength(2);
     expect(result.current.isCommunity).toBe(true);
-    expect(result.current.subvillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
+    expect(result.current.subVillage).toEqual({ s: 'Sub Village', p: 'Sub Villages' });
   });
 
   it('should use labelNamesFromStore when display values are present', () => {
@@ -130,7 +130,7 @@ describe('useAppTypeConfigs', () => {
       chiefdom: { s: 'Custom Chiefdom', p: 'Custom Chiefdoms' },
       healthFacility: { s: 'Custom HF', p: 'Custom HFs' },
       village: { s: 'Custom Village', p: 'Custom Villages' },
-      subvillage: { s: 'Custom Subvillage', p: 'Custom Subvillages' }
+      subVillage: { s: 'Custom Subvillage', p: 'Custom Subvillages' }
     };
     setupSelectors({
       appTypesFromUser: [APP_TYPE.COMMUNITY],
@@ -144,7 +144,7 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.chiefdom).toEqual(customLabels.chiefdom);
     expect(result.current.healthFacility).toEqual(customLabels.healthFacility);
     expect(result.current.village).toEqual(customLabels.village);
-    expect(result.current.subvillage).toEqual(customLabels.subvillage);
+    expect(result.current.subVillage).toEqual(customLabels.subVillage);
   });
 
   it('should return COMMUNITY hfDetails when appTypes is COMMUNITY only', () => {
@@ -189,15 +189,15 @@ describe('useAppTypeConfigs', () => {
     expect(result.current.medication.categories.isMandatory).toBe(true);
   });
 
-  it('should return subvillage label for both COMMUNITY and NON_COMMUNITY configs', () => {
+  it('should return subVillage label for both COMMUNITY and NON_COMMUNITY configs', () => {
     const expectedSubvillage = { s: 'Sub Village', p: 'Sub Villages' };
 
     setupSelectors({ appTypesFromUser: [APP_TYPE.COMMUNITY] });
     const { result: communityResult } = renderHook(() => useAppTypeConfigs());
-    expect(communityResult.current.subvillage).toEqual(expectedSubvillage);
+    expect(communityResult.current.subVillage).toEqual(expectedSubvillage);
 
     setupSelectors({ appTypesFromUser: [APP_TYPE.NON_COMMUNITY] });
     const { result: nonCommunityResult } = renderHook(() => useAppTypeConfigs());
-    expect(nonCommunityResult.current.subvillage).toEqual(expectedSubvillage);
+    expect(nonCommunityResult.current.subVillage).toEqual(expectedSubvillage);
   });
 });

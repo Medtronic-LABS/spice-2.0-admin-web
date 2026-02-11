@@ -32,7 +32,7 @@ jest.mock('../../../hooks/appTypeBasedConfigs', () => () => ({
   chiefdom: { s: 'Sub County', p: 'Sub Counties' },
   healthFacility: { s: 'Health Facility', p: 'Health Facilities' },
   village: { s: 'Village', p: 'Villages' },
-  subvillage: { s: 'Subvillage', p: 'Subvillages' }
+  subVillage: { s: 'Subvillage', p: 'Subvillages' }
 }));
 
 jest.mock('../../../hooks/tablePagination', () => ({

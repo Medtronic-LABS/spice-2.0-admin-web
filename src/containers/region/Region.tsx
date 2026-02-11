@@ -54,7 +54,7 @@ const Region = (): React.ReactElement => {
     chiefdom: { s: chiefdomSName },
     healthFacility: { s: healthFacilitySName },
     village: { s: villageSName },
-    subvillage: { s: subVillageSName }
+    subVillage: { s: subVillageSName }
   } = useAppTypeConfigs();
 
   // Check if the current user role is Region Admin to set read-only access
