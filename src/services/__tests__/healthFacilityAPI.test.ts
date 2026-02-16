@@ -22,7 +22,10 @@ import {
   fetchWorkflowList,
   peerSupervisorValidation,
   validateLinkedRestrictionsAPI,
-  fetchCountryCodeList
+  fetchCountryCodeList,
+  getSSPrefix,
+  createShasthyaShebika,
+  fetchShasthyaShebikaByShasthyaKormiId
 } from '../healthFacilityAPI';
 import { HF_SUMMARY, HF_USER } from '../../tests/mockData/healthFacilityConstants';
 
@@ -411,5 +414,44 @@ describe('Health Facility APIs', () => {
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/country-codes');
+  });
+
+  it('getSSPrefix sends a GET request to /spice-service/meta/get-ss-prefix', async () => {
+    mockAxios.onGet('/spice-service/meta/get-ss-prefix').reply(200, {});
+
+    await getSSPrefix();
+
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe('/spice-service/meta/get-ss-prefix');
+  });
+
+  it('createShasthyaShebika sends a POST request to /admin-service/shasthya-shebika/create with correct data', async () => {
+    const data = {
+      name: 'SS User',
+      phoneNumber: '+1234567890',
+      ssId: 'SS01',
+      subVillageIds: ['1', '2'],
+      shasthyaKormiId: '42'
+    };
+
+    mockAxios.onPost('/admin-service/shasthya-shebika/create').reply(200, {});
+
+    await createShasthyaShebika(data);
+
+    expect(mockAxios.history.post.length).toBe(1);
+    expect(mockAxios.history.post[0].url).toBe('/admin-service/shasthya-shebika/create');
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(data);
+  });
+
+  it('fetchShasthyaShebikaByShasthyaKormiId sends a POST request to /admin-service/shasthya-shebika/by-shasthya-kormi-id with array of ids', async () => {
+    const shasthyaKormiIds = ['1', '42'];
+
+    mockAxios.onPost('/admin-service/shasthya-shebika/by-shasthya-kormi-id').reply(200, {});
+
+    await fetchShasthyaShebikaByShasthyaKormiId(shasthyaKormiIds);
+
+    expect(mockAxios.history.post.length).toBe(1);
+    expect(mockAxios.history.post[0].url).toBe('/admin-service/shasthya-shebika/by-shasthya-kormi-id');
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(shasthyaKormiIds);
   });
 });

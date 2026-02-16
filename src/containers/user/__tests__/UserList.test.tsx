@@ -15,7 +15,8 @@ import {
   FETCH_HEALTH_FACILITY_LIST_REQUEST,
   CLEAR_HEALTH_FACILITY_LIST,
   CLEAR_PEER_SUPERVISOR_LIST,
-  CLEAR_VILLAGES_LIST_FROM_HF
+  CLEAR_VILLAGES_LIST_FROM_HF,
+  FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST
 } from '../../../store/healthFacility/actionTypes';
 import {
   CHANGE_PASSWORD_REQUEST,
@@ -272,7 +273,7 @@ const initialState = {
     healthFacilityUserList: [],
     hfTotal: 0,
     healthFacilityList: [],
-    healthFacilityUsersLoading: false,
+    hfUsersLoading: false,
     hfUserDetailLoading: false,
     loading: false,
     peerSupervisorList: { list: [] },
@@ -401,7 +402,7 @@ describe('UserList Component', () => {
           hfTotal: 0,
           peerSupervisorList: { list: [] },
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -434,7 +435,7 @@ describe('UserList Component', () => {
           hfTotal: 0,
           peerSupervisorList: { list: [] },
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -497,7 +498,7 @@ describe('UserList Component', () => {
           healthFacilityList: [],
           hfTotal: 0,
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -541,6 +542,19 @@ describe('UserList Component', () => {
         expect(mockModalFormCalls.length).toBeGreaterThan(0);
       });
       expect(screen.getByTestId(`mock-modalForm-${mockModalFormCalls.length}`)).toBeInTheDocument();
+    });
+
+    it('should dispatch fetchShasthyaShebikaByKormiIdRequest when opening edit with user id', async () => {
+      const localStore = mockStore({ ...initialState });
+      renderComponent(localStore);
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onRowEdit({ id: 42, roles: [{ name: 'SHASTIYA_KORMI', groupName: 'SPICE' }] });
+      const actions = localStore.getActions();
+      const fetchSSByKormiAction = actions.find(
+        (action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST
+      );
+      expect(fetchSSByKormiAction).toBeDefined();
+      expect(fetchSSByKormiAction?.shasthyaKormiIds).toEqual(['42']);
     });
 
     it('should handle openEditModal for edit with village-based roles', async () => {
@@ -597,7 +611,7 @@ describe('UserList Component', () => {
           hfTotal: 0,
           peerSupervisorList: { list: [] },
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -799,7 +813,7 @@ describe('UserList Component', () => {
           hfTotal: 0,
           peerSupervisorList: { list: [] },
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -865,7 +879,7 @@ describe('UserList Component', () => {
           healthFacilityList: [],
           hfTotal: 0,
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -899,7 +913,7 @@ describe('UserList Component', () => {
           healthFacilityList: [],
           hfTotal: 0,
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },
@@ -936,7 +950,7 @@ describe('UserList Component', () => {
           healthFacilityList: [],
           hfTotal: 0,
           hfUserDetailLoading: false,
-          healthFacilityUsersLoading: false,
+          hfUsersLoading: false,
           loading: false,
           peerSupervisorLoading: false
         },

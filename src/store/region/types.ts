@@ -18,6 +18,20 @@ export interface IMatchParams {
   regionId: string;
 }
 
+/** Sub-village entity from /admin-service/sub-villages-list API */
+export interface ISubVillage {
+  id: number;
+  name: string;
+  code: string;
+  type: string | null;
+  villageId: number;
+  chiefdomId: number;
+  countryId: number;
+  districtId: number;
+  chiefdomCode: string | null;
+  districtCode: string | null;
+}
+
 export interface IRegionState {
   regions: IRegion[];
   total: number;
@@ -29,6 +43,8 @@ export interface IRegionState {
   file: any;
   uploading: boolean;
   downloading: boolean;
+  subVillages: ISubVillage[];
+  subVillagesLoading: boolean;
 }
 
 export interface IRegionDetailFormValues {
@@ -190,6 +206,23 @@ export interface IDeactivateReqPayload {
   failureCb?: (e: Error) => void;
 }
 
+export interface IFetchSubVillagesRequest {
+  type: typeof ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST;
+  villageId: number;
+  successCb?: (payload: ISubVillage[]) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchSubVillagesSuccess {
+  type: typeof ACTION_TYPES.FETCH_SUB_VILLAGES_SUCCESS;
+  payload: ISubVillage[];
+}
+
+export interface IFetchSubVillagesFailure {
+  type: typeof ACTION_TYPES.FETCH_SUB_VILLAGES_FAILURE;
+  error: Error;
+}
+
 export interface IUploadFilePayload {
   file: any;
   appTypes: string;
@@ -324,4 +357,7 @@ export type RegionActions =
   | IDownloadFileFailure
   | IFetchCountryDetailReq
   | IFetchCountryDetailSuccess
-  | IFetchCountryDetailFail;
+  | IFetchCountryDetailFail
+  | IFetchSubVillagesRequest
+  | IFetchSubVillagesSuccess
+  | IFetchSubVillagesFailure

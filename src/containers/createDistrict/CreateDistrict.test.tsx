@@ -116,6 +116,27 @@ describe('CreateDistrict', () => {
       listTotal: 0,
       loading: false
     },
+    region: {
+      regions: [],
+      total: 0,
+      loading: false,
+      loadingMore: false,
+      error: null,
+      detail: {
+        id: '',
+        tenantId: '',
+        name: '',
+        list: [],
+        appTypes: [],
+        total: 0
+      },
+      isClientRegistryEnabled: undefined,
+      file: {},
+      uploading: false,
+      downloading: false,
+      subVillages: [],
+      subVillagesLoading: false
+    },
     common: {
       labelName: null
     }

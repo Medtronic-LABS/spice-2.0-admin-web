@@ -1,5 +1,12 @@
 import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
-import { getUserPayload, getAdminPayload, formatHealthFacility } from '../formatObjectUtils';
+import {
+  getUserPayload,
+  getAdminPayload,
+  formatHealthFacility,
+  getSSUsersPayload,
+  ISSUserInputItem,
+  ISSUserPayloadItem
+} from '../formatObjectUtils';
 
 describe('formatObjectUtils', () => {
   describe('getAdminPayload', () => {
@@ -369,7 +376,9 @@ describe('formatObjectUtils', () => {
     it('should handle HF creation payload', () => {
       const user = {
         ...mockUser,
-        roles: [{ id: 1 }, { id: 2 }]
+        roles: [{ id: 1 }, { id: 2 }],
+        villages: { id: 1 },
+        existingVillages: { id: 2 }
       };
 
       const result = getUserPayload({
@@ -561,6 +570,91 @@ describe('formatObjectUtils', () => {
       };
       const result = formatHealthFacility(mockHf, 1, [APPCONSTANTS.appTypes.community]);
       expect(result).toEqual(expected);
+    });
+  });
+
+  describe('getSSUsersPayload', () => {
+    it('should return empty array when ssUsers is not an array', () => {
+      expect(getSSUsersPayload(null as any)).toEqual([]);
+      expect(getSSUsersPayload(undefined as any)).toEqual([]);
+      expect(getSSUsersPayload('invalid' as any)).toEqual([]);
+    });
+
+    it('should return empty array when ssUsers is empty array', () => {
+      expect(getSSUsersPayload([])).toEqual([]);
+    });
+
+    it('should map form/API shape to payload shape with ssId.name and subVillages[].id', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        {
+          ssId: { id: 1, name: 'SS01' },
+          name: 'SS User One',
+          phoneNumber: '+1234567890',
+          subVillages: [{ id: 10 }, { id: 20 }]
+        }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result).toEqual([
+        {
+          name: 'SS User One',
+          phoneNumber: '+1234567890',
+          ssId: 'SS01',
+          subVillageIds: ['10', '20']
+        }
+      ]);
+    });
+
+    it('should handle multiple SS users', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { ssId: { id: 1, name: 'SS01' }, name: 'User 1', phoneNumber: '+1', subVillages: [{ id: 1 }] },
+        { ssId: { id: 2, name: 'SS02' }, name: 'User 2', phoneNumber: '+2', subVillages: [{ id: 2 }, { id: 3 }] }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({ name: 'User 1', phoneNumber: '+1', ssId: 'SS01', subVillageIds: ['1'] });
+      expect(result[1]).toEqual({ name: 'User 2', phoneNumber: '+2', ssId: 'SS02', subVillageIds: ['2', '3'] });
+    });
+
+    it('should default missing fields to empty string or empty array', () => {
+      const ssUsers: ISSUserInputItem[] = [{}];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result).toEqual([
+        {
+          name: '',
+          phoneNumber: '',
+          ssId: '',
+          subVillageIds: []
+        }
+      ]);
+    });
+
+    it('should handle missing ssId object (use empty string for ssId)', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { name: 'Test', phoneNumber: '+1', subVillages: [] }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result[0].ssId).toBe('');
+    });
+
+    it('should handle subVillages with missing id (coerce to string)', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { ssId: { name: 'SS01' }, name: 'Test', phoneNumber: '', subVillages: [{ id: undefined }, {}] }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result[0].subVillageIds).toEqual(['', '']);
+    });
+
+    it('should produce ISSUserPayloadItem shape with name, phoneNumber, ssId string, subVillageIds string[]', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { ssId: { id: 1, name: 'SS01' }, name: 'A', phoneNumber: '1', subVillages: [{ id: 100 }] }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      const item: ISSUserPayloadItem = result[0];
+      expect(typeof item.name).toBe('string');
+      expect(typeof item.phoneNumber).toBe('string');
+      expect(typeof item.ssId).toBe('string');
+      expect(Array.isArray(item.subVillageIds)).toBe(true);
+      expect(item.subVillageIds.every((id) => typeof id === 'string')).toBe(true);
     });
   });
 });

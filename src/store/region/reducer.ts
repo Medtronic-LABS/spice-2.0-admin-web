@@ -18,7 +18,9 @@ export const initialState: IRegionState = {
   isClientRegistryEnabled: undefined,
   file: {},
   uploading: false,
-  downloading: false
+  downloading: false,
+  subVillages: [],
+  subVillagesLoading: false
 };
 
 const regionReducer = (state = initialState, action = {} as RegionActions): IRegionState => {
@@ -132,6 +134,23 @@ const regionReducer = (state = initialState, action = {} as RegionActions): IReg
         ...state,
         downloading: false,
         error: action.payload.error
+      };
+    case REGION_TYPES.FETCH_SUB_VILLAGES_REQUEST:
+      return {
+        ...state,
+        subVillagesLoading: true
+      };
+    case REGION_TYPES.FETCH_SUB_VILLAGES_SUCCESS:
+      return {
+        ...state,
+        subVillages: Array.isArray(action.payload) ? action.payload : [],
+        subVillagesLoading: false
+      };
+    case REGION_TYPES.FETCH_SUB_VILLAGES_FAILURE:
+      return {
+        ...state,
+        subVillages: [],
+        subVillagesLoading: false
       };
     default:
       return {

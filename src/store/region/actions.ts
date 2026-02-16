@@ -30,7 +30,11 @@ import {
   IFetchRegionDetailReqPayload,
   IFetchCountryDetailReq,
   IFetchCountryDetailSuccess,
-  IFetchCountryDetailFail
+  IFetchCountryDetailFail,
+  IFetchSubVillagesRequest,
+  IFetchSubVillagesSuccess,
+  IFetchSubVillagesFailure,
+  ISubVillage
 } from './types';
 
 export const fetchRegionsRequest = ({
@@ -120,6 +124,31 @@ export const regionDetailsSuccess = (payload: { list: IRegionDetailList[]; total
 
 export const regionDetailsFailure = (error: Error): IRegionDetailsFailure => ({
   type: REGION_TYPES.FETCH_REGION_DETAIL_FAILURE,
+  error
+});
+
+export const fetchSubVillagesRequest = ({
+  villageId,
+  successCb,
+  failureCb
+}: {
+  villageId: number;
+  successCb?: (payload: ISubVillage[]) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchSubVillagesRequest => ({
+  type: REGION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
+  villageId,
+  successCb,
+  failureCb
+});
+
+export const fetchSubVillagesSuccess = (payload: ISubVillage[]): IFetchSubVillagesSuccess => ({
+  type: REGION_TYPES.FETCH_SUB_VILLAGES_SUCCESS,
+  payload
+});
+
+export const fetchSubVillagesFailure = (error: Error): IFetchSubVillagesFailure => ({
+  type: REGION_TYPES.FETCH_SUB_VILLAGES_FAILURE,
   error
 });
 

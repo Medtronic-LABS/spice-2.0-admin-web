@@ -104,10 +104,10 @@ export const getUserPayload = ({
       tenantId: payloadTenantId,
       supervisorId: Number(user.supervisor?.id) || null,
       roleIds: [...new Set(roleIds)],
-      villageIds: (Array.isArray([...(user?.villages || []), ...(user?.existingVillages || [])])
-        ? [...(user?.villages || []), ...(user?.existingVillages || [])]
-        : []
-      ).map(({ id }: { id: number }) => id),
+      villageIds: [
+        ...(user?.villages ? [user.villages] : []),
+        ...(user?.existingVillages ? [user.existingVillages] : [])
+      ].map(({ id }: { id: number }) => id),
       village: user?.village,
       timezone: user?.timezone?.id ? user?.timezone : null,
       district: user?.district,
@@ -256,4 +256,43 @@ export const getAdminPayload = ({
     return userPayload;
   });
   return payload;
+};
+
+/**
+ * SS user item as received from API/form (with nested ssId and subVillage objects).
+ */
+export interface ISSUserInputItem {
+  ssId?: { id?: number; name?: string; [key: string]: any };
+  name?: string;
+  phoneNumber?: string;
+  subVillages?: Array<{ id?: number; [key: string]: any }>;
+}
+
+/**
+ * SS user payload item as required by API (flat ssId string and subVillageIds string array).
+ */
+export interface ISSUserPayloadItem {
+  name: string;
+  phoneNumber: string;
+  ssId: string;
+  subVillageIds: string[];
+}
+
+/**
+ * Transforms an array of SS users from API/form shape to the payload shape.
+ * Maps ssId -> ssId.name and subVillage -> subVillage[].id as strings.
+ *
+ * @param ssUsers - Array of SS user objects with nested ssId and subVillage
+ * @returns Array of payload objects with name, phoneNumber, ssId (string), subVillageIds (string[])
+ */
+export const getSSUsersPayload = (ssUsers: ISSUserInputItem[]): ISSUserPayloadItem[] => {
+  if (!Array.isArray(ssUsers)) {
+    return [];
+  }
+  return ssUsers.map((item) => ({
+    name: item.name ?? '',
+    phoneNumber: item.phoneNumber ?? '',
+    ssId: item.ssId?.name ?? '',
+    subVillageIds: (item.subVillages ?? []).map((sv) => String(sv.id ?? ''))
+  }));
 };

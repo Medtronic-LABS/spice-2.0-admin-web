@@ -8,7 +8,8 @@ import {
   getRegionsCountSelector,
   getRegionsLoadingMoreSelector,
   getClientRegistryStatusSelector,
-  getRegionIdSelector
+  getRegionIdSelector,
+  getSubVillagesSelector
 } from '../selectors';
 import { initialState as mainInitialState } from '../reducer';
 
@@ -60,4 +61,9 @@ test('getRegionDetailsSelector should return regionDetails from state', () => {
 // Test getRegionIdSelector
 test('getRegionIdSelector should return region id from state', () => {
   expect(getRegionIdSelector(initialState)).toEqual(initialState.region.detail.id);
+});
+
+// Test getSubVillagesSelector
+test('getSubVillagesSelector should return subVillages from state', () => {
+  expect(getSubVillagesSelector(initialState)).toEqual(initialState.region.subVillages);
 });

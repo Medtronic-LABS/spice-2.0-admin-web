@@ -38,6 +38,11 @@ const getCountryList = (state: AppState) => state.healthFacility.countryList;
 const getCountryListLoading = (state: AppState) => state.healthFacility.countryListLoading;
 const getHFDashboardList = (state: AppState) => state.healthFacility.hfDashboardList;
 const getLoadingMore = (state: AppState) => state.healthFacility.loadingMore;
+const getSSPrefixList = (state: AppState) => state.healthFacility.ssPrefixList;
+const getSSPrefixLoading = (state: AppState) => state.healthFacility.ssPrefixLoading;
+const getShasthyaShebikaByKormiId = (state: AppState) => state.healthFacility.shasthyaShebikaByKormiId;
+const getShasthyaShebikaByKormiIdLoading = (state: AppState) =>
+  state.healthFacility.shasthyaShebikaByKormiIdLoading;
 
 export const healthFacilitySelector = createSelector(getHealthFacility, (site) => site);
 export const healthFacilityLoadingSelector = createSelector(getLoading, (loading) => loading);
@@ -93,3 +98,13 @@ export const countryListSelector = createSelector(getCountryList, (list) => list
 export const countryLoadingSelector = createSelector(getCountryListLoading, (loading) => loading);
 export const hfDashboardListSelector = createSelector(getHFDashboardList, (siteDashboardList) => siteDashboardList);
 export const hfLoadingMoreSelector = createSelector(getLoadingMore, (loadingMore) => loadingMore);
+export const ssPrefixListSelector = createSelector(getSSPrefixList, (list) => list);
+export const ssPrefixLoadingSelector = createSelector(getSSPrefixLoading, (loading) => loading);
+export const shasthyaShebikaByKormiIdSelector = createSelector(
+  getShasthyaShebikaByKormiId,
+  (byId) => byId
+);
+export const shasthyaShebikaByKormiIdLoadingSelector = createSelector(
+  getShasthyaShebikaByKormiIdLoading,
+  (loading) => loading
+);

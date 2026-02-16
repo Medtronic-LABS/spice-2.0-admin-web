@@ -24,7 +24,10 @@ import {
   fetchHealthFacilityDashboardList,
   fetchUnlinkedVillagesSagaRequest,
   fetchVillagesListUserLinkedSagaRequest,
-  fetchCityListSagaRequest
+  fetchCityListSagaRequest,
+  createShasthyaShebikaSaga,
+  fetchShasthyaShebikaByKormiIdSaga,
+  fetchSSPrefixSaga
 } from '../sagas';
 import * as hfService from '../../../services/healthFacilityAPI';
 import * as hfActions from '../actions';
@@ -1442,6 +1445,155 @@ describe('HF sagas', () => {
       expect(dispatched).toEqual([hfActions.fetchUnlinkedVillagesListFailure(error)]);
     });
   });
+  describe('Fetch SS Prefix: FETCH_SS_PREFIX_REQUEST', () => {
+    it('Fetch SS prefix list and dispatch success', async () => {
+      const ssPrefixList = [{ id: 1, name: 'SS01', displayOrder: 1 }];
+      const successCb = jest.fn();
+      const getSSPrefixSpy = jest.spyOn(hfService, 'getSSPrefix').mockImplementation(
+        () => Promise.resolve({ data: { entity: ssPrefixList } }) as AxiosPromise
+      );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchSSPrefixSaga,
+        {
+          type: ACTION_TYPES.FETCH_SS_PREFIX_REQUEST,
+          successCb
+        }
+      ).toPromise();
+      expect(getSSPrefixSpy).toHaveBeenCalledWith();
+      expect(successCb).toHaveBeenCalledWith(ssPrefixList);
+      expect(dispatched).toEqual([hfActions.fetchSSPrefixSuccess(ssPrefixList)]);
+    });
+
+    it('Fetch SS prefix list and dispatch failure', async () => {
+      const error = new Error('Failed to fetch SS prefix');
+      const failureCb = jest.fn();
+      const getSSPrefixSpy = jest.spyOn(hfService, 'getSSPrefix').mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchSSPrefixSaga,
+        {
+          type: ACTION_TYPES.FETCH_SS_PREFIX_REQUEST,
+          failureCb
+        }
+      ).toPromise();
+      expect(getSSPrefixSpy).toHaveBeenCalledWith();
+      expect(failureCb).toHaveBeenCalledWith(error);
+      expect(dispatched).toEqual([hfActions.fetchSSPrefixFailure()]);
+    });
+  });
+
+  describe('Create Shasthya Shebika: CREATE_SHASTHYA_SHEBIKA_REQUEST', () => {
+    it('Create shasthya shebika and dispatch success', async () => {
+      const successCb = jest.fn();
+      const data = {
+        name: 'SS User',
+        phoneNumber: '+1234567890',
+        ssId: 'SS01',
+        subVillageIds: ['1'],
+        shasthyaKormiId: '42'
+      };
+      const createSSSpy = jest
+        .spyOn(hfService, 'createShasthyaShebika')
+        .mockImplementation(() => Promise.resolve() as any);
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        createShasthyaShebikaSaga,
+        {
+          type: ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST,
+          data,
+          successCb
+        }
+      ).toPromise();
+      expect(createSSSpy).toHaveBeenCalledWith(data);
+      expect(successCb).toHaveBeenCalled();
+      expect(dispatched).toEqual([hfActions.createShasthyaShebikaSuccess()]);
+    });
+
+    it('Create shasthya shebika and dispatch failure', async () => {
+      const error = new Error('Failed to create shasthya shebika');
+      const failureCb = jest.fn();
+      const data = { name: 'SS', phoneNumber: '+1', ssId: 'SS01', subVillageIds: [], shasthyaKormiId: '42' };
+      const createSSSpy = jest
+        .spyOn(hfService, 'createShasthyaShebika')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        createShasthyaShebikaSaga,
+        {
+          type: ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST,
+          data,
+          failureCb
+        }
+      ).toPromise();
+      expect(createSSSpy).toHaveBeenCalledWith(data);
+      expect(failureCb).toHaveBeenCalledWith(error);
+      expect(dispatched).toEqual([hfActions.createShasthyaShebikaFailure(error)]);
+    });
+  });
+
+  describe('Fetch Shasthya Shebika by Kormi Id: FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST', () => {
+    it('Fetch shasthya shebika by kormi id and dispatch success', async () => {
+      const shasthyaKormiIds = ['42'];
+      const payload = { '42': [{ id: 1, name: 'SS User', ssId: 'SS01' }] };
+      const successCb = jest.fn();
+      const fetchSSByKormiSpy = jest
+        .spyOn(hfService, 'fetchShasthyaShebikaByShasthyaKormiId')
+        .mockImplementation(() => Promise.resolve({ data: { data: payload } }) as any);
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchShasthyaShebikaByKormiIdSaga,
+        {
+          type: ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
+          shasthyaKormiIds,
+          successCb
+        }
+      ).toPromise();
+      expect(fetchSSByKormiSpy).toHaveBeenCalledWith(shasthyaKormiIds);
+      expect(successCb).toHaveBeenCalledWith(payload);
+      expect(dispatched).toEqual([hfActions.fetchShasthyaShebikaByKormiIdSuccess(payload)]);
+    });
+
+    it('Fetch shasthya shebika by kormi id and dispatch failure', async () => {
+      const error = new Error('Failed to fetch shasthya shebika');
+      const failureCb = jest.fn();
+      const shasthyaKormiIds = ['42'];
+      const fetchSSByKormiSpy = jest
+        .spyOn(hfService, 'fetchShasthyaShebikaByShasthyaKormiId')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchShasthyaShebikaByKormiIdSaga,
+        {
+          type: ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
+          shasthyaKormiIds,
+          failureCb
+        }
+      ).toPromise();
+      expect(fetchSSByKormiSpy).toHaveBeenCalledWith(shasthyaKormiIds);
+      expect(failureCb).toHaveBeenCalledWith(error);
+      expect(dispatched).toEqual([hfActions.fetchShasthyaShebikaByKormiIdFailure(error)]);
+    });
+  });
+
   describe('Fetch Villages List for Health Facility: FETCH_VILLAGES_LIST_USER_LINKED', () => {
     const tenantIds = [1];
     const userId = 1;

@@ -82,7 +82,11 @@ export const initialState: IHealthFacilityState = {
       chiefdom: ''
     }
   ],
-  loadingMore: false
+  loadingMore: false,
+  ssPrefixList: [],
+  ssPrefixLoading: false,
+  shasthyaShebikaByKormiId: {},
+  shasthyaShebikaByKormiIdLoading: false
 };
 
 const healthFacilityReducer = (
@@ -150,6 +154,8 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.ACTIVATE_HEALTH_FACILITY_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_SUCCESS:
+    case HEALTH_FACILITY_ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_SUCCESS:
@@ -195,6 +201,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_DETAILS_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.ACTIVATE_HEALTH_FACILITY_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_REQUEST:
@@ -436,6 +443,41 @@ const healthFacilityReducer = (
       return {
         ...state,
         countryListLoading: false
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_SS_PREFIX_REQUEST:
+      return {
+        ...state,
+        ssPrefixLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_SS_PREFIX_SUCCESS:
+      return {
+        ...state,
+        ssPrefixLoading: false,
+        ssPrefixList: Array.isArray(action.payload) ? action.payload : []
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_SS_PREFIX_FAILURE:
+      return {
+        ...state,
+        ssPrefixLoading: false,
+        ssPrefixList: []
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST:
+      return {
+        ...state,
+        shasthyaShebikaByKormiIdLoading: true
+      };
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS: {
+      const payload = action.payload && typeof action.payload === 'object' ? action.payload : {};
+      return {
+        ...state,
+        shasthyaShebikaByKormiIdLoading: false,
+        shasthyaShebikaByKormiId: { ...state.shasthyaShebikaByKormiId, ...payload }
+      };
+    }
+    case HEALTH_FACILITY_ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE:
+      return {
+        ...state,
+        shasthyaShebikaByKormiIdLoading: false
       };
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA:
       return {

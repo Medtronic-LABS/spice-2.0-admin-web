@@ -328,4 +328,58 @@ describe('Region Reducer', () => {
     const newState = regionReducer(mainInitialState, action);
     expect(newState).toEqual(mainInitialState);
   });
+
+  it('should handle FETCH_SUB_VILLAGES_REQUEST', () => {
+    const action: any = {
+      type: REGION_TYPES.FETCH_SUB_VILLAGES_REQUEST
+    };
+    const expectedState = {
+      ...mainInitialState,
+      subVillagesLoading: true
+    };
+    const newState = regionReducer(mainInitialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SUB_VILLAGES_SUCCESS', () => {
+    const payload = [{ id: 1, name: 'Sub Village 1' }, { id: 2, name: 'Sub Village 2' }];
+    const action: any = {
+      type: REGION_TYPES.FETCH_SUB_VILLAGES_SUCCESS,
+      payload
+    };
+    const expectedState = {
+      ...mainInitialState,
+      subVillages: payload,
+      subVillagesLoading: false
+    };
+    const newState = regionReducer(mainInitialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SUB_VILLAGES_SUCCESS with non-array payload', () => {
+    const action: any = {
+      type: REGION_TYPES.FETCH_SUB_VILLAGES_SUCCESS,
+      payload: null
+    };
+    const expectedState = {
+      ...mainInitialState,
+      subVillages: [],
+      subVillagesLoading: false
+    };
+    const newState = regionReducer(mainInitialState, action);
+    expect(newState).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SUB_VILLAGES_FAILURE', () => {
+    const action: any = {
+      type: REGION_TYPES.FETCH_SUB_VILLAGES_FAILURE
+    };
+    const expectedState = {
+      ...mainInitialState,
+      subVillages: [],
+      subVillagesLoading: false
+    };
+    const newState = regionReducer(mainInitialState, action);
+    expect(newState).toEqual(expectedState);
+  });
 });

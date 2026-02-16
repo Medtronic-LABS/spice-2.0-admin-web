@@ -11,8 +11,17 @@ import {
   IFetchHFSummarySuccess,
   IFetchHFSummaryFailure,
   ICreateHFUserRequest,
+  ICreateHFUserResponse,
   ICreateHFUserSuccess,
   ICreateHFUserFailure,
+  ICreateShasthyaShebikaRequest,
+  ICreateShasthyaShebikaSuccess,
+  ICreateShasthyaShebikaFailure,
+  ICreateShasthyaShebikaPayload,
+  IFetchShasthyaShebikaByKormiIdRequest,
+  IFetchShasthyaShebikaByKormiIdSuccess,
+  IFetchShasthyaShebikaByKormiIdFailure,
+  ShasthyaShebikaByKormiIdPayload,
   IUpdateHFDetailsRequest,
   IUpdateHFDetailsSuccess,
   IUpdateHFDetailsFailure,
@@ -66,6 +75,10 @@ import {
   IFetchCultureListRequest,
   IFetchCultureListSuccess,
   IFetchCultureListFailure,
+  IFetchSSPrefixRequest,
+  IFetchSSPrefixSuccess,
+  IFetchSSPrefixFailure,
+  ISSPrefix,
   IFetchCountryListRequest,
   IFetchCountryListSuccess,
   IFetchCountryListFailure,
@@ -343,7 +356,7 @@ export const createHFUserRequest = ({
   failureCb
 }: {
   data: IHFUserPost;
-  successCb?: () => void;
+  successCb?: (response?: ICreateHFUserResponse) => void;
   failureCb?: (error: Error) => void;
 }): ICreateHFUserRequest => ({
   type: HF_TYPES.CREATE_HEALTH_FACILITY_USER_REQUEST,
@@ -358,6 +371,59 @@ export const createHFUserSuccess = (): ICreateHFUserSuccess => ({
 
 export const createHFUserFailure = (error: Error): ICreateHFUserFailure => ({
   type: HF_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE,
+  error
+});
+
+export const createShasthyaShebikaRequest = ({
+  data,
+  successCb,
+  failureCb
+}: {
+  data: ICreateShasthyaShebikaPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}): ICreateShasthyaShebikaRequest => ({
+  type: HF_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST,
+  data,
+  successCb,
+  failureCb
+});
+
+export const createShasthyaShebikaSuccess = (): ICreateShasthyaShebikaSuccess => ({
+  type: HF_TYPES.CREATE_SHASTHYA_SHEBIKA_SUCCESS
+});
+
+export const createShasthyaShebikaFailure = (error: Error): ICreateShasthyaShebikaFailure => ({
+  type: HF_TYPES.CREATE_SHASTHYA_SHEBIKA_FAILURE,
+  error
+});
+
+export const fetchShasthyaShebikaByKormiIdRequest = ({
+  shasthyaKormiIds,
+  successCb,
+  failureCb
+}: {
+  shasthyaKormiIds: string[];
+  successCb?: (payload: ShasthyaShebikaByKormiIdPayload) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchShasthyaShebikaByKormiIdRequest => ({
+  type: HF_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
+  shasthyaKormiIds,
+  successCb,
+  failureCb
+});
+
+export const fetchShasthyaShebikaByKormiIdSuccess = (
+  payload: ShasthyaShebikaByKormiIdPayload
+): IFetchShasthyaShebikaByKormiIdSuccess => ({
+  type: HF_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS,
+  payload
+});
+
+export const fetchShasthyaShebikaByKormiIdFailure = (
+  error: Error
+): IFetchShasthyaShebikaByKormiIdFailure => ({
+  type: HF_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE,
   error
 });
 
@@ -777,6 +843,22 @@ export const fetchCultureListSuccess = (payload: IFetchCultureListSuccessPayload
 
 export const fetchCultureListFailure = (): IFetchCultureListFailure => ({
   type: HF_TYPES.FETCH_CULTURE_LIST_FAILURE
+});
+
+export const fetchSSPrefixRequest = (
+  params?: { successCb?: (payload: ISSPrefix[]) => void; failureCb?: (error: Error) => void }
+): IFetchSSPrefixRequest => ({
+  type: HF_TYPES.FETCH_SS_PREFIX_REQUEST,
+  ...(params && { successCb: params.successCb, failureCb: params.failureCb })
+});
+
+export const fetchSSPrefixSuccess = (payload: ISSPrefix[]): IFetchSSPrefixSuccess => ({
+  type: HF_TYPES.FETCH_SS_PREFIX_SUCCESS,
+  payload
+});
+
+export const fetchSSPrefixFailure = (): IFetchSSPrefixFailure => ({
+  type: HF_TYPES.FETCH_SS_PREFIX_FAILURE
 });
 
 export const fetchCountryListRequest = (): IFetchCountryListRequest => ({

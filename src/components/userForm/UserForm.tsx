@@ -76,6 +76,7 @@ import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import useUserFormUtils, { filterRolesByAppTypeFn } from './userFormUtils';
+import AssignSSUsersSection from './AssignSSUsersSection';
 
 export interface IUserFormValues {
   email: string;
@@ -96,6 +97,8 @@ export interface IDisabledRoles {
 }
 
 export type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
+
+const SHASTIYA_KORMI_ROLE = 'SHASTIYA_KORMI';
 
 /**
  * Form for region admin creation
@@ -1035,7 +1038,8 @@ const UserForm = ({
   }, [autoFetchData, getRoleOptions, initialEditData, isEdit]);
 
   return (
-    <FieldArray name={formName} initialValue={autoFetchData}>
+    <>
+      <FieldArray name={formName} initialValue={autoFetchData}>
       {({ fields }) =>
         fields.map((name: string, index: number) => {
           const isLastChild = (fields?.length || 0) === index + 1;
@@ -1057,6 +1061,9 @@ const UserForm = ({
           const isSPICE = (formSuiteAccess || []).some((v: any) => v?.groupName === SPICE);
           const isReports = (formSuiteAccess || []).some((v: any) => v?.groupName === REPORTS);
           const isInsights = (formSuiteAccess || []).some((v: any) => v?.groupName === INSIGHTS);
+          const isShastiyaKormiSelected = (Array.isArray(spiceRole) ? spiceRole : spiceRole ? [spiceRole] : []).some(
+            (r: any) => r?.name === SHASTIYA_KORMI_ROLE
+          );
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1664,10 +1671,10 @@ const UserForm = ({
                   (isSPICE &&
                     (isEdit
                       ? ((mandatoryRoles || []).length
-                        ? !isCHPCHWSelected(mandatoryRoles) && showSpiceHFRef.current[index]
-                        : showSpiceHFRef.current[index] && (spiceRole || []).length) ||
+                        ? !isCHPCHWSelected(mandatoryRoles) && (showSpiceHFRef.current[index] || isShastiyaKormiSelected)
+                        : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) && (spiceRole || []).length) ||
                       (!isCommunity && isSiteUser && !isHF)
-                      : showSpiceHFRef.current[index] && (!isEdit || isReportOrInsightUser)))) && (
+                      : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) && (!isEdit || isReportOrInsightUser)))) && (
                     <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                       <Field
                         name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1833,6 +1840,8 @@ const UserForm = ({
         })
       }
     </FieldArray>
+    <AssignSSUsersSection />
+    </>
   );
 };
 

@@ -10,7 +10,8 @@ import {
   IUploadFileRequest,
   IDownloadFileRequest,
   IRegionDetailsRequest,
-  IFetchCountryDetailReq
+  IFetchCountryDetailReq,
+  IFetchSubVillagesRequest
 } from './types';
 import {
   createRegionSuccess,
@@ -29,7 +30,8 @@ import {
   UPLOAD_FILE_REQUEST,
   DOWNLOAD_FILE_REQUEST,
   FETCH_REGION_DETAIL_REQUEST,
-  FETCH_COUNTRY_DETAILS_REQUEST
+  FETCH_COUNTRY_DETAILS_REQUEST,
+  FETCH_SUB_VILLAGES_REQUEST
 } from './actionTypes';
 import { setLabelName } from '../common/actions';
 import { setAppType } from '../user/actions';
@@ -152,6 +154,24 @@ export function* regionDetailsSaga({
   }
 }
 
+export function* fetchSubVillagesSagaRequest({
+  villageId,
+  successCb,
+  failureCb
+}: IFetchSubVillagesRequest): SagaIterator {
+  try {
+    const response = yield call(regionService.fetchSubVillages, villageId);
+    const { entity } = response.data;
+    yield put(regionActions.fetchSubVillagesSuccess(entity ?? []));
+    successCb?.(entity ?? []);
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(regionActions.fetchSubVillagesFailure(e));
+    }
+  }
+}
+
 /*
   Worker Saga: Fired on FETCH_COUNTRY_DETAILS_REQUEST action
 */
@@ -188,6 +208,7 @@ function* regionSaga() {
   yield all([takeLatest(UPLOAD_FILE_REQUEST, uploadFileSaga)]);
   yield all([takeLatest(DOWNLOAD_FILE_REQUEST, downloadFileSaga)]);
   yield all([takeLatest(FETCH_COUNTRY_DETAILS_REQUEST, fetchCountryDetail)]);
+  yield all([takeLatest(FETCH_SUB_VILLAGES_REQUEST, fetchSubVillagesSagaRequest)])
 }
 
 export default regionSaga;

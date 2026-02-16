@@ -1,11 +1,12 @@
 import { Field } from 'react-final-form';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
+import { IMatchParams } from '../../../containers/user/UserList';
+import { fetchSubVillagesRequest } from '../../../store/region/actions';
 import { required } from '../../../utils/validation';
 import SelectInput from '../../formFields/SelectInput';
-import MultiSelect from '../../multiSelect/MultiSelect';
-import { useParams } from 'react-router-dom';
-import { IMatchParams } from '../../../containers/user/UserList';
 import useUserFormUtils from '../userFormUtils';
 
 export const DynamicCHForm = ({
@@ -26,8 +27,10 @@ export const DynamicCHForm = ({
   isHFCreate,
   showVillages
 }: any) => {
+  const dispatch = useDispatch();
   const { isCHPCHWSelected } = useUserFormUtils();
   const { healthFacilityId } = useParams<IMatchParams>();
+  const { village: { p: villagePName } } = useAppTypeConfigs();
 
   // Memoize form values to prevent unnecessary re-renders
   const formValues = useMemo(() => form.getState().values.users[index], [form, index]);
@@ -58,6 +61,16 @@ export const DynamicCHForm = ({
     formValues?.selectedVillages
   ]);
 
+  // When there is only one option, the field is auto-filled and onChange may not run — fetch sub-villages for that village
+  useEffect(() => {
+    if (currentHFVillages?.length === 1) {
+      const villageId = currentHFVillages[0]?.id;
+      if (villageId != null) {
+        dispatch(fetchSubVillagesRequest({ villageId: Number(villageId) }));
+      }
+    }
+  }, [currentHFVillages, dispatch]);
+
   // Memoize the edit disabled state
   const isEditDisabled = useMemo(() => {
     const selectedRoles = formValues?.selectedRoles || [];
@@ -67,20 +80,14 @@ export const DynamicCHForm = ({
   // Memoize the existing villages field render function
   const renderExistingVillagesField = useCallback(
     ({ input }: any) => (
-      <MultiSelect
+      <SelectInput
         {...input}
-        label='Existing Villages'
+        label={`Existing ${villagePName}`}
         labelKey='name'
         valueKey='id'
         required={true}
-        isShowLabel={true}
-        isSelectAll={true}
-        isDefaultSelected={true}
-        placeholder=''
-        menuPlacement={'auto'}
         isDisabled={false}
         isModel={true}
-        isMulti={true}
         isOptionDisabled={(option: any) => {
           return autoFetched[index] || isActivating || isEdit
             ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
@@ -97,27 +104,28 @@ export const DynamicCHForm = ({
   // Memoize the assigned villages field render function
   const renderAssignedVillagesField = useCallback(
     ({ input, meta }: any) => (
-      <MultiSelect
+      <SelectInput
         {...input}
-        label='Assigned Villages'
-        errorLabel='assigned villages'
+        label={`Assigned ${villagePName}`}
+        errorLabel={`assigned ${villagePName.toLowerCase()}`}
         labelKey='name'
         valueKey='id'
         required={true}
-        isShowLabel={true}
-        isSelectAll={true}
-        isDefaultSelected={true}
-        placeholder=''
-        menuPlacement={'auto'}
         isDisabled={isProfile || (!isHF && isEditDisabled)}
         isModel={true}
-        isMulti={true}
         options={currentHFVillages || []}
         loadingOptions={villagesLoading}
         error={isError(meta)}
+        onChange={(value: any) => {
+          input.onChange(value);
+          const villageId = Array.isArray(value) ? value[0]?.id : value?.id;
+          if (villageId != null) {
+            dispatch(fetchSubVillagesRequest({ villageId: Number(villageId) }));
+          }
+        }}
       />
     ),
-    [currentHFVillages, isEditDisabled, isHF, isProfile, isError, villagesLoading]
+    [currentHFVillages, dispatch, isEditDisabled, isHF, isProfile, isError, villagesLoading]
   );
 
   // Memoize the community unit field render function
@@ -149,7 +157,7 @@ export const DynamicCHForm = ({
           <Field
             name={`${name}.existingVillages`}
             type='text'
-            validate={(value) => required(Array.isArray(value) ? value : [])}
+            validate={(value) => required(Array.isArray(value) ? value : [value])}
             render={renderExistingVillagesField}
           />
         </div>
@@ -158,7 +166,7 @@ export const DynamicCHForm = ({
         <Field
           name={`${name}.villages`}
           type='text'
-          validate={(value) => required(Array.isArray(value) ? value : [])}
+          validate={(value) => required(Array.isArray(value) ? value : [value])}
           render={renderAssignedVillagesField}
         />
       </div>

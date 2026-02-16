@@ -30,7 +30,10 @@ import {
   IFetchCityListRequest,
   IFetchHFStatusRequest,
   IActivateHFRequest,
-  IFetchCultureListRequest
+  IFetchCultureListRequest,
+  IFetchSSPrefixRequest,
+  ICreateShasthyaShebikaRequest,
+  IFetchShasthyaShebikaByKormiIdRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -67,6 +70,12 @@ import {
   fetchUserDetailFailure,
   fetchCultureListSuccess,
   fetchCultureListFailure,
+  fetchSSPrefixSuccess,
+  fetchSSPrefixFailure,
+  createShasthyaShebikaSuccess,
+  createShasthyaShebikaFailure,
+  fetchShasthyaShebikaByKormiIdSuccess,
+  fetchShasthyaShebikaByKormiIdFailure,
   fetchCountryListSuccess,
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
@@ -104,6 +113,9 @@ import {
   FETCH_VILLAGES_LIST_FROM_HF_REQUEST,
   FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
   FETCH_CULTURE_LIST_REQUEST,
+  FETCH_SS_PREFIX_REQUEST,
+  CREATE_SHASTHYA_SHEBIKA_REQUEST,
+  FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
   DELETE_HEALTH_FACILITY_REQUEST,
   FETCH_PEER_SUPERVISOR_VALIDATION,
@@ -366,13 +378,59 @@ export function* deleteHFUserRequest({ data, successCb, failureCb }: IDeleteHFUs
 */
 export function* createHFUserSagaRequest({ data, successCb, failureCb }: ICreateHFUserRequest): SagaIterator {
   try {
-    yield call(hfService.addHFUser as any, data);
-    successCb?.();
+    const response: { data?: { entity?: { id: number }; message?: string; status?: boolean } } = yield call(
+      hfService.addHFUser as any,
+      data
+    );
+    successCb?.(response?.data);
     yield put(createHFUserSuccess());
   } catch (e) {
     if (e instanceof Error) {
       failureCb?.(e);
       yield put(createHFUserFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on CREATE_SHASTHYA_SHEBIKA_REQUEST action
+*/
+export function* createShasthyaShebikaSaga({
+  data,
+  successCb,
+  failureCb
+}: ICreateShasthyaShebikaRequest): SagaIterator {
+  try {
+    yield call(hfService.createShasthyaShebika, data);
+    successCb?.();
+    yield put(createShasthyaShebikaSuccess());
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(createShasthyaShebikaFailure(e));
+    }
+  }
+}
+
+/*
+  Worker Saga: Fired on FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST action.
+  Response data.data is keyed by shasthya kormi id (e.g. { "354": [...] }).
+*/
+export function* fetchShasthyaShebikaByKormiIdSaga(
+  action: IFetchShasthyaShebikaByKormiIdRequest
+): SagaIterator {
+  try {
+    const { data: responseData } = yield call(
+      hfService.fetchShasthyaShebikaByShasthyaKormiId as any,
+      action.shasthyaKormiIds
+    );
+    const payload = responseData?.data && typeof responseData.data === 'object' ? responseData.data : {};
+    yield put(fetchShasthyaShebikaByKormiIdSuccess(payload));
+    action.successCb?.(payload);
+  } catch (e) {
+    if (e instanceof Error) {
+      action.failureCb?.(e);
+      yield put(fetchShasthyaShebikaByKormiIdFailure(e));
     }
   }
 }
@@ -700,6 +758,23 @@ export function* fetchCultureList(action: IFetchCultureListRequest): SagaIterato
 }
 
 /*
+  Worker Saga: Fired on FETCH_SS_PREFIX_REQUEST action
+*/
+export function* fetchSSPrefixSaga(action: IFetchSSPrefixRequest): SagaIterator {
+  try {
+    const { data } = yield call(hfService.getSSPrefix);
+    const entity = data?.entity ?? [];
+    yield put(fetchSSPrefixSuccess(entity));
+    action.successCb?.(entity);
+  } catch (e) {
+    if (action?.failureCb && typeof action.failureCb === 'function') {
+      action.failureCb(e as Error);
+    }
+    yield put(fetchSSPrefixFailure());
+  }
+}
+
+/*
   Worker Saga: Fired on FETCH_COUNTRY_LIST_REQUEST action
 */
 export function* fetchCountryList(): SagaIterator {
@@ -792,6 +867,10 @@ function* healthFacilitySaga() {
   yield all([takeLatest(DELETE_HEALTH_FACILITY_USER_REQUEST, deleteHFUserRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_USER_REQUEST, updateHFUserSagaRequest)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_USER_REQUEST, createHFUserSagaRequest)]);
+  yield all([takeLatest(CREATE_SHASTHYA_SHEBIKA_REQUEST, createShasthyaShebikaSaga)]);
+  yield all([
+    takeLatest(FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST, fetchShasthyaShebikaByKormiIdSaga)
+  ]);
   yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST_FOR_HF, fetchDistrictListSagaRequest)]);
   yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF, fetchChiefdomListSagaRequest)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST_FOR_HF, fetchVillagesListSagaRequest)]);
@@ -804,6 +883,7 @@ function* healthFacilitySaga() {
   yield all([takeLatest(FETCH_VILLAGES_LIST_FROM_HF_REQUEST, fetchVillagesListFromHFSagaRequest)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_USER_LINKED, fetchVillagesListUserLinkedSagaRequest)]);
   yield all([takeLatest(FETCH_CULTURE_LIST_REQUEST, fetchCultureList)]);
+  yield all([takeLatest(FETCH_SS_PREFIX_REQUEST, fetchSSPrefixSaga)]);
   yield all([takeLatest(FETCH_COUNTRY_LIST_REQUEST, fetchCountryList)]);
   yield all([takeLatest(FETCH_HF_DASHBOARD_LIST_REQUEST, fetchHealthFacilityDashboardList)]);
   yield all([takeLatest(FETCH_UNLINKED_VILLAGES_REQUEST, fetchUnlinkedVillagesSagaRequest)]);

@@ -8,7 +8,8 @@ import {
   fetchClientRegistryStatus,
   uploadFileSaga,
   downloadFileSaga,
-  fetchCountryDetail
+  fetchCountryDetail,
+  fetchSubVillagesSagaRequest
 } from '../sagas';
 import * as ACTION_TYPES from '../actionTypes';
 import * as regionActions from '../actions';
@@ -423,6 +424,83 @@ describe('Region Saga', () => {
       ).toPromise();
       expect(downloadFileSpy).toHaveBeenCalledWith(1, ['COMMUNITY']);
       expect(dispatched).toEqual([regionActions.downloadFileFailure({ error })]);
+    });
+  });
+
+  describe('Fetch Sub Villages: FETCH_SUB_VILLAGES_REQUEST', () => {
+    it('Fetch sub villages and dispatches success', async () => {
+      const villageId = 10;
+      const subVillages = [{ id: 1, name: 'Sub Village 1' }, { id: 2, name: 'Sub Village 2' }];
+      const successCb = jest.fn();
+      const fetchSubVillagesSpy = jest.spyOn(regionService, 'fetchSubVillages').mockImplementation(() =>
+        Promise.resolve({
+          data: { entity: subVillages }
+        } as AxiosResponse)
+      );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchSubVillagesSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
+          villageId,
+          successCb
+        }
+      ).toPromise();
+      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageId);
+      expect(successCb).toHaveBeenCalledWith(subVillages);
+      expect(dispatched).toEqual([regionActions.fetchSubVillagesSuccess(subVillages)]);
+    });
+
+    it('Fetch sub villages with undefined entity and dispatches success with empty array', async () => {
+      const villageId = 10;
+      const successCb = jest.fn();
+      const fetchSubVillagesSpy = jest.spyOn(regionService, 'fetchSubVillages').mockImplementation(() =>
+        Promise.resolve({
+          data: { entity: undefined }
+        } as AxiosResponse)
+      );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchSubVillagesSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
+          villageId,
+          successCb
+        }
+      ).toPromise();
+      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageId);
+      expect(successCb).toHaveBeenCalledWith([]);
+      expect(dispatched).toEqual([regionActions.fetchSubVillagesSuccess([])]);
+    });
+
+    it('Fetch sub villages and dispatches failure', async () => {
+      const error = new Error('Failed to fetch sub villages');
+      const failureCb = jest.fn();
+      const villageId = 10;
+      const fetchSubVillagesSpy = jest
+        .spyOn(regionService, 'fetchSubVillages')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        fetchSubVillagesSagaRequest,
+        {
+          type: ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
+          villageId,
+          failureCb
+        }
+      ).toPromise();
+      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageId);
+      expect(failureCb).toHaveBeenCalledWith(error);
+      expect(dispatched).toEqual([regionActions.fetchSubVillagesFailure(error)]);
     });
   });
 

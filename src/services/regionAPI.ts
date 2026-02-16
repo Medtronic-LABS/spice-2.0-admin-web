@@ -47,6 +47,15 @@ export const fetchRegions = (limit: number | null, skip: number, sort: string, s
     }
   });
 
+export const fetchSubVillages = (villageId: number) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/sub-villages-list',
+    data: {
+      villageId
+    }
+  });
+
 export const createRegion = (data: IRegionPayload) =>
   axios({
     method: 'POST',

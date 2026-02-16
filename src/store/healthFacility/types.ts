@@ -45,6 +45,32 @@ export interface IHealthFacilityState {
   hfDropdownOptions: any;
   hfDashboardList: IHFDashboard[];
   loadingMore: boolean;
+  ssPrefixList: ISSPrefix[];
+  ssPrefixLoading: boolean;
+  /** SS users by shasthya kormi id (key = id string, value = array of SS user objects) */
+  shasthyaShebikaByKormiId: Record<string, any[]>;
+  shasthyaShebikaByKormiIdLoading: boolean;
+}
+
+/** SS (Shasthya Shebika) prefix item from spice-service/meta/get-ss-prefix */
+export interface ISSPrefix {
+  id: number;
+  name: string;
+  type: string;
+  displayOrder: number;
+  status: boolean;
+  displayValue: string;
+  default: boolean;
+  childExists: boolean;
+  answerDependent: boolean;
+}
+
+export interface ICreateShasthyaShebikaPayload {
+  name: string;
+  phoneNumber: string;
+  ssId: string;
+  shasthyaKormiId: string;
+  subVillageIds: string[];
 }
 
 export interface IHFDashboard {
@@ -412,10 +438,20 @@ export interface IHFUserPayLoad {
   tenantId: string;
   user: IHFUserPost;
 }
+/** Response body from create HF user API (admin-service/healthfacility/user-add) */
+export interface ICreateHFUserResponse {
+  message?: string;
+  entity?: { id: number; [key: string]: any };
+  status?: boolean;
+  entityList?: unknown;
+  responseCode?: number;
+  totalCount?: number | null;
+}
+
 export interface ICreateHFUserRequest {
   type: typeof ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_REQUEST;
   data: IHFUserPost;
-  successCb?: () => void;
+  successCb?: (response?: ICreateHFUserResponse) => void;
   failureCb?: (error: Error) => void;
 }
 
@@ -425,6 +461,50 @@ export interface ICreateHFUserSuccess {
 
 export interface ICreateHFUserFailure {
   type: typeof ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE;
+  error: Error;
+}
+
+export interface ICreateShasthyaShebikaPayload {
+  name: string;
+  phoneNumber: string;
+  ssId: string;
+  shasthyaKormiId: string;
+  subVillageIds: string[];
+}
+
+export interface ICreateShasthyaShebikaRequest {
+  type: typeof ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST;
+  data: ICreateShasthyaShebikaPayload;
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface ICreateShasthyaShebikaSuccess {
+  type: typeof ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_SUCCESS;
+}
+
+export interface ICreateShasthyaShebikaFailure {
+  type: typeof ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_FAILURE;
+  error: Error;
+}
+
+/** Response data from by-shasthya-kormi-id API: key = shasthya kormi id, value = SS user list */
+export type ShasthyaShebikaByKormiIdPayload = Record<string, any[]>;
+
+export interface IFetchShasthyaShebikaByKormiIdRequest {
+  type: typeof ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST;
+  shasthyaKormiIds: string[];
+  successCb?: (payload: ShasthyaShebikaByKormiIdPayload) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchShasthyaShebikaByKormiIdSuccess {
+  type: typeof ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS;
+  payload: ShasthyaShebikaByKormiIdPayload;
+}
+
+export interface IFetchShasthyaShebikaByKormiIdFailure {
+  type: typeof ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE;
   error: Error;
 }
 
@@ -821,6 +901,21 @@ export interface IFetchCultureListFailure {
   type: typeof ACTION_TYPES.FETCH_CULTURE_LIST_FAILURE;
 }
 
+export interface IFetchSSPrefixRequest {
+  type: typeof ACTION_TYPES.FETCH_SS_PREFIX_REQUEST;
+  successCb?: (payload: ISSPrefix[]) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchSSPrefixSuccess {
+  type: typeof ACTION_TYPES.FETCH_SS_PREFIX_SUCCESS;
+  payload: ISSPrefix[];
+}
+
+export interface IFetchSSPrefixFailure {
+  type: typeof ACTION_TYPES.FETCH_SS_PREFIX_FAILURE;
+}
+
 export interface IFetchCountryListRequest {
   type: typeof ACTION_TYPES.FETCH_COUNTRY_LIST_REQUEST;
 }
@@ -888,6 +983,12 @@ export type HealthFacilityActions =
   | ICreateHFUserRequest
   | ICreateHFUserSuccess
   | ICreateHFUserFailure
+  | ICreateShasthyaShebikaRequest
+  | ICreateShasthyaShebikaSuccess
+  | ICreateShasthyaShebikaFailure
+  | IFetchShasthyaShebikaByKormiIdRequest
+  | IFetchShasthyaShebikaByKormiIdSuccess
+  | IFetchShasthyaShebikaByKormiIdFailure
   | IUpdateHFDetailsRequest
   | IUpdateHFDetailsSuccess
   | IUpdateHFDetailsFailure
@@ -931,6 +1032,9 @@ export type HealthFacilityActions =
   | IFetchCultureListRequest
   | IFetchCultureListSuccess
   | IFetchCultureListFailure
+  | IFetchSSPrefixRequest
+  | IFetchSSPrefixSuccess
+  | IFetchSSPrefixFailure
   | IFetchCountryListRequest
   | IFetchCountryListSuccess
   | IFetchCountryListFailure

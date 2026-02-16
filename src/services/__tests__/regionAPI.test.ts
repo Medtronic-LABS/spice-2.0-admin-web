@@ -5,6 +5,7 @@ import {
   downloadFile,
   regionDetails,
   fetchRegions,
+  fetchSubVillages,
   createRegion,
   getCountryDetail,
   getRegionDetailById
@@ -109,8 +110,7 @@ describe('Region APIs', () => {
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(data);
   });
 
-  it(`getRegionDetailById sends a POST request
-    to /admin-service/data/get-country/countryId with correct data`, async () => {
+  it('getRegionDetailById sends a GET request to /admin-service/data/get-country/{countryId}', async () => {
     const countryId = '2';
 
     mockAxios.onGet(`/admin-service/data/get-country/${countryId}`).reply(200, {});

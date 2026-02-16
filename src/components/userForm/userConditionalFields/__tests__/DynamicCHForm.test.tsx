@@ -3,6 +3,11 @@ import { render, screen } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import { DynamicCHForm } from '../DynamicCHForm';
 
+const mockDispatch = jest.fn();
+jest.mock('react-redux', () => ({
+  useDispatch: () => mockDispatch
+}));
+
 const mockIsCHPCHWSelected = jest.fn();
 jest.mock('../../userFormUtils', () => ({
   __esModule: true,
@@ -13,14 +18,19 @@ jest.mock('react-router-dom', () => ({
   useParams: () => ({ healthFacilityId: '1' })
 }));
 
+jest.mock('../../../../hooks/appTypeBasedConfigs', () => ({
+  __esModule: true,
+  default: () => ({ village: { p: 'Villages' } })
+}));
+
+const mockFetchSubVillagesRequest = jest.fn((payload: any) => ({ type: 'FETCH_SUB_VILLAGES', payload }));
+jest.mock('../../../../store/region/actions', () => ({
+  fetchSubVillagesRequest: (payload: any) => mockFetchSubVillagesRequest(payload)
+}));
+
 jest.mock('../../../formFields/SelectInput', () => ({
   __esModule: true,
   default: ({ label }: any) => <div data-testid="select-input">{label}</div>
-}));
-
-jest.mock('../../../multiSelect/MultiSelect', () => ({
-  __esModule: true,
-  default: ({ label }: any) => <div data-testid="multi-select">{label}</div>
 }));
 
 const defaultInitialValues = {
@@ -67,6 +77,7 @@ describe('DynamicCHForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsCHPCHWSelected.mockReturnValue(false);
+    mockDispatch.mockImplementation((action: any) => action);
   });
 
   it('returns null when showVillages is false', () => {
@@ -162,5 +173,20 @@ describe('DynamicCHForm', () => {
     renderWithForm({ index: 1, name: 'users[1]', autoFetched: [false, true] }, initialValues);
     expect(screen.getByText('Assigned Villages')).toBeInTheDocument();
     expect(screen.getByText('Existing Villages')).toBeInTheDocument();
+  });
+
+  it('dispatches fetchSubVillagesRequest when there is exactly one village option (auto-fill case)', () => {
+    const oneVillage = [{ id: 42, name: 'Single Village' }];
+    renderWithForm(
+      {
+        villages: [oneVillage] as any,
+        autoFetched: [false],
+        isEdit: false,
+        isHF: false
+      },
+      defaultInitialValues
+    );
+    expect(mockDispatch).toHaveBeenCalled();
+    expect(mockFetchSubVillagesRequest).toHaveBeenCalledWith({ villageId: 42 });
   });
 });

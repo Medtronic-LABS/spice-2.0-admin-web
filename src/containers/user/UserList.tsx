@@ -22,10 +22,13 @@ import {
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
+  createShasthyaShebikaRequest,
   deleteHFUserRequest,
   fetchHFListRequest,
   fetchHFUserListRequest,
   fetchPeerSupervisorListRequest,
+  fetchSSPrefixRequest,
+  fetchShasthyaShebikaByKormiIdRequest,
   fetchUserDetailRequest,
   updateHFUserRequest
 } from '../../store/healthFacility/actions';
@@ -56,7 +59,7 @@ import {
   chwListSelector
 } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
-import { getUserPayload } from '../../utils/formatObjectUtils';
+import { getUserPayload, getSSUsersPayload, ISSUserPayloadItem } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { chwColumnDef, columnDef } from './userListMeta';
@@ -127,6 +130,7 @@ const UserList = (): React.ReactElement => {
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
+  const pendingSSUsersPayloadRef = useRef<ISSUserPayloadItem[] | null>(null);
   const [selectedFacility, setSelectedFacility] = useState<string[]>();
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
@@ -229,6 +233,11 @@ const UserList = (): React.ReactElement => {
     }
   }, [countryIdValue, dispatch, rolesGrouped, showFilters]);
 
+
+  useEffect(() => {
+    dispatch(fetchSSPrefixRequest());
+  }, [dispatch]);
+
   /**
    * Handler function for user delete
    * @param {object} data
@@ -263,6 +272,9 @@ const UserList = (): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
+    const userId = value?.id != null ? String(value.id) : null;
+    const { roles = [] } : { roles: any[] } = value;
+    const hasShastiyaKormiRole = roles.some(role => role.name?.toUpperCase() === "SHASTIYA_KORMI");
     if ((value.roles || []).some((userRole: IUserRole) => villageBasedRoles.includes(userRole.name))) {
       dispatch(
         fetchUserDetailRequest({
@@ -270,6 +282,18 @@ const UserList = (): React.ReactElement => {
           successCb: (user: any) => {
             const postData = { ...user };
             userForEdit.current = { users: [{ ...postData }] };
+            if (hasShastiyaKormiRole && userId) {
+              dispatch(
+                fetchShasthyaShebikaByKormiIdRequest({
+                  shasthyaKormiIds: [userId],
+                  failureCb: (e) => {
+                    toastCenter.error(
+                      ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL)
+                    );
+                  }
+                })
+              );
+            }
             setIsOpenUserModal({ isOpen: true, isEdit: true });
           },
           failureCb: (e) => {
@@ -280,6 +304,16 @@ const UserList = (): React.ReactElement => {
     } else {
       const postData = { ...value };
       userForEdit.current = { users: [{ ...postData }] };
+      if (hasShastiyaKormiRole && userId) {
+        dispatch(
+          fetchShasthyaShebikaByKormiIdRequest({
+            shasthyaKormiIds: [userId],
+            failureCb: (e) => {
+              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL));
+            }
+          })
+        );
+      }
       setIsOpenUserModal({ isOpen: true, isEdit: true });
     }
   };
@@ -303,24 +337,49 @@ const UserList = (): React.ReactElement => {
   };
 
   /**
-   * Handler function for success callback for add user and edit user
+   * Handler function for success callback for add user and edit user.
+   * On create, response.entity contains the created user (including id).
    */
-  const siteUserSuccess = useCallback(() => {
-    const successMessage = isOpenUserModal.isEdit
-      ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
-      : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
+  const siteUserSuccess = useCallback(
+    (response?: { entity?: { id: number }; message?: string; status?: boolean }) => {
+      const shasthyaKormiId = response?.entity?.id;
+      const ssUsersPayload = pendingSSUsersPayloadRef.current;
+      if (shasthyaKormiId != null && ssUsersPayload?.length) {
+        ssUsersPayload.forEach((entry) => {
+          dispatch(
+            createShasthyaShebikaRequest({
+              data: {
+                ...entry,
+                shasthyaKormiId: String(shasthyaKormiId)
+              },
+              failureCb: (e) => {
+                toastCenter.error(
+                  ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL)
+                );
+              }
+            })
+          );
+        });
+        pendingSSUsersPayloadRef.current = null;
+      }
 
-    if (!openConfirmationModal.userData.id) {
-      toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
-    }
-    refreshHFUserList();
-    setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
-    setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
-    setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
-    setIsOpenCHWListModal({ isOpen: false });
-    handlePeerSupervisorModalCancel();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpenUserModal.isEdit, refreshHFUserList, isOpenPeerSupervisorModal.isEdit]);
+      const successMessage = isOpenUserModal.isEdit
+        ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
+        : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
+
+      if (!openConfirmationModal.userData.id) {
+        toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
+      }
+      refreshHFUserList();
+      setIsOpenUserModal({ isOpen: false, isEdit: isOpenUserModal.isEdit });
+      setOpenConfirmationModal({ isOpen: false, isActivating: false, userData: {} });
+      setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
+      setIsOpenCHWListModal({ isOpen: false });
+      handlePeerSupervisorModalCancel();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [dispatch, isOpenUserModal.isEdit, refreshHFUserList, isOpenPeerSupervisorModal.isEdit]
+  );
 
   /**
    * Handler function for success callback for add user and edit user
@@ -396,7 +455,7 @@ const UserList = (): React.ReactElement => {
    * Handler for edit user form submit.
    */
   const handleEditSubmit = useCallback(
-    ({ users }: { users: IHFUserGet[] }) => {
+    ({ users, ssUsers }: { users: IHFUserGet[], ssUsers?: any[] }) => {
       const userObj = getUserPayload({
         userFormData: users,
         countryId: countryIdValue,
@@ -404,8 +463,10 @@ const UserList = (): React.ReactElement => {
         spiceRolesGroup: rolesGrouped?.SPICE,
         appTypes
       });
-
+      const ssUsersPayload = getSSUsersPayload(ssUsers ?? []);
       const data: IHFUserPost = userObj[0];
+      const isCreate = !isOpenUserModal.isEdit && !data.id;
+      pendingSSUsersPayloadRef.current = isCreate && ssUsersPayload.length > 0 ? ssUsersPayload : null;
 
       // If we're assigning a peer supervisor
       if (openConfirmationModal.userData.id && openConfirmationModal.roleId) {

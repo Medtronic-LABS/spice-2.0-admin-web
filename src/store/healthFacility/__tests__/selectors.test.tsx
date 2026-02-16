@@ -35,7 +35,11 @@ import {
   countryListSelector,
   countryLoadingSelector,
   hfDashboardListSelector,
-  hfLoadingMoreSelector
+  hfLoadingMoreSelector,
+  ssPrefixListSelector,
+  ssPrefixLoadingSelector,
+  shasthyaShebikaByKormiIdSelector,
+  shasthyaShebikaByKormiIdLoadingSelector
 } from '../selectors';
 
 const initialState: any = {
@@ -219,4 +223,26 @@ test('hfDashboardListSelector should return hfDashboardList from state', () => {
 // Test hfLoadingMoreSelector
 test('hfLoadingMoreSelector should return loadingMore from state', () => {
   expect(hfLoadingMoreSelector(initialState)).toEqual(initialState.healthFacility.loadingMore);
+});
+
+// Test ssPrefixListSelector
+test('ssPrefixListSelector should return ssPrefixList from state', () => {
+  expect(ssPrefixListSelector(initialState)).toEqual(initialState.healthFacility.ssPrefixList);
+});
+
+// Test ssPrefixLoadingSelector
+test('ssPrefixLoadingSelector should return ssPrefixLoading from state', () => {
+  expect(ssPrefixLoadingSelector(initialState)).toEqual(initialState.healthFacility.ssPrefixLoading);
+});
+
+// Test shasthyaShebikaByKormiIdSelector
+test('shasthyaShebikaByKormiIdSelector should return shasthyaShebikaByKormiId from state', () => {
+  expect(shasthyaShebikaByKormiIdSelector(initialState)).toEqual(initialState.healthFacility.shasthyaShebikaByKormiId);
+});
+
+// Test shasthyaShebikaByKormiIdLoadingSelector
+test('shasthyaShebikaByKormiIdLoadingSelector should return shasthyaShebikaByKormiIdLoading from state', () => {
+  expect(shasthyaShebikaByKormiIdLoadingSelector(initialState)).toEqual(
+    initialState.healthFacility.shasthyaShebikaByKormiIdLoading
+  );
 });

@@ -193,10 +193,13 @@ export const useRoleMeta = ({
     (roles: IRoles[] = [], currentSuite: string, index: number) => {
       const isCHAUser = (roles || []).some((userRole: IRoles) => chaRole.includes(userRole.name));
       const isCHWCHPUser = (roles || []).some((userRole: IRoles) => villageBasedRoles.includes(userRole.name));
+      const isShastiyaKormiUser = (roles || []).some(
+        (userRole: IRoles) => userRole.name === 'SHASTIYA_KORMI'
+      );
       // show HF and show Villages condition
       if (roles.length && currentSuite === SPICE) {
-        if (isCHWCHPUser) {
-          showFields.isShowVillages = isHFCreate ? false : isCHWCHPUser;
+        if (isCHWCHPUser || isShastiyaKormiUser) {
+          showFields.isShowVillages = isHFCreate ? false : true;
         }
         roles.forEach((userRole: IRoles) => {
           if (

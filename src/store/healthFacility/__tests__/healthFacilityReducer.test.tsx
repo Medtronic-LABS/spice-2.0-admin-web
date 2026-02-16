@@ -936,4 +936,95 @@ describe('healthFacilityReducer', () => {
     };
     expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
   });
+
+  it('should handle FETCH_SS_PREFIX_REQUEST', () => {
+    const action: any = {
+      type: actionTypes.FETCH_SS_PREFIX_REQUEST
+    };
+    const expectedState = {
+      ...initialState,
+      ssPrefixLoading: true
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SS_PREFIX_SUCCESS', () => {
+    const payload = [{ id: 1, name: 'SS01', displayOrder: 1 }];
+    const action: any = {
+      type: actionTypes.FETCH_SS_PREFIX_SUCCESS,
+      payload
+    };
+    const expectedState = {
+      ...initialState,
+      ssPrefixLoading: false,
+      ssPrefixList: payload
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SS_PREFIX_FAILURE', () => {
+    const action: any = {
+      type: actionTypes.FETCH_SS_PREFIX_FAILURE
+    };
+    const expectedState = {
+      ...initialState,
+      ssPrefixLoading: false,
+      ssPrefixList: []
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST', () => {
+    const action: any = {
+      type: actionTypes.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST
+    };
+    const expectedState = {
+      ...initialState,
+      shasthyaShebikaByKormiIdLoading: true
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS', () => {
+    const payload = { '42': [{ id: 1, name: 'SS User', ssId: 'SS01' }] };
+    const action: any = {
+      type: actionTypes.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS,
+      payload
+    };
+    const expectedState = {
+      ...initialState,
+      shasthyaShebikaByKormiIdLoading: false,
+      shasthyaShebikaByKormiId: payload
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS merging with existing state', () => {
+    const stateWithExisting = {
+      ...initialState,
+      shasthyaShebikaByKormiId: { '1': [{ id: 1, name: 'Existing' }] }
+    };
+    const payload = { '42': [{ id: 2, name: 'New', ssId: 'SS02' }] };
+    const action: any = {
+      type: actionTypes.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_SUCCESS,
+      payload
+    };
+    const result = healthFacilityReducer(stateWithExisting, action);
+    expect(result.shasthyaShebikaByKormiIdLoading).toBe(false);
+    expect(result.shasthyaShebikaByKormiId).toEqual({
+      '1': [{ id: 1, name: 'Existing' }],
+      '42': [{ id: 2, name: 'New', ssId: 'SS02' }]
+    });
+  });
+
+  it('should handle FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE', () => {
+    const action: any = {
+      type: actionTypes.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE
+    };
+    const expectedState = {
+      ...initialState,
+      shasthyaShebikaByKormiIdLoading: false
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
 });

@@ -12,6 +12,8 @@ const getIsUploading = (state: AppState) => state.region.uploading;
 const getIsDownloading = (state: AppState) => state.region.downloading;
 const getRegionDetails = (state: AppState) => state.region.detail;
 const getRegionId = (state: AppState) => state.region.detail.id;
+const getSubVillages = (state: AppState) => state.region.subVillages;
+const getSubVillagesLoading = (state: AppState) => state.region.subVillagesLoading;
 
 export const getRegionsSelector = createSelector(getRegions, (regions) => regions);
 export const getRegionsCountSelector = createSelector(getRegionsCount, (regiosCount) => regiosCount);
@@ -27,3 +29,5 @@ export const getIsDownloadingSelector = createSelector(getIsDownloading, (downlo
 export const getLoadingSelector = createSelector(getLoading, (loading) => loading);
 export const getRegionDetailsSelector = createSelector(getRegionDetails, (regionDetails) => regionDetails);
 export const getRegionIdSelector = createSelector(getRegionId, (regionId) => regionId);
+export const getSubVillagesSelector = createSelector(getSubVillages, (subVillages) => subVillages);
+export const getSubVillagesLoadingSelector = createSelector(getSubVillagesLoading, (loading) => loading);
