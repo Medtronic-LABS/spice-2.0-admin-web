@@ -15,6 +15,7 @@ describe('formatObjectUtils', () => {
       lastName: ' Doe ',
       gender: 'Male',
       username: 'johndoe',
+      email: 'john.doe@example.com',
       phoneNumber: '1234567890',
       countryCode: { phoneNumberCode: '+1' },
       timezone: {

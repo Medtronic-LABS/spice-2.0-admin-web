@@ -3,6 +3,7 @@ import {
   required,
   validateEmail,
   validatePassword,
+  validateNoSpaces,
   maxLength,
   composeValidators,
   convertToNumber,
@@ -83,6 +84,29 @@ describe('Validation', () => {
 
       it('returns an empty string for valid password', () => {
         expect(validatePassword('Password123')).toBe('');
+      });
+    });
+
+    describe('validateNoSpaces', () => {
+      it('returns an empty string for usernames without spaces', () => {
+        expect(validateNoSpaces('johndoe')).toBe('');
+        expect(validateNoSpaces('john_doe')).toBe('');
+        expect(validateNoSpaces('john.doe')).toBe('');
+        expect(validateNoSpaces('john-doe123')).toBe('');
+      });
+
+      it('returns an error message for usernames with spaces', () => {
+        expect(validateNoSpaces('john doe')).toBe('Username cannot contain spaces');
+        expect(validateNoSpaces('john  doe')).toBe('Username cannot contain spaces');
+        expect(validateNoSpaces(' johndoe')).toBe('Username cannot contain spaces');
+        expect(validateNoSpaces('johndoe ')).toBe('Username cannot contain spaces');
+        expect(validateNoSpaces('john doe smith')).toBe('Username cannot contain spaces');
+      });
+
+      it('returns an empty string for empty or undefined input', () => {
+        expect(validateNoSpaces('')).toBe('');
+        expect(validateNoSpaces(null as any)).toBe('');
+        expect(validateNoSpaces(undefined as any)).toBe('');
       });
     });
 

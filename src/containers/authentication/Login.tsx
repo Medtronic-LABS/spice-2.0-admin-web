@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../assets/images/app-logo.svg';
 import Checkbox from '../../components/formFields/Checkbox';
 import TextInput from '../../components/formFields/TextInput';
-import { composeValidators, required, validateEmail } from '../../utils/validation';
+import { composeValidators, required, validateLoginIdentifier } from '../../utils/validation';
 import styles from './Authentication.module.scss';
 import localStorageServices from '../../global/localStorageServices';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -109,11 +109,11 @@ const Login = (props: any): React.ReactElement => {
               <Field
                 name='email'
                 type='text'
-                validate={composeValidators(required, validateEmail)}
+                validate={composeValidators(required, validateLoginIdentifier)}
                 render={({ input, meta }) => (
                   <TextInput
                     {...input}
-                    label='Email'
+                    label='Email, username or mobile number'
                     errorLabel='email'
                     error={(meta.touched && meta.error) || undefined}
                     onChange={(e) => {

@@ -390,6 +390,8 @@ const APPCONSTANTS = {
   EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG: 'Email ID already exists in different organization',
   EMAIL_DUPLICATION_ERR_MSG: `Multiple users can't have same`,
   USERNAME_DUPLICATION_ERR_MSG: `Multiple users can't have same username`,
+  USERNAME_SPACE_ERR_MSG: 'Username cannot contain spaces',
+  VALIDATION_PENDING_ERROR: ' ',
   PHONE_NUMBER_ALREADY_EXISTS_ERR_MSG: 'Phone number already exists',
   PHONE_NUMBER_DUPLICATION_ERR_MSG: `Multiple users can't have same`,
   ACTIVE: 'Active',

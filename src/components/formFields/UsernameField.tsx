@@ -7,7 +7,7 @@ import ApiError from '../../global/ApiError';
 import styles from './TextInput.module.scss';
 import { fetchUserByUsername } from '../../services/userAPI';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import { composeValidators, required } from '../../utils/validation';
+import { composeValidators, required, validateNoSpaces } from '../../utils/validation';
 import TextInput from './TextInput';
 import { IHFUserGet } from '../../store/healthFacility/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -75,6 +75,8 @@ const UsernameField = forwardRef(
   const differentOrgError = APPCONSTANTS.EMAIL_ALREADY_EXISTS_IN_ORG_ERR_MSG;
   const duplicationError = APPCONSTANTS.USERNAME_DUPLICATION_ERR_MSG || `Multiple users can't have same username`;
   const siteAdminError = APPCONSTANTS.HEALTH_FACILITY_ADMIN_PERMISSION_ERR_MSG;
+  const noSpacesError = APPCONSTANTS.USERNAME_SPACE_ERR_MSG;
+  const emptyCharError = APPCONSTANTS.VALIDATION_PENDING_ERROR;
   const { isCommunity, appTypes } = useAppTypeConfigs();
 
   useImperativeHandle(
@@ -244,7 +246,7 @@ const UsernameField = forwardRef(
     <Field
       name={`${name}.username`}
       type='text'
-      validate={composeValidators(required, validateIsUsernameExist, validateDuplication)}
+      validate={composeValidators(required, validateNoSpaces, validateIsUsernameExist, validateDuplication)}
       render={({ input, meta }: FieldRenderProps<string>) => {
         return (
           <TextInput
@@ -266,7 +268,7 @@ const UsernameField = forwardRef(
             showLoader={loading}
             label='Username'
             errorLabel={
-              [alreadyExistError, cfrError, differentOrgError, siteAdminError, ' '].includes(meta.error) ||
+              [alreadyExistError, cfrError, differentOrgError, siteAdminError, noSpacesError, emptyCharError].includes(meta.error) ||
               isNetworkError ||
               errorCode.current === 409
                 ? ''

@@ -177,6 +177,7 @@ export const getAdminPayload = ({
       lastName: user.lastName.trim(),
       gender: user.gender,
       username: user.username,
+      email: user.email.trim(),
       phoneNumber: user.phoneNumber,
       // for create region countryCode will be come as free text
       countryCode: user?.countryCode?.phoneNumberCode || user?.countryCode,

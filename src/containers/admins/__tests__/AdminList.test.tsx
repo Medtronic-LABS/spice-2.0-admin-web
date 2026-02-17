@@ -384,6 +384,10 @@ describe('AdminList Component', () => {
             firstName: 'John',
             lastName: 'Doe',
             username: 'johndoe',
+            email: 'johndoe@example.com',
+            phoneNumber: '1234567890',
+            countryCode: '+1',
+            gender: 'Male',
             roles: [{ groupName: 'SPICE' }]
           }
         ]

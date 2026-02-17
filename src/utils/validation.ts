@@ -34,9 +34,50 @@ export function validateEmail(email: string) {
   return regex.test(email) ? '' : 'Please enter a valid ';
 }
 
+/**
+ * Validates login identifier: accepts email, username or mobile number.
+ * @param value input string (email, username or mobile)
+ * @returns empty string if valid, error message otherwise
+ */
+export function validateLoginIdentifier(value: string | null | undefined): string {
+  if (!value || typeof value !== 'string' || !value.trim()) {
+    return '';
+  }
+  const trimmed = value.trim();
+  // Valid email
+  if (validateEmail(trimmed) === '') {
+    return '';
+  }
+  // Username: alphanumeric, dots, underscores, hyphens; 3–64 chars
+  if (/^[a-zA-Z0-9._-]{3,64}$/.test(trimmed)) {
+    return '';
+  }
+  // Mobile: optional +, then 8–15 digits (spaces ignored)
+  const digitsOnly = trimmed.replace(/\s/g, '');
+  if (/^\+?\d{8,15}$/.test(digitsOnly)) {
+    return '';
+  }
+  return 'Please enter a valid email, username or mobile number';
+}
+
 export function validatePassword(password: string) {
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,64}$/;
   return regex.test(password) ? '' : 'Please enter a valid password.';
+}
+
+/**
+ * Validates that username does not contain spaces
+ * @param username username string
+ * @returns empty string if valid, error message otherwise
+ */
+export function validateNoSpaces(username: string) {
+  if (!username) {
+    return '';
+  }
+  if (/\s/.test(username)) {
+    return 'Username cannot contain spaces';
+  }
+  return '';
 }
 
 /**
