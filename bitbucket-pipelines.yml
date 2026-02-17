@@ -16,7 +16,7 @@ definitions:
     # Step 1: Install & Test – produces coverage and node_modules for Sonar and Build
     - step: &install-test
         name: Install & Test
-        image: node:22
+        image: node:22.14.0
         caches:
           - npm
         script:
