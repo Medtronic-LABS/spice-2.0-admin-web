@@ -134,7 +134,7 @@ const HealthFacilityDetailsForm = ({
   });
 
   // map variables
-  const { latitude = '', longitude = '' } = form.getState().values[formName];
+  const { latitude = '', longitude = '' } = form.getState()?.values?.[formName] ?? {};
   const [position, setPosition] = useState<{
     latitude: number | any;
     longitude: number | any;
