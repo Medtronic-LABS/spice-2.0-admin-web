@@ -115,7 +115,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
       { label: villageSName, value: healthFacility?.cityName },
       { label: 'Latitude', value: healthFacility?.latitude },
       { label: 'Longitude', value: healthFacility?.longitude },
-      { label: 'Facility ID (Postal Code)', value: healthFacility?.postalCode },
+      { label: 'Facility ID', value: healthFacility?.postalCode },
       { label: 'Language', value: healthFacility?.language },
       {
         label: `Linked ${villagePName}`,

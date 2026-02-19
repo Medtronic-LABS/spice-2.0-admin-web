@@ -550,8 +550,8 @@ const HealthFacilityDetailsForm = ({
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
-                  label='Facility ID (Postal Code)'
-                  errorLabel='facility id (postal code)'
+                  label='Facility ID'
+                  errorLabel='facility id'
                   disabled={isEdit || isActivating}
                   error={(meta.touched && meta.error) || undefined}
                 />

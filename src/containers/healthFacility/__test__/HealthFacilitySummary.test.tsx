@@ -253,7 +253,7 @@ describe('HealthFacilitySummary', () => {
       expect(screen.getByText('Village')).toBeInTheDocument();
       expect(screen.getByText('Latitude')).toBeInTheDocument();
       expect(screen.getByText('Longitude')).toBeInTheDocument();
-      expect(screen.getByText('Facility ID (Postal Code)')).toBeInTheDocument();
+      expect(screen.getByText('Facility ID')).toBeInTheDocument();
       expect(screen.getByText('Language')).toBeInTheDocument();
       expect(screen.getByText('Linked Villages')).toBeInTheDocument();
     });

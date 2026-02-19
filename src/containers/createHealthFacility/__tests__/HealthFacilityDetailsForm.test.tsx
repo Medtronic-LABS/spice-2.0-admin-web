@@ -187,7 +187,7 @@ describe('HealthFacilityDetailsForm', () => {
     expect(screen.getByText('County')).toBeInTheDocument();
     expect(screen.getByText('Sub County')).toBeInTheDocument();
     expect(screen.getByText('City')).toBeInTheDocument();
-    expect(screen.getByText('Facility ID (Postal Code)')).toBeInTheDocument();
+    expect(screen.getByText('Facility ID')).toBeInTheDocument();
     expect(screen.getByText('Language')).toBeInTheDocument();
     expect(screen.getByText('Linked Villages')).toBeInTheDocument();
     expect(screen.getByText('Latitude')).toBeInTheDocument();
