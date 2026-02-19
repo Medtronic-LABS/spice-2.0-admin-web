@@ -1027,4 +1027,40 @@ describe('healthFacilityReducer', () => {
     };
     expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
   });
+
+  it('should handle DELETE_SHASTHYA_SHEBIKAS_REQUEST', () => {
+    const action: any = {
+      type: actionTypes.DELETE_SHASTHYA_SHEBIKAS_REQUEST
+    };
+    const expectedState = {
+      ...initialState,
+      loading: true
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle DELETE_SHASTHYA_SHEBIKAS_SUCCESS', () => {
+    const action: any = {
+      type: actionTypes.DELETE_SHASTHYA_SHEBIKAS_SUCCESS
+    };
+    const expectedState = {
+      ...initialState,
+      loading: false
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle DELETE_SHASTHYA_SHEBIKAS_FAILURE', () => {
+    const error = new Error('Failed to delete shasthya shebikas');
+    const action: any = {
+      type: actionTypes.DELETE_SHASTHYA_SHEBIKAS_FAILURE,
+      error
+    };
+    const expectedState = {
+      ...initialState,
+      loading: false,
+      error: action.error
+    };
+    expect(healthFacilityReducer(initialState, action)).toEqual(expectedState);
+  });
 });

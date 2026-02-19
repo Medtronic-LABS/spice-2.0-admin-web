@@ -263,3 +263,10 @@ export const fetchShasthyaShebikaByShasthyaKormiId = (shasthyaKormiIds: string[]
     url: '/admin-service/shasthya-shebika/by-shasthya-kormi-id',
     data: shasthyaKormiIds
   });
+
+export const deleteShasthyaShebikas = (ids: string[]) =>
+  axios({
+    method: 'PUT',
+    url: '/admin-service/shasthya-shebika/remove',
+    data: ids
+  });

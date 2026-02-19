@@ -11,7 +11,7 @@ import Loader from '../../components/loader/Loader';
 import ModalForm from '../../components/modal/ModalForm';
 import UserForm, { ModuleNames } from '../../components/userForm/UserForm';
 import APPCONSTANTS from '../../constants/appConstants';
-import { onlyCHWRoles, villageBasedRoles } from '../../constants/roleConstants';
+import { onlyCHWRoles, shastiyaKormiRole, villageBasedRoles } from '../../constants/roleConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
 import { useRoleOptions } from '../../hooks/roleOptionsHook';
@@ -24,6 +24,7 @@ import {
   createHFUserRequest,
   createShasthyaShebikaRequest,
   deleteHFUserRequest,
+  deleteShasthyaShebikasRequest,
   fetchHFListRequest,
   fetchHFUserListRequest,
   fetchPeerSupervisorListRequest,
@@ -42,7 +43,7 @@ import {
   healthFacilityUsersLoadingSelector,
   peerSupervisorLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole } from '../../store/healthFacility/types';
+import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole, ShasthyaShebikaByKormiIdPayload } from '../../store/healthFacility/types';
 import {
   changePassword,
   fetchCHWListRequest,
@@ -122,7 +123,7 @@ const UserList = (): React.ReactElement => {
   const email = useSelector(emailSelector);
   const rolesGrouped = useSelector(userRolesSelector);
   const hfUserList = useSelector(healthFacilityUserListSelector);
-  const loading = useSelector(healthFacilityLoadingSelector);
+  const hfOperationsLoading = useSelector(healthFacilityLoadingSelector);
   const hfUserCount = useSelector(healthFacilityListUsersTotalSelector);
   const hfUserDetailLoading = useSelector(userDetailLoadingSelector);
   const healthFacilityList = useSelector(healthFacilityListSelector);
@@ -239,13 +240,12 @@ const UserList = (): React.ReactElement => {
   }, [dispatch]);
 
   /**
-   * Handler function for user delete
-   * @param {object} data
-   * @param {number} data.id - User id for user to delete
-   * @param {any[]} data.organizations - user organization for user to delete
+   * Deletes a user from the health facility
+   * @param {number} id - User id to delete
+   * @param {any[]} organizations - User organizations
    */
-  const handleUserDelete = useCallback(
-    ({ data: { id, organizations = [] } }: { data: { id: number; organizations: any[] } }) => {
+  const deleteUser = useCallback(
+    (id: number, organizations: any[]) => {
       dispatch(
         deleteHFUserRequest({
           data: {
@@ -268,13 +268,69 @@ const UserList = (): React.ReactElement => {
   );
 
   /**
+   * Handler function for user delete
+   * @param {object} data
+   * @param {number} data.id - User id for user to delete
+   * @param {any[]} data.organizations - user organization for user to delete
+   * @param {any[]} data.roles - user roles to check for SHASTIYA_KORMI
+   */
+  const handleUserDelete = useCallback(
+    ({ data: { id, organizations = [], roles = [] } }: { data: { id: number; organizations: any[]; roles: IRoles[] } }) => {
+      const hasShastiyaKormiRole = roles.some(
+        (role) => role.name?.toUpperCase() === shastiyaKormiRole
+      );
+
+      // If user has SHASTIYA_KORMI role, first delete associated Shasthya Shebikas
+      if (hasShastiyaKormiRole) {
+        dispatch(
+          fetchShasthyaShebikaByKormiIdRequest({
+            shasthyaKormiIds: [String(id)],
+            successCb: (response: ShasthyaShebikaByKormiIdPayload) => {
+              // Extract SS User IDs from the response
+              const ssUserIds: string[] = response[id]?.map((item) => String(item.id)) || [];
+
+              // Delete Shasthya Shebikas if IDs exist
+              if (ssUserIds.length > 0) {
+                dispatch(
+                  deleteShasthyaShebikasRequest({
+                    ids: ssUserIds,
+                    successCb: () => {
+                      toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_SUCCESS);
+                      deleteUser(id, organizations);
+                    },
+                    failureCb: (e) => {
+                      toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_FAIL));
+                    }
+                  })
+                );
+              } else {
+                // No SS users to delete, proceed with user deletion
+                deleteUser(id, organizations);
+              }
+            },
+            failureCb: (e) => {
+              toastCenter.error(
+                ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL)
+              );
+            }
+          })
+        );
+      } else {
+        // User doesn't have SHASTIYA_KORMI role, proceed with direct deletion
+        deleteUser(id, organizations);
+      }
+    },
+    [deleteUser, dispatch]
+  );
+
+  /**
    * Handler to open user edit modal
    * @param value
    */
   const openEditModal = (value: any) => {
     const userId = value?.id != null ? String(value.id) : null;
     const { roles = [] } : { roles: any[] } = value;
-    const hasShastiyaKormiRole = roles.some(role => role.name?.toUpperCase() === "SHASTIYA_KORMI");
+    const hasShastiyaKormiRole = roles.some(role => role.name?.toUpperCase() === shastiyaKormiRole);
     if ((value.roles || []).some((userRole: IUserRole) => villageBasedRoles.includes(userRole.name))) {
       dispatch(
         fetchUserDetailRequest({
@@ -1033,7 +1089,7 @@ const UserList = (): React.ReactElement => {
   return (
     <>
       {(hfUserDetailLoading ||
-        loading ||
+        hfOperationsLoading ||
         changePasswordLoading ||
         healthFacilityUserListLoading ||
         peerSupervisorLoading) && <Loader />}

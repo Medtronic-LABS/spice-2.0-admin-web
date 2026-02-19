@@ -27,7 +27,8 @@ import {
   fetchCityListSagaRequest,
   createShasthyaShebikaSaga,
   fetchShasthyaShebikaByKormiIdSaga,
-  fetchSSPrefixSaga
+  fetchSSPrefixSaga,
+  deleteShasthyaShebikasRequestSaga
 } from '../sagas';
 import * as hfService from '../../../services/healthFacilityAPI';
 import * as hfActions from '../actions';
@@ -1465,7 +1466,7 @@ describe('HF sagas', () => {
       ).toPromise();
       expect(getSSPrefixSpy).toHaveBeenCalledWith();
       expect(successCb).toHaveBeenCalledWith(ssPrefixList);
-      expect(dispatched).toEqual([hfActions.fetchSSPrefixSuccess(ssPrefixList)]);
+      expect(dispatched).toEqual([hfActions.fetchSSPrefixSuccess(ssPrefixList as any)]);
     });
 
     it('Fetch SS prefix list and dispatch failure', async () => {
@@ -1645,6 +1646,55 @@ describe('HF sagas', () => {
       expect(villageListHF).toHaveBeenCalledWith(tenantIds, userId);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchVillagesListFromHFFailure(error)]);
+    });
+  });
+
+  describe('Delete Shasthya Shebikas: DELETE_SHASTHYA_SHEBIKAS_REQUEST', () => {
+    it('Delete shasthya shebikas and dispatch success', async () => {
+      const ids = ['1', '2', '42'];
+      const successCb = jest.fn();
+      const deleteSSSpy = jest
+        .spyOn(hfService, 'deleteShasthyaShebikas')
+        .mockImplementation(() => Promise.resolve() as any);
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        deleteShasthyaShebikasRequestSaga,
+        {
+          type: ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_REQUEST,
+          ids,
+          successCb
+        }
+      ).toPromise();
+      expect(deleteSSSpy).toHaveBeenCalledWith(ids);
+      expect(successCb).toHaveBeenCalled();
+      expect(dispatched).toEqual([hfActions.deleteShasthyaShebikasSuccess()]);
+    });
+
+    it('Delete shasthya shebikas and dispatch failure', async () => {
+      const error = new Error('Failed to delete shasthya shebikas');
+      const failureCb = jest.fn();
+      const ids = ['1', '42'];
+      const deleteSSSpy = jest
+        .spyOn(hfService, 'deleteShasthyaShebikas')
+        .mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action)
+        },
+        deleteShasthyaShebikasRequestSaga,
+        {
+          type: ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_REQUEST,
+          ids,
+          failureCb
+        }
+      ).toPromise();
+      expect(deleteSSSpy).toHaveBeenCalledWith(ids);
+      expect(failureCb).toHaveBeenCalledWith(error);
+      expect(dispatched).toEqual([hfActions.deleteShasthyaShebikasFailure(error)]);
     });
   });
 });

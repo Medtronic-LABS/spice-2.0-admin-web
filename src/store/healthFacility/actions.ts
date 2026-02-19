@@ -22,6 +22,9 @@ import {
   IFetchShasthyaShebikaByKormiIdSuccess,
   IFetchShasthyaShebikaByKormiIdFailure,
   ShasthyaShebikaByKormiIdPayload,
+  IDeleteShasthyaShebikasRequest,
+  IDeleteShasthyaShebikasSuccess,
+  IDeleteShasthyaShebikasFailure,
   IUpdateHFDetailsRequest,
   IUpdateHFDetailsSuccess,
   IUpdateHFDetailsFailure,
@@ -424,6 +427,30 @@ export const fetchShasthyaShebikaByKormiIdFailure = (
   error: Error
 ): IFetchShasthyaShebikaByKormiIdFailure => ({
   type: HF_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE,
+  error
+});
+
+export const deleteShasthyaShebikasRequest = ({
+  ids,
+  successCb,
+  failureCb
+}: {
+  ids: string[];
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}): IDeleteShasthyaShebikasRequest => ({
+  type: HF_TYPES.DELETE_SHASTHYA_SHEBIKAS_REQUEST,
+  ids,
+  successCb,
+  failureCb
+});
+
+export const deleteShasthyaShebikasSuccess = (): IDeleteShasthyaShebikasSuccess => ({
+  type: HF_TYPES.DELETE_SHASTHYA_SHEBIKAS_SUCCESS
+});
+
+export const deleteShasthyaShebikasFailure = (error: Error): IDeleteShasthyaShebikasFailure => ({
+  type: HF_TYPES.DELETE_SHASTHYA_SHEBIKAS_FAILURE,
   error
 });
 

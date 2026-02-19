@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, SPICE } from '../../constants/roleConstants';
+import { hf4ReportUser, INSIGHTS, peerSupervisor, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
@@ -97,8 +97,6 @@ export interface IDisabledRoles {
 }
 
 export type ModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
-
-const SHASTIYA_KORMI_ROLE = 'SHASTIYA_KORMI';
 
 /**
  * Form for region admin creation
@@ -1062,7 +1060,7 @@ const UserForm = ({
           const isReports = (formSuiteAccess || []).some((v: any) => v?.groupName === REPORTS);
           const isInsights = (formSuiteAccess || []).some((v: any) => v?.groupName === INSIGHTS);
           const isShastiyaKormiSelected = (Array.isArray(spiceRole) ? spiceRole : spiceRole ? [spiceRole] : []).some(
-            (r: any) => r?.name === SHASTIYA_KORMI_ROLE
+            (r: any) => r?.name === shastiyaKormiRole
           );
           return (
             <span key={`form_${idRefs.current[index]}`}>

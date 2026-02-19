@@ -16,7 +16,8 @@ import {
   CLEAR_HEALTH_FACILITY_LIST,
   CLEAR_PEER_SUPERVISOR_LIST,
   CLEAR_VILLAGES_LIST_FROM_HF,
-  FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST
+  FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
+  DELETE_SHASTHYA_SHEBIKAS_REQUEST
 } from '../../../store/healthFacility/actionTypes';
 import {
   CHANGE_PASSWORD_REQUEST,
@@ -485,7 +486,7 @@ describe('UserList Component', () => {
   });
 
   describe('Delete User Functionality', () => {
-    it('should call deleteHFUserRequest and show success message on successful deletion', async () => {
+    it('should call deleteHFUserRequest and show success message on successful deletion for regular user', async () => {
       const localStore = mockStore({
         user: { 
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
@@ -508,7 +509,7 @@ describe('UserList Component', () => {
       renderComponent(localStore);
 
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-      mockCustomTable.onDeleteClick({ data: { id: 1, organizations: [{ id: 1 }] } });
+      mockCustomTable.onDeleteClick({ data: { id: 1, organizations: [{ id: 1 }], roles: [{ name: 'Admin' }] } });
 
       const actions = localStore.getActions();
       const mockUserDelete = actions.find((action: any) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
@@ -526,6 +527,250 @@ describe('UserList Component', () => {
         failureCbSpy();
         expect(failureCbSpy).toHaveBeenCalled();
         expect(successCbSpy).toHaveBeenCalled();
+      }
+    });
+
+    it('should fetch Shasthya Shebikas when deleting user with SHASTIYA_KORMI role', async () => {
+      const localStore = mockStore({
+        user: { 
+          user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+          countryList: [], 
+          userRoles: mockIGroupRoles, 
+          chwList: [] 
+        },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          healthFacilityList: [],
+          hfTotal: 0,
+          hfUserDetailLoading: false,
+          hfUsersLoading: false,
+          loading: false,
+          peerSupervisorLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ 
+        data: { 
+          id: 42, 
+          organizations: [{ id: 1 }], 
+          roles: [{ name: 'SHASTIYA_KORMI' }] 
+        } 
+      });
+
+      const actions = localStore.getActions();
+      const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
+      
+      expect(fetchSSAction).toBeDefined();
+      expect(fetchSSAction?.shasthyaKormiIds).toEqual(['42']);
+    });
+
+    it('should delete Shasthya Shebikas and then delete user for SHASTIYA_KORMI role', async () => {
+      const localStore = mockStore({
+        user: { 
+          user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+          countryList: [], 
+          userRoles: mockIGroupRoles, 
+          chwList: [] 
+        },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          healthFacilityList: [],
+          hfTotal: 0,
+          hfUserDetailLoading: false,
+          hfUsersLoading: false,
+          loading: false,
+          peerSupervisorLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ 
+        data: { 
+          id: 42, 
+          organizations: [{ id: 1 }], 
+          roles: [{ name: 'SHASTIYA_KORMI' }] 
+        } 
+      });
+
+      const actions = localStore.getActions();
+      const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
+      
+      if (fetchSSAction) {
+        // Simulate successful fetch with SS users
+        const mockResponse = {
+          '42': [
+            { id: 10, name: 'SSUser1', ssId: 'SS01' },
+            { id: 9, name: 'SSUser2', ssId: 'SS02' }
+          ]
+        };
+        fetchSSAction.successCb(mockResponse);
+
+        const deleteSSAction = actions.find((action: any) => action.type === DELETE_SHASTHYA_SHEBIKAS_REQUEST);
+        expect(deleteSSAction).toBeDefined();
+        expect(deleteSSAction?.ids).toEqual(['10', '9']);
+
+        // Simulate successful deletion of SS users
+        if (deleteSSAction) {
+          deleteSSAction.successCb();
+          
+          const deleteUserAction = actions.find((action: any) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
+          expect(deleteUserAction).toBeDefined();
+          expect(deleteUserAction?.data.id).toBe(42);
+        }
+      }
+    });
+
+    it('should directly delete user when SHASTIYA_KORMI has no SS users', async () => {
+      const localStore = mockStore({
+        user: { 
+          user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+          countryList: [], 
+          userRoles: mockIGroupRoles, 
+          chwList: [] 
+        },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          healthFacilityList: [],
+          hfTotal: 0,
+          hfUserDetailLoading: false,
+          hfUsersLoading: false,
+          loading: false,
+          peerSupervisorLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ 
+        data: { 
+          id: 42, 
+          organizations: [{ id: 1 }], 
+          roles: [{ name: 'SHASTIYA_KORMI' }] 
+        } 
+      });
+
+      const actions = localStore.getActions();
+      const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
+      
+      if (fetchSSAction) {
+        // Simulate successful fetch with no SS users
+        const mockResponse = { '42': [] };
+        fetchSSAction.successCb(mockResponse);
+
+        // Should not dispatch deleteShasthyaShebikas
+        const deleteSSAction = actions.find((action: any) => action.type === DELETE_SHASTHYA_SHEBIKAS_REQUEST);
+        expect(deleteSSAction).toBeUndefined();
+
+        // Should directly dispatch deleteHFUserRequest
+        const deleteUserAction = actions.find((action: any) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
+        expect(deleteUserAction).toBeDefined();
+        expect(deleteUserAction?.data.id).toBe(42);
+      }
+    });
+
+    it('should handle failure when fetching Shasthya Shebikas', async () => {
+      const localStore = mockStore({
+        user: { 
+          user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+          countryList: [], 
+          userRoles: mockIGroupRoles, 
+          chwList: [] 
+        },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          healthFacilityList: [],
+          hfTotal: 0,
+          hfUserDetailLoading: false,
+          hfUsersLoading: false,
+          loading: false,
+          peerSupervisorLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ 
+        data: { 
+          id: 42, 
+          organizations: [{ id: 1 }], 
+          roles: [{ name: 'SHASTIYA_KORMI' }] 
+        } 
+      });
+
+      const actions = localStore.getActions();
+      const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
+      
+      if (fetchSSAction) {
+        const error = new Error('Failed to fetch SS users');
+        fetchSSAction.failureCb(error);
+
+        expect(toastCenter.error).toHaveBeenCalledWith(
+          ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL)
+        );
+      }
+    });
+
+    it('should handle failure when deleting Shasthya Shebikas', async () => {
+      const localStore = mockStore({
+        user: { 
+          user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+          countryList: [], 
+          userRoles: mockIGroupRoles, 
+          chwList: [] 
+        },
+        healthFacility: { 
+          healthFacilityUserList: [mockIHFUserGet],
+          healthFacilityList: [],
+          hfTotal: 0,
+          hfUserDetailLoading: false,
+          hfUsersLoading: false,
+          loading: false,
+          peerSupervisorLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+
+      const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+      mockCustomTable.onDeleteClick({ 
+        data: { 
+          id: 42, 
+          organizations: [{ id: 1 }], 
+          roles: [{ name: 'SHASTIYA_KORMI' }] 
+        } 
+      });
+
+      const actions = localStore.getActions();
+      const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
+      
+      if (fetchSSAction) {
+        const mockResponse = {
+          '42': [{ id: 10, name: 'SSUser1', ssId: 'SS01' }]
+        };
+        fetchSSAction.successCb(mockResponse);
+
+        const deleteSSAction = actions.find((action: any) => action.type === DELETE_SHASTHYA_SHEBIKAS_REQUEST);
+        
+        if (deleteSSAction) {
+          const error = new Error('Failed to delete SS users');
+          deleteSSAction.failureCb(error);
+
+          expect(toastCenter.error).toHaveBeenCalledWith(
+            ...getErrorToastArgs(error, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_FAIL)
+          );
+        }
       }
     });
   });

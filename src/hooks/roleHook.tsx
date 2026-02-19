@@ -35,7 +35,8 @@ import {
   urlBased,
   villageBasedRoles,
   // PHUInchargeRole,
-  PHUInchargePlusFacilityReportAdmin
+  PHUInchargePlusFacilityReportAdmin,
+  shastiyaKormiRole
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
@@ -194,7 +195,7 @@ export const useRoleMeta = ({
       const isCHAUser = (roles || []).some((userRole: IRoles) => chaRole.includes(userRole.name));
       const isCHWCHPUser = (roles || []).some((userRole: IRoles) => villageBasedRoles.includes(userRole.name));
       const isShastiyaKormiUser = (roles || []).some(
-        (userRole: IRoles) => userRole.name === 'SHASTIYA_KORMI'
+        (userRole: IRoles) => userRole.name === shastiyaKormiRole
       );
       // show HF and show Villages condition
       if (roles.length && currentSuite === SPICE) {

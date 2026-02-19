@@ -13,17 +13,16 @@ import TextInput from '../formFields/TextInput';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { required } from '../../utils/validation';
 import { ISSPrefix } from '../../store/healthFacility/types';
+import { shastiyaKormiRole } from '../../constants/roleConstants';
 
 /** Default row shape for Assign SS Users (used when adding a new row) */
 export const DEFAULT_SS_USER_ROW = { ssId: null, name: '', phoneNumber: '', subVillages: null };
 
 /** SPICE role name that enables the Assign SS Users section */
-const SHASTIYA_KORMI_ROLE = 'SHASTIYA_KORMI';
-
 const hasShastiyaKormiRole = (role: any): boolean => {
   if (!role) return false;
-  if (Array.isArray(role)) return role.some((r: { name?: string }) => r?.name === SHASTIYA_KORMI_ROLE);
-  return role?.name === SHASTIYA_KORMI_ROLE;
+  if (Array.isArray(role)) return role.some((r: { name?: string }) => r?.name === shastiyaKormiRole);
+  return role?.name === shastiyaKormiRole;
 };
 
 /** Map API SS user item to form row shape */

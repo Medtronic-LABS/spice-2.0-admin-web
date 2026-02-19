@@ -25,7 +25,8 @@ import {
   fetchCountryCodeList,
   getSSPrefix,
   createShasthyaShebika,
-  fetchShasthyaShebikaByShasthyaKormiId
+  fetchShasthyaShebikaByShasthyaKormiId,
+  deleteShasthyaShebikas
 } from '../healthFacilityAPI';
 import { HF_SUMMARY, HF_USER } from '../../tests/mockData/healthFacilityConstants';
 
@@ -453,5 +454,17 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/shasthya-shebika/by-shasthya-kormi-id');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(shasthyaKormiIds);
+  });
+
+  it('deleteShasthyaShebikas sends a PUT request to /admin-service/shasthya-shebika/remove with array of ids', async () => {
+    const ids = ['1', '42', '100'];
+
+    mockAxios.onPut('/admin-service/shasthya-shebika/remove').reply(200, {});
+
+    await deleteShasthyaShebikas(ids);
+
+    expect(mockAxios.history.put.length).toBe(1);
+    expect(mockAxios.history.put[0].url).toBe('/admin-service/shasthya-shebika/remove');
+    expect(JSON.parse(mockAxios.history.put[0].data)).toEqual(ids);
   });
 });

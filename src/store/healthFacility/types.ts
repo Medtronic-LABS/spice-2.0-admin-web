@@ -1,4 +1,5 @@
 import ApiError from '../../global/ApiError';
+import { ISubVillage } from '../region/types';
 import * as ACTION_TYPES from './actionTypes';
 
 export interface IHealthFacilityState {
@@ -488,8 +489,26 @@ export interface ICreateShasthyaShebikaFailure {
   error: Error;
 }
 
+/** Sub-village in Shasthya Shebika by Kormi ID response; extends ISubVillage with assignment fields */
+export interface IShasthyaShebikaSubVillage extends ISubVillage {
+  assignedShasthyaShebikaId?: number;
+  assignedShasthyaShebikaName?: string;
+  assignedShasthyaShebikaSsId?: string;
+}
+
+/** Shasthya Shebika user item in by-shasthya-kormi-id API response */
+export interface IShasthyaShebikaByKormiIdItem {
+  id: number;
+  name: string;
+  phoneNumber: string;
+  ssId: string;
+  shasthyaKormiId: number;
+  shasthyaKormiName: string | null;
+  subVillages: IShasthyaShebikaSubVillage[];
+}
+
 /** Response data from by-shasthya-kormi-id API: key = shasthya kormi id, value = SS user list */
-export type ShasthyaShebikaByKormiIdPayload = Record<string, any[]>;
+export type ShasthyaShebikaByKormiIdPayload = Record<string, IShasthyaShebikaByKormiIdItem[]>;
 
 export interface IFetchShasthyaShebikaByKormiIdRequest {
   type: typeof ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST;
@@ -505,6 +524,22 @@ export interface IFetchShasthyaShebikaByKormiIdSuccess {
 
 export interface IFetchShasthyaShebikaByKormiIdFailure {
   type: typeof ACTION_TYPES.FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_FAILURE;
+  error: Error;
+}
+
+export interface IDeleteShasthyaShebikasRequest {
+  type: typeof ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_REQUEST;
+  ids: string[];
+  successCb?: () => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IDeleteShasthyaShebikasSuccess {
+  type: typeof ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_SUCCESS;
+}
+
+export interface IDeleteShasthyaShebikasFailure {
+  type: typeof ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_FAILURE;
   error: Error;
 }
 
@@ -989,6 +1024,9 @@ export type HealthFacilityActions =
   | IFetchShasthyaShebikaByKormiIdRequest
   | IFetchShasthyaShebikaByKormiIdSuccess
   | IFetchShasthyaShebikaByKormiIdFailure
+  | IDeleteShasthyaShebikasRequest
+  | IDeleteShasthyaShebikasSuccess
+  | IDeleteShasthyaShebikasFailure
   | IUpdateHFDetailsRequest
   | IUpdateHFDetailsSuccess
   | IUpdateHFDetailsFailure

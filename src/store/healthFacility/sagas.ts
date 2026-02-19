@@ -33,7 +33,8 @@ import {
   IFetchCultureListRequest,
   IFetchSSPrefixRequest,
   ICreateShasthyaShebikaRequest,
-  IFetchShasthyaShebikaByKormiIdRequest
+  IFetchShasthyaShebikaByKormiIdRequest,
+  IDeleteShasthyaShebikasRequest
 } from '../healthFacility/types';
 import {
   fetchHFListSuccess,
@@ -76,6 +77,8 @@ import {
   createShasthyaShebikaFailure,
   fetchShasthyaShebikaByKormiIdSuccess,
   fetchShasthyaShebikaByKormiIdFailure,
+  deleteShasthyaShebikasSuccess,
+  deleteShasthyaShebikasFailure,
   fetchCountryListSuccess,
   fetchCountryListFailure,
   deleteHealthFacilitySuccess,
@@ -116,6 +119,7 @@ import {
   FETCH_SS_PREFIX_REQUEST,
   CREATE_SHASTHYA_SHEBIKA_REQUEST,
   FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
+  DELETE_SHASTHYA_SHEBIKAS_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
   DELETE_HEALTH_FACILITY_REQUEST,
   FETCH_PEER_SUPERVISOR_VALIDATION,
@@ -432,6 +436,23 @@ export function* fetchShasthyaShebikaByKormiIdSaga(
       action.failureCb?.(e);
       yield put(fetchShasthyaShebikaByKormiIdFailure(e));
     }
+  }
+}
+
+/*
+  Worker Saga: Fired on DELETE_SHASTHYA_SHEBIKAS_REQUEST action
+*/
+export function* deleteShasthyaShebikasRequestSaga(
+  action: IDeleteShasthyaShebikasRequest
+): SagaIterator {
+  try {
+    yield call(hfService.deleteShasthyaShebikas, action.ids);
+    yield put(deleteShasthyaShebikasSuccess());
+    action.successCb?.();
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    action.failureCb?.(error);
+    yield put(deleteShasthyaShebikasFailure(error));
   }
 }
 
@@ -871,6 +892,7 @@ function* healthFacilitySaga() {
   yield all([
     takeLatest(FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST, fetchShasthyaShebikaByKormiIdSaga)
   ]);
+  yield all([takeLatest(DELETE_SHASTHYA_SHEBIKAS_REQUEST, deleteShasthyaShebikasRequestSaga)]);
   yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST_FOR_HF, fetchDistrictListSagaRequest)]);
   yield all([takeLatest(FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF, fetchChiefdomListSagaRequest)]);
   yield all([takeLatest(FETCH_VILLAGES_LIST_REQUEST_FOR_HF, fetchVillagesListSagaRequest)]);
