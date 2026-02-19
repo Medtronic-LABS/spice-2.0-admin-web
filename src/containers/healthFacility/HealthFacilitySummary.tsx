@@ -522,13 +522,12 @@ const HealthFacilitySummary = (): React.ReactElement => {
    * Formats a user's phone number by combining the country code and phone number for hf summary.
    *
    * @param {Object} user - The user object containing phone information.
-   * @param {string} user.countryCode - The country code of the user's phone number.
    * @param {string} user.phoneNumber - The user's phone number.
    *
-   * @returns {string} - The formatted phone number string in the format: "+ {countryCode} {phoneNumber}".
+   * @returns {string} - The formatted phone number string in the format: "{phoneNumber}".
    */
-  const formatPhone = (user: { countryCode: string; phoneNumber: string }): string => {
-    return `${user.countryCode && '+ ' + user.countryCode} ${user.phoneNumber}`;
+  const formatPhone = (user: { phoneNumber: string }): string => {
+    return user.phoneNumber;
   };
 
   /**

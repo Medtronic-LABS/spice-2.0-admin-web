@@ -4,7 +4,7 @@ import styles from './TextInput.module.scss';
 import TextInput from './TextInput';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormApi } from 'final-form';
-import APPCONSTANTS, { SL_REGION } from '../../constants/appConstants';
+import APPCONSTANTS, { BD_PHONE_NUMBER_LENGTH, BD_REGION } from '../../constants/appConstants';
 import ApiError from '../../global/ApiError';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { IHFUserGet } from '../../store/healthFacility/types';
@@ -49,7 +49,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
   const isValidPhoneNumber = (phoneNumber?: string, checkSameNumberAgain?: boolean) => {
     return (
       phoneNumber &&
-      !validateMobile(phoneNumber, SL_REGION.includes(regionDetails.name)) &&
+      !validateMobile(phoneNumber, BD_REGION.includes(regionDetails.name)) &&
       (lastCheckedNumber.current !== phoneNumber || checkSameNumberAgain)
     );
   };
@@ -144,13 +144,16 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
     }
   };
   const getErrorLabel = (meta: FieldMetaState<string>) => {
-    if (
+    // Hide error messages for network errors, empty errors, or specific validation errors
+    // that are handled by inline validation display
+    const shouldHideError =
       alreadyExistError === meta.error ||
       isNetworkError ||
       !meta.error ||
       meta.error === ' ' ||
-      meta.error === errorMsgs.PH_NO_STARTS_WITH_ERROR
-    ) {
+      meta.error === errorMsgs.PH_NO_STARTS_WITH_ERROR ||
+      meta.error === errorMsgs.PH_NO_LENGTH_ERROR;
+    if (shouldHideError) {
       return '';
     } else {
       return 'phone number';
@@ -163,11 +166,11 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
       type='text'
       validate={composeValidators(
         required,
-        (value: string) => validateMobile(value, SL_REGION.includes(regionDetails.name)),
+        (value: string) => validateMobile(value, BD_REGION.includes(regionDetails.name)),
         validateIfNumberExist,
         validateDuplication
       )}
-      parse={(value) => normalizePhone(value, '', 8)}
+      parse={(value) => normalizePhone(value, '', BD_PHONE_NUMBER_LENGTH)}
       render={({ input, meta }: FieldRenderProps<string>) => {
         return (
           <TextInput

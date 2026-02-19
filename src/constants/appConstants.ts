@@ -513,7 +513,8 @@ export const APP_TYPE = {
   COMMUNITY: 'COMMUNITY',
   NON_COMMUNITY: 'NON_COMMUNITY'
 };
-export const SL_REGION = ['Sierra Leone', 'SL'];
+export const BD_REGION = ['Bangladesh', 'BD'];
+export const BD_PHONE_NUMBER_LENGTH = 11;
 export const CFR_SUITEACCSESS_NAME = { user: 'cfr_user', admin: 'cfr_admin', quickSight: 'cfr_quicksight_admin' };
 export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
 export const COMMON_INSIGHTS_USERROLE = ['CFR_HEALTH_FACILITY_USER'];

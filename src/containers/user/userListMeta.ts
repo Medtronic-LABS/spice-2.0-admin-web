@@ -55,7 +55,7 @@ export const columnDef = ({
       name: 'phoneNumber',
       label: 'CONTACT NUMBER',
       width: '15%',
-      cellFormatter: (user: IHFUserGet) => `+${user.countryCode} ${user.phoneNumber}`
+      cellFormatter: (user: IHFUserGet) => `${user.phoneNumber}`
     }
   ];
 };

@@ -53,7 +53,7 @@ describe('Column Definitions and Formatting Functions', () => {
   it('formats phone number correctly in the phoneNumber column', () => {
     const phoneFormatter = columns.find((col: { name: string }) => col.name === 'phoneNumber')?.cellFormatter;
     const result = phoneFormatter?.(user);
-    expect(result).toBe('+1 123-456-7890');
+    expect(result).toBe('123-456-7890');
   });
 
   it('verifies the column configuration', () => {

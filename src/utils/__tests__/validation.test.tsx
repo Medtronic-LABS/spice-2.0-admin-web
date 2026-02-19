@@ -381,7 +381,7 @@ describe('Validation', () => {
       test('should return an error message for a mobile number with invalid characters or length', () => {
         const input = '12345';
         const result = validateMobile(input, false);
-        expect(result).toBe('Please enter a valid ');
+        expect(result).toBe('Please enter a valid');
       });
     });
 
@@ -690,45 +690,47 @@ describe('Validation', () => {
     });
   });
 
-  describe('mobile validation', () => {
-    it('should return error message when number starts with 0', () => {
-      const input = '01234567';
+  describe('mobile validation - Bangladesh', () => {
+    it('should return error message when number does not start with 01', () => {
+      const input = '21234567';
       const result = validateMobile(input, true);
-      expect(result).toBe('Must start with 2, 3, 7, 8, or 9.');
+      expect(result).toBe('Phone number must start with 01');
     });
 
-    it('should return empty string for valid SL number starting with valid digit', () => {
-      const input = '21234567';
+    it('should return error message when number length is not 11 digits', () => {
+      const input = '012345678';
+      const result = validateMobile(input, true);
+      expect(result).toBe('Phone number must be exactly 11 digits');
+    });
+
+    it('should return empty string for valid BD number starting with 01 and 11 digits', () => {
+      const input = '01234567890';
       const result = validateMobile(input, true);
       expect(result).toBe('');
     });
 
-    it('should return error for SL number with 5 consecutive same digits', () => {
-      const input = '22222345';
+    it('should return error for BD number with 5 consecutive same digits', () => {
+      const input = '01222223456';
       const result = validateMobile(input, true);
-      expect(result).toBe('Please enter a valid ');
+      expect(result).toBe('Phone number cannot contain 5 or more consecutive same digits');
     });
-  });
 
-  describe('mobile validation', () => {
     it('should return error for numbers with 5 or more consecutive same digits', () => {
-      expect(validateMobile('22222345', true)).toBe('Please enter a valid ');
-      expect(validateMobile('77777890', true)).toBe('Please enter a valid ');
-      expect(validateMobile('23444445', true)).toBe('Please enter a valid ');
+      expect(validateMobile('01222223456', true)).toBe('Phone number cannot contain 5 or more consecutive same digits');
+      expect(validateMobile('01777778901', true)).toBe('Phone number cannot contain 5 or more consecutive same digits');
+      expect(validateMobile('01234444456', true)).toBe('Phone number cannot contain 5 or more consecutive same digits');
     });
 
     it('should accept numbers with less than 5 consecutive same digits', () => {
-      expect(validateMobile('22223345', true)).toBe('');
-      expect(validateMobile('23333456', true)).toBe('');
-      expect(validateMobile('99991234', true)).toBe('');
+      expect(validateMobile('01222334567', true)).toBe('');
+      expect(validateMobile('01233334567', true)).toBe('');
+      expect(validateMobile('01999912345', true)).toBe('');
     });
 
-    it('should validate number length for SL numbers', () => {
-      expect(validateMobile('2123456', true)).toBe('Please enter a valid ');
-      expect(validateMobile('21234567', true)).toBe('');
-      expect(validateMobile('212345678', true)).toBe('Please enter a valid ');
-      expect(validateMobile('2123456789', true)).toBe('Please enter a valid ');
-      expect(validateMobile('21234567890', true)).toBe('Please enter a valid ');
+    it('should validate number length for BD numbers', () => {
+      expect(validateMobile('0123456789', true)).toBe('Phone number must be exactly 11 digits');
+      expect(validateMobile('01234567890', true)).toBe('');
+      expect(validateMobile('012345678901', true)).toBe('Phone number must be exactly 11 digits');
     });
   });
 });

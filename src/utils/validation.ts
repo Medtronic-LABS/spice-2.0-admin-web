@@ -236,35 +236,40 @@ export function validateFullName(name: string) {
 /**
  * To check whether mobile number contains valid digits and pattern
  * @param mobileNo mobile number string
- * @param isSl boolean to indicate if Sierra Leone validation should be applied
+ * @param isBd boolean to indicate if Bangladesh validation should be applied
  * @returns {string} error message or empty string
  */
-export function validateMobile(mobileNo: string, isSl: boolean): string {
+export function validateMobile(mobileNo: string, isBd: boolean): string {
   if (!mobileNo) {
     return '';
   }
 
-  if (typeof isSl === 'boolean' && isSl) {
-    // For SL:
-    // Check if the number starts with- 0, 2, 3, 7, 8, 9
-    if (!/^[23789]/.test(mobileNo)) {
+  if (isBd) {
+    // Check if number starts with 01
+    if (!/^01/.test(mobileNo)) {
       return errorMsgs.PH_NO_STARTS_WITH_ERROR;
     }
-    // 1. Check if number has 8 digits
-    const digitCheck = /^\d{8}$/;
-    // 2. Check for 5 or more consecutive same digits
-    const repeatingDigitsCheck = /(\d)\1{4,}/;
 
-    // Number is invalid if:
-    // - it doesn't have 8 digits OR
-    // - it has 5 or more consecutive same digits
-    if (!digitCheck.test(mobileNo) || repeatingDigitsCheck.test(mobileNo)) {
-      return 'Please enter a valid ';
+    // Check if number contains exactly 11 digits
+    const digitCheck = /^\d{11}$/;
+    if (!digitCheck.test(mobileNo)) {
+      return errorMsgs.PH_NO_LENGTH_ERROR;
+    }
+
+    // Optional: Check for 5 or more consecutive same digits
+    const repeatingDigitsCheck = /(\d)\1{4,}/;
+    if (repeatingDigitsCheck.test(mobileNo)) {
+      return errorMsgs.PH_NO_REPEATING_DIGITS;
     }
   } else {
-    // For non-SL: just check if number has 8-10 digits
+    // For non-BD: just check if number has 8-10 digits
     if (!/^\d{8,10}$/.test(mobileNo)) {
-      return 'Please enter a valid ';
+      return errorMsgs.PH_NO_INVALID;
+    }
+
+    const repeatingDigitsCheck = /(\d)\1{4,}/;
+    if (repeatingDigitsCheck.test(mobileNo)) {
+      return errorMsgs.PH_NO_REPEATING_DIGITS;
     }
   }
 

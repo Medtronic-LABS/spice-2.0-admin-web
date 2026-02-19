@@ -1248,7 +1248,7 @@ const UserForm = ({
                                 const tenantIds = [
                                   ...(initialEditData[index]?.hfTenantIds || []),
                                   Number(form.getState().values?.users?.[0]?.healthfacility?.tenantId) ||
-                                  (healthFacilityId && tenantId ? Number(tenantId) : undefined),
+                                    (healthFacilityId && tenantId ? Number(tenantId) : undefined),
                                   ...((fetchedData.current?.[index] || {}).organizations || []).map((v: any) => v.id),
                                   isHF ? Number(hfTenantId) : undefined
                                 ].filter((v: number | undefined) => v);
@@ -1608,8 +1608,9 @@ const UserForm = ({
                     )}
                   />
                 </div>
-                <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
-                  {isRegionCreate ? (
+                {/* Country code field only required when creating region users */}
+                {isRegionCreate && (
+                  <div className={'col-sm-6 col-12'}>
                     <Field
                       name={`${name}.countryCode`}
                       type='text'
@@ -1626,29 +1627,8 @@ const UserForm = ({
                         />
                       )}
                     />
-                  ) : (
-                    <Field
-                      name={`${name}.countryCode`}
-                      type='text'
-                      validate={required}
-                      render={({ input, meta }) => (
-                        <SelectInput
-                          {...(input as any)}
-                          label='Country Code'
-                          errorLabel='country code'
-                          labelKey='phoneNumberCode'
-                          valueKey='id'
-                          appendPlus={true}
-                          disabled={isActivating}
-                          options={countryList || []}
-                          loadingOptions={isCountryListLoading}
-                          error={isError(meta)}
-                          isModel={true}
-                        />
-                      )}
-                    />
-                  )}
-                </div>
+                  </div>
+                )}
                 <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                   <PhoneNumberField
                     id={form.getState().values.users[index]?.id}
@@ -1669,57 +1649,59 @@ const UserForm = ({
                   (isSPICE &&
                     (isEdit
                       ? ((mandatoryRoles || []).length
-                        ? !isCHPCHWSelected(mandatoryRoles) && (showSpiceHFRef.current[index] || isShastiyaKormiSelected)
-                        : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) && (spiceRole || []).length) ||
-                      (!isCommunity && isSiteUser && !isHF)
-                      : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) && (!isEdit || isReportOrInsightUser)))) && (
-                    <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
-                      <Field
-                        name={`${name}.${NAMING_VARIABLES.healthFacility}`}
-                        type='text'
-                        validate={required}
-                        disabled={isActivating}
-                        render={({ input, meta }) => {
-                          return (
-                            <SelectInput
-                              {...(input as any)}
-                              label={`Assigned ${healthfacilitySName}`}
-                              errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
-                              labelKey='name'
-                              valueKey='id'
-                              options={newHFList}
-                              loadingOptions={hfLoading}
-                              error={isError(meta)}
-                              isModel={true}
-                              disabled={isProfile}
-                              onChange={(hf: IHealthFacility) => {
-                                if (!autoFetched[index]) {
-                                  emailDisabledFn('', index, false);
-                                }
-                                const formData = form.getState()?.values?.users?.[index];
-                                const supervisorFieldData = `${formName}[${index}].supervisor`;
-                                form.change(supervisorFieldData, null);
+                          ? !isCHPCHWSelected(mandatoryRoles) &&
+                            (showSpiceHFRef.current[index] || isShastiyaKormiSelected)
+                          : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) && (spiceRole || []).length) ||
+                        (!isCommunity && isSiteUser && !isHF)
+                      : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) &&
+                        (!isEdit || isReportOrInsightUser)))) && (
+                  <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
+                    <Field
+                      name={`${name}.${NAMING_VARIABLES.healthFacility}`}
+                      type='text'
+                      validate={required}
+                      disabled={isActivating}
+                      render={({ input, meta }) => {
+                        return (
+                          <SelectInput
+                            {...(input as any)}
+                            label={`Assigned ${healthfacilitySName}`}
+                            errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
+                            labelKey='name'
+                            valueKey='id'
+                            options={newHFList}
+                            loadingOptions={hfLoading}
+                            error={isError(meta)}
+                            isModel={true}
+                            disabled={isProfile}
+                            onChange={(hf: IHealthFacility) => {
+                              if (!autoFetched[index]) {
+                                emailDisabledFn('', index, false);
+                              }
+                              const formData = form.getState()?.values?.users?.[index];
+                              const supervisorFieldData = `${formName}[${index}].supervisor`;
+                              form.change(supervisorFieldData, null);
 
-                                if (showVillage[index]) {
-                                  fetchSupervisorList(
-                                    formData?.organizations
-                                      ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
+                              if (showVillage[index]) {
+                                fetchSupervisorList(
+                                  formData?.organizations
+                                    ? [...formData?.organizations?.map((v: any) => v?.id), hf?.tenantId].filter(
                                         (v: any) => v
                                       )
-                                      : [hf.tenantId],
-                                    index
-                                  );
-                                  fetchVillagesList([Number(hf.tenantId)], formData?.id, index);
-                                }
+                                    : [hf.tenantId],
+                                  index
+                                );
+                                fetchVillagesList([Number(hf.tenantId)], formData?.id, index);
+                              }
 
-                                input.onChange(hf);
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </div>
-                  )}
+                              input.onChange(hf);
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </div>
+                )}
                 {isReports && showReportHFRef.current[index] && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
