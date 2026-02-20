@@ -251,18 +251,16 @@ describe('User APIs', () => {
     to /user-service/user/validate-phonenumber with correct data`, async () => {
     const phoneNumber = '2345678901';
     const id = 1;
-    const countryCode = '2';
 
     mockAxios.onPost('/user-service/user/validate-phonenumber').reply(200, {});
 
-    await validatePhoneNumber(phoneNumber, id, countryCode);
+    await validatePhoneNumber(phoneNumber, id);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/validate-phonenumber');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       phoneNumber,
-      id,
-      countryCode
+      id
     });
   });
 

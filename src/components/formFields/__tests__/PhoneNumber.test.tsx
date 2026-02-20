@@ -56,7 +56,6 @@ describe('PhoneNumberField', () => {
     fieldName: 'phoneNumber',
     formName: 'users',
     index: 0,
-    countryCode: 'US',
     form: {
       getState: () => ({
         values: {

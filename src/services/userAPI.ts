@@ -97,13 +97,12 @@ export const fetchUserByEmail = ({
     }
   });
 
-export const validatePhoneNumber = (phoneNumber: string, id: number | null, countryCode: string | undefined) =>
+export const validatePhoneNumber = (phoneNumber: string, id: number | null) =>
   axios({
     method: 'POST',
     url: '/user-service/user/validate-phonenumber',
     data: {
       phoneNumber,
-      countryCode,
       id
     }
   });

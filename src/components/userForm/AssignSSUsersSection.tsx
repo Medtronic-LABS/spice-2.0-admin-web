@@ -182,11 +182,6 @@ const AssignSSUsersSection = (): React.ReactElement => {
                             form={form}
                             formName={ssUsersFormName}
                             index={index}
-                            countryCode={
-                              form.getState().values?.users?.[0]?.countryCode?.phoneNumberCode ||
-                              form.getState().values?.users?.[0]?.countryCode ||
-                              ''
-                            }
                           />
                         </div>
                       </div>

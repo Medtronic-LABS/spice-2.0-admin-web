@@ -20,11 +20,10 @@ interface IProps {
   form: FormApi<any>;
   formName: string;
   index: number;
-  countryCode: string;
   disabled?: boolean;
 }
 
-const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryCode, disabled }: IProps) => {
+const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled }: IProps) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -100,7 +99,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
         }
         setValidating(true);
         setLoading(true);
-        await validatePhoneNumber(phoneNumber, id, countryCode || '').then((res) => {
+        await validatePhoneNumber(phoneNumber, id).then((res) => {
           submitEnabledStatus.current = true;
           errorRef.current = '';
           setValidating(false);
@@ -125,15 +124,15 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, countryC
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [id, countryCode, form, name, alreadyExistError]
+    [id, form, name, alreadyExistError]
   );
 
   useEffect(() => {
-    if (currentphoneNumber && countryCode) {
+    if (currentphoneNumber.current) {
       validatePhoneNumberFn(form?.getState().values[formName][index]?.phoneNumber, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentphoneNumber, countryCode]);
+  }, [currentphoneNumber]);
 
   // error functions
   const getErrorMsg = (meta: FieldMetaState<string>) => {

@@ -1638,11 +1638,6 @@ const UserForm = ({
                     formName={formName}
                     index={index}
                     disabled={isActivating && !isProfile}
-                    countryCode={
-                      isRegionCreate
-                        ? form.getState().values?.users[index]?.countryCode
-                        : form.getState().values?.users[index]?.countryCode?.phoneNumberCode
-                    }
                   />
                 </div>
                 {(isPeerSupervisor ||
