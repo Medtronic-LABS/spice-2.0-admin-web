@@ -173,9 +173,17 @@ jest.mock('../userConditionalFields/DynamicCHForm', () => ({
   DynamicCHForm: () => <div data-testid="dynamic-ch-form">DynamicCHForm</div>
 }));
 
+const mockAssignSSUsersSectionCalls: any[] = [];
 jest.mock('../AssignSSUsersSection', () => ({
   __esModule: true,
-  default: () => <div data-testid="assign-ss-users-section">AssignSSUsersSection</div>
+  default: (props: any) => {
+    mockAssignSSUsersSectionCalls.push(props);
+    return (
+      <div data-testid="assign-ss-users-section" data-edit={String(!!props.isEdit)}>
+        AssignSSUsersSection
+      </div>
+    );
+  }
 }));
 
 jest.mock('../../../utils/toastCenter', () => ({
@@ -235,6 +243,7 @@ const renderUserForm = (props: any = {}, storeState: any = defaultStoreState) =>
 describe('UserForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAssignSSUsersSectionCalls.length = 0;
     mockGetSuiteAccessList.mockReturnValue([{ groupName: 'SPICE', label: 'SPICE' }]);
     mockGetSpiceGroupName.mockImplementation((suiteAccess: any[]) => suiteAccess?.[0] || { groupName: 'SPICE' });
     mockFormUserData.mockImplementation((data: any) => data || {});
@@ -351,6 +360,26 @@ describe('UserForm', () => {
         userFormParams: { ...defaultProps.userFormParams, isEdit: true }
       });
       expect(screen.getByTestId('assign-ss-users-section')).toBeInTheDocument();
+    });
+  });
+
+  describe('AssignSSUsersSection isEdit', () => {
+    it('passes isEdit true to AssignSSUsersSection when isEdit prop is true', () => {
+      renderUserForm({ isEdit: true });
+      expect(screen.getByTestId('assign-ss-users-section')).toHaveAttribute('data-edit', 'true');
+      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1].isEdit).toBe(true);
+    });
+
+    it('passes isEdit false to AssignSSUsersSection when isEdit prop is false', () => {
+      renderUserForm({ isEdit: false });
+      expect(screen.getByTestId('assign-ss-users-section')).toHaveAttribute('data-edit', 'false');
+      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1].isEdit).toBe(false);
+    });
+
+    it('passes isEdit as falsy to AssignSSUsersSection when isEdit prop is omitted', () => {
+      renderUserForm();
+      expect(screen.getByTestId('assign-ss-users-section')).toHaveAttribute('data-edit', 'false');
+      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1].isEdit).toBeFalsy();
     });
   });
 

@@ -36,22 +36,38 @@ jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
 
 jest.mock('../../formFields/SelectInput', () => ({
   __esModule: true,
-  default: ({ label }: any) => <div data-testid="select-input">{label}</div>
+  default: ({ label, disabled }: any) => (
+    <div data-testid="select-input" data-disabled={disabled}>
+      {label}
+    </div>
+  )
 }));
 
 jest.mock('../../formFields/TextInput', () => ({
   __esModule: true,
-  default: ({ label }: any) => <div data-testid="text-input">{label}</div>
+  default: ({ label, disabled }: any) => (
+    <div data-testid="text-input" data-disabled={disabled}>
+      {label}
+    </div>
+  )
 }));
 
 jest.mock('../../formFields/PhoneNumber', () => ({
   __esModule: true,
-  default: () => <div data-testid="phone-number-field">Phone Number</div>
+  default: ({ disabled }: any) => (
+    <div data-testid="phone-number-field" data-disabled={disabled}>
+      Phone Number
+    </div>
+  )
 }));
 
 jest.mock('../../multiSelect/MultiSelect', () => ({
   __esModule: true,
-  default: ({ label }: any) => <div data-testid="multi-select">{label}</div>
+  default: ({ label, isDisabled }: any) => (
+    <div data-testid="multi-select" data-disabled={isDisabled}>
+      {label}
+    </div>
+  )
 }));
 
 const initialValuesWithShastiyaKormi = {
@@ -73,10 +89,13 @@ const initialValuesWithoutShastiyaKormi = {
   ]
 };
 
-const renderWithForm = (initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi) => {
+const renderWithForm = (
+  initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi,
+  isEdit?: boolean
+) => {
   return render(
     <Form onSubmit={() => {}} initialValues={initialValues} mutators={{ ...arrayMutators }}>
-      {() => <AssignSSUsersSection />}
+      {() => <AssignSSUsersSection isEdit={isEdit} />}
     </Form>
   );
 };
@@ -174,6 +193,48 @@ describe('AssignSSUsersSection', () => {
       renderWithForm(initialValuesWithShastiyaKormi);
       const heading = screen.getByText('Assign Shasthya Shebika Users');
       expect(heading).toHaveClass('fw-bold', 'theme-text');
+    });
+  });
+
+  describe('isEdit mode', () => {
+    it('should not show Add row or Remove row controls when isEdit is true', () => {
+      renderWithForm(initialValuesWithShastiyaKormi, true);
+      expect(screen.queryByTestId('plus-icon')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('bin-icon')).not.toBeInTheDocument();
+    });
+
+    it('should show Add row control when isEdit is false', () => {
+      renderWithForm(initialValuesWithShastiyaKormi, false);
+      expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
+    });
+
+    it('should show Add row control when isEdit is omitted (default)', () => {
+      renderWithForm(initialValuesWithShastiyaKormi);
+      expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
+    });
+
+    it('should disable SS ID, Name, Phone Number, and Sub-village when isEdit is true', () => {
+      renderWithForm(initialValuesWithShastiyaKormi, true);
+      const selectInputs = screen.getAllByTestId('select-input');
+      const textInputs = screen.getAllByTestId('text-input');
+      const phoneFields = screen.getAllByTestId('phone-number-field');
+      const multiSelects = screen.getAllByTestId('multi-select');
+      selectInputs.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
+      textInputs.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
+      phoneFields.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
+      multiSelects.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
+    });
+
+    it('should not disable fields when isEdit is false', () => {
+      renderWithForm(initialValuesWithShastiyaKormi, false);
+      const selectInput = screen.getByTestId('select-input');
+      const textInput = screen.getByTestId('text-input');
+      const phoneField = screen.getByTestId('phone-number-field');
+      const multiSelect = screen.getByTestId('multi-select');
+      expect(selectInput).toHaveAttribute('data-disabled', 'false');
+      expect(textInput).toHaveAttribute('data-disabled', 'false');
+      expect(phoneField).toHaveAttribute('data-disabled', 'false');
+      expect(multiSelect).toHaveAttribute('data-disabled', 'false');
     });
   });
 });

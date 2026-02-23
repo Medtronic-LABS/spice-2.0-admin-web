@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
@@ -113,6 +113,7 @@ jest.mock('../../../components/modal/ModalForm', () => ({
   __esModule: true,
   default: (props: any) => {
     mockModalFormCalls.push(props);
+    const formContent = props.render?.(props.form ?? {}) ?? null;
     return props.show ? (
       <div data-testid="modal-form">
         <span>{props.title}</span>
@@ -122,12 +123,24 @@ jest.mock('../../../components/modal/ModalForm', () => ({
         <button type="button" onClick={() => props.handleFormSubmit?.({})} data-testid="modal-submit">
           {props.submitText || 'Submit'}
         </button>
+        {formContent}
       </div>
     ) : null;
   }
 }));
 
-jest.mock('../../../components/userForm/UserForm', () => () => <div data-testid="user-form">UserForm</div>);
+const mockUserFormCalls: any[] = [];
+jest.mock('../../../components/userForm/UserForm', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockUserFormCalls.push(props);
+    return (
+      <div data-testid="user-form" data-edit={String(!!props.isEdit)}>
+        UserForm
+      </div>
+    );
+  }
+}));
 
 jest.mock('../../createHealthFacility/HealthFacilityDetailsForm', () => ({
   __esModule: true,
@@ -197,6 +210,7 @@ describe('HealthFacilitySummary', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockModalFormCalls.length = 0;
+    mockUserFormCalls.length = 0;
     mockDetailCard.mockClear();
     mockCustomTable.mockClear();
   });
@@ -341,13 +355,15 @@ describe('HealthFacilitySummary', () => {
       expect(addUserModals.some((m) => m.show === true)).toBe(true);
     });
 
-    it('closes Add User modal when handleCancel is called', () => {
+    it('closes Add User modal when handleCancel is called', async () => {
       renderComponent();
       const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');
       fireEvent.click(addUserButton!);
       const addUserModal = mockModalFormCalls.find((m) => m.title === 'Add User');
       expect(addUserModal).toBeDefined();
-      addUserModal?.handleCancel?.();
+      await act(async () => {
+        addUserModal?.handleCancel?.();
+      });
       expect(screen.queryByTestId('modal-form')).toBeDefined();
     });
   });
@@ -408,6 +424,38 @@ describe('HealthFacilitySummary', () => {
       expect(titles).toContain('Edit Health Facility');
       expect(titles).toContain('Add User');
       expect(titles).toContain('CHW Activate');
+    });
+  });
+
+  describe('UserForm isEdit', () => {
+    it('passes isEdit false when Add User modal is open', () => {
+      renderComponent();
+      const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');
+      fireEvent.click(addUserButton!);
+      expect(screen.getByTestId('user-form')).toHaveAttribute('data-edit', 'false');
+      const lastUserFormCall = mockUserFormCalls[mockUserFormCalls.length - 1];
+      expect(lastUserFormCall.isEdit).toBe(false);
+    });
+
+    it('passes isEdit true when Edit User modal is open after edit flow', async () => {
+      renderComponent();
+      const tableProps = mockCustomTable.mock.calls[0][0];
+      expect(tableProps.onRowEdit).toBeDefined();
+      tableProps.onRowEdit({ id: 1 });
+      const actions = store.getActions();
+      const fetchDetailAction = actions.find(
+        (a: any) => a.type === 'FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST'
+      );
+      expect(fetchDetailAction).toBeDefined();
+      const mockUserData = { id: 1, firstName: 'Test', lastName: 'User', roles: [] };
+      await act(async () => {
+        fetchDetailAction.successCb(mockUserData);
+      });
+      await waitFor(() => {
+        expect(screen.getByTestId('user-form')).toHaveAttribute('data-edit', 'true');
+      });
+      const lastUserFormCall = mockUserFormCalls[mockUserFormCalls.length - 1];
+      expect(lastUserFormCall.isEdit).toBe(true);
     });
   });
 });

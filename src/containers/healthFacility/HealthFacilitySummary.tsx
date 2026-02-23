@@ -18,9 +18,13 @@ import {
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
+  createShasthyaShebikaRequest,
   deleteHFUserRequest,
+  deleteShasthyaShebikasRequest,
   fetchHFSummaryRequest,
   fetchHFUserListRequest,
+  fetchSSPrefixRequest,
+  fetchShasthyaShebikaByKormiIdRequest,
   fetchUserDetailRequest,
   fetchWorkflowListRequest,
   updateHFDetailsRequest,
@@ -39,14 +43,15 @@ import {
   IHealthFacility,
   IHealthFacilityForm,
   IPeerSupervisor,
+  ShasthyaShebikaByKormiIdPayload,
   IVillages
 } from '../../store/healthFacility/types';
 import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { formatRoles, formatUserToastMsg } from '../../utils/commonUtils';
-import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUtils';
+import { formatHealthFacility, getSSUsersPayload, getUserPayload, ISSUserInputItem, ISSUserPayloadItem } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
-import { onlyCHWRoles } from '../../constants/roleConstants';
+import { onlyCHWRoles, shastiyaKormiRole } from '../../constants/roleConstants';
 import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
 import { offlineSyncRequest, updateUserStatus } from '../../store/user/actions';
 
@@ -94,6 +99,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
+  const pendingSSUsersPayloadRef = useRef<ISSUserPayloadItem[] | null>(null);
   const {
     isCommunity,
     appTypes,
@@ -141,6 +147,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
     };
     // eslint-disable-next-line
   }, [listParams, tenantId, dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchSSPrefixRequest());
+  }, [dispatch]);
 
   /*
    * Load initial health facility summary details
@@ -392,6 +402,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    */
   const handleEditUserClick = useCallback(
     (user: any) => {
+      const userId = user?.id != null ? String(user.id) : null;
       dispatch(
         fetchUserDetailRequest({
           id: Number(user?.id),
@@ -399,6 +410,21 @@ const HealthFacilitySummary = (): React.ReactElement => {
             setIsHFUserEdit(true);
             const postData = { ...userData };
             hfUserForEdit.current = { users: [{ ...postData }] };
+            const hasShastiyaKormiRole = (postData.roles || []).some(
+              (selectedRole: { name?: string }) => selectedRole.name?.toUpperCase() === shastiyaKormiRole
+            );
+            if (hasShastiyaKormiRole && userId) {
+              dispatch(
+                fetchShasthyaShebikaByKormiIdRequest({
+                  shasthyaKormiIds: [userId],
+                  failureCb: (e) => {
+                    toastCenter.error(
+                      ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL)
+                    );
+                  }
+                })
+              );
+            }
             setHFUserModal(true);
           },
           failureCb: (e) => {
@@ -433,7 +459,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    *
    * @returns {void}
    */
-  const handleAddEditUserSubmit = ({ users }: { users: IHFUserPost[] }): void => {
+  const handleAddEditUserSubmit = ({ users, ssUsers }: { users: IHFUserPost[], ssUsers?: ISSUserInputItem[] }): void => {
     const userObj = getUserPayload({
       appTypes,
       userFormData: users,
@@ -441,8 +467,10 @@ const HealthFacilitySummary = (): React.ReactElement => {
       tenantId,
       spiceRolesGroup: rolesGrouped?.SPICE
     });
+    const ssUsersPayload = getSSUsersPayload(ssUsers ?? []);
     const data: IHFUserPost = userObj[0];
     const isUserEdit = isHFUserEdit || data.id;
+    pendingSSUsersPayloadRef.current = !isUserEdit && ssUsersPayload.length > 0 ? ssUsersPayload : null;
     onSubmitHandler(
       data,
       isUserEdit ? updateHFUserRequest : createHFUserRequest,
@@ -463,7 +491,26 @@ const HealthFacilitySummary = (): React.ReactElement => {
    *
    * @returns {void}
    */
-  const healthfacilityUserSuccess = (): void => {
+  const healthfacilityUserSuccess = (response?: { entity?: { id: number } }): void => {
+    const shasthyaKormiId = response?.entity?.id;
+    const ssUsersPayload = pendingSSUsersPayloadRef.current;
+    if (shasthyaKormiId != null && ssUsersPayload?.length) {
+      ssUsersPayload.forEach((entry) => {
+        dispatch(
+          createShasthyaShebikaRequest({
+            data: {
+              ...entry,
+              shasthyaKormiId: String(shasthyaKormiId)
+            },
+            failureCb: (e) => {
+              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_CREATE_FAIL));
+            }
+          })
+        );
+      });
+    }
+    pendingSSUsersPayloadRef.current = null;
+
     // Determine the success message based on whether it's an edit or create action
     const successMessage = isHFUserEdit
       ? formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS, healthFacilitySName)
@@ -494,28 +541,65 @@ const HealthFacilitySummary = (): React.ReactElement => {
    * Handles the click event to delete a health facility user
    * @param {Object} param0 - The delete parameters
    */
-  const handleUserDelete = ({ data: { id } }: { data: { id: number } }) => {
-    dispatch(
-      deleteHFUserRequest({
-        data: {
-          id,
-          appTypes,
-          countryId: countryIdValue,
-          tenantIds: [Number(tenantId)]
-        },
-        successCb: () => {
-          toastCenter.success(
-            APPCONSTANTS.SUCCESS,
-            formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS, healthFacilitySName)
-          );
-          refreshHFUserList();
-          refreshHFDetails();
-        },
-        failureCb: (e) => {
-          fetchFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_FAIL, healthFacilitySName));
-        }
-      })
-    );
+  const handleUserDelete = ({ data: { id, roles = [] } }: { data: { id: number; roles?: Array<{ name?: string }> } }) => {
+    const deleteUser = () => {
+      dispatch(
+        deleteHFUserRequest({
+          data: {
+            id,
+            appTypes,
+            countryId: countryIdValue,
+            tenantIds: [Number(tenantId)]
+          },
+          successCb: () => {
+            toastCenter.success(
+              APPCONSTANTS.SUCCESS,
+              formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_SUCCESS, healthFacilitySName)
+            );
+            refreshHFUserList();
+            refreshHFDetails();
+          },
+          failureCb: (e) => {
+            fetchFailure(e, formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_DELETE_FAIL, healthFacilitySName));
+          }
+        })
+      );
+    };
+
+    const hasShastiyaKormiRole = roles.some((selectedRole) => selectedRole.name?.toUpperCase() === shastiyaKormiRole);
+    if (hasShastiyaKormiRole) {
+      dispatch(
+        fetchShasthyaShebikaByKormiIdRequest({
+          shasthyaKormiIds: [String(id)],
+          successCb: (response: ShasthyaShebikaByKormiIdPayload) => {
+            const ssUserIds: string[] = response?.[id]?.map((item) => String(item.id)) ?? [];
+            if (ssUserIds.length > 0) {
+              dispatch(
+                deleteShasthyaShebikasRequest({
+                  ids: ssUserIds,
+                  successCb: () => {
+                    toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_SUCCESS);
+                    deleteUser();
+                  },
+                  failureCb: (e) => {
+                    toastCenter.error(
+                      ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_FAIL)
+                    );
+                  }
+                })
+              );
+            } else {
+              deleteUser();
+            }
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL));
+          }
+        })
+      );
+    } else {
+      deleteUser();
+    }
   };
 
   /**

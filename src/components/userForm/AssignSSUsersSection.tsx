@@ -70,15 +70,22 @@ const getFilteredSubVillageOptionsForIndex = (
       .filter((id: number) => !Number.isNaN(id))
   );
 
-  // Return sub-villages that are either selected in current row or not used elsewhere
+  // Return sub-villages that are either selected in current row or (not used elsewhere and not assigned to another SS)
   return (subVillagesList ?? []).filter(
-    (opt: any) =>
-      currentRowIds.has(Number(opt.id)) ||
-      !usedInOtherRows.has(Number(opt.id))
+    (opt: any) => {
+      const inCurrentRow = currentRowIds.has(Number(opt.id));
+      const notUsedElsewhere = !usedInOtherRows.has(Number(opt.id));
+      const notAssignedToSS = opt.assignedShasthyaShebikaId == null;
+      return inCurrentRow || (notUsedElsewhere && notAssignedToSS);
+    }
   );
 };
 
-const AssignSSUsersSection = (): React.ReactElement => {
+interface IAssignSSUsersSectionProps {
+  isEdit?: boolean;
+}
+
+const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): React.ReactElement => {
   const form = useForm();
   const ssUsersFormName = 'ssUsers';
   const ssUsersInitialValue = useMemo(() => [{ ...DEFAULT_SS_USER_ROW }], []);
@@ -99,17 +106,27 @@ const AssignSSUsersSection = (): React.ReactElement => {
   const ssListForUser = userId != null ? shasthyaShebikaByKormiId?.[String(userId)] : null;
 
   useEffect(() => {
-    if (userId == null) {
+    const clearInitializedUser = () => {
       ssUsersInitializedForUserId.current = null;
-      return;
+    };
+
+    if (userId == null) {
+      clearInitializedUser();
+      return clearInitializedUser;
     }
-    if (!Array.isArray(ssListForUser) || ssListForUser.length === 0) return;
-    if (ssUsersInitializedForUserId.current === String(userId)) return;
+    if (!Array.isArray(ssListForUser) || ssListForUser.length === 0) {
+      return clearInitializedUser;
+    }
+    if (ssUsersInitializedForUserId.current === String(userId)) {
+      return clearInitializedUser;
+    }
     const options = ssPrefixList ?? [];
     const mapped = ssListForUser.map((item: any) => mapApiSSUserToFormRow(item, options));
     form.change(ssUsersFormName, mapped);
     ssUsersInitializedForUserId.current = String(userId);
     ssUserRefs.current = mapped.map(() => new Date().getTime());
+
+    return clearInitializedUser;
   }, [userId, ssListForUser, form, ssPrefixList]);
 
   return (
@@ -153,7 +170,7 @@ const AssignSSUsersSection = (): React.ReactElement => {
                                 error={meta.touched && meta.error}
                                 required={true}
                                 isLoading={ssPrefixLoading}
-                                isDisabled={ssPrefixLoading}
+                                disabled={ssPrefixLoading || isEdit}
                                 placeholder={ssPrefixLoading ? 'Loading SS IDs...' : 'Select SS ID'}
                               />
                             )}
@@ -170,6 +187,7 @@ const AssignSSUsersSection = (): React.ReactElement => {
                                 errorLabel='name'
                                 error={(meta.touched && meta.error) || undefined}
                                 required={true}
+                                disabled={isEdit}
                               />
                             )}
                           />
@@ -182,6 +200,7 @@ const AssignSSUsersSection = (): React.ReactElement => {
                             form={form}
                             formName={ssUsersFormName}
                             index={index}
+                            disabled={isEdit}
                           />
                         </div>
                       </div>
@@ -205,14 +224,14 @@ const AssignSSUsersSection = (): React.ReactElement => {
                                 isSelectAll={true}
                                 error={meta.touched && meta.error}
                                 isLoading={subVillagesLoading}
-                                isDisabled={subVillagesLoading}
+                                isDisabled={subVillagesLoading || isEdit}
                                 placeholder={subVillagesLoading ? `Loading ${subVillageSName}...` : `Select ${subVillageSName}`}
                               />
                             )}
                           />
                         </div>
                         <div className='col-12 col-sm-auto d-flex align-items-end align-self-center gap-1 pb-0dot25'>
-                          {(fields?.length ?? 0) > 1 && (
+                          {!isEdit && (fields?.length ?? 0) > 1 && (
                             <div
                               className='danger-text lh-1dot25 pointer'
                               onClick={() => {
@@ -229,7 +248,7 @@ const AssignSSUsersSection = (): React.ReactElement => {
                               />
                             </div>
                           )}
-                          {isLastSSRow && (
+                          {!isEdit && isLastSSRow && (
                             <div
                               className='theme-text lh-1dot25 pointer d-flex align-items-center'
                               onClick={() => {
