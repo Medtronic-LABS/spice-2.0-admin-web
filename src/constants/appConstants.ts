@@ -256,6 +256,8 @@ const APPCONSTANTS = {
   SHASTIYA_SHEBIKA_DELETE_FAIL: 'Unable to delete Shasthya Shebikas. Please try after sometime.',
   USERS_LIST_FETCH_ERROR: 'Unable to load users. Please try after sometime.',
   NO_VILLAGE_FOUND: 'No Union available. Unions are already linked to other users.',
+  NO_VILLAGE_PRESENT: 'No Unions available.',
+  VILLAGES_FETCH_FAIL: 'Failed to fetch Unions. Please try after sometime.',
   ADD_ANOTHER_USER: 'Add Another User',
   IS_TERMS_CONDITIONS_DISMISSED: 'isTacD',
   TERMSCONDITIONS_UPDATE_FAIL: 'Failed to accept terms and conditions.',

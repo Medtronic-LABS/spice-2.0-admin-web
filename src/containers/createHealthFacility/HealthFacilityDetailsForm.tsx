@@ -26,7 +26,6 @@ import {
   fetchCityListRequest,
   fetchCultureListRequest,
   fetchHFTypesRequest,
-  fetchUnlinkedVillagesRequest,
   fetchVillagesListRequest
 } from '../../store/healthFacility/actions';
 import {
@@ -34,8 +33,6 @@ import {
   cultureLoadingSelector,
   hfTypesLoadingSelector,
   hfTypesSelector,
-  unlinkedVillagesListSelector,
-  unlinkedVillagesLoadingSelector,
   villagesListSelector,
   villagesLoadingSelector
 } from '../../store/healthFacility/selectors';
@@ -92,8 +89,6 @@ const HealthFacilityDetailsForm = ({
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const hfTypesList = useSelector(hfTypesSelector);
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
-  const unlinkedVillagesList = useSelector(unlinkedVillagesListSelector);
-  const unlinkedVillagesLoading = useSelector(unlinkedVillagesLoadingSelector);
   const districtList = useSelector(getDistrictListSelector);
   const chiefdomList = useSelector(chiefdomListSelector);
   const districtLoading = useSelector(districtLoadingSelector);
@@ -255,19 +250,14 @@ const HealthFacilityDetailsForm = ({
         fetchVillagesListRequest({
           countryId,
           districtId: Number(selectedDistrictId),
-          chiefdomId: Number(selectedChiefdomId)
-        })
-      );
-      dispatch(
-        fetchUnlinkedVillagesRequest({
-          countryId,
-          districtId: Number(selectedDistrictId),
           chiefdomId: Number(selectedChiefdomId),
-          healthFacilityId: data?.id ? data.id : undefined,
           successCb: (list: IVillages[]) => {
             if (!list.length) {
-              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_FOUND);
+              toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_PRESENT);
             }
+          },
+          failureCb: (error: Error) => {
+            toastCenter.error(...getErrorToastArgs(error, APPCONSTANTS.ERROR, APPCONSTANTS.VILLAGES_FETCH_FAIL));
           }
         })
       );
@@ -600,8 +590,8 @@ const HealthFacilityDetailsForm = ({
                     menuPlacement={'auto'}
                     isModel={true}
                     isMulti={true}
-                    options={unlinkedVillagesList}
-                    loading={unlinkedVillagesLoading}
+                    options={villagesList}
+                    loading={villagesLoading}
                     error={(isLinkedVillagesRequired && meta.touched && meta.error) || undefined}
                     controlStyles={{
                       borderColor: meta.touched && meta.error ? 'red !important' : '#8c8c8c',

@@ -155,6 +155,8 @@ describe('HealthFacilityDetailsForm', () => {
       isEdit: boolean;
       isNextClicked: boolean;
       isActivating: boolean;
+      isHFCreate: boolean;
+      data: Record<string, unknown>;
     }> = {},
     initialValues: Record<string, unknown> = defaultInitialValues
   ) => {
@@ -167,6 +169,7 @@ describe('HealthFacilityDetailsForm', () => {
               formName="healthFacility"
               isEdit={false}
               isNextClicked={false}
+              data={{}}
               {...props}
             />
           )}
@@ -229,8 +232,41 @@ describe('HealthFacilityDetailsForm', () => {
     expect(screen.queryByTestId('map-container')).not.toBeInTheDocument();
   });
 
+  it('renders map container when latitude and longitude are provided in initial values', () => {
+    renderWithForm(
+      {},
+      {
+        healthFacility: {
+          ...defaultInitialValues.healthFacility,
+          latitude: '12.34',
+          longitude: '56.78'
+        }
+      }
+    );
+    expect(screen.getByTestId('map-container')).toBeInTheDocument();
+  });
+
   it('renders City field when isCityVillage is false from app type config', () => {
     renderWithForm();
     expect(screen.getByText('City')).toBeInTheDocument();
+  });
+
+  it('renders with data prop for edit mode', () => {
+    renderWithForm({
+      isEdit: true,
+      data: { type: { id: 1, name: 'Type A' }, name: 'Test HF' }
+    });
+    expect(screen.getByText('Health Facility Name')).toBeInTheDocument();
+    expect(screen.getByText('Health Facility Type')).toBeInTheDocument();
+  });
+
+  it('renders with isActivating true without crashing', () => {
+    renderWithForm({ isActivating: true });
+    expect(screen.getByText('Health Facility Name')).toBeInTheDocument();
+  });
+
+  it('renders with isHFCreate true without crashing', () => {
+    renderWithForm({ isHFCreate: true });
+    expect(screen.getByText('Health Facility Name')).toBeInTheDocument();
   });
 });
