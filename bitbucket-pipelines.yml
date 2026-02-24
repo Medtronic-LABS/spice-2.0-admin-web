@@ -51,6 +51,13 @@ definitions:
           - npm
         script:
           - export CI=false
+          - |
+            if [ -d "node_modules" ]; then
+              echo "[OK] node_modules found from previous artifact. Skipping install."
+            else
+              echo "[INFO] node_modules missing. Installing dependencies..."
+              npm ci
+            fi
           - npm run build
         artifacts:
           - build/**
@@ -91,8 +98,26 @@ pipelines:
                 <<: *sonar
                 runs-on: *runner-uhis-dev
       - stage:
-          name: Build & Deploy
+          name: Build & Deploy to UHIS-DEV
           deployment: uhis-dev
+          steps:
+            - step:
+                <<: *build
+                runs-on: *runner-uhis-dev
+            - step:
+                <<: *deploy-s3-cf
+                runs-on: *runner-uhis-dev
+                
+
+  # Manual pipeline: Build & Deploy to UHIS-QA
+  # Required deployment variables for 'uhis-qa':
+  #   - AWS_S3_BUCKET: S3 bucket for QA environment (e.g., spice-web-uhis-qa)
+  #   - CF_DIST_ID: CloudFront distribution ID for QA environment
+  custom:
+    deploy-uhis-qa:
+      - stage:
+          name: Build & Deploy to UHIS-QA
+          deployment: uhis-qa
           steps:
             - step:
                 <<: *build
