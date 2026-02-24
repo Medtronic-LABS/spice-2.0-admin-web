@@ -40,6 +40,7 @@ definitions:
             -Dsonar.tests=./src
             -Dsonar.test.inclusions=*.test.{ts,tsx}
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.qualitygate.wait=true
         # SONAR_HOST_URL, SONAR_TOKEN from Bitbucket vars; SONAR_PROJECT_KEY set per branch below
 
     # Step 3: Build – uses node_modules artifact from Install & Test (no second npm ci)
