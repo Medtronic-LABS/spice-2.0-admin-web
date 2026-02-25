@@ -368,9 +368,9 @@ describe('Region Saga', () => {
           dispatch: (action) => dispatched.push(action)
         },
         uploadFileSaga,
-        { file: {} as any, appTypes: 'COMMUNITY', type: ACTION_TYPES.UPLOAD_FILE_REQUEST }
+        { file: {} as any, appTypes: 'COMMUNITY', countryId: 1, type: ACTION_TYPES.UPLOAD_FILE_REQUEST }
       ).toPromise();
-      expect(uploadFileSpy).toHaveBeenCalledWith({}, 'COMMUNITY');
+      expect(uploadFileSpy).toHaveBeenCalledWith({}, 'COMMUNITY', 1);
       expect(dispatched).toEqual([regionActions.uploadFileSuccess({} as any)]);
     });
 
@@ -385,9 +385,9 @@ describe('Region Saga', () => {
           dispatch: (action) => dispatched.push(action)
         },
         uploadFileSaga,
-        { file: {} as any, appTypes: 'COMMUNITY', type: ACTION_TYPES.UPLOAD_FILE_REQUEST }
+        { file: {} as any, appTypes: 'COMMUNITY', countryId: 1, type: ACTION_TYPES.UPLOAD_FILE_REQUEST }
       ).toPromise();
-      expect(uploadFileSpy).toHaveBeenCalledWith({}, 'COMMUNITY');
+      expect(uploadFileSpy).toHaveBeenCalledWith({}, 'COMMUNITY', 1);
       expect(dispatched).toEqual([regionActions.uploadFileFailure({ error })]);
     });
   });

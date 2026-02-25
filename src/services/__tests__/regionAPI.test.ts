@@ -28,12 +28,14 @@ describe('Region APIs', () => {
     const formData = new FormData();
     formData.append('file', file);
     const appTypes = 'NON_COMMUNITY';
+    const countryId = 1;
     mockAxios.onPost('/admin-service/region-details/upload-file').reply(200, {});
 
-    await uploadFile(file, appTypes);
+    await uploadFile(file, appTypes, countryId);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/region-details/upload-file');
+    expect(mockAxios.history.post[0].params).toEqual({ countryId });
     expect(mockAxios.history.post[0].headers['Content-Type']).toBe('multipart/form-data');
     // expect(mockAxios.history.post[0].data).toEqual(formData);
   });

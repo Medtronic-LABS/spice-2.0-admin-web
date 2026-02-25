@@ -226,6 +226,7 @@ export interface IFetchSubVillagesFailure {
 export interface IUploadFilePayload {
   file: any;
   appTypes: string;
+  countryId: number;
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }
@@ -301,6 +302,7 @@ export interface IUploadFileRequest {
   type: typeof ACTION_TYPES.UPLOAD_FILE_REQUEST;
   file: any;
   appTypes: string;
+  countryId: number;
   successCb?: (payload: any) => void;
   failureCb?: (error: Error) => void;
 }

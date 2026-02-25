@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { IFetchRegionDetailReqPayload, IRegionPayload } from '../store/region/types';
 
-export const uploadFile = (file: any, appTypes: string) => {
+export const uploadFile = (file: any, appTypes: string, countryId: number) => {
   const data = new FormData();
   data.append('file', file);
   data.append('appTypes', appTypes);
   return axios({
     method: 'POST',
     url: '/admin-service/region-details/upload-file',
+    params: { countryId },
     data,
     headers: { 'Content-Type': 'multipart/form-data' }
   });

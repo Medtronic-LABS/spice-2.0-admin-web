@@ -100,9 +100,9 @@ export function* fetchClientRegistryStatus(action: IFetchClientRegistryStatusReq
 /*
   Worker Saga: Fired on UPLOAD_FILE_REQUEST action
 */
-export function* uploadFileSaga({ file, appTypes, successCb, failureCb }: IUploadFileRequest): SagaIterator {
+export function* uploadFileSaga({ file, appTypes, countryId, successCb, failureCb }: IUploadFileRequest): SagaIterator {
   try {
-    const data = yield call(regionService.uploadFile, file, appTypes);
+    const data = yield call(regionService.uploadFile, file, appTypes, countryId);
     successCb?.(data);
     yield put(regionActions.uploadFileSuccess(data));
   } catch (e: any) {

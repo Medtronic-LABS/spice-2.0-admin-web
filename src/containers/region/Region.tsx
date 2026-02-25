@@ -97,6 +97,7 @@ const Region = (): React.ReactElement => {
       uploadFileRequest({
         file,
         appTypes: appTypes[0],
+        countryId: Number(regionId),
         successCb: (_) => {
           dispatch(clearChiefdomList());
           dispatch(clearDistrictList());

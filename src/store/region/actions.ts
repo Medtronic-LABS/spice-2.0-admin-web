@@ -202,12 +202,14 @@ export const clearClientRegistryStatus = (): IClearClientRegistryStatus => ({
 export const uploadFileRequest = ({
   file,
   appTypes,
+  countryId,
   successCb,
   failureCb
 }: IUploadFilePayload): IUploadFileRequest => ({
   type: REGION_TYPES.UPLOAD_FILE_REQUEST,
   file,
   appTypes,
+  countryId,
   successCb,
   failureCb
 });
