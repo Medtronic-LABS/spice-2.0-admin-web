@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import AssignSSUsersSection, { DEFAULT_SS_USER_ROW } from '../AssignSSUsersSection';
@@ -7,24 +7,23 @@ import AssignSSUsersSection, { DEFAULT_SS_USER_ROW } from '../AssignSSUsersSecti
 jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid="bin-icon" /> }));
 jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid="plus-icon" /> }));
 
+const defaultMockState = {
+  region: {
+    subVillages: [] as any[],
+    subVillagesLoading: false
+  },
+  healthFacility: {
+    ssPrefixList: [
+      { id: 1, name: 'SS01', displayOrder: 1 },
+      { id: 2, name: 'SS02', displayOrder: 2 }
+    ] as any[],
+    ssPrefixLoading: false,
+    shasthyaShebikaByKormiId: {} as Record<string, any[]>
+  }
+};
+
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn((selector: (state: any) => any) => {
-    const mockState = {
-      region: { 
-        subVillages: [],
-        subVillagesLoading: false
-      },
-      healthFacility: {
-        ssPrefixList: [
-          { id: 1, name: 'SS01', displayOrder: 1 },
-          { id: 2, name: 'SS02', displayOrder: 2 }
-        ],
-        ssPrefixLoading: false,
-        shasthyaShebikaByKormiId: {}
-      }
-    };
-    return selector(mockState);
-  })
+  useSelector: jest.fn((selector: (state: any) => any) => selector(defaultMockState))
 }));
 
 jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
@@ -36,9 +35,10 @@ jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
 
 jest.mock('../../formFields/SelectInput', () => ({
   __esModule: true,
-  default: ({ label, disabled }: any) => (
+  default: ({ label, disabled, placeholder }: any) => (
     <div data-testid="select-input" data-disabled={disabled}>
       {label}
+      {placeholder && <span data-testid="select-placeholder">{placeholder}</span>}
     </div>
   )
 }));
@@ -63,9 +63,10 @@ jest.mock('../../formFields/PhoneNumber', () => ({
 
 jest.mock('../../multiSelect/MultiSelect', () => ({
   __esModule: true,
-  default: ({ label, isDisabled }: any) => (
+  default: ({ label, isDisabled, placeholder }: any) => (
     <div data-testid="multi-select" data-disabled={isDisabled}>
       {label}
+      {placeholder && <span data-testid="multi-select-placeholder">{placeholder}</span>}
     </div>
   )
 }));
@@ -100,9 +101,23 @@ const renderWithForm = (
   );
 };
 
+const resetMockState = () => {
+  defaultMockState.region.subVillages = [];
+  defaultMockState.region.subVillagesLoading = false;
+  defaultMockState.healthFacility.ssPrefixList = [
+    { id: 1, name: 'SS01', displayOrder: 1 },
+    { id: 2, name: 'SS02', displayOrder: 2 }
+  ];
+  defaultMockState.healthFacility.ssPrefixLoading = false;
+  defaultMockState.healthFacility.shasthyaShebikaByKormiId = {};
+};
+
 describe('AssignSSUsersSection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetMockState();
+    const { useSelector } = require('react-redux');
+    useSelector.mockImplementation((selector: (state: any) => any) => selector(defaultMockState));
   });
 
   describe('DEFAULT_SS_USER_ROW', () => {
@@ -235,6 +250,93 @@ describe('AssignSSUsersSection', () => {
       expect(textInput).toHaveAttribute('data-disabled', 'false');
       expect(phoneField).toHaveAttribute('data-disabled', 'false');
       expect(multiSelect).toHaveAttribute('data-disabled', 'false');
+    });
+  });
+
+  describe('add / remove row', () => {
+    it('should add a second row when Add row (plus icon) is clicked', async () => {
+      renderWithForm(initialValuesWithShastiyaKormi, false);
+      expect(screen.getAllByTestId('select-input')).toHaveLength(1);
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('plus-icon'));
+      });
+
+      expect(screen.getAllByTestId('select-input')).toHaveLength(2);
+      expect(screen.getAllByTestId('text-input')).toHaveLength(2);
+    });
+
+    it('should show Remove row control when there are multiple rows', async () => {
+      renderWithForm(initialValuesWithShastiyaKormi, false);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('plus-icon'));
+      });
+      const removeButtons = screen.getAllByTitle('Remove row');
+      expect(removeButtons.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should remove a row when Remove row is clicked', async () => {
+      renderWithForm(initialValuesWithShastiyaKormi, false);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('plus-icon'));
+      });
+      expect(screen.getAllByTestId('select-input')).toHaveLength(2);
+
+      const removeButtons = screen.getAllByTitle('Remove row');
+      await act(async () => {
+        fireEvent.click(removeButtons[0]);
+      });
+
+      expect(screen.getAllByTestId('select-input')).toHaveLength(1);
+    });
+  });
+
+  describe('loading states', () => {
+    it('should pass loading state to SS ID field when ssPrefixLoading is true', () => {
+      const useSelectorMock = require('react-redux').useSelector;
+      useSelectorMock.mockImplementation((selector: (state: any) => any) => {
+        const loadingState = {
+          ...defaultMockState,
+          healthFacility: { ...defaultMockState.healthFacility, ssPrefixLoading: true }
+        };
+        return selector(loadingState);
+      });
+      renderWithForm(initialValuesWithShastiyaKormi);
+      expect(screen.getByText('Loading SS IDs...')).toBeInTheDocument();
+    });
+
+    it('should pass loading state to Sub Village field when subVillagesLoading is true', () => {
+      const useSelectorMock = require('react-redux').useSelector;
+      useSelectorMock.mockImplementation((selector: (state: any) => any) => {
+        const loadingState = {
+          ...defaultMockState,
+          region: { ...defaultMockState.region, subVillagesLoading: true }
+        };
+        return selector(loadingState);
+      });
+      renderWithForm(initialValuesWithShastiyaKormi);
+      expect(screen.getByText('Loading Sub Village...')).toBeInTheDocument();
+    });
+  });
+
+  describe('initialization from shasthyaShebikaByKormiId', () => {
+    it('should render section when user has shasthyaShebika list and form initializes ssUsers', () => {
+      defaultMockState.healthFacility.shasthyaShebikaByKormiId = {
+        '100': [
+          {
+            ssId: 'SS01',
+            name: 'Test SS User',
+            phoneNumber: '+1234567890',
+            subVillages: []
+          }
+        ]
+      };
+      const initialValues = {
+        users: [{ id: 100, role: { id: 81, name: 'SHASTIYA_KORMI' } }],
+        ssUsers: []
+      };
+      expect(() => renderWithForm(initialValues)).not.toThrow();
+      expect(screen.getByText('Assign Shasthya Shebika Users')).toBeInTheDocument();
     });
   });
 });

@@ -429,7 +429,7 @@ describe('Region Saga', () => {
 
   describe('Fetch Sub Villages: FETCH_SUB_VILLAGES_REQUEST', () => {
     it('Fetch sub villages and dispatches success', async () => {
-      const villageId = 10;
+      const villageIds = [10];
       const subVillages = [{ id: 1, name: 'Sub Village 1' }, { id: 2, name: 'Sub Village 2' }];
       const successCb = jest.fn();
       const fetchSubVillagesSpy = jest.spyOn(regionService, 'fetchSubVillages').mockImplementation(() =>
@@ -445,17 +445,17 @@ describe('Region Saga', () => {
         fetchSubVillagesSagaRequest,
         {
           type: ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
-          villageId,
+          villageIds,
           successCb
         }
       ).toPromise();
-      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageId);
+      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageIds);
       expect(successCb).toHaveBeenCalledWith(subVillages);
       expect(dispatched).toEqual([regionActions.fetchSubVillagesSuccess(subVillages)]);
     });
 
     it('Fetch sub villages with undefined entity and dispatches success with empty array', async () => {
-      const villageId = 10;
+      const villageIds = [10];
       const successCb = jest.fn();
       const fetchSubVillagesSpy = jest.spyOn(regionService, 'fetchSubVillages').mockImplementation(() =>
         Promise.resolve({
@@ -470,11 +470,11 @@ describe('Region Saga', () => {
         fetchSubVillagesSagaRequest,
         {
           type: ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
-          villageId,
+          villageIds,
           successCb
         }
       ).toPromise();
-      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageId);
+      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageIds);
       expect(successCb).toHaveBeenCalledWith([]);
       expect(dispatched).toEqual([regionActions.fetchSubVillagesSuccess([])]);
     });
@@ -482,7 +482,7 @@ describe('Region Saga', () => {
     it('Fetch sub villages and dispatches failure', async () => {
       const error = new Error('Failed to fetch sub villages');
       const failureCb = jest.fn();
-      const villageId = 10;
+      const villageIds = [10];
       const fetchSubVillagesSpy = jest
         .spyOn(regionService, 'fetchSubVillages')
         .mockImplementation(() => Promise.reject(error));
@@ -494,11 +494,11 @@ describe('Region Saga', () => {
         fetchSubVillagesSagaRequest,
         {
           type: ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
-          villageId,
+          villageIds,
           failureCb
         }
       ).toPromise();
-      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageId);
+      expect(fetchSubVillagesSpy).toHaveBeenCalledWith(villageIds);
       expect(failureCb).toHaveBeenCalledWith(error);
       expect(dispatched).toEqual([regionActions.fetchSubVillagesFailure(error)]);
     });

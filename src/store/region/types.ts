@@ -208,7 +208,7 @@ export interface IDeactivateReqPayload {
 
 export interface IFetchSubVillagesRequest {
   type: typeof ACTION_TYPES.FETCH_SUB_VILLAGES_REQUEST;
-  villageId: number;
+  villageIds: number[];
   successCb?: (payload: ISubVillage[]) => void;
   failureCb?: (error: Error) => void;
 }

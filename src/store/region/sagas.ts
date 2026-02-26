@@ -155,12 +155,12 @@ export function* regionDetailsSaga({
 }
 
 export function* fetchSubVillagesSagaRequest({
-  villageId,
+  villageIds,
   successCb,
   failureCb
 }: IFetchSubVillagesRequest): SagaIterator {
   try {
-    const response = yield call(regionService.fetchSubVillages, villageId);
+    const response = yield call(regionService.fetchSubVillages, villageIds);
     const { entity } = response.data;
     yield put(regionActions.fetchSubVillagesSuccess(entity ?? []));
     successCb?.(entity ?? []);

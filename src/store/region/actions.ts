@@ -128,16 +128,16 @@ export const regionDetailsFailure = (error: Error): IRegionDetailsFailure => ({
 });
 
 export const fetchSubVillagesRequest = ({
-  villageId,
+  villageIds,
   successCb,
   failureCb
 }: {
-  villageId: number;
+  villageIds: number[];
   successCb?: (payload: ISubVillage[]) => void;
   failureCb?: (error: Error) => void;
 }): IFetchSubVillagesRequest => ({
   type: REGION_TYPES.FETCH_SUB_VILLAGES_REQUEST,
-  villageId,
+  villageIds,
   successCb,
   failureCb
 });

@@ -378,8 +378,8 @@ describe('formatObjectUtils', () => {
       const user = {
         ...mockUser,
         roles: [{ id: 1 }, { id: 2 }],
-        villages: { id: 1 },
-        existingVillages: { id: 2 }
+        villages: [{ id: 1 }],
+        existingVillages: [{ id: 2 }]
       };
 
       const result = getUserPayload({

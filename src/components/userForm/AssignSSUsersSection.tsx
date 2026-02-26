@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import { FormApi } from 'final-form';
 import { Field, FormSpy, useForm } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useSelector } from 'react-redux';
@@ -14,6 +15,7 @@ import MultiSelect from '../multiSelect/MultiSelect';
 import { required } from '../../utils/validation';
 import { ISSPrefix } from '../../store/healthFacility/types';
 import { shastiyaKormiRole } from '../../constants/roleConstants';
+import { ISubVillage } from '../../store/region/types';
 
 /** Default row shape for Assign SS Users (used when adding a new row) */
 export const DEFAULT_SS_USER_ROW = { ssId: null, name: '', phoneNumber: '', subVillages: null };
@@ -81,15 +83,201 @@ const getFilteredSubVillageOptionsForIndex = (
   );
 };
 
+/** Clears subVillages field values that are no longer in the current options when subVillagesList/options change */
+const SubVillagesFieldWithCleanup = ({
+  form,
+  name,
+  index,
+  options,
+  isEdit,
+  subVillagesLoading,
+  children
+}: {
+  form: FormApi<any>;
+  name: string;
+  index: number;
+  options: ISubVillage[];
+  isEdit: boolean;
+  subVillagesLoading: boolean;
+  children: React.ReactNode;
+}) => {
+  useEffect(() => {
+    if(subVillagesLoading || isEdit) return;
+    const currentValue = form.getState().values?.ssUsers?.[index]?.subVillages;
+    const selected = Array.isArray(currentValue) ? currentValue : [];
+    if (selected.length === 0) return;
+    const optionIds = new Set(options.map((opt: any) => Number(opt?.id)).filter((id: number) => !Number.isNaN(id)));
+    const validSelected = selected.filter((v: any) => optionIds.has(Number(v?.id)));
+    if (validSelected.length !== selected.length) {
+      form.change(`${name}.subVillages`, validSelected.length > 0 ? validSelected : null);
+    }
+  }, [form, index, name, isEdit, subVillagesLoading, options]);
+
+  return <>{children}</>;
+};
+
 interface IAssignSSUsersSectionProps {
   isEdit?: boolean;
 }
+
+interface IFormSpyValues {
+  users?: Array<{ role?: any }>;
+  ssUsers?: Array<{ ssId?: any; subVillages?: any[] }>;
+}
+
+interface ISSUserRowProps {
+  name: string;
+  index: number;
+  fields: { length?: number; remove: (idx: number) => void; push: (row: typeof DEFAULT_SS_USER_ROW) => void };
+  form: FormApi<any>;
+  isEdit: boolean;
+  filteredSSIdOptions: ISSPrefix[];
+  ssPrefixLoading: boolean;
+  subVillageSName: string;
+  subVillagesList: ISubVillage[];
+  subVillagesLoading: boolean;
+  ssUsers: Array<{ ssId?: any; subVillages?: any[] }>;
+}
+
+const SSUserRow = ({
+  name,
+  index,
+  fields,
+  form,
+  isEdit,
+  filteredSSIdOptions,
+  ssPrefixLoading,
+  subVillageSName,
+  subVillagesList,
+  subVillagesLoading,
+  ssUsers
+}: ISSUserRowProps): React.ReactElement => {
+  const isLastSSRow = (fields?.length || 0) === index + 1;
+  const showRemove = !isEdit && (fields?.length ?? 0) > 1;
+  const showAdd = !isEdit && isLastSSRow;
+
+  return (
+    <React.Fragment>
+      {index > 0 && <div className='divider mx-neg-1dot25 mb-1dot5' />}
+      <div className='row gx-1dot25 align-items-start'>
+        <div className='col-12 col-sm-6 col-lg-4'>
+          <Field
+            name={`${name}.ssId`}
+            validate={required}
+            render={({ input, meta }) => (
+              <SelectInput
+                {...(input as any)}
+                label='SS ID'
+                errorLabel='SS ID'
+                labelKey='name'
+                valueKey='id'
+                options={filteredSSIdOptions}
+                isModel={true}
+                error={meta.touched && meta.error}
+                required={true}
+                isLoading={ssPrefixLoading}
+                disabled={ssPrefixLoading || isEdit}
+                placeholder={ssPrefixLoading ? 'Loading SS IDs...' : 'Select SS ID'}
+              />
+            )}
+          />
+        </div>
+        <div className='col-12 col-sm-6 col-lg-4'>
+          <Field
+            name={`${name}.name`}
+            validate={required}
+            render={({ input, meta }) => (
+              <TextInput
+                {...input}
+                label='Name'
+                errorLabel='name'
+                error={(meta.touched && meta.error) || undefined}
+                required={true}
+                disabled={isEdit}
+              />
+            )}
+          />
+        </div>
+        <div className='col-12 col-sm-6 col-lg-4'>
+          <PhoneNumberField
+            id={0}
+            name={name}
+            fieldName='phoneNumber'
+            form={form}
+            formName='ssUsers'
+            index={index}
+            disabled={isEdit}
+          />
+        </div>
+      </div>
+      <div className='row gx-1dot25 align-items-start mt-0dot5'>
+        <div className='col-12 col-sm-10'>
+          <SubVillagesFieldWithCleanup
+            form={form}
+            name={name}
+            index={index}
+            options={subVillagesList}
+            isEdit={isEdit}
+            subVillagesLoading={subVillagesLoading}
+          >
+            <Field
+              name={`${name}.subVillages`}
+              validate={required}
+              render={({ input, meta }) => (
+                <MultiSelect
+                  {...(input as any)}
+                  label={subVillageSName}
+                  errorLabel={subVillageSName}
+                  labelKey='name'
+                  valueKey='id'
+                  options={getFilteredSubVillageOptionsForIndex(index, ssUsers, subVillagesList)}
+                  isShowLabel={true}
+                  isModel={true}
+                  isMulti={true}
+                  required={true}
+                  isSelectAll={true}
+                  error={meta.touched && meta.error}
+                  isLoading={subVillagesLoading}
+                  isDisabled={subVillagesLoading || isEdit}
+                  placeholder={subVillagesLoading ? `Loading ${subVillageSName}...` : `Select ${subVillageSName}`}
+                />
+              )}
+            />
+          </SubVillagesFieldWithCleanup>
+        </div>
+        <div className='col-12 col-sm-auto d-flex align-items-end align-self-center gap-1 pb-0dot25'>
+          {showRemove && (
+            <button
+              type='button'
+              className='danger-text lh-1dot25 pointer border-0 bg-transparent p-0'
+              onClick={() => fields.remove(index)}
+              title='Remove row'
+              aria-label='Remove row'
+            >
+              <BinIcon className='me-0dot5' aria-hidden style={{ width: 20, height: 20 }} />
+            </button>
+          )}
+          {showAdd && (
+            <button
+              type='button'
+              className='theme-text lh-1dot25 pointer d-flex align-items-center border-0 bg-transparent p-0'
+              onClick={() => fields.push({ ...DEFAULT_SS_USER_ROW })}
+              title='Add row'
+              aria-label='Add row'
+            >
+              <PlusIcon className='me-0dot5' aria-hidden style={{ width: 20, height: 20 }} />
+            </button>
+          )}
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};
 
 const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): React.ReactElement => {
   const form = useForm();
   const ssUsersFormName = 'ssUsers';
   const ssUsersInitialValue = useMemo(() => [{ ...DEFAULT_SS_USER_ROW }], []);
-  const ssUserRefs = useRef<number[]>([new Date().getTime()]);
   const ssUsersInitializedForUserId = useRef<string | null>(null);
   const subVillagesList = useSelector(getSubVillagesSelector);
   const subVillagesLoading = useSelector(getSubVillagesLoadingSelector);
@@ -103,7 +291,7 @@ const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): R
   }, [ssPrefixList]);
 
   const userId = form.getState()?.values?.users?.[0]?.id;
-  const ssListForUser = userId != null ? shasthyaShebikaByKormiId?.[String(userId)] : null;
+  const ssListForUser = userId == null ? null : shasthyaShebikaByKormiId?.[String(userId)];
 
   useEffect(() => {
     const clearInitializedUser = () => {
@@ -124,14 +312,14 @@ const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): R
     const mapped = ssListForUser.map((item: any) => mapApiSSUserToFormRow(item, options));
     form.change(ssUsersFormName, mapped);
     ssUsersInitializedForUserId.current = String(userId);
-    ssUserRefs.current = mapped.map(() => new Date().getTime());
 
     return clearInitializedUser;
   }, [userId, ssListForUser, form, ssPrefixList]);
 
   return (
   <FormSpy subscription={{ values: true }}>
-    {({ values }: { values?: { users?: Array<{ role?: any }>; ssUsers?: Array<{ ssId?: any; subVillages?: any[] }> } }) => {
+    {(formSpyProps: { values?: IFormSpyValues }) => {
+      const { values } = formSpyProps;
       const firstUserRole = values?.users?.[0]?.role;
       if (!hasShastiyaKormiRole(firstUserRole)) return null;
       const ssUsers = values?.ssUsers ?? [];
@@ -148,128 +336,22 @@ const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): R
           <FieldArray name={ssUsersFormName} initialValue={ssUsersInitialValue}>
             {({ fields }) => (
               <>
-                {fields.map((name: string, index: number) => {
-                  const isLastSSRow = (fields?.length || 0) === index + 1;
-                  return (
-                    <React.Fragment key={`ss_user_${ssUserRefs.current[index] ?? index}`}>
-                      {index > 0 && <div className='divider mx-neg-1dot25 mb-1dot5' />}
-                      <div className='row gx-1dot25 align-items-start'>
-                        <div className='col-12 col-sm-6 col-lg-4'>
-                          <Field
-                            name={`${name}.ssId`}
-                            validate={required}
-                            render={({ input, meta }) => (
-                              <SelectInput
-                                {...(input as any)}
-                                label='SS ID'
-                                errorLabel='SS ID'
-                                labelKey='name'
-                                valueKey='id'
-                                options={filteredSSIdOptions}
-                                isModel={true}
-                                error={meta.touched && meta.error}
-                                required={true}
-                                isLoading={ssPrefixLoading}
-                                disabled={ssPrefixLoading || isEdit}
-                                placeholder={ssPrefixLoading ? 'Loading SS IDs...' : 'Select SS ID'}
-                              />
-                            )}
-                          />
-                        </div>
-                        <div className='col-12 col-sm-6 col-lg-4'>
-                          <Field
-                            name={`${name}.name`}
-                            validate={required}
-                            render={({ input, meta }) => (
-                              <TextInput
-                                {...input}
-                                label='Name'
-                                errorLabel='name'
-                                error={(meta.touched && meta.error) || undefined}
-                                required={true}
-                                disabled={isEdit}
-                              />
-                            )}
-                          />
-                        </div>
-                        <div className='col-12 col-sm-6 col-lg-4'>
-                          <PhoneNumberField
-                            id={0}
-                            name={name}
-                            fieldName='phoneNumber'
-                            form={form}
-                            formName={ssUsersFormName}
-                            index={index}
-                            disabled={isEdit}
-                          />
-                        </div>
-                      </div>
-                      <div className='row gx-1dot25 align-items-start mt-0dot5'>
-                        <div className='col-12 col-sm-10'>
-                          <Field
-                            name={`${name}.subVillages`}
-                            validate={required}
-                            render={({ input, meta }) => (
-                              <MultiSelect
-                                {...(input as any)}
-                                label={subVillageSName}
-                                errorLabel={subVillageSName}
-                                labelKey='name'
-                                valueKey='id'
-                                options={getFilteredSubVillageOptionsForIndex(index, ssUsers, subVillagesList)}
-                                isShowLabel={true}
-                                isModel={true}
-                                isMulti={true}
-                                required={true}
-                                isSelectAll={true}
-                                error={meta.touched && meta.error}
-                                isLoading={subVillagesLoading}
-                                isDisabled={subVillagesLoading || isEdit}
-                                placeholder={subVillagesLoading ? `Loading ${subVillageSName}...` : `Select ${subVillageSName}`}
-                              />
-                            )}
-                          />
-                        </div>
-                        <div className='col-12 col-sm-auto d-flex align-items-end align-self-center gap-1 pb-0dot25'>
-                          {!isEdit && (fields?.length ?? 0) > 1 && (
-                            <div
-                              className='danger-text lh-1dot25 pointer'
-                              onClick={() => {
-                                ssUserRefs.current = ssUserRefs.current.filter((_, i) => i !== index);
-                                fields.remove(index);
-                              }}
-                              title='Remove row'
-                            >
-                              <BinIcon
-                                className='me-0dot5'
-                                aria-labelledby='bin-icon'
-                                aria-label='bin-icon'
-                                style={{ width: 20, height: 20 }}
-                              />
-                            </div>
-                          )}
-                          {!isEdit && isLastSSRow && (
-                            <div
-                              className='theme-text lh-1dot25 pointer d-flex align-items-center'
-                              onClick={() => {
-                                ssUserRefs.current.push(new Date().getTime());
-                                fields.push({ ...DEFAULT_SS_USER_ROW });
-                              }}
-                              title='Add row'
-                            >
-                              <PlusIcon
-                                className='me-0dot5'
-                                aria-labelledby='plus-icon'
-                                aria-label='plus-icon'
-                                style={{ width: 20, height: 20 }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
+                {fields.map((fieldName: string, rowIndex: number) => (
+                  <SSUserRow
+                    key={fieldName}
+                    name={fieldName}
+                    index={rowIndex}
+                    fields={fields}
+                    form={form}
+                    isEdit={isEdit}
+                    filteredSSIdOptions={filteredSSIdOptions}
+                    ssPrefixLoading={ssPrefixLoading}
+                    subVillageSName={subVillageSName}
+                    subVillagesList={subVillagesList}
+                    subVillagesLoading={subVillagesLoading}
+                    ssUsers={ssUsers}
+                  />
+                ))}
               </>
             )}
           </FieldArray>

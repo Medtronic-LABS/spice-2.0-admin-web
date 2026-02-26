@@ -105,9 +105,11 @@ export const getUserPayload = ({
       supervisorId: Number(user.supervisor?.id) || null,
       roleIds: [...new Set(roleIds)],
       villageIds: [
-        ...(user?.villages ? [user.villages] : []),
-        ...(user?.existingVillages ? [user.existingVillages] : [])
-      ].map(({ id }: { id: number }) => id),
+        ...(Array.isArray(user?.villages) ? user.villages : []),
+        ...(Array.isArray(user?.existingVillages) ? user.existingVillages : [])
+      ]
+        .filter((v): v is { id: number } => v != null && typeof v === 'object' && typeof v.id === 'number')
+        .map((v) => v.id),
       village: user?.village,
       timezone: user?.timezone?.id ? user?.timezone : null,
       district: user?.district,

@@ -2,12 +2,32 @@ import { Field } from 'react-final-form';
 import { useMemo, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import debounce from 'lodash/debounce';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
 import { IMatchParams } from '../../../containers/user/UserList';
-import { fetchSubVillagesRequest } from '../../../store/region/actions';
+import { fetchSubVillagesRequest, fetchSubVillagesSuccess } from '../../../store/region/actions';
 import { required } from '../../../utils/validation';
 import SelectInput from '../../formFields/SelectInput';
 import useUserFormUtils from '../userFormUtils';
+import MultiSelect from '../../multiSelect/MultiSelect';
+import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
+import APPCONSTANTS from '../../../constants/appConstants';
+import { IVillages } from '../../../store/healthFacility/types';
+
+const extractVillageIds = (value: IVillages[]): number[] => {
+  let values: IVillages[];
+  if (Array.isArray(value)) {
+    values = value;
+  } else if (value) {
+    values = [value];
+  } else {
+    values = [];
+  }
+
+  return values
+    .map((v: any) => Number(v?.id))
+    .filter((id): id is number => !Number.isNaN(id));
+};
 
 export const DynamicCHForm = ({
   index,
@@ -66,10 +86,34 @@ export const DynamicCHForm = ({
     if (currentHFVillages?.length === 1) {
       const villageId = currentHFVillages[0]?.id;
       if (villageId != null) {
-        dispatch(fetchSubVillagesRequest({ villageId: Number(villageId) }));
+        dispatch(
+          fetchSubVillagesRequest({
+            villageIds: [Number(villageId)],
+            failureCb: (e) => {
+              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
+            }
+          })
+        );
       }
     }
   }, [currentHFVillages, dispatch]);
+
+  const debouncedFetchSubVillages = useMemo(
+    () =>
+      debounce((villageIds: number[]) => {
+        dispatch(
+          fetchSubVillagesRequest({
+            villageIds,
+            failureCb: (e) => {
+              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
+            }
+          })
+        );
+      }, APPCONSTANTS.SUB_VILLAGES_DEBOUNCE_MS),
+    [dispatch]
+  );
+
+  useEffect(() => () => debouncedFetchSubVillages.cancel(), [debouncedFetchSubVillages]);
 
   // Memoize the edit disabled state
   const isEditDisabled = useMemo(() => {
@@ -80,14 +124,20 @@ export const DynamicCHForm = ({
   // Memoize the existing villages field render function
   const renderExistingVillagesField = useCallback(
     ({ input }: any) => (
-      <SelectInput
+      <MultiSelect
         {...input}
         label={`Existing ${villagePName}`}
         labelKey='name'
         valueKey='id'
         required={true}
+        isShowLabel={true}
+        isSelectAll={true}
+        isDefaultSelected={true}
+        placeholder=''
+        menuPlacement={'auto'}
         isDisabled={false}
         isModel={true}
+        isMulti={true}
         isOptionDisabled={(option: any) => {
           return autoFetched[index] || isActivating || isEdit
             ? (mandatoryVillages || []).map((v: any) => v.id).includes(option.id)
@@ -104,28 +154,37 @@ export const DynamicCHForm = ({
   // Memoize the assigned villages field render function
   const renderAssignedVillagesField = useCallback(
     ({ input, meta }: any) => (
-      <SelectInput
+      <MultiSelect
         {...input}
         label={`Assigned ${villagePName}`}
         errorLabel={`assigned ${villagePName.toLowerCase()}`}
         labelKey='name'
         valueKey='id'
         required={true}
+        isShowLabel={true}
+        isSelectAll={true}
+        isDefaultSelected={true}
+        placeholder=''
+        menuPlacement={'auto'}
         isDisabled={isProfile || (!isHF && isEditDisabled)}
         isModel={true}
+        isMulti={true}
         options={currentHFVillages || []}
         loadingOptions={villagesLoading}
         error={isError(meta)}
         onChange={(value: any) => {
           input.onChange(value);
-          const villageId = Array.isArray(value) ? value[0]?.id : value?.id;
-          if (villageId != null) {
-            dispatch(fetchSubVillagesRequest({ villageId: Number(villageId) }));
+          const villageIds = extractVillageIds(value);
+          if (villageIds.length > 0) {
+            debouncedFetchSubVillages(villageIds);
+          } else {
+            debouncedFetchSubVillages.cancel();
+            dispatch(fetchSubVillagesSuccess([]));
           }
         }}
       />
     ),
-    [currentHFVillages, dispatch, isEditDisabled, isHF, isProfile, isError, villagesLoading]
+    [currentHFVillages, debouncedFetchSubVillages, dispatch, isEditDisabled, isHF, isProfile, isError, villagesLoading]
   );
 
   // Memoize the community unit field render function
@@ -157,7 +216,7 @@ export const DynamicCHForm = ({
           <Field
             name={`${name}.existingVillages`}
             type='text'
-            validate={(value) => required(Array.isArray(value) ? value : [value])}
+            validate={(value) => required(Array.isArray(value) ? value : [])}
             render={renderExistingVillagesField}
           />
         </div>
@@ -166,7 +225,7 @@ export const DynamicCHForm = ({
         <Field
           name={`${name}.villages`}
           type='text'
-          validate={(value) => required(Array.isArray(value) ? value : [value])}
+          validate={(value) => required(Array.isArray(value) ? value : [])}
           render={renderAssignedVillagesField}
         />
       </div>
