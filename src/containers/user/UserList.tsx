@@ -749,7 +749,7 @@ const UserList = (): React.ReactElement => {
           skip: (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
           limit: null,
           userBased: !isSuperUser,
-          tenantIds: [tenantId],
+          tenantIds: [],
           failureCb: (e: Error) => {
             toastCenter.error(
               ...getErrorToastArgs(
