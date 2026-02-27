@@ -85,6 +85,13 @@ pipelines:
             - step:
                 <<: *sonar
                 runs-on: *runner-uhis-dev
+      - stage:
+          name: Build
+          deployment: uhis-dev
+          steps:
+            - step:
+                <<: *build
+                runs-on: *runner-uhis-dev
 
   branches:
     "uhis-dev":
