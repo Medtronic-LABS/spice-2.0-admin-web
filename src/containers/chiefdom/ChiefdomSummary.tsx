@@ -33,7 +33,7 @@ import { IRoles, ITimezone } from '../../store/user/types';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import { getAdminPayload } from '../../utils/formatObjectUtils';
 
-interface IAdminEditFormValues {
+export interface IAdminEditFormValues {
   reports: IRoles[];
   suiteAccess: Array<{ groupName: string; id: string }>;
   id: string;

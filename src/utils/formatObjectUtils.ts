@@ -1,7 +1,11 @@
+import { IUserFormValues } from '../components/userForm/UserForm';
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
-import { IHFUserGet } from '../store/healthFacility/types';
-import { IUserPayload } from '../store/user/types';
+import { IAdminEditFormValues } from '../containers/chiefdom/ChiefdomSummary';
+import { IHFUserGet, IHFUserPost } from '../store/healthFacility/types';
+import { IEditUserDetail, IUserPayload } from '../store/user/types';
 
+export type UserFormDataItem = IHFUserGet | IHFUserPost;
+export type AdminFormDataItem = IHFUserGet | IAdminEditFormValues | IUserFormValues | IEditUserDetail;
 /**
  * Constructs a payload for health facility data.
  * This function formats the health facility object by extracting necessary fields
@@ -57,7 +61,7 @@ export const getUserPayload = ({
   appTypes
 }: {
   appTypes: string[];
-  userFormData: IHFUserGet[];
+  userFormData: UserFormDataItem[];
   countryId: number | string;
   tenantId?: number | string;
   isHFCreate?: boolean;
@@ -141,7 +145,7 @@ export const getUserPayload = ({
     }
 
     if (!isHFAdmin) {
-      userPayload.redRisk = user?.redRisk === true || user?.redRisk === false ? user.redRisk : undefined;
+      userPayload.redRisk = user?.redRisk ?? null;
     }
 
     return userPayload;
@@ -167,7 +171,7 @@ export const getAdminPayload = ({
   appTypes
 }: {
   appTypes: string[];
-  userFormData: IHFUserGet[];
+  userFormData: AdminFormDataItem[];
   countryId?: number | string;
   tenantId?: number | string | undefined;
   isFromList?: boolean;
