@@ -220,8 +220,8 @@ const RegionFormCustomization = (): React.ReactElement => {
                     input={{ onChange }}
                     labelKey={'name'}
                     valueKey={'id'}
-                    value={currentCulture as any}
-                    defaultValue={defaultCulture as any}
+                    value={currentCulture}
+                    defaultValue={defaultCulture}
                     options={filterByAppTypes(cultureList, appTypes)}
                     loadingOptions={isCultureListLoading}
                   />

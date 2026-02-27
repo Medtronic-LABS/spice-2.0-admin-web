@@ -200,7 +200,7 @@ export const useRoleMeta = ({
       // show HF and show Villages condition
       if (roles.length && currentSuite === SPICE) {
         if (isCHWCHPUser || isShastiyaKormiUser) {
-          showFields.isShowVillages = isHFCreate ? false : true;
+          showFields.isShowVillages = !isHFCreate;
         }
         roles.forEach((userRole: IRoles) => {
           if (

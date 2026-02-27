@@ -19,16 +19,16 @@ describe('PaginationInput', () => {
     const { getByRole, unmount } = render(<PaginationInput {...props} />);
     const input = getByRole('textbox');
     fireEvent.change(input, { target: { value: '2' } });
-    fireEvent.keyPress(input, { key: 'Enter', code: 'Enter', charCode: 13 });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter', keyCode: 13 });
     expect(props.onPagination).toHaveBeenCalledWith(2);
     unmount();
   });
 
-  it('calls onPagination when other key is pressed and input value is valid', () => {
+  it('does not call onPagination when other key is pressed and input value is valid', () => {
     const { getByRole, unmount } = render(<PaginationInput {...props} />);
     const input = getByRole('textbox');
     fireEvent.change(input, { target: { value: '2' } });
-    fireEvent.keyPress(input, { key: 'ArrowRight', code: 'ArrowRight', charCode: 39 });
+    fireEvent.keyDown(input, { key: 'ArrowRight', code: 'ArrowRight', keyCode: 39 });
     expect(props.onPagination).not.toHaveBeenCalled();
     unmount();
   });

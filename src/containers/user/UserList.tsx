@@ -328,7 +328,7 @@ const UserList = (): React.ReactElement => {
    * @param value
    */
   const openEditModal = (value: any) => {
-    const userId = value?.id != null ? String(value.id) : null;
+    const userId = value?.id == null ? null : String(value.id);
     const { roles = [] } : { roles: any[] } = value;
     const hasShastiyaKormiRole = roles.some(role => role.name?.toUpperCase() === shastiyaKormiRole);
     if ((value.roles || []).some((userRole: IUserRole) => villageBasedRoles.includes(userRole.name))) {

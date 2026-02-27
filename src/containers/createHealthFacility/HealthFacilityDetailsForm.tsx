@@ -164,7 +164,7 @@ const HealthFacilityDetailsForm = ({
 
   if (!isEdit && chiefdomId) {
     const { values: formValues = {} } = form?.getState?.() || {};
-    const chiefdomFormValue = (formValues as any)?.formName?.chiefdom;
+    const chiefdomFormValue = formValues?.formName?.chiefdom;
     if (!chiefdomFormValue && Number(chiefdom?.id) === Number(chiefdomId)) {
       let districtValue = {};
       if (chiefdom.district.id) {
@@ -192,7 +192,7 @@ const HealthFacilityDetailsForm = ({
   }, []);
   if (!isEdit && districtId) {
     const { values: formValues = {} } = form?.getState?.() || {};
-    const districtFormValue = (formValues as any)?.formName?.district;
+    const districtFormValue = formValues?.formName?.district;
     if (!districtFormValue && Number(district?.id) === Number(districtId)) {
       form?.change(`${formName}.district` as any, district);
     }

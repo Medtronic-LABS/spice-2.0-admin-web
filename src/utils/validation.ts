@@ -53,7 +53,7 @@ export function validateLoginIdentifier(value: string | null | undefined): strin
     return '';
   }
   // Mobile: optional +, then 8–15 digits (spaces ignored)
-  const digitsOnly = trimmed.replace(/\s/g, '');
+  const digitsOnly = trimmed.replaceAll(' ', '');
   if (/^\+?\d{8,15}$/.test(digitsOnly)) {
     return '';
   }
@@ -246,7 +246,7 @@ export function validateMobile(mobileNo: string, isBd: boolean): string {
 
   if (isBd) {
     // Check if number starts with 01
-    if (!/^01/.test(mobileNo)) {
+    if (!mobileNo.startsWith('01')) {
       return errorMsgs.PH_NO_STARTS_WITH_ERROR;
     }
 

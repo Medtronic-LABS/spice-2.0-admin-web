@@ -80,12 +80,16 @@ const MyProfile = (): React.ReactElement => {
    * @return {Array} An array of label-value pairs for profile information
    */
   const lableData = useMemo(() => {
+    const countryCodeStr =
+      typeof userDetails?.countryCode === 'string'
+        ? userDetails.countryCode
+        : userDetails?.countryCode?.phoneNumberCode;
     const data = [
       { label: 'Name', value: userDetails ? `${userDetails.firstName} ${userDetails.lastName}` : null },
       { label: 'Email ID', value: userDetails?.username, colClassName: 'col-sm-6 col-lg-8' },
       {
         label: 'Mobile Number',
-        value: `${userDetails?.countryCode ? '+' + userDetails?.countryCode : ''} ${
+        value: `${countryCodeStr ? '+' + countryCodeStr : ''} ${
           userDetails?.phoneNumber ? userDetails?.phoneNumber : '--'
         }`,
         colClassName: 'col-sm-6 col-lg-4 col-md-6'

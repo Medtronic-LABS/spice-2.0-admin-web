@@ -413,11 +413,11 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                     entityName='healthFacility'
                     data={submittedData.data?.users}
                     autoFetchedState={{ autoFetch, setAutoFetchState }}
-                    parentOrgId={selectedchiefdomTenantId || tenantId}
+                    parentOrgId={selectedchiefdomTenantId ?? tenantId}
                     ignoreTenantId={''}
                     isSiteUser={true}
                     disabledRolesState={{ disabledRoles: disabledRoleState, setDisabledRoles }}
-                    appTypes={submittedData.data?.appTypes || []}
+                    appTypes={submittedData.data?.appTypes ?? []}
                     fetchHFListForReports={false}
                     userFormParams={{ isHF: true, isHFCreate: true }}
                   />

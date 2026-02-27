@@ -194,7 +194,7 @@ const Pagination: React.FC<IPaginationProps> = ({
    * Render Pagination Anchors
    * @returns {any[]}
    */
-  const renderAnchors = (): any[] => state.pages.map(renderAnchor);
+  const renderAnchors = (): any[] => state.pages.map((page, index) => renderAnchor(page, index));
 
   const handleRowsPerPageChange = (selectedOption: { value: number }) => {
     onChangeRowsPerPage(selectedOption.value);

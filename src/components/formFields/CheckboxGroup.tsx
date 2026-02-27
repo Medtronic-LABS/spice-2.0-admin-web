@@ -19,7 +19,7 @@ const CheckboxGroup = ({
   meta
 }: ICheckboxGroupProps): React.ReactElement => {
   const checkboxRef = useRef<HTMLInputElement>(null);
-  const onKeyPress = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.key === 'Enter') {
@@ -51,7 +51,7 @@ const CheckboxGroup = ({
               type='checkbox'
               className={styles.checkbox}
               onClick={(event: React.BaseSyntheticEvent) => setValue(event, option.value)}
-              onKeyPress={onKeyPress}
+              onKeyDown={handleKeyDown}
               defaultChecked={fields?.value?.includes(option.value) || false}
               onChange={(event) => event.target.value}
             />

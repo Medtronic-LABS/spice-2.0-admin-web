@@ -47,7 +47,7 @@ describe('Checkbox', () => {
 
     const checkbox = screen.getByRole('checkbox');
     checkbox.focus();
-    fireEvent.keyPress(checkbox, { key: 'Enter', code: 'Enter', charCode: 13 });
+    fireEvent.keyDown(checkbox, { key: 'Enter', code: 'Enter', keyCode: 13 });
 
     expect(screen.getByRole('checkbox')).toBeChecked();
   });
@@ -58,7 +58,7 @@ describe('Checkbox', () => {
 
     const checkbox = screen.getByRole('checkbox');
     checkbox.focus();
-    fireEvent.keyPress(checkbox, { key: ' ', code: 'Space', charCode: 32 });
+    fireEvent.keyDown(checkbox, { key: ' ', code: 'Space', keyCode: 32 });
 
     expect(screen.getByRole('checkbox')).not.toBeChecked();
   });

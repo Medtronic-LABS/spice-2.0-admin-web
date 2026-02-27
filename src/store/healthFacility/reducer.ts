@@ -163,6 +163,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.HF_STATUS_CHANGE_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_SUCCESS:
     case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_FAILURE:
+    case HEALTH_FACILITY_ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_SUCCESS:
       return {
         ...state,
         loading: false
@@ -207,6 +208,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.HF_STATUS_CHANGE_REQUEST:
     case HEALTH_FACILITY_ACTION_TYPES.LINKED_RESTRICTIONS_VALIDATION_REQUEST:
+    case HEALTH_FACILITY_ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_REQUEST:  
       return {
         ...state,
         loading: true
@@ -232,6 +234,7 @@ const healthFacilityReducer = (
     case HEALTH_FACILITY_ACTION_TYPES.UPDATE_HEALTH_FACILITY_USER_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_USER_FAILURE:
     case HEALTH_FACILITY_ACTION_TYPES.DELETE_HEALTH_FACILITY_FAILURE:
+    case HEALTH_FACILITY_ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_FAILURE:
       return {
         ...state,
         loading: false,
@@ -478,22 +481,6 @@ const healthFacilityReducer = (
       return {
         ...state,
         shasthyaShebikaByKormiIdLoading: false
-      };
-    case HEALTH_FACILITY_ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_REQUEST:
-      return {
-        ...state,
-        loading: true
-      };
-    case HEALTH_FACILITY_ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_SUCCESS:
-      return {
-        ...state,
-        loading: false
-      };
-    case HEALTH_FACILITY_ACTION_TYPES.DELETE_SHASTHYA_SHEBIKAS_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        error: action.error
       };
     case HEALTH_FACILITY_ACTION_TYPES.CLEAR_ALL_DEPENDENT_DATA:
       return {

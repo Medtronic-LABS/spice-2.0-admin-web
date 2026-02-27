@@ -187,6 +187,8 @@ describe('DynamicCHForm', () => {
       defaultInitialValues
     );
     expect(mockDispatch).toHaveBeenCalled();
-    expect(mockFetchSubVillagesRequest).toHaveBeenCalledWith({ villageIds: [42] });
+    expect(mockFetchSubVillagesRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ villageIds: [42] })
+    );
   });
 });

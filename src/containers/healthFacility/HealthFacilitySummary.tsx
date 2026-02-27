@@ -402,7 +402,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    */
   const handleEditUserClick = useCallback(
     (user: any) => {
-      const userId = user?.id != null ? String(user.id) : null;
+      const userId = user?.id == null ? null : String(user.id);
       dispatch(
         fetchUserDetailRequest({
           id: Number(user?.id),

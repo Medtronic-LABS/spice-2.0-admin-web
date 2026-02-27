@@ -15,10 +15,10 @@ const PaginationInput = ({ maxNumber, className, onChange, onPagination, ...othe
   const [value, setValue] = useState('');
 
   /**
-   * Handles the key press event
+   * Handles the key down event (e.g. Enter to submit)
    * @param {React.KeyboardEvent<HTMLInputElement>} e - The keyboard event
    */
-  const onKeyPress = useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter' && Number(value) && !error) {
         setValue('');
@@ -51,7 +51,7 @@ const PaginationInput = ({ maxNumber, className, onChange, onPagination, ...othe
       value={value}
       className={`${className} ${styles.goToPage} ${error ? styles.error : ''}`}
       onChange={onChangeEvent}
-      onKeyPress={onKeyPress}
+      onKeyDown={handleKeyDown}
     />
   );
 };

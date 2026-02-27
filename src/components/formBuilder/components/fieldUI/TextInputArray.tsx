@@ -52,7 +52,7 @@ const TextInputArray = ({ onChange, defaultValue = [], label, required = true, d
    * Handles the addition of a new item to the text input array based on the provided configuration.
    */
   const handleAdd = () => {
-    keys.current.push(Number(keys.current[keys.current.length - 1] || 0) + 1);
+    keys.current.push(Number(keys.current.at(-1) || 0) + 1);
     setValue([...value, '']);
   };
 

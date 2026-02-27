@@ -1,4 +1,5 @@
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
+import { IHFUserGet } from '../store/healthFacility/types';
 import { IUserPayload } from '../store/user/types';
 
 /**
@@ -41,7 +42,7 @@ export const formatHealthFacility = (hf: any, countryId: number | string, appTyp
 /**
  * Generates a user payload from user form data.
  * @param {Object} params - The parameters for generating the payload
- * @param {any[]} params.userFormData - Array of user form data
+ * @param {IHFUserGet[]} params.userFormData - Array of user form data
  * @param {number | string} params.countryId - The country ID
  * @param {number | string} [params.tenantId] - The tenant ID
  * @param {boolean} [params.isHFCreate=false] - Flag indicating if it's a health facility creation
@@ -56,40 +57,48 @@ export const getUserPayload = ({
   appTypes
 }: {
   appTypes: string[];
-  userFormData: any[];
+  userFormData: IHFUserGet[];
   countryId: number | string;
-  tenantId?: number | string | undefined;
+  tenantId?: number | string;
   isHFCreate?: boolean;
   spiceRolesGroup?: Array<{ name: string; id: number }>;
 }) => {
-  const payload = userFormData.map((user: any) => {
-    let roleIds: number[] = (user.roles || []).map((role: any) => role.id);
-    const isHFAdmin = user?.roles?.some((role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN);
 
-    // add or remove redrisk roleId from roleIds array
-    const redRiskData = spiceRolesGroup?.find(
-      (roleData: { name: string }) => NAMING_VARIABLES.redRisk === roleData.name
+  const resolveTenantId = (user: any): number | undefined => {
+    if (tenantId) return Number(tenantId);
+    if (user?.healthfacility?.tenantId) return Number(user.healthfacility.tenantId);
+    if (user?.tenantId) return Number(user.tenantId);
+    return undefined;
+  };
+
+  const adjustRoleIds = (user: any, roleIds: number[], isHFAdmin: boolean) => {
+    const redRiskData = (spiceRolesGroup ?? []).find(
+      roleData => roleData.name === NAMING_VARIABLES.redRisk
     );
-    if (redRiskData?.id) {
-      roleIds =
-        user?.redRisk && !isHFAdmin
-          ? [...new Set([...roleIds, redRiskData?.id])]
-          : roleIds?.filter((roleId: number) => roleId !== redRiskData?.id);
+
+    if (!redRiskData?.id) return roleIds;
+
+    if (user?.redRisk && !isHFAdmin) {
+      return [...new Set([...roleIds, redRiskData.id])];
     }
-    // for tenantId
-    let payloadTenantId = Number(user?.tenantId || tenantId); // By default add user tenantId or tenentId from URL
-    if (user?.tenantId) {
-      // if user has it's own tenantId(while edit) then send that tenantId
-      payloadTenantId = Number(user.tenantId);
-    }
-    if (user?.healthfacility?.tenantId) {
-      // if hf admin create or user create then send assigned hf tenantId
-      payloadTenantId = Number(user.healthfacility.tenantId);
-    }
-    if (tenantId) {
-      // send URL tenantId from summary page
-      payloadTenantId = Number(tenantId);
-    }
+
+    return roleIds.filter(id => id !== redRiskData.id);
+  };
+
+  return userFormData.map((user: any) => {
+    const isHFAdmin = user?.roles?.some(
+      (role: any) => role.name === APPCONSTANTS.ROLES.HEALTH_FACILITY_ADMIN
+    );
+
+    const isSpiceExists = user?.roles?.some(
+      (role: any) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice
+    );
+
+    let roleIds: number[] = (user.roles || []).map(
+      (role: { id: number }) => role.id
+    );
+    roleIds = adjustRoleIds(user, roleIds, isHFAdmin);
+
     const userPayload: IUserPayload = {
       appTypes,
       firstName: user.firstName.trim(),
@@ -101,56 +110,48 @@ export const getUserPayload = ({
       culture: user?.culture || null,
       countryCode: user?.countryCode?.phoneNumberCode || null,
       country: { id: Number(countryId) },
-      tenantId: payloadTenantId,
+      tenantId: isSpiceExists ? resolveTenantId(user) : undefined,
       supervisorId: Number(user.supervisor?.id) || null,
       roleIds: [...new Set(roleIds)],
       villageIds: [
         ...(Array.isArray(user?.villages) ? user.villages : []),
         ...(Array.isArray(user?.existingVillages) ? user.existingVillages : [])
       ]
-        .filter((v): v is { id: number } => v != null && typeof v === 'object' && typeof v.id === 'number')
-        .map((v) => v.id),
+        .filter((v): v is { id: number } => v && typeof v.id === 'number')
+        .map(v => v.id),
       village: user?.village,
-      timezone: user?.timezone?.id ? user?.timezone : null,
+      timezone: user?.timezone?.id ? user.timezone : null,
       district: user?.district,
       chiefdom: user?.chiefdom,
-      // userUnitId: user?.userUnitId,
-      designation: user?.designation?.id ? { name: user?.designation?.name, id: user?.designation?.id } : null,
-      reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization) ? user.reportUserOrganization : []).map(
-        ({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId
-      ),
+      designation: user?.designation?.id
+        ? { name: user.designation.name, id: user.designation.id }
+        : null,
+      reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization)
+        ? user.reportUserOrganization
+        : []
+      ).map(({ tenantId }: { tenantId: number }) => tenantId),
       insightUserOrganizationIds: (Array.isArray(user?.insightUserOrganization)
         ? user.insightUserOrganization
         : []
-      ).map(({ tenantId: hfTenantId }: { tenantId: number }) => hfTenantId)
+      ).map(({ tenantId }: { tenantId: number }) => tenantId)
     };
 
-    const isSpiceExists = user?.roles?.some(
-      (role: { groupName: string }) => role.groupName === APPCONSTANTS.spiceRoleGrouped.spice
-    );
-    // if spice doesn't exists in user, then remove tenantId
-    if (!isSpiceExists) {
-      userPayload.tenantId = undefined;
-    }
-
-    // add id for edit
     if (user?.id) {
       userPayload.id = Number(user.id);
     }
-    // add redrisk if not hf admin
+
     if (!isHFAdmin) {
-      userPayload.redRisk = user?.redRisk ?? null;
+      userPayload.redRisk = user?.redRisk === true || user?.redRisk === false ? user.redRisk : undefined;
     }
 
     return userPayload;
   });
-  return payload;
 };
 
 /**
  * Generates an admin payload from user form data.
  * @param {Object} params - The parameters for generating the payload
- * @param {any[]} params.userFormData - Array of user form data
+ * @param {IHFUserGet[]} params.userFormData - Array of user form data
  * @param {number | string} [params.countryId] - The country ID
  * @param {number | string} [params.tenantId] - The tenant ID
  * @param {boolean} [params.isFromList=false] - Flag indicating if the request is from a list
@@ -166,7 +167,7 @@ export const getAdminPayload = ({
   appTypes
 }: {
   appTypes: string[];
-  userFormData: any[];
+  userFormData: IHFUserGet[];
   countryId?: number | string;
   tenantId?: number | string | undefined;
   isFromList?: boolean;

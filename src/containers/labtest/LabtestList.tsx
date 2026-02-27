@@ -141,7 +141,7 @@ const LabTestList = (props: IMatchProps): React.ReactElement => {
     props.history.push(
       PROTECTED_ROUTES.customizeLabTest
         .replace(':tenantId', tenantId)
-        .replace(':regionId', regionId as string)
+        .replace(':regionId', regionId)
         .replace(':labTestName', encodeURIComponent(data.testName.trim()))
         .replace(':identifier', data.uniqueName || camelCase(data.testName.trim()) + Date.now())
         .replace(':testId', data?.id || null),

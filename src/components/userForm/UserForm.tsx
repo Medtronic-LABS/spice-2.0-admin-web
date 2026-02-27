@@ -30,7 +30,6 @@ import {
 import {
   assignedHFListForHFAdminSelector,
   countryListSelector,
-  countryLoadingSelector,
   healthFacilityListSelector,
   healthFacilityLoadingSelector,
   peerSupervisorListSelector,
@@ -181,7 +180,6 @@ const UserForm = ({
   const districtLoading = useSelector(districtLoadingSelector);
   const countryList = useSelector(countryListSelector);
   const designationList = useSelector(designationListSelector);
-  const isCountryListLoading = useSelector(countryLoadingSelector);
   const [peerSupervisors, setPeerSupervisors] = useState([[...peerSupervisorList.list]] as IPeerSupervisor[][]);
   const [villages, setVillages] = useState([[...villagesList.list]] as IVillages[][]);
   const [autoFetchData, setAutoFetchData] = useState(autoFetchedDataState?.autoFetchData || ([] as any[]));
@@ -1059,9 +1057,15 @@ const UserForm = ({
           const isSPICE = (formSuiteAccess || []).some((v: any) => v?.groupName === SPICE);
           const isReports = (formSuiteAccess || []).some((v: any) => v?.groupName === REPORTS);
           const isInsights = (formSuiteAccess || []).some((v: any) => v?.groupName === INSIGHTS);
-          const isShastiyaKormiSelected = (Array.isArray(spiceRole) ? spiceRole : spiceRole ? [spiceRole] : []).some(
-            (r: any) => r?.name === shastiyaKormiRole
-          );
+          let spiceRoleList: any[];
+          if (Array.isArray(spiceRole)) {
+            spiceRoleList = spiceRole;
+          } else if (spiceRole) {
+            spiceRoleList = [spiceRole];
+          } else {
+            spiceRoleList = [];
+          }
+          const isShastiyaKormiSelected = spiceRoleList.some((r: any) => r?.name === shastiyaKormiRole);
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>

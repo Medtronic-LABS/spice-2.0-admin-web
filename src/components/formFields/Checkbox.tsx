@@ -18,7 +18,7 @@ const Checkbox = ({
   ...inputProps
 }: ICheckboxProps & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>) => {
   const checkboxRef = useRef<HTMLInputElement>(null);
-  const onKeyPress = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.key === 'Enter') {
@@ -42,7 +42,7 @@ const Checkbox = ({
             {...inputProps}
             className={`${switchCheckbox ? '' : styles.checkbox} `}
             ref={checkboxRef}
-            onKeyPress={onKeyPress}
+            onKeyDown={handleKeyDown}
           />
           {switchCheckbox && <span className={styles.switcher} />}
         </div>

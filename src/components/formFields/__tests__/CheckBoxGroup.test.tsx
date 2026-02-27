@@ -89,7 +89,7 @@ describe('CheckboxGroup', () => {
     render(<CheckboxGroup {...defaultProps} />);
 
     const checkboxes = screen.getAllByRole('checkbox');
-    fireEvent.keyPress(checkboxes[0], { key: 'Enter', code: 'Enter', charCode: 13 });
+    fireEvent.keyDown(checkboxes[0], { key: 'Enter', code: 'Enter', keyCode: 13 });
     expect(checkboxes[0]).toBeChecked();
   });
 
@@ -105,7 +105,7 @@ describe('CheckboxGroup', () => {
     );
 
     const checkboxes = screen.getAllByRole('checkbox');
-    fireEvent.keyPress(checkboxes[0], { key: ' ', code: 'Space', charCode: 32 });
+    fireEvent.keyDown(checkboxes[0], { key: ' ', code: 'Space', keyCode: 32 });
     expect(checkboxes[0]).toBeChecked();
   });
 });
