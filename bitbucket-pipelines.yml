@@ -75,7 +75,25 @@ definitions:
 
 pipelines:
   pull-requests:
-    "uhis-dev":
+    "uhis-*":
+      - stage:
+          name: Install, Test & Sonar
+          steps:
+            - step:
+                <<: *install-test
+                runs-on: *runner-uhis-dev
+            - step:
+                <<: *sonar
+                runs-on: *runner-uhis-dev
+      - stage:
+          name: Build
+          deployment: uhis-dev
+          steps:
+            - step:
+                <<: *build
+                runs-on: *runner-uhis-dev
+    
+    "feature/uhis-*":
       - stage:
           name: Install, Test & Sonar
           steps:
