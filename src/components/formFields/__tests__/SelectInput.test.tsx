@@ -89,6 +89,26 @@ describe('SelectInput', () => {
     expect(screen.getByTestId('select-input')).toBeInTheDocument();
   });
 
+  it('calls parent onChange when auto-selecting single option', () => {
+    const singleOption = [{ label: 'Single Option', value: 'single' }];
+    const mockOnChange = jest.fn();
+
+    renderWithForm(
+      <SelectInput
+        {...defaultProps}
+        options={singleOption}
+        name='testSelect'
+        autoSelect={true}
+        required={true}
+        onChange={mockOnChange}
+        input={{ ...defaultProps.input }}
+      />
+    );
+    jest.advanceTimersByTime(0);
+
+    expect(mockOnChange).toHaveBeenCalledWith(singleOption[0]);
+  });
+
   it('disables the select when disabled prop is true', () => {
     renderWithForm(<SelectInput {...defaultProps} disabled={true} />);
     expect(screen.getByTestId('select-input')).toBeInTheDocument();
