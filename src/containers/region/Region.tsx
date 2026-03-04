@@ -109,7 +109,13 @@ const Region = (): React.ReactElement => {
           setUploadClicked(false); // Reset upload button state
         },
         failureCb: (e) => {
-          toastCenter.error(APPCONSTANTS.OOPS, formatUserToastMsg(APPCONSTANTS.REGION_UPLOAD_FAILURE, regionSName));
+          toastCenter.error(
+            ...getErrorToastArgs(
+              e as Error,
+              APPCONSTANTS.ERROR,
+              formatUserToastMsg(APPCONSTANTS.REGION_UPLOAD_FAILURE, regionSName)
+            )
+          );
         }
       })
     );
