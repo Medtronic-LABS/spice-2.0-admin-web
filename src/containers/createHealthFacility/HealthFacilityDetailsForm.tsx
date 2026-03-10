@@ -7,6 +7,7 @@ import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
 import SelectInput from '../../components/formFields/SelectInput';
 import TextInput from '../../components/formFields/TextInput';
+import styles from '../../components/formFields/TextInput.module.scss';
 import MapWrapper from '../../components/map/MapContainer';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -38,6 +39,8 @@ import {
 } from '../../store/healthFacility/selectors';
 import { ICity, IObjectData, IVillages } from '../../store/healthFacility/types';
 import { countryIdSelector } from '../../store/user/selectors';
+import { useUniqueFieldValidation } from '../../hooks/useUniqueFieldValidation';
+import { checkFacilityNameUnique, checkPostalCodeUnique } from '../../services/healthFacilityAPI';
 import { filterByAppTypes } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
@@ -52,6 +55,7 @@ import {
 import Workflows from '../healthFacility/Workflows';
 import './HealthFacilityDetails.scss';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
+import { errorMsgs } from '../../constants/erroMsgs';
 
 interface IAddUserFormProps {
   formName: string;
@@ -126,6 +130,32 @@ const HealthFacilityDetailsForm = ({
   }>({
     clinicalWorkflows: form?.getState()?.values?.healthFacility?.clinicalWorkflows || [],
     customizedWorkflows: form?.getState()?.values?.healthFacility?.customizedWorkflows || []
+  });
+
+  const facilityNameValidation = useUniqueFieldValidation({
+    apiFn: checkFacilityNameUnique,
+    existsErrorMsg: errorMsgs.HF_NAME_EXISTS_ERROR,
+    notValidatedMsg: `${healthFacilitySName} Name is not validated.`,
+    errorLabel: `${healthFacilitySName.toLowerCase()} name`,
+    minLength: 2,
+    form,
+    formName,
+    fieldKey: 'name',
+    isEdit,
+    toastErrorMsg: errorMsgs.HF_NAME_VALIDATE_FAIL
+  });
+
+  const postalCodeValidation = useUniqueFieldValidation({
+    apiFn: checkPostalCodeUnique,
+    existsErrorMsg: errorMsgs.POSTAL_CODE_EXISTS_ERROR,
+    notValidatedMsg: 'Facility ID is not validated.',
+    errorLabel: 'Facility Id',
+    minLength: 3,
+    form,
+    formName,
+    fieldKey: 'postalCode',
+    isEdit,
+    toastErrorMsg: errorMsgs.POSTAL_CODE_VALIDATE_FAIL
   });
 
   // map variables
@@ -388,15 +418,46 @@ const HealthFacilityDetailsForm = ({
             <Field
               name={`${formName}.name`}
               type='text'
-              validate={composeValidators(required, minLength(2))}
+              validate={composeValidators(required, minLength(2), facilityNameValidation.validateExist)}
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
+                  onBlur={(e) => {
+                    input.onBlur(e);
+                    const trimmed = input.value?.trim?.();
+                    if (
+                      !isEdit &&
+                      trimmed &&
+                      trimmed.length >= 2 &&
+                      facilityNameValidation.lastCheckedRef.current !== trimmed
+                    ) {
+                      facilityNameValidation.submitEnabledStatusRef.current = false;
+                      facilityNameValidation.checkUniqueFn(input.value);
+                    }
+                  }}
+                  onChange={(e) => {
+                    facilityNameValidation.submitEnabledStatusRef.current = false;
+                    facilityNameValidation.setNetworkError(false);
+                    input.onChange(e);
+                  }}
                   label={`${healthFacilitySName} Name`}
-                  errorLabel={`${healthFacilitySName.toLowerCase()} name`}
+                  errorLabel={facilityNameValidation.getErrorLabel(meta)}
                   disabled={isEdit || isActivating}
                   capitalize={true}
-                  error={(meta.touched && meta.error) || undefined}
+                  showLoader={facilityNameValidation.loading}
+                  error={facilityNameValidation.getErrorMsg(meta)}
+                  helpertext={
+                    facilityNameValidation.networkError ? (
+                      <div>
+                        <span
+                          className={styles.validateErrorText}
+                          onClick={() => facilityNameValidation.checkUniqueFn(input.value, true)}
+                        >
+                          Validate
+                        </span>
+                      </div>
+                    ) : null
+                  }
                 />
               )}
             />
@@ -535,15 +596,46 @@ const HealthFacilityDetailsForm = ({
             <Field
               name={`${formName}.postalCode`}
               type='text'
-              validate={composeValidators(required, minLength(3))}
+              validate={composeValidators(required, minLength(3), postalCodeValidation.validateExist)}
               parse={normalizePhone}
               render={({ input, meta }) => (
                 <TextInput
                   {...input}
+                  onBlur={(e) => {
+                    input.onBlur(e);
+                    const trimmed = input.value?.trim?.();
+                    if (
+                      !isEdit &&
+                      trimmed &&
+                      trimmed.length >= 3 &&
+                      postalCodeValidation.lastCheckedRef.current !== trimmed
+                    ) {
+                      postalCodeValidation.submitEnabledStatusRef.current = false;
+                      postalCodeValidation.checkUniqueFn(input.value);
+                    }
+                  }}
+                  onChange={(e) => {
+                    postalCodeValidation.submitEnabledStatusRef.current = false;
+                    postalCodeValidation.setNetworkError(false);
+                    input.onChange(e);
+                  }}
                   label='Facility ID'
-                  errorLabel='facility id'
+                  errorLabel={postalCodeValidation.getErrorLabel(meta)}
                   disabled={isEdit || isActivating}
-                  error={(meta.touched && meta.error) || undefined}
+                  error={postalCodeValidation.getErrorMsg(meta)}
+                  showLoader={postalCodeValidation.loading}
+                  helpertext={
+                    postalCodeValidation.networkError ? (
+                      <div>
+                        <span
+                          className={styles.validateErrorText}
+                          onClick={() => postalCodeValidation.checkUniqueFn(input.value, true)}
+                        >
+                          Validate
+                        </span>
+                      </div>
+                    ) : null
+                  }
                 />
               )}
             />

@@ -52,6 +52,20 @@ export const createHealthFacility = (data: ICreateHFRequestPayload) =>
     data
   });
 
+export const checkFacilityNameUnique = (name: string) =>
+  axios({
+    method: 'GET',
+    url: '/user-service/organization/check-facility-name-unique',
+    params: { name }
+  });
+
+export const checkPostalCodeUnique = (postalCode: string) =>
+  axios({
+    method: 'GET',
+    url: '/user-service/organization/check-postal-code-unique',
+    params: { postalCode }
+  });
+
 export const deleteHealtFacility = (data: IDeleteHFPayload) =>
   axios({
     url: '/user-service/organization/delete-healthfacility',

@@ -9,7 +9,7 @@ interface ITextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   toolTipTitle?: string;
   errorLabel?: string;
-  helpertext?: React.ReactElement;
+  helpertext?: React.ReactElement | null;
   showLoader?: boolean;
   removeErrorContainer?: boolean;
   capitalize?: boolean;

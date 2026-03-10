@@ -1,14 +1,21 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import HealthFacilityDetailsForm from '../HealthFacilityDetailsForm';
+import * as healthFacilityAPI from '../../../services/healthFacilityAPI';
 
 const mockStore = configureStore([]);
 
 jest.mock('react-router', () => ({
   useParams: () => ({ regionId: undefined, districtId: undefined, chiefdomId: undefined, tenantId: '1' })
+}));
+
+jest.mock('../../../services/healthFacilityAPI', () => ({
+  ...jest.requireActual('../../../services/healthFacilityAPI'),
+  checkFacilityNameUnique: jest.fn(() => Promise.resolve({ data: { unique: true } })),
+  checkPostalCodeUnique: jest.fn(() => Promise.resolve({ data: { unique: true } }))
 }));
 
 jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
@@ -55,12 +62,26 @@ jest.mock('../../../components/formContainer/FormContainer', () => ({
 
 jest.mock('../../../components/formFields/TextInput', () => ({
   __esModule: true,
-  default: ({ label, input }: any) => (
-    <div data-testid="text-input">
-      <label>{label}</label>
-      <input {...input} />
-    </div>
-  )
+  default: ({ label, input = {}, onBlur, onChange }: any) => {
+    const id = input?.name?.replace(/\./g, '-') || `input-${label.replace(/\s/g, '-')}`;
+    return (
+      <div data-testid="text-input" data-label={label}>
+        <label htmlFor={id}>{label}</label>
+        <input
+          id={id}
+          {...input}
+          onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+            input?.onBlur?.(e);
+            onBlur?.(e);
+          }}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            input?.onChange?.(e.target.value);
+            onChange?.(e);
+          }}
+        />
+      </div>
+    );
+  }
 }));
 
 jest.mock('../../../components/formFields/SelectInput', () => ({
@@ -92,6 +113,10 @@ jest.mock('../../healthFacility/Workflows', () => ({
 }));
 
 jest.mock('../HealthFacilityDetails.scss', () => ({}));
+
+jest.mock('../../../components/formFields/TextInput.module.scss', () => ({
+  validateErrorText: 'validateErrorText'
+}));
 
 const defaultStoreState = {
   healthFacility: {
@@ -268,5 +293,52 @@ describe('HealthFacilityDetailsForm', () => {
   it('renders with isHFCreate true without crashing', () => {
     renderWithForm({ isHFCreate: true });
     expect(screen.getByText('Health Facility Name')).toBeInTheDocument();
+  });
+
+  it('calls checkFacilityNameUnique on blur when health facility name has at least 2 characters', async () => {
+    const checkFacilityNameUniqueMock = healthFacilityAPI.checkFacilityNameUnique as jest.Mock;
+    checkFacilityNameUniqueMock.mockResolvedValue({ data: { unique: true } });
+    renderWithForm();
+    const nameInput = screen.getByLabelText('Health Facility Name');
+    fireEvent.change(nameInput, { target: { value: 'Test Facility' } });
+    fireEvent.blur(nameInput);
+    await screen.findByText('Health Facility Name');
+    expect(checkFacilityNameUniqueMock).toHaveBeenCalledWith('Test Facility');
+  });
+
+  it('does not call checkFacilityNameUnique when isEdit is true', () => {
+    const checkFacilityNameUniqueMock = healthFacilityAPI.checkFacilityNameUnique as jest.Mock;
+    checkFacilityNameUniqueMock.mockClear();
+    renderWithForm({ isEdit: true });
+    const nameInput = screen.queryByLabelText('Health Facility Name');
+    if (nameInput) {
+      fireEvent.change(nameInput, { target: { value: 'Test Facility' } });
+      fireEvent.blur(nameInput);
+    }
+    expect(checkFacilityNameUniqueMock).not.toHaveBeenCalled();
+  });
+
+  it('calls checkPostalCodeUnique on blur when postal code has at least 3 characters', async () => {
+    const checkPostalCodeUniqueMock = healthFacilityAPI.checkPostalCodeUnique as jest.Mock;
+    checkPostalCodeUniqueMock.mockResolvedValue({ data: { unique: true } });
+    renderWithForm();
+    const postalInput = screen.getByLabelText('Facility ID');
+    fireEvent.change(postalInput, { target: { value: '123' } });
+    fireEvent.blur(postalInput);
+    await screen.findByText('Facility ID');
+    expect(checkPostalCodeUniqueMock).toHaveBeenCalled();
+    expect(checkPostalCodeUniqueMock.mock.calls[0][0].replace(/\D/g, '').length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('does not call checkPostalCodeUnique when isEdit is true', () => {
+    const checkPostalCodeUniqueMock = healthFacilityAPI.checkPostalCodeUnique as jest.Mock;
+    checkPostalCodeUniqueMock.mockClear();
+    renderWithForm({ isEdit: true });
+    const postalInput = screen.queryByLabelText('Facility ID');
+    if (postalInput) {
+      fireEvent.change(postalInput, { target: { value: '123' } });
+      fireEvent.blur(postalInput);
+    }
+    expect(checkPostalCodeUniqueMock).not.toHaveBeenCalled();
   });
 });

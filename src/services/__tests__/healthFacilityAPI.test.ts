@@ -6,6 +6,8 @@ import {
   fetchChiefdomList,
   fetchCultureList,
   createHealthFacility,
+  checkFacilityNameUnique,
+  checkPostalCodeUnique,
   fetchHFSummary,
   fetchHFUserList,
   updateHFDetails,
@@ -161,6 +163,28 @@ describe('Health Facility APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/organization/create-healthfacility');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(data);
+  });
+
+  it('checkFacilityNameUnique sends a GET request to /user-service/organization/check-facility-name-unique with name param', async () => {
+    const name = 'Test Health Facility';
+    mockAxios.onGet('/user-service/organization/check-facility-name-unique').reply(200, { unique: true });
+
+    await checkFacilityNameUnique(name);
+
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe('/user-service/organization/check-facility-name-unique');
+    expect(mockAxios.history.get[0].params).toEqual({ name });
+  });
+
+  it('checkPostalCodeUnique sends a GET request to /user-service/organization/check-postal-code-unique with postalCode param', async () => {
+    const postalCode = '12345';
+    mockAxios.onGet('/user-service/organization/check-postal-code-unique').reply(200, { unique: true });
+
+    await checkPostalCodeUnique(postalCode);
+
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe('/user-service/organization/check-postal-code-unique');
+    expect(mockAxios.history.get[0].params).toEqual({ postalCode });
   });
 
   it('fetchHFSummary sends a POST request to /admin-service/healthfacility/details with correct data', async () => {
