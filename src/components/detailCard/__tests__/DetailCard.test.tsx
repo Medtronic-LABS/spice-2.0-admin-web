@@ -1,10 +1,19 @@
+import React from 'react';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import DetailCard from '../DetailCard';
 
 jest.mock('../../button/IconButton.svg', () => ({
   ReactComponent: 'IconButton'
 }));
+
+const mockStore = configureStore([]);
+const defaultStoreState = {
+  user: { user: { appTypes: [], country: {} } },
+  common: { labelName: {} }
+};
 
 describe('DetailCard', () => {
   beforeEach(() => {
@@ -103,6 +112,57 @@ describe('DetailCard', () => {
       </DetailCard>
     );
     expect(getByText('Test Child')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('accepts updatedFilterData with number arrays for districtIds and chiefdomIds', () => {
+    const store = mockStore(defaultStoreState);
+    const headerText = 'Test Header';
+    const updatedFilterData = {
+      districtIds: [1, 2],
+      chiefdomIds: [10, 20]
+    };
+    const onFilterData = [
+      { id: 1, name: 'District', key: 'districtIds', isSearchable: true, isFacility: false, isGeneric: true, data: [], isShow: true },
+      { id: 2, name: 'Chiefdom', key: 'chiefdomIds', isSearchable: true, isFacility: false, isGeneric: true, data: [], isShow: true }
+    ];
+    const onChange = jest.fn();
+    const { unmount, getByText } = render(
+      <Provider store={store}>
+        <DetailCard
+          header={headerText}
+          isFilter={true}
+          onFilterData={onFilterData}
+          updatedFilterData={updatedFilterData}
+          onChange={onChange}
+        >
+          <div>Test Child</div>
+        </DetailCard>
+      </Provider>
+    );
+    expect(getByText('Test Child')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('wraps search bar and filters in a flex container when both are present', () => {
+    const store = mockStore(defaultStoreState);
+    const headerText = 'Test Header';
+    const { unmount, container } = render(
+      <Provider store={store}>
+        <DetailCard
+          header={headerText}
+          isSearch={true}
+          isFilter={true}
+          onSearch={jest.fn()}
+          searchPlaceholder='Search'
+          onFilterData={[{ id: 1, name: 'Filter', isSearchable: false, isFacility: false, data: [], isShow: true }]}
+        >
+          <div>Test Child</div>
+        </DetailCard>
+      </Provider>
+    );
+    const flexDiv = container.querySelector('.d-flex');
+    expect(flexDiv).toBeInTheDocument();
     unmount();
   });
 });

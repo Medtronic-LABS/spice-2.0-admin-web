@@ -10,6 +10,7 @@ import districtReducer from '../district/reducer';
 import chiefdomReducer from '../chiefdom/reducer';
 import programReducer from '../program/reducer';
 import commonReducer from '../common/reducer';
+import branchReducer from '../branch/reducer';
 
 describe('rootReducer', () => {
   it('should combine all reducers correctly', () => {
@@ -23,7 +24,8 @@ describe('rootReducer', () => {
       district: districtReducer,
       chiefdom: chiefdomReducer,
       program: programReducer,
-      common: commonReducer
+      common: commonReducer,
+      branch: branchReducer
     });
 
     const initialState = {
@@ -36,7 +38,8 @@ describe('rootReducer', () => {
       district: {},
       chiefdom: {},
       program: {},
-      common: {}
+      common: {},
+      branch: {}
     };
 
     const action = { type: 'SOME_ACTION' };
@@ -58,7 +61,8 @@ describe('rootReducer', () => {
       district: districtReducer,
       chiefdom: chiefdomReducer,
       program: programReducer,
-      common: commonReducer
+      common: commonReducer,
+      branch: branchReducer
     });
 
     const initialState = {
@@ -71,7 +75,8 @@ describe('rootReducer', () => {
       district: {},
       chiefdom: {},
       program: {},
-      common: {}
+      common: {},
+      branch: {}
     };
 
     const resetAction = { type: 'RESET_STORE' };

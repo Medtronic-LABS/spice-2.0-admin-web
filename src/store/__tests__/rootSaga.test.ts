@@ -10,6 +10,7 @@ import districtSaga from '../district/sagas';
 import chiefdomSaga from '../chiefdom/sagas';
 import programSaga from '../program/sagas';
 import commonSaga from '../common/sagas';
+import branchSaga from '../branch/sagas';
 
 describe('rootSaga', () => {
   it('should run all the sagas', () => {
@@ -25,6 +26,7 @@ describe('rootSaga', () => {
     expect(generator.next().value).toEqual(all([fork(chiefdomSaga)]));
     expect(generator.next().value).toEqual(all([fork(programSaga)]));
     expect(generator.next().value).toEqual(all([fork(commonSaga)]));
+    expect(generator.next().value).toEqual(all([fork(branchSaga)]));
     expect(generator.next().done).toBe(true);
   });
 });

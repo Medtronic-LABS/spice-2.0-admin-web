@@ -334,6 +334,7 @@ const APPCONSTANTS = {
   REGION_TENANT_ERROR: 'Unable to get region information. Please try after sometime.',
   SEARCH_BY_NAME_EMAIL: 'Name / Email',
   SEARCH_BY_NAME_EMAIL_PHONE: 'Name / Email / Phone',
+  SEARCH_BY_NAME_CODE: 'Name / Code',
   SEARCH_BY_NAME: 'Search Name',
   SEARCH_BY_EMAIL: 'Search Email',
   GENDER_OPTIONS: [
@@ -463,7 +464,11 @@ const APPCONSTANTS = {
     DISTRICT_ADMIN_LEVEL: 15,
     HEALTH_FACILITY_ADMIN_LEVEL: 25
   },
-  BY_REGION_DETAILS: 'BY_REGION_DETAILS'
+  BY_REGION_DETAILS: 'BY_REGION_DETAILS',
+  BRANCH_CREATE_SUCCESS: 'Branch created successfully.',
+  BRANCH_CREATE_FAIL: 'Failed to create the branch. Please try again.',
+  BRANCH_UPDATE_SUCCESS: 'Branch updated successfully.',
+  BRANCH_UPDATE_FAIL: 'Failed to update the branch. Please try again.'
 };
 
 export const ROLE_LABELS = {

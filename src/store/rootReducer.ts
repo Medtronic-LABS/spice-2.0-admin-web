@@ -9,6 +9,7 @@ import districtReducer from './district/reducer';
 import chiefdomReducer from './chiefdom/reducer';
 import programReducer from './program/reducer';
 import commonReducer from './common/reducer';
+import branchReducer from './branch/reducer';
 
 const appReducer = combineReducers({
   user: userReducer,
@@ -20,7 +21,8 @@ const appReducer = combineReducers({
   district: districtReducer,
   chiefdom: chiefdomReducer,
   program: programReducer,
-  common: commonReducer
+  common: commonReducer,
+  branch: branchReducer
 });
 
 const rootReducer = (state: any, action: any) => {

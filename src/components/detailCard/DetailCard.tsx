@@ -10,9 +10,9 @@ import Filter from '../tableFilter/Filter';
 type SetSelectedState = Dispatch<SetStateAction<string[] | undefined>>;
 
 interface IUpdatedFilterData {
-  districtIds: string[];
-  chiefdomIds: string[];
-  healthFacilityTypes: string[];
+  districtIds: number[];
+  chiefdomIds: number[];
+  healthFacilityTypes?: string[];
 }
 
 interface IDetailCardProps {
@@ -160,11 +160,13 @@ const DetailCard = ({
             isSearch && buttonLabel ? 'flex-grow-1' : 'flex-grow-0'
           } flex-grow-md-0 ${styles.buttonContainer}`}
         >
-          {renderSearchBar()}
+          <div className='d-flex'>
+            {renderSearchBar()}
 
-          {onFilterData?.map(
-            (data: IFilteredData) => data.data && renderFilter(data.isFacility, data, data?.isGeneric, data.id)
-          )}
+            {onFilterData?.map(
+              (data: IFilteredData) => data.data && renderFilter(data.isFacility, data, data?.isGeneric, data.id)
+            )}
+          </div>
           <div className='d-flex'>
             {renderCustomIcon()}
             {buttonLabel && onButtonClick ? (

@@ -1,6 +1,7 @@
 import { IUserFormValues } from '../components/userForm/UserForm';
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
 import { IAdminEditFormValues } from '../containers/chiefdom/ChiefdomSummary';
+import { IBranch, ICreateBranchRequestPayload, IUpdateBranchRequestPayload } from '../store/branch/types';
 import { IHFUserGet, IHFUserPost } from '../store/healthFacility/types';
 import { IEditUserDetail, IUserPayload } from '../store/user/types';
 
@@ -304,3 +305,26 @@ export const getSSUsersPayload = (ssUsers: ISSUserInputItem[]): ISSUserPayloadIt
     subVillageIds: (item.subVillages ?? []).map((sv) => String(sv.id ?? ''))
   }));
 };
+
+const toPositionCount = (v: string | number | null | undefined): number | null => {
+  if (v === '' || v == null) return null;
+  const n = Number(typeof v === 'string' ? v.replace(/\D/g, '') : v);
+  return Number.isNaN(n) ? 0 : n;
+};
+
+export const mapBranchToCreatePayload = (branch: IBranch): ICreateBranchRequestPayload => ({
+  name: branch.name,
+  code: branch.code,
+  currentAccountCode: branch.currentAccountCode,
+  districtId: branch.district?.id ?? 0,
+  chiefdomId: branch.chiefdom?.id ?? 0,
+  skPositionCount: toPositionCount(branch.skPositionCount),
+  ssPositionCount: toPositionCount(branch.ssPositionCount),
+  poPositionCount: toPositionCount(branch.poPositionCount),
+  foPositionCount: toPositionCount(branch.foPositionCount),
+});
+
+export const mapBranchToUpdatePayload = (branch: IBranch): IUpdateBranchRequestPayload => ({
+  ...mapBranchToCreatePayload(branch),
+  id: branch.id, // guaranteed for edit flow
+});

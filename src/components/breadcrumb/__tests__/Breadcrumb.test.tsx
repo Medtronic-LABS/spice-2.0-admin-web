@@ -190,6 +190,22 @@ describe('Breadcrumb Component', () => {
     unmount();
   });
 
+  it('renders without error when on branch by region route', () => {
+    const branchPath = PROTECTED_ROUTES.branchByRegion.replace(':regionId', '1').replace(':tenantId', '1');
+    const { unmount, getByLabelText } = renderComponent(branchPath);
+    expect(getByLabelText('Home')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('renders without error when on branch by region route', () => {
+    const branchPath = PROTECTED_ROUTES.branchByRegion
+      .replace(':regionId', '1')
+      .replace(':tenantId', '1');
+    const { unmount, getByLabelText } = renderComponent(branchPath);
+    expect(getByLabelText('Home')).toBeInTheDocument();
+    unmount();
+  });
+
   it('shows correct separator between breadcrumb items', () => {
     const { unmount } = renderComponent(
       PROTECTED_ROUTES.districtSummary.replace(':districtId', '2').replace(':tenantId', '123')

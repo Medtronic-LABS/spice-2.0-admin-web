@@ -4,6 +4,8 @@ import {
   getAdminPayload,
   formatHealthFacility,
   getSSUsersPayload,
+  mapBranchToCreatePayload,
+  mapBranchToUpdatePayload,
   ISSUserInputItem,
   ISSUserPayloadItem
 } from '../formatObjectUtils';
@@ -656,6 +658,95 @@ describe('formatObjectUtils', () => {
       expect(typeof item.ssId).toBe('string');
       expect(Array.isArray(item.subVillageIds)).toBe(true);
       expect(item.subVillageIds.every((id) => typeof id === 'string')).toBe(true);
+    });
+  });
+
+  describe('mapBranchToCreatePayload', () => {
+    it('should map branch to create payload with districtId and chiefdomId', () => {
+      const branch = {
+        id: 1,
+        name: 'Branch A',
+        code: 'BR001',
+        currentAccountCode: 'ACC001',
+        district: { id: 10, name: 'District X' },
+        chiefdom: { id: 20, name: 'Chiefdom Y' },
+        skPositionCount: 1,
+        ssPositionCount: 2,
+        poPositionCount: 0,
+        foPositionCount: 0
+      };
+      const result = mapBranchToCreatePayload(branch as any);
+      expect(result).toEqual({
+        name: 'Branch A',
+        code: 'BR001',
+        currentAccountCode: 'ACC001',
+        districtId: 10,
+        chiefdomId: 20,
+        skPositionCount: 1,
+        ssPositionCount: 2,
+        poPositionCount: 0,
+        foPositionCount: 0
+      });
+    });
+
+    it('should coerce string position counts to numbers and null when empty', () => {
+      const branch = {
+        id: 1,
+        name: 'B',
+        code: 'BR',
+        currentAccountCode: 'ACC',
+        district: { id: 1 },
+        chiefdom: { id: 2 },
+        skPositionCount: '1',
+        ssPositionCount: '',
+        poPositionCount: null,
+        foPositionCount: 0
+      };
+      const result = mapBranchToCreatePayload(branch as any);
+      expect(result.skPositionCount).toBe(1);
+      expect(result.ssPositionCount).toBeNull();
+      expect(result.poPositionCount).toBeNull();
+      expect(result.foPositionCount).toBe(0);
+    });
+
+    it('should use 0 for missing district or chiefdom id', () => {
+      const branch = {
+        id: 1,
+        name: 'B',
+        code: 'BR',
+        currentAccountCode: 'ACC',
+        district: null,
+        chiefdom: undefined,
+        skPositionCount: 0,
+        ssPositionCount: 0,
+        poPositionCount: 0,
+        foPositionCount: 0
+      };
+      const result = mapBranchToCreatePayload(branch as any);
+      expect(result.districtId).toBe(0);
+      expect(result.chiefdomId).toBe(0);
+    });
+  });
+
+  describe('mapBranchToUpdatePayload', () => {
+    it('should extend create payload with id', () => {
+      const branch = {
+        id: 99,
+        name: 'Branch A',
+        code: 'BR001',
+        currentAccountCode: 'ACC001',
+        district: { id: 10 },
+        chiefdom: { id: 20 },
+        skPositionCount: 0,
+        ssPositionCount: 0,
+        poPositionCount: 0,
+        foPositionCount: 0
+      };
+      const result = mapBranchToUpdatePayload(branch as any);
+      expect(result.id).toBe(99);
+      expect(result.name).toBe('Branch A');
+      expect(result.districtId).toBe(10);
+      expect(result.chiefdomId).toBe(20);
     });
   });
 });

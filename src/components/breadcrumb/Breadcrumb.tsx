@@ -49,6 +49,7 @@ const regionRoutes = [
   PROTECTED_ROUTES.regionSummary,
   PROTECTED_ROUTES.districtByRegion,
   PROTECTED_ROUTES.chiefdomByRegion,
+  PROTECTED_ROUTES.branchByRegion,
   PROTECTED_ROUTES.healthFacilityByRegion,
   PROTECTED_ROUTES.adminByRegion,
   PROTECTED_ROUTES.userByRegion,

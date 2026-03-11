@@ -50,6 +50,8 @@ export const PROTECTED_ROUTES = {
   chiefdomByDistrict: '/district/:districtId/:tenantId/chiefdom',
   chiefdomSummary: '/chiefdom/:chiefdomId/:tenantId',
 
+  branchByRegion: '/region/:regionId/:tenantId/branch',
+
   // AF
   healthFacilityDashboard: '/health-facility',
   healthFacilitySummary: '/health-facility/:healthFacilityId/:tenantId',
@@ -94,6 +96,7 @@ export const routesWithSideMenu = [
   { route: PROTECTED_ROUTES.chiefdomByRegion },
   { route: PROTECTED_ROUTES.chiefdomByDistrict },
   { route: PROTECTED_ROUTES.chiefdomSummary, disabledRoles: [APPCONSTANTS.ROLES.CHIEFDOM_ADMIN] },
+  { route: PROTECTED_ROUTES.branchByRegion },
   { route: PROTECTED_ROUTES.healthFacilityByRegion },
   { route: PROTECTED_ROUTES.healthFacilityByDistrict },
   { route: PROTECTED_ROUTES.healthFacilityByChiefdom },
@@ -126,6 +129,7 @@ export const SIDE_MENU_MAPPER = {
   REGION_CUSTOMIZATION: PROTECTED_ROUTES.customizationByRegion,
   DISTRICT_BY_REGION: PROTECTED_ROUTES.districtByRegion,
   CHIEFDOM_BY_REGION: PROTECTED_ROUTES.chiefdomByRegion,
+  BRANCH_BY_REGION: PROTECTED_ROUTES.branchByRegion,
   HEALTH_FACILITY_BY_REGION: PROTECTED_ROUTES.healthFacilityByRegion,
   ADMINS_BY_REGION: PROTECTED_ROUTES.adminByRegion,
   USERS_BY_REGION: PROTECTED_ROUTES.userByRegion,
