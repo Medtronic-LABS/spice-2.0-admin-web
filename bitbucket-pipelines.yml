@@ -73,6 +73,28 @@ definitions:
           - aws s3 cp build/index.html s3://${AWS_S3_BUCKET}/index.html --metadata-directive REPLACE --cache-control "no-cache, no-store, must-revalidate"
           - aws --no-cli-pager cloudfront create-invalidation --distribution-id ${CF_DIST_ID} --paths "/*" --output text --query "Invalidation.Id"
 
+    # step 5: Deploy to UHIS-TRAINING
+    # OIDC deploy: use same audience in AWS IdP and in the IAM role trust policy.
+    - step: &deploy-s3-cf-training
+        name: Upload to S3 & Invalidate CloudFront
+        image: amazon/aws-cli:2.15.0
+        oidc:
+          audiences:
+            - ari:cloud:bitbucket::workspace/25d4da96-4791-4b12-9b73-a2308af9ff35
+        script:
+          - set -e
+
+          # Configure AWS OIDC authentication
+          - export AWS_ROLE_ARN=$AWS_OIDC_ROLE
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
+          - echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
+          - aws sts get-caller-identity
+          # AWS_S3_BUCKET, CF_DIST_ID from deployment vars
+          - aws s3 sync build/ s3://${AWS_S3_BUCKET}/ --delete --exact-timestamps --exclude "index.html" --cache-control "max-age=31536000,public"
+          - aws s3 cp build/index.html s3://${AWS_S3_BUCKET}/index.html --metadata-directive REPLACE --cache-control "no-cache, no-store, must-revalidate"
+          - aws --no-cli-pager cloudfront create-invalidation --distribution-id ${CF_DIST_ID} --paths "/*" --output text --query "Invalidation.Id"
+          - rm -f $(pwd)/web-identity-token
+
 pipelines:
   pull-requests:
     "uhis-*":
@@ -92,7 +114,7 @@ pipelines:
             - step:
                 <<: *build
                 runs-on: *runner-uhis-dev
-    
+
     "feature/uhis-*":
       - stage:
           name: Install, Test & Sonar
@@ -132,7 +154,6 @@ pipelines:
             - step:
                 <<: *deploy-s3-cf
                 runs-on: *runner-uhis-dev
-                
 
   # Manual pipeline: Build & Deploy to UHIS-QA
   # Required deployment variables for 'uhis-qa':
@@ -149,4 +170,15 @@ pipelines:
                 runs-on: *runner-uhis-dev
             - step:
                 <<: *deploy-s3-cf
+                runs-on: *runner-uhis-dev
+    deploy-uhis-training:
+      - stage:
+          name: Build & Deploy to UHIS-TRAINING
+          deployment: uhis-training
+          steps:
+            - step:
+                <<: *build
+                runs-on: *runner-uhis-dev
+            - step:
+                <<: *deploy-s3-cf-training
                 runs-on: *runner-uhis-dev
