@@ -2,14 +2,24 @@ import { SagaIterator } from 'redux-saga';
 import { call, put, takeLatest } from 'redux-saga/effects';
 
 import * as branchService from '../../services/branchAPI';
-import { IFetchBranchListRequest, ICreateBranchRequest, IUpdateBranchRequest } from './types';
+import {
+  IFetchBranchListRequest,
+  ICreateBranchRequest,
+  IUpdateBranchRequest,
+  IFetchBranchSummaryRequest
+} from './types';
 import * as branchActions from './actions';
-import { FETCH_BRANCH_LIST_REQUEST, CREATE_BRANCH_REQUEST, UPDATE_BRANCH_REQUEST } from './actionTypes';
+import {
+  FETCH_BRANCH_LIST_REQUEST,
+  CREATE_BRANCH_REQUEST,
+  UPDATE_BRANCH_REQUEST,
+  FETCH_BRANCH_SUMMARY_REQUEST
+} from './actionTypes';
 
 /**
  * Worker saga: fetches branch list via POST /admin-service/branch/list
  */
-function* fetchBranchListSaga({ payload, successCb, failureCb }: IFetchBranchListRequest): SagaIterator {
+export function* fetchBranchListSaga({ payload, successCb, failureCb }: IFetchBranchListRequest): SagaIterator {
   try {
     const { data } = yield call(branchService.fetchBranchList as any, payload);
     const branches = data?.entityList ?? data?.list ?? [];
@@ -28,7 +38,7 @@ function* fetchBranchListSaga({ payload, successCb, failureCb }: IFetchBranchLis
 /**
  * Worker saga: creates branch via POST /admin-service/branch/create
  */
-function* createBranchSaga({ payload, successCb, failureCb }: ICreateBranchRequest): SagaIterator {
+export function* createBranchSaga({ payload, successCb, failureCb }: ICreateBranchRequest): SagaIterator {
   try {
     yield call(branchService.createBranch as any, payload);
     successCb?.();
@@ -44,7 +54,7 @@ function* createBranchSaga({ payload, successCb, failureCb }: ICreateBranchReque
 /**
  * Worker saga: updates branch via PUT /admin-service/branch/update
  */
-function* updateBranchSaga({ payload, successCb, failureCb }: IUpdateBranchRequest): SagaIterator {
+export function* updateBranchSaga({ payload, successCb, failureCb }: IUpdateBranchRequest): SagaIterator {
   try {
     yield call(branchService.updateBranch as any, payload);
     successCb?.();
@@ -57,10 +67,32 @@ function* updateBranchSaga({ payload, successCb, failureCb }: IUpdateBranchReque
   }
 }
 
+/**
+ * Worker saga: fetches branch summary via GET /admin-service/branch/:branchId
+ */
+export function* fetchBranchSummarySaga({
+  branchId,
+  successCb,
+  failureCb
+}: IFetchBranchSummaryRequest): SagaIterator {
+  try {
+    const { data } = yield call(branchService.fetchBranchById as any, branchId);
+    const branchSummary = data?.entity;
+    successCb?.(branchSummary);
+    yield put(branchActions.fetchBranchSummarySuccess(branchSummary));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(branchActions.fetchBranchSummaryFailure(e));
+    }
+  }
+}
+
 function* branchSaga(): SagaIterator {
   yield takeLatest(FETCH_BRANCH_LIST_REQUEST, fetchBranchListSaga);
   yield takeLatest(CREATE_BRANCH_REQUEST, createBranchSaga);
   yield takeLatest(UPDATE_BRANCH_REQUEST, updateBranchSaga);
+  yield takeLatest(FETCH_BRANCH_SUMMARY_REQUEST, fetchBranchSummarySaga);
 }
 
 export default branchSaga;

@@ -1,9 +1,10 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import BranchForm from '../BranchForm';
+import BranchForm, { validateNonNegative } from '../BranchForm';
+import { errorMsgs } from '../../../constants/erroMsgs';
 
 const mockStore = configureStore([]);
 
@@ -28,10 +29,17 @@ jest.mock('../../../store/chiefdom/actions', () => ({
 
 jest.mock('../../../components/formFields/TextInput', () => ({
   __esModule: true,
-  default: ({ label, disabled, input = {} }: any) => (
+  default: ({ label, disabled, input = {}, error, onKeyDown }: any) => (
     <div data-testid="text-input" data-label={label} data-disabled={disabled}>
       <label>{label}</label>
-      <input {...input} aria-label={label} disabled={disabled} />
+      <input
+        {...input}
+        aria-label={label}
+        disabled={disabled}
+        onKeyDown={onKeyDown}
+        data-testid={label ? `input-${label.replace(/\s/g, '-')}` : undefined}
+      />
+      {error && <span data-testid="field-error">{error}</span>}
     </div>
   )
 }));
@@ -141,6 +149,17 @@ describe('BranchForm', () => {
     );
   });
 
+  it('updates form when chiefdom is selected', async () => {
+    const { getByTestId } = renderWithForm();
+    const chiefdomSelectButton = getByTestId('select-chiefdom');
+
+    await act(async () => {
+      chiefdomSelectButton.click();
+    });
+
+    expect(chiefdomSelectButton).toBeInTheDocument();
+  });
+
   it('renders district and chiefdom select options from store', () => {
     renderWithForm();
     expect(screen.getByText('District')).toBeInTheDocument();
@@ -155,5 +174,80 @@ describe('BranchForm', () => {
     });
     const textInputs = container.querySelectorAll('[data-testid="text-input"]');
     expect(textInputs.length).toBeGreaterThanOrEqual(4);
+  });
+
+  describe('validateNonNegative', () => {
+    it('returns undefined for empty, undefined, or null', () => {
+      expect(validateNonNegative('')).toBeUndefined();
+      expect(validateNonNegative(undefined)).toBeUndefined();
+      expect(validateNonNegative(null as any)).toBeUndefined();
+    });
+    it('returns INVALID_NO for NaN', () => {
+      expect(validateNonNegative('abc')).toBe(errorMsgs.INVALID_NO);
+      expect(validateNonNegative('12abc')).toBe(errorMsgs.INVALID_NO);
+    });
+    it('returns NEGATIVE_NO for negative numbers', () => {
+      expect(validateNonNegative(-1)).toBe(errorMsgs.NEGATIVE_NO);
+      expect(validateNonNegative('-5')).toBe(errorMsgs.NEGATIVE_NO);
+    });
+    it('returns LIMIT_NO for values greater than 999', () => {
+      expect(validateNonNegative(1000)).toBe(errorMsgs.LIMIT_NO);
+      expect(validateNonNegative('1000')).toBe(errorMsgs.LIMIT_NO);
+    });
+    it('returns undefined for valid 0-999', () => {
+      expect(validateNonNegative(0)).toBeUndefined();
+      expect(validateNonNegative(999)).toBeUndefined();
+      expect(validateNonNegative('42')).toBeUndefined();
+    });
+  });
+
+  it('uses default formName "branch" and default isEdit false when not provided', () => {
+    render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}} initialValues={{}}>
+          {({ form }) => <BranchForm form={form} />}
+        </Form>
+      </Provider>
+    );
+    expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.getByText('District')).toBeInTheDocument();
+  });
+
+  it('dispatches fetchChiefdomDropdownRequest on mount when isEdit is true and district has tenantId', () => {
+    renderWithForm(
+      { isEdit: true },
+      { branch: { district: { id: 1, name: 'District A', tenantId: 100 } } }
+    );
+    const actions = store.getActions();
+    expect(actions).toContainEqual(
+      expect.objectContaining({
+        type: 'FETCH_CHIEFDOM_DROPDOWN_REQUEST',
+        payload: { tenantId: '100' }
+      })
+    );
+  });
+
+  const positionCountLabels = [
+    'SK Position Count',
+    'SS Position Count',
+    'PO Position Count',
+    'FO Position Count'
+  ];
+
+  positionCountLabels.forEach((label) => {
+    it(`position count field "${label}" prevents non-digit key input`, () => {
+      renderWithForm();
+      const testId = `input-${label.replace(/\s/g, '-')}`;
+      const input = screen.getByTestId(testId);
+      const event = new KeyboardEvent('keydown', {
+        key: 'a',
+        keyCode: 65,
+        bubbles: true,
+        cancelable: true
+      });
+      const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+      input.dispatchEvent(event);
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
   });
 });

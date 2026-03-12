@@ -1,8 +1,9 @@
 import * as BRANCH_TYPES from './actionTypes';
-import { BranchActions, IBranchState } from './types';
+import { BranchActions, IBranch, IBranchState } from './types';
 
 export const initialState: IBranchState = {
   branches: [],
+  branchSummary: null,
   loading: false,
   totalCount: 0,
   error: null
@@ -13,6 +14,7 @@ const branchReducer = (state = initialState, action = {} as BranchActions): IBra
     case BRANCH_TYPES.FETCH_BRANCH_LIST_REQUEST:
     case BRANCH_TYPES.CREATE_BRANCH_REQUEST:
     case BRANCH_TYPES.UPDATE_BRANCH_REQUEST:
+    case BRANCH_TYPES.FETCH_BRANCH_SUMMARY_REQUEST:
       return { ...state, loading: true };
     case BRANCH_TYPES.FETCH_BRANCH_LIST_SUCCESS:
       return {
@@ -22,9 +24,17 @@ const branchReducer = (state = initialState, action = {} as BranchActions): IBra
         totalCount: action.payload.totalCount,
         error: null
       };
+    case BRANCH_TYPES.FETCH_BRANCH_SUMMARY_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        branchSummary: action.payload,
+        error: null
+      };
     case BRANCH_TYPES.FETCH_BRANCH_LIST_FAILURE:
     case BRANCH_TYPES.CREATE_BRANCH_FAILURE:
     case BRANCH_TYPES.UPDATE_BRANCH_FAILURE:
+    case BRANCH_TYPES.FETCH_BRANCH_SUMMARY_FAILURE:
       return { ...state, loading: false, error: action.error };
     case BRANCH_TYPES.CREATE_BRANCH_SUCCESS:
     case BRANCH_TYPES.UPDATE_BRANCH_SUCCESS:
@@ -32,6 +42,16 @@ const branchReducer = (state = initialState, action = {} as BranchActions): IBra
     case BRANCH_TYPES.CLEAR_BRANCH_LIST:
       return {
         ...initialState
+      };
+    case BRANCH_TYPES.SET_BRANCH_SUMMARY:
+      return {
+        ...state,
+        branchSummary: action.data ? { ...(state.branchSummary || ({} as IBranch)), ...action.data } : null
+      };
+    case BRANCH_TYPES.CLEAR_BRANCH_SUMMARY:
+      return {
+        ...state,
+        branchSummary: null
       };
     default:
       return state;

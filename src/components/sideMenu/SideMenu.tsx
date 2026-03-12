@@ -21,7 +21,7 @@ import { chiefdomLoadingSelector } from '../../store/chiefdom/selectors';
 import { programLoadingSelector } from '../../store/program/selectors';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
-type RouteModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility';
+type RouteModuleNames = 'region' | 'district' | 'chiefdom' | 'health-facility' | 'branch';
 interface ISideMenuProps {
   className?: string;
 }
@@ -86,7 +86,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const currentModule: RouteModuleNames = pathname.split('/')[1];
   const { route: currentRoute } =
     routesWithSideMenu.find(({ route }) => matchPath(pathname, { path: route, exact: true })) || {};
-  const { regionId, districtId, chiefdomId, healthFacilityId, tenantId } = matchPath(pathname, {
+  const { regionId, districtId, chiefdomId, healthFacilityId, tenantId, branchId } = matchPath(pathname, {
     path: currentRoute,
     exact: true
   })?.params as any;
@@ -136,6 +136,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
         ':districtId': districtId,
         ':chiefdomId': chiefdomId,
         ':healthFacilityId': healthFacilityId,
+        ':branchId': branchId,
         ':tenantId': getTenentId()
       };
       choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
@@ -150,7 +151,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
       setFetchedSideMenu(choosenRoutes);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appTypes, chiefdomId, countryIdValue, countryTenantId, districtId, healthFacilityId, regionId, tenantId]
+    [appTypes, chiefdomId, countryIdValue, countryTenantId, districtId, healthFacilityId, regionId, branchId, tenantId]
   );
 
   /**

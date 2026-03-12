@@ -23,6 +23,14 @@ describe('branchReducer', () => {
     expect(state.loading).toBe(true);
   });
 
+  it('should set loading to true for FETCH_BRANCH_SUMMARY_REQUEST', () => {
+    const state = branchReducer(initialState, {
+      type: BRANCH_TYPES.FETCH_BRANCH_SUMMARY_REQUEST,
+      branchId: 1
+    } as any);
+    expect(state.loading).toBe(true);
+  });
+
   it('should handle FETCH_BRANCH_LIST_SUCCESS', () => {
     const branches = [{ id: 1, name: 'Branch A', code: 'BR001', district: {}, chiefdom: {} }];
     const action = {
@@ -36,9 +44,33 @@ describe('branchReducer', () => {
     expect(state.error).toBeNull();
   });
 
+  it('should handle FETCH_BRANCH_SUMMARY_SUCCESS', () => {
+    const branchSummary = {
+      id: 1,
+      name: 'Branch A',
+      code: 'BR001',
+      currentAccountCode: 'ACC001',
+      district: { id: 1, name: 'District 1' },
+      chiefdom: { id: 1, name: 'Chiefdom 1' }
+    } as any;
+    const action = { type: BRANCH_TYPES.FETCH_BRANCH_SUMMARY_SUCCESS, payload: branchSummary };
+    const state = branchReducer({ ...initialState, loading: true }, action as any);
+    expect(state.loading).toBe(false);
+    expect(state.branchSummary).toEqual(branchSummary);
+    expect(state.error).toBeNull();
+  });
+
   it('should handle FETCH_BRANCH_LIST_FAILURE', () => {
     const error = new Error('Fetch failed');
     const action = { type: BRANCH_TYPES.FETCH_BRANCH_LIST_FAILURE, error };
+    const state = branchReducer({ ...initialState, loading: true }, action as any);
+    expect(state.loading).toBe(false);
+    expect(state.error).toBe(error);
+  });
+
+  it('should handle FETCH_BRANCH_SUMMARY_FAILURE', () => {
+    const error = new Error('Fetch summary failed');
+    const action = { type: BRANCH_TYPES.FETCH_BRANCH_SUMMARY_FAILURE, error };
     const state = branchReducer({ ...initialState, loading: true }, action as any);
     expect(state.loading).toBe(false);
     expect(state.error).toBe(error);
@@ -74,8 +106,34 @@ describe('branchReducer', () => {
     expect(state.error).toBeNull();
   });
 
+  it('should handle SET_BRANCH_SUMMARY', () => {
+    const data = { name: 'Branch A', id: 1 };
+    const action = { type: BRANCH_TYPES.SET_BRANCH_SUMMARY, data };
+    const state = branchReducer(initialState, action as any);
+    expect(state.branchSummary).toEqual({ ...data });
+  });
+
+  it('should handle SET_BRANCH_SUMMARY merging with existing branchSummary', () => {
+    const existingSummary = { id: 1, name: 'Old', code: 'BR001' } as any;
+    const data = { name: 'Updated Name' };
+    const action = { type: BRANCH_TYPES.SET_BRANCH_SUMMARY, data };
+    const state = branchReducer({ ...initialState, branchSummary: existingSummary }, action as any);
+    expect(state.branchSummary).toEqual({ id: 1, name: 'Updated Name', code: 'BR001' });
+  });
+
+  it('should handle CLEAR_BRANCH_SUMMARY', () => {
+    const stateWithSummary = {
+      ...initialState,
+      branchSummary: { id: 1, name: 'Branch A', code: 'BR001', district: {}, chiefdom: {} } as any
+    };
+    const action = { type: BRANCH_TYPES.CLEAR_BRANCH_SUMMARY };
+    const state = branchReducer(stateWithSummary, action as any);
+    expect(state.branchSummary).toBeNull();
+  });
+
   it('should handle CLEAR_BRANCH_LIST', () => {
     const stateWithData = {
+      ...initialState,
       branches: [{ id: 1, name: 'Branch A', code: 'BR001', district: {}, chiefdom: {} }],
       loading: false,
       totalCount: 1,

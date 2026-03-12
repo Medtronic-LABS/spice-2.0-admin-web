@@ -111,7 +111,7 @@ const Region = (): React.ReactElement => {
         failureCb: (e) => {
           toastCenter.error(
             ...getErrorToastArgs(
-              e as Error,
+              e,
               APPCONSTANTS.ERROR,
               formatUserToastMsg(APPCONSTANTS.REGION_UPLOAD_FAILURE, regionSName)
             )

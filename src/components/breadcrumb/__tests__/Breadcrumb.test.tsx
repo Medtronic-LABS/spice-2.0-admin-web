@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import Breadcrumb from '../Breadcrumb';
 import { PROTECTED_ROUTES } from '../../../constants/route';
@@ -10,10 +10,12 @@ import { CLEAR_REGION_DETAIL } from '../../../store/region/actionTypes';
 import { CLEAR_CHIEFDOM_DETAIL } from '../../../store/chiefdom/actionTypes';
 import { CLEAR_DISTRICT_DETAILS } from '../../../store/district/actionTypes';
 import { CLEAR_HF_SUMMARY } from '../../../store/healthFacility/actionTypes';
+import { CLEAR_BRANCH_SUMMARY } from '../../../store/branch/actionTypes';
 import { SET_REGION_DETAILS } from '../../../store/region/actionTypes';
 import { SET_DISTRICT_DETAILS } from '../../../store/district/actionTypes';
 import { SET_CHIEFDOM_DETAILS } from '../../../store/chiefdom/actionTypes';
 import { SET_HF_SUMMARY } from '../../../store/healthFacility/actionTypes';
+import { SET_BRANCH_SUMMARY } from '../../../store/branch/actionTypes';
 
 jest.mock('../../../assets/images/home.svg', () => ({
   ReactComponent: 'HomeIcon'
@@ -48,6 +50,9 @@ const initialState = {
       name: 'Test Health Facility',
       tenantId: '123'
     }
+  },
+  branch: {
+    branchSummary: null
   },
   user: {
     user: {
@@ -147,6 +152,9 @@ describe('Breadcrumb Component', () => {
 
     const mockClearHfSummaryType = actions.find((action) => action.type === CLEAR_HF_SUMMARY);
     expect(mockClearHfSummaryType).toBeTruthy();
+
+    const mockClearBranchSummaryType = actions.find((action) => action.type === CLEAR_BRANCH_SUMMARY);
+    expect(mockClearBranchSummaryType).toBeTruthy();
   });
 
   it('clears data when clicking home icon with multiple suite access', () => {
@@ -182,6 +190,9 @@ describe('Breadcrumb Component', () => {
 
     const mockClearHfSummaryType = actions.find((action) => action.type === CLEAR_HF_SUMMARY);
     expect(mockClearHfSummaryType).toBeTruthy();
+
+    const mockClearBranchSummaryType = actions.find((action) => action.type === CLEAR_BRANCH_SUMMARY);
+    expect(mockClearBranchSummaryType).toBeTruthy();
   });
 
   it('displays custom breadcrumb for special routes', () => {
@@ -204,6 +215,61 @@ describe('Breadcrumb Component', () => {
     const { unmount, getByLabelText } = renderComponent(branchPath);
     expect(getByLabelText('Home')).toBeInTheDocument();
     unmount();
+  });
+
+  it('displays branch name in breadcrumb when on branch summary route', () => {
+    const branchSummaryPath = PROTECTED_ROUTES.branchSummary.replace(':branchId', '1').replace(':tenantId', '123');
+    const localStore = mockStore({
+      ...initialState,
+      branch: {
+        branchSummary: {
+          id: 1,
+          name: 'Test Branch',
+          code: 'BR001',
+          currentAccountCode: 'ACC001',
+          district: { id: 1, name: 'District 1' },
+          chiefdom: { id: 1, name: 'Chiefdom 1' }
+        }
+      }
+    });
+    const { unmount } = render(
+      <Provider store={localStore}>
+        <MemoryRouter initialEntries={[branchSummaryPath]}>
+          <Breadcrumb />
+        </MemoryRouter>
+      </Provider>
+    );
+    expect(screen.getByText('Test Branch')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('dispatches branch summary when branch route is restored from session', () => {
+    const localStore = mockStore(initialState);
+    const mockBreadcrumbs = [
+      {
+        label: 'Test Branch',
+        route: '/branch/1/123'
+      }
+    ];
+    sessionStorage.setItem('breadCrumbs', JSON.stringify(mockBreadcrumbs));
+    const branchSummaryPath = '/branch/1/123';
+
+    render(
+      <Provider store={localStore}>
+        <MemoryRouter initialEntries={[branchSummaryPath]}>
+          <Breadcrumb />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const actions = localStore.getActions();
+    const setBranchAction = actions.find((action) => action.type === SET_BRANCH_SUMMARY);
+    expect(setBranchAction).toBeTruthy();
+    expect(setBranchAction.data).toEqual({
+      id: '1',
+      tenantId: '123',
+      name: 'Test Branch'
+    });
   });
 
   it('shows correct separator between breadcrumb items', () => {
@@ -530,7 +596,9 @@ describe('Breadcrumb Component', () => {
 
     const actions = localStore.getActions();
     const dispatchedActions = actions.filter((action) =>
-      [SET_REGION_DETAILS, SET_DISTRICT_DETAILS, SET_CHIEFDOM_DETAILS, SET_HF_SUMMARY].includes(action.type)
+      [SET_REGION_DETAILS, SET_DISTRICT_DETAILS, SET_CHIEFDOM_DETAILS, SET_HF_SUMMARY, SET_BRANCH_SUMMARY].includes(
+        action.type
+      )
     );
 
     expect(dispatchedActions).toHaveLength(0);

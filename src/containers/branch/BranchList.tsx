@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CustomTable from '../../components/customTable/CustomTable';
@@ -27,6 +27,7 @@ import useCountryId from '../../hooks/useCountryId';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/healthFacility/actions';
 import { mapBranchToCreatePayload, mapBranchToUpdatePayload } from '../../utils/formatObjectUtils';
+import { PROTECTED_ROUTES } from '../../constants/route';
 
 interface IMatchParams {
   regionId: string;
@@ -51,6 +52,7 @@ type FetchDetailsParams = {
  */
 const BranchList = (): React.ReactElement => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const { regionId, tenantId } = useParams<IMatchParams>();
   const countryId = useCountryId({ regionId });
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
@@ -89,7 +91,9 @@ const BranchList = (): React.ReactElement => {
           districtIds: districtIds ?? filters.districtIds,
           chiefdomIds: chiefdomIds ?? filters.chiefdomIds,
         },
-        failureCb: (e) => toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ERROR))
+        failureCb: (e) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ERROR));
+        }
       })
     );
 }, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId, filters.districtIds, filters.chiefdomIds]);
@@ -104,14 +108,15 @@ const BranchList = (): React.ReactElement => {
           countryId,
           tenantId,
           isActive: true,
-          failureCb: (e) =>
+          failureCb: (e) => {
             toastCenter.error(
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
                 formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
               )
-            )
+            );
+          }
         })
       );
     }
@@ -181,8 +186,9 @@ const BranchList = (): React.ReactElement => {
     };
 
     // shared failure callback
-    const onFailure = (e: Error) =>
+    const onFailure = (e: Error) => {
       toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, failureMessage));
+    };
 
     if (branchModal.isEdit) {
       const payload: IUpdateBranchRequestPayload = mapBranchToUpdatePayload(branch);
@@ -207,6 +213,12 @@ const BranchList = (): React.ReactElement => {
     }
     handlePage(1);
     setFilters(newFilters);
+  };
+
+  const handleRowClick = (data: any) => {
+    history.push(
+      PROTECTED_ROUTES.branchSummary.replace(':branchId', data.id).replace(':tenantId', tenantId)
+    );
   };
 
   return (
@@ -285,6 +297,7 @@ const BranchList = (): React.ReactElement => {
             count={branchCount}
             onRowEdit={openBranchModal}
             handlePageChange={handlePage}
+            handleRowClick={(rowData) => (rowData.isActive ? handleRowClick(rowData) : undefined)}
           />
         </DetailCard>
       </div>

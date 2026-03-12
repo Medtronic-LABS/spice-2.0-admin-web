@@ -1,11 +1,13 @@
 import { IChiefdom, IDistrict } from '../healthFacility/types';
 import * as ACTION_TYPES from './actionTypes';
 
+type BranchPositionCountValue = string | number | null;
+
 interface BranchPositionCounts {
-  skPositionCount?: string | number | null;
-  ssPositionCount?: string | number | null;
-  poPositionCount?: string | number | null;
-  foPositionCount?: string | number | null;
+  skPositionCount?: BranchPositionCountValue;
+  ssPositionCount?: BranchPositionCountValue;
+  poPositionCount?: BranchPositionCountValue;
+  foPositionCount?: BranchPositionCountValue;
 }
 
 interface BranchBase extends BranchPositionCounts {
@@ -31,6 +33,7 @@ export interface IUpdateBranchRequestPayload extends ICreateBranchRequestPayload
 
 export interface IBranchState {
   branches: IBranch[];
+  branchSummary: IBranch | null;
   loading: boolean;
   totalCount: number;
   error: string | null | Error;
@@ -103,6 +106,32 @@ export interface IClearBranchList {
   type: typeof ACTION_TYPES.CLEAR_BRANCH_LIST;
 }
 
+export interface IFetchBranchSummaryRequest {
+  type: typeof ACTION_TYPES.FETCH_BRANCH_SUMMARY_REQUEST;
+  branchId: number;
+  successCb?: (data: IBranch) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchBranchSummarySuccess {
+  type: typeof ACTION_TYPES.FETCH_BRANCH_SUMMARY_SUCCESS;
+  payload: IBranch;
+}
+
+export interface IFetchBranchSummaryFailure {
+  type: typeof ACTION_TYPES.FETCH_BRANCH_SUMMARY_FAILURE;
+  error: Error;
+}
+
+export interface ISetBranchSummary {
+  type: typeof ACTION_TYPES.SET_BRANCH_SUMMARY;
+  data: Partial<IBranch>;
+}
+
+export interface IClearBranchSummary {
+  type: typeof ACTION_TYPES.CLEAR_BRANCH_SUMMARY;
+}
+
 export type BranchActions =
   | IFetchBranchListRequest
   | IFetchBranchListSuccess
@@ -113,4 +142,9 @@ export type BranchActions =
   | IUpdateBranchRequest
   | IUpdateBranchSuccess
   | IUpdateBranchFailure
-  | IClearBranchList;
+  | IClearBranchList
+  | IFetchBranchSummaryRequest
+  | IFetchBranchSummarySuccess
+  | IFetchBranchSummaryFailure
+  | ISetBranchSummary
+  | IClearBranchSummary;

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
-import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import TextInput from '../../components/formFields/TextInput';
@@ -15,7 +14,7 @@ import { FormApi } from 'final-form';
 import { errorMsgs } from '../../constants/erroMsgs';
 
 /** Validates non-negative number (>= 0) */
-const validateNonNegative = (value?: string | number): string | undefined => {
+export const validateNonNegative = (value?: string | number): string | undefined => {
   if (value === '' || value === undefined || value === null) return undefined;
   const num = Number(value);
   if (Number.isNaN(num)) return errorMsgs.INVALID_NO;
@@ -35,7 +34,6 @@ interface IBranchFormProps {
  */
 const BranchForm = ({ form, formName = 'branch', isEdit = false }: IBranchFormProps): React.ReactElement => {
   const dispatch = useDispatch();
-  const { tenantId } = useParams<{ regionId?: string; tenantId?: string }>();
   const districtOptions = useSelector(getDistrictListSelector);
   const districtOptionsLoading = useSelector(districtLoadingSelector);
   const chiefdomOptions = useSelector(chiefdomDropdownSelector);

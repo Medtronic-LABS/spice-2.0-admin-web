@@ -11,7 +11,13 @@ import {
   IUpdateBranchFailure,
   IUpdateBranchSuccess,
   IClearBranchList,
-  IFetchBranchListRequestPayload
+  IFetchBranchListRequestPayload,
+  IFetchBranchSummaryRequest,
+  IFetchBranchSummarySuccess,
+  IFetchBranchSummaryFailure,
+  IBranch,
+  ISetBranchSummary,
+  IClearBranchSummary
 } from './types';
 
 export const fetchBranchListRequest = ({
@@ -91,4 +97,38 @@ export const updateBranchFailure = (error: Error): IUpdateBranchFailure => ({
 
 export const clearBranchList = (): IClearBranchList => ({
   type: BRANCH_TYPES.CLEAR_BRANCH_LIST
+});
+
+export const fetchBranchSummaryRequest = ({
+  branchId,
+  successCb,
+  failureCb
+}: {
+  branchId: number;
+  successCb?: (data: IBranch) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchBranchSummaryRequest => ({
+  type: BRANCH_TYPES.FETCH_BRANCH_SUMMARY_REQUEST,
+  branchId,
+  successCb,
+  failureCb
+});
+
+export const fetchBranchSummarySuccess = (payload: IBranch): IFetchBranchSummarySuccess => ({
+  type: BRANCH_TYPES.FETCH_BRANCH_SUMMARY_SUCCESS,
+  payload
+});
+
+export const fetchBranchSummaryFailure = (error: Error): IFetchBranchSummaryFailure => ({
+  type: BRANCH_TYPES.FETCH_BRANCH_SUMMARY_FAILURE,
+  error
+});
+
+export const setBranchSummary = (data: Partial<IBranch>): ISetBranchSummary => ({
+  type: BRANCH_TYPES.SET_BRANCH_SUMMARY,
+  data
+});
+
+export const clearBranchSummary = (): IClearBranchSummary => ({
+  type: BRANCH_TYPES.CLEAR_BRANCH_SUMMARY
 });

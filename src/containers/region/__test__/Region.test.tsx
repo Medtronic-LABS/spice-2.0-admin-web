@@ -287,4 +287,18 @@ describe('Region Component', () => {
     const downloadTemplateButton = screen.getByText('Download Template').closest('button');
     expect(downloadTemplateButton).toBeDisabled();
   });
+
+  it('shows drag-drop component in upload modal when Upload is clicked', () => {
+    renderWithProviders(<Region />, { store });
+    const buttons = screen.getAllByTestId('detail-card-button');
+    const uploadButton = buttons.find((btn) => btn.textContent?.includes('Upload')) ?? buttons[0];
+    fireEvent.click(uploadButton);
+    const modalDragDrop = screen.getByTestId('drag-drop-files');
+    expect(modalDragDrop).toBeInTheDocument();
+  });
+
+  it('shows search with placeholder Search Name when list has data', () => {
+    renderWithProviders(<Region />, { store });
+    expect(screen.getByPlaceholderText('Search Name')).toBeInTheDocument();
+  });
 });

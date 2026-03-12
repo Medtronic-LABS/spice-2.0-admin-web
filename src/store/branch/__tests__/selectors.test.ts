@@ -2,7 +2,8 @@ import {
   branchListSelector,
   branchLoadingSelector,
   branchTotalCountSelector,
-  branchErrorSelector
+  branchErrorSelector,
+  branchSummarySelector
 } from '../selectors';
 import { initialState as mainInitialState } from '../reducer';
 
@@ -46,4 +47,21 @@ test('branchErrorSelector should return error when present', () => {
   const error = new Error('Test error');
   const errorState = { branch: { ...mainInitialState, error } };
   expect(branchErrorSelector(errorState)).toBe(error);
+});
+
+test('branchSummarySelector should return branchSummary from state', () => {
+  expect(branchSummarySelector(initialState)).toEqual(initialState.branch.branchSummary);
+});
+
+test('branchSummarySelector should return branch summary when set', () => {
+  const branchSummary = {
+    id: 1,
+    name: 'Branch A',
+    code: 'BR001',
+    currentAccountCode: 'ACC001',
+    district: { id: 1, name: 'District 1' },
+    chiefdom: { id: 1, name: 'Chiefdom 1' }
+  };
+  const stateWithSummary = { branch: { ...mainInitialState, branchSummary } };
+  expect(branchSummarySelector(stateWithSummary)).toEqual(branchSummary);
 });

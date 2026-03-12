@@ -5,6 +5,7 @@ const getBranches = (state: AppState) => state.branch.branches;
 const getLoading = (state: AppState) => state.branch.loading;
 const getTotalCount = (state: AppState) => state.branch.totalCount;
 const getError = (state: AppState) => state.branch.error;
+const getBranchSummary = (state: AppState) => state.branch.branchSummary;
 
 export const branchListSelector = createSelector(getBranches, (branches) => branches);
 
@@ -13,3 +14,5 @@ export const branchLoadingSelector = createSelector(getLoading, (loading) => loa
 export const branchTotalCountSelector = createSelector(getTotalCount, (totalCount) => totalCount);
 
 export const branchErrorSelector = createSelector(getError, (error) => error);
+
+export const branchSummarySelector = createSelector(getBranchSummary, (branchSummary) => branchSummary);

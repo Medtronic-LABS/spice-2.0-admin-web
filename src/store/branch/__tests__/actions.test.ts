@@ -105,4 +105,51 @@ describe('Branch actions', () => {
     const action = branchActions.clearBranchList();
     expect(action.type).toBe(BRANCH_TYPES.CLEAR_BRANCH_LIST);
   });
+
+  it('fetchBranchSummaryRequest should create an action with branchId and callbacks', () => {
+    const successCb = jest.fn();
+    const failureCb = jest.fn();
+    const action = branchActions.fetchBranchSummaryRequest({
+      branchId: 1,
+      successCb,
+      failureCb
+    });
+    expect(action.type).toBe(BRANCH_TYPES.FETCH_BRANCH_SUMMARY_REQUEST);
+    expect(action.branchId).toBe(1);
+    expect(action.successCb).toBe(successCb);
+    expect(action.failureCb).toBe(failureCb);
+  });
+
+  it('fetchBranchSummarySuccess should create an action with payload', () => {
+    const payload = {
+      id: 1,
+      name: 'Branch A',
+      code: 'BR001',
+      currentAccountCode: 'ACC001',
+      district: { id: 1, name: 'District 1' },
+      chiefdom: { id: 1, name: 'Chiefdom 1' }
+    } as any;
+    const action = branchActions.fetchBranchSummarySuccess(payload);
+    expect(action.type).toBe(BRANCH_TYPES.FETCH_BRANCH_SUMMARY_SUCCESS);
+    expect(action.payload).toEqual(payload);
+  });
+
+  it('fetchBranchSummaryFailure should create an action with error', () => {
+    const error = new Error('Fetch summary failed');
+    const action = branchActions.fetchBranchSummaryFailure(error);
+    expect(action.type).toBe(BRANCH_TYPES.FETCH_BRANCH_SUMMARY_FAILURE);
+    expect(action.error).toBe(error);
+  });
+
+  it('setBranchSummary should create an action with data', () => {
+    const data = { name: 'Branch A', id: 1 };
+    const action = branchActions.setBranchSummary(data);
+    expect(action.type).toBe(BRANCH_TYPES.SET_BRANCH_SUMMARY);
+    expect(action.data).toEqual(data);
+  });
+
+  it('clearBranchSummary should create an action', () => {
+    const action = branchActions.clearBranchSummary();
+    expect(action.type).toBe(BRANCH_TYPES.CLEAR_BRANCH_SUMMARY);
+  });
 });

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { fetchBranchList, createBranch, updateBranch } from '../branchAPI';
+import { fetchBranchList, createBranch, updateBranch, fetchBranchById } from '../branchAPI';
 
 describe('Branch API', () => {
   let mockAxios: MockAdapter;
@@ -78,5 +78,16 @@ describe('Branch API', () => {
     expect(mockAxios.history.put[0].url).toBe('/admin-service/branch/update');
     expect(mockAxios.history.put[0].method).toBe('put');
     expect(JSON.parse(mockAxios.history.put[0].data)).toEqual(requestData);
+  });
+
+  it('fetchBranchById sends a GET request to /admin-service/branch/:branchId', async () => {
+    const branchId = 1;
+    mockAxios.onGet(`/admin-service/branch/${branchId}`).reply(200, { entity: {} });
+
+    await fetchBranchById(branchId);
+
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe(`/admin-service/branch/${branchId}`);
+    expect(mockAxios.history.get[0].method).toBe('get');
   });
 });

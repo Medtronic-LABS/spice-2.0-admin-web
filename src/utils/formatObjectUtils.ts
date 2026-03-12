@@ -308,7 +308,7 @@ export const getSSUsersPayload = (ssUsers: ISSUserInputItem[]): ISSUserPayloadIt
 
 const toPositionCount = (v: string | number | null | undefined): number | null => {
   if (v === '' || v == null) return null;
-  const n = Number(typeof v === 'string' ? v.replace(/\D/g, '') : v);
+  const n = Number(typeof v === 'string' ? v.replaceAll(/\D/g, '') : v);
   return Number.isNaN(n) ? 0 : n;
 };
 

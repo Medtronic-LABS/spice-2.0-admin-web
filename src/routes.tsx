@@ -54,6 +54,7 @@ import WorkflowFormCustomization from './containers/workflow/WorkflowFormCustomi
 import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
 import PrivacyPolicy from './containers/privacyPolicy/PrivacyPolicy';
 import BranchList from './containers/branch/BranchList';
+import BranchSummary from './containers/branch/BranchSummary';
 interface IRoute {
   path: string;
   exact: boolean;
@@ -377,6 +378,12 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.branchByRegion,
       exact: true,
       component: BranchList,
+      authorisedRoles: SU_SA
+    },
+    {
+      path: PROTECTED_ROUTES.branchSummary,
+      exact: true,
+      component: BranchSummary,
       authorisedRoles: SU_SA
     },
   ];

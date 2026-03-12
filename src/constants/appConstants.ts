@@ -93,7 +93,8 @@ const APPCONSTANTS = {
     REGION: 'region',
     DISTRICT: 'district',
     CHIEFDOM: 'chiefdom',
-    HEALTHFACILITY: 'health-facility'
+    HEALTHFACILITY: 'health-facility',
+    BRANCH: 'branch'
   },
   IS_SIDEMENU_COLLAPSED: 'isSmCollapsed',
   REGIONS_PER_PAGE: 10,
@@ -513,7 +514,8 @@ export const SIDE_MENU_FETCHING_HIERARCHY = {
   region: 'BY_REGION',
   district: 'BY_DISTRICT',
   chiefdom: 'BY_CHIEFDOM',
-  'health-facility': 'BY_HEALTH_FACILITY'
+  'health-facility': 'BY_HEALTH_FACILITY',
+  branch: "BY_BRANCH"
 };
 
 export const APP_TYPE_NAME = 'appTypes';

@@ -59,6 +59,13 @@ const initialState = {
       tenantId: 1
     }
   },
+  branch: {
+    branches: [],
+    branchSummary: null,
+    loading: false,
+    totalCount: 0,
+    error: null
+  },
   medication: {
     loading: false
   },

@@ -9,6 +9,7 @@ import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { districtSelector } from '../../store/district/selectors';
 import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
 import { healthFacilitySelector } from '../../store/healthFacility/selectors';
+import { branchSummarySelector } from '../../store/branch/selectors';
 import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
 import { clearDistrictDetails, setDistrictDetails } from '../../store/district/actions';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -18,6 +19,7 @@ import sessionStorageServices from '../../global/sessionStorageServices';
 import { clearRegionDetail, setRegionDetail } from '../../store/region/actions';
 import { clearChiefdomDetail, setChiefdomDetails } from '../../store/chiefdom/actions';
 import { clearHFSummary, setHFSummary } from '../../store/healthFacility/actions';
+import { setBranchSummary, clearBranchSummary } from '../../store/branch/actions';
 import { clearSideMenu } from '../../store/common/actions';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 
@@ -75,6 +77,8 @@ const healthFacilityRoutes = [
   PROTECTED_ROUTES.userByHealthFacility
 ];
 
+const branchRoutes = [PROTECTED_ROUTES.branchSummary];
+
 const dashboardRoutes = [
   // PROTECTED_ROUTES.regionDashboard,
   PROTECTED_ROUTES.districtDashboard,
@@ -93,6 +97,7 @@ const Breadcrumb = (): React.ReactElement => {
   const district = useSelector(districtSelector);
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const healthFacility = useSelector(healthFacilitySelector);
+  const branch = useSelector(branchSummarySelector);
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
 
@@ -174,6 +179,7 @@ const Breadcrumb = (): React.ReactElement => {
   }, [pathname]);
 
   const showSite = activeRoute.includes(':healthFacilityId');
+  const showBranch = activeRoute.includes(':branchId');
   const showOU =
     (role !== APPCONSTANTS.ROLES.CHIEFDOM_ADMIN || chiefdomRoutes.includes(activeRoute)) &&
     (showSite || activeRoute.includes(':chiefdomId'));
@@ -182,7 +188,7 @@ const Breadcrumb = (): React.ReactElement => {
     (showOU || activeRoute.includes(':districtId'));
   const showRegion =
     (role !== APPCONSTANTS.ROLES.REGION_ADMIN || regionRoutes.includes(activeRoute)) &&
-    (showDistrict || activeRoute.includes(':regionId'));
+    (showDistrict || activeRoute.includes(':regionId') || showBranch);
 
   const sections: ISection[] = useMemo(() => {
     const result = [];
@@ -222,6 +228,16 @@ const Breadcrumb = (): React.ReactElement => {
           .replace(':tenantId', healthFacility.tenantId?.toString())
       });
     }
+    if (branch?.name && showBranch) {
+      const branchParams = matchPath(pathname, { path: PROTECTED_ROUTES.branchSummary, exact: true })?.params as { tenantId?: string } | undefined;
+      const branchTenantId = (branch as { tenantId?: string })?.tenantId ?? branchParams?.tenantId;
+      result.push({
+        label: branch.name,
+        route: PROTECTED_ROUTES.branchSummary
+          .replace(':branchId', branch.id?.toString())
+          .replace(':tenantId', branchTenantId?.toString() ?? '')
+      });
+    }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
       // we have a custom breadcrumb for certain routes
       // this if block executes when current route is one of customBreadcrumb routes
@@ -251,7 +267,11 @@ const Breadcrumb = (): React.ReactElement => {
     healthFacility.name,
     healthFacility.id,
     healthFacility.tenantId,
-    showSite
+    showSite,
+    branch?.name,
+    branch?.id,
+    showBranch,
+    pathname
   ]);
 
   const dispatchData = useCallback((routeObject: any, name: string) => {
@@ -281,6 +301,9 @@ const Breadcrumb = (): React.ReactElement => {
         if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.HEALTHFACILITY) {
           dispatch(setHFSummary(dispatchData(routeObject, label)));
         }
+        if (routeObject.name === APPCONSTANTS.ROUTE_NAMES.BRANCH) {
+          dispatch(setBranchSummary(dispatchData(routeObject, label)));
+        }
       }
     },
     [dispatch, dispatchData]
@@ -291,8 +314,8 @@ const Breadcrumb = (): React.ReactElement => {
     if (storedBC) {
       const breadCrumbs = JSON.parse(storedBC);
       breadCrumbs.forEach((bc: ISection) => {
-        const isCustomPath = Boolean(
-          customBreadcrumbs.find(({ route }) => Boolean(matchPath(bc.route, { path: route, exact: true })))
+        const isCustomPath = customBreadcrumbs.some(({ route }) =>
+          Boolean(matchPath(bc.route, { path: route, exact: true }))
         );
         if (!isCustomPath) {
           const routeMatch = Object.values(PROTECTED_ROUTES).find((route) =>
@@ -314,40 +337,52 @@ const Breadcrumb = (): React.ReactElement => {
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       const prevRoute = {
-        isSiteRoute: Boolean(
-          healthFacilityRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isSiteRoute: healthFacilityRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
         ),
-        isOURoute: Boolean(
-          chiefdomRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isBranchRoute: branchRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
         ),
-        isDistrictRoute: Boolean(
-          districtRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isOURoute: chiefdomRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
         ),
-        isRegionRoute: Boolean(
-          regionRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isDistrictRoute: districtRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
         ),
-        isDashboardRoute: Boolean(
-          dashboardRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isRegionRoute: regionRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
+        ),
+        isDashboardRoute: dashboardRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
         )
       };
       const currRoute = {
-        isSiteRoute: Boolean(
-          healthFacilityRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        isSiteRoute: healthFacilityRoutes.some((route) =>
+          Boolean(matchPath(pathname, { path: route, exact: true }))
         ),
-        isOURoute: Boolean(chiefdomRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))),
-        isDistrictRoute: Boolean(
-          districtRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        isBranchRoute: branchRoutes.some((route) =>
+          Boolean(matchPath(pathname, { path: route, exact: true }))
         ),
-        isRegionRoute: Boolean(
-          regionRoutes.find((route) => Boolean(matchPath(pathname, { path: route, exact: true })))
+        isOURoute: chiefdomRoutes.some((route) =>
+          Boolean(matchPath(pathname, { path: route, exact: true }))
         ),
-        isDashboardRoute: Boolean(
-          dashboardRoutes.find((route) => Boolean(matchPath(prevPathname.current, { path: route, exact: true })))
+        isDistrictRoute: districtRoutes.some((route) =>
+          Boolean(matchPath(pathname, { path: route, exact: true }))
+        ),
+        isRegionRoute: regionRoutes.some((route) =>
+          Boolean(matchPath(pathname, { path: route, exact: true }))
+        ),
+        isDashboardRoute: dashboardRoutes.some((route) =>
+          Boolean(matchPath(prevPathname.current, { path: route, exact: true }))
         )
       };
       if (!prevRoute.isDashboardRoute && currRoute.isDashboardRoute) {
         dispatch(clearDistrictDetails());
         dispatch(clearChiefdomDetail());
+        dispatch(clearBranchSummary());
+      }
+      if (prevRoute.isBranchRoute && !currRoute.isBranchRoute) {
+        dispatch(clearBranchSummary());
       }
       if ((prevRoute.isOURoute || prevRoute.isSiteRoute) && !currRoute.isOURoute && !currRoute.isSiteRoute) {
         dispatch(clearChiefdomDetail());
@@ -381,6 +416,7 @@ const Breadcrumb = (): React.ReactElement => {
     dispatch(clearDistrictDetails());
     dispatch(clearChiefdomDetail());
     dispatch(clearHFSummary());
+    dispatch(clearBranchSummary());
     dispatch(clearSideMenu());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

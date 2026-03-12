@@ -449,12 +449,13 @@ const HealthFacilityDetailsForm = ({
                   helpertext={
                     facilityNameValidation.networkError ? (
                       <div>
-                        <span
+                        <button
+                          type="button"
                           className={styles.validateErrorText}
                           onClick={() => facilityNameValidation.checkUniqueFn(input.value, true)}
                         >
                           Validate
-                        </span>
+                        </button>
                       </div>
                     ) : null
                   }
@@ -627,12 +628,13 @@ const HealthFacilityDetailsForm = ({
                   helpertext={
                     postalCodeValidation.networkError ? (
                       <div>
-                        <span
+                        <button
+                          type="button"
                           className={styles.validateErrorText}
                           onClick={() => postalCodeValidation.checkUniqueFn(input.value, true)}
                         >
                           Validate
-                        </span>
+                        </button>
                       </div>
                     ) : null
                   }

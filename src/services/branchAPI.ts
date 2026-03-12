@@ -25,3 +25,9 @@ export const updateBranch = (data: IUpdateBranchRequestPayload) =>
     url: '/admin-service/branch/update',
     data
   });
+
+export const fetchBranchById = (branchId: number) =>
+  axios({
+    method: 'GET',
+    url: `/admin-service/branch/${branchId}`
+  });
