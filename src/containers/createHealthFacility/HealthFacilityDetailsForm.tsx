@@ -228,6 +228,33 @@ const HealthFacilityDetailsForm = ({
     }
   }
 
+  // Populate chiefdom (Upazila) from healthfacility/details API when editing, same pattern as district above
+  if (isEdit && data?.chiefdom) {
+    const { values: formValues = {} } = form?.getState?.() || {};
+    const chiefdomFormValue = formValues?.[formName]?.chiefdom;
+    if (!chiefdomFormValue?.id && data.chiefdom?.id) {
+      form?.change(`${formName}.chiefdom` as any, data.chiefdom);
+    }
+  }
+
+  // Populate city (Union) from healthfacility/details API when editing, same pattern as district/chiefdom
+  if (isEdit && data?.city) {
+    const { values: formValues = {} } = form?.getState?.() || {};
+    const cityFormValue = formValues?.[formName]?.city;
+    if ((!cityFormValue?.id && !cityFormValue?.value) && (data.city?.id ?? (data.city as { value?: string })?.value)) {
+      form?.change(`${formName}.city` as any, data.city);
+    }
+  }
+
+  // Populate linkedVillages (Linked Unions) from healthfacility/details API when editing, same pattern
+  if (isEdit && data?.linkedVillages?.length) {
+    const { values: formValues = {} } = form?.getState?.() || {};
+    const linkedVillagesFormValue = formValues?.[formName]?.linkedVillages;
+    if (!(Array.isArray(linkedVillagesFormValue) && linkedVillagesFormValue.length > 0)) {
+      form?.change(`${formName}.linkedVillages` as any, data.linkedVillages);
+    }
+  }
+
   // Culture list fetch
   useEffect(() => {
     if (!languages.length) {
