@@ -43,7 +43,8 @@ jest.mock('../../../utils/commonUtils', () => ({
 
 jest.mock('../../../utils/formatObjectUtils', () => ({
   formatHealthFacility: jest.fn((data: any) => ({ ...data, clinicalWorkflowIds: [1], customizedWorkflowIds: [] })),
-  getUserPayload: jest.fn(() => [])
+  getUserPayload: jest.fn(() => []),
+  getSSUsersPayload: jest.fn((ssUsers: any[]) => ssUsers ?? [])
 }));
 
 jest.mock('../../../global/sessionStorageServices', () => ({
@@ -54,6 +55,7 @@ jest.mock('../../../store/healthFacility/actions', () => ({
   clearAllDependentData: jest.fn(() => ({ type: 'CLEAR_ALL_DEPENDENT_DATA' })),
   clearHFList: jest.fn(() => ({ type: 'CLEAR_HF_LIST' })),
   createHFRequest: jest.fn((payload: any) => ({ type: 'CREATE_HF_REQUEST', ...payload })),
+  fetchSSPrefixRequest: jest.fn(() => ({ type: 'FETCH_SS_PREFIX_REQUEST' })),
   fetchWorkflowListRequest: jest.fn((payload: any) => ({ type: 'FETCH_WORKFLOW_LIST_REQUEST', ...payload }))
 }));
 
@@ -175,6 +177,14 @@ describe('CreateHealthFacility', () => {
     renderCreateHealthFacility();
     await waitFor(() => {
       expect(clearAllDependentData).toHaveBeenCalled();
+    });
+  });
+
+  it('dispatches fetchSSPrefixRequest on mount', async () => {
+    const { fetchSSPrefixRequest } = require('../../../store/healthFacility/actions');
+    renderCreateHealthFacility();
+    await waitFor(() => {
+      expect(fetchSSPrefixRequest).toHaveBeenCalled();
     });
   });
 

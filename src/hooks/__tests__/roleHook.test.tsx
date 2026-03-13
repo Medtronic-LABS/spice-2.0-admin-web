@@ -14,7 +14,8 @@ import {
   reportAdminRole,
   hf4ReportUser,
   peerSupervisor,
-  villageBasedRoles
+  villageBasedRoles,
+  shastiyaKormiRole
 } from '../../constants/roleConstants';
 
 jest.mock('../appTypeBasedConfigs', () => ({
@@ -398,6 +399,81 @@ describe('roleHook', () => {
         ['NON_COMMUNITY']
       );
       expect(onRoleChange).toHaveBeenCalled();
+    });
+
+    it('should set showVillages to true for Shastiya Kormi role when isHFCreate is true', () => {
+      const onRoleChange = jest.fn();
+      const propDisabledRoles = { current: [{}] };
+      const { result } = renderHook(() =>
+        useRoleMeta({
+          ...defaultMetaProps,
+          disabledRoles: propDisabledRoles,
+          onRoleChange,
+          isHFCreate: true,
+          isHF: false,
+          isCHAStatus: [false],
+          isCHWCHPStatus: [false],
+          showVillagesState: [false],
+          showSpiceHFListState: [false],
+          showReportHFListState: [false],
+          showInsightHFListState: [false]
+        })
+      );
+
+      const allRoles: IRoles[] = [
+        createRole({ name: shastiyaKormiRole, groupName: SPICE })
+      ];
+      const appTypeBasedRoles: Record<string, IRoles[]> = {
+        SPICE: [createRole({ name: shastiyaKormiRole, groupName: SPICE })],
+        REPORTS: [],
+        INSIGHTS: []
+      };
+
+      result.current.roleChange({
+        allRoles,
+        index: 0,
+        appTypeBasedRoles
+      });
+
+      expect(onRoleChange).toHaveBeenCalledTimes(1);
+      const [callArg] = onRoleChange.mock.calls[0];
+      expect(callArg.showVillages).toEqual([true]);
+    });
+
+    it('should set showVillages to true for CHW role when isHFCreate is true', () => {
+      const onRoleChange = jest.fn();
+      const propDisabledRoles = { current: [{}] };
+      const { result } = renderHook(() =>
+        useRoleMeta({
+          ...defaultMetaProps,
+          disabledRoles: propDisabledRoles,
+          onRoleChange,
+          isHFCreate: true,
+          isHF: false,
+          isCHAStatus: [false],
+          isCHWCHPStatus: [false],
+          showVillagesState: [false],
+          showSpiceHFListState: [false],
+          showReportHFListState: [false],
+          showInsightHFListState: [false]
+        })
+      );
+
+      const appTypeBasedRoles: Record<string, IRoles[]> = {
+        SPICE: [createRole({ name: 'CHW', groupName: SPICE })],
+        REPORTS: [],
+        INSIGHTS: []
+      };
+
+      result.current.roleChange({
+        allRoles: [createRole({ name: 'CHW', groupName: SPICE })],
+        index: 0,
+        appTypeBasedRoles
+      });
+
+      expect(onRoleChange).toHaveBeenCalledTimes(1);
+      const [callArg] = onRoleChange.mock.calls[0];
+      expect(callArg.showVillages).toEqual([true]);
     });
   });
 });

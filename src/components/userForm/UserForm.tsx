@@ -74,7 +74,7 @@ import TextInput from '../formFields/TextInput';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
-import useUserFormUtils, { filterRolesByAppTypeFn } from './userFormUtils';
+import useUserFormUtils, { filterRolesByAppTypeFn, isVillageBasedRoleSelection } from './userFormUtils';
 import AssignSSUsersSection from './AssignSSUsersSection';
 
 export interface IUserFormValues {
@@ -549,7 +549,7 @@ const UserForm = ({
       fetchedData.current = newFetchedData;
       getRoleOptions(index, userData.roles);
       roleChange({ allRoles: userData.roles as IRoles[], index, appTypeBasedRoles });
-      if (isCHPCHWSelected(userData.roles)) {
+      if (isVillageBasedRoleSelection(userData.roles)) {
         const tenantIds = [...userData.organizations.map((v: any) => v.id), hfTenantId].filter((v: any) => v);
         fetchListWithConditions(tenantIds, userData.id, 'village', index);
         fetchListWithConditions(tenantIds, userData.id, 'supervisor', index);
@@ -1065,7 +1065,7 @@ const UserForm = ({
           } else {
             spiceRoleList = [];
           }
-          const isShastiyaKormiSelected = spiceRoleList.some((r: any) => r?.name === shastiyaKormiRole);
+          const isShastiyaKormiSelected = spiceRoleList.some((r: IRoles) => r?.name === shastiyaKormiRole);
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1232,8 +1232,8 @@ const UserForm = ({
                                 const selectedAppTypes = roleBasedAppTypes(fullRoles);
                                 getHFLists(selectedAppTypes);
                               }
-                              // fetch HF list based on CHW selection
-                              if (isCHPCHWSelected(values)) {
+                              // fetch village and supervisor list for CHW/CHP or Shastiya Kormi selection
+                              if (isVillageBasedRoleSelection(values)) {
                                 if (!isEdit && !autoFetched[index]) {
                                   // To clear the Selected village during Add User
                                   form.batch(() => {
@@ -1653,7 +1653,9 @@ const UserForm = ({
                           : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) && (spiceRole || []).length) ||
                         (!isCommunity && isSiteUser && !isHF)
                       : (showSpiceHFRef.current[index] || isShastiyaKormiSelected) &&
-                        (!isEdit || isReportOrInsightUser)))) && (
+                        (!isEdit || isReportOrInsightUser)))) &&
+                  !isHFCreate &&
+                  (!isHF || !isShastiyaKormiSelected) && (
                   <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                     <Field
                       name={`${name}.${NAMING_VARIABLES.healthFacility}`}
@@ -1811,7 +1813,7 @@ const UserForm = ({
                   reportUserOnlyInAdminList={isReportOrInsightUser}
                   isCommunity={isCommunity}
                 />
-                {actionButtons(fields, index, isLastChild, emailFieldRef, usernameFieldRef)}
+                {!isHFCreate && actionButtons(fields, index, isLastChild, emailFieldRef, usernameFieldRef)}
               </div>
               {divider(isLastChild)}
             </span>

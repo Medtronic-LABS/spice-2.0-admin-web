@@ -133,7 +133,6 @@ import {
 } from './actionTypes';
 import ApiError from '../../global/ApiError';
 import { AppState } from '../rootReducer';
-import APPCONSTANTS from '../../constants/appConstants';
 
 /*
   Worker Saga: Fired on FETCH_HEALTH_FACILITY_LIST_REQUEST action
@@ -195,10 +194,6 @@ export function* createHealthFacilityRequest({ data, successCb, failureCb }: ICr
     yield put(createHFSuccess());
   } catch (e) {
     if (e instanceof ApiError) {
-      e.message =
-        e.statusCode === 409
-          ? APPCONSTANTS.HEALTH_FACILITY_VALIDATION_ERROR
-          : APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR;
       failureCb?.(e);
       yield put(createHFFailure(e));
     }

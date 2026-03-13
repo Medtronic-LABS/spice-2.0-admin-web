@@ -18,6 +18,7 @@ import {
   clearAllDependentData,
   clearHFList,
   createHFRequest,
+  fetchSSPrefixRequest,
   fetchWorkflowListRequest
 } from '../../store/healthFacility/actions';
 import {
@@ -27,7 +28,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { IClinicalWorkflows, IHFUserGet, IHealthFacility, IWorkflow } from '../../store/healthFacility/types';
 import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import { formatHealthFacility, getUserPayload } from '../../utils/formatObjectUtils';
+import { formatHealthFacility, getSSUsersPayload, getUserPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import Workflows from '../healthFacility/Workflows';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
@@ -67,6 +68,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
     data: {
       healthFacility: {} as any,
       users: [] as IHFUserGet[],
+      ssUsers: [] as any[],
       appTypes: [] as string[]
     },
     addUserClicked: false,
@@ -110,6 +112,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
 
   useEffect(() => {
     dispatch(clearAllDependentData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchSSPrefixRequest());
   }, [dispatch]);
 
   const onGotoList = useCallback(() => {
@@ -168,7 +174,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         ...getErrorToastArgs(
           e,
           APPCONSTANTS.ERROR,
-          formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR, healthFacilitySName)
+          formatUserToastMsg(
+            e?.message || APPCONSTANTS.HEALTH_FACILITY_CREATION_ERROR,
+            healthFacilitySName
+          )
         )
       );
     },
@@ -188,7 +197,15 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
    * extracts relevant information, and updates the component's state to move to the next page.
    * It also filters and extracts app types based on the selected workflows.
    */
-  const onSubmitClicked = ({ healthFacility, users }: { healthFacility: IHealthFacility; users: any }) => {
+  const onSubmitClicked = ({
+    healthFacility,
+    users,
+    ssUsers = []
+  }: {
+    healthFacility: IHealthFacility;
+    users: any;
+    ssUsers?: any[];
+  }) => {
     const selectedWorkflows = healthFacility?.workflows || [];
     const selectedAppTypes = filterAndExtractAppTypes(workflows, selectedWorkflows) || [];
     setSubmittedData({
@@ -199,6 +216,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
           defaultTrueWorkflows: healthFacility.defaultTrueWorkflows || []
         },
         users,
+        ssUsers: ssUsers ?? [],
         appTypes: selectedAppTypes
       },
       isSubmitClicked: true,
@@ -218,7 +236,8 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
         ...submittedData,
         data: {
           ...submittedData.data,
-          users: formInstance.current.getState().values.users
+          users: formInstance.current.getState().values.users,
+          ssUsers: formInstance.current.getState().values.ssUsers ?? []
         },
         addUserClicked: submittedData.pageNumber - 1 > PAGENUMBER.WORKFLOW,
         pageNumber: submittedData.pageNumber >= 1 ? submittedData.pageNumber - 1 : PAGENUMBER.DETAILS
@@ -231,7 +250,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
       return;
     }
 
-    const { healthFacility, users } = submittedData.data;
+    const { healthFacility, users, ssUsers } = submittedData.data;
 
     const handleWorkflowPage = () => {
       dispatch(
@@ -297,9 +316,14 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
               spiceRolesGroup: rolesGrouped?.SPICE
             })
           : undefined;
+      const shasthyaShebikas = getSSUsersPayload(ssUsers ?? []);
+      const mappedUserData = postUserData?.map(user => ({
+        ...user,
+        shasthyaShebikas
+      })) ?? [];
       const postData = {
         ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId, appTypes),
-        users: postUserData
+        users: mappedUserData
       };
       if (postData?.clinicalWorkflowIds?.length || postData?.customizedWorkflowIds?.length) {
         dispatch(createHFRequest({ data: postData, successCb: onCreateSuccess, failureCb: onCreateFailure }));

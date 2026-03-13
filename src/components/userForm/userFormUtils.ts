@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
-import { SPICE, villageBasedRoles } from '../../constants/roleConstants';
+import { shastiyaKormiRole, SPICE, villageBasedRoles } from '../../constants/roleConstants';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 import { removeRedRiskFromRoleArray } from '../../utils/commonUtils';
@@ -20,6 +20,12 @@ export const filterRolesByAppTypeFn = (fullRoles: IGroupRoles, appTypes: string[
     return fullRoles;
   }
 };
+
+/** True when roles include CHW/CHP or Shastiya Kormi (village-based roles). */
+export const isVillageBasedRoleSelection = (roles: IRoles[] | undefined): boolean =>
+  (roles || []).some(
+    (r) => villageBasedRoles.includes(r?.name) || r?.name === shastiyaKormiRole
+  );
 
 const useUserFormUtils = () => {
   const { mobileRoles, isHFAdminRole } = UserFormMeta();

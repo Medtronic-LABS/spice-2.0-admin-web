@@ -14,6 +14,9 @@ import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { IVillages } from '../../../store/healthFacility/types';
 
+// Stable empty array to avoid new reference when not in HF create (prevents infinite loop in useMemo/useEffect)
+const EMPTY_VILLAGES: IVillages[] = [];
+
 const extractVillageIds = (value: IVillages[]): number[] => {
   let values: IVillages[];
   if (Array.isArray(value)) {
@@ -56,8 +59,16 @@ export const DynamicCHForm = ({
   const formValues = useMemo(() => form.getState().values.users[index], [form, index]);
   const mandatoryVillages = useMemo(() => formValues?.existingVillages || [], [formValues?.existingVillages]);
 
+  // When creating user from HF create flow, use linked villages from the health facility form.
+  // When editing (!isHFCreate), use stable EMPTY_VILLAGES so dependency doesn't change every render (avoids infinite loop).
+  const linkedVillagesFromHF = isHFCreate
+    ? (form.getState().values?.healthFacility?.linkedVillages ?? [])
+    : EMPTY_VILLAGES;
   // Memoize the current HF villages calculation
   const currentHFVillages = useMemo(() => {
+    if (isHFCreate) {
+      return Array.isArray(linkedVillagesFromHF) ? linkedVillagesFromHF : [];
+    }
     const hfTenantId = isHF ? healthFacilityId : formValues?.healthfacility?.id;
     const allVillages = villages[index];
     const selectedVillages = formValues?.selectedVillages || [];
@@ -71,6 +82,8 @@ export const DynamicCHForm = ({
     }
     return allVillages;
   }, [
+    isHFCreate,
+    linkedVillagesFromHF,
     autoFetched,
     index,
     isEdit,

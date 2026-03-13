@@ -391,6 +391,16 @@ describe('UserForm', () => {
       expect(screen.getByText('First Name')).toBeInTheDocument();
     });
 
+    it('does not render action buttons (Add Another User, Remove User, Reset Fields) when isHFCreate is true', () => {
+      renderUserForm({
+        disableOptions: false,
+        userFormParams: { ...defaultProps.userFormParams, isHFCreate: true, isHF: true }
+      });
+      expect(screen.queryByText('Add Another User')).not.toBeInTheDocument();
+      expect(screen.queryByText('Remove User')).not.toBeInTheDocument();
+      expect(screen.queryByText('Reset Fields')).not.toBeInTheDocument();
+    });
+
     it('renders when isAdminForm is true', () => {
       renderUserForm({
         userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },

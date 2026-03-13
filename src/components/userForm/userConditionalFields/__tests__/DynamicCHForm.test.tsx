@@ -191,4 +191,43 @@ describe('DynamicCHForm', () => {
       expect.objectContaining({ villageIds: [42] })
     );
   });
+
+  it('renders Assigned Villages when isHFCreate is true and form has healthFacility.linkedVillages', () => {
+    const linkedVillages = [{ id: 10, name: 'Linked Village A' }];
+    const initialValues = {
+      users: [
+        {
+          existingVillages: [],
+          selectedVillages: [],
+          healthfacility: {},
+          selectedRoles: []
+        }
+      ],
+      healthFacility: { linkedVillages }
+    };
+    renderWithForm(
+      { isHFCreate: true, showVillages: true, villages: [[]] },
+      initialValues as any
+    );
+    expect(screen.getByText('Assigned Villages')).toBeInTheDocument();
+  });
+
+  it('does not cause infinite re-renders when isHFCreate is false (uses stable EMPTY_VILLAGES)', () => {
+    const initialValues = {
+      users: [
+        {
+          existingVillages: [],
+          selectedVillages: [],
+          healthfacility: {},
+          selectedRoles: []
+        }
+      ]
+    };
+    const { unmount } = renderWithForm(
+      { isHFCreate: false, showVillages: true },
+      initialValues as any
+    );
+    expect(screen.getByText('Assigned Villages')).toBeInTheDocument();
+    unmount();
+  });
 });
