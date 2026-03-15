@@ -113,7 +113,6 @@ const SelectInput = ({
       const value = autoSelectValue || options[0];
       setTimeout(() => {
         change(name, value);
-        onChange?.(value);
       }, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -22,7 +22,6 @@ import {
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
-  createShasthyaShebikaRequest,
   deleteHFUserRequest,
   deleteShasthyaShebikasRequest,
   fetchHFListRequest,
@@ -60,7 +59,7 @@ import {
   chwListSelector
 } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
-import { getUserPayload, getSSUsersPayload, ISSUserPayloadItem } from '../../utils/formatObjectUtils';
+import { getUserPayload, getSSUsersPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { chwColumnDef, columnDef } from './userListMeta';
@@ -131,7 +130,6 @@ const UserList = (): React.ReactElement => {
   const peerSupervisorLoading = useSelector(peerSupervisorLoadingSelector);
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
   const userForEdit = useRef<{ users: any[] }>({ users: [] });
-  const pendingSSUsersPayloadRef = useRef<ISSUserPayloadItem[] | null>(null);
   const [selectedFacility, setSelectedFacility] = useState<string[]>();
   const [selectedRole, setSelectedRole] = useState<string[]>();
   const [changePasswordLoading, setChangePasswordLoading] = useState<boolean>(false);
@@ -397,28 +395,7 @@ const UserList = (): React.ReactElement => {
    * On create, response.entity contains the created user (including id).
    */
   const siteUserSuccess = useCallback(
-    (response?: { entity?: { id: number }; message?: string; status?: boolean }) => {
-      const shasthyaKormiId = response?.entity?.id;
-      const ssUsersPayload = pendingSSUsersPayloadRef.current;
-      if (shasthyaKormiId != null && ssUsersPayload?.length) {
-        ssUsersPayload.forEach((entry) => {
-          dispatch(
-            createShasthyaShebikaRequest({
-              data: {
-                ...entry,
-                shasthyaKormiId: String(shasthyaKormiId)
-              },
-              failureCb: (e) => {
-                toastCenter.error(
-                  ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_FETCH_FAIL)
-                );
-              }
-            })
-          );
-        });
-        pendingSSUsersPayloadRef.current = null;
-      }
-
+    (_response?: { entity?: { id: number }; message?: string; status?: boolean }) => {
       const successMessage = isOpenUserModal.isEdit
         ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
         : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
@@ -520,9 +497,7 @@ const UserList = (): React.ReactElement => {
         appTypes
       });
       const ssUsersPayload = getSSUsersPayload(ssUsers ?? []);
-      const data: IHFUserPost = userObj[0];
-      const isCreate = !isOpenUserModal.isEdit && !data.id;
-      pendingSSUsersPayloadRef.current = isCreate && ssUsersPayload.length > 0 ? ssUsersPayload : null;
+      const data: IHFUserPost = { ...userObj[0], shasthyaShebikas: ssUsersPayload };
 
       // If we're assigning a peer supervisor
       if (openConfirmationModal.userData.id && openConfirmationModal.roleId) {

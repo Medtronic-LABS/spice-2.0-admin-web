@@ -66,14 +66,6 @@ export interface ISSPrefix {
   answerDependent: boolean;
 }
 
-export interface ICreateShasthyaShebikaPayload {
-  name: string;
-  phoneNumber: string;
-  ssId: string;
-  shasthyaKormiId: string;
-  subVillageIds: string[];
-}
-
 export interface IHFDashboard {
   id: number;
   name: string;
@@ -304,6 +296,14 @@ export interface IHFUserPost {
   villageIds?: number[];
   timezone?: { id: number; name?: string };
   redRisk?: boolean;
+  shasthyaShebikas?: ICreateShasthyaShebikaPayload[];
+}
+
+export interface ICreateShasthyaShebikaPayload {
+  name: string;
+  phoneNumber: string;
+  ssId: string;
+  subVillageIds: string[];
 }
 
 export interface IOptionsResponse {
@@ -462,30 +462,6 @@ export interface ICreateHFUserSuccess {
 
 export interface ICreateHFUserFailure {
   type: typeof ACTION_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE;
-  error: Error;
-}
-
-export interface ICreateShasthyaShebikaPayload {
-  name: string;
-  phoneNumber: string;
-  ssId: string;
-  shasthyaKormiId: string;
-  subVillageIds: string[];
-}
-
-export interface ICreateShasthyaShebikaRequest {
-  type: typeof ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST;
-  data: ICreateShasthyaShebikaPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}
-
-export interface ICreateShasthyaShebikaSuccess {
-  type: typeof ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_SUCCESS;
-}
-
-export interface ICreateShasthyaShebikaFailure {
-  type: typeof ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_FAILURE;
   error: Error;
 }
 
@@ -1018,9 +994,6 @@ export type HealthFacilityActions =
   | ICreateHFUserRequest
   | ICreateHFUserSuccess
   | ICreateHFUserFailure
-  | ICreateShasthyaShebikaRequest
-  | ICreateShasthyaShebikaSuccess
-  | ICreateShasthyaShebikaFailure
   | IFetchShasthyaShebikaByKormiIdRequest
   | IFetchShasthyaShebikaByKormiIdSuccess
   | IFetchShasthyaShebikaByKormiIdFailure

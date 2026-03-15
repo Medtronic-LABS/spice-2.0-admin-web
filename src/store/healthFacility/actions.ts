@@ -14,10 +14,6 @@ import {
   ICreateHFUserResponse,
   ICreateHFUserSuccess,
   ICreateHFUserFailure,
-  ICreateShasthyaShebikaRequest,
-  ICreateShasthyaShebikaSuccess,
-  ICreateShasthyaShebikaFailure,
-  ICreateShasthyaShebikaPayload,
   IFetchShasthyaShebikaByKormiIdRequest,
   IFetchShasthyaShebikaByKormiIdSuccess,
   IFetchShasthyaShebikaByKormiIdFailure,
@@ -374,30 +370,6 @@ export const createHFUserSuccess = (): ICreateHFUserSuccess => ({
 
 export const createHFUserFailure = (error: Error): ICreateHFUserFailure => ({
   type: HF_TYPES.CREATE_HEALTH_FACILITY_USER_FAILURE,
-  error
-});
-
-export const createShasthyaShebikaRequest = ({
-  data,
-  successCb,
-  failureCb
-}: {
-  data: ICreateShasthyaShebikaPayload;
-  successCb?: () => void;
-  failureCb?: (error: Error) => void;
-}): ICreateShasthyaShebikaRequest => ({
-  type: HF_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST,
-  data,
-  successCb,
-  failureCb
-});
-
-export const createShasthyaShebikaSuccess = (): ICreateShasthyaShebikaSuccess => ({
-  type: HF_TYPES.CREATE_SHASTHYA_SHEBIKA_SUCCESS
-});
-
-export const createShasthyaShebikaFailure = (error: Error): ICreateShasthyaShebikaFailure => ({
-  type: HF_TYPES.CREATE_SHASTHYA_SHEBIKA_FAILURE,
   error
 });
 

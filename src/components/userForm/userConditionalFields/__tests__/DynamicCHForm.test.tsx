@@ -192,6 +192,30 @@ describe('DynamicCHForm', () => {
     );
   });
 
+  it('in edit mode on mount fetches sub-villages for selectedVillages from form values', () => {
+    const initialValues = {
+      users: [
+        {
+          existingVillages: [],
+          selectedVillages: [{ id: 10, name: 'Village A' }, { id: 20, name: 'Village B' }],
+          healthfacility: {},
+          selectedRoles: []
+        }
+      ]
+    };
+    renderWithForm({ isEdit: true }, initialValues);
+    expect(mockFetchSubVillagesRequest).toHaveBeenCalledTimes(1);
+    expect(mockFetchSubVillagesRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ villageIds: [10, 20] })
+    );
+  });
+
+  it('in edit mode does not dispatch fetchSubVillagesRequest when selectedVillages is empty', () => {
+    mockFetchSubVillagesRequest.mockClear();
+    renderWithForm({ isEdit: true }, defaultInitialValues);
+    expect(mockFetchSubVillagesRequest).not.toHaveBeenCalled();
+  });
+
   it('renders Assigned Villages when isHFCreate is true and form has healthFacility.linkedVillages', () => {
     const linkedVillages = [{ id: 10, name: 'Linked Village A' }];
     const initialValues = {

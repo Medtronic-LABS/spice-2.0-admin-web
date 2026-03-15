@@ -1,5 +1,5 @@
 import { Field } from 'react-final-form';
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import debounce from 'lodash/debounce';
@@ -55,6 +55,20 @@ export const DynamicCHForm = ({
   const { healthFacilityId } = useParams<IMatchParams>();
   const { village: { p: villagePName } } = useAppTypeConfigs();
 
+  const fetchSubVillages = useCallback(
+    (villageIds: number[]) => {
+      dispatch(
+        fetchSubVillagesRequest({
+          villageIds,
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
+          }
+        })
+      );
+    },
+    [dispatch]
+  );
+
   // Memoize form values to prevent unnecessary re-renders
   const formValues = useMemo(() => form.getState().values.users[index], [form, index]);
   const mandatoryVillages = useMemo(() => formValues?.existingVillages || [], [formValues?.existingVillages]);
@@ -69,7 +83,7 @@ export const DynamicCHForm = ({
     if (isHFCreate) {
       return Array.isArray(linkedVillagesFromHF) ? linkedVillagesFromHF : [];
     }
-    const hfTenantId = isHF ? healthFacilityId : formValues?.healthfacility?.id;
+    const hfTenantId = isHF ? healthFacilityId : formValues?.healthfacility?.[0]?.formDataId;
     const allVillages = villages[index];
     const selectedVillages = formValues?.selectedVillages || [];
 
@@ -89,41 +103,43 @@ export const DynamicCHForm = ({
     isEdit,
     isHF,
     healthFacilityId,
-    formValues?.healthfacility?.id,
+    formValues?.healthfacility?.[0]?.formDataId,
     villages,
     formValues?.selectedVillages
   ]);
+
+  // In edit mode, on mount fetch sub-villages for already selected villages
+  const hasFetchedSubVillagesForEdit = useRef(false);
+  useEffect(() => {
+    if (!isEdit) {
+      hasFetchedSubVillagesForEdit.current = false;
+      return;
+    }
+    const selected = formValues?.selectedVillages;
+    if (!selected?.length || hasFetchedSubVillagesForEdit.current) return;
+    const villageIds = extractVillageIds(selected);
+    if (villageIds.length > 0) {
+      hasFetchedSubVillagesForEdit.current = true;
+      fetchSubVillages(villageIds);
+    }
+  }, [isEdit, formValues?.selectedVillages, fetchSubVillages]);
 
   // When there is only one option, the field is auto-filled and onChange may not run — fetch sub-villages for that village
   useEffect(() => {
     if (currentHFVillages?.length === 1) {
       const villageId = currentHFVillages[0]?.id;
       if (villageId != null) {
-        dispatch(
-          fetchSubVillagesRequest({
-            villageIds: [Number(villageId)],
-            failureCb: (e) => {
-              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
-            }
-          })
-        );
+        fetchSubVillages([Number(villageId)]);
       }
     }
-  }, [currentHFVillages, dispatch]);
+  }, [currentHFVillages, fetchSubVillages]);
 
   const debouncedFetchSubVillages = useMemo(
     () =>
       debounce((villageIds: number[]) => {
-        dispatch(
-          fetchSubVillagesRequest({
-            villageIds,
-            failureCb: (e) => {
-              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
-            }
-          })
-        );
+        fetchSubVillages(villageIds);
       }, APPCONSTANTS.SUB_VILLAGES_DEBOUNCE_MS),
-    [dispatch]
+    [fetchSubVillages]
   );
 
   useEffect(() => () => debouncedFetchSubVillages.cancel(), [debouncedFetchSubVillages]);

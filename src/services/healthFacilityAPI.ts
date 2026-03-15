@@ -10,7 +10,6 @@ import {
   IHealthFacilityPost,
   IDeleteHFPayload,
   IFetchHFStatusRequest,
-  ICreateShasthyaShebikaPayload
 } from '../store/healthFacility/types';
 
 export const fetchHealthFacilityList = ({
@@ -262,13 +261,6 @@ export const getSSPrefix = () =>
   axios({
     method: 'GET',
     url: '/spice-service/meta/get-ss-prefix'
-  });
-
-export const createShasthyaShebika = (data: ICreateShasthyaShebikaPayload) =>
-  axios({
-    method: 'POST',
-    url: '/admin-service/shasthya-shebika/create',
-    data
   });
 
 export const fetchShasthyaShebikaByShasthyaKormiId = (shasthyaKormiIds: string[]) =>

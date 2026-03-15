@@ -178,11 +178,7 @@ jest.mock('../AssignSSUsersSection', () => ({
   __esModule: true,
   default: (props: any) => {
     mockAssignSSUsersSectionCalls.push(props);
-    return (
-      <div data-testid="assign-ss-users-section" data-edit={String(!!props.isEdit)}>
-        AssignSSUsersSection
-      </div>
-    );
+    return <div data-testid="assign-ss-users-section">AssignSSUsersSection</div>;
   }
 }));
 
@@ -363,23 +359,11 @@ describe('UserForm', () => {
     });
   });
 
-  describe('AssignSSUsersSection isEdit', () => {
-    it('passes isEdit true to AssignSSUsersSection when isEdit prop is true', () => {
+  describe('AssignSSUsersSection', () => {
+    it('renders AssignSSUsersSection with no isEdit prop (section manages its own state)', () => {
       renderUserForm({ isEdit: true });
-      expect(screen.getByTestId('assign-ss-users-section')).toHaveAttribute('data-edit', 'true');
-      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1].isEdit).toBe(true);
-    });
-
-    it('passes isEdit false to AssignSSUsersSection when isEdit prop is false', () => {
-      renderUserForm({ isEdit: false });
-      expect(screen.getByTestId('assign-ss-users-section')).toHaveAttribute('data-edit', 'false');
-      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1].isEdit).toBe(false);
-    });
-
-    it('passes isEdit as falsy to AssignSSUsersSection when isEdit prop is omitted', () => {
-      renderUserForm();
-      expect(screen.getByTestId('assign-ss-users-section')).toHaveAttribute('data-edit', 'false');
-      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1].isEdit).toBeFalsy();
+      expect(screen.getByTestId('assign-ss-users-section')).toBeInTheDocument();
+      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1]).not.toHaveProperty('isEdit');
     });
   });
 

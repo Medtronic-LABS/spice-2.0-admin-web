@@ -32,7 +32,6 @@ import {
   IActivateHFRequest,
   IFetchCultureListRequest,
   IFetchSSPrefixRequest,
-  ICreateShasthyaShebikaRequest,
   IFetchShasthyaShebikaByKormiIdRequest,
   IDeleteShasthyaShebikasRequest
 } from '../healthFacility/types';
@@ -73,8 +72,6 @@ import {
   fetchCultureListFailure,
   fetchSSPrefixSuccess,
   fetchSSPrefixFailure,
-  createShasthyaShebikaSuccess,
-  createShasthyaShebikaFailure,
   fetchShasthyaShebikaByKormiIdSuccess,
   fetchShasthyaShebikaByKormiIdFailure,
   deleteShasthyaShebikasSuccess,
@@ -117,7 +114,6 @@ import {
   FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST,
   FETCH_CULTURE_LIST_REQUEST,
   FETCH_SS_PREFIX_REQUEST,
-  CREATE_SHASTHYA_SHEBIKA_REQUEST,
   FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST,
   DELETE_SHASTHYA_SHEBIKAS_REQUEST,
   FETCH_COUNTRY_LIST_REQUEST,
@@ -387,26 +383,6 @@ export function* createHFUserSagaRequest({ data, successCb, failureCb }: ICreate
     if (e instanceof Error) {
       failureCb?.(e);
       yield put(createHFUserFailure(e));
-    }
-  }
-}
-
-/*
-  Worker Saga: Fired on CREATE_SHASTHYA_SHEBIKA_REQUEST action
-*/
-export function* createShasthyaShebikaSaga({
-  data,
-  successCb,
-  failureCb
-}: ICreateShasthyaShebikaRequest): SagaIterator {
-  try {
-    yield call(hfService.createShasthyaShebika, data);
-    successCb?.();
-    yield put(createShasthyaShebikaSuccess());
-  } catch (e) {
-    if (e instanceof Error) {
-      failureCb?.(e);
-      yield put(createShasthyaShebikaFailure(e));
     }
   }
 }
@@ -883,7 +859,6 @@ function* healthFacilitySaga() {
   yield all([takeLatest(DELETE_HEALTH_FACILITY_USER_REQUEST, deleteHFUserRequest)]);
   yield all([takeLatest(UPDATE_HEALTH_FACILITY_USER_REQUEST, updateHFUserSagaRequest)]);
   yield all([takeLatest(CREATE_HEALTH_FACILITY_USER_REQUEST, createHFUserSagaRequest)]);
-  yield all([takeLatest(CREATE_SHASTHYA_SHEBIKA_REQUEST, createShasthyaShebikaSaga)]);
   yield all([
     takeLatest(FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST, fetchShasthyaShebikaByKormiIdSaga)
   ]);

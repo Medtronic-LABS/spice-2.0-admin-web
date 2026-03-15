@@ -89,7 +89,6 @@ const SubVillagesFieldWithCleanup = ({
   name,
   index,
   options,
-  isEdit,
   subVillagesLoading,
   children
 }: {
@@ -97,12 +96,11 @@ const SubVillagesFieldWithCleanup = ({
   name: string;
   index: number;
   options: ISubVillage[];
-  isEdit: boolean;
   subVillagesLoading: boolean;
   children: React.ReactNode;
 }) => {
   useEffect(() => {
-    if(subVillagesLoading || isEdit) return;
+    if (subVillagesLoading || !options?.length) return;
     const currentValue = form.getState().values?.ssUsers?.[index]?.subVillages;
     const selected = Array.isArray(currentValue) ? currentValue : [];
     if (selected.length === 0) return;
@@ -111,14 +109,10 @@ const SubVillagesFieldWithCleanup = ({
     if (validSelected.length !== selected.length) {
       form.change(`${name}.subVillages`, validSelected.length > 0 ? validSelected : null);
     }
-  }, [form, index, name, isEdit, subVillagesLoading, options]);
+  }, [form, index, name, subVillagesLoading, options]);
 
   return <>{children}</>;
 };
-
-interface IAssignSSUsersSectionProps {
-  isEdit?: boolean;
-}
 
 interface IFormSpyValues {
   users?: Array<{ role?: any }>;
@@ -130,7 +124,6 @@ interface ISSUserRowProps {
   index: number;
   fields: { length?: number; remove: (idx: number) => void; push: (row: typeof DEFAULT_SS_USER_ROW) => void };
   form: FormApi<any>;
-  isEdit: boolean;
   filteredSSIdOptions: ISSPrefix[];
   ssPrefixLoading: boolean;
   subVillageSName: string;
@@ -144,7 +137,6 @@ const SSUserRow = ({
   index,
   fields,
   form,
-  isEdit,
   filteredSSIdOptions,
   ssPrefixLoading,
   subVillageSName,
@@ -153,8 +145,8 @@ const SSUserRow = ({
   ssUsers
 }: ISSUserRowProps): React.ReactElement => {
   const isLastSSRow = (fields?.length || 0) === index + 1;
-  const showRemove = !isEdit && (fields?.length ?? 0) > 1;
-  const showAdd = !isEdit && isLastSSRow;
+  const showRemove = (fields?.length ?? 0) > 1;
+  const showAdd = isLastSSRow;
 
   return (
     <React.Fragment>
@@ -176,7 +168,7 @@ const SSUserRow = ({
                 error={meta.touched && meta.error}
                 required={true}
                 isLoading={ssPrefixLoading}
-                disabled={ssPrefixLoading || isEdit}
+                disabled={ssPrefixLoading}
                 placeholder={ssPrefixLoading ? 'Loading SS IDs...' : 'Select SS ID'}
               />
             )}
@@ -193,7 +185,6 @@ const SSUserRow = ({
                 errorLabel='name'
                 error={(meta.touched && meta.error) || undefined}
                 required={true}
-                disabled={isEdit}
               />
             )}
           />
@@ -206,7 +197,6 @@ const SSUserRow = ({
             form={form}
             formName='ssUsers'
             index={index}
-            disabled={isEdit}
           />
         </div>
       </div>
@@ -217,7 +207,6 @@ const SSUserRow = ({
             name={name}
             index={index}
             options={subVillagesList}
-            isEdit={isEdit}
             subVillagesLoading={subVillagesLoading}
           >
             <Field
@@ -238,7 +227,7 @@ const SSUserRow = ({
                   isSelectAll={true}
                   error={meta.touched && meta.error}
                   isLoading={subVillagesLoading}
-                  isDisabled={subVillagesLoading || isEdit}
+                  isDisabled={subVillagesLoading}
                   placeholder={subVillagesLoading ? `Loading ${subVillageSName}...` : `Select ${subVillageSName}`}
                 />
               )}
@@ -274,7 +263,7 @@ const SSUserRow = ({
   );
 };
 
-const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): React.ReactElement => {
+const AssignSSUsersSection = (): React.ReactElement => {
   const form = useForm();
   const ssUsersFormName = 'ssUsers';
   const ssUsersInitialValue = useMemo(() => [{ ...DEFAULT_SS_USER_ROW }], []);
@@ -343,7 +332,6 @@ const AssignSSUsersSection = ({ isEdit = false }: IAssignSSUsersSectionProps): R
                     index={rowIndex}
                     fields={fields}
                     form={form}
-                    isEdit={isEdit}
                     filteredSSIdOptions={filteredSSIdOptions}
                     ssPrefixLoading={ssPrefixLoading}
                     subVillageSName={subVillageSName}

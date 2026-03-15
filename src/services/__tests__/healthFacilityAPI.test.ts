@@ -26,7 +26,6 @@ import {
   validateLinkedRestrictionsAPI,
   fetchCountryCodeList,
   getSSPrefix,
-  createShasthyaShebika,
   fetchShasthyaShebikaByShasthyaKormiId,
   deleteShasthyaShebikas
 } from '../healthFacilityAPI';
@@ -448,24 +447,6 @@ describe('Health Facility APIs', () => {
 
     expect(mockAxios.history.get.length).toBe(1);
     expect(mockAxios.history.get[0].url).toBe('/spice-service/meta/get-ss-prefix');
-  });
-
-  it('createShasthyaShebika sends a POST request to /admin-service/shasthya-shebika/create with correct data', async () => {
-    const data = {
-      name: 'SS User',
-      phoneNumber: '+1234567890',
-      ssId: 'SS01',
-      subVillageIds: ['1', '2'],
-      shasthyaKormiId: '42'
-    };
-
-    mockAxios.onPost('/admin-service/shasthya-shebika/create').reply(200, {});
-
-    await createShasthyaShebika(data);
-
-    expect(mockAxios.history.post.length).toBe(1);
-    expect(mockAxios.history.post[0].url).toBe('/admin-service/shasthya-shebika/create');
-    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(data);
   });
 
   it('fetchShasthyaShebikaByShasthyaKormiId sends a POST request to /admin-service/shasthya-shebika/by-shasthya-kormi-id with array of ids', async () => {

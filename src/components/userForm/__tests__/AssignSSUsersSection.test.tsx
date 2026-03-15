@@ -91,12 +91,11 @@ const initialValuesWithoutShastiyaKormi = {
 };
 
 const renderWithForm = (
-  initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi,
-  isEdit?: boolean
+  initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi
 ) => {
   return render(
     <Form onSubmit={() => {}} initialValues={initialValues} mutators={{ ...arrayMutators }}>
-      {() => <AssignSSUsersSection isEdit={isEdit} />}
+      {() => <AssignSSUsersSection />}
     </Form>
   );
 };
@@ -211,51 +210,28 @@ describe('AssignSSUsersSection', () => {
     });
   });
 
-  describe('isEdit mode', () => {
-    it('should not show Add row or Remove row controls when isEdit is true', () => {
-      renderWithForm(initialValuesWithShastiyaKormi, true);
-      expect(screen.queryByTestId('plus-icon')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('bin-icon')).not.toBeInTheDocument();
-    });
-
-    it('should show Add row control when isEdit is false', () => {
-      renderWithForm(initialValuesWithShastiyaKormi, false);
-      expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
-    });
-
-    it('should show Add row control when isEdit is omitted (default)', () => {
+  describe('add/remove row and field state', () => {
+    it('should show Add row control when section is visible', () => {
       renderWithForm(initialValuesWithShastiyaKormi);
       expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
     });
 
-    it('should disable SS ID, Name, Phone Number, and Sub-village when isEdit is true', () => {
-      renderWithForm(initialValuesWithShastiyaKormi, true);
-      const selectInputs = screen.getAllByTestId('select-input');
-      const textInputs = screen.getAllByTestId('text-input');
-      const phoneFields = screen.getAllByTestId('phone-number-field');
-      const multiSelects = screen.getAllByTestId('multi-select');
-      selectInputs.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
-      textInputs.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
-      phoneFields.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
-      multiSelects.forEach(el => expect(el).toHaveAttribute('data-disabled', 'true'));
-    });
-
-    it('should not disable fields when isEdit is false', () => {
-      renderWithForm(initialValuesWithShastiyaKormi, false);
+    it('should not disable SS ID, Name, Phone Number, and Sub-village by default', () => {
+      renderWithForm(initialValuesWithShastiyaKormi);
       const selectInput = screen.getByTestId('select-input');
       const textInput = screen.getByTestId('text-input');
       const phoneField = screen.getByTestId('phone-number-field');
       const multiSelect = screen.getByTestId('multi-select');
-      expect(selectInput).toHaveAttribute('data-disabled', 'false');
-      expect(textInput).toHaveAttribute('data-disabled', 'false');
-      expect(phoneField).toHaveAttribute('data-disabled', 'false');
-      expect(multiSelect).toHaveAttribute('data-disabled', 'false');
+      expect(selectInput).not.toHaveAttribute('data-disabled', 'true');
+      expect(textInput).not.toHaveAttribute('data-disabled', 'true');
+      expect(phoneField).not.toHaveAttribute('data-disabled', 'true');
+      expect(multiSelect).not.toHaveAttribute('data-disabled', 'true');
     });
   });
 
   describe('add / remove row', () => {
     it('should add a second row when Add row (plus icon) is clicked', async () => {
-      renderWithForm(initialValuesWithShastiyaKormi, false);
+      renderWithForm(initialValuesWithShastiyaKormi);
       expect(screen.getAllByTestId('select-input')).toHaveLength(1);
 
       await act(async () => {
@@ -267,7 +243,7 @@ describe('AssignSSUsersSection', () => {
     });
 
     it('should show Remove row control when there are multiple rows', async () => {
-      renderWithForm(initialValuesWithShastiyaKormi, false);
+      renderWithForm(initialValuesWithShastiyaKormi);
       await act(async () => {
         fireEvent.click(screen.getByTestId('plus-icon'));
       });
@@ -276,7 +252,7 @@ describe('AssignSSUsersSection', () => {
     });
 
     it('should remove a row when Remove row is clicked', async () => {
-      renderWithForm(initialValuesWithShastiyaKormi, false);
+      renderWithForm(initialValuesWithShastiyaKormi);
       await act(async () => {
         fireEvent.click(screen.getByTestId('plus-icon'));
       });

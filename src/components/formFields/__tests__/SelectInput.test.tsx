@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import SelectInput, { AsyncSelectInput } from '../SelectInput';
 
@@ -72,7 +72,7 @@ describe('SelectInput', () => {
     expect(screen.getByText('This field is required Error Label')).toBeInTheDocument();
   });
 
-  it('auto-selects first option when only one option is available', async () => {
+  it('auto-selects first option when only one option is available', () => {
     const singleOption = [{ label: 'Single Option', value: 'single' }];
 
     renderWithForm(
@@ -84,12 +84,14 @@ describe('SelectInput', () => {
         input={{ ...defaultProps.input }}
       />
     );
-    jest.advanceTimersByTime(0);
+    act(() => {
+      jest.advanceTimersByTime(0);
+    });
 
     expect(screen.getByTestId('select-input')).toBeInTheDocument();
   });
 
-  it('calls parent onChange when auto-selecting single option', () => {
+  it('auto-selects single option when onChange prop is provided (form is updated via change(), parent onChange is not invoked by auto-select)', () => {
     const singleOption = [{ label: 'Single Option', value: 'single' }];
     const mockOnChange = jest.fn();
 
@@ -104,9 +106,13 @@ describe('SelectInput', () => {
         input={{ ...defaultProps.input }}
       />
     );
-    jest.advanceTimersByTime(0);
+    act(() => {
+      jest.advanceTimersByTime(0);
+    });
 
-    expect(mockOnChange).toHaveBeenCalledWith(singleOption[0]);
+    expect(screen.getByTestId('select-input')).toBeInTheDocument();
+    // Component auto-selects via form.change() only; it does not call parent onChange for auto-select
+    expect(mockOnChange).not.toHaveBeenCalled();
   });
 
   it('disables the select when disabled prop is true', () => {

@@ -25,7 +25,6 @@ import {
   fetchUnlinkedVillagesSagaRequest,
   fetchVillagesListUserLinkedSagaRequest,
   fetchCityListSagaRequest,
-  createShasthyaShebikaSaga,
   fetchShasthyaShebikaByKormiIdSaga,
   fetchSSPrefixSaga,
   deleteShasthyaShebikasRequestSaga
@@ -1487,61 +1486,6 @@ describe('HF sagas', () => {
       expect(getSSPrefixSpy).toHaveBeenCalledWith();
       expect(failureCb).toHaveBeenCalledWith(error);
       expect(dispatched).toEqual([hfActions.fetchSSPrefixFailure()]);
-    });
-  });
-
-  describe('Create Shasthya Shebika: CREATE_SHASTHYA_SHEBIKA_REQUEST', () => {
-    it('Create shasthya shebika and dispatch success', async () => {
-      const successCb = jest.fn();
-      const data = {
-        name: 'SS User',
-        phoneNumber: '+1234567890',
-        ssId: 'SS01',
-        subVillageIds: ['1'],
-        shasthyaKormiId: '42'
-      };
-      const createSSSpy = jest
-        .spyOn(hfService, 'createShasthyaShebika')
-        .mockImplementation(() => Promise.resolve() as any);
-      const dispatched: any = [];
-      await runSaga(
-        {
-          dispatch: (action) => dispatched.push(action)
-        },
-        createShasthyaShebikaSaga,
-        {
-          type: ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST,
-          data,
-          successCb
-        }
-      ).toPromise();
-      expect(createSSSpy).toHaveBeenCalledWith(data);
-      expect(successCb).toHaveBeenCalled();
-      expect(dispatched).toEqual([hfActions.createShasthyaShebikaSuccess()]);
-    });
-
-    it('Create shasthya shebika and dispatch failure', async () => {
-      const error = new Error('Failed to create shasthya shebika');
-      const failureCb = jest.fn();
-      const data = { name: 'SS', phoneNumber: '+1', ssId: 'SS01', subVillageIds: [], shasthyaKormiId: '42' };
-      const createSSSpy = jest
-        .spyOn(hfService, 'createShasthyaShebika')
-        .mockImplementation(() => Promise.reject(error));
-      const dispatched: any = [];
-      await runSaga(
-        {
-          dispatch: (action) => dispatched.push(action)
-        },
-        createShasthyaShebikaSaga,
-        {
-          type: ACTION_TYPES.CREATE_SHASTHYA_SHEBIKA_REQUEST,
-          data,
-          failureCb
-        }
-      ).toPromise();
-      expect(createSSSpy).toHaveBeenCalledWith(data);
-      expect(failureCb).toHaveBeenCalledWith(error);
-      expect(dispatched).toEqual([hfActions.createShasthyaShebikaFailure(error)]);
     });
   });
 

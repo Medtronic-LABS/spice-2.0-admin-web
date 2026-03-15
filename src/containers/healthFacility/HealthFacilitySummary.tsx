@@ -18,7 +18,6 @@ import {
   clearSupervisorList,
   clearVillageHFList,
   createHFUserRequest,
-  createShasthyaShebikaRequest,
   deleteHFUserRequest,
   deleteShasthyaShebikasRequest,
   fetchHFSummaryRequest,
@@ -48,7 +47,7 @@ import {
 } from '../../store/healthFacility/types';
 import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { formatRoles, formatUserToastMsg } from '../../utils/commonUtils';
-import { formatHealthFacility, getSSUsersPayload, getUserPayload, ISSUserInputItem, ISSUserPayloadItem } from '../../utils/formatObjectUtils';
+import { formatHealthFacility, getSSUsersPayload, getUserPayload, ISSUserInputItem } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import { onlyCHWRoles, shastiyaKormiRole } from '../../constants/roleConstants';
@@ -99,7 +98,6 @@ const HealthFacilitySummary = (): React.ReactElement => {
   const [showHFUserModal, setHFUserModal] = useState(false);
   const [isHFUserEdit, setIsHFUserEdit] = useState(false);
   const hfUserForEdit = useRef<{ users: any[] }>({ users: [] });
-  const pendingSSUsersPayloadRef = useRef<ISSUserPayloadItem[] | null>(null);
   const {
     isCommunity,
     appTypes,
@@ -468,9 +466,8 @@ const HealthFacilitySummary = (): React.ReactElement => {
       spiceRolesGroup: rolesGrouped?.SPICE
     });
     const ssUsersPayload = getSSUsersPayload(ssUsers ?? []);
-    const data: IHFUserPost = userObj[0];
+    const data: IHFUserPost = { ...userObj[0], shasthyaShebikas: ssUsersPayload };
     const isUserEdit = isHFUserEdit || data.id;
-    pendingSSUsersPayloadRef.current = !isUserEdit && ssUsersPayload.length > 0 ? ssUsersPayload : null;
     onSubmitHandler(
       data,
       isUserEdit ? updateHFUserRequest : createHFUserRequest,
@@ -491,26 +488,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
    *
    * @returns {void}
    */
-  const healthfacilityUserSuccess = (response?: { entity?: { id: number } }): void => {
-    const shasthyaKormiId = response?.entity?.id;
-    const ssUsersPayload = pendingSSUsersPayloadRef.current;
-    if (shasthyaKormiId != null && ssUsersPayload?.length) {
-      ssUsersPayload.forEach((entry) => {
-        dispatch(
-          createShasthyaShebikaRequest({
-            data: {
-              ...entry,
-              shasthyaKormiId: String(shasthyaKormiId)
-            },
-            failureCb: (e) => {
-              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_CREATE_FAIL));
-            }
-          })
-        );
-      });
-    }
-    pendingSSUsersPayloadRef.current = null;
-
+  const healthfacilityUserSuccess = (_response?: { entity?: { id: number } }): void => {
     // Determine the success message based on whether it's an edit or create action
     const successMessage = isHFUserEdit
       ? formatUserToastMsg(APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_SUCCESS, healthFacilitySName)

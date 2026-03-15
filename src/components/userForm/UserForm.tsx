@@ -240,6 +240,7 @@ const UserForm = ({
   const showReportHFRef = useRef<boolean[]>([false]);
   const showInsightHFRef = useRef<boolean[]>([false]);
   const [showVillage, setShowVillage] = useState<boolean[]>([false]);
+  const villageSupervisorFetchedForId = useRef<number | null>(null);
   const spiceRoles = useRef([] as IRoles[]);
   const reportRolesRef = useRef([] as IRoles[]);
   const insightRolesRef = useRef([] as IRoles[]);
@@ -776,14 +777,17 @@ const UserForm = ({
   );
 
   /**
-   * Effect hook to fetch village and supervisor lists based on the initial edit data. ***
+   * Effect hook to fetch village and supervisor lists based on the initial edit data.
+   * Guarded so APIs are only called once per user (avoids duplicate calls when autoFetchData/showVillage update in sequence).
    */
   useEffect(() => {
-    if ((isEdit || isActivating) && showVillage[0] && !isProfile) {
+    if ((isEdit || isActivating) && showVillage[0] && !isProfile && initialEditData[0]) {
+      const editId = initialEditData[0]?.id;
+      if (villageSupervisorFetchedForId.current === editId) return;
+      villageSupervisorFetchedForId.current = editId ?? null;
+
       const tenantIds = [...initialEditData[0].hfTenantIds, isHF ? tenantId : undefined].filter((v: number) => v);
-      if (isHF) {
-        fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
-      }
+      fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'village', 0);
       fetchListWithConditions(tenantIds, initialEditData[0]?.id, 'supervisor', 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1821,7 +1825,7 @@ const UserForm = ({
         })
       }
     </FieldArray>
-    <AssignSSUsersSection isEdit={isEdit} />
+    <AssignSSUsersSection />
     </>
   );
 };
