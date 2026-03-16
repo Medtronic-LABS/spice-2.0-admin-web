@@ -13,6 +13,9 @@ import MultiSelect from '../../multiSelect/MultiSelect';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { IVillages } from '../../../store/healthFacility/types';
+import { IRoles } from '../../../store/user/types';
+import { shastiyaKormiRole } from '../../../constants/roleConstants';
+import { fetchBranchesByUnionRequest } from '../../../store/branch/actions';
 
 // Stable empty array to avoid new reference when not in HF create (prevents infinite loop in useMemo/useEffect)
 const EMPTY_VILLAGES: IVillages[] = [];
@@ -36,6 +39,7 @@ export const DynamicCHForm = ({
   index,
   form,
   name,
+  spiceRoleList,
   isHF,
   isEdit,
   isProfile,
@@ -54,19 +58,33 @@ export const DynamicCHForm = ({
   const { isCHPCHWSelected } = useUserFormUtils();
   const { healthFacilityId } = useParams<IMatchParams>();
   const { village: { p: villagePName } } = useAppTypeConfigs();
+  const isShastiyaKormiSelected = useMemo(
+    () => spiceRoleList.some((r: IRoles) => r?.name === shastiyaKormiRole),
+    [spiceRoleList]
+  );
 
   const fetchSubVillages = useCallback(
     (villageIds: number[]) => {
-      dispatch(
-        fetchSubVillagesRequest({
-          villageIds,
-          failureCb: (e) => {
-            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
-          }
-        })
-      );
+      if(isShastiyaKormiSelected) {
+        dispatch(
+          fetchSubVillagesRequest({
+            villageIds,
+            failureCb: (e) => {
+              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SUBVILLAGES_FETCH_FAIL));
+            }
+          })
+        );
+        dispatch(
+          fetchBranchesByUnionRequest({
+            unionIds: villageIds,
+            failureCb: (e) => {
+              toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.BRANCHES_BY_UNIONS_FETCH_FAIL));
+            }
+          })
+        );
+      }
     },
-    [dispatch]
+    [dispatch, isShastiyaKormiSelected]
   );
 
   // Memoize form values to prevent unnecessary re-renders

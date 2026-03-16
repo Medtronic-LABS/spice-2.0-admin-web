@@ -261,6 +261,7 @@ const APPCONSTANTS = {
   NO_VILLAGE_PRESENT: 'No Unions available.',
   VILLAGES_FETCH_FAIL: 'Failed to fetch Unions. Please try after sometime.',
   SUBVILLAGES_FETCH_FAIL: 'Failed to fetch villages. Please try after sometime.',
+  BRANCHES_BY_UNIONS_FETCH_FAIL: 'Failed to fetch branches. Please try after sometime.',
   ADD_ANOTHER_USER: 'Add Another User',
   IS_TERMS_CONDITIONS_DISMISSED: 'isTacD',
   TERMSCONDITIONS_UPDATE_FAIL: 'Failed to accept terms and conditions.',

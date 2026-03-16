@@ -1776,6 +1776,7 @@ const UserForm = ({
                   index={index}
                   form={form}
                   name={name}
+                  spiceRoleList={spiceRoleList}
                   isHF={isHF}
                   isEdit={isEdit}
                   isProfile={isProfile}
@@ -1796,6 +1797,7 @@ const UserForm = ({
                   <BranchTaggingFields
                     name={name}
                     form={form}
+                    spiceRoleList={spiceRoleList}
                     isError={isError}
                     isHFCreate={isHFCreate}
                   />
