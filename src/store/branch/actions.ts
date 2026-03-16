@@ -17,7 +17,11 @@ import {
   IFetchBranchSummaryFailure,
   IBranch,
   ISetBranchSummary,
-  IClearBranchSummary
+  IClearBranchSummary,
+  IFetchBranchesByUnionRequest,
+  IFetchBranchesByUnionSuccess,
+  IFetchBranchesByUnionFailure,
+  IClearBranchesByUnion
 } from './types';
 
 export const fetchBranchListRequest = ({
@@ -131,4 +135,33 @@ export const setBranchSummary = (data: Partial<IBranch>): ISetBranchSummary => (
 
 export const clearBranchSummary = (): IClearBranchSummary => ({
   type: BRANCH_TYPES.CLEAR_BRANCH_SUMMARY
+});
+
+export const fetchBranchesByUnionRequest = ({
+  unionIds,
+  successCb,
+  failureCb
+}: {
+  unionIds: number[];
+  successCb?: (branches: IBranch[]) => void;
+  failureCb?: (error: Error) => void;
+}): IFetchBranchesByUnionRequest => ({
+  type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST,
+  unionIds,
+  successCb,
+  failureCb
+});
+
+export const fetchBranchesByUnionSuccess = (payload: IBranch[]): IFetchBranchesByUnionSuccess => ({
+  type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_SUCCESS,
+  payload
+});
+
+export const fetchBranchesByUnionFailure = (error: Error): IFetchBranchesByUnionFailure => ({
+  type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_FAILURE,
+  error
+});
+
+export const clearBranchesByUnion = (): IClearBranchesByUnion => ({
+  type: BRANCH_TYPES.CLEAR_BRANCHES_BY_UNION
 });
