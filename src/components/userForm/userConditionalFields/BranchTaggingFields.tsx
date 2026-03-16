@@ -1,7 +1,6 @@
 import { Field } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import SelectInput from '../../formFields/SelectInput';
-import { required } from '../../../utils/validation';
 import { IRoles } from '../../../store/user/types';
 import { branchesByUnionSelector, branchLoadingSelector } from '../../../store/branch/selectors';
 
@@ -13,13 +12,7 @@ interface BranchTaggingFieldsProps {
   isHFCreate?: boolean;
 }
 
-const BranchTaggingFields = ({
-  name,
-  form,
-  spiceRoleList,
-  isError,
-  isHFCreate
-}: BranchTaggingFieldsProps) => {
+const BranchTaggingFields = ({ name, form, spiceRoleList, isError, isHFCreate }: BranchTaggingFieldsProps) => {
   const branches = useSelector(branchesByUnionSelector);
   const branchesLoading = useSelector(branchLoadingSelector);
 
@@ -28,7 +21,6 @@ const BranchTaggingFields = ({
       <Field
         name={`${name}.branches`}
         type='text'
-        validate={required}
         render={({ input, meta }) => (
           <SelectInput
             {...(input as any)}
@@ -40,6 +32,7 @@ const BranchTaggingFields = ({
             loadingOptions={branchesLoading}
             error={isError(meta)}
             isModel={true}
+            required={false}
           />
         )}
       />
@@ -48,4 +41,3 @@ const BranchTaggingFields = ({
 };
 
 export default BranchTaggingFields;
-
