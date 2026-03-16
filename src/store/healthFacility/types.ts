@@ -1,4 +1,5 @@
 import ApiError from '../../global/ApiError';
+import { IBranch } from '../branch/types';
 import { ISubVillage } from '../region/types';
 import * as ACTION_TYPES from './actionTypes';
 
@@ -266,6 +267,7 @@ export interface IHFUserGet {
     formDataId: number;
   }>;
   country?: { id: number; phoneNumberCode: string; name: string; tenantId?: number };
+  branches?: IBranch[];
 }
 
 export interface IUserRole {
@@ -297,6 +299,7 @@ export interface IHFUserPost {
   timezone?: { id: number; name?: string };
   redRisk?: boolean;
   shasthyaShebikas?: ICreateShasthyaShebikaPayload[];
+  branches?: number[];
 }
 
 export interface ICreateShasthyaShebikaPayload {

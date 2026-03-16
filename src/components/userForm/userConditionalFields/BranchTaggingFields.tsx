@@ -26,7 +26,7 @@ const BranchTaggingFields = ({
   return (
     <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
       <Field
-        name={`${name}.branch`}
+        name={`${name}.branches`}
         type='text'
         validate={required}
         render={({ input, meta }) => (

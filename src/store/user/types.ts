@@ -793,6 +793,7 @@ export interface IUserPayload {
   chiefdom?: string;
   redRisk?: boolean;
   designation: { id: string; name: string } | null;
+  branches?: number[];
 }
 export interface ISetAppType {
   type: typeof USER_TYPES.SET_APP_TYPE;

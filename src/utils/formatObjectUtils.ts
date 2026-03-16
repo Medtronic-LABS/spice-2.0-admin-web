@@ -103,7 +103,8 @@ export const getUserPayload = ({
       (role: { id: number }) => role.id
     );
     roleIds = adjustRoleIds(user, roleIds, isHFAdmin);
-
+    const branches = user?.branches ? (Array.isArray(user.branches) ? user.branches : [user.branches]) : [];
+    
     const userPayload: IUserPayload = {
       appTypes,
       firstName: user.firstName.trim(),
@@ -118,6 +119,9 @@ export const getUserPayload = ({
       tenantId: isSpiceExists ? resolveTenantId(user) : undefined,
       supervisorId: Number(user.supervisor?.id) || null,
       roleIds: [...new Set(roleIds)],
+      branches: branches
+        .filter((b: IBranch) => b && typeof b.id === 'number')
+        .map((b: IBranch) => b.id),
       villageIds: [
         ...(Array.isArray(user?.villages) ? user.villages : []),
         ...(Array.isArray(user?.existingVillages) ? user.existingVillages : [])
