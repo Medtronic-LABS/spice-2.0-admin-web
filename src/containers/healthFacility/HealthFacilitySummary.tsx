@@ -53,6 +53,7 @@ import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDet
 import { onlyCHWRoles, shastiyaKormiRole } from '../../constants/roleConstants';
 import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
 import { offlineSyncRequest, updateUserStatus } from '../../store/user/actions';
+import { clearBranchesByUnion } from '../../store/branch/actions';
 
 interface IMatchParams {
   healthFacilityId: string;
@@ -513,6 +514,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     setIsHFUserEdit(false);
     hfUserForEdit.current = { users: [] };
     setHFUserModal(true);
+    dispatch(clearBranchesByUnion());
   }, [hfUserForEdit]);
 
   /**
