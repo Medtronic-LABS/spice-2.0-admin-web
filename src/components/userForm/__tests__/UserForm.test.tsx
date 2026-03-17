@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { Provider } from 'react-redux';
@@ -170,7 +170,20 @@ jest.mock('../userConditionalFields/AdminFields', () => ({
 }));
 
 jest.mock('../userConditionalFields/DynamicCHForm', () => ({
-  DynamicCHForm: () => <div data-testid="dynamic-ch-form">DynamicCHForm</div>
+  DynamicCHForm: (props: any) => {
+    mockDynamicCHFormCalls.push(props);
+    return <div data-testid="dynamic-ch-form">DynamicCHForm</div>;
+  }
+}));
+
+const mockDynamicCHFormCalls: any[] = [];
+const mockBranchTaggingFieldsCalls: any[] = [];
+jest.mock('../userConditionalFields/BranchTaggingFields', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockBranchTaggingFieldsCalls.push(props);
+    return <div data-testid="branch-tagging-fields">BranchTaggingFields</div>;
+  }
 }));
 
 const mockAssignSSUsersSectionCalls: any[] = [];
@@ -223,12 +236,16 @@ const defaultProps = {
   }
 };
 
-const renderUserForm = (props: any = {}, storeState: any = defaultStoreState) => {
+const renderUserForm = (
+  props: any = {},
+  storeState: any = defaultStoreState,
+  formInitialValues: any = undefined
+) => {
   const store = mockStore(storeState);
   return render(
     <Provider store={store}>
       <MemoryRouter>
-        <Form onSubmit={() => {}} mutators={{ ...arrayMutators }}>
+        <Form onSubmit={() => {}} mutators={{ ...arrayMutators }} initialValues={formInitialValues}>
           {({ form }) => <UserForm {...defaultProps} form={form} {...props} />}
         </Form>
       </MemoryRouter>
@@ -240,6 +257,8 @@ describe('UserForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockAssignSSUsersSectionCalls.length = 0;
+    mockDynamicCHFormCalls.length = 0;
+    mockBranchTaggingFieldsCalls.length = 0;
     mockGetSuiteAccessList.mockReturnValue([{ groupName: 'SPICE', label: 'SPICE' }]);
     mockGetSpiceGroupName.mockImplementation((suiteAccess: any[]) => suiteAccess?.[0] || { groupName: 'SPICE' });
     mockFormUserData.mockImplementation((data: any) => data || {});
@@ -287,6 +306,58 @@ describe('UserForm', () => {
       renderUserForm();
       expect(screen.getByTestId('site-user-form')).toBeInTheDocument();
       expect(screen.getByTestId('dynamic-ch-form')).toBeInTheDocument();
+    });
+
+    it('passes spiceRoleList to DynamicCHForm', () => {
+      renderUserForm();
+      expect(mockDynamicCHFormCalls.length).toBeGreaterThanOrEqual(1);
+      expect(mockDynamicCHFormCalls[mockDynamicCHFormCalls.length - 1]).toHaveProperty('spiceRoleList');
+    });
+
+    it('does not render BranchTaggingFields when Shastiya Kormi role is not selected', () => {
+      const initialValues = {
+        users: [{ role: [{ name: 'OTHER_ROLE', id: 1 }], suiteAccess: [{ groupName: 'SPICE' }] }]
+      };
+      renderUserForm({}, defaultStoreState, initialValues);
+      expect(screen.queryByTestId('branch-tagging-fields')).not.toBeInTheDocument();
+      expect(mockBranchTaggingFieldsCalls.length).toBe(0);
+    });
+
+    it('renders BranchTaggingFields with expected props when Shastiya Kormi is default-selected (isAdminForm)', async () => {
+      const storeWithShastiyaKormi = {
+        ...defaultStoreState,
+        user: {
+          ...defaultStoreState.user,
+          userRoles: {
+            SPICE: [
+              { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+              { id: 2, name: 'SHASTIYA_KORMI', groupName: 'SPICE', displayName: 'Shastiya Kormi', appTypes: ['web'] }
+            ]
+          }
+        }
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },
+          defaultSelectedRole: 'SHASTIYA_KORMI'
+        },
+        storeWithShastiyaKormi
+      );
+      await waitFor(
+        () => {
+          expect(mockBranchTaggingFieldsCalls.length).toBeGreaterThanOrEqual(1);
+        },
+        { timeout: 3000 }
+      );
+      const lastCall = mockBranchTaggingFieldsCalls[mockBranchTaggingFieldsCalls.length - 1];
+      expect(lastCall).toHaveProperty('name');
+      expect(lastCall).toHaveProperty('form');
+      expect(lastCall).toHaveProperty('spiceRoleList');
+      expect(lastCall).toHaveProperty('isError');
+      expect(lastCall).toHaveProperty('isHFCreate');
+      expect(lastCall.spiceRoleList).toEqual(
+        expect.arrayContaining([expect.objectContaining({ name: 'SHASTIYA_KORMI' })])
+      );
     });
 
     it('renders Phone Number field', () => {

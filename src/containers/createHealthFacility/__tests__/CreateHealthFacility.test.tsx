@@ -59,6 +59,10 @@ jest.mock('../../../store/healthFacility/actions', () => ({
   fetchWorkflowListRequest: jest.fn((payload: any) => ({ type: 'FETCH_WORKFLOW_LIST_REQUEST', ...payload }))
 }));
 
+jest.mock('../../../store/branch/actions', () => ({
+  clearBranchesByUnion: jest.fn(() => ({ type: 'CLEAR_BRANCHES_BY_UNION' }))
+}));
+
 jest.mock('../../../components/loader/Loader', () => ({
   __esModule: true,
   default: () => <div data-testid="loader">Loading...</div>
@@ -119,6 +123,7 @@ const defaultStoreState = {
   branch: {
     branchSummary: null,
     branches: [],
+    branchesByUnion: [],
     loading: false,
     totalCount: 0,
     error: null
@@ -177,6 +182,14 @@ describe('CreateHealthFacility', () => {
     renderCreateHealthFacility();
     await waitFor(() => {
       expect(clearAllDependentData).toHaveBeenCalled();
+    });
+  });
+
+  it('dispatches clearBranchesByUnion on mount', async () => {
+    const { clearBranchesByUnion } = require('../../../store/branch/actions');
+    renderCreateHealthFacility();
+    await waitFor(() => {
+      expect(clearBranchesByUnion).toHaveBeenCalled();
     });
   });
 

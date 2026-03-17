@@ -1,5 +1,6 @@
 import {
   branchListSelector,
+  branchesByUnionSelector,
   branchLoadingSelector,
   branchTotalCountSelector,
   branchErrorSelector,
@@ -13,6 +14,21 @@ const initialState: any = {
 
 test('branchListSelector should return branches from state', () => {
   expect(branchListSelector(initialState)).toEqual(initialState.branch.branches);
+});
+
+test('branchesByUnionSelector should return branchesByUnion from state', () => {
+  expect(branchesByUnionSelector(initialState)).toEqual(initialState.branch.branchesByUnion);
+});
+
+test('branchesByUnionSelector should return updated branches when state changes', () => {
+  const stateWithBranchesByUnion = {
+    branch: {
+      ...mainInitialState,
+      branchesByUnion: [{ id: 1, name: 'Branch A', code: 'BR001' }]
+    }
+  };
+  expect(branchesByUnionSelector(stateWithBranchesByUnion)).toHaveLength(1);
+  expect(branchesByUnionSelector(stateWithBranchesByUnion)[0].name).toBe('Branch A');
 });
 
 test('branchLoadingSelector should return loading from state', () => {
