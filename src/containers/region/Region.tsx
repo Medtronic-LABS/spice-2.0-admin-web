@@ -177,21 +177,26 @@ const Region = (): React.ReactElement => {
   const fields = [
     {
       id: 1,
+      name: 'divisionname',
+      label: 'Division'
+    },
+    {
+      id: 2,
       name: 'districtname',
       label: districtSName
     },
     {
-      id: 2,
+      id: 3,
       name: 'chiefdomname',
       label: chiefdomSName
     },
     {
-      id: 3,
+      id: 4,
       name: 'villagename',
       label: villageSName
     },
     {
-      id: 4,
+      id: 5,
       name: 'subvillagename',
       label: subVillageSName,
       cellFormatter: (data: IRegionDetailList) => data.subvillagename || '-'
