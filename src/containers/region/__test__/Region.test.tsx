@@ -223,6 +223,7 @@ describe('Region Component', () => {
 
   it('renders table with expected column headers', () => {
     renderWithProviders(<Region />, { store });
+    expect(screen.getByRole('columnheader', { name: 'Division' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'County' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Sub County' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Village' })).toBeInTheDocument();
