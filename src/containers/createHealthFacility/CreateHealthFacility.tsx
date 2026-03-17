@@ -34,6 +34,7 @@ import Workflows from '../healthFacility/Workflows';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import IconButton from '../../components/button/IconButton';
+import { clearBranchesByUnion } from '../../store/branch/actions';
 
 interface IMatchParams {
   regionId?: string;
@@ -112,6 +113,7 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
 
   useEffect(() => {
     dispatch(clearAllDependentData());
+    dispatch(clearBranchesByUnion());
   }, [dispatch]);
 
   useEffect(() => {
