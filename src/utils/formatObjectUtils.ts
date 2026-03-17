@@ -103,7 +103,15 @@ export const getUserPayload = ({
       (role: { id: number }) => role.id
     );
     roleIds = adjustRoleIds(user, roleIds, isHFAdmin);
-    const branches = user?.branches ? (Array.isArray(user.branches) ? user.branches : [user.branches]) : [];
+
+    let branches: IBranch[] = [];
+    if (user?.branches) {
+      if (Array.isArray(user.branches)) {
+        branches = user.branches;
+      } else {
+        branches = [user.branches];
+      }
+    }
     
     const userPayload: IUserPayload = {
       appTypes,
