@@ -36,6 +36,7 @@ export interface IBranchState {
   branchesByUnion: IBranch[];
   branchSummary: IBranch | null;
   loading: boolean;
+  loadingBranchesByUnion: boolean;
   totalCount: number;
   error: string | null | Error;
 }

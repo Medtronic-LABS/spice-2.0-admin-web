@@ -32,6 +32,7 @@ describe('BranchTaggingFields', () => {
       branch: {
         branchesByUnion: [],
         loading: false,
+        loadingBranchesByUnion: false,
         ...branchState
       }
     });
@@ -94,7 +95,7 @@ describe('BranchTaggingFields', () => {
   });
 
   it('passes loading state from Redux to SelectInput', () => {
-    const store = createStore({ loading: true });
+    const store = createStore({ loadingBranchesByUnion: true });
     renderWithForm({}, store);
     const selectProps = mockSelectInput.mock.calls[0][0];
     expect(selectProps.loadingOptions).toBe(true);

@@ -31,12 +31,13 @@ describe('branchReducer', () => {
     expect(state.loading).toBe(true);
   });
 
-  it('should set loading to true for FETCH_BRANCHES_BY_UNION_REQUEST', () => {
+  it('should set loadingBranchesByUnion to true for FETCH_BRANCHES_BY_UNION_REQUEST', () => {
     const state = branchReducer(initialState, {
       type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST,
       unionIds: [1, 2]
     } as any);
-    expect(state.loading).toBe(true);
+    expect(state.loadingBranchesByUnion).toBe(true);
+    expect(state.loading).toBe(false);
   });
 
   it('should handle FETCH_BRANCH_LIST_SUCCESS', () => {
@@ -87,8 +88,8 @@ describe('branchReducer', () => {
   it('should handle FETCH_BRANCHES_BY_UNION_SUCCESS', () => {
     const branches = [{ id: 1, name: 'Branch A', code: 'BR001', district: {}, chiefdom: {} }];
     const action = { type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_SUCCESS, payload: branches };
-    const state = branchReducer({ ...initialState, loading: true }, action as any);
-    expect(state.loading).toBe(false);
+    const state = branchReducer({ ...initialState, loadingBranchesByUnion: true }, action as any);
+    expect(state.loadingBranchesByUnion).toBe(false);
     expect(state.branchesByUnion).toEqual(branches);
     expect(state.error).toBeNull();
   });
@@ -96,8 +97,8 @@ describe('branchReducer', () => {
   it('should handle FETCH_BRANCHES_BY_UNION_FAILURE', () => {
     const error = new Error('Fetch branches by union failed');
     const action = { type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_FAILURE, error };
-    const state = branchReducer({ ...initialState, loading: true }, action as any);
-    expect(state.loading).toBe(false);
+    const state = branchReducer({ ...initialState, loadingBranchesByUnion: true }, action as any);
+    expect(state.loadingBranchesByUnion).toBe(false);
     expect(state.error).toBe(error);
   });
 

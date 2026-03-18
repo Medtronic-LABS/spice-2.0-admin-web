@@ -2,6 +2,7 @@ import {
   branchListSelector,
   branchesByUnionSelector,
   branchLoadingSelector,
+  branchLoadingByUnionSelector,
   branchTotalCountSelector,
   branchErrorSelector,
   branchSummarySelector
@@ -57,6 +58,15 @@ test('branchListSelector should return updated branches when state changes', () 
 test('branchLoadingSelector should return true when loading', () => {
   const loadingState = { branch: { ...mainInitialState, loading: true } };
   expect(branchLoadingSelector(loadingState)).toBe(true);
+});
+
+test('branchLoadingByUnionSelector should return loadingBranchesByUnion from state', () => {
+  expect(branchLoadingByUnionSelector(initialState)).toEqual(initialState.branch.loadingBranchesByUnion);
+});
+
+test('branchLoadingByUnionSelector should return true when loadingBranchesByUnion', () => {
+  const loadingState = { branch: { ...mainInitialState, loadingBranchesByUnion: true } };
+  expect(branchLoadingByUnionSelector(loadingState)).toBe(true);
 });
 
 test('branchErrorSelector should return error when present', () => {
