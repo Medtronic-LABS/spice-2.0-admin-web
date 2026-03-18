@@ -351,13 +351,8 @@ describe('UserForm', () => {
       );
       const lastCall = mockBranchTaggingFieldsCalls[mockBranchTaggingFieldsCalls.length - 1];
       expect(lastCall).toHaveProperty('name');
-      expect(lastCall).toHaveProperty('form');
-      expect(lastCall).toHaveProperty('spiceRoleList');
       expect(lastCall).toHaveProperty('isError');
       expect(lastCall).toHaveProperty('isHFCreate');
-      expect(lastCall.spiceRoleList).toEqual(
-        expect.arrayContaining([expect.objectContaining({ name: 'SHASTIYA_KORMI' })])
-      );
     });
 
     it('renders Phone Number field', () => {

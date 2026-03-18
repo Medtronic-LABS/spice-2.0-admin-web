@@ -1796,8 +1796,6 @@ const UserForm = ({
                 {isShastiyaKormiSelected && (
                   <BranchTaggingFields
                     name={name}
-                    form={form}
-                    spiceRoleList={spiceRoleList}
                     isError={isError}
                     isHFCreate={isHFCreate}
                   />

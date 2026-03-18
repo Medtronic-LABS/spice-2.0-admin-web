@@ -4,7 +4,6 @@ import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import BranchTaggingFields from '../BranchTaggingFields';
-import { IRoles } from '../../../../store/user/types';
 
 const mockStore = configureStore([]);
 
@@ -25,8 +24,6 @@ jest.mock('../../../formFields/SelectInput', () => ({
 describe('BranchTaggingFields', () => {
   const defaultProps = {
     name: 'branchTagging',
-    form: {},
-    spiceRoleList: [] as IRoles[],
     isError: jest.fn((meta: any) => meta?.error)
   };
 
@@ -46,11 +43,10 @@ describe('BranchTaggingFields', () => {
     return render(
       <Provider store={store}>
         <Form onSubmit={() => {}}>
-          {({ form }) => (
+          {() => (
             <BranchTaggingFields
               {...defaultProps}
               {...props}
-              form={form}
             />
           )}
         </Form>
