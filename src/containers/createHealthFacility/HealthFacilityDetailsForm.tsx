@@ -615,6 +615,7 @@ const HealthFacilityDetailsForm = ({
                       fetchCityListDebounce(value);
                     }
                   }}
+                  menuPlacement='bottom'
                 />
               )}
             />
