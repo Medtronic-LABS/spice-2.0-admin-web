@@ -127,9 +127,13 @@ jest.mock('../../formFields/UsernameField', () => {
   };
 });
 
+const mockPhoneNumberCalls: any[] = [];
 jest.mock('../../formFields/PhoneNumber', () => ({
   __esModule: true,
-  default: () => <div data-testid="phone-number-field">Phone Number</div>
+  default: (props: any) => {
+    mockPhoneNumberCalls.push(props);
+    return <div data-testid="phone-number-field">Phone Number</div>;
+  }
 }));
 
 jest.mock('../../formFields/Radio', () => ({
@@ -430,6 +434,15 @@ describe('UserForm', () => {
       renderUserForm({ isEdit: true });
       expect(screen.getByTestId('assign-ss-users-section')).toBeInTheDocument();
       expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1]).not.toHaveProperty('isEdit');
+    });
+  });
+
+  describe('PhoneNumberField', () => {
+    it('passes required={true} to PhoneNumberField when rendering user form', () => {
+      mockPhoneNumberCalls.length = 0;
+      renderUserForm();
+      const phoneNumberWithRequired = mockPhoneNumberCalls.find((c: any) => c.required === true);
+      expect(phoneNumberWithRequired).toBeDefined();
     });
   });
 

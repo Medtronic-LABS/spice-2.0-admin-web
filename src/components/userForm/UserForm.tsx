@@ -1647,6 +1647,7 @@ const UserForm = ({
                     formName={formName}
                     index={index}
                     disabled={isActivating && !isProfile}
+                    required={true}
                   />
                 </div>
                 {(isPeerSupervisor ||

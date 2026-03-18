@@ -211,7 +211,6 @@ const SSUserRow = ({
           >
             <Field
               name={`${name}.subVillages`}
-              validate={required}
               render={({ input, meta }) => (
                 <MultiSelect
                   {...(input as any)}
@@ -223,7 +222,7 @@ const SSUserRow = ({
                   isShowLabel={true}
                   isModel={true}
                   isMulti={true}
-                  required={true}
+                  required={false}
                   isSelectAll={true}
                   error={meta.touched && meta.error}
                   isLoading={subVillagesLoading}

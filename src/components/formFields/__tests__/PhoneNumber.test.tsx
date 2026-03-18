@@ -87,6 +87,36 @@ describe('PhoneNumberField', () => {
     expect(screen.getByTestId('text-input')).toBeInTheDocument();
   });
 
+  it('passes required={false} to TextInput by default', () => {
+    render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}} initialValues={{ users: [{ phoneNumber: '' }] }}>
+          {() => <PhoneNumberField {...defaultProps} />}
+        </Form>
+      </Provider>
+    );
+    expect(mockSelectChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        required: false
+      })
+    );
+  });
+
+  it('passes required={true} to TextInput when required prop is true', () => {
+    render(
+      <Provider store={store}>
+        <Form onSubmit={() => {}} initialValues={{ users: [{ phoneNumber: '' }] }}>
+          {() => <PhoneNumberField {...defaultProps} required={true} />}
+        </Form>
+      </Provider>
+    );
+    expect(mockSelectChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        required: true
+      })
+    );
+  });
+
   it('shows error when phone number already exists', async () => {
     const error = new ApiError({ statusCode: '409', message: 'already exists' });
     error.statusCode = 409;

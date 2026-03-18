@@ -61,14 +61,19 @@ jest.mock('../../formFields/PhoneNumber', () => ({
   )
 }));
 
+const mockMultiSelectCalls: any[] = [];
 jest.mock('../../multiSelect/MultiSelect', () => ({
   __esModule: true,
-  default: ({ label, isDisabled, placeholder }: any) => (
-    <div data-testid="multi-select" data-disabled={isDisabled}>
-      {label}
-      {placeholder && <span data-testid="multi-select-placeholder">{placeholder}</span>}
-    </div>
-  )
+  default: (props: any) => {
+    mockMultiSelectCalls.push(props);
+    const { label, isDisabled, placeholder } = props;
+    return (
+      <div data-testid="multi-select" data-disabled={isDisabled}>
+        {label}
+        {placeholder && <span data-testid="multi-select-placeholder">{placeholder}</span>}
+      </div>
+    );
+  }
 }));
 
 const initialValuesWithShastiyaKormi = {
@@ -188,6 +193,14 @@ describe('AssignSSUsersSection', () => {
     it('should render Sub Village label when section is visible', () => {
       renderWithForm(initialValuesWithShastiyaKormi);
       expect(screen.getByText('Sub Village')).toBeInTheDocument();
+    });
+
+    it('should render Sub Village field as optional (required=false)', () => {
+      mockMultiSelectCalls.length = 0;
+      renderWithForm(initialValuesWithShastiyaKormi);
+      const subVillageMultiSelectCall = mockMultiSelectCalls.find((c: any) => c.label === 'Sub Village');
+      expect(subVillageMultiSelectCall).toBeDefined();
+      expect(subVillageMultiSelectCall.required).toBe(false);
     });
 
     it('should render at least one row of fields by default', () => {

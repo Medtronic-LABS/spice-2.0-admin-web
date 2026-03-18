@@ -21,9 +21,10 @@ interface IProps {
   formName: string;
   index: number;
   disabled?: boolean;
+  required?: boolean;
 }
 
-const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled }: IProps) => {
+const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled, required: isRequired = false }: IProps) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {
@@ -55,6 +56,9 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled
 
   const validateIfNumberExist = useCallback(
     (phoneNumber: string) => {
+      if (!phoneNumber) {
+        return '';
+      }
       return (
         errorRef.current ||
         ((validating || !submitEnabledStatus.current) && lastCheckedNumber.current !== phoneNumber
@@ -69,6 +73,9 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled
   const validateDuplication = useCallback(
     (value: string) => {
       try {
+        if (!value) {
+          return '';
+        }
         if (lastCheckedNumber.current !== value) {
           return '';
         }
@@ -164,7 +171,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled
       name={`${name}.${fieldName}`}
       type='text'
       validate={composeValidators(
-        required,
+        isRequired ? required : () => undefined,
         (value: string) => validateMobile(value, BD_REGION.includes(regionDetails.name)),
         validateIfNumberExist,
         validateDuplication
@@ -191,6 +198,7 @@ const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled
               setNetworkError(false);
               input.onChange(event);
             }}
+            required={isRequired}
             disabled={disabled}
             lowerCase={true}
             showLoader={loading}
