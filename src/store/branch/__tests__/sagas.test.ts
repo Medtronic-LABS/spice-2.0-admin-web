@@ -3,7 +3,8 @@ import {
   fetchBranchListSaga,
   createBranchSaga,
   updateBranchSaga,
-  fetchBranchSummarySaga
+  fetchBranchSummarySaga,
+  fetchBranchesByUnionSaga
 } from '../sagas';
 import * as branchService from '../../../services/branchAPI';
 import * as branchActions from '../actions';
@@ -266,6 +267,75 @@ describe('Branch sagas', () => {
 
       expect(failureCb).toHaveBeenCalledWith(error);
       expect(dispatched).toEqual([branchActions.fetchBranchSummaryFailure(error)]);
+    });
+  });
+
+  describe('fetchBranchesByUnionSaga', () => {
+    it('fetches branches by unions and dispatches success with entityList', async () => {
+      const unionIds = [1, 2, 3];
+      const successCb = jest.fn();
+      const fetchSpy = jest.spyOn(branchService, 'fetchBranchesByUnions').mockResolvedValue({
+        data: { entityList: mockBranches }
+      } as AxiosResponse);
+
+      const dispatched: any[] = [];
+      await runSaga(
+        { dispatch: (action) => dispatched.push(action) },
+        fetchBranchesByUnionSaga,
+        {
+          type: ACTION_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST,
+          unionIds,
+          successCb,
+          failureCb: undefined
+        }
+      ).toPromise();
+
+      expect(fetchSpy).toHaveBeenCalledWith(unionIds);
+      expect(successCb).toHaveBeenCalledWith(mockBranches);
+      expect(dispatched).toEqual([branchActions.fetchBranchesByUnionSuccess(mockBranches)]);
+    });
+
+    it('uses empty array when entityList is not present', async () => {
+      const unionIds = [1];
+      jest.spyOn(branchService, 'fetchBranchesByUnions').mockResolvedValue({
+        data: {}
+      } as AxiosResponse);
+
+      const dispatched: any[] = [];
+      await runSaga(
+        { dispatch: (action) => dispatched.push(action) },
+        fetchBranchesByUnionSaga,
+        {
+          type: ACTION_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST,
+          unionIds,
+          successCb: undefined,
+          failureCb: undefined
+        }
+      ).toPromise();
+
+      expect(dispatched).toEqual([branchActions.fetchBranchesByUnionSuccess([])]);
+    });
+
+    it('dispatches failure and calls failureCb on error', async () => {
+      const error = new Error('Fetch branches by union failed');
+      const failureCb = jest.fn();
+      const unionIds = [1, 2];
+      jest.spyOn(branchService, 'fetchBranchesByUnions').mockRejectedValue(error);
+
+      const dispatched: any[] = [];
+      await runSaga(
+        { dispatch: (action) => dispatched.push(action) },
+        fetchBranchesByUnionSaga,
+        {
+          type: ACTION_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST,
+          unionIds,
+          successCb: undefined,
+          failureCb
+        }
+      ).toPromise();
+
+      expect(failureCb).toHaveBeenCalledWith(error);
+      expect(dispatched).toEqual([branchActions.fetchBranchesByUnionFailure(error)]);
     });
   });
 });

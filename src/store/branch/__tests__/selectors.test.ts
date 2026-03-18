@@ -1,6 +1,8 @@
 import {
   branchListSelector,
+  branchesByUnionSelector,
   branchLoadingSelector,
+  branchLoadingByUnionSelector,
   branchTotalCountSelector,
   branchErrorSelector,
   branchSummarySelector
@@ -13,6 +15,21 @@ const initialState: any = {
 
 test('branchListSelector should return branches from state', () => {
   expect(branchListSelector(initialState)).toEqual(initialState.branch.branches);
+});
+
+test('branchesByUnionSelector should return branchesByUnion from state', () => {
+  expect(branchesByUnionSelector(initialState)).toEqual(initialState.branch.branchesByUnion);
+});
+
+test('branchesByUnionSelector should return updated branches when state changes', () => {
+  const stateWithBranchesByUnion = {
+    branch: {
+      ...mainInitialState,
+      branchesByUnion: [{ id: 1, name: 'Branch A', code: 'BR001' }]
+    }
+  };
+  expect(branchesByUnionSelector(stateWithBranchesByUnion)).toHaveLength(1);
+  expect(branchesByUnionSelector(stateWithBranchesByUnion)[0].name).toBe('Branch A');
 });
 
 test('branchLoadingSelector should return loading from state', () => {
@@ -41,6 +58,15 @@ test('branchListSelector should return updated branches when state changes', () 
 test('branchLoadingSelector should return true when loading', () => {
   const loadingState = { branch: { ...mainInitialState, loading: true } };
   expect(branchLoadingSelector(loadingState)).toBe(true);
+});
+
+test('branchLoadingByUnionSelector should return loadingBranchesByUnion from state', () => {
+  expect(branchLoadingByUnionSelector(initialState)).toEqual(initialState.branch.loadingBranchesByUnion);
+});
+
+test('branchLoadingByUnionSelector should return true when loadingBranchesByUnion', () => {
+  const loadingState = { branch: { ...mainInitialState, loadingBranchesByUnion: true } };
+  expect(branchLoadingByUnionSelector(loadingState)).toBe(true);
 });
 
 test('branchErrorSelector should return error when present', () => {

@@ -28,6 +28,11 @@ jest.mock('../../../../store/region/actions', () => ({
   fetchSubVillagesRequest: (payload: any) => mockFetchSubVillagesRequest(payload)
 }));
 
+const mockFetchBranchesByUnionRequest = jest.fn((payload: any) => ({ type: 'FETCH_BRANCHES_BY_UNION_REQUEST', payload }));
+jest.mock('../../../../store/branch/actions', () => ({
+  fetchBranchesByUnionRequest: (payload: any) => mockFetchBranchesByUnionRequest(payload)
+}));
+
 jest.mock('../../../formFields/SelectInput', () => ({
   __esModule: true,
   default: ({ label }: any) => <div data-testid="select-input">{label}</div>
@@ -44,9 +49,11 @@ const defaultInitialValues = {
   ]
 };
 
+const shastiyaKormiRole = 'SHASTIYA_KORMI';
 const defaultProps = {
   index: 0,
   name: 'users[0]',
+  spiceRoleList: [] as { name?: string }[],
   isHF: false,
   isEdit: false,
   isProfile: false,
@@ -175,10 +182,11 @@ describe('DynamicCHForm', () => {
     expect(screen.getByText('Existing Villages')).toBeInTheDocument();
   });
 
-  it('dispatches fetchSubVillagesRequest when there is exactly one village option (auto-fill case)', () => {
+  it('dispatches fetchSubVillagesRequest and fetchBranchesByUnionRequest when there is exactly one village option and Shastiya Kormi role is selected', () => {
     const oneVillage = [{ id: 42, name: 'Single Village' }];
     renderWithForm(
       {
+        spiceRoleList: [{ name: shastiyaKormiRole }],
         villages: [oneVillage] as any,
         autoFetched: [false],
         isEdit: false,
@@ -190,9 +198,12 @@ describe('DynamicCHForm', () => {
     expect(mockFetchSubVillagesRequest).toHaveBeenCalledWith(
       expect.objectContaining({ villageIds: [42] })
     );
+    expect(mockFetchBranchesByUnionRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ unionIds: [42] })
+    );
   });
 
-  it('in edit mode on mount fetches sub-villages for selectedVillages from form values', () => {
+  it('in edit mode on mount fetches sub-villages and branches by union for selectedVillages when Shastiya Kormi is selected', () => {
     const initialValues = {
       users: [
         {
@@ -203,17 +214,34 @@ describe('DynamicCHForm', () => {
         }
       ]
     };
-    renderWithForm({ isEdit: true }, initialValues);
+    renderWithForm({ isEdit: true, spiceRoleList: [{ name: shastiyaKormiRole }] }, initialValues);
     expect(mockFetchSubVillagesRequest).toHaveBeenCalledTimes(1);
     expect(mockFetchSubVillagesRequest).toHaveBeenCalledWith(
       expect.objectContaining({ villageIds: [10, 20] })
     );
+    expect(mockFetchBranchesByUnionRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ unionIds: [10, 20] })
+    );
   });
 
-  it('in edit mode does not dispatch fetchSubVillagesRequest when selectedVillages is empty', () => {
+  it('in edit mode does not dispatch fetchSubVillagesRequest or fetchBranchesByUnionRequest when selectedVillages is empty', () => {
     mockFetchSubVillagesRequest.mockClear();
-    renderWithForm({ isEdit: true }, defaultInitialValues);
+    mockFetchBranchesByUnionRequest.mockClear();
+    renderWithForm({ isEdit: true, spiceRoleList: [{ name: shastiyaKormiRole }] }, defaultInitialValues);
     expect(mockFetchSubVillagesRequest).not.toHaveBeenCalled();
+    expect(mockFetchBranchesByUnionRequest).not.toHaveBeenCalled();
+  });
+
+  it('does not dispatch fetchSubVillagesRequest or fetchBranchesByUnionRequest when Shastiya Kormi role is not selected', () => {
+    mockFetchSubVillagesRequest.mockClear();
+    mockFetchBranchesByUnionRequest.mockClear();
+    const oneVillage = [{ id: 42, name: 'Single Village' }];
+    renderWithForm(
+      { spiceRoleList: [], villages: [oneVillage] as any, autoFetched: [false], isEdit: false, isHF: false },
+      defaultInitialValues
+    );
+    expect(mockFetchSubVillagesRequest).not.toHaveBeenCalled();
+    expect(mockFetchBranchesByUnionRequest).not.toHaveBeenCalled();
   });
 
   it('renders Assigned Villages when isHFCreate is true and form has healthFacility.linkedVillages', () => {

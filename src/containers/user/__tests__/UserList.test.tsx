@@ -422,6 +422,36 @@ describe('UserList Component', () => {
       });
     });
 
+    it('should dispatch clearBranchesByUnion when Add User button is clicked', async () => {
+      const localStore = mockStore({
+        user: {
+          user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
+        },
+        healthFacility: {
+          healthFacilityUserList: [mockIHFUserGet],
+          healthFacilityList: [],
+          hfTotal: 0,
+          peerSupervisorList: { list: [] },
+          hfUserDetailLoading: false,
+          hfUsersLoading: false,
+          loading: false,
+          peerSupervisorLoading: false
+        },
+        common: { labelName: null }
+      });
+
+      renderComponent(localStore);
+      const addButton = screen.getByText('Add User');
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        expect(localStore.getActions().some((a: any) => a.type === 'CLEAR_BRANCHES_BY_UNION')).toBe(true);
+      });
+    });
+
     it('should handle successful user creation', async () => {
       const localStore = mockStore({
         user: { 

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { fetchBranchList, createBranch, updateBranch, fetchBranchById } from '../branchAPI';
+import { fetchBranchList, createBranch, updateBranch, fetchBranchById, fetchBranchesByUnions } from '../branchAPI';
 
 describe('Branch API', () => {
   let mockAxios: MockAdapter;
@@ -89,5 +89,17 @@ describe('Branch API', () => {
     expect(mockAxios.history.get.length).toBe(1);
     expect(mockAxios.history.get[0].url).toBe(`/admin-service/branch/${branchId}`);
     expect(mockAxios.history.get[0].method).toBe('get');
+  });
+
+  it('fetchBranchesByUnions sends a POST request to /admin-service/branch/list-by-unions with unionIds', async () => {
+    const unionIds = [1, 2, 3];
+    mockAxios.onPost('/admin-service/branch/list-by-unions').reply(200, {});
+
+    await fetchBranchesByUnions(unionIds);
+
+    expect(mockAxios.history.post.length).toBe(1);
+    expect(mockAxios.history.post[0].url).toBe('/admin-service/branch/list-by-unions');
+    expect(mockAxios.history.post[0].method).toBe('post');
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ unionIds });
   });
 });

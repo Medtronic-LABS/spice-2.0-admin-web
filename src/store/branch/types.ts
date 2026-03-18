@@ -33,8 +33,10 @@ export interface IUpdateBranchRequestPayload extends ICreateBranchRequestPayload
 
 export interface IBranchState {
   branches: IBranch[];
+  branchesByUnion: IBranch[];
   branchSummary: IBranch | null;
   loading: boolean;
+  loadingBranchesByUnion: boolean;
   totalCount: number;
   error: string | null | Error;
 }
@@ -132,6 +134,27 @@ export interface IClearBranchSummary {
   type: typeof ACTION_TYPES.CLEAR_BRANCH_SUMMARY;
 }
 
+export interface IFetchBranchesByUnionRequest {
+  type: typeof ACTION_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST;
+  unionIds: number[];
+  successCb?: (branches: IBranch[]) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchBranchesByUnionSuccess {
+  type: typeof ACTION_TYPES.FETCH_BRANCHES_BY_UNION_SUCCESS;
+  payload: IBranch[];
+}
+
+export interface IFetchBranchesByUnionFailure {
+  type: typeof ACTION_TYPES.FETCH_BRANCHES_BY_UNION_FAILURE;
+  error: Error;
+}
+
+export interface IClearBranchesByUnion {
+  type: typeof ACTION_TYPES.CLEAR_BRANCHES_BY_UNION;
+}
+
 export type BranchActions =
   | IFetchBranchListRequest
   | IFetchBranchListSuccess
@@ -147,4 +170,8 @@ export type BranchActions =
   | IFetchBranchSummarySuccess
   | IFetchBranchSummaryFailure
   | ISetBranchSummary
-  | IClearBranchSummary;
+  | IClearBranchSummary
+  | IFetchBranchesByUnionRequest
+  | IFetchBranchesByUnionSuccess
+  | IFetchBranchesByUnionFailure
+  | IClearBranchesByUnion;

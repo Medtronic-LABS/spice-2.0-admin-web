@@ -483,6 +483,70 @@ describe('formatObjectUtils', () => {
       expect(result[0].timezone).toEqual({ id: 1, name: 'UTC' });
       expect(result[0].designation).toEqual({ id: 1, name: 'Doctor' });
     });
+
+    it('should include branches as array of ids when user has branches', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        branches: [
+          { id: 10, name: 'Branch A' },
+          { id: 20, name: 'Branch B' }
+        ]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].branches).toEqual([10, 20]);
+    });
+
+    it('should normalize single branch object to array and map to id', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        branches: { id: 5, name: 'Branch Single' }
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].branches).toEqual([5]);
+    });
+
+    it('should filter out invalid branch entries (missing id or non-numeric id)', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        branches: [
+          { id: 1, name: 'Valid' },
+          { id: 'invalid' as any, name: 'Invalid' },
+          null,
+          { name: 'NoId' },
+          { id: 2, name: 'Valid2' }
+        ]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].branches).toEqual([1, 2]);
+    });
+
+    it('should set branches to empty array when user has no branches', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].branches).toEqual([]);
+    });
   });
 
   describe('formatHealthFacility', () => {

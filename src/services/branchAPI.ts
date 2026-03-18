@@ -31,3 +31,10 @@ export const fetchBranchById = (branchId: number) =>
     method: 'GET',
     url: `/admin-service/branch/${branchId}`
   });
+
+export const fetchBranchesByUnions = (unionIds: number[]) =>
+  axios({
+    method: 'POST',
+    url: '/admin-service/branch/list-by-unions',
+    data: { unionIds }
+  });

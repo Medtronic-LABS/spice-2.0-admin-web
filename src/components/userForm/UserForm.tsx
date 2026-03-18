@@ -74,6 +74,7 @@ import TextInput from '../formFields/TextInput';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
+import BranchTaggingFields from './userConditionalFields/BranchTaggingFields';
 import useUserFormUtils, { filterRolesByAppTypeFn, isVillageBasedRoleSelection } from './userFormUtils';
 import AssignSSUsersSection from './AssignSSUsersSection';
 
@@ -1775,6 +1776,7 @@ const UserForm = ({
                   index={index}
                   form={form}
                   name={name}
+                  spiceRoleList={spiceRoleList}
                   isHF={isHF}
                   isEdit={isEdit}
                   isProfile={isProfile}
@@ -1791,6 +1793,13 @@ const UserForm = ({
                   isHFCreate={isHFCreate}
                   showVillages={showVillage[index]}
                 />
+                {isShastiyaKormiSelected && (
+                  <BranchTaggingFields
+                    name={name}
+                    isError={isError}
+                    isHFCreate={isHFCreate}
+                  />
+                )}
                 <SiteUserForm
                   isAdminForm={isAdminForm}
                   isCHW={isActivating}

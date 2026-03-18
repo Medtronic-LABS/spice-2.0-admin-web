@@ -68,6 +68,7 @@ import Radio from '../../components/formFields/Radio';
 import { Field } from 'react-final-form';
 import './UserList.scss';
 import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
+import { clearBranchesByUnion } from '../../store/branch/actions';
 
 export interface IMatchParams {
   tenantId: string;
@@ -378,6 +379,7 @@ const UserList = (): React.ReactElement => {
   const handleAddUserClick = () => {
     userForEdit.current = { users: [] as IHFUserGet[] };
     setIsOpenUserModal({ isOpen: true, isEdit: false });
+    dispatch(clearBranchesByUnion());
   };
 
   /**

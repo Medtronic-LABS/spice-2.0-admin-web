@@ -355,6 +355,13 @@ describe('HealthFacilitySummary', () => {
       expect(addUserModals.some((m) => m.show === true)).toBe(true);
     });
 
+    it('dispatches clearBranchesByUnion when Add User button is clicked', () => {
+      renderComponent();
+      const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');
+      fireEvent.click(addUserButton!);
+      expect(store.getActions().some((a: any) => a.type === 'CLEAR_BRANCHES_BY_UNION')).toBe(true);
+    });
+
     it('closes Add User modal when handleCancel is called', async () => {
       renderComponent();
       const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');

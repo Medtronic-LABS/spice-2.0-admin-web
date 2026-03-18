@@ -6,14 +6,16 @@ import {
   IFetchBranchListRequest,
   ICreateBranchRequest,
   IUpdateBranchRequest,
-  IFetchBranchSummaryRequest
+  IFetchBranchSummaryRequest,
+  IFetchBranchesByUnionRequest
 } from './types';
 import * as branchActions from './actions';
 import {
   FETCH_BRANCH_LIST_REQUEST,
   CREATE_BRANCH_REQUEST,
   UPDATE_BRANCH_REQUEST,
-  FETCH_BRANCH_SUMMARY_REQUEST
+  FETCH_BRANCH_SUMMARY_REQUEST,
+  FETCH_BRANCHES_BY_UNION_REQUEST
 } from './actionTypes';
 
 /**
@@ -88,11 +90,35 @@ export function* fetchBranchSummarySaga({
   }
 }
 
+/**
+ * Worker saga: fetches branches by unions via POST /admin-service/branch/list-by-unions
+ */
+export function* fetchBranchesByUnionSaga({
+  unionIds,
+  successCb,
+  failureCb
+}: IFetchBranchesByUnionRequest): SagaIterator {
+  try {
+    const {
+      data: { entityList }
+    } = yield call(branchService.fetchBranchesByUnions as any, unionIds);
+    const branches = entityList ?? [];
+    successCb?.(branches);
+    yield put(branchActions.fetchBranchesByUnionSuccess(branches));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(branchActions.fetchBranchesByUnionFailure(e));
+    }
+  }
+}
+
 function* branchSaga(): SagaIterator {
   yield takeLatest(FETCH_BRANCH_LIST_REQUEST, fetchBranchListSaga);
   yield takeLatest(CREATE_BRANCH_REQUEST, createBranchSaga);
   yield takeLatest(UPDATE_BRANCH_REQUEST, updateBranchSaga);
   yield takeLatest(FETCH_BRANCH_SUMMARY_REQUEST, fetchBranchSummarySaga);
+  yield takeLatest(FETCH_BRANCHES_BY_UNION_REQUEST, fetchBranchesByUnionSaga);
 }
 
 export default branchSaga;
