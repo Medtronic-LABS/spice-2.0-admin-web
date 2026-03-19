@@ -671,6 +671,51 @@ describe('formatObjectUtils', () => {
       ]);
     });
 
+    it('should include id in payload when item has an id (edit flow)', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        {
+          id: 42,
+          ssId: { id: 1, name: 'SS01' },
+          name: 'Existing User',
+          phoneNumber: '+9876543210',
+          subVillages: [{ id: 5 }]
+        }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result).toEqual([
+        {
+          id: 42,
+          name: 'Existing User',
+          phoneNumber: '+9876543210',
+          ssId: 'SS01',
+          subVillageIds: ['5']
+        }
+      ]);
+    });
+
+    it('should not include id in payload when item has no id (create flow)', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        {
+          ssId: { id: 1, name: 'SS01' },
+          name: 'New User',
+          phoneNumber: '+1111111111',
+          subVillages: []
+        }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result[0]).not.toHaveProperty('id');
+    });
+
+    it('should handle mixed items with and without id', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { id: 10, ssId: { id: 1, name: 'SS01' }, name: 'Existing', phoneNumber: '+1', subVillages: [] },
+        { ssId: { id: 2, name: 'SS02' }, name: 'New', phoneNumber: '+2', subVillages: [] }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result[0].id).toBe(10);
+      expect(result[1]).not.toHaveProperty('id');
+    });
+
     it('should handle multiple SS users', () => {
       const ssUsers: ISSUserInputItem[] = [
         { ssId: { id: 1, name: 'SS01' }, name: 'User 1', phoneNumber: '+1', subVillages: [{ id: 1 }] },

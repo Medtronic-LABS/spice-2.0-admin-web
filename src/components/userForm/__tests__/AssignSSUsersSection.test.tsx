@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { Form } from 'react-final-form';
+import { Form, useForm } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import AssignSSUsersSection, { DEFAULT_SS_USER_ROW } from '../AssignSSUsersSection';
 
@@ -95,12 +95,29 @@ const initialValuesWithoutShastiyaKormi = {
   ]
 };
 
+const FormValuesProbe = () => {
+  const form = useForm();
+  const values = form.getState().values ?? {};
+  const firstSSUser = (values as any).ssUsers?.[0] ?? {};
+
+  return (
+    <div data-testid="form-values-probe">
+      <span data-testid="first-ss-user-id">{firstSSUser.id ?? ''}</span>
+    </div>
+  );
+};
+
 const renderWithForm = (
   initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi
 ) => {
   return render(
     <Form onSubmit={() => {}} initialValues={initialValues} mutators={{ ...arrayMutators }}>
-      {() => <AssignSSUsersSection />}
+      {() => (
+        <>
+          <AssignSSUsersSection />
+          <FormValuesProbe />
+        </>
+      )}
     </Form>
   );
 };
@@ -313,6 +330,7 @@ describe('AssignSSUsersSection', () => {
       defaultMockState.healthFacility.shasthyaShebikaByKormiId = {
         '100': [
           {
+            id: 555,
             ssId: 'SS01',
             name: 'Test SS User',
             phoneNumber: '+1234567890',
@@ -326,6 +344,7 @@ describe('AssignSSUsersSection', () => {
       };
       expect(() => renderWithForm(initialValues)).not.toThrow();
       expect(screen.getByText('Assign Shasthya Shebika Users')).toBeInTheDocument();
+      expect(screen.getByTestId('first-ss-user-id').textContent).toBe('555');
     });
   });
 });

@@ -283,6 +283,7 @@ export const getAdminPayload = ({
  * SS user item as received from API/form (with nested ssId and subVillage objects).
  */
 export interface ISSUserInputItem {
+  id?: number;
   ssId?: { id?: number; name?: string; [key: string]: any };
   name?: string;
   phoneNumber?: string;
@@ -293,6 +294,7 @@ export interface ISSUserInputItem {
  * SS user payload item as required by API (flat ssId string and subVillageIds string array).
  */
 export interface ISSUserPayloadItem {
+  id?: number;
   name: string;
   phoneNumber: string;
   ssId: string;
@@ -306,16 +308,29 @@ export interface ISSUserPayloadItem {
  * @param ssUsers - Array of SS user objects with nested ssId and subVillage
  * @returns Array of payload objects with name, phoneNumber, ssId (string), subVillageIds (string[])
  */
-export const getSSUsersPayload = (ssUsers: ISSUserInputItem[]): ISSUserPayloadItem[] => {
+export const getSSUsersPayload = (
+  ssUsers: ISSUserInputItem[]
+): ISSUserPayloadItem[] => {
   if (!Array.isArray(ssUsers)) {
     return [];
   }
-  return ssUsers.map((item) => ({
-    name: item.name ?? '',
-    phoneNumber: item.phoneNumber ?? '',
-    ssId: item.ssId?.name ?? '',
-    subVillageIds: (item.subVillages ?? []).map((sv) => String(sv.id ?? ''))
-  }));
+
+  return ssUsers.map((item) => {
+    const mappedSSUser: ISSUserPayloadItem = {
+      name: item.name ?? '',
+      phoneNumber: item.phoneNumber ?? '',
+      ssId: item.ssId?.name ?? '',
+      subVillageIds: (item.subVillages ?? []).map((sv) =>
+        String(sv.id ?? '')
+      ),
+    };
+
+    if (item.id != null) {
+      mappedSSUser.id = item.id;
+    }
+
+    return mappedSSUser;
+  });
 };
 
 const toPositionCount = (v: string | number | null | undefined): number | null => {

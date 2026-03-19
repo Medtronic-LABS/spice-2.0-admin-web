@@ -29,7 +29,7 @@ const hasShastiyaKormiRole = (role: any): boolean => {
 
 /** Map API SS user item to form row shape */
 const mapApiSSUserToFormRow = (
-  item: { name?: string; phoneNumber?: string; ssId?: string; subVillages?: any[] },
+  item: { id?: number, name?: string; phoneNumber?: string; ssId?: string; subVillages?: any[] },
   ssPrefixList: ISSPrefix[]
 ) => {
   const ssIdOption =
@@ -37,6 +37,7 @@ const mapApiSSUserToFormRow = (
       ? ssPrefixList.find((opt) => opt.name === item.ssId) ?? null
       : null;
   return {
+    id: item.id,
     ssId: ssIdOption,
     name: item.name ?? '',
     phoneNumber: item.phoneNumber ?? '',
