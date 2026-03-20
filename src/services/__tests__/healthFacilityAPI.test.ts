@@ -358,17 +358,17 @@ describe('Health Facility APIs', () => {
     });
   });
 
-  it('fetchVillagesListfromHF sends a POST request to /admin-service/healthfacility/unlinked-villages-list with correct data', async () => {
+  it('fetchVillagesListfromHF sends a POST request to /admin-service/healthfacility/villages-list with correct data', async () => {
     const userId = 1;
     const tenantIds = [1];
     const appTypes = ['NON_COMMUNITY'];
 
-    mockAxios.onPost('/admin-service/healthfacility/unlinked-villages-list').reply(200, {});
+    mockAxios.onPost('/admin-service/healthfacility/villages-list').reply(200, {});
 
     await fetchVillagesListfromHF(tenantIds, userId, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
-    expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility/unlinked-villages-list');
+    expect(mockAxios.history.post[0].url).toBe('/admin-service/healthfacility/villages-list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       tenantIds,
       userId,

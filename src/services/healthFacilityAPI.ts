@@ -195,7 +195,7 @@ export const fetchUnlinkedVillagesAPI = (
 
 export const fetchVillagesListfromHF = (tenantIds: number[], userId: number, appTypes: string[]) =>
   axios({
-    url: '/admin-service/healthfacility/unlinked-villages-list',
+    url: '/admin-service/healthfacility/villages-list',
     method: 'POST',
     data: { tenantIds, userId, appTypes }
   });
