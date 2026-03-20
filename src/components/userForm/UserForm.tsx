@@ -77,6 +77,7 @@ import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import BranchTaggingFields from './userConditionalFields/BranchTaggingFields';
 import useUserFormUtils, { filterRolesByAppTypeFn, isVillageBasedRoleSelection } from './userFormUtils';
 import AssignSSUsersSection from './AssignSSUsersSection';
+import { clearBranchesByUnion } from '../../store/branch/actions';
 
 export interface IUserFormValues {
   email: string;
@@ -1682,6 +1683,14 @@ const UserForm = ({
                             isModel={true}
                             disabled={isProfile}
                             onChange={(hf: IHealthFacility) => {
+                              form.change(`${formName}[${index}].villages`, []);
+                              form.change(`${formName}[${index}].selectedVillages`, []);
+                              form.change(`${formName}[${index}].branches`, []);
+                              setVillages((prevVillages) => {
+                                const updatedVillages = [...prevVillages];
+                                updatedVillages[index] = [];
+                                return updatedVillages;
+                              });
                               if (!autoFetched[index]) {
                                 emailDisabledFn('', index, false);
                               }
@@ -1702,6 +1711,7 @@ const UserForm = ({
                               }
 
                               input.onChange(hf);
+                              dispatch(clearBranchesByUnion());
                             }}
                           />
                         );

@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
 import UserForm from '../UserForm';
+import { clearBranchesByUnion } from '../../../store/branch/actions';
 
 const mockStore = configureStore([]);
 
@@ -156,6 +157,15 @@ jest.mock('../../formFields/SelectInput', () => ({
   default: (props: any) => (
     <div data-testid="select-input">
       <label>{props.label}</label>
+      {typeof props.onChange === 'function' && (
+        <button
+          type="button"
+          data-testid={`select-trigger-${(props.label || '').replace(/\s/g, '-')}`}
+          onClick={() => props.onChange({ id: 101, tenantId: 202, name: 'HF A' })}
+        >
+          trigger-change
+        </button>
+      )}
     </div>
   )
 }));
@@ -426,6 +436,33 @@ describe('UserForm', () => {
         userFormParams: { ...defaultProps.userFormParams, isEdit: true }
       });
       expect(screen.getByTestId('assign-ss-users-section')).toBeInTheDocument();
+    });
+
+    it('dispatches clearBranchesByUnion when assigned health facility changes', async () => {
+      const store = mockStore(defaultStoreState);
+      render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <Form onSubmit={() => {}} mutators={{ ...arrayMutators }}>
+              {({ form }) => (
+                <UserForm
+                  {...defaultProps}
+                  form={form}
+                  isPeerSupervisor={true}
+                  userFormParams={{ ...defaultProps.userFormParams, isEdit: true }}
+                  isEdit={true}
+                />
+              )}
+            </Form>
+          </MemoryRouter>
+        </Provider>
+      );
+
+      fireEvent.click(screen.getByTestId('select-trigger-Assigned-Health-Facility'));
+
+      await waitFor(() => {
+        expect(store.getActions()).toEqual(expect.arrayContaining([expect.objectContaining(clearBranchesByUnion())]));
+      });
     });
   });
 
