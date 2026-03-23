@@ -46,27 +46,31 @@ const BranchForm = ({ form, formName = 'branch', isEdit = false }: IBranchFormPr
 
   const handleDistrictChange = (value: IDistrict | null) => {
     if (value?.tenantId != null) {
+      hasFetchedChiefdomForDistrictRef.current = true;
       dispatch(fetchChiefdomDropdownRequest({ tenantId: String(value.tenantId) }));
-    }
-  };
-
-  /**
-   * Edit flow: fetch chiefdom dropdown only once when modal opens in edit mode with formName.district.tenantId
-   */
-  const districtTenantId = form.getState().values?.[formName]?.district?.tenantId ?? null;
-  const hasFetchedChiefdomForEditRef = useRef(false);
-
-  useEffect(() => {
-    if (!isEdit) {
-      hasFetchedChiefdomForEditRef.current = false;
       return;
     }
 
-    if (!hasFetchedChiefdomForEditRef.current && districtTenantId != null) {
-      hasFetchedChiefdomForEditRef.current = true;
+    hasFetchedChiefdomForDistrictRef.current = false;
+  };
+
+  /**
+   * Fetch chiefdom dropdown when district tenant is available (supports edit + add auto-select flows)
+   */
+  const districtTenantId = form.getState().values?.[formName]?.district?.tenantId ?? null;
+  const hasFetchedChiefdomForDistrictRef = useRef(false);
+
+  useEffect(() => {
+    if (districtTenantId == null) {
+      hasFetchedChiefdomForDistrictRef.current = false;
+      return;
+    }
+
+    if (!hasFetchedChiefdomForDistrictRef.current) {
+      hasFetchedChiefdomForDistrictRef.current = true;
       dispatch(fetchChiefdomDropdownRequest({ tenantId: String(districtTenantId) }));
     }
-  }, [isEdit, districtTenantId, dispatch]);
+  }, [districtTenantId, dispatch]);
 
   return (
     <div className='row gx-1dot25'>

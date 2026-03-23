@@ -91,6 +91,7 @@ describe('BranchForm', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    store.clearActions();
   });
 
   it('renders all form fields', () => {
@@ -213,9 +214,9 @@ describe('BranchForm', () => {
     expect(screen.getByText('District')).toBeInTheDocument();
   });
 
-  it('dispatches fetchChiefdomDropdownRequest on mount when isEdit is true and district has tenantId', () => {
+  it('dispatches fetchChiefdomDropdownRequest on mount when district has tenantId', () => {
     renderWithForm(
-      { isEdit: true },
+      { isEdit: false },
       { branch: { district: { id: 1, name: 'District A', tenantId: 100 } } }
     );
     const actions = store.getActions();
@@ -223,6 +224,19 @@ describe('BranchForm', () => {
       expect.objectContaining({
         type: 'FETCH_CHIEFDOM_DROPDOWN_REQUEST',
         payload: { tenantId: '100' }
+      })
+    );
+  });
+
+  it('does not dispatch fetchChiefdomDropdownRequest on mount when district tenantId is missing', () => {
+    renderWithForm(
+      { isEdit: true },
+      { branch: { district: { id: 1, name: 'District A' } } }
+    );
+    const actions = store.getActions();
+    expect(actions).not.toContainEqual(
+      expect.objectContaining({
+        type: 'FETCH_CHIEFDOM_DROPDOWN_REQUEST'
       })
     );
   });
