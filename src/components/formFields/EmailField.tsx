@@ -115,8 +115,8 @@ const EmailField = forwardRef(
           let smallestDuplicateIndex: number = -1;
           const users = form?.getState().values[formName];
           let count = 0;
-          users.forEach(({ username }: IHFUserGet, i: number) => {
-            if (username.toLowerCase() === (value || '').toLowerCase()) {
+          users.forEach(({ email }: IHFUserGet, i: number) => {
+            if (email.toLowerCase() === (value || '').toLowerCase()) {
               if (smallestDuplicateIndex < 0) {
                 smallestDuplicateIndex = i;
               }
@@ -140,13 +140,12 @@ const EmailField = forwardRef(
         const {
           data: { entity: data }
         } = res;
-        if (enableAutoPopulate && data?.username === email) {
-          onFindExistingUser?.(data);
-          setDisabled(true);
-          errorValue.current = '';
+        if (enableAutoPopulate && data?.email === email) {
+          setDisabled(false);
+          errorValue.current = alreadyExistError;
         } else if (!enableAutoPopulate) {
           errorValue.current = data !== null ? alreadyExistError : '';
-        } else if (!data?.username) {
+        } else if (!data?.email) {
           errorValue.current = '';
         }
         setLoading(false);

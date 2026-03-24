@@ -111,7 +111,7 @@ describe('EmailField', () => {
 
   it('shows error when email already exists', async () => {
     (fetchUserByEmail as jest.Mock).mockResolvedValue({
-      data: { entity: { username: 'test@example.com' } }
+      data: { entity: { email: 'test@example.com' } }
     });
 
     renderEmailField();
@@ -149,10 +149,10 @@ describe('EmailField', () => {
     expect(screen.getByTestId('text-input')).toBeInTheDocument();
   });
 
-  it('auto-populates user data when enableAutoPopulate is true', async () => {
+  it('does not auto-populate user data when enableAutoPopulate is true', async () => {
     const mockOnFindExistingUser = jest.fn();
     (fetchUserByEmail as jest.Mock).mockResolvedValue({
-      data: { entity: { username: 'test@example.com' } }
+      data: { entity: { email: 'test@example.com' } }
     });
 
     renderEmailField({
@@ -166,13 +166,13 @@ describe('EmailField', () => {
       fireEvent.blur(input);
     });
 
-    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    expect(mockOnFindExistingUser).not.toHaveBeenCalled();
   });
 
-  it('auto-populates user data when enableAutoPopulate is true', async () => {
+  it('keeps input enabled when existing email is found with enableAutoPopulate true', async () => {
     const mockOnFindExistingUser = jest.fn();
     (fetchUserByEmail as jest.Mock).mockResolvedValue({
-      data: { entity: { username: 'test@example.com' } }
+      data: { entity: { email: 'test@example.com' } }
     });
 
     renderEmailField({
@@ -186,7 +186,11 @@ describe('EmailField', () => {
       fireEvent.blur(input);
     });
 
-    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    await waitFor(() => {
+      const lastCall = mockSelectChildComponent.mock.calls[mockSelectChildComponent.mock.calls.length - 1][0];
+      expect(lastCall.disabled).toBe(false);
+    });
+    expect(mockOnFindExistingUser).not.toHaveBeenCalled();
   });
 
   it('handles resetEmailField ref method correctly', () => {
@@ -221,10 +225,10 @@ describe('EmailField', () => {
     expect(screen.getByTestId('text-input')).toBeInTheDocument();
   });
 
-  it('auto-populates user data when enableAutoPopulate is true and username is empty', async () => {
+  it('clears existing-user error when enableAutoPopulate is true and email is empty', async () => {
     const mockOnFindExistingUser = jest.fn();
     (fetchUserByEmail as jest.Mock).mockResolvedValue({
-      data: { entity: { username: '' } }
+      data: { entity: { email: '' } }
     });
 
     renderEmailField({
@@ -238,7 +242,7 @@ describe('EmailField', () => {
       fireEvent.blur(input);
     });
 
-    expect(screen.getByTestId('text-input')).toBeInTheDocument();
+    expect(mockOnFindExistingUser).not.toHaveBeenCalled();
   });
 
   it('validates email on blur with clearEmail as false', async () => {

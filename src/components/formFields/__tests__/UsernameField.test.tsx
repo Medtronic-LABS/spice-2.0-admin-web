@@ -287,7 +287,7 @@ describe('UsernameField', () => {
   });
 
   describe('Auto-populate Feature', () => {
-    it('auto-populates user data when enableAutoPopulate is true', async () => {
+    it('does not auto-populate user data when enableAutoPopulate is true', async () => {
       const mockOnFindExistingUser = jest.fn();
       mockFetchUserByUsername.mockResolvedValue({
         status: 200,
@@ -308,7 +308,30 @@ describe('UsernameField', () => {
         fireEvent.blur(input);
       });
 
-      expect(screen.getByTestId('text-input')).toBeInTheDocument();
+      expect(mockOnFindExistingUser).not.toHaveBeenCalled();
+    });
+
+    it('keeps username input enabled when existing user is found', async () => {
+      mockFetchUserByUsername.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {},
+        data: { entity: { username: 'existinguser' } }
+      });
+
+      renderUsernameField({ enableAutoPopulate: true });
+
+      const input = screen.getByTestId('input');
+      fireEvent.change(input, { target: { value: 'existinguser' } });
+      await waitFor(() => {
+        fireEvent.blur(input);
+      });
+
+      await waitFor(() => {
+        const lastCall = mockTextInputComponent.mock.calls[mockTextInputComponent.mock.calls.length - 1][0];
+        expect(lastCall.disabled).toBe(false);
+      });
     });
 
     it('does not auto-populate when enableAutoPopulate is false', async () => {

@@ -250,6 +250,7 @@ export interface IHFUserGet {
   gender: string;
   phoneNumber: string;
   username: string;
+  email: string;
   countryCode: string;
   roles: IUserRole[];
   tenantId: number;

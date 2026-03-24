@@ -146,9 +146,8 @@ const UsernameField = forwardRef(
         data: { entity: data }
       } = res;
       if (enableAutoPopulate && data?.username === username) {
-        onFindExistingUser?.(data);
-        setDisabled(true);
-        errorValue.current = '';
+        setDisabled(false);
+        errorValue.current = alreadyExistError;
       } else if (!enableAutoPopulate) {
         errorValue.current = data !== null ? alreadyExistError : '';
       } else if (!data?.username) {
