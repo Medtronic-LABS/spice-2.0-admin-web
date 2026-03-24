@@ -86,7 +86,7 @@ const MyProfile = (): React.ReactElement => {
         : userDetails?.countryCode?.phoneNumberCode;
     const data = [
       { label: 'Name', value: userDetails ? `${userDetails.firstName} ${userDetails.lastName}` : null },
-      { label: 'Email ID', value: userDetails?.username, colClassName: 'col-sm-6 col-lg-8' },
+      { label: 'Email ID', value: userDetails?.email, colClassName: 'col-sm-6 col-lg-8' },
       {
         label: 'Mobile Number',
         value: `${countryCodeStr ? '+' + countryCodeStr : ''} ${
