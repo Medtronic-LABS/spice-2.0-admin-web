@@ -1,11 +1,11 @@
 import styles from './PrivacyPolicy.module.scss';
-import { ReactComponent as Logo } from '../../assets/images/app-logo.svg';
+import Logo from '../../assets/images/app-logo-name.png';
 
 const PrivacyPolicy = () => {
   return (
     <div className={styles.privacyContainer}>
       <div className='container'>
-        <Logo aria-labelledby='Medtronics' className={styles.logo} />
+        <img src={Logo} alt='Medtronics' className={styles.logo} />
         <h1 className={styles.privacyTitle}>Privacy Statement</h1>
         <br />
         <h3 className={styles.privacyHeader}>

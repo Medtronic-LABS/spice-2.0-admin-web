@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { ReactComponent as NavBarLogo } from '../../assets/images/nav-bar-logo.svg';
+import NavBarLogo from '../../assets/images/app-logo-name.png';
 import LogoutIcon from '../../assets/images/power-switch.svg';
 import CaretDownIcon from '../../assets/images/caret-down-grey.svg';
 import UserMenu from './UserMenu';
@@ -61,7 +61,7 @@ export default function Header(): React.ReactElement {
         className={`navbar navbar-expand navbar-light bg-light ps-sm-3dot125 ps-1 pe-sm-1dot5 pe-1 ${styles.appNavbar}`}
       >
         <Link to='/' className={`${styles.navbarLogo} navbar-brand`}>
-          <NavBarLogo aria-labelledby='navbar-logo' className={styles.navBarLogoImg} />
+          <img src={NavBarLogo} alt='navbar-logo' className={styles.navBarLogoImg} />
         </Link>
         <div className={`nav-item dropdown ms-auto`}>
           <div

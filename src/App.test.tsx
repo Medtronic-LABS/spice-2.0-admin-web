@@ -33,10 +33,6 @@ jest.mock('react-ga4', () => ({
   send: jest.fn()
 }));
 
-jest.mock('./assets/images/app-logo.svg', () => ({
-  ReactComponent: () => <div>Logo</div>
-}));
-
 jest.mock('./components/header/Header', () => () => <div data-testid='header'>Mock Header</div>);
 
 jest.mock('./hooks/appTypeBasedConfigs', () => ({

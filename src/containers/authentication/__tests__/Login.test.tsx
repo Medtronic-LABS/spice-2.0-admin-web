@@ -12,10 +12,6 @@ import * as commonUtils from '../../../utils/commonUtils';
 
 const mockStore = configureMockStore([]);
 
-jest.mock('../../../assets/images/app-logo.svg', () => ({
-  ReactComponent: () => <img alt='Logo' />
-}));
-
 jest.mock('../../../utils/toastCenter', () => ({
   __esModule: true,
   default: {
@@ -77,7 +73,7 @@ describe('Login', () => {
 
     it('should contain a logo', () => {
       renderLogin();
-      expect(screen.getByAltText('Logo')).toBeInTheDocument();
+      expect(screen.getByAltText('Medtronic')).toBeInTheDocument();
     });
 
     it('should contain email/username input field', () => {
@@ -684,7 +680,7 @@ describe('Login', () => {
 
     it('should have accessible logo', () => {
       renderLogin();
-      const logo = screen.getByAltText('Logo');
+      const logo = screen.getByAltText('Medtronic');
       expect(logo).toBeInTheDocument();
     });
 

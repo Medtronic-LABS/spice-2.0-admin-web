@@ -1,5 +1,5 @@
 import styles from './Authentication.module.scss';
-import logo from '../../assets/images/app-logo.svg';
+import Logo from '../../assets/images/app-logo-name.png';
 import { Form } from 'react-final-form';
 import ResetPasswordFields, { generatePassword } from './ResetPasswordFields';
 import { Link, RouteComponentProps } from 'react-router-dom';
@@ -114,7 +114,7 @@ const ResetPassword = (props: Props) => {
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <div className={`${styles.brand} text-center`}>
-          <img src={logo} alt='Medtronics' />
+          <img src={Logo} alt='Medtronics' />
         </div>
         <div className={`primary-title text-center ${styles.loginTitle}`}>Reset your password</div>
         <Form

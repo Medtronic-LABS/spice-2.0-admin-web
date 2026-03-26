@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { Link } from 'react-router-dom';
-import { ReactComponent as Logo } from '../../assets/images/app-logo.svg';
+import Logo from '../../assets/images/app-logo-name.png';
 import Checkbox from '../../components/formFields/Checkbox';
 import TextInput from '../../components/formFields/TextInput';
 import { composeValidators, required, validateLoginIdentifier } from '../../utils/validation';
@@ -93,7 +93,7 @@ const Login = (props: any): React.ReactElement => {
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <div className={`${styles.brand} text-center`}>
-          <Logo aria-labelledby='Medtronic' />
+          <img src={Logo} alt='Medtronic' />
         </div>
         <div className='primary-title text-center'>
           <b>Welcome</b>

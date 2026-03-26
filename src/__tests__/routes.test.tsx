@@ -27,10 +27,6 @@ jest.mock('react-leaflet', () => ({
   useMapEvents: jest.fn()
 }));
 
-jest.mock('../../../assets/images/app-logo.svg', () => ({
-  ReactComponent: 'Logo'
-}));
-
 jest.mock('../../../assets/images/admin.svg', () => ({
   ReactComponent: () => <div>AdminPortalLogo</div>
 }));

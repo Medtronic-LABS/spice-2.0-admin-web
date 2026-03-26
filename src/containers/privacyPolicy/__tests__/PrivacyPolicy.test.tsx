@@ -1,11 +1,6 @@
 import { shallow } from 'enzyme';
 import PrivacyPolicy from '../PrivacyPolicy';
 import styles from './PrivacyPolicy.module.scss';
-import { ReactComponent as Logo } from '../../../assets/images/app-logo.svg';
-
-jest.mock('../../../assets/images/app-logo.svg', () => ({
-  ReactComponent: 'Logo'
-}));
 
 describe('PrivacyPolicy', () => {
   let wrapper: any;
@@ -22,10 +17,10 @@ describe('PrivacyPolicy', () => {
     expect(wrapper.find('div.container').length).toBe(1);
   });
 
-  it('should render a Logo component with the correct props', () => {
-    const logo = wrapper.find(Logo);
+  it('should render a logo image with the correct props', () => {
+    const logo = wrapper.find('img[alt="Medtronics"]');
     expect(logo.length).toBe(1);
-    expect(logo.prop('aria-labelledby')).toBe('Medtronics');
+    expect(logo.prop('alt')).toBe('Medtronics');
     expect(logo.prop('className')).toBe(styles.logo);
   });
 
