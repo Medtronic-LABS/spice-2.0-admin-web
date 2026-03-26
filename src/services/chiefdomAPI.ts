@@ -108,7 +108,8 @@ export const fetchChiefdomForDropdown = (params: { tenantId: string }) =>
     url: '/admin-service/chiefdom/all',
     data: {
       tenantId: params.tenantId,
-      isPaginated: false
+      isPaginated: false,
+      searchTerm: ''
     }
   });
 

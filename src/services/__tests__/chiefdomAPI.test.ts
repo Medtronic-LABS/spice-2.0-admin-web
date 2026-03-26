@@ -276,7 +276,8 @@ describe('Chiefdom APIs', () => {
     expect(mockAxios.history.post[0].url).toBe('/admin-service/chiefdom/all');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
       tenantId: params.tenantId,
-      isPaginated: false
+      isPaginated: false,
+      searchTerm: ''
     });
   });
 });
