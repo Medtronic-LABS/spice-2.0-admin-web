@@ -288,6 +288,7 @@ export interface ISSUserInputItem {
   name?: string;
   phoneNumber?: string;
   subVillages?: Array<{ id?: number; [key: string]: any }>;
+  isActive?: boolean;
 }
 
 /**
@@ -299,6 +300,7 @@ export interface ISSUserPayloadItem {
   phoneNumber: string;
   ssId: string;
   subVillageIds: string[];
+  isActive: boolean;
 }
 
 /**
@@ -323,6 +325,7 @@ export const getSSUsersPayload = (
       subVillageIds: (item.subVillages ?? []).map((sv) =>
         String(sv.id ?? '')
       ),
+      isActive: item.isActive ?? true
     };
 
     if (item.id != null) {

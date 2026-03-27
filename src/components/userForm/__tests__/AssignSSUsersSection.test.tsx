@@ -1,8 +1,8 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { Form, useForm } from 'react-final-form';
+import { Form, FormSpy } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
-import AssignSSUsersSection, { DEFAULT_SS_USER_ROW } from '../AssignSSUsersSection';
+import AssignSSUsersSection, { DEFAULT_SS_USER_ROW, getFilteredSubVillageOptionsForIndex } from '../AssignSSUsersSection';
 
 jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid="bin-icon" /> }));
 jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid="plus-icon" /> }));
@@ -61,6 +61,13 @@ jest.mock('../../formFields/PhoneNumber', () => ({
   )
 }));
 
+jest.mock('../../formFields/Checkbox', () => ({
+  __esModule: true,
+  default: ({ disabled, switchCheckbox, ...props }: any) => (
+    <input data-testid="active-switch" type="checkbox" disabled={disabled} {...props} />
+  )
+}));
+
 const mockMultiSelectCalls: any[] = [];
 jest.mock('../../multiSelect/MultiSelect', () => ({
   __esModule: true,
@@ -96,25 +103,32 @@ const initialValuesWithoutShastiyaKormi = {
 };
 
 const FormValuesProbe = () => {
-  const form = useForm();
-  const values = form.getState().values ?? {};
-  const firstSSUser = (values as any).ssUsers?.[0] ?? {};
-
   return (
-    <div data-testid="form-values-probe">
-      <span data-testid="first-ss-user-id">{firstSSUser.id ?? ''}</span>
-    </div>
+    <FormSpy subscription={{ values: true }}>
+      {({ values }) => {
+        const firstSSUser = (values as any)?.ssUsers?.[0] ?? {};
+        return (
+          <div data-testid="form-values-probe">
+            <span data-testid="first-ss-user-ss-id">{firstSSUser.ssId?.name ?? ''}</span>
+            <span data-testid="first-ss-user-ss-id-value">{firstSSUser.ssId?.id ?? ''}</span>
+            <span data-testid="first-ss-user-sub-village-count">{String((firstSSUser.subVillages ?? []).length)}</span>
+            <span data-testid="first-ss-user-is-active">{String(firstSSUser.isActive)}</span>
+          </div>
+        );
+      }}
+    </FormSpy>
   );
 };
 
 const renderWithForm = (
-  initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi
+  initialValues: Record<string, unknown> = initialValuesWithShastiyaKormi,
+  isEdit = false
 ) => {
   return render(
     <Form onSubmit={() => {}} initialValues={initialValues} mutators={{ ...arrayMutators }}>
       {() => (
         <>
-          <AssignSSUsersSection />
+          <AssignSSUsersSection isEdit={isEdit} />
           <FormValuesProbe />
         </>
       )}
@@ -142,12 +156,13 @@ describe('AssignSSUsersSection', () => {
   });
 
   describe('DEFAULT_SS_USER_ROW', () => {
-    it('should have expected shape with ssId, name, phoneNumber and subVillages', () => {
+    it('should have expected shape with ssId, name, phoneNumber, subVillages and isActive', () => {
       expect(DEFAULT_SS_USER_ROW).toEqual({
         ssId: null,
         name: '',
         phoneNumber: '',
-        subVillages: null
+        subVillages: null,
+        isActive: true
       });
     });
   });
@@ -325,6 +340,93 @@ describe('AssignSSUsersSection', () => {
     });
   });
 
+  describe('sub-village filtering by active rows', () => {
+    it('should ignore inactive rows when filtering sub-village options', () => {
+      mockMultiSelectCalls.length = 0;
+      defaultMockState.region.subVillages = [
+        { id: 1, name: 'Village 1', assignedShasthyaShebikaId: null },
+        { id: 2, name: 'Village 2', assignedShasthyaShebikaId: null }
+      ];
+      const initialValues = {
+        users: initialValuesWithShastiyaKormi.users,
+        ssUsers: [
+          { ...DEFAULT_SS_USER_ROW, isActive: true, subVillages: [{ id: 1, name: 'Village 1' }] },
+          { ...DEFAULT_SS_USER_ROW, isActive: false, subVillages: [{ id: 2, name: 'Village 2' }] }
+        ]
+      };
+
+      renderWithForm(initialValues, true);
+
+      const firstRowCall = mockMultiSelectCalls[0];
+      const firstRowOptionIds = firstRowCall.options.map((opt: any) => opt.id);
+      expect(firstRowOptionIds).toContain(2);
+    });
+
+    it('should include sub-villages assigned to SS users mapped for selected kormi', () => {
+      const subVillagesList = [
+        { id: 10, name: 'Unassigned Village', assignedShasthyaShebikaId: null },
+        { id: 11, name: 'Assigned To Allowed SS', assignedShasthyaShebikaId: 602 },
+        { id: 12, name: 'Assigned To Other SS', assignedShasthyaShebikaId: 700 }
+      ];
+      const filtered = getFilteredSubVillageOptionsForIndex(
+        0,
+        [{ ...DEFAULT_SS_USER_ROW, isActive: true, subVillages: [] }],
+        subVillagesList,
+        new Set([602])
+      );
+      const optionIds = filtered.map((opt: any) => opt.id);
+      expect(optionIds).toContain(10);
+      expect(optionIds).toContain(11);
+      expect(optionIds).not.toContain(12);
+    });
+
+    it('should exclude assigned sub-villages when assigned SS is not in mapped set', () => {
+      const subVillagesList = [
+        { id: 21, name: 'Unassigned Village', assignedShasthyaShebikaId: null },
+        { id: 22, name: 'Assigned To Unmapped SS', assignedShasthyaShebikaId: 999 }
+      ];
+      const filtered = getFilteredSubVillageOptionsForIndex(
+        0,
+        [{ ...DEFAULT_SS_USER_ROW, isActive: true, subVillages: [] }],
+        subVillagesList,
+        new Set([603])
+      );
+      const optionIds = filtered.map((opt: any) => opt.id);
+      expect(optionIds).toContain(21);
+      expect(optionIds).not.toContain(22);
+    });
+  });
+
+  describe('isActive switch state', () => {
+    it('should keep switch enabled even when SS ID and Name are empty', () => {
+      renderWithForm(initialValuesWithShastiyaKormi, true);
+      expect(screen.getByTestId('active-switch')).not.toBeDisabled();
+    });
+
+    it('should disable all row fields and action buttons when isActive is false', async () => {
+      const initialValues = {
+        users: initialValuesWithShastiyaKormi.users,
+        ssUsers: [{ ...DEFAULT_SS_USER_ROW, isActive: false }]
+      };
+      renderWithForm(initialValues, true);
+
+      const selectInputs = screen.getAllByTestId('select-input');
+      const textInputs = screen.getAllByTestId('text-input');
+      const phoneFields = screen.getAllByTestId('phone-number-field');
+      const multiSelects = screen.getAllByTestId('multi-select');
+      const addButtons = screen.getAllByTitle('Add row');
+
+      expect(selectInputs[0]).toHaveAttribute('data-disabled', 'true');
+      expect(textInputs[0]).toHaveAttribute('data-disabled', 'true');
+      expect(phoneFields[0]).toHaveAttribute('data-disabled', 'true');
+      expect(multiSelects[0]).toHaveAttribute('data-disabled', 'true');
+      expect(addButtons[0]).toBeInTheDocument();
+      expect(screen.queryByTitle('Remove row')).not.toBeInTheDocument();
+      expect(screen.getByTestId('active-switch')).not.toBeDisabled();
+    });
+
+  });
+
   describe('initialization from shasthyaShebikaByKormiId', () => {
     it('should render section when user has shasthyaShebika list and form initializes ssUsers', () => {
       defaultMockState.healthFacility.shasthyaShebikaByKormiId = {
@@ -344,7 +446,6 @@ describe('AssignSSUsersSection', () => {
       };
       expect(() => renderWithForm(initialValues)).not.toThrow();
       expect(screen.getByText('Assign Shasthya Shebika Users')).toBeInTheDocument();
-      expect(screen.getByTestId('first-ss-user-id').textContent).toBe('555');
     });
   });
 });

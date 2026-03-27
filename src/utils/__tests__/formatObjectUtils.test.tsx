@@ -666,7 +666,8 @@ describe('formatObjectUtils', () => {
           name: 'SS User One',
           phoneNumber: '+1234567890',
           ssId: 'SS01',
-          subVillageIds: ['10', '20']
+          subVillageIds: ['10', '20'],
+          isActive: true
         }
       ]);
     });
@@ -688,7 +689,8 @@ describe('formatObjectUtils', () => {
           name: 'Existing User',
           phoneNumber: '+9876543210',
           ssId: 'SS01',
-          subVillageIds: ['5']
+          subVillageIds: ['5'],
+          isActive: true
         }
       ]);
     });
@@ -723,8 +725,8 @@ describe('formatObjectUtils', () => {
       ];
       const result = getSSUsersPayload(ssUsers);
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ name: 'User 1', phoneNumber: '+1', ssId: 'SS01', subVillageIds: ['1'] });
-      expect(result[1]).toEqual({ name: 'User 2', phoneNumber: '+2', ssId: 'SS02', subVillageIds: ['2', '3'] });
+      expect(result[0]).toEqual({ name: 'User 1', phoneNumber: '+1', ssId: 'SS01', subVillageIds: ['1'], isActive: true });
+      expect(result[1]).toEqual({ name: 'User 2', phoneNumber: '+2', ssId: 'SS02', subVillageIds: ['2', '3'], isActive: true });
     });
 
     it('should default missing fields to empty string or empty array', () => {
@@ -735,7 +737,8 @@ describe('formatObjectUtils', () => {
           name: '',
           phoneNumber: '',
           ssId: '',
-          subVillageIds: []
+          subVillageIds: [],
+          isActive: true
         }
       ]);
     });
@@ -756,7 +759,7 @@ describe('formatObjectUtils', () => {
       expect(result[0].subVillageIds).toEqual(['', '']);
     });
 
-    it('should produce ISSUserPayloadItem shape with name, phoneNumber, ssId string, subVillageIds string[]', () => {
+    it('should produce ISSUserPayloadItem shape with name, phoneNumber, ssId string, subVillageIds string[] and isActive boolean', () => {
       const ssUsers: ISSUserInputItem[] = [
         { ssId: { id: 1, name: 'SS01' }, name: 'A', phoneNumber: '1', subVillages: [{ id: 100 }] }
       ];
@@ -767,6 +770,15 @@ describe('formatObjectUtils', () => {
       expect(typeof item.ssId).toBe('string');
       expect(Array.isArray(item.subVillageIds)).toBe(true);
       expect(item.subVillageIds.every((id) => typeof id === 'string')).toBe(true);
+      expect(typeof item.isActive).toBe('boolean');
+    });
+
+    it('should map isActive from input when provided', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { ssId: { id: 1, name: 'SS01' }, name: 'A', phoneNumber: '1', subVillages: [], isActive: false }
+      ];
+      const result = getSSUsersPayload(ssUsers);
+      expect(result[0].isActive).toBe(false);
     });
   });
 

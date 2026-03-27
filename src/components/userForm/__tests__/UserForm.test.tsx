@@ -467,10 +467,10 @@ describe('UserForm', () => {
   });
 
   describe('AssignSSUsersSection', () => {
-    it('renders AssignSSUsersSection with no isEdit prop (section manages its own state)', () => {
+    it('renders AssignSSUsersSection with isEdit prop from UserForm', () => {
       renderUserForm({ isEdit: true });
       expect(screen.getByTestId('assign-ss-users-section')).toBeInTheDocument();
-      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1]).not.toHaveProperty('isEdit');
+      expect(mockAssignSSUsersSectionCalls[mockAssignSSUsersSectionCalls.length - 1]).toHaveProperty('isEdit', true);
     });
   });
 

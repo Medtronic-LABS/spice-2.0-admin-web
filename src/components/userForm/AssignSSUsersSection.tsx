@@ -11,6 +11,7 @@ import { ssPrefixListSelector, ssPrefixLoadingSelector, shasthyaShebikaByKormiId
 import PhoneNumberField from '../formFields/PhoneNumber';
 import SelectInput from '../formFields/SelectInput';
 import TextInput from '../formFields/TextInput';
+import Checkbox from '../formFields/Checkbox';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { required } from '../../utils/validation';
 import { ISSPrefix } from '../../store/healthFacility/types';
@@ -18,7 +19,7 @@ import { shastiyaKormiRole } from '../../constants/roleConstants';
 import { ISubVillage } from '../../store/region/types';
 
 /** Default row shape for Assign SS Users (used when adding a new row) */
-export const DEFAULT_SS_USER_ROW = { ssId: null, name: '', phoneNumber: '', subVillages: null };
+export const DEFAULT_SS_USER_ROW = { ssId: null, name: '', phoneNumber: '', subVillages: null, isActive: true };
 
 /** SPICE role name that enables the Assign SS Users section */
 const hasShastiyaKormiRole = (role: any): boolean => {
@@ -29,7 +30,7 @@ const hasShastiyaKormiRole = (role: any): boolean => {
 
 /** Map API SS user item to form row shape */
 const mapApiSSUserToFormRow = (
-  item: { id?: number, name?: string; phoneNumber?: string; ssId?: string; subVillages?: any[] },
+  item: { id?: number, name?: string; phoneNumber?: string; ssId?: string; subVillages?: any[]; isActive?: boolean },
   ssPrefixList: ISSPrefix[]
 ) => {
   const ssIdOption =
@@ -41,7 +42,8 @@ const mapApiSSUserToFormRow = (
     ssId: ssIdOption,
     name: item.name ?? '',
     phoneNumber: item.phoneNumber ?? '',
-    subVillages: item.subVillages ?? null
+    subVillages: item.subVillages ?? null,
+    isActive: item.isActive ?? true
   };
 };
 
@@ -52,10 +54,11 @@ const mapApiSSUserToFormRow = (
  * @param subVillagesList - Complete list of available sub-villages
  * @returns Filtered array of sub-village options available for the current row
  */
-const getFilteredSubVillageOptionsForIndex = (
+export const getFilteredSubVillageOptionsForIndex = (
   rowIndex: number,
-  ssUsers: Array<{ ssId?: any; subVillages?: any[] }>,
-  subVillagesList: any[]
+  ssUsers: Array<{ ssId?: any; subVillages?: any[]; isActive?: boolean }>,
+  subVillagesList: any[],
+  allowedAssignedSSIds: Set<number>
 ): any[] => {
   // Get IDs of sub-villages currently selected in this row
   const currentRowIds = new Set(
@@ -67,7 +70,7 @@ const getFilteredSubVillageOptionsForIndex = (
   // Get IDs of sub-villages used in other rows
   const usedInOtherRows = new Set(
     ssUsers
-      .filter((_, i) => i !== rowIndex)
+      .filter((row, i) => i !== rowIndex && row?.isActive)
       .flatMap(row => row?.subVillages ?? [])
       .map((v: any) => Number(v?.id))
       .filter((id: number) => !Number.isNaN(id))
@@ -79,7 +82,9 @@ const getFilteredSubVillageOptionsForIndex = (
       const inCurrentRow = currentRowIds.has(Number(opt.id));
       const notUsedElsewhere = !usedInOtherRows.has(Number(opt.id));
       const notAssignedToSS = opt.assignedShasthyaShebikaId == null;
-      return inCurrentRow || (notUsedElsewhere && notAssignedToSS);
+      const assignedSSId = Number(opt?.assignedShasthyaShebikaId);
+      const assignedToAllowedSS = !Number.isNaN(assignedSSId) && allowedAssignedSSIds.has(assignedSSId);
+      return inCurrentRow || (notUsedElsewhere && (notAssignedToSS || assignedToAllowedSS));
     }
   );
 };
@@ -117,7 +122,7 @@ const SubVillagesFieldWithCleanup = ({
 
 interface IFormSpyValues {
   users?: Array<{ role?: any }>;
-  ssUsers?: Array<{ ssId?: any; subVillages?: any[] }>;
+  ssUsers?: Array<{ ssId?: any; name?: string; subVillages?: any[]; isActive?: boolean }>;
 }
 
 interface ISSUserRowProps {
@@ -130,7 +135,9 @@ interface ISSUserRowProps {
   subVillageSName: string;
   subVillagesList: ISubVillage[];
   subVillagesLoading: boolean;
-  ssUsers: Array<{ ssId?: any; subVillages?: any[] }>;
+  ssUsers: Array<{ ssId?: any; name?: string; subVillages?: any[]; isActive?: boolean }>;
+  allowedAssignedSSIds: Set<number>;
+  isEdit?: boolean;
 }
 
 const SSUserRow = ({
@@ -143,11 +150,21 @@ const SSUserRow = ({
   subVillageSName,
   subVillagesList,
   subVillagesLoading,
-  ssUsers
+  ssUsers,
+  allowedAssignedSSIds,
+  isEdit
 }: ISSUserRowProps): React.ReactElement => {
   const isLastSSRow = (fields?.length || 0) === index + 1;
   const showRemove = (fields?.length ?? 0) > 1;
   const showAdd = isLastSSRow;
+  const currentRow = ssUsers?.[index];
+  const isRowDisabled = currentRow?.isActive === false;
+  const filteredSubVillageOptions = getFilteredSubVillageOptionsForIndex(
+    index,
+    ssUsers,
+    subVillagesList,
+    allowedAssignedSSIds
+  );
 
   return (
     <React.Fragment>
@@ -169,7 +186,7 @@ const SSUserRow = ({
                 error={meta.touched && meta.error}
                 required={true}
                 isLoading={ssPrefixLoading}
-                disabled={ssPrefixLoading}
+                disabled={ssPrefixLoading || isRowDisabled}
                 placeholder={ssPrefixLoading ? 'Loading SS IDs...' : 'Select SS ID'}
               />
             )}
@@ -186,6 +203,7 @@ const SSUserRow = ({
                 errorLabel='name'
                 error={(meta.touched && meta.error) || undefined}
                 required={true}
+                disabled={isRowDisabled}
               />
             )}
           />
@@ -198,11 +216,12 @@ const SSUserRow = ({
             form={form}
             formName='ssUsers'
             index={index}
+            disabled={isRowDisabled}
           />
         </div>
       </div>
       <div className='row gx-1dot25 align-items-start mt-0dot5'>
-        <div className='col-12 col-sm-10'>
+        <div className='col-12 col-sm-8'>
           <SubVillagesFieldWithCleanup
             form={form}
             name={name}
@@ -219,7 +238,7 @@ const SSUserRow = ({
                   errorLabel={subVillageSName}
                   labelKey='name'
                   valueKey='id'
-                  options={getFilteredSubVillageOptionsForIndex(index, ssUsers, subVillagesList)}
+                  options={filteredSubVillageOptions}
                   isShowLabel={true}
                   isModel={true}
                   isMulti={true}
@@ -227,7 +246,7 @@ const SSUserRow = ({
                   isSelectAll={true}
                   error={meta.touched && meta.error}
                   isLoading={subVillagesLoading}
-                  isDisabled={subVillagesLoading}
+                  isDisabled={subVillagesLoading || isRowDisabled}
                   placeholder={subVillagesLoading ? `Loading ${subVillageSName}...` : `Select ${subVillageSName}`}
                 />
               )}
@@ -257,13 +276,36 @@ const SSUserRow = ({
               <PlusIcon className='me-0dot5' aria-hidden style={{ width: 20, height: 20 }} />
             </button>
           )}
+          {isEdit && (
+            <div style={{ transform: 'translateY(5px)' }}>
+              <Field name={`${name}.isActive`} type='checkbox'>
+                {({ input }) => (
+                  <Checkbox
+                    {...input}
+                    switchCheckbox={true}
+                    onChange={(event) => {
+                      const wasActive = Boolean(input.checked);
+                      const willBeActive = event?.target?.checked;
+
+                      input.onChange(event);
+
+                      if (!wasActive && willBeActive) {
+                        form.change(`${name}.ssId`, null);
+                        form.change(`${name}.subVillages`, null);
+                      }
+                    }}
+                  />
+                )}
+              </Field>
+            </div>
+          )}
         </div>
       </div>
     </React.Fragment>
   );
 };
 
-const AssignSSUsersSection = (): React.ReactElement => {
+const AssignSSUsersSection = ({ isEdit }: { isEdit?: boolean }): React.ReactElement => {
   const form = useForm();
   const ssUsersFormName = 'ssUsers';
   const ssUsersInitialValue = useMemo(() => [{ ...DEFAULT_SS_USER_ROW }], []);
@@ -281,6 +323,13 @@ const AssignSSUsersSection = (): React.ReactElement => {
 
   const userId = form.getState()?.values?.users?.[0]?.id;
   const ssListForUser = userId == null ? null : shasthyaShebikaByKormiId?.[String(userId)];
+  const allowedAssignedSSIds = useMemo(() => {
+    return new Set(
+      (ssListForUser ?? [])
+        .map((item: any) => Number(item?.id))
+        .filter((id: number) => !Number.isNaN(id))
+    );
+  }, [ssListForUser]);
 
   useEffect(() => {
     const clearInitializedUser = () => {
@@ -313,7 +362,7 @@ const AssignSSUsersSection = (): React.ReactElement => {
       if (!hasShastiyaKormiRole(firstUserRole)) return null;
       const ssUsers = values?.ssUsers ?? [];
       const usedIds = new Set(
-        ssUsers.map(user => user.ssId?.id)
+        ssUsers.filter(user => user.isActive).map(user => user.ssId?.id)
       );
       const filteredSSIdOptions = ssIdOptions.filter(
         option => !usedIds.has(option.id)
@@ -338,6 +387,8 @@ const AssignSSUsersSection = (): React.ReactElement => {
                     subVillagesList={subVillagesList}
                     subVillagesLoading={subVillagesLoading}
                     ssUsers={ssUsers}
+                    allowedAssignedSSIds={allowedAssignedSSIds}
+                    isEdit={isEdit}
                   />
                 ))}
               </>

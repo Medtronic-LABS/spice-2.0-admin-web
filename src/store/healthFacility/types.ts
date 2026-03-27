@@ -485,6 +485,7 @@ export interface IShasthyaShebikaByKormiIdItem {
   shasthyaKormiId: number;
   shasthyaKormiName: string | null;
   subVillages: IShasthyaShebikaSubVillage[];
+  isActive: boolean;
 }
 
 /** Response data from by-shasthya-kormi-id API: key = shasthya kormi id, value = SS user list */

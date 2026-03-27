@@ -1845,7 +1845,7 @@ const UserForm = ({
         })
       }
     </FieldArray>
-    <AssignSSUsersSection />
+    <AssignSSUsersSection isEdit={isEdit} />
     </>
   );
 };
