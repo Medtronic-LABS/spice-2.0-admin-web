@@ -45,7 +45,6 @@ export function useUniqueFieldValidation(
     form,
     formName,
     fieldKey,
-    isEdit,
     toastErrorMsg
   } = options;
 
@@ -94,7 +93,7 @@ export function useUniqueFieldValidation(
   const checkUniqueFn = useCallback(
     async (value: string, forceRetry?: boolean) => {
       const trimmed = value?.trim?.() || '';
-      if (isEdit || !trimmed || trimmed.length < minLength) return;
+      if (!trimmed || trimmed.length < minLength) return;
       if (!forceRetry && lastCheckedRef.current === trimmed) return;
       try {
         setLoading(true);
@@ -120,7 +119,6 @@ export function useUniqueFieldValidation(
       fieldKey,
       form,
       formName,
-      isEdit,
       minLength,
       toastErrorMsg
     ]

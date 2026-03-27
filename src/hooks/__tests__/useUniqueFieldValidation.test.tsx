@@ -90,15 +90,16 @@ describe('useUniqueFieldValidation', () => {
     expect(result.current.validateExist('hello')).toBe('');
   });
 
-  it('checkUniqueFn does not call apiFn when isEdit is true', async () => {
-    const options = { ...defaultOptions, isEdit: true };
+  it('checkUniqueFn calls apiFn even when isEdit is true', async () => {
+    const apiFn = jest.fn(() => Promise.resolve({ data: { unique: true } }));
+    const options = { ...defaultOptions, apiFn, isEdit: true };
     const { result } = renderHook(() => useUniqueFieldValidation(options));
 
     await act(async () => {
       await result.current.checkUniqueFn('test value');
     });
 
-    expect(defaultOptions.apiFn).not.toHaveBeenCalled();
+    expect(apiFn).toHaveBeenCalledWith('test value');
   });
 
   it('checkUniqueFn does not call apiFn when value is shorter than minLength', async () => {

@@ -122,7 +122,7 @@ const HealthFacilityDetailsForm = ({
   const [cityList, setCityList] = useState<ICity[]>([]);
   const timerId: React.MutableRefObject<number | undefined> = useRef<number>();
   const [cityLoading, setCityLoading] = useState(false);
-
+  const [initialPostalCode] = useState<string>(data?.postalCode || '');
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const [workflowEditedData, setWorkFlowEditedData] = useState<{
     customizedWorkflows: number[];
@@ -144,7 +144,6 @@ const HealthFacilityDetailsForm = ({
     isEdit,
     toastErrorMsg: errorMsgs.HF_NAME_VALIDATE_FAIL
   });
-
   const postalCodeValidation = useUniqueFieldValidation({
     apiFn: checkPostalCodeUnique,
     existsErrorMsg: errorMsgs.POSTAL_CODE_EXISTS_ERROR,
@@ -633,8 +632,12 @@ const HealthFacilityDetailsForm = ({
                   onBlur={(e) => {
                     input.onBlur(e);
                     const trimmed = input.value?.trim?.();
-                    if (
-                      !isEdit &&
+                    if (isEdit && trimmed === initialPostalCode) {
+                      postalCodeValidation.submitEnabledStatusRef.current = true;
+                      postalCodeValidation.lastCheckedRef.current = trimmed;
+                      form.change(`${formName}.postalCode`, trimmed + ' ');
+                      form.change(`${formName}.postalCode`, trimmed);
+                    } else if (
                       trimmed &&
                       trimmed.length >= 3 &&
                       postalCodeValidation.lastCheckedRef.current !== trimmed
@@ -650,7 +653,7 @@ const HealthFacilityDetailsForm = ({
                   }}
                   label='Facility ID'
                   errorLabel={postalCodeValidation.getErrorLabel(meta)}
-                  disabled={isEdit || isActivating}
+                  disabled={isActivating}
                   error={postalCodeValidation.getErrorMsg(meta)}
                   showLoader={postalCodeValidation.loading}
                   helpertext={

@@ -330,15 +330,40 @@ describe('HealthFacilityDetailsForm', () => {
     expect(checkPostalCodeUniqueMock.mock.calls[0][0].replace(/\D/g, '').length).toBeGreaterThanOrEqual(3);
   });
 
-  it('does not call checkPostalCodeUnique when isEdit is true', () => {
+  it('does not call checkPostalCodeUnique in edit mode when value matches initial postal code', () => {
     const checkPostalCodeUniqueMock = healthFacilityAPI.checkPostalCodeUnique as jest.Mock;
     checkPostalCodeUniqueMock.mockClear();
-    renderWithForm({ isEdit: true });
-    const postalInput = screen.queryByLabelText('Facility ID');
-    if (postalInput) {
-      fireEvent.change(postalInput, { target: { value: '123' } });
-      fireEvent.blur(postalInput);
-    }
+    renderWithForm(
+      { isEdit: true, data: { postalCode: '12345' } },
+      {
+        healthFacility: {
+          ...defaultInitialValues.healthFacility,
+          postalCode: '12345'
+        }
+      }
+    );
+    const postalInput = screen.getByLabelText('Facility ID');
+    fireEvent.change(postalInput, { target: { value: '12345' } });
+    fireEvent.blur(postalInput);
     expect(checkPostalCodeUniqueMock).not.toHaveBeenCalled();
+  });
+
+  it('calls checkPostalCodeUnique in edit mode when value differs from initial postal code', async () => {
+    const checkPostalCodeUniqueMock = healthFacilityAPI.checkPostalCodeUnique as jest.Mock;
+    checkPostalCodeUniqueMock.mockResolvedValue({ data: { unique: true } });
+    renderWithForm(
+      { isEdit: true, data: { postalCode: '12345' } },
+      {
+        healthFacility: {
+          ...defaultInitialValues.healthFacility,
+          postalCode: '12345'
+        }
+      }
+    );
+    const postalInput = screen.getByLabelText('Facility ID');
+    fireEvent.change(postalInput, { target: { value: '67890' } });
+    fireEvent.blur(postalInput);
+    await screen.findByText('Facility ID');
+    expect(checkPostalCodeUniqueMock).toHaveBeenCalled();
   });
 });
