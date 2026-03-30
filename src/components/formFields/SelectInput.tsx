@@ -200,6 +200,7 @@ const SelectInput = ({
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         isDisabled={disabled}
+        isClearable={!required}
         isOptionDisabled={isOptionDisabled}
         aria-label={label}
       />
@@ -290,7 +291,7 @@ export const AsyncSelectInput = ({
         classNamePrefix='select-field'
         placeholder={placeholder || ''}
         label={label}
-        isClearable={true}
+        isClearable={!required}
         onChange={(value) => handleChange(input, onChange as (e: any) => void, value)}
         menuPortalTarget={isModel ? document.body : false}
         cacheOptions={false}

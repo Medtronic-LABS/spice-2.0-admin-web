@@ -67,6 +67,18 @@ describe('SelectInput', () => {
     expect(selectInput.querySelector('.input-asterisk')).toBeInTheDocument();
   });
 
+  it('enables clear when required is false', () => {
+    renderWithForm(<SelectInput {...defaultProps} required={false} />);
+    const passedProps = mockSelectChildComponent.mock.calls[0][0];
+    expect(passedProps.isClearable).toBe(true);
+  });
+
+  it('disables clear when required is true', () => {
+    renderWithForm(<SelectInput {...defaultProps} required={true} />);
+    const passedProps = mockSelectChildComponent.mock.calls[0][0];
+    expect(passedProps.isClearable).toBe(false);
+  });
+
   it('displays error message when error prop is provided', () => {
     renderWithForm(<SelectInput {...defaultProps} error='This field is required' errorLabel='Error Label' />);
     expect(screen.getByText('This field is required Error Label')).toBeInTheDocument();
@@ -234,6 +246,18 @@ describe('AsyncSelectInput', () => {
     render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} required={true} />);
     const asyncSelect = screen.getByTestId('async-select-input');
     expect(asyncSelect.querySelector('.input-asterisk')).toBeInTheDocument();
+  });
+
+  it('enables clear for async select when required is false', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} required={false} />);
+    const passedProps = mockAsyncChildComponent.mock.calls[0][0];
+    expect(passedProps.isClearable).toBe(true);
+  });
+
+  it('disables clear for async select when required is true', () => {
+    render(<AsyncSelectInput {...defaultAsyncProps} options={mockOptions} required={true} />);
+    const passedProps = mockAsyncChildComponent.mock.calls[0][0];
+    expect(passedProps.isClearable).toBe(false);
   });
 
   it('renders select input component with isModel as true', () => {
