@@ -1,0 +1,43 @@
+.build_template: &build_template
+  stage: build
+  image: node:22.14.0-alpine
+  script:
+    - export APP_VERSION=$CI_COMMIT_SHORT_SHA
+    - echo "${APP_VERSION}" > version
+    #- cp $BUILD_ENV .env
+    - npm install --omit=optional
+    - npx update-browserslist-db@latest
+    - npm run build
+    - tar -zcf .gitlab/build.tar.gz ./build
+  artifacts:
+    expire_in: '1 day'
+    paths:
+      - build/
+      - .gitlab/build.tar.gz
+  cache:
+    key:
+      files:
+        - package.json
+    paths:
+      - node_modules
+    policy: pull
+
+build-staging:
+  <<: *build_template
+  variables:
+    NODE_ENV: "staging"
+    CI: "false"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: always
+    - when: never
+
+build-production:
+  <<: *build_template
+  variables:
+    NODE_ENV: "production"
+    CI: "false"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      when: always
+    - when: never

@@ -1,0 +1,41 @@
+.deploy_gcloud: &deploy_gcloud
+  stage: deploy
+  image: docker.bracits.com/hub/google/cloud-sdk:514.0.0-alpine
+  script:
+    - echo "Extracting build artifacts..."
+    - tar -zxf .gitlab/build.tar.gz
+    - ls -la build/
+    - echo "$GOOGLE_SA_KEY" > key.json
+    - gcloud auth activate-service-account $GSA_EMAIL --key-file=key.json --project=$GOOGLE_PROJECT_ID
+    - echo "Uploading to $GCS_BUCKET"
+    - gsutil -m cp -r build/* gs://$GCS_BUCKET/
+  artifacts:
+    expire_in: '1 day'
+    paths:
+      - build/
+
+deploy-staging:
+  <<: *deploy_gcloud
+  dependencies:
+    - build-staging
+  variables:
+    GCS_BUCKET: stg-bhp-uhis-app
+    GOOGLE_SA_KEY: $STAGING_GOOGLE_SA_KEY
+    GSA_EMAIL: $STAGING_GSA_EMAIL
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: always
+    - when: never
+
+deploy-production:
+  <<: *deploy_gcloud
+  dependencies:
+    - build-production
+  variables:
+    GCS_BUCKET: prod-bhp-uhis-app
+    GOOGLE_SA_KEY: $PRODUCTION_GOOGLE_SA_KEY
+    GSA_EMAIL: $PRODUCTION_GSA_EMAIL
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      when: manual
+    - when: never
