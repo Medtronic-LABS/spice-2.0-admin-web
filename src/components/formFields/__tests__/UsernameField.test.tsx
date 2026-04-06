@@ -89,7 +89,7 @@ describe('UsernameField', () => {
   const renderUsernameField = (props = {}) => {
     return render(
       <Provider store={store}>
-        <Form onSubmit={() => {}}>
+        <Form onSubmit={jest.fn()}>
           {() => <UsernameField {...defaultProps} {...props} />}
         </Form>
       </Provider>
@@ -500,7 +500,7 @@ describe('UsernameField', () => {
 
       render(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
+          <Form onSubmit={jest.fn()}>
             {() => (
               <>
                 <UsernameField {...defaultProps} form={formWithDuplicates} index={0} />
@@ -512,7 +512,7 @@ describe('UsernameField', () => {
       );
 
       const inputs = screen.getAllByTestId('input');
-      
+
       fireEvent.change(inputs[1], { target: { value: 'johndoe' } });
       await waitFor(() => {
         fireEvent.blur(inputs[1]);
@@ -544,14 +544,14 @@ describe('UsernameField', () => {
 
       render(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
+          <Form onSubmit={jest.fn()}>
             {() => <UsernameField {...defaultProps} form={formWithDuplicates} index={0} />}
           </Form>
         </Provider>
       );
 
       const input = screen.getByTestId('input');
-      
+
       fireEvent.change(input, { target: { value: 'johndoe' } });
       await waitFor(() => {
         fireEvent.blur(input);
@@ -620,7 +620,7 @@ describe('UsernameField', () => {
 
       render(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
+          <Form onSubmit={jest.fn()}>
             {() => <UsernameField {...defaultProps} ref={ref} />}
           </Form>
         </Provider>
@@ -628,7 +628,7 @@ describe('UsernameField', () => {
 
       expect(ref.current).toBeDefined();
       expect(ref.current.resetUsernameField).toBeDefined();
-      
+
       ref.current.resetUsernameField();
 
       expect(mockTextInputComponent).toHaveBeenCalled();
@@ -821,8 +821,8 @@ describe('UsernameField', () => {
 
       render(
         <Provider store={nonCommunityStore}>
-          <Form onSubmit={() => {}}>
-            {() => <UsernameField {...defaultProps} parentOrgId="123" ignoreTenantId="456" />}
+          <Form onSubmit={jest.fn()}>
+            {() => <UsernameField {...defaultProps} parentOrgId='123' ignoreTenantId='456' />}
           </Form>
         </Provider>
       );
@@ -911,8 +911,8 @@ describe('UsernameField', () => {
 
       const { rerender } = render(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
-            {() => <UsernameField {...defaultProps} parentOrgId="123" />}
+          <Form onSubmit={jest.fn()}>
+            {() => <UsernameField {...defaultProps} parentOrgId='123' />}
           </Form>
         </Provider>
       );
@@ -923,8 +923,8 @@ describe('UsernameField', () => {
 
       rerender(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
-            {() => <UsernameField {...defaultProps} parentOrgId="456" />}
+          <Form onSubmit={jest.fn()}>
+            {() => <UsernameField {...defaultProps} parentOrgId='456' />}
           </Form>
         </Provider>
       );
@@ -943,8 +943,8 @@ describe('UsernameField', () => {
 
       const { rerender } = render(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
-            {() => <UsernameField {...defaultProps} ignoreTenantId="123" />}
+          <Form onSubmit={jest.fn()}>
+            {() => <UsernameField {...defaultProps} ignoreTenantId='123' />}
           </Form>
         </Provider>
       );
@@ -955,8 +955,8 @@ describe('UsernameField', () => {
 
       rerender(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
-            {() => <UsernameField {...defaultProps} ignoreTenantId="456" />}
+          <Form onSubmit={jest.fn()}>
+            {() => <UsernameField {...defaultProps} ignoreTenantId='456' />}
           </Form>
         </Provider>
       );
@@ -977,7 +977,7 @@ describe('UsernameField', () => {
       expect(() => {
         render(
           <Provider store={store}>
-            <Form onSubmit={() => {}}>
+            <Form onSubmit={jest.fn()}>
               {() => <UsernameField {...defaultProps} form={errorForm} />}
             </Form>
           </Provider>
@@ -1003,7 +1003,7 @@ describe('UsernameField', () => {
 
       render(
         <Provider store={store}>
-          <Form onSubmit={() => {}}>
+          <Form onSubmit={jest.fn()}>
             {() => <UsernameField {...defaultProps} form={errorForm} />}
           </Form>
         </Provider>
@@ -1032,7 +1032,7 @@ describe('UsernameField', () => {
       expect(() => {
         render(
           <Provider store={store}>
-            <Form onSubmit={() => {}}>
+            <Form onSubmit={jest.fn()}>
               {() => <UsernameField {...defaultProps} form={emptyForm} />}
             </Form>
           </Provider>

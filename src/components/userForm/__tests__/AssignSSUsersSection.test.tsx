@@ -4,8 +4,8 @@ import { Form, FormSpy } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import AssignSSUsersSection, { DEFAULT_SS_USER_ROW, getFilteredSubVillageOptionsForIndex } from '../AssignSSUsersSection';
 
-jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid="bin-icon" /> }));
-jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid="plus-icon" /> }));
+jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
+jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid='plus-icon' /> }));
 
 const defaultMockState = {
   region: {
@@ -36,9 +36,9 @@ jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
 jest.mock('../../formFields/SelectInput', () => ({
   __esModule: true,
   default: ({ label, disabled, placeholder }: any) => (
-    <div data-testid="select-input" data-disabled={disabled}>
+    <div data-testid='select-input' data-disabled={disabled}>
       {label}
-      {placeholder && <span data-testid="select-placeholder">{placeholder}</span>}
+      {placeholder && <span data-testid='select-placeholder'>{placeholder}</span>}
     </div>
   )
 }));
@@ -46,7 +46,7 @@ jest.mock('../../formFields/SelectInput', () => ({
 jest.mock('../../formFields/TextInput', () => ({
   __esModule: true,
   default: ({ label, disabled }: any) => (
-    <div data-testid="text-input" data-disabled={disabled}>
+    <div data-testid='text-input' data-disabled={disabled}>
       {label}
     </div>
   )
@@ -55,7 +55,7 @@ jest.mock('../../formFields/TextInput', () => ({
 jest.mock('../../formFields/PhoneNumber', () => ({
   __esModule: true,
   default: ({ disabled }: any) => (
-    <div data-testid="phone-number-field" data-disabled={disabled}>
+    <div data-testid='phone-number-field' data-disabled={disabled}>
       Phone Number
     </div>
   )
@@ -64,7 +64,7 @@ jest.mock('../../formFields/PhoneNumber', () => ({
 jest.mock('../../formFields/Checkbox', () => ({
   __esModule: true,
   default: ({ disabled, switchCheckbox, ...props }: any) => (
-    <input data-testid="active-switch" type="checkbox" disabled={disabled} {...props} />
+    <input data-testid='active-switch' type='checkbox' disabled={disabled} {...props} />
   )
 }));
 
@@ -75,9 +75,9 @@ jest.mock('../../multiSelect/MultiSelect', () => ({
     mockMultiSelectCalls.push(props);
     const { label, isDisabled, placeholder } = props;
     return (
-      <div data-testid="multi-select" data-disabled={isDisabled}>
+      <div data-testid='multi-select' data-disabled={isDisabled}>
         {label}
-        {placeholder && <span data-testid="multi-select-placeholder">{placeholder}</span>}
+        {placeholder && <span data-testid='multi-select-placeholder'>{placeholder}</span>}
       </div>
     );
   }
@@ -108,11 +108,11 @@ const FormValuesProbe = () => {
       {({ values }) => {
         const firstSSUser = (values as any)?.ssUsers?.[0] ?? {};
         return (
-          <div data-testid="form-values-probe">
-            <span data-testid="first-ss-user-ss-id">{firstSSUser.ssId?.name ?? ''}</span>
-            <span data-testid="first-ss-user-ss-id-value">{firstSSUser.ssId?.id ?? ''}</span>
-            <span data-testid="first-ss-user-sub-village-count">{String((firstSSUser.subVillages ?? []).length)}</span>
-            <span data-testid="first-ss-user-is-active">{String(firstSSUser.isActive)}</span>
+          <div data-testid='form-values-probe'>
+            <span data-testid='first-ss-user-ss-id'>{firstSSUser.ssId?.name ?? ''}</span>
+            <span data-testid='first-ss-user-ss-id-value'>{firstSSUser.ssId?.id ?? ''}</span>
+            <span data-testid='first-ss-user-sub-village-count'>{String((firstSSUser.subVillages ?? []).length)}</span>
+            <span data-testid='first-ss-user-is-active'>{String(firstSSUser.isActive)}</span>
           </div>
         );
       }}
@@ -125,7 +125,7 @@ const renderWithForm = (
   isEdit = false
 ) => {
   return render(
-    <Form onSubmit={() => {}} initialValues={initialValues} mutators={{ ...arrayMutators }}>
+    <Form onSubmit={jest.fn()} initialValues={initialValues} mutators={{ ...arrayMutators }}>
       {() => (
         <>
           <AssignSSUsersSection isEdit={isEdit} />

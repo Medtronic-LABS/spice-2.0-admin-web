@@ -40,11 +40,11 @@ interface IBranchFilters {
   skip: number | null;
 }
 
-type FetchDetailsParams = {
+interface IFetchDetailsParams {
   skip?: number | null;
   districtIds?: number[] | null;
   chiefdomIds?: number[] | null;
-};
+}
 
 /**
  * BranchList component for displaying branch list with Add button and edit functionality
@@ -80,23 +80,34 @@ const BranchList = (): React.ReactElement => {
   /**
    * Fetch branch list API
    */
-  const fetchDetails = useCallback(({ skip = null, districtIds = null, chiefdomIds = null }: FetchDetailsParams) => {
-    dispatch(
-      fetchBranchListRequest({
-        payload: {
-          countryId,
-          limit: listParams.rowsPerPage,
-          skip: skip ?? (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
-          searchTerm: listParams.searchTerm ?? '',
-          districtIds: districtIds ?? filters.districtIds,
-          chiefdomIds: chiefdomIds ?? filters.chiefdomIds,
-        },
-        failureCb: (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ERROR));
-        }
-      })
-    );
-}, [dispatch, listParams.page, listParams.rowsPerPage, listParams.searchTerm, countryId, filters.districtIds, filters.chiefdomIds]);
+  const fetchDetails = useCallback(
+    ({ skip = null, districtIds = null, chiefdomIds = null }: IFetchDetailsParams) => {
+      dispatch(
+        fetchBranchListRequest({
+          payload: {
+            countryId,
+            limit: listParams.rowsPerPage,
+            skip: skip ?? (listParams.page - APPCONSTANTS.INITIAL_PAGE) * listParams.rowsPerPage,
+            searchTerm: listParams.searchTerm ?? '',
+            districtIds: districtIds ?? filters.districtIds,
+            chiefdomIds: chiefdomIds ?? filters.chiefdomIds
+          },
+          failureCb: (e) => {
+            toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.ERROR));
+          }
+        })
+      );
+    },
+    [
+      dispatch,
+      listParams.page,
+      listParams.rowsPerPage,
+      listParams.searchTerm,
+      countryId,
+      filters.districtIds,
+      filters.chiefdomIds
+    ]
+  );
 
   /**
    * Fetch district options on initial page load
@@ -167,7 +178,7 @@ const BranchList = (): React.ReactElement => {
   const handleEditSubmit = useCallback(
   ({ branch }: { branch: IBranch }) => {
     // early exit if invalid
-    if (!branch || (branchModal.isEdit && !branchModal.data)) return;
+    if (!branch || (branchModal.isEdit && !branchModal.data)) { return; }
 
     // Define messages based on flow
     const successMessage = branchModal.isEdit
@@ -176,7 +187,7 @@ const BranchList = (): React.ReactElement => {
 
     const failureMessage = branchModal.isEdit
       ? APPCONSTANTS.BRANCH_UPDATE_FAIL
-      : APPCONSTANTS.BRANCH_CREATE_FAIL;    
+      : APPCONSTANTS.BRANCH_CREATE_FAIL;
 
     // shared success callback
     const onSuccess = () => {

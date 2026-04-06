@@ -9,7 +9,7 @@ export const fetchBranchList = (data: IFetchBranchListRequestPayload) =>
   axios({
     method: 'POST',
     url: '/admin-service/branch/list',
-    data: data
+    data
   });
 
 export const createBranch = (data: ICreateBranchRequestPayload) =>

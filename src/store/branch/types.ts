@@ -3,26 +3,26 @@ import * as ACTION_TYPES from './actionTypes';
 
 type BranchPositionCountValue = string | number | null;
 
-interface BranchPositionCounts {
+interface IBranchPositionCounts {
   skPositionCount?: BranchPositionCountValue;
   ssPositionCount?: BranchPositionCountValue;
   poPositionCount?: BranchPositionCountValue;
   foPositionCount?: BranchPositionCountValue;
 }
 
-interface BranchBase extends BranchPositionCounts {
+interface IBranchBase extends IBranchPositionCounts {
   name: string;
   code: string;
   currentAccountCode: string;
 }
 
-export interface IBranch extends BranchBase {
+export interface IBranch extends IBranchBase {
   id: number;
   district: IDistrict;
   chiefdom: IChiefdom;
 }
 
-export interface ICreateBranchRequestPayload extends BranchBase {
+export interface ICreateBranchRequestPayload extends IBranchBase {
   districtId: number;
   chiefdomId: number;
 }

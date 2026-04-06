@@ -57,7 +57,7 @@ jest.mock('../../../utils/commonUtils', () => ({
 
 jest.mock('../../../components/loader/Loader', () => ({
   __esModule: true,
-  default: () => <div data-testid="loader">Loading...</div>
+  default: () => <div data-testid='loader'>Loading...</div>
 }));
 
 const mockDetailCard = jest.fn();
@@ -66,15 +66,15 @@ jest.mock('../../../components/detailCard/DetailCard', () => ({
   default: (props: any) => {
     mockDetailCard(props);
     return (
-      <div data-testid="detail-card">
+      <div data-testid='detail-card'>
         <span>{props.header}</span>
         {props.buttonLabel && (
-          <button type="button" onClick={props.onButtonClick} data-testid="detail-card-button">
+          <button type='button' onClick={props.onButtonClick} data-testid='detail-card-button'>
             {props.buttonLabel}
           </button>
         )}
         {props.isSearch && (
-          <input data-testid="detail-card-search" onChange={(e) => props.onSearch?.(e.target.value)} />
+          <input data-testid='detail-card-search' onChange={(e) => props.onSearch?.(e.target.value)} />
         )}
         {props.children}
       </div>
@@ -88,7 +88,7 @@ jest.mock('../../../components/customTable/CustomTable', () => ({
   default: (props: any) => {
     mockCustomTable(props);
     return (
-      <table data-testid="custom-table">
+      <table data-testid='custom-table'>
         <thead>
           <tr>
             {props.columnsDef?.map((col: any) => (
@@ -115,12 +115,12 @@ jest.mock('../../../components/modal/ModalForm', () => ({
     mockModalFormCalls.push(props);
     const formContent = props.render?.(props.form ?? {}) ?? null;
     return props.show ? (
-      <div data-testid="modal-form">
+      <div data-testid='modal-form'>
         <span>{props.title}</span>
-        <button type="button" onClick={() => props.handleCancel?.()} data-testid="modal-cancel">
+        <button type='button' onClick={() => props.handleCancel?.()} data-testid='modal-cancel'>
           {props.cancelText || 'Cancel'}
         </button>
-        <button type="button" onClick={() => props.handleFormSubmit?.({})} data-testid="modal-submit">
+        <button type='button' onClick={() => props.handleFormSubmit?.({})} data-testid='modal-submit'>
           {props.submitText || 'Submit'}
         </button>
         {formContent}
@@ -135,7 +135,7 @@ jest.mock('../../../components/userForm/UserForm', () => ({
   default: (props: any) => {
     mockUserFormCalls.push(props);
     return (
-      <div data-testid="user-form" data-edit={String(!!props.isEdit)}>
+      <div data-testid='user-form' data-edit={String(!!props.isEdit)}>
         UserForm
       </div>
     );
@@ -144,17 +144,17 @@ jest.mock('../../../components/userForm/UserForm', () => ({
 
 jest.mock('../../createHealthFacility/HealthFacilityDetailsForm', () => ({
   __esModule: true,
-  default: () => <div data-testid="health-facility-details-form">HealthFacilityDetailsForm</div>
+  default: () => <div data-testid='health-facility-details-form'>HealthFacilityDetailsForm</div>
 }));
 
 jest.mock('../../../components/customTable/ConfirmationModalPopup', () => ({
   __esModule: true,
   default: (props: any) => (
-    <div data-testid="confirmation-modal">
-      <button type="button" onClick={props.handleCancel} data-testid="confirmation-cancel">
+    <div data-testid='confirmation-modal'>
+      <button type='button' onClick={props.handleCancel} data-testid='confirmation-cancel'>
         Cancel
       </button>
-      <button type="button" onClick={props.handleSubmit} data-testid="confirmation-submit">
+      <button type='button' onClick={props.handleSubmit} data-testid='confirmation-submit'>
         Ok
       </button>
     </div>
@@ -347,7 +347,9 @@ describe('HealthFacilitySummary', () => {
 
     it('opens Add User modal when Add User button is clicked', () => {
       renderComponent();
-      const addUserButtons = screen.getAllByTestId('detail-card-button').filter((btn) => btn.textContent === 'Add User');
+      const addUserButtons = screen
+        .getAllByTestId('detail-card-button')
+        .filter((btn) => btn.textContent === 'Add User');
       expect(addUserButtons.length).toBeGreaterThanOrEqual(1);
       fireEvent.click(addUserButtons[0]);
       const addUserModals = mockModalFormCalls.filter((m) => m.title === 'Add User');

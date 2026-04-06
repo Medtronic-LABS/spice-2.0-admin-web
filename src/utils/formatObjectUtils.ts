@@ -70,9 +70,9 @@ export const getUserPayload = ({
 }) => {
 
   const resolveTenantId = (user: any): number | undefined => {
-    if (tenantId) return Number(tenantId);
-    if (user?.healthfacility?.tenantId) return Number(user.healthfacility.tenantId);
-    if (user?.tenantId) return Number(user.tenantId);
+    if (tenantId) { return Number(tenantId); }
+    if (user?.healthfacility?.tenantId) { return Number(user.healthfacility.tenantId); }
+    if (user?.tenantId) { return Number(user.tenantId); }
     return undefined;
   };
 
@@ -81,7 +81,7 @@ export const getUserPayload = ({
       roleData => roleData.name === NAMING_VARIABLES.redRisk
     );
 
-    if (!redRiskData?.id) return roleIds;
+    if (!redRiskData?.id) { return roleIds; }
 
     if (user?.redRisk && !isHFAdmin) {
       return [...new Set([...roleIds, redRiskData.id])];
@@ -112,7 +112,7 @@ export const getUserPayload = ({
         branches = [user.branches];
       }
     }
-    
+
     const userPayload: IUserPayload = {
       appTypes,
       firstName: user.firstName.trim(),
@@ -146,11 +146,11 @@ export const getUserPayload = ({
       reportUserOrganizationIds: (Array.isArray(user?.reportUserOrganization)
         ? user.reportUserOrganization
         : []
-      ).map(({ tenantId }: { tenantId: number }) => tenantId),
+      ).map(({ tenantId: reportTenantId }: { tenantId: number }) => reportTenantId),
       insightUserOrganizationIds: (Array.isArray(user?.insightUserOrganization)
         ? user.insightUserOrganization
         : []
-      ).map(({ tenantId }: { tenantId: number }) => tenantId)
+      ).map(({ tenantId: insightTenantId }: { tenantId: number }) => insightTenantId)
     };
 
     if (user?.id) {
@@ -337,7 +337,7 @@ export const getSSUsersPayload = (
 };
 
 const toPositionCount = (v: string | number | null | undefined): number | null => {
-  if (v === '' || v == null) return null;
+  if (v === '' || v == null) { return null; }
   const n = Number(typeof v === 'string' ? v.replaceAll(/\D/g, '') : v);
   return Number.isNaN(n) ? 0 : n;
 };
@@ -351,10 +351,10 @@ export const mapBranchToCreatePayload = (branch: IBranch): ICreateBranchRequestP
   skPositionCount: toPositionCount(branch.skPositionCount),
   ssPositionCount: toPositionCount(branch.ssPositionCount),
   poPositionCount: toPositionCount(branch.poPositionCount),
-  foPositionCount: toPositionCount(branch.foPositionCount),
+  foPositionCount: toPositionCount(branch.foPositionCount)
 });
 
 export const mapBranchToUpdatePayload = (branch: IBranch): IUpdateBranchRequestPayload => ({
   ...mapBranchToCreatePayload(branch),
-  id: branch.id, // guaranteed for edit flow
+  id: branch.id // guaranteed for edit flow
 });

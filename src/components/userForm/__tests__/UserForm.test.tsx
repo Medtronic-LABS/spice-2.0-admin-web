@@ -79,21 +79,21 @@ jest.mock('../../../hooks/roleOptionsHook', () => ({
   })
 }));
 
-jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid="bin-icon" /> }));
-jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid="plus-icon" /> }));
-jest.mock('../../assets/images/reset.svg', () => ({ ReactComponent: () => <span data-testid="reset-icon" /> }));
+jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
+jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid='plus-icon' /> }));
+jest.mock('../../assets/images/reset.svg', () => ({ ReactComponent: () => <span data-testid='reset-icon' /> }));
 
 jest.mock('../../formFields/TextInput', () => {
-  const React = require('react');
+  const ReactLib = require('react');
   return {
     __esModule: true,
     default: (props: any) => {
       const { errorLabel, ...inputProps } = props;
-      return React.createElement(
+      return ReactLib.createElement(
         'div',
         { 'data-testid': 'text-input' },
-        React.createElement('label', null, props.label),
-        React.createElement('input', {
+        ReactLib.createElement('label', null, props.label),
+        ReactLib.createElement('input', {
           'data-testid': `input-${(props.label || '').replace(/\s/g, '-')}`,
           ...inputProps
         })
@@ -103,26 +103,26 @@ jest.mock('../../formFields/TextInput', () => {
 });
 
 jest.mock('../../formFields/EmailField', () => {
-  const React = require('react');
+  const ReactLib = require('react');
   return {
     __esModule: true,
-    default: React.forwardRef((props: any, ref: any) =>
-      React.createElement('div', { 'data-testid': 'email-field' },
-        React.createElement('label', null, 'Email'),
-        React.createElement('input', { 'data-testid': 'email-input', ref, ...props })
+    default: ReactLib.forwardRef((props: any, ref: any) =>
+      ReactLib.createElement('div', { 'data-testid': 'email-field' },
+        ReactLib.createElement('label', null, 'Email'),
+        ReactLib.createElement('input', { 'data-testid': 'email-input', ref, ...props })
       )
     )
   };
 });
 
 jest.mock('../../formFields/UsernameField', () => {
-  const React = require('react');
+  const ReactLib = require('react');
   return {
     __esModule: true,
-    default: React.forwardRef((props: any, ref: any) =>
-      React.createElement('div', { 'data-testid': 'username-field' },
-        React.createElement('label', null, 'Username'),
-        React.createElement('input', { 'data-testid': 'username-input', ref, ...props })
+    default: ReactLib.forwardRef((props: any, ref: any) =>
+      ReactLib.createElement('div', { 'data-testid': 'username-field' },
+        ReactLib.createElement('label', null, 'Username'),
+        ReactLib.createElement('input', { 'data-testid': 'username-input', ref, ...props })
       )
     )
   };
@@ -133,18 +133,18 @@ jest.mock('../../formFields/PhoneNumber', () => ({
   __esModule: true,
   default: (props: any) => {
     mockPhoneNumberCalls.push(props);
-    return <div data-testid="phone-number-field">Phone Number</div>;
+    return <div data-testid='phone-number-field'>Phone Number</div>;
   }
 }));
 
 jest.mock('../../formFields/Radio', () => ({
   __esModule: true,
   default: (props: any) => (
-    <div data-testid="radio-group">
+    <div data-testid='radio-group'>
       <label>{props.fieldLabel}</label>
       {(props.options || []).map((opt: any) => (
         <label key={opt.value}>
-          <input type="radio" value={opt.value} name={props.name} />
+          <input type='radio' value={opt.value} name={props.name} />
           {opt.label}
         </label>
       ))}
@@ -155,11 +155,11 @@ jest.mock('../../formFields/Radio', () => ({
 jest.mock('../../formFields/SelectInput', () => ({
   __esModule: true,
   default: (props: any) => (
-    <div data-testid="select-input">
+    <div data-testid='select-input'>
       <label>{props.label}</label>
       {typeof props.onChange === 'function' && (
         <button
-          type="button"
+          type='button'
           data-testid={`select-trigger-${(props.label || '').replace(/\s/g, '-')}`}
           onClick={() => props.onChange({ id: 101, tenantId: 202, name: 'HF A' })}
         >
@@ -173,20 +173,20 @@ jest.mock('../../formFields/SelectInput', () => ({
 jest.mock('../../multiSelect/MultiSelect', () => ({
   __esModule: true,
   default: (props: any) => (
-    <div data-testid="multi-select">
+    <div data-testid='multi-select'>
       <label>{props.label}</label>
     </div>
   )
 }));
 
 jest.mock('../userConditionalFields/AdminFields', () => ({
-  SiteUserForm: () => <div data-testid="site-user-form">SiteUserForm</div>
+  SiteUserForm: () => <div data-testid='site-user-form'>SiteUserForm</div>
 }));
 
 jest.mock('../userConditionalFields/DynamicCHForm', () => ({
   DynamicCHForm: (props: any) => {
     mockDynamicCHFormCalls.push(props);
-    return <div data-testid="dynamic-ch-form">DynamicCHForm</div>;
+    return <div data-testid='dynamic-ch-form'>DynamicCHForm</div>;
   }
 }));
 
@@ -196,7 +196,7 @@ jest.mock('../userConditionalFields/BranchTaggingFields', () => ({
   __esModule: true,
   default: (props: any) => {
     mockBranchTaggingFieldsCalls.push(props);
-    return <div data-testid="branch-tagging-fields">BranchTaggingFields</div>;
+    return <div data-testid='branch-tagging-fields'>BranchTaggingFields</div>;
   }
 }));
 
@@ -205,7 +205,7 @@ jest.mock('../AssignSSUsersSection', () => ({
   __esModule: true,
   default: (props: any) => {
     mockAssignSSUsersSectionCalls.push(props);
-    return <div data-testid="assign-ss-users-section">AssignSSUsersSection</div>;
+    return <div data-testid='assign-ss-users-section'>AssignSSUsersSection</div>;
   }
 }));
 
@@ -259,7 +259,7 @@ const renderUserForm = (
   return render(
     <Provider store={store}>
       <MemoryRouter>
-        <Form onSubmit={() => {}} mutators={{ ...arrayMutators }} initialValues={formInitialValues}>
+        <Form onSubmit={jest.fn()} mutators={{ ...arrayMutators }} initialValues={formInitialValues}>
           {({ form }) => <UserForm {...defaultProps} form={form} {...props} />}
         </Form>
       </MemoryRouter>
@@ -337,7 +337,9 @@ describe('UserForm', () => {
       expect(mockBranchTaggingFieldsCalls.length).toBe(0);
     });
 
-    it('renders BranchTaggingFields with expected props when Shastiya Kormi is default-selected (isAdminForm)', async () => {
+    it(
+      'renders BranchTaggingFields with expected props when Shastiya Kormi is default-selected (isAdminForm)',
+      async () => {
       const storeWithShastiyaKormi = {
         ...defaultStoreState,
         user: {
@@ -443,7 +445,7 @@ describe('UserForm', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <Form onSubmit={() => {}} mutators={{ ...arrayMutators }}>
+            <Form onSubmit={jest.fn()} mutators={{ ...arrayMutators }}>
               {({ form }) => (
                 <UserForm
                   {...defaultProps}

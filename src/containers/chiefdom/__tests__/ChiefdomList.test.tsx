@@ -11,7 +11,7 @@ import '@testing-library/jest-dom';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/edit.svg', () => ({
-  ReactComponent: () => <svg data-testid="edit-icon">EditIcon</svg>
+  ReactComponent: () => <svg data-testid='edit-icon'>EditIcon</svg>
 }));
 
 jest.mock('../../../constants/appConstants', () => ({

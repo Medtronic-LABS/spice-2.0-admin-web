@@ -476,7 +476,7 @@ const HealthFacilityDetailsForm = ({
                     facilityNameValidation.networkError ? (
                       <div>
                         <button
-                          type="button"
+                          type='button'
                           className={styles.validateErrorText}
                           onClick={() => facilityNameValidation.checkUniqueFn(input.value, true)}
                         >
@@ -660,7 +660,7 @@ const HealthFacilityDetailsForm = ({
                     postalCodeValidation.networkError ? (
                       <div>
                         <button
-                          type="button"
+                          type='button'
                           className={styles.validateErrorText}
                           onClick={() => postalCodeValidation.checkUniqueFn(input.value, true)}
                         >

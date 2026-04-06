@@ -208,7 +208,7 @@ function* regionSaga() {
   yield all([takeLatest(UPLOAD_FILE_REQUEST, uploadFileSaga)]);
   yield all([takeLatest(DOWNLOAD_FILE_REQUEST, downloadFileSaga)]);
   yield all([takeLatest(FETCH_COUNTRY_DETAILS_REQUEST, fetchCountryDetail)]);
-  yield all([takeLatest(FETCH_SUB_VILLAGES_REQUEST, fetchSubVillagesSagaRequest)])
+  yield all([takeLatest(FETCH_SUB_VILLAGES_REQUEST, fetchSubVillagesSagaRequest)]);
 }
 
 export default regionSaga;

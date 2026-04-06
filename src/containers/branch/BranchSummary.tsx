@@ -72,7 +72,11 @@ const BranchSummary: React.FC = () => {
           isActive: true,
           failureCb: (e) => {
             toastCenter.error(
-              ...getErrorToastArgs(e, APPCONSTANTS.OOPS, formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName))
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+              )
             );
           }
         })
@@ -90,7 +94,7 @@ const BranchSummary: React.FC = () => {
 
   const handleEditSubmit = useCallback(
     ({ branch }: { branch: IBranch }) => {
-      if (!branch || !branchSummary) return;
+      if (!branch || !branchSummary) { return; }
       const onSuccess = () => {
         toastCenter.success(APPCONSTANTS.SUCCESS, APPCONSTANTS.BRANCH_UPDATE_SUCCESS);
         closeEditModal();

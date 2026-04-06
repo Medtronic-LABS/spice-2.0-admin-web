@@ -65,13 +65,13 @@ jest.mock('../../../store/branch/actions', () => ({
 
 jest.mock('../../../components/loader/Loader', () => ({
   __esModule: true,
-  default: () => <div data-testid="loader">Loading...</div>
+  default: () => <div data-testid='loader'>Loading...</div>
 }));
 
 jest.mock('../../../components/formContainer/FormContainer', () => ({
   __esModule: true,
   default: ({ label, children }: any) => (
-    <div data-testid="form-container">
+    <div data-testid='form-container'>
       <span>{label}</span>
       {children}
     </div>
@@ -81,7 +81,7 @@ jest.mock('../../../components/formContainer/FormContainer', () => ({
 jest.mock('../../../components/button/IconButton', () => ({
   __esModule: true,
   default: ({ label, handleClick }: any) => (
-    <button type="button" onClick={handleClick} data-testid={`icon-btn-${label?.replace(/\s/g, '-')}`}>
+    <button type='button' onClick={handleClick} data-testid={`icon-btn-${label?.replace(/\s/g, '-')}`}>
       {label}
     </button>
   )
@@ -89,17 +89,17 @@ jest.mock('../../../components/button/IconButton', () => ({
 
 jest.mock('../HealthFacilityDetailsForm', () => ({
   __esModule: true,
-  default: () => <div data-testid="health-facility-details-form">HealthFacilityDetailsForm</div>
+  default: () => <div data-testid='health-facility-details-form'>HealthFacilityDetailsForm</div>
 }));
 
 jest.mock('../../../containers/healthFacility/Workflows', () => ({
   __esModule: true,
-  default: () => <div data-testid="workflows">Workflows</div>
+  default: () => <div data-testid='workflows'>Workflows</div>
 }));
 
 jest.mock('../../../components/userForm/UserForm', () => ({
   __esModule: true,
-  default: () => <div data-testid="user-form">UserForm</div>
+  default: () => <div data-testid='user-form'>UserForm</div>
 }));
 
 jest.mock('../../../assets/images/info-grey.svg', () => ({ ReactComponent: () => null }));
@@ -165,7 +165,7 @@ describe('CreateHealthFacility', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[path]}>
-          <Route path={PROTECTED_ROUTES.createHealthFacilityByRegion} exact component={CreateHealthFacility} />
+          <Route path={PROTECTED_ROUTES.createHealthFacilityByRegion} exact={true} component={CreateHealthFacility} />
         </MemoryRouter>
       </Provider>
     );
@@ -252,7 +252,7 @@ describe('CreateHealthFacility', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[createPath]}>
-          <Route path="/region/:regionId/:tenantId/health-facility/create" component={CreateHealthFacility} />
+          <Route path='/region/:regionId/:tenantId/health-facility/create' component={CreateHealthFacility} />
         </MemoryRouter>
       </Provider>
     );
@@ -269,7 +269,7 @@ describe('CreateHealthFacility', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[createPath]}>
-          <Route path="/region/:regionId/:tenantId/health-facility/create" component={CreateHealthFacility} />
+          <Route path='/region/:regionId/:tenantId/health-facility/create' component={CreateHealthFacility} />
         </MemoryRouter>
       </Provider>
     );

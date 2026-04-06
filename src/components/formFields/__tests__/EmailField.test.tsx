@@ -76,11 +76,13 @@ describe('EmailField', () => {
     jest.clearAllMocks();
   });
 
+  const handleSubmit = jest.fn();
+
   const renderEmailField = (props = {}) => {
     // tslint:disable-next-line:no-empty
     return render(
       <Provider store={store}>
-        <Form onSubmit={() => {}}>{() => <EmailField {...defaultProps} {...props} />}</Form>
+        <Form onSubmit={handleSubmit}>{() => <EmailField {...defaultProps} {...props} />}</Form>
       </Provider>
     );
   };
@@ -197,10 +199,9 @@ describe('EmailField', () => {
     const localProps: any = { isEdit: false, name: 'users[0]', form: mockForm, formName: 'users', index: 0 };
     const ref: any = { current: null };
 
-    // tslint:disable-next-line:no-empty
     render(
       <Provider store={store}>
-        <Form onSubmit={() => {}}>{() => <EmailField {...localProps} ref={ref} />}</Form>
+        <Form onSubmit={jest.fn()}>{() => <EmailField {...localProps} ref={ref} />}</Form>
       </Provider>
     );
 

@@ -9,7 +9,7 @@ import {
   IHFUserPost,
   IHealthFacilityPost,
   IDeleteHFPayload,
-  IFetchHFStatusRequest,
+  IFetchHFStatusRequest
 } from '../store/healthFacility/types';
 
 export const fetchHealthFacilityList = ({

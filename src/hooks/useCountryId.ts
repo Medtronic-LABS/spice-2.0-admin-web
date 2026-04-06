@@ -5,17 +5,18 @@ import sessionStorageServices from '../global/sessionStorageServices';
 import APPCONSTANTS from '../constants/appConstants';
 // import { getRegionDetailSelector } from '../store/region_com/selectors';
 
-export interface UseCountryIdParams {
+export interface IUseCountryIdParams {
   regionId?: string;
 }
 
 /**
  * Custom hook to get the current country ID.
  * When on a region-scoped route, pass regionId from URL so API calls use that context.
- * @param params - Optional URL params: regionId, districtId, chiefdomId. When regionId is present, it is used as countryId.
+ * @param params - Optional URL params: regionId, districtId, chiefdomId. When regionId is present,
+ * it is used as countryId.
  * @return {number} The country ID from URL (regionId), or from Redux store or session storage
  */
-const useCountryId = (params?: UseCountryIdParams) => {
+const useCountryId = (params?: IUseCountryIdParams) => {
   const country = useSelector(countryIdSelector);
   const { regionId } = params || {};
 

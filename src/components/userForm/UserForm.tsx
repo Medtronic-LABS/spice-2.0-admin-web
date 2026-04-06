@@ -297,7 +297,7 @@ const UserForm = ({
   ]);
 
   const getHFListFn = useCallback(() => {
-    const isSuperUserOrSuperAdmin = [SUPER_ADMIN, SUPER_USER].includes(role);
+  const isSuperUserOrSuperAdmin = [SUPER_ADMIN, SUPER_USER].includes(role);
     if (countryId) {
       dispatch(
         fetchHFListRequest({
@@ -780,12 +780,13 @@ const UserForm = ({
 
   /**
    * Effect hook to fetch village and supervisor lists based on the initial edit data.
-   * Guarded so APIs are only called once per user (avoids duplicate calls when autoFetchData/showVillage update in sequence).
+   * Guarded so APIs are only called once per user (avoids duplicate calls when
+   * autoFetchData/showVillage update in sequence).
    */
   useEffect(() => {
     if ((isEdit || isActivating) && showVillage[0] && !isProfile && initialEditData[0]) {
       const editId = initialEditData[0]?.id;
-      if (villageSupervisorFetchedForId.current === editId) return;
+      if (villageSupervisorFetchedForId.current === editId) { return; }
       villageSupervisorFetchedForId.current = editId ?? null;
 
       const tenantIds = [...initialEditData[0].hfTenantIds, isHF ? tenantId : undefined].filter((v: number) => v);

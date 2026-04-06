@@ -236,7 +236,10 @@ describe('formatObjectUtils', () => {
           gender: 'Male',
           username: 'johndoe',
           phoneNumber: '123-456-7890',
-          roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }, { id: 2, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+          roles: [
+            { id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice },
+            { id: 2, groupName: APPCONSTANTS.spiceRoleGrouped.spice }
+          ],
           redRisk: true,
           tenantId: 123
         }
@@ -426,7 +429,11 @@ describe('formatObjectUtils', () => {
         },
         {
           desc: 'healthfacility tenantId',
-          user: { ...mockUser, healthfacility: { tenantId: 222 }, roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }] },
+          user: {
+            ...mockUser,
+            healthfacility: { tenantId: 222 },
+            roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }]
+          },
           expectedTenantId: 222
         },
         {
@@ -725,8 +732,20 @@ describe('formatObjectUtils', () => {
       ];
       const result = getSSUsersPayload(ssUsers);
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ name: 'User 1', phoneNumber: '+1', ssId: 'SS01', subVillageIds: ['1'], isActive: true });
-      expect(result[1]).toEqual({ name: 'User 2', phoneNumber: '+2', ssId: 'SS02', subVillageIds: ['2', '3'], isActive: true });
+      expect(result[0]).toEqual({
+        name: 'User 1',
+        phoneNumber: '+1',
+        ssId: 'SS01',
+        subVillageIds: ['1'],
+        isActive: true
+      });
+      expect(result[1]).toEqual({
+        name: 'User 2',
+        phoneNumber: '+2',
+        ssId: 'SS02',
+        subVillageIds: ['2', '3'],
+        isActive: true
+      });
     });
 
     it('should default missing fields to empty string or empty array', () => {

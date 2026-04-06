@@ -32,10 +32,10 @@ import APPCONSTANTS from '../../../constants/appConstants';
 
 // Mock react-leaflet to avoid ES module issues
 jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
-  TileLayer: () => <div data-testid="tile-layer" />,
-  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
-  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
   useMap: () => ({ setView: jest.fn(), getCenter: () => ({ lat: 0, lng: 0 }) }),
   useMapEvent: jest.fn(),
   useMapEvents: jest.fn()
@@ -53,7 +53,7 @@ jest.mock('../../../components/userForm/UserForm', () => () => {
 });
 
 jest.mock('../../../assets/images/reset-password.svg', () => ({
-  ReactComponent: () => <svg data-testid="password-change-icon">PasswordChangeIcon</svg>
+  ReactComponent: () => <svg data-testid='password-change-icon'>PasswordChangeIcon</svg>
 }));
 
 const mockChildTableComponent = jest.fn();
@@ -77,10 +77,10 @@ jest.mock('../../../components/customTable/ConfirmationModalPopup', () => (props
     <div data-testid={`mock-confirmationModal-${props.isOpen}`}>
       {props.isOpen && (
         <>
-          <button onClick={props.handleCancel} data-testid="confirmation-cancel">Cancel</button>
-          <button onClick={props.handleSubmit} data-testid="confirmation-submit">Submit</button>
+          <button onClick={props.handleCancel} data-testid='confirmation-cancel'>Cancel</button>
+          <button onClick={props.handleSubmit} data-testid='confirmation-submit'>Submit</button>
           {props.customButtonLabel && (
-            <button onClick={props.handleCustomButton} data-testid="confirmation-custom">
+            <button onClick={props.handleCustomButton} data-testid='confirmation-custom'>
               {props.customButtonLabel}
             </button>
           )}
@@ -98,20 +98,30 @@ jest.mock('../../../utils/toastCenter', () => ({
 
 jest.mock('../../../containers/authentication/ResetPasswordFields', () => ({
   __esModule: true,
-  default: () => <div data-testid="reset-password-fields">Reset Password Fields</div>,
+  default: () => <div data-testid='reset-password-fields'>Reset Password Fields</div>,
   generatePassword: jest.fn((password: string) => `hashed_${password}`)
 }));
 
-jest.mock('../../../components/loader/Loader', () => () => <div data-testid="loader">Loading...</div>);
+jest.mock('../../../components/loader/Loader', () => () => <div data-testid='loader'>Loading...</div>);
 
-jest.mock('../../../components/detailCard/DetailCard', () => ({ children, onButtonClick, onSearch, setSelectedRole, setSelectedFacility, buttonLabel, header }: any) => (
-  <div data-testid="detail-card">
-    <h2>{header}</h2>
-    <button onClick={onButtonClick}>{buttonLabel}</button>
-    <input data-testid="search-input" onChange={(e) => onSearch && onSearch(e.target.value)} />
-    {children}
-  </div>
-));
+jest.mock('../../../components/detailCard/DetailCard', () => {
+  return ({
+    children,
+    onButtonClick,
+    onSearch,
+    setSelectedRole,
+    setSelectedFacility,
+    buttonLabel,
+    header
+  }: any) => (
+    <div data-testid='detail-card'>
+      <h2>{header}</h2>
+      <button onClick={onButtonClick}>{buttonLabel}</button>
+      <input data-testid='search-input' onChange={(e) => onSearch && onSearch(e.target.value)} />
+      {children}
+    </div>
+  );
+});
 
 const mockHandleSearch = jest.fn();
 const mockHandlePage = jest.fn();
@@ -391,11 +401,11 @@ describe('UserList Component', () => {
   describe('Add User Functionality', () => {
     it('should open modal for adding a new user when Add User button is clicked', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
         healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
@@ -454,11 +464,11 @@ describe('UserList Component', () => {
 
     it('should handle successful user creation', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
         healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
@@ -479,12 +489,11 @@ describe('UserList Component', () => {
       fireEvent.click(addButton);
 
       await waitFor(() => {
-        const mockModalForm: any = mockModalFormCalls[0];
-        expect(mockModalForm).toBeDefined();
+        expect(mockModalFormCalls[0]).toBeDefined();
       });
 
-      const mockModalForm: any = mockModalFormCalls[0];
-      mockModalForm.handleFormSubmit({
+      const modalForm: any = mockModalFormCalls[0];
+      modalForm.handleFormSubmit({
         users: [
           {
             firstName: 'John',
@@ -497,7 +506,7 @@ describe('UserList Component', () => {
 
       const actions = localStore.getActions();
       const mockCreateHFUser = actions.find((action: any) => action.type === CREATE_HEALTH_FACILITY_USER_REQUEST);
-      
+
       if (mockCreateHFUser) {
         mockCreateHFUser.successCb();
         mockCreateHFUser.failureCb((error: Error) => {
@@ -516,15 +525,17 @@ describe('UserList Component', () => {
   });
 
   describe('Delete User Functionality', () => {
-    it('should call deleteHFUserRequest and show success message on successful deletion for regular user', async () => {
+    it(
+      'should call deleteHFUserRequest and show success message on successful deletion for regular user',
+      async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -562,13 +573,13 @@ describe('UserList Component', () => {
 
     it('should fetch Shasthya Shebikas when deleting user with SHASTIYA_KORMI role', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -583,30 +594,30 @@ describe('UserList Component', () => {
       renderComponent(localStore);
 
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-      mockCustomTable.onDeleteClick({ 
-        data: { 
-          id: 42, 
-          organizations: [{ id: 1 }], 
-          roles: [{ name: 'SHASTIYA_KORMI' }] 
-        } 
+      mockCustomTable.onDeleteClick({
+        data: {
+          id: 42,
+          organizations: [{ id: 1 }],
+          roles: [{ name: 'SHASTIYA_KORMI' }]
+        }
       });
 
       const actions = localStore.getActions();
       const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
-      
+
       expect(fetchSSAction).toBeDefined();
       expect(fetchSSAction?.shasthyaKormiIds).toEqual(['42']);
     });
 
     it('should delete Shasthya Shebikas and then delete user for SHASTIYA_KORMI role', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -621,17 +632,17 @@ describe('UserList Component', () => {
       renderComponent(localStore);
 
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-      mockCustomTable.onDeleteClick({ 
-        data: { 
-          id: 42, 
-          organizations: [{ id: 1 }], 
-          roles: [{ name: 'SHASTIYA_KORMI' }] 
-        } 
+      mockCustomTable.onDeleteClick({
+        data: {
+          id: 42,
+          organizations: [{ id: 1 }],
+          roles: [{ name: 'SHASTIYA_KORMI' }]
+        }
       });
 
       const actions = localStore.getActions();
       const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
-      
+
       if (fetchSSAction) {
         // Simulate successful fetch with SS users
         const mockResponse = {
@@ -649,7 +660,7 @@ describe('UserList Component', () => {
         // Simulate successful deletion of SS users
         if (deleteSSAction) {
           deleteSSAction.successCb();
-          
+
           const deleteUserAction = actions.find((action: any) => action.type === DELETE_HEALTH_FACILITY_USER_REQUEST);
           expect(deleteUserAction).toBeDefined();
           expect(deleteUserAction?.data.id).toBe(42);
@@ -659,13 +670,13 @@ describe('UserList Component', () => {
 
     it('should directly delete user when SHASTIYA_KORMI has no SS users', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -680,17 +691,17 @@ describe('UserList Component', () => {
       renderComponent(localStore);
 
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-      mockCustomTable.onDeleteClick({ 
-        data: { 
-          id: 42, 
-          organizations: [{ id: 1 }], 
-          roles: [{ name: 'SHASTIYA_KORMI' }] 
-        } 
+      mockCustomTable.onDeleteClick({
+        data: {
+          id: 42,
+          organizations: [{ id: 1 }],
+          roles: [{ name: 'SHASTIYA_KORMI' }]
+        }
       });
 
       const actions = localStore.getActions();
       const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
-      
+
       if (fetchSSAction) {
         // Simulate successful fetch with no SS users
         const mockResponse = { '42': [] };
@@ -709,13 +720,13 @@ describe('UserList Component', () => {
 
     it('should handle failure when fetching Shasthya Shebikas', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -730,17 +741,17 @@ describe('UserList Component', () => {
       renderComponent(localStore);
 
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-      mockCustomTable.onDeleteClick({ 
-        data: { 
-          id: 42, 
-          organizations: [{ id: 1 }], 
-          roles: [{ name: 'SHASTIYA_KORMI' }] 
-        } 
+      mockCustomTable.onDeleteClick({
+        data: {
+          id: 42,
+          organizations: [{ id: 1 }],
+          roles: [{ name: 'SHASTIYA_KORMI' }]
+        }
       });
 
       const actions = localStore.getActions();
       const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
-      
+
       if (fetchSSAction) {
         const error = new Error('Failed to fetch SS users');
         fetchSSAction.failureCb(error);
@@ -753,13 +764,13 @@ describe('UserList Component', () => {
 
     it('should handle failure when deleting Shasthya Shebikas', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -774,17 +785,17 @@ describe('UserList Component', () => {
       renderComponent(localStore);
 
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
-      mockCustomTable.onDeleteClick({ 
-        data: { 
-          id: 42, 
-          organizations: [{ id: 1 }], 
-          roles: [{ name: 'SHASTIYA_KORMI' }] 
-        } 
+      mockCustomTable.onDeleteClick({
+        data: {
+          id: 42,
+          organizations: [{ id: 1 }],
+          roles: [{ name: 'SHASTIYA_KORMI' }]
+        }
       });
 
       const actions = localStore.getActions();
       const fetchSSAction = actions.find((action: any) => action.type === FETCH_SHASTHYA_SHEBIKA_BY_KORMI_ID_REQUEST);
-      
+
       if (fetchSSAction) {
         const mockResponse = {
           '42': [{ id: 10, name: 'SSUser1', ssId: 'SS01' }]
@@ -792,7 +803,7 @@ describe('UserList Component', () => {
         fetchSSAction.successCb(mockResponse);
 
         const deleteSSAction = actions.find((action: any) => action.type === DELETE_SHASTHYA_SHEBIKAS_REQUEST);
-        
+
         if (deleteSSAction) {
           const error = new Error('Failed to delete SS users');
           deleteSSAction.failureCb(error);
@@ -844,8 +855,10 @@ describe('UserList Component', () => {
       };
       mockCustomTable.onRowEdit(postData);
       const actions = localStore.getActions();
-      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
-      
+      const mockFetchDetailsType = actions.find(
+        (action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST
+      );
+
       if (mockFetchDetailsType) {
         mockFetchDetailsType.successCb({
           id: 1,
@@ -874,11 +887,11 @@ describe('UserList Component', () => {
 
     it('should handle user update successfully', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
         healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
@@ -899,12 +912,11 @@ describe('UserList Component', () => {
       mockCustomTable.onRowEdit({ id: 1, roles: [{ groupName: 'SPICE' }] });
 
       await waitFor(() => {
-        const mockModalForm: any = mockModalFormCalls[0];
-        expect(mockModalForm).toBeDefined();
+        expect(mockModalFormCalls[0]).toBeDefined();
       });
 
-      const mockModalForm: any = mockModalFormCalls[0];
-      mockModalForm.handleFormSubmit({
+      const modalForm: any = mockModalFormCalls[0];
+      modalForm.handleFormSubmit({
         users: [
           {
             id: 1,
@@ -918,7 +930,7 @@ describe('UserList Component', () => {
 
       const actions = localStore.getActions();
       const mockUpdateHFUser = actions.find((action: any) => action.type === UPDATE_HEALTH_FACILITY_USER_REQUEST);
-      
+
       if (mockUpdateHFUser) {
         mockUpdateHFUser.successCb();
         mockUpdateHFUser.failureCb((error: Error) => {
@@ -952,7 +964,7 @@ describe('UserList Component', () => {
 
     it('should handle change password submit correctly', () => {
       renderComponent(store);
-      
+
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
       mockCustomTable.onCustomConfirmed({
         id: 1,
@@ -960,7 +972,7 @@ describe('UserList Component', () => {
       });
 
       const changePasswordModal = mockModalFormCalls[mockModalFormCalls.length - 1];
-      
+
       if (changePasswordModal) {
         changePasswordModal.handleFormSubmit({
           userPreference: { passwordChange: APPCONSTANTS.PASSWORD_VALUES.CHANGE_PASSWORD },
@@ -969,7 +981,7 @@ describe('UserList Component', () => {
 
         const actions = store.getActions();
         const mockChangePassword = actions.find((action: any) => action.type === CHANGE_PASSWORD_REQUEST);
-        
+
         if (mockChangePassword && mockChangePassword.data) {
           mockChangePassword.data.successCB();
           mockChangePassword.data.failureCb((error: Error) => {
@@ -990,7 +1002,7 @@ describe('UserList Component', () => {
 
     it('should handle send email password reset', () => {
       renderComponent(store);
-      
+
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
       mockCustomTable.onCustomConfirmed({
         id: 1,
@@ -998,7 +1010,7 @@ describe('UserList Component', () => {
       });
 
       const changePasswordModal = mockModalFormCalls[mockModalFormCalls.length - 1];
-      
+
       if (changePasswordModal) {
         changePasswordModal.handleFormSubmit({
           userPreference: { passwordChange: APPCONSTANTS.PASSWORD_VALUES.SEND_EMAIL }
@@ -1006,7 +1018,7 @@ describe('UserList Component', () => {
 
         const actions = store.getActions();
         const mockForgotPassword = actions.find((action: any) => action.type === USER_FORGOT_PASSWORD_REQUEST);
-        
+
         if (mockForgotPassword && mockForgotPassword.data) {
           mockForgotPassword.data.successCB();
           const successCBSpy: any = jest.spyOn(mockForgotPassword.data, 'successCB');
@@ -1024,14 +1036,14 @@ describe('UserList Component', () => {
         user: { ...initialState.user, chwList: [] }
       });
       renderComponent(localStore);
-      
+
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
       const userData = { ...mockIHFUserGet, active: false };
       mockCustomTable.onActivateClick(userData);
 
       const actions = localStore.getActions();
       const mockUpdateStatus = actions.find((action: any) => action.type === UPDATE_USER_STATUS_REQUEST);
-      
+
       if (mockUpdateStatus) {
         mockUpdateStatus.successCb();
         mockUpdateStatus.failureCb((error: Error) => {
@@ -1076,11 +1088,11 @@ describe('UserList Component', () => {
   describe('Modal Functionality', () => {
     it('should handle modal cancellation correctly', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
         healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
@@ -1101,13 +1113,12 @@ describe('UserList Component', () => {
       fireEvent.click(addButton);
 
       await waitFor(() => {
-        const mockModalForm: any = mockModalFormCalls[0];
-        expect(mockModalForm).toBeDefined();
+        expect(mockModalFormCalls[0]).toBeDefined();
       });
 
-      const mockModalForm: any = mockModalFormCalls[0];
-      mockModalForm.handleCancel();
-      expect(mockModalForm.handleCancel).toBeDefined();
+      const modalFormCancel: any = mockModalFormCalls[0];
+      modalFormCancel.handleCancel();
+      expect(modalFormCancel.handleCancel).toBeDefined();
     });
   });
 
@@ -1116,7 +1127,7 @@ describe('UserList Component', () => {
       renderComponent(store);
       const searchInput = screen.getByTestId('search-input');
       expect(searchInput).toBeInTheDocument();
-      
+
       fireEvent.change(searchInput, { target: { value: 'test search' } });
       expect(mockHandleSearch).toHaveBeenCalled();
     });
@@ -1143,13 +1154,13 @@ describe('UserList Component', () => {
 
     it('should call fetch user list on mount', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -1165,7 +1176,7 @@ describe('UserList Component', () => {
 
       const actions = localStore.getActions();
       const mockFetchListType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_LIST_REQUEST);
-      
+
       if (mockFetchListType) {
         const failureCbSpy = jest.spyOn(mockFetchListType, 'failureCb');
         mockFetchListType.failureCb({ message: 'error' });
@@ -1177,13 +1188,13 @@ describe('UserList Component', () => {
 
     it('should call fetch health facility list on mount', async () => {
       const localStore = mockStore({
-        user: { 
+        user: {
           user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
-          countryList: [], 
-          userRoles: mockIGroupRoles, 
-          chwList: [] 
+          countryList: [],
+          userRoles: mockIGroupRoles,
+          chwList: []
         },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           healthFacilityList: [],
           hfTotal: 0,
@@ -1199,7 +1210,7 @@ describe('UserList Component', () => {
 
       const actions = localStore.getActions();
       const mockFetchHFList = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_LIST_REQUEST);
-      
+
       if (mockFetchHFList) {
         const failureCbSpy = jest.spyOn(mockFetchHFList, 'failureCb');
         mockFetchHFList.failureCb({ message: 'error' });
@@ -1251,9 +1262,9 @@ describe('UserList Component', () => {
     it('should handle CHW reassignment submit', () => {
       const localStore = mockStore({
         ...initialState,
-        user: { 
-          ...initialState.user, 
-          chwList: [{ id: 1, name: 'CHW1' }] 
+        user: {
+          ...initialState.user,
+          chwList: [{ id: 1, name: 'CHW1' }]
         },
         healthFacility: {
           ...initialState.healthFacility,
@@ -1264,7 +1275,7 @@ describe('UserList Component', () => {
 
       // Find the CHW list modal
       const chwListModal = mockModalFormCalls.find((modal: any) => modal.title === 'CHW List');
-      
+
       if (chwListModal) {
         const formData = {
           'peersupervisor-1': { id: 1, name: 'Supervisor1' }
@@ -1273,7 +1284,7 @@ describe('UserList Component', () => {
 
         const actions = localStore.getActions();
         const mockReassign = actions.find((action: any) => action.type === REASSIGN_CHW_REQUEST);
-        
+
         if (mockReassign) {
           mockReassign.successCb();
           mockReassign.failureCb((error: Error) => {
@@ -1318,7 +1329,7 @@ describe('UserList Component', () => {
         user: { ...initialState.user, chwList: [] }
       });
       renderComponent(localStore);
-      
+
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
       const userData = { ...mockIHFUserGet, active: false };
       mockCustomTable.onActivateClick(userData);
@@ -1336,7 +1347,7 @@ describe('UserList Component', () => {
         user: { ...initialState.user, chwList: [] }
       });
       renderComponent(localStore);
-      
+
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
       const userData = { ...mockIHFUserGet, active: false };
       mockCustomTable.onActivateClick(userData);

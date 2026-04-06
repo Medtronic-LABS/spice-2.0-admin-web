@@ -6,7 +6,7 @@ import configureStore from 'redux-mock-store';
 import TableFilter from '../Filter';
 
 jest.mock('../../../assets/images/filter-icon.svg', () => ({
-  ReactComponent: () => <svg data-testid="filter-icon" />
+  ReactComponent: () => <svg data-testid='filter-icon' />
 }));
 
 const mockStore = configureStore([]);

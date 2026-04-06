@@ -129,6 +129,8 @@
     "test": "node scripts/test.js --watchAll=false --coverage --testResultsProcessor jest-sonar-reporter",
     "testOnly": "node scripts/test.js",
     "lint": "tslint -c tslint.json src/**/*.{ts,tsx}",
+    "lint:fix": "tslint -c tslint.json --fix src/**/*.{ts,tsx}",
+    "prepare": "husky install",
     "sonar": "node sonarqube.js"
   },
   "eslintConfig": {

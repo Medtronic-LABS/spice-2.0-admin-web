@@ -13,9 +13,9 @@ jest.mock('../../../formFields/SelectInput', () => ({
   default: (props: any) => {
     mockSelectInput(props);
     return (
-      <div data-testid="select-input">
+      <div data-testid='select-input'>
         <span>{props.label}</span>
-        {props.error && <span data-testid="select-error">{props.error}</span>}
+        {props.error && <span data-testid='select-error'>{props.error}</span>}
       </div>
     );
   }
@@ -43,7 +43,7 @@ describe('BranchTaggingFields', () => {
   ) => {
     return render(
       <Provider store={store}>
-        <Form onSubmit={() => {}}>
+        <Form onSubmit={jest.fn()}>
           {() => (
             <BranchTaggingFields
               {...defaultProps}

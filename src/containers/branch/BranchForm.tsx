@@ -15,11 +15,11 @@ import { errorMsgs } from '../../constants/erroMsgs';
 
 /** Validates non-negative number (>= 0) */
 export const validateNonNegative = (value?: string | number): string | undefined => {
-  if (value === '' || value === undefined || value === null) return undefined;
+  if (value === '' || value === undefined || value === null) { return undefined; }
   const num = Number(value);
-  if (Number.isNaN(num)) return errorMsgs.INVALID_NO;
-  if (num < 0) return errorMsgs.NEGATIVE_NO;
-  if (num > 999) return errorMsgs.LIMIT_NO;
+  if (Number.isNaN(num)) { return errorMsgs.INVALID_NO; }
+  if (num < 0) { return errorMsgs.NEGATIVE_NO; }
+  if (num > 999) { return errorMsgs.LIMIT_NO; }
   return undefined;
 };
 

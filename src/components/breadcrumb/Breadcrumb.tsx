@@ -229,7 +229,10 @@ const Breadcrumb = (): React.ReactElement => {
       });
     }
     if (branch?.name && showBranch) {
-      const branchParams = matchPath(pathname, { path: PROTECTED_ROUTES.branchSummary, exact: true })?.params as { tenantId?: string } | undefined;
+      const branchParams = matchPath(pathname, {
+        path: PROTECTED_ROUTES.branchSummary,
+        exact: true
+      })?.params as { tenantId?: string } | undefined;
       const branchTenantId = (branch as { tenantId?: string })?.tenantId ?? branchParams?.tenantId;
       result.push({
         label: branch.name,

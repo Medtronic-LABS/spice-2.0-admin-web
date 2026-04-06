@@ -358,7 +358,7 @@ describe('Health Facility APIs', () => {
     });
   });
 
-  it('fetchVillagesListfromHF sends a POST request to /admin-service/healthfacility/villages-list with correct data', async () => {
+  it('fetchVillagesListfromHF sends POST to villages-list with correct data', async () => {
     const userId = 1;
     const tenantIds = [1];
     const appTypes = ['NON_COMMUNITY'];
@@ -461,7 +461,7 @@ describe('Health Facility APIs', () => {
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(shasthyaKormiIds);
   });
 
-  it('deleteShasthyaShebikas sends a PUT request to /admin-service/shasthya-shebika/remove with array of ids', async () => {
+  it('deleteShasthyaShebikas sends PUT to shasthya-shebika/remove with array of ids', async () => {
     const ids = ['1', '42', '100'];
 
     mockAxios.onPut('/admin-service/shasthya-shebika/remove').reply(200, {});

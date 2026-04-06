@@ -516,7 +516,7 @@ export const SIDE_MENU_FETCHING_HIERARCHY = {
   district: 'BY_DISTRICT',
   chiefdom: 'BY_CHIEFDOM',
   'health-facility': 'BY_HEALTH_FACILITY',
-  branch: "BY_BRANCH"
+  branch: 'BY_BRANCH'
 };
 
 export const APP_TYPE_NAME = 'appTypes';

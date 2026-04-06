@@ -47,13 +47,13 @@ jest.mock('../../../utils/toastCenter', () => ({
 }));
 
 jest.mock('../../../assets/images/info-grey.svg', () => ({
-  ReactComponent: () => <span data-testid="site-details-icon" />
+  ReactComponent: () => <span data-testid='site-details-icon' />
 }));
 
 jest.mock('../../../components/formContainer/FormContainer', () => ({
   __esModule: true,
   default: ({ label, children }: any) => (
-    <div data-testid="form-container">
+    <div data-testid='form-container'>
       <span>{label}</span>
       {children}
     </div>
@@ -65,7 +65,7 @@ jest.mock('../../../components/formFields/TextInput', () => ({
   default: ({ label, input = {}, onBlur, onChange }: any) => {
     const id = input?.name?.replace(/\./g, '-') || `input-${label.replace(/\s/g, '-')}`;
     return (
-      <div data-testid="text-input" data-label={label}>
+      <div data-testid='text-input' data-label={label}>
         <label htmlFor={id}>{label}</label>
         <input
           id={id}
@@ -87,7 +87,7 @@ jest.mock('../../../components/formFields/TextInput', () => ({
 jest.mock('../../../components/formFields/SelectInput', () => ({
   __esModule: true,
   default: ({ label }: any) => (
-    <div data-testid="select-input">
+    <div data-testid='select-input'>
       <span>{label}</span>
     </div>
   )
@@ -96,7 +96,7 @@ jest.mock('../../../components/formFields/SelectInput', () => ({
 jest.mock('../../../components/multiSelect/MultiSelect', () => ({
   __esModule: true,
   default: ({ label }: any) => (
-    <div data-testid="multi-select">
+    <div data-testid='multi-select'>
       <span>{label}</span>
     </div>
   )
@@ -104,12 +104,12 @@ jest.mock('../../../components/multiSelect/MultiSelect', () => ({
 
 jest.mock('../../../components/map/MapContainer', () => ({
   __esModule: true,
-  default: () => <div data-testid="map-container" />
+  default: () => <div data-testid='map-container' />
 }));
 
 jest.mock('../../healthFacility/Workflows', () => ({
   __esModule: true,
-  default: () => <div data-testid="workflows">Workflows</div>
+  default: () => <div data-testid='workflows'>Workflows</div>
 }));
 
 jest.mock('../HealthFacilityDetails.scss', () => ({}));
@@ -187,11 +187,11 @@ describe('HealthFacilityDetailsForm', () => {
   ) => {
     return render(
       <Provider store={store}>
-        <Form onSubmit={() => {}} initialValues={initialValues}>
+        <Form onSubmit={jest.fn()} initialValues={initialValues}>
           {({ form }) => (
             <HealthFacilityDetailsForm
               form={form}
-              formName="healthFacility"
+              formName='healthFacility'
               isEdit={false}
               isNextClicked={false}
               data={{}}

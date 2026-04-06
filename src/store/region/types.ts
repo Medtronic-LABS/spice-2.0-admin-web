@@ -362,4 +362,4 @@ export type RegionActions =
   | IFetchCountryDetailFail
   | IFetchSubVillagesRequest
   | IFetchSubVillagesSuccess
-  | IFetchSubVillagesFailure
+  | IFetchSubVillagesFailure;

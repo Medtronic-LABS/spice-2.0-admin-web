@@ -24,7 +24,16 @@ interface IProps {
   required?: boolean;
 }
 
-const PhoneNumberField = ({ id, name, fieldName, form, formName, index, disabled, required: isRequired = false }: IProps) => {
+const PhoneNumberField = ({
+  id,
+  name,
+  fieldName,
+  form,
+  formName,
+  index,
+  disabled,
+  required: isRequired = false
+}: IProps) => {
   const submitEnabledStatus = useRef(true);
   const currentphoneNumber = useRef(
     (() => {

@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux';
 import SelectInput from '../../formFields/SelectInput';
 import { branchesByUnionSelector, branchLoadingByUnionSelector } from '../../../store/branch/selectors';
 
-interface BranchTaggingFieldsProps {
+interface IBranchTaggingFieldsProps {
   name: string;
   isError: (meta: any) => string | undefined;
   isHFCreate?: boolean;
 }
 
-const BranchTaggingFields = ({ name, isError, isHFCreate }: BranchTaggingFieldsProps) => {
+const BranchTaggingFields = ({ name, isError, isHFCreate }: IBranchTaggingFieldsProps) => {
   const branches = useSelector(branchesByUnionSelector);
   const branchesLoading = useSelector(branchLoadingByUnionSelector);
 

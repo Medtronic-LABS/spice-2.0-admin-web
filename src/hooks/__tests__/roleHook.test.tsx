@@ -258,7 +258,7 @@ describe('roleHook', () => {
         separateRolesByGroupName: jest.fn((roles: IRoles[]) =>
           roles.reduce((acc: Record<string, IRoles[]>, r) => {
             const g = r.groupName || '';
-            if (!acc[g]) acc[g] = [];
+            if (!acc[g]) { acc[g] = []; }
             acc[g].push(r);
             return acc;
           }, {})

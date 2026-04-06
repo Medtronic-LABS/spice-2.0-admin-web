@@ -75,7 +75,7 @@ jest.mock('../../../utils/formatObjectUtils', () => ({
 
 jest.mock('../../../components/loader/Loader', () => ({
   __esModule: true,
-  default: () => <div data-testid="loader">Loading...</div>
+  default: () => <div data-testid='loader'>Loading...</div>
 }));
 
 jest.mock('../../../components/detailCard/DetailCard', () => ({
@@ -93,17 +93,17 @@ jest.mock('../../../components/detailCard/DetailCard', () => ({
     onChange?: (option: number[], name: string) => void;
     children: React.ReactNode;
   }) => (
-    <div data-testid="detail-card">
+    <div data-testid='detail-card'>
       <h2>{header}</h2>
-      <button type="button" onClick={onButtonClick}>
+      <button type='button' onClick={onButtonClick}>
         {buttonLabel}
       </button>
       {onChange && (
         <>
-          <button type="button" onClick={() => onChange([1], 'districtIds')} data-testid="set-district-filter">
+          <button type='button' onClick={() => onChange([1], 'districtIds')} data-testid='set-district-filter'>
             Set district filter
           </button>
-          <button type="button" onClick={() => onChange([], 'districtIds')} data-testid="clear-district-filter">
+          <button type='button' onClick={() => onChange([], 'districtIds')} data-testid='clear-district-filter'>
             Clear district filter
           </button>
         </>
@@ -124,9 +124,9 @@ jest.mock('../../../components/customTable/CustomTable', () => ({
     rowData: any[];
     onRowEdit: (row: any) => void;
     handleRowClick?: (row: any) => void;
-    columnsDef: { name: string; label: string; cellFormatter?: (row: any) => any }[];
+    columnsDef: Array<{ name: string; label: string; cellFormatter?: (row: any) => any }>;
   }) => (
-    <div data-testid="custom-table">
+    <div data-testid='custom-table'>
       <table>
         <thead>
           <tr>
@@ -145,12 +145,12 @@ jest.mock('../../../components/customTable/CustomTable', () => ({
                 </td>
               ))}
               <td>
-                <button type="button" onClick={() => onRowEdit(row)} data-testid={`edit-row-${idx}`}>
+                <button type='button' onClick={() => onRowEdit(row)} data-testid={`edit-row-${idx}`}>
                   Edit
                 </button>
                 {handleRowClick && (
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => handleRowClick(row)}
                     data-testid={`row-click-${idx}`}
                   >
@@ -182,21 +182,31 @@ jest.mock('../../../components/modal/ModalForm', () => ({
     render: (form: any) => React.ReactNode;
   }) =>
     show ? (
-      <div data-testid="modal-form">
+      <div data-testid='modal-form'>
         <h3>{title}</h3>
-        <button type="button" onClick={handleCancel} data-testid="modal-cancel">
+        <button type='button' onClick={handleCancel} data-testid='modal-cancel'>
           Cancel
         </button>
         <button
-          type="button"
-          data-testid="modal-submit"
-          onClick={() => handleFormSubmit({ branch: { name: 'Test', code: 'T1', currentAccountCode: 'ACC', district: { id: 1 }, chiefdom: { id: 1 } } })}
+          type='button'
+          data-testid='modal-submit'
+          onClick={() =>
+            handleFormSubmit({
+              branch: {
+                name: 'Test',
+                code: 'T1',
+                currentAccountCode: 'ACC',
+                district: { id: 1 },
+                chiefdom: { id: 1 }
+              }
+            })
+          }
         >
           Submit
         </button>
         <button
-          type="button"
-          data-testid="modal-submit-empty"
+          type='button'
+          data-testid='modal-submit-empty'
           onClick={() => handleFormSubmit({ branch: null })}
         >
           Submit empty
@@ -208,7 +218,7 @@ jest.mock('../../../components/modal/ModalForm', () => ({
 
 jest.mock('../BranchForm', () => ({
   __esModule: true,
-  default: () => <div data-testid="branch-form">BranchForm</div>
+  default: () => <div data-testid='branch-form'>BranchForm</div>
 }));
 
 const defaultStoreState = {
@@ -271,7 +281,7 @@ describe('BranchList', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1/tenant/1/branch']}>
-          <Route path="/region/:regionId/tenant/:tenantId/branch">
+          <Route path='/region/:regionId/tenant/:tenantId/branch'>
             <BranchList />
           </Route>
         </MemoryRouter>
@@ -376,7 +386,7 @@ describe('BranchList', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1/tenant/1/branch']}>
-          <Route path="/region/:regionId/tenant/:tenantId/branch">
+          <Route path='/region/:regionId/tenant/:tenantId/branch'>
             <BranchList />
           </Route>
         </MemoryRouter>
@@ -410,7 +420,7 @@ describe('BranchList', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1/tenant/1/branch']}>
-          <Route path="/region/:regionId/tenant/:tenantId/branch">
+          <Route path='/region/:regionId/tenant/:tenantId/branch'>
             <BranchList />
           </Route>
         </MemoryRouter>
@@ -433,7 +443,7 @@ describe('BranchList', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1/tenant/1/branch']}>
-          <Route path="/region/:regionId/tenant/:tenantId/branch">
+          <Route path='/region/:regionId/tenant/:tenantId/branch'>
             <BranchList />
           </Route>
         </MemoryRouter>

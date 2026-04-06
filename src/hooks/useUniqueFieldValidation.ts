@@ -1,10 +1,11 @@
 import { FormApi } from 'final-form';
 import { FieldMetaState } from 'react-final-form';
 import { useCallback, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
 import toastCenter, { getErrorToastArgs } from '../utils/toastCenter';
 import APPCONSTANTS from '../constants/appConstants';
 
-export interface UseUniqueFieldValidationOptions {
+export interface IUseUniqueFieldValidationOptions {
   apiFn: (value: string) => Promise<{ data?: { unique?: boolean } }>;
   existsErrorMsg: string;
   notValidatedMsg: string;
@@ -17,7 +18,7 @@ export interface UseUniqueFieldValidationOptions {
   toastErrorMsg: string;
 }
 
-export interface UseUniqueFieldValidationReturn {
+export interface IUseUniqueFieldValidationReturn {
   getErrorMsg: (meta: FieldMetaState<string>) => string | undefined;
   getErrorLabel: (meta: FieldMetaState<string>) => string;
   validateExist: (value: string) => string | undefined;
@@ -25,8 +26,8 @@ export interface UseUniqueFieldValidationReturn {
   loading: boolean;
   networkError: boolean;
   setNetworkError: (value: boolean) => void;
-  submitEnabledStatusRef: React.MutableRefObject<boolean>;
-  lastCheckedRef: React.MutableRefObject<string>;
+  submitEnabledStatusRef: MutableRefObject<boolean>;
+  lastCheckedRef: MutableRefObject<string>;
 }
 
 /**
@@ -34,8 +35,8 @@ export interface UseUniqueFieldValidationReturn {
  * Manages refs, loading/network error state, validators, and retry behavior.
  */
 export function useUniqueFieldValidation(
-  options: UseUniqueFieldValidationOptions
-): UseUniqueFieldValidationReturn {
+  options: IUseUniqueFieldValidationOptions
+): IUseUniqueFieldValidationReturn {
   const {
     apiFn,
     existsErrorMsg,
@@ -93,8 +94,8 @@ export function useUniqueFieldValidation(
   const checkUniqueFn = useCallback(
     async (value: string, forceRetry?: boolean) => {
       const trimmed = value?.trim?.() || '';
-      if (!trimmed || trimmed.length < minLength) return;
-      if (!forceRetry && lastCheckedRef.current === trimmed) return;
+      if (!trimmed || trimmed.length < minLength) { return; }
+      if (!forceRetry && lastCheckedRef.current === trimmed) { return; }
       try {
         setLoading(true);
         setNetworkError(false);

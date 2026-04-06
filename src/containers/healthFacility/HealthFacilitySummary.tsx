@@ -458,7 +458,13 @@ const HealthFacilitySummary = (): React.ReactElement => {
    *
    * @returns {void}
    */
-  const handleAddEditUserSubmit = ({ users, ssUsers }: { users: IHFUserPost[], ssUsers?: ISSUserInputItem[] }): void => {
+  const handleAddEditUserSubmit = ({
+    users,
+    ssUsers
+  }: {
+    users: IHFUserPost[];
+    ssUsers?: ISSUserInputItem[];
+  }): void => {
     const userObj = getUserPayload({
       appTypes,
       userFormData: users,
@@ -521,7 +527,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
    * Handles the click event to delete a health facility user
    * @param {Object} param0 - The delete parameters
    */
-  const handleUserDelete = ({ data: { id, roles = [] } }: { data: { id: number; roles?: Array<{ name?: string }> } }) => {
+  const handleUserDelete = ({
+    data: { id, roles = [] }
+  }: {
+    data: { id: number; roles?: Array<{ name?: string }> };
+  }) => {
     const deleteUser = () => {
       dispatch(
         deleteHFUserRequest({

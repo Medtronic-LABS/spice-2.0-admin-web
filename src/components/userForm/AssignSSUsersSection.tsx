@@ -23,8 +23,8 @@ export const DEFAULT_SS_USER_ROW = { ssId: null, name: '', phoneNumber: '', subV
 
 /** SPICE role name that enables the Assign SS Users section */
 const hasShastiyaKormiRole = (role: any): boolean => {
-  if (!role) return false;
-  if (Array.isArray(role)) return role.some((r: { name?: string }) => r?.name === shastiyaKormiRole);
+  if (!role) { return false; }
+  if (Array.isArray(role)) { return role.some((r: { name?: string }) => r?.name === shastiyaKormiRole); }
   return role?.name === shastiyaKormiRole;
 };
 
@@ -106,10 +106,10 @@ const SubVillagesFieldWithCleanup = ({
   children: React.ReactNode;
 }) => {
   useEffect(() => {
-    if (subVillagesLoading || !options?.length) return;
+    if (subVillagesLoading || !options?.length) { return; }
     const currentValue = form.getState().values?.ssUsers?.[index]?.subVillages;
     const selected = Array.isArray(currentValue) ? currentValue : [];
-    if (selected.length === 0) return;
+    if (selected.length === 0) { return; }
     const optionIds = new Set(options.map((opt: any) => Number(opt?.id)).filter((id: number) => !Number.isNaN(id)));
     const validSelected = selected.filter((v: any) => optionIds.has(Number(v?.id)));
     if (validSelected.length !== selected.length) {
@@ -262,7 +262,7 @@ const SSUserRow = ({
               title='Remove row'
               aria-label='Remove row'
             >
-              <BinIcon className='me-0dot5' aria-hidden style={{ width: 20, height: 20 }} />
+              <BinIcon className='me-0dot5' aria-hidden={true} style={{ width: 20, height: 20 }} />
             </button>
           )}
           {showAdd && (
@@ -273,7 +273,7 @@ const SSUserRow = ({
               title='Add row'
               aria-label='Add row'
             >
-              <PlusIcon className='me-0dot5' aria-hidden style={{ width: 20, height: 20 }} />
+              <PlusIcon className='me-0dot5' aria-hidden={true} style={{ width: 20, height: 20 }} />
             </button>
           )}
           {isEdit && (
@@ -359,7 +359,7 @@ const AssignSSUsersSection = ({ isEdit }: { isEdit?: boolean }): React.ReactElem
     {(formSpyProps: { values?: IFormSpyValues }) => {
       const { values } = formSpyProps;
       const firstUserRole = values?.users?.[0]?.role;
-      if (!hasShastiyaKormiRole(firstUserRole)) return null;
+      if (!hasShastiyaKormiRole(firstUserRole)) { return null; }
       const ssUsers = values?.ssUsers ?? [];
       const usedIds = new Set(
         ssUsers.filter(user => user.isActive).map(user => user.ssId?.id)

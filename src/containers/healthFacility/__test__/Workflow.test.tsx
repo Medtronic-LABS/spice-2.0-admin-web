@@ -62,7 +62,12 @@ const mockFormApi: Partial<FormApi<any, Partial<any>>> = {
 const renderWithStore = (store: any, form: FormApi<any, Partial<any>>, formName: string) =>
   render(
     <Provider store={store}>
-      <Form onSubmit={() => {}} initialValues={{ healthFacility: { workflows: [], clinicalWorkflows: [], customizedWorkflows: [] } }}>
+      <Form
+        onSubmit={jest.fn()}
+        initialValues={{
+          healthFacility: { workflows: [], clinicalWorkflows: [], customizedWorkflows: [] }
+        }}
+      >
         {({ form: formInstance }) => <Workflows form={formInstance || form} formName={formName} />}
       </Form>
     </Provider>

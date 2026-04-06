@@ -7,10 +7,10 @@ import configureStore from 'redux-mock-store';
 
 // Mock react-leaflet to avoid ES module issues
 jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
-  TileLayer: () => <div data-testid="tile-layer" />,
-  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
-  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
   useMap: () => ({
     setView: jest.fn(),
     getCenter: () => ({ lat: 0, lng: 0 })

@@ -15,10 +15,10 @@ jest.mock('../utils/routeUtil', () => ({
 
 // Mock react-leaflet to avoid ES module issues
 jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
-  TileLayer: () => <div data-testid="tile-layer" />,
-  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
-  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
   useMap: () => ({
     setView: jest.fn(),
     getCenter: () => ({ lat: 0, lng: 0 })
@@ -134,7 +134,7 @@ describe('AppRoutes', () => {
 
   it('should redirect to the next URL when logged in and next parameter is present', async () => {
     const nextUrl = '/dashboard';
-    
+
     // Mock URLSearchParams to return the next parameter when get('next') is called
     const originalURLSearchParams = global.URLSearchParams;
     global.URLSearchParams = jest.fn().mockImplementation(() => {
@@ -172,7 +172,7 @@ describe('AppRoutes', () => {
     });
 
     expect(screen.getByTestId('loader')).toBeInTheDocument();
-    
+
     // Restore original URLSearchParams
     global.URLSearchParams = originalURLSearchParams;
   });

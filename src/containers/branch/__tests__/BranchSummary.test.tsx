@@ -55,7 +55,7 @@ jest.mock('../../../utils/formatObjectUtils', () => ({
 
 jest.mock('../../../components/loader/Loader', () => ({
   __esModule: true,
-  default: () => <div data-testid="loader">Loading...</div>
+  default: () => <div data-testid='loader'>Loading...</div>
 }));
 
 jest.mock('../../../components/detailCard/DetailCard', () => ({
@@ -71,9 +71,9 @@ jest.mock('../../../components/detailCard/DetailCard', () => ({
     onButtonClick: () => void;
     children: React.ReactNode;
   }) => (
-    <div data-testid="detail-card">
+    <div data-testid='detail-card'>
       <h2>{header}</h2>
-      <button type="button" onClick={onButtonClick}>
+      <button type='button' onClick={onButtonClick}>
         {buttonLabel}
       </button>
       {children}
@@ -99,15 +99,15 @@ jest.mock('../../../components/modal/ModalForm', () => ({
     render?: (form: any) => React.ReactNode;
   }) =>
     show ? (
-      <div data-testid="modal-form">
+      <div data-testid='modal-form'>
         <h3>{title}</h3>
         {renderProp?.([])}
-        <button type="button" onClick={handleCancel} data-testid="modal-cancel">
+        <button type='button' onClick={handleCancel} data-testid='modal-cancel'>
           Cancel
         </button>
         <button
-          type="button"
-          data-testid="modal-submit"
+          type='button'
+          data-testid='modal-submit'
           onClick={() =>
             handleFormSubmit({
               branch: {
@@ -129,7 +129,7 @@ jest.mock('../../../components/modal/ModalForm', () => ({
 
 jest.mock('../BranchForm', () => ({
   __esModule: true,
-  default: () => <div data-testid="branch-form">BranchForm</div>
+  default: () => <div data-testid='branch-form'>BranchForm</div>
 }));
 
 const mockBranchSummary = {
@@ -236,7 +236,7 @@ describe('BranchSummary', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/branch/1/tenant/1']}>
-          <Route path="/branch/:branchId/tenant/:tenantId">
+          <Route path='/branch/:branchId/tenant/:tenantId'>
             <BranchSummary />
           </Route>
         </MemoryRouter>
@@ -259,7 +259,7 @@ describe('BranchSummary', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/branch/1/tenant/1']}>
-          <Route path="/branch/:branchId/tenant/:tenantId">
+          <Route path='/branch/:branchId/tenant/:tenantId'>
             <BranchSummary />
           </Route>
         </MemoryRouter>
@@ -345,7 +345,7 @@ describe('BranchSummary', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/branch/1/tenant/1']}>
-          <Route path="/branch/:branchId/tenant/:tenantId">
+          <Route path='/branch/:branchId/tenant/:tenantId'>
             <BranchSummary />
           </Route>
         </MemoryRouter>
@@ -364,7 +364,7 @@ describe('BranchSummary', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/branch//tenant/1']}>
-          <Route path="/branch/:branchId/tenant/:tenantId">
+          <Route path='/branch/:branchId/tenant/:tenantId'>
             <BranchSummary />
           </Route>
         </MemoryRouter>
@@ -387,7 +387,7 @@ describe('BranchSummary', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/branch/1/tenant/1']}>
-          <Route path="/branch/:branchId/tenant/:tenantId">
+          <Route path='/branch/:branchId/tenant/:tenantId'>
             <BranchSummary />
           </Route>
         </MemoryRouter>
@@ -413,7 +413,7 @@ describe('BranchSummary', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/branch/1/tenant/1']}>
-          <Route path="/branch/:branchId/tenant/:tenantId">
+          <Route path='/branch/:branchId/tenant/:tenantId'>
             <BranchSummary />
           </Route>
         </MemoryRouter>
@@ -431,7 +431,9 @@ describe('BranchSummary', () => {
     });
   });
 
-  it('onSuccess callback calls toastCenter.success, closes modal, and dispatches fetchBranchSummaryRequest', async () => {
+  it(
+    'onSuccess callback calls toastCenter.success, closes modal, and dispatches fetchBranchSummaryRequest',
+    async () => {
     const toastCenter = require('../../../utils/toastCenter').default;
     renderBranchSummary();
 

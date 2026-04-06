@@ -42,7 +42,13 @@ import {
   healthFacilityUsersLoadingSelector,
   peerSupervisorLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHFUserGet, IHFUserPost, IPeerSupervisor, IUserRole, ShasthyaShebikaByKormiIdPayload } from '../../store/healthFacility/types';
+import {
+  IHFUserGet,
+  IHFUserPost,
+  IPeerSupervisor,
+  IUserRole,
+  ShasthyaShebikaByKormiIdPayload
+} from '../../store/healthFacility/types';
 import {
   changePassword,
   fetchCHWListRequest,
@@ -274,9 +280,13 @@ const UserList = (): React.ReactElement => {
    * @param {any[]} data.roles - user roles to check for SHASTIYA_KORMI
    */
   const handleUserDelete = useCallback(
-    ({ data: { id, organizations = [], roles = [] } }: { data: { id: number; organizations: any[]; roles: IRoles[] } }) => {
+    ({
+      data: { id, organizations = [], roles = [] }
+    }: {
+      data: { id: number; organizations: any[]; roles: IRoles[] };
+    }) => {
       const hasShastiyaKormiRole = roles.some(
-        (role) => role.name?.toUpperCase() === shastiyaKormiRole
+        (userRole) => userRole.name?.toUpperCase() === shastiyaKormiRole
       );
 
       // If user has SHASTIYA_KORMI role, first delete associated Shasthya Shebikas
@@ -298,7 +308,9 @@ const UserList = (): React.ReactElement => {
                       deleteUser(id, organizations);
                     },
                     failureCb: (e) => {
-                      toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_FAIL));
+                      toastCenter.error(
+                        ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.SHASTIYA_SHEBIKA_DELETE_FAIL)
+                      );
                     }
                   })
                 );
@@ -329,7 +341,9 @@ const UserList = (): React.ReactElement => {
   const openEditModal = (value: any) => {
     const userId = value?.id == null ? null : String(value.id);
     const { roles = [] } : { roles: any[] } = value;
-    const hasShastiyaKormiRole = roles.some(role => role.name?.toUpperCase() === shastiyaKormiRole);
+    const hasShastiyaKormiRole = roles.some(
+      (userRole) => userRole.name?.toUpperCase() === shastiyaKormiRole
+    );
     if ((value.roles || []).some((userRole: IUserRole) => villageBasedRoles.includes(userRole.name))) {
       dispatch(
         fetchUserDetailRequest({
@@ -510,7 +524,9 @@ const UserList = (): React.ReactElement => {
           tenantId: openConfirmationModal.userData.tenantId
         };
         onSubmitHandler(payload, reassignCHWRequest, siteActivateUserSuccess, (e) => {
-          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR));
+          toastCenter.error(
+            ...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.HEALTH_FACILITY_USER_UPDATE_ERROR)
+          );
         });
       } else {
         // Regular user update/create

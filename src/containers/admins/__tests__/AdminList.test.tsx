@@ -26,7 +26,7 @@ jest.mock('../../../components/userForm/UserForm', () => () => {
 });
 
 jest.mock('../../../assets/images/reset-password.svg', () => ({
-  ReactComponent: () => <svg data-testid="password-change-icon">PasswordChangeIcon</svg>
+  ReactComponent: () => <svg data-testid='password-change-icon'>PasswordChangeIcon</svg>
 }));
 
 const mockChildTableComponent = jest.fn();
@@ -53,20 +53,29 @@ jest.mock('../../../utils/toastCenter', () => ({
 
 jest.mock('../../../containers/authentication/ResetPasswordFields', () => ({
   __esModule: true,
-  default: () => <div data-testid="reset-password-fields">Reset Password Fields</div>,
+  default: () => <div data-testid='reset-password-fields'>Reset Password Fields</div>,
   generatePassword: jest.fn((password: string) => `hashed_${password}`)
 }));
 
-jest.mock('../../../components/loader/Loader', () => () => <div data-testid="loader">Loading...</div>);
+jest.mock('../../../components/loader/Loader', () => () => <div data-testid='loader'>Loading...</div>);
 
-jest.mock('../../../components/detailCard/DetailCard', () => ({ children, onButtonClick, onSearch, setSelectedRole, buttonLabel, header }: any) => (
-  <div data-testid="detail-card">
-    <h2>{header}</h2>
-    <button onClick={onButtonClick}>{buttonLabel}</button>
-    <input data-testid="search-input" onChange={(e) => onSearch && onSearch(e.target.value)} />
-    {children}
-  </div>
-));
+jest.mock('../../../components/detailCard/DetailCard', () => {
+  return ({
+    children,
+    onButtonClick,
+    onSearch,
+    setSelectedRole,
+    buttonLabel,
+    header
+  }: any) => (
+    <div data-testid='detail-card'>
+      <h2>{header}</h2>
+      <button onClick={onButtonClick}>{buttonLabel}</button>
+      <input data-testid='search-input' onChange={(e) => onSearch && onSearch(e.target.value)} />
+      {children}
+    </div>
+  );
+});
 
 const mockHandleSearch = jest.fn();
 const mockHandlePage = jest.fn();
@@ -373,12 +382,11 @@ describe('AdminList Component', () => {
       fireEvent.click(addButton);
 
       await waitFor(() => {
-        const mockModalForm: any = mockModalFormCalls[0];
-        expect(mockModalForm).toBeDefined();
+        expect(mockModalFormCalls[0]).toBeDefined();
       });
 
-      const mockModalForm: any = mockModalFormCalls[0];
-      mockModalForm.handleFormSubmit({
+      const modalForm: any = mockModalFormCalls[0];
+      modalForm.handleFormSubmit({
         users: [
           {
             firstName: 'John',
@@ -395,7 +403,7 @@ describe('AdminList Component', () => {
 
       const actions = localStore.getActions();
       const mockCreateHFUser = actions.find((action: any) => action.type === CREATE_HEALTH_FACILITY_USER_REQUEST);
-      
+
       if (mockCreateHFUser) {
         mockCreateHFUser.successCb();
         mockCreateHFUser.failureCb((error: Error) => {
@@ -414,10 +422,12 @@ describe('AdminList Component', () => {
   });
 
   describe('Delete Admin Functionality', () => {
-    it('should call deleteHFUserRequest and show success message on successful deletion without organizations', async () => {
+    it(
+      'should call deleteHFUserRequest and show success message on successful deletion without organizations',
+      async () => {
       const localStore = mockStore({
         user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           hfUserDetailLoading: false,
           healthFacilityUsersLoading: false
@@ -449,10 +459,12 @@ describe('AdminList Component', () => {
       }
     });
 
-    it('should call deleteHFUserRequest and show success message on successful deletion with organizations', async () => {
+    it(
+      'should call deleteHFUserRequest and show success message on successful deletion with organizations',
+      async () => {
       const localStore = mockStore({
         user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: [mockIHFUserGet],
           hfUserDetailLoading: false,
           healthFacilityUsersLoading: false
@@ -510,8 +522,10 @@ describe('AdminList Component', () => {
       };
       mockCustomTable.onRowEdit(postData);
       const actions = localStore.getActions();
-      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
-      
+      const mockFetchDetailsType = actions.find(
+        (action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST
+      );
+
       if (mockFetchDetailsType) {
         mockFetchDetailsType.successCb({
           id: 1,
@@ -555,8 +569,10 @@ describe('AdminList Component', () => {
       };
       mockCustomTable.onRowEdit(postData);
       const actions = localStore.getActions();
-      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST);
-      
+      const mockFetchDetailsType = actions.find(
+        (action: any) => action.type === FETCH_HEALTH_FACILITY_USER_DETAIL_REQUEST
+      );
+
       if (mockFetchDetailsType) {
         mockFetchDetailsType.successCb({
           id: 1
@@ -624,12 +640,11 @@ describe('AdminList Component', () => {
       fireEvent.click(addButton);
 
       await waitFor(() => {
-        const mockModalForm: any = mockModalFormCalls[0];
-        expect(mockModalForm).toBeDefined();
+        expect(mockModalFormCalls[0]).toBeDefined();
       });
 
-      const mockModalForm: any = mockModalFormCalls[0];
-      mockModalForm.handleCancel();
+      const modalFormCancel: any = mockModalFormCalls[0];
+      modalFormCancel.handleCancel();
       expect(screen.queryByTestId('modal-title')).not.toBeInTheDocument();
     });
 
@@ -655,7 +670,7 @@ describe('AdminList Component', () => {
 
     it('should handle reset password submit correctly', () => {
       renderComponent(store);
-      
+
       // First open the change password modal
       const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
       mockCustomTable.onCustomConfirmed({
@@ -665,7 +680,7 @@ describe('AdminList Component', () => {
 
       // Find the change password modal (should be the last one)
       const changePasswordModal = mockModalFormCalls[mockModalFormCalls.length - 1];
-      
+
       if (changePasswordModal) {
         changePasswordModal.handleFormSubmit({
           newPassword: 'newPassword'
@@ -673,7 +688,7 @@ describe('AdminList Component', () => {
 
         const actions = store.getActions();
         const mockChangePassword = actions.find((action: any) => action.type === CHANGE_PASSWORD_REQUEST);
-        
+
         if (mockChangePassword && mockChangePassword.data) {
           mockChangePassword.data.successCB();
           mockChangePassword.data.failureCb((error: Error) => {
@@ -730,7 +745,7 @@ describe('AdminList Component', () => {
     it('should call fetch admin list on mount', async () => {
       const localStore = mockStore({
         user: { countryList: [], email: 'test@gmail.com', userRoles: mockIGroupRoles },
-        healthFacility: { 
+        healthFacility: {
           healthFacilityUserList: mockIHFUserGet,
           hfUserDetailLoading: false,
           healthFacilityUsersLoading: false
@@ -741,8 +756,10 @@ describe('AdminList Component', () => {
       renderComponent(localStore);
 
       const actions = localStore.getActions();
-      const mockFetchDetailsType = actions.find((action: any) => action.type === FETCH_HEALTH_FACILITY_USER_LIST_REQUEST);
-      
+      const mockFetchDetailsType = actions.find(
+        (action: any) => action.type === FETCH_HEALTH_FACILITY_USER_LIST_REQUEST
+      );
+
       if (mockFetchDetailsType) {
         const failureCbSpy = jest.spyOn(mockFetchDetailsType, 'failureCb');
         mockFetchDetailsType.failureCb({ message: 'error' });
@@ -758,7 +775,7 @@ describe('AdminList Component', () => {
       renderComponent(store);
       const searchInput = screen.getByTestId('search-input');
       expect(searchInput).toBeInTheDocument();
-      
+
       fireEvent.change(searchInput, { target: { value: 'test search' } });
       expect(searchInput).toBeInTheDocument();
     });

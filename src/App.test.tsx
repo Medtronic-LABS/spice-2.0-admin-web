@@ -8,10 +8,10 @@ const mockStore = configureStore();
 
 // Mock react-leaflet to avoid ES module issues
 jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
-  TileLayer: () => <div data-testid="tile-layer" />,
-  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
-  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
   useMap: () => ({
     setView: jest.fn(),
     getCenter: () => ({ lat: 0, lng: 0 })
@@ -43,9 +43,13 @@ jest.mock('./hooks/appTypeBasedConfigs', () => ({
   })
 }));
 
-jest.mock('./containers/terms/TermsAndConditions', () => () => <div data-testid='terms-and-conditions'>Terms and Conditions</div>);
+jest.mock('./containers/terms/TermsAndConditions', () => () => (
+  <div data-testid='terms-and-conditions'>Terms and Conditions</div>
+));
 
-jest.mock('./components/errorBoundary/ErrorBoundary', () => ({ children }: any) => <div data-testid='error-boundary'>{children}</div>);
+jest.mock('./components/errorBoundary/ErrorBoundary', () => ({ children }: any) => (
+  <div data-testid='error-boundary'>{children}</div>
+));
 
 jest.mock('./components/breadcrumb/Breadcrumb', () => () => <div data-testid='breadcrumb'>Breadcrumb</div>);
 

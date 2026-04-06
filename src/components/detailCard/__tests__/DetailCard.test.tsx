@@ -123,8 +123,26 @@ describe('DetailCard', () => {
       chiefdomIds: [10, 20]
     };
     const onFilterData = [
-      { id: 1, name: 'District', key: 'districtIds', isSearchable: true, isFacility: false, isGeneric: true, data: [], isShow: true },
-      { id: 2, name: 'Chiefdom', key: 'chiefdomIds', isSearchable: true, isFacility: false, isGeneric: true, data: [], isShow: true }
+      {
+        id: 1,
+        name: 'District',
+        key: 'districtIds',
+        isSearchable: true,
+        isFacility: false,
+        isGeneric: true,
+        data: [],
+        isShow: true
+      },
+      {
+        id: 2,
+        name: 'Chiefdom',
+        key: 'chiefdomIds',
+        isSearchable: true,
+        isFacility: false,
+        isGeneric: true,
+        data: [],
+        isShow: true
+      }
     ];
     const onChange = jest.fn();
     const { unmount, getByText } = render(

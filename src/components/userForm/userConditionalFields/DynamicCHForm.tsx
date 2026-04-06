@@ -65,7 +65,7 @@ export const DynamicCHForm = ({
 
   const fetchSubVillages = useCallback(
     (villageIds: number[]) => {
-      if(isShastiyaKormiSelected) {
+      if (isShastiyaKormiSelected) {
         dispatch(
           fetchSubVillagesRequest({
             villageIds,
@@ -92,7 +92,8 @@ export const DynamicCHForm = ({
   const mandatoryVillages = useMemo(() => formValues?.existingVillages || [], [formValues?.existingVillages]);
 
   // When creating user from HF create flow, use linked villages from the health facility form.
-  // When editing (!isHFCreate), use stable EMPTY_VILLAGES so dependency doesn't change every render (avoids infinite loop).
+  // When editing (!isHFCreate), use stable EMPTY_VILLAGES so dependency doesn't change every render
+  // (avoids infinite loop).
   const linkedVillagesFromHF = isHFCreate
     ? (form.getState().values?.healthFacility?.linkedVillages ?? [])
     : EMPTY_VILLAGES;
@@ -134,7 +135,7 @@ export const DynamicCHForm = ({
       return;
     }
     const selected = formValues?.selectedVillages;
-    if (!selected?.length || hasFetchedSubVillagesForEdit.current) return;
+    if (!selected?.length || hasFetchedSubVillagesForEdit.current) { return; }
     const villageIds = extractVillageIds(selected);
     if (villageIds.length > 0) {
       hasFetchedSubVillagesForEdit.current = true;
@@ -142,7 +143,8 @@ export const DynamicCHForm = ({
     }
   }, [isEdit, formValues?.selectedVillages, fetchSubVillages]);
 
-  // When there is only one option, the field is auto-filled and onChange may not run — fetch sub-villages for that village
+  // When there is only one option, the field is auto-filled and onChange may not run —
+  // fetch sub-villages for that village
   useEffect(() => {
     if (currentHFVillages?.length === 1) {
       const villageId = currentHFVillages[0]?.id;

@@ -30,7 +30,7 @@ jest.mock('../../../store/chiefdom/actions', () => ({
 jest.mock('../../../components/formFields/TextInput', () => ({
   __esModule: true,
   default: ({ label, disabled, input = {}, error, onKeyDown }: any) => (
-    <div data-testid="text-input" data-label={label} data-disabled={disabled}>
+    <div data-testid='text-input' data-label={label} data-disabled={disabled}>
       <label>{label}</label>
       <input
         {...input}
@@ -39,7 +39,7 @@ jest.mock('../../../components/formFields/TextInput', () => ({
         onKeyDown={onKeyDown}
         data-testid={label ? `input-${label.replace(/\s/g, '-')}` : undefined}
       />
-      {error && <span data-testid="field-error">{error}</span>}
+      {error && <span data-testid='field-error'>{error}</span>}
     </div>
   )
 }));
@@ -47,10 +47,10 @@ jest.mock('../../../components/formFields/TextInput', () => ({
 jest.mock('../../../components/formFields/SelectInput', () => ({
   __esModule: true,
   default: ({ label, onChange }: any) => (
-    <div data-testid="select-input" data-label={label}>
+    <div data-testid='select-input' data-label={label}>
       <span>{label}</span>
       <button
-        type="button"
+        type='button'
         data-testid={`select-${label.toLowerCase()}`}
         onClick={() => onChange?.({ id: 1, tenantId: 100 })}
       >
@@ -80,9 +80,9 @@ describe('BranchForm', () => {
   ) => {
     return render(
       <Provider store={store}>
-        <Form onSubmit={() => {}} initialValues={initialValues}>
+        <Form onSubmit={jest.fn()} initialValues={initialValues}>
           {({ form }) => (
-            <BranchForm form={form} formName="branch" isEdit={false} {...props} />
+            <BranchForm form={form} formName='branch' isEdit={false} {...props} />
           )}
         </Form>
       </Provider>
@@ -205,7 +205,7 @@ describe('BranchForm', () => {
   it('uses default formName "branch" and default isEdit false when not provided', () => {
     render(
       <Provider store={store}>
-        <Form onSubmit={() => {}} initialValues={{}}>
+        <Form onSubmit={jest.fn()} initialValues={{}}>
           {({ form }) => <BranchForm form={form} />}
         </Form>
       </Provider>

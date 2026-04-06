@@ -68,32 +68,32 @@ describe('ConsentForm', () => {
   it('should enable the submit button when isDistrict is true and form type is selected', () => {
     const wrapper = mount(<ConsentForm {...props} isDistrict={true} />);
     const selectInput = wrapper.find(SelectInput);
-    
+
     act(() => {
       selectInput.prop('input').onChange({ name: 'Screening', id: 0 });
     });
-    
+
     wrapper.update();
     const submitButton = wrapper.find('button.primary-btn');
     expect(submitButton).toHaveLength(1);
     expect(submitButton.prop('disabled')).toBe(false);
   });
   it('handle onClick handleSubmit', () => {
-    const wrapper = mount(<ConsentForm {...props} isDistrict={true} editorContent="test content" />);
+    const wrapper = mount(<ConsentForm {...props} isDistrict={true} editorContent='test content' />);
     const selectInput = wrapper.find(SelectInput);
-    
+
     // First select a form type to enable the submit button
     act(() => {
       selectInput.prop('input').onChange({ name: 'Screening', id: 0 });
     });
     wrapper.update();
-    
+
     // Now click the submit button
     const submitButton = wrapper.find('button.primary-btn');
     act(() => {
       submitButton.simulate('click');
     });
-    
+
     expect(mockSubmitConsentForm).toHaveBeenCalledWith('test content');
   });
 });

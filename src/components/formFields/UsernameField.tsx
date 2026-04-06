@@ -171,12 +171,12 @@ const UsernameField = forwardRef(
         const isAdminFetched = !(isHF || isHFCreate) && isSiteUser;
         const usernameFetchPayload = isCommunity
           ? {
-              username: username, // API uses email parameter but we pass username
+              username, // API uses email parameter but we pass username
               appTypes
             }
           : {
               appTypes,
-              username: username, // API uses email parameter but we pass username
+              username, // API uses email parameter but we pass username
               parentOrganizationId: parentOrgId,
               ignoreTenantId,
               isSiteUsers: isAdminFetched
@@ -267,7 +267,14 @@ const UsernameField = forwardRef(
             showLoader={loading}
             label='Username'
             errorLabel={
-              [alreadyExistError, cfrError, differentOrgError, siteAdminError, noSpacesError, emptyCharError].includes(meta.error) ||
+              [
+                alreadyExistError,
+                cfrError,
+                differentOrgError,
+                siteAdminError,
+                noSpacesError,
+                emptyCharError
+              ].includes(meta.error) ||
               isNetworkError ||
               errorCode.current === 409
                 ? ''

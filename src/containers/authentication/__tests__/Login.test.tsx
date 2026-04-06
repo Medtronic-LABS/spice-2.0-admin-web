@@ -430,9 +430,9 @@ describe('Login', () => {
       const mockDecryptedPassword = 'decrypted-password';
 
       (localStorageServices.getItem as jest.Mock).mockImplementation((key: string) => {
-        if (key === APPCONSTANTS.USERNAME) return mockUsername;
-        if (key === APPCONSTANTS.PASSWORD) return mockPassword;
-        if (key === APPCONSTANTS.REMEMBER_ME) return true;
+        if (key === APPCONSTANTS.USERNAME) { return mockUsername; }
+        if (key === APPCONSTANTS.PASSWORD) { return mockPassword; }
+        if (key === APPCONSTANTS.REMEMBER_ME) { return true; }
         return null;
       });
 
@@ -466,7 +466,7 @@ describe('Login', () => {
       const mockDecryptedPassword = 'decrypted-password';
 
       (localStorageServices.getItem as jest.Mock).mockImplementation((key: string) => {
-        if (key === APPCONSTANTS.PASSWORD) return mockPassword;
+        if (key === APPCONSTANTS.PASSWORD) { return mockPassword; }
         return null;
       });
 
@@ -483,8 +483,8 @@ describe('Login', () => {
       const mockDecryptedPassword = 'decrypted-password';
 
       (localStorageServices.getItem as jest.Mock).mockImplementation((key: string) => {
-        if (key === APPCONSTANTS.USERNAME) return mockUsername;
-        if (key === APPCONSTANTS.PASSWORD) return mockPassword;
+        if (key === APPCONSTANTS.USERNAME) { return mockUsername; }
+        if (key === APPCONSTANTS.PASSWORD) { return mockPassword; }
         return null;
       });
 
@@ -571,8 +571,8 @@ describe('Login', () => {
       const mockDecryptedPassword = 'decrypted-password';
 
       (localStorageServices.getItem as jest.Mock).mockImplementation((key: string) => {
-        if (key === APPCONSTANTS.USERNAME) return mockUsername;
-        if (key === APPCONSTANTS.PASSWORD) return mockPassword;
+        if (key === APPCONSTANTS.USERNAME) { return mockUsername; }
+        if (key === APPCONSTANTS.PASSWORD) { return mockPassword; }
         return null;
       });
 
@@ -654,7 +654,7 @@ describe('Login', () => {
       const mockPassword = 'encrypted-password';
 
       (localStorageServices.getItem as jest.Mock).mockImplementation((key: string) => {
-        if (key === APPCONSTANTS.PASSWORD) return mockPassword;
+        if (key === APPCONSTANTS.PASSWORD) { return mockPassword; }
         return null;
       });
 

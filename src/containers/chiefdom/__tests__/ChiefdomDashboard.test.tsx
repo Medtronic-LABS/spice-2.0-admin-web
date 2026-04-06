@@ -7,7 +7,7 @@ import styles from '../Chiefdom.module.scss';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/arrow-right-small.svg', () => ({
-  ReactComponent: () => <svg data-testid="arrow-right-icon">ArrowRight</svg>
+  ReactComponent: () => <svg data-testid='arrow-right-icon'>ArrowRight</svg>
 }));
 
 describe('ChiefdomDashboard', () => {

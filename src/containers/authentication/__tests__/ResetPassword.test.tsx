@@ -25,14 +25,14 @@ jest.mock('../../../store/user/actions', () => ({
   resetPassword: jest.fn()
 }));
 
-jest.mock('../../../components/loader/Loader', () => () => <div data-testid="loader">Loading...</div>);
+jest.mock('../../../components/loader/Loader', () => () => <div data-testid='loader'>Loading...</div>);
 
 // Mock URLSearchParams
 const originalURLSearchParams = global.URLSearchParams;
 beforeAll(() => {
   global.URLSearchParams = jest.fn().mockImplementation(() => ({
     get: (key: string) => {
-      if (key === 'token') return 'test-token';
+      if (key === 'token') { return 'test-token'; }
       return null;
     }
   })) as any;
@@ -52,7 +52,7 @@ describe('ResetPassword', () => {
     jest.clearAllMocks();
     mockDispatch.mockClear();
     successCallback = null;
-    
+
     store = mockStore({
       user: {
         email: 'test@example.com',
@@ -100,10 +100,10 @@ describe('ResetPassword', () => {
     return render(
       <Provider store={store}>
         <MemoryRouter>
-          <ResetPassword 
+          <ResetPassword
             history={mockHistory}
             match={mockMatch}
-            email="test@example.com"
+            email='test@example.com'
             isPasswordSet={false}
           />
         </MemoryRouter>

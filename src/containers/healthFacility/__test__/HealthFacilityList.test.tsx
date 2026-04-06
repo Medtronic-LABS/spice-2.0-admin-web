@@ -19,10 +19,10 @@ const mockHistoryPush = jest.fn();
 
 // Mock react-leaflet to avoid ES module issues
 jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
-  TileLayer: () => <div data-testid="tile-layer" />,
-  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
-  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
+  TileLayer: () => <div data-testid='tile-layer' />,
+  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
+  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
   useMap: () => ({ setView: jest.fn(), getCenter: () => ({ lat: 0, lng: 0 }) }),
   useMapEvent: jest.fn(),
   useMapEvents: jest.fn()
@@ -30,10 +30,10 @@ jest.mock('react-leaflet', () => ({
 jest.mock('leaflet/dist/leaflet.css', () => ({}));
 
 jest.mock('../../../assets/images/edit.svg', () => ({
-  ReactComponent: () => <svg data-testid="edit-icon" />
+  ReactComponent: () => <svg data-testid='edit-icon' />
 }));
 jest.mock('../../../components/userForm/UserForm', () => () => {
-  return <div data-testid="mock-userForm">userForm</div>;
+  return <div data-testid='mock-userForm'>userForm</div>;
 });
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -341,7 +341,7 @@ describe('HealthFacilityList Component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1/2/health-facility']}>
-          <Route path="/region/:regionId/:tenantId/health-facility">
+          <Route path='/region/:regionId/:tenantId/health-facility'>
             <HealthFacilityList />
           </Route>
         </MemoryRouter>

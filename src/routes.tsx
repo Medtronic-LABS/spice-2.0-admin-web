@@ -385,7 +385,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       exact: true,
       component: BranchSummary,
       authorisedRoles: SU_SA
-    },
+    }
   ];
 })();
 
