@@ -554,6 +554,74 @@ describe('formatObjectUtils', () => {
       });
       expect(result[0].branches).toEqual([]);
     });
+
+    it('should map single districts and chiefdoms model objects to districtIds and chiefdomIds', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        districts: { id: 11, name: 'D1', tenantId: 't1' },
+        chiefdoms: { id: 22, name: 'C1' }
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].districtIds).toEqual([11]);
+      expect(result[0].chiefdomIds).toEqual([22]);
+    });
+
+    it('should map districts and chiefdoms arrays to districtIds and chiefdomIds', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        districts: [{ id: 1 }, { id: 2 }],
+        chiefdoms: [{ id: 3 }]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].districtIds).toEqual([1, 2]);
+      expect(result[0].chiefdomIds).toEqual([3]);
+    });
+
+    it('should filter out invalid district and chiefdom entries from districtIds and chiefdomIds', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        districts: [
+          { id: 1, name: 'Ok' },
+          { id: 'bad' as any },
+          null,
+          { name: 'NoId' },
+          { id: 2 }
+        ],
+        chiefdoms: [{ id: 10 }, { id: undefined as any }]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].districtIds).toEqual([1, 2]);
+      expect(result[0].chiefdomIds).toEqual([10]);
+    });
+
+    it('should set districtIds and chiefdomIds to empty arrays when districts and chiefdoms are absent', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }]
+      };
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+      expect(result[0].districtIds).toEqual([]);
+      expect(result[0].chiefdomIds).toEqual([]);
+    });
   });
 
   describe('formatHealthFacility', () => {

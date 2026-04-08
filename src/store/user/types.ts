@@ -787,6 +787,8 @@ export interface IUserPayload {
   reportUserOrganizationIds: number[];
   insightUserOrganizationIds: number[];
   villageIds?: number[];
+  districtIds?: number[];
+  chiefdomIds?: number[];
   village?: string;
   timezone: { id: number; name?: string };
   district?: string;

@@ -200,6 +200,15 @@ jest.mock('../userConditionalFields/BranchTaggingFields', () => ({
   }
 }));
 
+const mockDistrictChiefdomVillageFieldsCalls: any[] = [];
+jest.mock('../userConditionalFields/DistrictChiefdomVillageFields', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockDistrictChiefdomVillageFieldsCalls.push(props);
+    return <div data-testid='district-chiefdom-village-fields'>DistrictChiefdomVillageFields</div>;
+  }
+}));
+
 const mockAssignSSUsersSectionCalls: any[] = [];
 jest.mock('../AssignSSUsersSection', () => ({
   __esModule: true,
@@ -273,6 +282,7 @@ describe('UserForm', () => {
     mockAssignSSUsersSectionCalls.length = 0;
     mockDynamicCHFormCalls.length = 0;
     mockBranchTaggingFieldsCalls.length = 0;
+    mockDistrictChiefdomVillageFieldsCalls.length = 0;
     mockGetSuiteAccessList.mockReturnValue([{ groupName: 'SPICE', label: 'SPICE' }]);
     mockGetSpiceGroupName.mockImplementation((suiteAccess: any[]) => suiteAccess?.[0] || { groupName: 'SPICE' });
     mockFormUserData.mockImplementation((data: any) => data || {});
@@ -370,6 +380,52 @@ describe('UserForm', () => {
       expect(lastCall).toHaveProperty('isError');
       expect(lastCall).toHaveProperty('isHFCreate');
     });
+
+    it('does not render DistrictChiefdomVillageFields when PO role is not selected', () => {
+      const initialValues = {
+        users: [{ role: [{ name: 'OTHER_ROLE', id: 1 }], suiteAccess: [{ groupName: 'SPICE' }] }]
+      };
+      renderUserForm({}, defaultStoreState, initialValues);
+      expect(screen.queryByTestId('district-chiefdom-village-fields')).not.toBeInTheDocument();
+      expect(mockDistrictChiefdomVillageFieldsCalls.length).toBe(0);
+    });
+
+    it(
+      'renders DistrictChiefdomVillageFields with expected props when PO is default-selected (isAdminForm)',
+      async () => {
+      const storeWithPo = {
+        ...defaultStoreState,
+        user: {
+          ...defaultStoreState.user,
+          userRoles: {
+            SPICE: [
+              { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+              { id: 2, name: 'PO', groupName: 'SPICE', displayName: 'PO', appTypes: ['web'] }
+            ]
+          }
+        }
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },
+          defaultSelectedRole: 'PO'
+        },
+        storeWithPo
+      );
+      await waitFor(
+        () => {
+          expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
+        },
+        { timeout: 3000 }
+      );
+      const lastCall = mockDistrictChiefdomVillageFieldsCalls[mockDistrictChiefdomVillageFieldsCalls.length - 1];
+      expect(lastCall).toHaveProperty('name');
+      expect(lastCall).toHaveProperty('isError');
+      expect(lastCall).toHaveProperty('isHFCreate');
+      expect(lastCall).toHaveProperty('index');
+      expect(lastCall).toHaveProperty('form');
+      }
+    );
 
     it('renders Phone Number field', () => {
       renderUserForm();

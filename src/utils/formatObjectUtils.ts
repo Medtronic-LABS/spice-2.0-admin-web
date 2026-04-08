@@ -140,6 +140,16 @@ export const getUserPayload = ({
       timezone: user?.timezone?.id ? user.timezone : null,
       district: user?.district,
       chiefdom: user?.chiefdom,
+      districtIds: [
+        ...(Array.isArray(user?.districts) ? user.districts : [user?.districts])
+      ]
+        .filter((v): v is { id: number } => v && typeof v.id === 'number')
+        .map(v => v.id),
+      chiefdomIds: [
+        ...(Array.isArray(user?.chiefdoms) ? user.chiefdoms : [user?.chiefdoms])
+      ]
+        .filter((v): v is { id: number } => v && typeof v.id === 'number')
+        .map(v => v.id),
       designation: user?.designation?.id
         ? { name: user.designation.name, id: user.designation.id }
         : null,
