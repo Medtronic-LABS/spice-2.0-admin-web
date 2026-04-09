@@ -36,7 +36,8 @@ import {
   villageBasedRoles,
   // PHUInchargeRole,
   PHUInchargePlusFacilityReportAdmin,
-  shastiyaKormiRole
+  shastiyaKormiRole,
+  poRole
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
@@ -130,9 +131,12 @@ export const filterSPICERoles = (
     const isReports = groupName === REPORTS;
     const isReportAdmin = name === reportAdminRole[0];
     const isHF4User = name === hf4ReportUser;
-
+    const isPOUser = name === poRole;
     const isPeerSupervisor = (allRoles || []).some((r: IRoles) => r.name === peerSupervisor);
     if (!isPeerSupervisor && isHF4User) {
+      return false;
+    }
+    if ((isHF || isHFCreate) && isPOUser) {
       return false;
     }
     if (isHF || isHFCreate) {
