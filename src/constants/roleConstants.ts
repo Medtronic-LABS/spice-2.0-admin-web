@@ -15,6 +15,7 @@ export const peerSupervisor = 'PEER_SUPERVISOR';
 export const hf4ReportUser = 'HF4_REPORT_USER';
 export const shastiyaKormiRole = 'SHASTIYA_KORMI';
 export const poRole = 'PO';
+export const foRole = 'FO';
 // export const PHUIncharge = 'PHU_INCHARGE';
 
 // COMMUNITY

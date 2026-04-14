@@ -829,7 +829,7 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, mockState.user.user.appTypes);
+      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, [], mockState.user.user.appTypes);
       expect(successCb).toHaveBeenCalled();
       expect(dispatched).toEqual([
         hfActions.fetchVillagesListFromHFSuccess({
@@ -860,7 +860,7 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, mockState.user.user.appTypes);
+      expect(villageListHF).toHaveBeenCalledWith(countryId, districtId, chiefdomId, [], mockState.user.user.appTypes);
       expect(failureCb).toHaveBeenCalled();
       expect(dispatched).toEqual([hfActions.fetchVillagesListFromHFFailure(error)]);
     });
@@ -1075,10 +1075,11 @@ describe('HF sagas', () => {
           successCb
         }
       ).toPromise();
-      expect(hfVillageListSpy).toHaveBeenCalledWith(
+      expect(hfVillageListSpy).toHaveBeenLastCalledWith(
         hfVillageRequest.countryId,
         hfVillageRequest.districtId,
         hfVillageRequest.chiefdomId,
+        undefined,
         mockState.user.user.appTypes
       );
       expect(successCb).toHaveBeenCalled();
@@ -1108,10 +1109,11 @@ describe('HF sagas', () => {
           failureCb
         }
       ).toPromise();
-      expect(hfVillageListSpy).toHaveBeenCalledWith(
+      expect(hfVillageListSpy).toHaveBeenLastCalledWith(
         hfVillageRequest.countryId,
         hfVillageRequest.districtId,
         hfVillageRequest.chiefdomId,
+        undefined,
         mockState.user.user.appTypes
       );
       expect(failureCb).toHaveBeenCalled();

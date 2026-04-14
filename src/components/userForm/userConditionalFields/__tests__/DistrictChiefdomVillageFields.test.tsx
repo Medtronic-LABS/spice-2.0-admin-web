@@ -76,11 +76,9 @@ const baseStore = {
     districtList: [{ id: 1, name: 'D1' }],
     loading: false
   },
-  chiefdom: {
-    chiefdomList: [{ id: 2, name: 'C1' }],
-    loading: false
-  },
   healthFacility: {
+    chiefdomList: [{ id: 2, name: 'C1' }],
+    chiefdomLoading: false,
     villagesList: [{ id: 3, name: 'V1' }],
     villagesLoading: false
   }
@@ -90,7 +88,8 @@ describe('DistrictChiefdomVillageFields', () => {
   const defaultProps = {
     name: 'users.0',
     isError: jest.fn((meta: any) => meta?.error),
-    index: 0
+    index: 0,
+    isFoSelected: false
   };
 
   const renderWithForm = (
@@ -140,7 +139,7 @@ describe('DistrictChiefdomVillageFields', () => {
     );
   });
 
-  it('dispatches fetch chiefdom list when selected district has tenantId', () => {
+  it('dispatches fetch chiefdom list when selected district is present', () => {
     const { store } = renderWithForm(
       {},
       baseStore,
@@ -151,14 +150,15 @@ describe('DistrictChiefdomVillageFields', () => {
     expect(store.getActions()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'FETCH_CHIEFDOM_LIST_REQUEST',
-          tenantId: '88'
+          type: HF_ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF,
+          countryId: 99,
+          districtIds: [1]
         })
       ])
     );
   });
 
-  it('dispatches fetch villages when district id, chiefdom id, and countryId are set', () => {
+  it('dispatches fetch villages when chiefdom id and countryId are set', () => {
     const { store } = renderWithForm(
       {},
       baseStore,
@@ -176,8 +176,7 @@ describe('DistrictChiefdomVillageFields', () => {
         expect.objectContaining({
           type: HF_ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF,
           countryId: 99,
-          districtId: 5,
-          chiefdomId: 7
+          chiefdomIds: [7]
         })
       ])
     );
@@ -189,7 +188,7 @@ describe('DistrictChiefdomVillageFields', () => {
     const chiefdomCall = mockSelectInput.mock.calls.find((c) => c[0].label === 'Chiefdom');
     expect(districtCall?.[0].options).toEqual(baseStore.district.districtList);
     expect(districtCall?.[0].loadingOptions).toBe(false);
-    expect(chiefdomCall?.[0].options).toEqual(baseStore.chiefdom.chiefdomList);
+    expect(chiefdomCall?.[0].options).toEqual(baseStore.healthFacility.chiefdomList);
     expect(mockMultiSelect.mock.calls[0][0].options).toEqual(baseStore.healthFacility.villagesList);
     expect(mockMultiSelect.mock.calls[0][0].loadingOptions).toBe(false);
   });
@@ -269,5 +268,12 @@ describe('DistrictChiefdomVillageFields', () => {
     const { container } = renderWithForm({ isHFCreate: true });
     const cols = container.querySelectorAll('.col-12.col-sm-6.col-lg-4');
     expect(cols.length).toBe(3);
+  });
+
+  it('renders district and chiefdom as multiselect when FO is selected', () => {
+    renderWithForm({ isFoSelected: true });
+    expect(screen.queryByTestId('trigger-select-County')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('trigger-select-Chiefdom')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('multi-select').length).toBe(3);
   });
 });

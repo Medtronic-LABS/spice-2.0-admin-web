@@ -173,11 +173,17 @@ export const fetchChiefdomList = ({
     }
   });
 
-export const fetchVillagesList = (countryId: number, districtId: number, chiefdomId: number, appTypes: string[]) =>
+export const fetchVillagesList = (
+  countryId: number,
+  districtId: number,
+  chiefdomId: number,
+  chiefdomIds: number[],
+  appTypes: string[]
+) =>
   axios({
     url: '/admin-service/villages-list',
     method: 'POST',
-    data: { countryId, districtId, chiefdomId, appTypes }
+    data: { countryId, districtId, chiefdomId, chiefdomIds, appTypes }
   });
 
 export const fetchUnlinkedVillagesAPI = (

@@ -324,15 +324,22 @@ describe('Health Facility APIs', () => {
     const countryId = 1;
     const districtId = 1;
     const chiefdomId = 1;
+    const chiefdomIds = [1, 2];
     const appTypes = ['NON_COMMUNITY'];
 
     mockAxios.onPost('/admin-service/villages-list').reply(200, {});
 
-    await fetchVillagesList(countryId, districtId, chiefdomId, appTypes);
+    await fetchVillagesList(countryId, districtId, chiefdomId, chiefdomIds, appTypes);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/villages-list');
-    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ countryId, districtId, chiefdomId, appTypes });
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({
+      countryId,
+      districtId,
+      chiefdomId,
+      chiefdomIds,
+      appTypes
+    });
   });
 
   it(`fetchUnlinkedVillagesAPI sends a POST request to

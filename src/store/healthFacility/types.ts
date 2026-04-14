@@ -702,8 +702,9 @@ export interface IFetchChiefdomListFailure {
 export interface IFetchVillagesListRequest {
   type: typeof ACTION_TYPES.FETCH_VILLAGES_LIST_REQUEST_FOR_HF;
   countryId: number;
-  districtId: number;
-  chiefdomId: number;
+  districtId?: number;
+  chiefdomId?: number;
+  chiefdomIds?: number[];
   successCb?: (data: IVillages[], total: number) => void;
   failureCb?: (error: Error) => void;
 }

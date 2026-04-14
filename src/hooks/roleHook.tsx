@@ -37,7 +37,8 @@ import {
   // PHUInchargeRole,
   PHUInchargePlusFacilityReportAdmin,
   shastiyaKormiRole,
-  poRole
+  poRole,
+  foRole
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
@@ -132,11 +133,12 @@ export const filterSPICERoles = (
     const isReportAdmin = name === reportAdminRole[0];
     const isHF4User = name === hf4ReportUser;
     const isPOUser = name === poRole;
+    const isFOUser = name === foRole;
     const isPeerSupervisor = (allRoles || []).some((r: IRoles) => r.name === peerSupervisor);
     if (!isPeerSupervisor && isHF4User) {
       return false;
     }
-    if ((isHF || isHFCreate) && isPOUser) {
+    if ((isHF || isHFCreate) && (isPOUser || isFOUser)) {
       return false;
     }
     if (isHF || isHFCreate) {

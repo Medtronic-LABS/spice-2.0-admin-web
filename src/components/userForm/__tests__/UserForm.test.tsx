@@ -424,8 +424,36 @@ describe('UserForm', () => {
       expect(lastCall).toHaveProperty('isHFCreate');
       expect(lastCall).toHaveProperty('index');
       expect(lastCall).toHaveProperty('form');
+      expect(lastCall).toHaveProperty('isFoSelected', false);
       }
     );
+
+    it('passes isFoSelected=true to DistrictChiefdomVillageFields when FO is default-selected', async () => {
+      const storeWithFo = {
+        ...defaultStoreState,
+        user: {
+          ...defaultStoreState.user,
+          userRoles: {
+            SPICE: [
+              { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+              { id: 2, name: 'FO', groupName: 'SPICE', displayName: 'FO', appTypes: ['web'] }
+            ]
+          }
+        }
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },
+          defaultSelectedRole: 'FO'
+        },
+        storeWithFo
+      );
+      await waitFor(() => {
+        expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
+      });
+      const lastCall = mockDistrictChiefdomVillageFieldsCalls[mockDistrictChiefdomVillageFieldsCalls.length - 1];
+      expect(lastCall).toHaveProperty('isFoSelected', true);
+    });
 
     it('renders Phone Number field', () => {
       renderUserForm();

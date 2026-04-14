@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Field, useFormState } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -7,12 +7,15 @@ import SelectInput from '../../formFields/SelectInput';
 import MultiSelect from '../../multiSelect/MultiSelect';
 import APPCONSTANTS from '../../../constants/appConstants';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
-import { fetchChiefdomListRequest } from '../../../store/chiefdom/actions';
 import { districtLoadingSelector, getDistrictListSelector } from '../../../store/district/selectors';
-import { chiefdomListSelector, chiefdomLoadingSelector } from '../../../store/chiefdom/selectors';
 import { fetchDistrictListRequest } from '../../../store/district/actions';
-import { fetchVillagesListRequest } from '../../../store/healthFacility/actions';
-import { villagesListSelector, villagesLoadingSelector } from '../../../store/healthFacility/selectors';
+import { fetchChiefdomListRequest, fetchVillagesListRequest } from '../../../store/healthFacility/actions';
+import {
+  chiefdomListSelector,
+  chiefdomLoadingSelector,
+  villagesListSelector,
+  villagesLoadingSelector
+} from '../../../store/healthFacility/selectors';
 import { IVillages } from '../../../store/healthFacility/types';
 import { countryIdSelector } from '../../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
@@ -24,14 +27,28 @@ interface IDistrictChiefdomVillageFieldsProps {
   isError: (meta: any) => string | undefined;
   isHFCreate?: boolean;
   index: number;
+  isFoSelected: boolean;
 }
+
+interface IWithId {
+  id: number;
+}
+
+const extractIds = (data?: IWithId | IWithId[]): number[] => {
+  if (Array.isArray(data)) {
+    return data.map(item => Number(item.id)).filter(Boolean);
+  }
+
+  return data?.id ? [Number(data.id)] : [];
+};
 
 const DistrictChiefdomVillageFields = ({
   form,
   name,
   isError,
   isHFCreate,
-  index
+  index,
+  isFoSelected
 }: IDistrictChiefdomVillageFieldsProps) => {
   const dispatch = useDispatch();
   const { tenantId, regionId } = useParams<{ tenantId: string, regionId: string }>();
@@ -47,9 +64,14 @@ const DistrictChiefdomVillageFields = ({
   // Subscribe to live form values so dependent fetches react to field changes.
   const { values } = useFormState({ subscription: { values: true } });
   const currentUser = (values as any)?.users?.[index];
-  const selectedDistrictId = currentUser?.districts?.id;
-  const selectedDistrictTenantId = currentUser?.districts?.tenantId;
-  const selectedChiefdomId = currentUser?.chiefdoms?.id;
+  const selectedDistrictIds = useMemo(
+    () => extractIds(currentUser?.districts),
+    [currentUser?.districts]
+  );
+  const selectedChiefdomIds = useMemo(
+    () => extractIds(currentUser?.chiefdoms),
+    [currentUser?.chiefdoms]
+  );
 
   // District fetch
   useEffect(() => {
@@ -60,19 +82,18 @@ const DistrictChiefdomVillageFields = ({
 
   // Chiefdom fetch
   useEffect(() => {
-    if (selectedDistrictTenantId) {
-      dispatch(fetchChiefdomListRequest({ tenantId: selectedDistrictTenantId }));
+    if (selectedDistrictIds.length && countryId) {
+      dispatch(fetchChiefdomListRequest({ countryId, districtIds: selectedDistrictIds }));
     }
-  }, [dispatch, selectedDistrictTenantId]);
+  }, [countryId, dispatch, selectedDistrictIds]);
 
   // Villages fetch
   useEffect(() => {
-    if (selectedChiefdomId && selectedDistrictId && countryId) {
+    if (selectedChiefdomIds.length && countryId) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
-          districtId: Number(selectedDistrictId),
-          chiefdomId: Number(selectedChiefdomId),
+          chiefdomIds: selectedChiefdomIds,
           successCb: (list: IVillages[]) => {
             if (!list.length) {
               toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_PRESENT);
@@ -84,7 +105,11 @@ const DistrictChiefdomVillageFields = ({
         })
       );
     }
-  }, [countryId, dispatch, selectedChiefdomId, selectedDistrictId]);
+  }, [
+    countryId,
+    dispatch,
+    selectedChiefdomIds
+  ]);
 
   const {
     district: { s: districtSName },
@@ -99,49 +124,102 @@ const DistrictChiefdomVillageFields = ({
         <Field
           name={`${name}.districts`}
           type='text'
-          render={({ input, meta }) => (
-            <SelectInput
-              {...(input as any)}
-              label={districtSName}
-              errorLabel={districtSName.toLowerCase()}
-              labelKey='name'
-              valueKey='id'
-              options={districtList || []}
-              loadingOptions={districtLoading}
-              error={isError(meta)}
-              isModel={true}
-              required={true}
-              onChange={(value: any) => {
-                form.change(`${name}.chiefdoms`, undefined);
-                form.change(`${name}.villages`, undefined);
-                input.onChange(value);
-              }}
-            />
-          )}
+          render={({ input, meta }) =>
+            isFoSelected ? (
+              <MultiSelect
+                {...(input as any)}
+                label={districtSName}
+                errorLabel={districtSName.toLowerCase()}
+                labelKey='name'
+                valueKey='id'
+                required={true}
+                isShowLabel={true}
+                isSelectAll={true}
+                isDefaultSelected={true}
+                placeholder=''
+                menuPlacement={'auto'}
+                isDisabled={false}
+                isModel={true}
+                isMulti={true}
+                options={districtList || []}
+                loadingOptions={districtLoading}
+                error={isError(meta)}
+                onChange={(value: any) => {
+                  form.change(`${name}.chiefdoms`, undefined);
+                  form.change(`${name}.villages`, undefined);
+                  input.onChange(value);
+                }}
+              />
+            ) : (
+              <SelectInput
+                {...(input as any)}
+                label={districtSName}
+                errorLabel={districtSName.toLowerCase()}
+                labelKey='name'
+                valueKey='id'
+                options={districtList || []}
+                loadingOptions={districtLoading}
+                error={isError(meta)}
+                isModel={true}
+                required={true}
+                onChange={(value: any) => {
+                  form.change(`${name}.chiefdoms`, undefined);
+                  form.change(`${name}.villages`, undefined);
+                  input.onChange(value);
+                }}
+              />
+            )
+          }
         />
       </div>
       <div className={colClass}>
         <Field
           name={`${name}.chiefdoms`}
           type='text'
-          render={({ input, meta }) => (
-            <SelectInput
-              {...(input as any)}
-              label={chiefdomSName}
-              errorLabel={chiefdomSName.toLowerCase()}
-              labelKey='name'
-              valueKey='id'
-              options={chiefdomList || []}
-              loadingOptions={chiefdomLoading}
-              error={isError(meta)}
-              isModel={true}
-              required={true}
-              onChange={(value: any) => {
-                form.change(`${name}.villages`, undefined);
-                input.onChange(value);
-              }}
-            />
-          )}
+          render={({ input, meta }) =>
+            isFoSelected ? (
+              <MultiSelect
+                {...(input as any)}
+                label={chiefdomSName}
+                errorLabel={chiefdomSName.toLowerCase()}
+                labelKey='name'
+                valueKey='id'
+                required={true}
+                isShowLabel={true}
+                isSelectAll={true}
+                isDefaultSelected={true}
+                placeholder=''
+                menuPlacement={'auto'}
+                isDisabled={false}
+                isModel={true}
+                isMulti={true}
+                options={chiefdomList || []}
+                loadingOptions={chiefdomLoading}
+                error={isError(meta)}
+                onChange={(value: any) => {
+                  form.change(`${name}.villages`, undefined);
+                  input.onChange(value);
+                }}
+              />
+            ) : (
+              <SelectInput
+                {...(input as any)}
+                label={chiefdomSName}
+                errorLabel={chiefdomSName.toLowerCase()}
+                labelKey='name'
+                valueKey='id'
+                options={chiefdomList || []}
+                loadingOptions={chiefdomLoading}
+                error={isError(meta)}
+                isModel={true}
+                required={true}
+                onChange={(value: any) => {
+                  form.change(`${name}.villages`, undefined);
+                  input.onChange(value);
+                }}
+              />
+            )
+          }
         />
       </div>
       <div className={colClass}>

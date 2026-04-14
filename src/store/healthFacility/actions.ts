@@ -605,6 +605,7 @@ export const fetchVillagesListRequest = ({
   countryId,
   districtId,
   chiefdomId,
+  chiefdomIds,
   successCb,
   failureCb
 }: Omit<IFetchVillagesListRequest, 'type'>): IFetchVillagesListRequest => ({
@@ -612,6 +613,7 @@ export const fetchVillagesListRequest = ({
   countryId,
   districtId,
   chiefdomId,
+  chiefdomIds,
   successCb,
   failureCb
 });

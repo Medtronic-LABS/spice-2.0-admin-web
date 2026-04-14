@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { hf4ReportUser, INSIGHTS, peerSupervisor, poRole, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
+import { foRole, hf4ReportUser, INSIGHTS, peerSupervisor, poRole, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
@@ -37,7 +37,7 @@ import {
   villagesFromHFListSelector,
   villagesFromHFLoadingSelector
 } from '../../store/healthFacility/selectors';
-import { IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
+import { IChiefdom, IHealthFacility, IPeerSupervisor, IVillages } from '../../store/healthFacility/types';
 import {
   clearDesignationList,
   fetchCommunityListRequest,
@@ -79,6 +79,7 @@ import useUserFormUtils, { filterRolesByAppTypeFn, isVillageBasedRoleSelection }
 import AssignSSUsersSection from './AssignSSUsersSection';
 import { clearBranchesByUnion } from '../../store/branch/actions';
 import DistrictChiefdomVillageFields from './userConditionalFields/DistrictChiefdomVillageFields';
+import { IDistrict } from '../../store/district/types';
 
 export interface IUserFormValues {
   email: string;
@@ -357,12 +358,19 @@ const UserForm = ({
           existingVillages.push(village);
         }
       });
-      const firstDistrict = Array.isArray(initialEditValue?.districts)
-        ? initialEditValue.districts[0]
-        : initialEditValue?.districts;
-      const firstChiefdom = Array.isArray(initialEditValue?.chiefdoms)
-        ? initialEditValue.chiefdoms[0]
-        : initialEditValue?.chiefdoms;
+      let selectedDistricts: IDistrict[] = [];
+      if (Array.isArray(initialEditValue?.districts)) {
+        selectedDistricts = initialEditValue.districts;
+      } else if (initialEditValue?.districts) {
+        selectedDistricts = [initialEditValue.districts];
+      }
+
+      let selectedChiefdoms: IChiefdom[] = [];
+      if (Array.isArray(initialEditValue?.chiefdoms)) {
+        selectedChiefdoms = initialEditValue.chiefdoms;
+      } else if (initialEditValue?.chiefdoms) {
+        selectedChiefdoms = [initialEditValue.chiefdoms];
+      }
       return [
         {
           ...initialEditValue,
@@ -384,8 +392,8 @@ const UserForm = ({
             initialEditValue?.organizations?.filter(
               (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.chiefdom
             ) || '',
-          districts: firstDistrict || '',
-          chiefdoms: firstChiefdom || '',
+          districts: selectedDistricts,
+          chiefdoms: selectedChiefdoms,
           healthfacility:
             initialEditValue?.organizations?.filter(
               (countyDetail: any) => countyDetail.formName === NAMING_VARIABLES.healthFacility
@@ -1083,6 +1091,7 @@ const UserForm = ({
           }
           const isShastiyaKormiSelected = spiceRoleList.some((r: IRoles) => r?.name === shastiyaKormiRole);
           const isPoSelected = spiceRoleList.some((r: IRoles) => r?.name === poRole);
+          const isFoSelected = spiceRoleList.some((r: IRoles) => r?.name === foRole);
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1822,13 +1831,14 @@ const UserForm = ({
                     isHFCreate={isHFCreate}
                   />
                 )}
-                {isPoSelected && (
+                {(isPoSelected || isFoSelected) && (
                   <DistrictChiefdomVillageFields
                     form={form}
                     name={name}
                     isError={isError}
                     isHFCreate={isHFCreate}
                     index={index}
+                    isFoSelected={isFoSelected}
                   />
                 )}
                 <SiteUserForm
