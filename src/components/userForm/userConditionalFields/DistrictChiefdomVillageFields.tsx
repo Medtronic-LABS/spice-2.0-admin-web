@@ -36,10 +36,13 @@ interface IWithId {
 
 const extractIds = (data?: IWithId | IWithId[]): number[] => {
   if (Array.isArray(data)) {
-    return data.map(item => Number(item.id)).filter(Boolean);
+    return data
+      .map(item => Number(item.id))
+      .filter(num => Number.isFinite(num));
   }
 
-  return data?.id ? [Number(data.id)] : [];
+  const id = Number(data?.id);
+  return Number.isFinite(id) ? [id] : [];
 };
 
 const DistrictChiefdomVillageFields = ({

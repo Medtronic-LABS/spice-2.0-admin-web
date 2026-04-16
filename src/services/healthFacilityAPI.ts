@@ -175,9 +175,9 @@ export const fetchChiefdomList = ({
 
 export const fetchVillagesList = (
   countryId: number,
-  districtId: number,
-  chiefdomId: number,
-  chiefdomIds: number[],
+  districtId: number | undefined,
+  chiefdomId: number | undefined,
+  chiefdomIds: number[] = [],
   appTypes: string[]
 ) =>
   axios({

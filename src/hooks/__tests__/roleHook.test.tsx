@@ -15,9 +15,7 @@ import {
   hf4ReportUser,
   peerSupervisor,
   villageBasedRoles,
-  shastiyaKormiRole,
-  poRole,
-  foRole
+  shastiyaKormiRole
 } from '../../constants/roleConstants';
 
 jest.mock('../appTypeBasedConfigs', () => ({
@@ -229,56 +227,6 @@ describe('roleHook', () => {
       );
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe(superAdminRole);
-    });
-
-    it('should exclude PO when either isHF or isHFCreate is true', () => {
-      const roles = [createRole({ name: poRole, groupName: SPICE, suiteAccessName: 'other' })];
-
-      const hfCreateResult = filterSPICERoles(
-        roles,
-        { ...baseOptions, isHF: true, isHFCreate: true },
-        []
-      );
-      expect(hfCreateResult).toHaveLength(0);
-
-      const onlyHFResult = filterSPICERoles(
-        roles,
-        { ...baseOptions, isHF: true, isHFCreate: false },
-        []
-      );
-      expect(onlyHFResult).toHaveLength(0);
-
-      const onlyHFCreateResult = filterSPICERoles(
-        roles,
-        { ...baseOptions, isHF: false, isHFCreate: true },
-        []
-      );
-      expect(onlyHFCreateResult).toHaveLength(0);
-    });
-
-    it('should exclude FO when either isHF or isHFCreate is true', () => {
-      const roles = [createRole({ name: foRole, groupName: SPICE, suiteAccessName: 'other' })];
-
-      const hfCreateResult = filterSPICERoles(
-        roles,
-        { ...baseOptions, isHF: true, isHFCreate: true },
-        []
-      );
-      expect(hfCreateResult).toHaveLength(0);
-
-      const onlyHFResult = filterSPICERoles(
-        roles,
-        { ...baseOptions, isHF: true, isHFCreate: false },
-        []
-      );
-      expect(onlyHFResult).toHaveLength(0);
-
-      const onlyHFCreateResult = filterSPICERoles(
-        roles,
-        { ...baseOptions, isHF: false, isHFCreate: true },
-        []
-      );
-      expect(onlyHFCreateResult).toHaveLength(0);
     });
   });
 

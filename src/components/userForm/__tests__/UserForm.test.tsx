@@ -550,6 +550,62 @@ describe('UserForm', () => {
         expect(store.getActions()).toEqual(expect.arrayContaining([expect.objectContaining(clearBranchesByUnion())]));
       });
     });
+
+    it.each([
+      { roleName: 'PO' },
+      { roleName: 'FO' }
+    ])(
+      'renders assigned health facility selector and dispatches clearBranchesByUnion when %s user changes it',
+      async ({ roleName }) => {
+        const storeStateWithRole = {
+          ...defaultStoreState,
+          user: {
+            ...defaultStoreState.user,
+            userRoles: {
+              SPICE: [
+                { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+                { id: 2, name: roleName, groupName: 'SPICE', displayName: roleName, appTypes: ['web'] }
+              ]
+            }
+          }
+        };
+        const initialValues = {
+          users: [
+            {
+              role: [{ id: 2, name: roleName }],
+              suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }]
+            }
+          ]
+        };
+        const store = mockStore(storeStateWithRole);
+
+        render(
+          <Provider store={store}>
+            <MemoryRouter>
+              <Form onSubmit={jest.fn()} mutators={{ ...arrayMutators }} initialValues={initialValues}>
+                {({ form }) => (
+                  <UserForm
+                    {...defaultProps}
+                    form={form}
+                    userFormParams={{ ...defaultProps.userFormParams, isAdminForm: true }}
+                    defaultSelectedRole={roleName}
+                  />
+                )}
+              </Form>
+            </MemoryRouter>
+          </Provider>
+        );
+
+        expect(screen.getByText('Assigned Health Facility')).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId('select-trigger-Assigned-Health-Facility'));
+
+        await waitFor(() => {
+          expect(store.getActions()).toEqual(
+            expect.arrayContaining([expect.objectContaining(clearBranchesByUnion())])
+          );
+        });
+      }
+    );
   });
 
   describe('AssignSSUsersSection', () => {
