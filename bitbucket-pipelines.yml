@@ -154,6 +154,27 @@ pipelines:
             - step:
                 <<: *deploy-s3-cf
                 runs-on: *runner-uhis-dev
+    
+    "uhis-training":
+      - stage:
+          name: Install, Test & Sonar
+          steps:
+            - step:
+                <<: *install-test
+                runs-on: *runner-uhis-dev
+            - step:
+                <<: *sonar
+                runs-on: *runner-uhis-dev
+      - stage:
+          name: Build & Deploy to UHIS-TRAINING
+          deployment: uhis-training
+          steps:
+            - step:
+                <<: *build
+                runs-on: *runner-uhis-dev
+            - step:
+                <<: *deploy-s3-cf-training
+                runs-on: *runner-uhis-dev
 
   # Manual pipeline: Build & Deploy to UHIS-QA
   # Required deployment variables for 'uhis-qa':
@@ -170,15 +191,4 @@ pipelines:
                 runs-on: *runner-uhis-dev
             - step:
                 <<: *deploy-s3-cf
-                runs-on: *runner-uhis-dev
-    deploy-uhis-training:
-      - stage:
-          name: Build & Deploy to UHIS-TRAINING
-          deployment: uhis-training
-          steps:
-            - step:
-                <<: *build
-                runs-on: *runner-uhis-dev
-            - step:
-                <<: *deploy-s3-cf-training
                 runs-on: *runner-uhis-dev
