@@ -21,7 +21,8 @@ import {
   IFetchBranchesByUnionRequest,
   IFetchBranchesByUnionSuccess,
   IFetchBranchesByUnionFailure,
-  IClearBranchesByUnion
+  IClearBranchesByUnion,
+  IBranchRegionFilterPayload
 } from './types';
 
 export const fetchBranchListRequest = ({
@@ -138,16 +139,16 @@ export const clearBranchSummary = (): IClearBranchSummary => ({
 });
 
 export const fetchBranchesByUnionRequest = ({
-  unionIds,
+  payload,
   successCb,
   failureCb
 }: {
-  unionIds: number[];
+  payload: IBranchRegionFilterPayload
   successCb?: (branches: IBranch[]) => void;
   failureCb?: (error: Error) => void;
 }): IFetchBranchesByUnionRequest => ({
   type: BRANCH_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST,
-  unionIds,
+  payload,
   successCb,
   failureCb
 });

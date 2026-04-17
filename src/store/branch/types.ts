@@ -79,6 +79,12 @@ export interface ICreateBranchRequest {
   failureCb?: (error: Error) => void;
 }
 
+export interface IBranchRegionFilterPayload {
+  unionIds?: number[];
+  districtIds?: number[];
+  chiefdomIds?: number[];
+}
+
 export interface ICreateBranchSuccess {
   type: typeof ACTION_TYPES.CREATE_BRANCH_SUCCESS;
 }
@@ -136,7 +142,7 @@ export interface IClearBranchSummary {
 
 export interface IFetchBranchesByUnionRequest {
   type: typeof ACTION_TYPES.FETCH_BRANCHES_BY_UNION_REQUEST;
-  unionIds: number[];
+  payload: IBranchRegionFilterPayload;
   successCb?: (branches: IBranch[]) => void;
   failureCb?: (error: Error) => void;
 }

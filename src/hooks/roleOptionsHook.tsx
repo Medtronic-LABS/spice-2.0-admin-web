@@ -69,7 +69,7 @@ export const useRoleOptions = ({
             }
 
             if (isCommunity && (currentModule !== regionSname.toLowerCase() || isHFCreate)) {
-              return !reportAdminRole.includes(role.name);
+              return reportAdminRole.includes(role.name);
             }
             return true;
           })

@@ -1,6 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
-import useUserFormUtils from '../userFormUtils';
+import useUserFormUtils, { getRoleFlags } from '../userFormUtils';
 import { IRoles } from '../../../store/user/types';
+import {
+  areaManagerRole,
+  divisionalManagerRole,
+  foRole,
+  poRole,
+  shastiyaKormiRole
+} from '../../../constants/roleConstants';
 
 jest.mock('../userFormMeta', () => ({
   __esModule: true,
@@ -105,5 +112,53 @@ describe('useUserFormUtils', () => {
     });
 
     expect(mockInput.onChange).toBeCalled();
+  });
+});
+
+describe('getRoleFlags', () => {
+  test('should return all flags as false when roles are undefined', () => {
+    expect(getRoleFlags()).toEqual({
+      isPoSelected: false,
+      isFoSelected: false,
+      isAreaManagerSelected: false,
+      isDivisionalManagerSelected: false,
+      isShastiyaKormiSelected: false
+    });
+  });
+
+  test('should return correct flags for a single role object', () => {
+    expect(getRoleFlags({ name: poRole })).toEqual({
+      isPoSelected: true,
+      isFoSelected: false,
+      isAreaManagerSelected: false,
+      isDivisionalManagerSelected: false,
+      isShastiyaKormiSelected: false
+    });
+  });
+
+  test('should return correct flags for multiple selected roles', () => {
+    expect(
+      getRoleFlags([
+        { name: foRole },
+        { name: areaManagerRole },
+        { name: shastiyaKormiRole }
+      ])
+    ).toEqual({
+      isPoSelected: false,
+      isFoSelected: true,
+      isAreaManagerSelected: true,
+      isDivisionalManagerSelected: false,
+      isShastiyaKormiSelected: true
+    });
+  });
+
+  test('should detect divisional manager role in an array', () => {
+    expect(getRoleFlags([{ name: divisionalManagerRole }])).toEqual({
+      isPoSelected: false,
+      isFoSelected: false,
+      isAreaManagerSelected: false,
+      isDivisionalManagerSelected: true,
+      isShastiyaKormiSelected: false
+    });
   });
 });

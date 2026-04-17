@@ -4,10 +4,12 @@ import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import BranchTaggingFields from '../BranchTaggingFields';
+import { areaManagerRole, divisionalManagerRole, shastiyaKormiRole } from '../../../../constants/roleConstants';
 
 const mockStore = configureStore([]);
 
 const mockSelectInput = jest.fn();
+const mockMultiSelect = jest.fn();
 jest.mock('../../../formFields/SelectInput', () => ({
   __esModule: true,
   default: (props: any) => {
@@ -20,11 +22,24 @@ jest.mock('../../../formFields/SelectInput', () => ({
     );
   }
 }));
+jest.mock('../../../multiSelect/MultiSelect', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockMultiSelect(props);
+    return (
+      <div data-testid='multi-select'>
+        <span>{props.label}</span>
+        {props.error && <span data-testid='multi-select-error'>{props.error}</span>}
+      </div>
+    );
+  }
+}));
 
 describe('BranchTaggingFields', () => {
   const defaultProps = {
     name: 'branchTagging',
-    isError: jest.fn((meta: any) => meta?.error)
+    isError: jest.fn((meta: any) => meta?.error),
+    index: 0
   };
 
   const createStore = (branchState = {}) =>
@@ -39,11 +54,12 @@ describe('BranchTaggingFields', () => {
 
   const renderWithForm = (
     props: Partial<React.ComponentProps<typeof BranchTaggingFields>> = {},
-    store = createStore()
+    store = createStore(),
+    initialValues = { users: [{ role: [{ name: shastiyaKormiRole }] }] }
   ) => {
     return render(
       <Provider store={store}>
-        <Form onSubmit={jest.fn()}>
+        <Form onSubmit={jest.fn()} initialValues={initialValues}>
           {() => (
             <BranchTaggingFields
               {...defaultProps}
@@ -59,9 +75,10 @@ describe('BranchTaggingFields', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the Branch select field', () => {
+  it('renders single-select Branch field for SHASTIYA_KORMI role', () => {
     renderWithForm();
     expect(screen.getByTestId('select-input')).toBeInTheDocument();
+    expect(screen.queryByTestId('multi-select')).not.toBeInTheDocument();
     expect(screen.getByText('Branch')).toBeInTheDocument();
   });
 
@@ -127,5 +144,38 @@ describe('BranchTaggingFields', () => {
     const { container } = renderWithForm({ isHFCreate: true });
     const wrapper = container.querySelector('.col-12.col-sm-6.col-lg-4');
     expect(wrapper).toBeInTheDocument();
+  });
+
+  it('renders multiselect Branch field for AREA_MANAGER role', () => {
+    const initialValues = { users: [{ role: [{ name: areaManagerRole }] }] };
+    renderWithForm({}, createStore(), initialValues);
+    expect(screen.getByTestId('multi-select')).toBeInTheDocument();
+    expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+    const multiProps = mockMultiSelect.mock.calls[0][0];
+    expect(multiProps.isMulti).toBe(true);
+    expect(multiProps.label).toBe('Branches');
+  });
+
+  it('renders multiselect Branch field for DIVISIONAL_MANAGER role', () => {
+    const initialValues = { users: [{ role: [{ name: divisionalManagerRole }] }] };
+    renderWithForm({}, createStore(), initialValues);
+    expect(screen.getByTestId('multi-select')).toBeInTheDocument();
+    expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+  });
+
+  it('renders multiselect Branch field when both manager and SK roles are selected', () => {
+    const initialValues = {
+      users: [{ role: [{ name: shastiyaKormiRole }, { name: areaManagerRole }] }]
+    };
+    renderWithForm({}, createStore(), initialValues);
+    expect(screen.getByTestId('multi-select')).toBeInTheDocument();
+    expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+  });
+
+  it('does not render branch field for non-target roles', () => {
+    const initialValues = { users: [{ role: [{ name: 'OTHER_ROLE' }] }] };
+    renderWithForm({}, createStore(), initialValues);
+    expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('multi-select')).not.toBeInTheDocument();
   });
 });

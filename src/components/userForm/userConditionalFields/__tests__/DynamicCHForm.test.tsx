@@ -202,7 +202,7 @@ describe('DynamicCHForm', () => {
       expect.objectContaining({ villageIds: [42] })
     );
     expect(mockFetchBranchesByUnionRequest).toHaveBeenCalledWith(
-      expect.objectContaining({ unionIds: [42] })
+      expect.objectContaining({ payload: { unionIds: [42] } })
     );
   });
 
@@ -223,7 +223,7 @@ describe('DynamicCHForm', () => {
       expect.objectContaining({ villageIds: [10, 20] })
     );
     expect(mockFetchBranchesByUnionRequest).toHaveBeenCalledWith(
-      expect.objectContaining({ unionIds: [10, 20] })
+      expect.objectContaining({ payload: { unionIds: [10, 20] } })
     );
   });
 

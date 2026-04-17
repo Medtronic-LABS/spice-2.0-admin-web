@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import DistrictChiefdomVillageFields from '../DistrictChiefdomVillageFields';
 import * as HF_ACTION_TYPES from '../../../../store/healthFacility/actionTypes';
+import { foRole, poRole } from '../../../../constants/roleConstants';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -88,14 +89,13 @@ describe('DistrictChiefdomVillageFields', () => {
   const defaultProps = {
     name: 'users.0',
     isError: jest.fn((meta: any) => meta?.error),
-    index: 0,
-    isFoSelected: false
+    index: 0
   };
 
   const renderWithForm = (
     props: Partial<React.ComponentProps<typeof DistrictChiefdomVillageFields>> = {},
     storeState = baseStore,
-    initialValues: Record<string, unknown> = { users: [{}] }
+    initialValues: Record<string, unknown> = { users: [{ role: [{ name: poRole }] }] }
   ) => {
     const store = mockStore(storeState);
     const view = render(
@@ -165,6 +165,7 @@ describe('DistrictChiefdomVillageFields', () => {
       {
         users: [
           {
+            role: [{ name: poRole }],
             districts: { id: 5, tenantId: '88', name: 'D' },
             chiefdoms: { id: 7, name: 'C' }
           }
@@ -203,6 +204,7 @@ describe('DistrictChiefdomVillageFields', () => {
           initialValues={{
             users: [
               {
+                role: [{ name: poRole }],
                 districts: { id: 1, tenantId: '1', name: 'Old' },
                 chiefdoms: { id: 2, name: 'C' },
                 villages: [{ id: 3 }]
@@ -236,6 +238,7 @@ describe('DistrictChiefdomVillageFields', () => {
           initialValues={{
             users: [
               {
+                role: [{ name: poRole }],
                 districts: { id: 1, tenantId: '1', name: 'D' },
                 chiefdoms: { id: 2, name: 'C' },
                 villages: [{ id: 3 }]
@@ -271,7 +274,7 @@ describe('DistrictChiefdomVillageFields', () => {
   });
 
   it('renders district and chiefdom as multiselect when FO is selected', () => {
-    renderWithForm({ isFoSelected: true });
+    renderWithForm({}, baseStore, { users: [{ role: [{ name: foRole }] }] });
     expect(screen.queryByTestId('trigger-select-County')).not.toBeInTheDocument();
     expect(screen.queryByTestId('trigger-select-Chiefdom')).not.toBeInTheDocument();
     expect(screen.getAllByTestId('multi-select').length).toBe(3);

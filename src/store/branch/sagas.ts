@@ -91,17 +91,17 @@ export function* fetchBranchSummarySaga({
 }
 
 /**
- * Worker saga: fetches branches by unions via POST /admin-service/branch/list-by-unions
+ * Worker saga: fetches branches by region filters via POST /admin-service/branch/list-by-region-filters
  */
 export function* fetchBranchesByUnionSaga({
-  unionIds,
+  payload,
   successCb,
   failureCb
 }: IFetchBranchesByUnionRequest): SagaIterator {
   try {
     const {
       data: { entityList }
-    } = yield call(branchService.fetchBranchesByUnions as any, unionIds);
+    } = yield call(branchService.fetchBranchesByUnions as any, payload);
     const branches = entityList ?? [];
     successCb?.(branches);
     yield put(branchActions.fetchBranchesByUnionSuccess(branches));

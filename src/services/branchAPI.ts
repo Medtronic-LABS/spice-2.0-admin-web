@@ -2,7 +2,8 @@ import axios from 'axios';
 import {
   IFetchBranchListRequestPayload,
   ICreateBranchRequestPayload,
-  IUpdateBranchRequestPayload
+  IUpdateBranchRequestPayload,
+  IBranchRegionFilterPayload
 } from '../store/branch/types';
 
 export const fetchBranchList = (data: IFetchBranchListRequestPayload) =>
@@ -32,9 +33,12 @@ export const fetchBranchById = (branchId: number) =>
     url: `/admin-service/branch/${branchId}`
   });
 
-export const fetchBranchesByUnions = (unionIds: number[]) =>
-  axios({
+export const fetchBranchesByUnions = (
+  data: IBranchRegionFilterPayload
+) => {
+  return axios({
     method: 'POST',
-    url: '/admin-service/branch/list-by-unions',
-    data: { unionIds }
+    url: '/admin-service/branch/list-by-region-filters',
+    data
   });
+};

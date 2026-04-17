@@ -1,12 +1,13 @@
 import { FormApi } from 'final-form';
 import { useEffect, useMemo } from 'react';
-import { Field, useFormState } from 'react-final-form';
+import { Field, useField } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import SelectInput from '../../formFields/SelectInput';
 import MultiSelect from '../../multiSelect/MultiSelect';
 import APPCONSTANTS from '../../../constants/appConstants';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
+import { fetchBranchesByUnionRequest } from '../../../store/branch/actions';
 import { districtLoadingSelector, getDistrictListSelector } from '../../../store/district/selectors';
 import { fetchDistrictListRequest } from '../../../store/district/actions';
 import { fetchChiefdomListRequest, fetchVillagesListRequest } from '../../../store/healthFacility/actions';
@@ -20,6 +21,7 @@ import { IVillages } from '../../../store/healthFacility/types';
 import { countryIdSelector } from '../../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
 import sessionStorageServices from '../../../global/sessionStorageServices';
+import { getRoleFlags } from '../userFormUtils';
 
 interface IDistrictChiefdomVillageFieldsProps {
   form: FormApi<any>;
@@ -27,7 +29,6 @@ interface IDistrictChiefdomVillageFieldsProps {
   isError: (meta: any) => string | undefined;
   isHFCreate?: boolean;
   index: number;
-  isFoSelected: boolean;
 }
 
 interface IWithId {
@@ -50,8 +51,7 @@ const DistrictChiefdomVillageFields = ({
   name,
   isError,
   isHFCreate,
-  index,
-  isFoSelected
+  index
 }: IDistrictChiefdomVillageFieldsProps) => {
   const dispatch = useDispatch();
   const { tenantId, regionId } = useParams<{ tenantId: string, regionId: string }>();
@@ -64,16 +64,34 @@ const DistrictChiefdomVillageFields = ({
   const villages = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
 
-  // Subscribe to live form values so dependent fetches react to field changes.
-  const { values } = useFormState({ subscription: { values: true } });
-  const currentUser = (values as any)?.users?.[index];
+  // Subscribe only to role and location fields for this user row.
+  const {
+    input: { value: spiceRole }
+  } = useField(`${name}.role`, { subscription: { value: true } });
+  const {
+    input: { value: selectedDistricts }
+  } = useField(`${name}.districts`, { subscription: { value: true } });
+  const {
+    input: { value: selectedChiefdoms }
+  } = useField(`${name}.chiefdoms`, { subscription: { value: true } });
+  const roleFlags = getRoleFlags(spiceRole);
+
+  const {
+    isPoSelected,
+    isFoSelected,
+    isAreaManagerSelected,
+    isDivisionalManagerSelected
+  } = roleFlags;
+  const isPoOrFoSelected = isPoSelected || isFoSelected;
+  const isManagerSelected = isAreaManagerSelected || isDivisionalManagerSelected;
+
   const selectedDistrictIds = useMemo(
-    () => extractIds(currentUser?.districts),
-    [currentUser?.districts]
+    () => extractIds(selectedDistricts),
+    [selectedDistricts]
   );
   const selectedChiefdomIds = useMemo(
-    () => extractIds(currentUser?.chiefdoms),
-    [currentUser?.chiefdoms]
+    () => extractIds(selectedChiefdoms),
+    [selectedChiefdoms]
   );
 
   // District fetch
@@ -92,7 +110,7 @@ const DistrictChiefdomVillageFields = ({
 
   // Villages fetch
   useEffect(() => {
-    if (selectedChiefdomIds.length && countryId) {
+    if (selectedChiefdomIds.length && countryId && isPoOrFoSelected) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
@@ -111,8 +129,36 @@ const DistrictChiefdomVillageFields = ({
   }, [
     countryId,
     dispatch,
+    isPoOrFoSelected,
     selectedChiefdomIds
   ]);
+
+  // Branches fetch by region filters
+  useEffect(() => {
+    if (!isManagerSelected || selectedDistrictIds.length === 0) {
+      return;
+    }
+
+    const requestPayload: {
+      districtIds?: number[];
+      chiefdomIds?: number[];
+    } = {
+      districtIds: selectedDistrictIds
+    };
+
+    if (isAreaManagerSelected && selectedChiefdomIds.length) {
+      requestPayload.chiefdomIds = selectedChiefdomIds;
+    }
+
+    dispatch(
+      fetchBranchesByUnionRequest({
+        payload: requestPayload,
+        failureCb: (e) => {
+          toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.BRANCHES_BY_UNIONS_FETCH_FAIL));
+        }
+      })
+    );
+  }, [dispatch, isAreaManagerSelected, isManagerSelected, selectedChiefdomIds, selectedDistrictIds]);
 
   const {
     district: { s: districtSName },
@@ -121,6 +167,10 @@ const DistrictChiefdomVillageFields = ({
   } = useAppTypeConfigs();
   const colClass = `${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `;
 
+  if (!isPoOrFoSelected && !isManagerSelected) {
+    return null;
+  }
+
   return (
     <>
       <div className={colClass}>
@@ -128,7 +178,7 @@ const DistrictChiefdomVillageFields = ({
           name={`${name}.districts`}
           type='text'
           render={({ input, meta }) =>
-            isFoSelected ? (
+            isFoSelected || isAreaManagerSelected || isDivisionalManagerSelected ? (
               <MultiSelect
                 {...(input as any)}
                 label={districtSName}
@@ -150,6 +200,7 @@ const DistrictChiefdomVillageFields = ({
                 onChange={(value: any) => {
                   form.change(`${name}.chiefdoms`, undefined);
                   form.change(`${name}.villages`, undefined);
+                  form.change(`${name}.branches`, undefined);
                   input.onChange(value);
                 }}
               />
@@ -168,6 +219,7 @@ const DistrictChiefdomVillageFields = ({
                 onChange={(value: any) => {
                   form.change(`${name}.chiefdoms`, undefined);
                   form.change(`${name}.villages`, undefined);
+                  form.change(`${name}.branches`, undefined);
                   input.onChange(value);
                 }}
               />
@@ -175,16 +227,70 @@ const DistrictChiefdomVillageFields = ({
           }
         />
       </div>
-      <div className={colClass}>
-        <Field
-          name={`${name}.chiefdoms`}
-          type='text'
-          render={({ input, meta }) =>
-            isFoSelected ? (
+      {(isPoOrFoSelected || isAreaManagerSelected) && (
+        <div className={colClass}>
+          <Field
+            name={`${name}.chiefdoms`}
+            type='text'
+            render={({ input, meta }) =>
+              isFoSelected || isAreaManagerSelected ? (
+                <MultiSelect
+                  {...(input as any)}
+                  label={chiefdomSName}
+                  errorLabel={chiefdomSName.toLowerCase()}
+                  labelKey='name'
+                  valueKey='id'
+                  required={true}
+                  isShowLabel={true}
+                  isSelectAll={true}
+                  isDefaultSelected={true}
+                  placeholder=''
+                  menuPlacement={'auto'}
+                  isDisabled={false}
+                  isModel={true}
+                  isMulti={true}
+                  options={chiefdomList || []}
+                  loadingOptions={chiefdomLoading}
+                  error={isError(meta)}
+                  onChange={(value: any) => {
+                    form.change(`${name}.villages`, undefined);
+                    form.change(`${name}.branches`, undefined);
+                    input.onChange(value);
+                  }}
+                />
+              ) : (
+                <SelectInput
+                  {...(input as any)}
+                  label={chiefdomSName}
+                  errorLabel={chiefdomSName.toLowerCase()}
+                  labelKey='name'
+                  valueKey='id'
+                  options={chiefdomList || []}
+                  loadingOptions={chiefdomLoading}
+                  error={isError(meta)}
+                  isModel={true}
+                  required={true}
+                  onChange={(value: any) => {
+                    form.change(`${name}.villages`, undefined);
+                    form.change(`${name}.branches`, undefined);
+                    input.onChange(value);
+                  }}
+                />
+              )
+            }
+          />
+        </div>
+      )}
+      {isPoOrFoSelected && (
+        <div className={colClass}>
+          <Field
+            name={`${name}.villages`}
+            type='text'
+            render={({ input, meta }) => (
               <MultiSelect
                 {...(input as any)}
-                label={chiefdomSName}
-                errorLabel={chiefdomSName.toLowerCase()}
+                label={villagePName}
+                errorLabel={villagePName.toLowerCase()}
                 labelKey='name'
                 valueKey='id'
                 required={true}
@@ -196,62 +302,14 @@ const DistrictChiefdomVillageFields = ({
                 isDisabled={false}
                 isModel={true}
                 isMulti={true}
-                options={chiefdomList || []}
-                loadingOptions={chiefdomLoading}
+                options={villages || []}
+                loadingOptions={villagesLoading}
                 error={isError(meta)}
-                onChange={(value: any) => {
-                  form.change(`${name}.villages`, undefined);
-                  input.onChange(value);
-                }}
               />
-            ) : (
-              <SelectInput
-                {...(input as any)}
-                label={chiefdomSName}
-                errorLabel={chiefdomSName.toLowerCase()}
-                labelKey='name'
-                valueKey='id'
-                options={chiefdomList || []}
-                loadingOptions={chiefdomLoading}
-                error={isError(meta)}
-                isModel={true}
-                required={true}
-                onChange={(value: any) => {
-                  form.change(`${name}.villages`, undefined);
-                  input.onChange(value);
-                }}
-              />
-            )
-          }
-        />
-      </div>
-      <div className={colClass}>
-        <Field
-          name={`${name}.villages`}
-          type='text'
-          render={({ input, meta }) => (
-            <MultiSelect
-              {...(input as any)}
-              label={villagePName}
-              errorLabel={villagePName.toLowerCase()}
-              labelKey='name'
-              valueKey='id'
-              required={true}
-              isShowLabel={true}
-              isSelectAll={true}
-              isDefaultSelected={true}
-              placeholder=''
-              menuPlacement={'auto'}
-              isDisabled={false}
-              isModel={true}
-              isMulti={true}
-              options={villages || []}
-              loadingOptions={villagesLoading}
-              error={isError(meta)}
-            />
-          )}
-        />
-      </div>
+            )}
+          />
+        </div>
+      )}
     </>
   );
 };

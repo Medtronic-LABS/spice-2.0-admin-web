@@ -338,13 +338,13 @@ describe('UserForm', () => {
       expect(mockDynamicCHFormCalls[mockDynamicCHFormCalls.length - 1]).toHaveProperty('spiceRoleList');
     });
 
-    it('does not render BranchTaggingFields when Shastiya Kormi role is not selected', () => {
+    it('passes BranchTaggingFields props even when Shastiya Kormi role is not selected', () => {
       const initialValues = {
         users: [{ role: [{ name: 'OTHER_ROLE', id: 1 }], suiteAccess: [{ groupName: 'SPICE' }] }]
       };
       renderUserForm({}, defaultStoreState, initialValues);
-      expect(screen.queryByTestId('branch-tagging-fields')).not.toBeInTheDocument();
-      expect(mockBranchTaggingFieldsCalls.length).toBe(0);
+      expect(screen.getByTestId('branch-tagging-fields')).toBeInTheDocument();
+      expect(mockBranchTaggingFieldsCalls.length).toBeGreaterThanOrEqual(1);
     });
 
     it(
@@ -379,15 +379,16 @@ describe('UserForm', () => {
       expect(lastCall).toHaveProperty('name');
       expect(lastCall).toHaveProperty('isError');
       expect(lastCall).toHaveProperty('isHFCreate');
+      expect(lastCall).toHaveProperty('index');
     });
 
-    it('does not render DistrictChiefdomVillageFields when PO role is not selected', () => {
+    it('passes DistrictChiefdomVillageFields props even when PO role is not selected', () => {
       const initialValues = {
         users: [{ role: [{ name: 'OTHER_ROLE', id: 1 }], suiteAccess: [{ groupName: 'SPICE' }] }]
       };
       renderUserForm({}, defaultStoreState, initialValues);
-      expect(screen.queryByTestId('district-chiefdom-village-fields')).not.toBeInTheDocument();
-      expect(mockDistrictChiefdomVillageFieldsCalls.length).toBe(0);
+      expect(screen.getByTestId('district-chiefdom-village-fields')).toBeInTheDocument();
+      expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
     });
 
     it(
@@ -424,11 +425,10 @@ describe('UserForm', () => {
       expect(lastCall).toHaveProperty('isHFCreate');
       expect(lastCall).toHaveProperty('index');
       expect(lastCall).toHaveProperty('form');
-      expect(lastCall).toHaveProperty('isFoSelected', false);
       }
     );
 
-    it('passes isFoSelected=true to DistrictChiefdomVillageFields when FO is default-selected', async () => {
+    it('passes DistrictChiefdomVillageFields base props when FO is default-selected', async () => {
       const storeWithFo = {
         ...defaultStoreState,
         user: {
@@ -452,7 +452,8 @@ describe('UserForm', () => {
         expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
       });
       const lastCall = mockDistrictChiefdomVillageFieldsCalls[mockDistrictChiefdomVillageFieldsCalls.length - 1];
-      expect(lastCall).toHaveProperty('isFoSelected', true);
+      expect(lastCall).toHaveProperty('index');
+      expect(lastCall).toHaveProperty('form');
     });
 
     it('renders Phone Number field', () => {

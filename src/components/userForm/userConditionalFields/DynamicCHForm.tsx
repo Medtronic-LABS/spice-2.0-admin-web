@@ -76,7 +76,7 @@ export const DynamicCHForm = ({
         );
         dispatch(
           fetchBranchesByUnionRequest({
-            unionIds: villageIds,
+            payload: { unionIds: villageIds },
             failureCb: (e) => {
               toastCenter.error(...getErrorToastArgs(e, APPCONSTANTS.OOPS, APPCONSTANTS.BRANCHES_BY_UNIONS_FETCH_FAIL));
             }

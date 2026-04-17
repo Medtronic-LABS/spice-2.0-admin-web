@@ -91,15 +91,25 @@ describe('Branch API', () => {
     expect(mockAxios.history.get[0].method).toBe('get');
   });
 
-  it('fetchBranchesByUnions sends a POST request to /admin-service/branch/list-by-unions with unionIds', async () => {
+  it('fetchBranchesByUnions sends unionIds to region filters endpoint', async () => {
     const unionIds = [1, 2, 3];
-    mockAxios.onPost('/admin-service/branch/list-by-unions').reply(200, {});
+    mockAxios.onPost('/admin-service/branch/list-by-region-filters').reply(200, {});
 
-    await fetchBranchesByUnions(unionIds);
+    await fetchBranchesByUnions({ unionIds });
 
     expect(mockAxios.history.post.length).toBe(1);
-    expect(mockAxios.history.post[0].url).toBe('/admin-service/branch/list-by-unions');
+    expect(mockAxios.history.post[0].url).toBe('/admin-service/branch/list-by-region-filters');
     expect(mockAxios.history.post[0].method).toBe('post');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual({ unionIds });
+  });
+
+  it('fetchBranchesByUnions sends optional districtIds and chiefdomIds', async () => {
+    const payload = { districtIds: [10, 20], chiefdomIds: [100], unionIds: [1] };
+    mockAxios.onPost('/admin-service/branch/list-by-region-filters').reply(200, {});
+
+    await fetchBranchesByUnions(payload);
+
+    expect(mockAxios.history.post.length).toBe(1);
+    expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(payload);
   });
 });

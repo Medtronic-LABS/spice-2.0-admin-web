@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
-import { shastiyaKormiRole, SPICE, villageBasedRoles } from '../../constants/roleConstants';
+import { areaManagerRole, divisionalManagerRole, foRole, poRole, shastiyaKormiRole, SPICE, villageBasedRoles } from '../../constants/roleConstants';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 import { removeRedRiskFromRoleArray } from '../../utils/commonUtils';
@@ -26,6 +26,22 @@ export const isVillageBasedRoleSelection = (roles: IRoles[] | undefined): boolea
   (roles || []).some(
     (r) => villageBasedRoles.includes(r?.name) || r?.name === shastiyaKormiRole
   );
+
+interface IRole { name?: string; }
+
+export const getRoleFlags = (roles?: IRole | IRole[]) => {
+  const roleList = Array.isArray(roles) ? roles : roles ? [roles] : [];
+
+  const roleNames = new Set(roleList.map((r) => r?.name));
+
+  return {
+    isPoSelected: roleNames.has(poRole),
+    isFoSelected: roleNames.has(foRole),
+    isAreaManagerSelected: roleNames.has(areaManagerRole),
+    isDivisionalManagerSelected: roleNames.has(divisionalManagerRole),
+    isShastiyaKormiSelected: roleNames.has(shastiyaKormiRole)
+  };
+};
 
 const useUserFormUtils = () => {
   const { mobileRoles, isHFAdminRole } = UserFormMeta();

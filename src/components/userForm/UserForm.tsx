@@ -1089,9 +1089,11 @@ const UserForm = ({
           } else {
             spiceRoleList = [];
           }
-          const isShastiyaKormiSelected = spiceRoleList.some((r: IRoles) => r?.name === shastiyaKormiRole);
-          const isPoSelected = spiceRoleList.some((r: IRoles) => r?.name === poRole);
-          const isFoSelected = spiceRoleList.some((r: IRoles) => r?.name === foRole);
+          const roleNames = new Set(spiceRoleList.map((r: IRoles) => r?.name));
+
+          const isShastiyaKormiSelected = roleNames.has(shastiyaKormiRole);
+          const isPoSelected = roleNames.has(poRole);
+          const isFoSelected = roleNames.has(foRole);
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1424,7 +1426,7 @@ const UserForm = ({
                         return (
                           <MultiSelect
                             {...(input as any)}
-                            label='Reports Role'
+                            label='REPORTS Role'
                             errorLabel='Please select at least one role.'
                             labelKey='displayName'
                             valueKey='id'
@@ -1830,19 +1832,19 @@ const UserForm = ({
                   isHFCreate={isHFCreate}
                   showVillages={showVillage[index]}
                 />
-                {isShastiyaKormiSelected && (
-                  <BranchTaggingFields name={name} isError={isError} isHFCreate={isHFCreate} />
-                )}
-                {(isPoSelected || isFoSelected) && (
-                  <DistrictChiefdomVillageFields
-                    form={form}
-                    name={name}
-                    isError={isError}
-                    isHFCreate={isHFCreate}
-                    index={index}
-                    isFoSelected={isFoSelected}
-                  />
-                )}
+                <DistrictChiefdomVillageFields
+                  form={form}
+                  name={name}
+                  isError={isError}
+                  isHFCreate={isHFCreate}
+                  index={index}
+                />
+                <BranchTaggingFields
+                  name={name}
+                  isError={isError}
+                  isHFCreate={isHFCreate}
+                  index={index}
+                />
                 <SiteUserForm
                   isAdminForm={isAdminForm}
                   isCHW={isActivating}
