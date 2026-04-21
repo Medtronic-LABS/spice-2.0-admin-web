@@ -22,6 +22,7 @@ import { countryIdSelector } from '../../../store/user/selectors';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
 import sessionStorageServices from '../../../global/sessionStorageServices';
 import { getRoleFlags } from '../userFormUtils';
+import { required } from '../../../utils/validation';
 
 interface IDistrictChiefdomVillageFieldsProps {
   form: FormApi<any>;
@@ -177,6 +178,7 @@ const DistrictChiefdomVillageFields = ({
         <Field
           name={`${name}.districts`}
           type='text'
+          validate={required}
           render={({ input, meta }) =>
             isFoSelected || isAreaManagerSelected || isDivisionalManagerSelected ? (
               <MultiSelect
@@ -232,6 +234,7 @@ const DistrictChiefdomVillageFields = ({
           <Field
             name={`${name}.chiefdoms`}
             type='text'
+            validate={required}
             render={({ input, meta }) =>
               isFoSelected || isAreaManagerSelected ? (
                 <MultiSelect
@@ -286,6 +289,7 @@ const DistrictChiefdomVillageFields = ({
           <Field
             name={`${name}.villages`}
             type='text'
+            validate={required}
             render={({ input, meta }) => (
               <MultiSelect
                 {...(input as any)}

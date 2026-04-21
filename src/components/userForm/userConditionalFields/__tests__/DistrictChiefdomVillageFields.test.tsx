@@ -279,4 +279,13 @@ describe('DistrictChiefdomVillageFields', () => {
     expect(screen.queryByTestId('trigger-select-Chiefdom')).not.toBeInTheDocument();
     expect(screen.getAllByTestId('multi-select').length).toBe(3);
   });
+
+  it('calls isError with meta and passes result to SelectInput as error prop', () => {
+    const customError = 'District is required';
+    const isError = jest.fn(() => customError);
+    renderWithForm({ isError });
+    expect(isError).toHaveBeenCalled();
+    const selectProps = mockSelectInput.mock.calls[0][0];
+    expect(selectProps.error).toBe(customError);
+  });
 });
