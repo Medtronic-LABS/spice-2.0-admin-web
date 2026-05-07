@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import BranchTaggingFields from '../BranchTaggingFields';
-import { areaManagerRole, divisionalManagerRole, shastiyaKormiRole } from '../../../../constants/roleConstants';
+import { areaManagerRole, divisionalManagerRole, shastiyaKormiRole, poRole, foRole } from '../../../../constants/roleConstants';
 
 const mockStore = configureStore([]);
 
@@ -161,6 +161,22 @@ describe('BranchTaggingFields', () => {
     renderWithForm({}, createStore(), initialValues);
     expect(screen.getByTestId('multi-select')).toBeInTheDocument();
     expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+  });
+
+  it('renders single-select Branch field for PROGRAM_ORGANIZER role', () => {
+    const initialValues = { users: [{ role: [{ name: poRole }] }] };
+    renderWithForm({}, createStore(), initialValues);
+    expect(screen.getByTestId('multi-select')).toBeInTheDocument();
+    expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+    expect(screen.getByText('Branches')).toBeInTheDocument();
+  });
+
+  it('renders multiselect Branch field for FIELD_ORGANIZER role', () => {
+    const initialValues = { users: [{ role: [{ name: foRole }] }] };
+    renderWithForm({}, createStore(), initialValues);
+    expect(screen.getByTestId('multi-select')).toBeInTheDocument();
+    expect(screen.queryByTestId('select-input')).not.toBeInTheDocument();
+    expect(screen.getByText('Branches')).toBeInTheDocument();
   });
 
   it('renders multiselect Branch field when both manager and SK roles are selected', () => {

@@ -20,10 +20,12 @@ const BranchTaggingFields = ({ name, isError, isHFCreate, index }: IBranchTaggin
     input: { value: spiceRole }
   } = useField(`users.${index}.role`, { subscription: { value: true } });
   const roleFlags = getRoleFlags(spiceRole);
-  const { isShastiyaKormiSelected, isAreaManagerSelected, isDivisionalManagerSelected } = roleFlags;
+  const { isPoSelected, isFoSelected, isShastiyaKormiSelected, isAreaManagerSelected, isDivisionalManagerSelected } =
+    roleFlags;
   const isManagerSelected = isAreaManagerSelected || isDivisionalManagerSelected;
+  const isOrganizerSelected = isPoSelected || isFoSelected;
 
-  if (!isShastiyaKormiSelected && !isManagerSelected) {
+  if (!isShastiyaKormiSelected && !isManagerSelected && !isOrganizerSelected) {
     return null;
   }
 
@@ -32,10 +34,10 @@ const BranchTaggingFields = ({ name, isError, isHFCreate, index }: IBranchTaggin
       <Field
         name={`${name}.branches`}
         type='text'
-        validate={isManagerSelected ? required : undefined}
+        validate={(isManagerSelected || isOrganizerSelected) ? required : undefined}
         render={({ input, meta }) =>
           // Manager roles always use multi-select, including users with both manager and SK roles.
-          isManagerSelected ? (
+          (isManagerSelected || isOrganizerSelected) ? (
             <MultiSelect
               {...(input as any)}
               label='Branches'

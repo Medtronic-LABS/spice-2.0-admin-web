@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import DistrictChiefdomVillageFields from '../DistrictChiefdomVillageFields';
 import * as HF_ACTION_TYPES from '../../../../store/healthFacility/actionTypes';
-import { foRole, poRole } from '../../../../constants/roleConstants';
+import { foRole, poRole, areaManagerRole, divisionalManagerRole } from '../../../../constants/roleConstants';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -196,7 +196,7 @@ describe('DistrictChiefdomVillageFields', () => {
 
   it('clears chiefdoms and villages when district changes', async () => {
     const store = mockStore(baseStore);
-    let formApi: { change: (...args: unknown[]) => void };
+    let formApi: any;
     render(
       <Provider store={store}>
         <Form
@@ -230,7 +230,7 @@ describe('DistrictChiefdomVillageFields', () => {
 
   it('clears villages when chiefdom changes', async () => {
     const store = mockStore(baseStore);
-    let formApi: { change: (...args: unknown[]) => void };
+    let formApi: any;
     render(
       <Provider store={store}>
         <Form
@@ -287,5 +287,333 @@ describe('DistrictChiefdomVillageFields', () => {
     expect(isError).toHaveBeenCalled();
     const selectProps = mockSelectInput.mock.calls[0][0];
     expect(selectProps.error).toBe(customError);
+  });
+
+  it('fetches branches with unionIds when PO/FO (organizer) selects villages', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: poRole }],
+            districts: { id: 5, name: 'D' },
+            chiefdoms: { id: 7, name: 'C' },
+            villages: [{ id: 100 }, { id: 200 }]
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            unionIds: [100, 200]
+          }
+        })
+      ])
+    );
+  });
+
+  it('does not fetch branches when organizer (PO/FO) has no villages selected', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: poRole }],
+            districts: { id: 5, name: 'D' },
+            chiefdoms: { id: 7, name: 'C' },
+            villages: []
+          }
+        ]
+      }
+    );
+    const branchActions = store.getActions().filter(
+      (action: any) => action.type === 'FETCH_BRANCHES_BY_UNION_REQUEST'
+    );
+    expect(branchActions.length).toBe(0);
+  });
+
+  it('fetches branches with districtIds for divisional manager (manager role)', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: divisionalManagerRole }],
+            districts: [{ id: 1 }, { id: 2 }],
+            chiefdoms: { id: 7, name: 'C' },
+            villages: []
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            districtIds: [1, 2]
+          }
+        })
+      ])
+    );
+  });
+
+  it('fetches branches with chiefdomIds for area manager role', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: areaManagerRole }],
+            districts: [{ id: 5 }],
+            chiefdoms: [{ id: 10 }, { id: 20 }],
+            villages: []
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: expect.objectContaining({
+            chiefdomIds: [10, 20],
+            districtIds: [5]
+          })
+        })
+      ])
+    );
+  });
+
+  it('does not fetch branches when manager has no districts selected', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: divisionalManagerRole }],
+            districts: [],
+            chiefdoms: { id: 7, name: 'C' }
+          }
+        ]
+      }
+    );
+    const branchActions = store.getActions().filter(
+      (action: any) => action.type === 'FETCH_BRANCHES_BY_UNION_REQUEST'
+    );
+    expect(branchActions.length).toBe(0);
+  });
+
+  it('still fetches branches for area manager with districts but no chiefdoms', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: areaManagerRole }],
+            districts: [{ id: 5 }],
+            chiefdoms: []
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            districtIds: [5]
+          }
+        })
+      ])
+    );
+  });
+
+  it('includes both chiefdomIds and districtIds when area manager has both districts and chiefdoms', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: areaManagerRole }],
+            districts: [{ id: 1 }],
+            chiefdoms: [{ id: 10 }]
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            districtIds: [1],
+            chiefdomIds: [10]
+          }
+        })
+      ])
+    );
+  });
+
+  it('includes only unionIds when FO (organizer) selects villages', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: foRole }],
+            districts: [{ id: 1 }, { id: 2 }],
+            chiefdoms: [{ id: 7 }],
+            villages: [{ id: 100 }]
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            unionIds: [100]
+          }
+        })
+      ])
+    );
+  });
+
+  it('correctly extracts and memoizes multiple village IDs from selectedVillages', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: poRole }],
+            districts: { id: 5, name: 'D' },
+            chiefdoms: { id: 7, name: 'C' },
+            villages: [{ id: 50 }, { id: 60 }, { id: 70 }]
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            unionIds: [50, 60, 70]
+          }
+        })
+      ])
+    );
+  });
+
+  it('handles single village object (not array) correctly', () => {
+    const { store } = renderWithForm(
+      {},
+      baseStore,
+      {
+        users: [
+          {
+            role: [{ name: poRole }],
+            districts: { id: 5, name: 'D' },
+            chiefdoms: { id: 7, name: 'C' },
+            villages: { id: 88, name: 'SingleVillage' }
+          }
+        ]
+      }
+    );
+    expect(store.getActions()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FETCH_BRANCHES_BY_UNION_REQUEST',
+          payload: {
+            unionIds: [88]
+          }
+        })
+      ])
+    );
+  });
+
+  it('clears branches when villages are changed via MultiSelect onChange', async () => {
+    mockMultiSelect.mockClear();
+    const store = mockStore(baseStore);
+    let formApi: any;
+    render(
+      <Provider store={store}>
+        <Form
+          onSubmit={jest.fn()}
+          initialValues={{
+            users: [
+              {
+                role: [{ name: poRole }],
+                districts: { id: 5, name: 'D' },
+                chiefdoms: { id: 7, name: 'C' },
+                villages: [{ id: 3, name: 'V1' }],
+                branches: [{ id: 101, name: 'B1' }]
+              }
+            ]
+          }}
+        >
+          {({ form }) => {
+            formApi = form;
+            return <DistrictChiefdomVillageFields form={form} {...defaultProps} />;
+          }}
+        </Form>
+      </Provider>
+    );
+    const changeSpy = jest.spyOn(formApi!, 'change');
+    // Find the last villages MultiSelect call after render is complete
+    const villagesMultiSelectProps = mockMultiSelect.mock.calls
+      .filter((call) => call[0].label === 'Villages')
+      .pop()?.[0];
+
+    expect(villagesMultiSelectProps).toBeDefined();
+    expect(villagesMultiSelectProps?.onChange).toBeDefined();
+
+    await act(async () => {
+      villagesMultiSelectProps?.onChange?.([{ id: 4, name: 'V2' }]);
+    });
+
+    expect(changeSpy).toHaveBeenCalledWith('users.0.branches', undefined);
+    changeSpy.mockRestore();
+  });
+
+  it('renders villages MultiSelect only when organizer (PO/FO) is selected', () => {
+    mockMultiSelect.mockClear();
+    renderWithForm({}, baseStore, {
+      users: [{ role: [{ name: poRole }] }]
+    });
+    const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
+    expect(villagesCalls.length).toBeGreaterThanOrEqual(1);
+    const villagesProps = villagesCalls[villagesCalls.length - 1][0];
+    expect(villagesProps).toMatchObject({
+      label: 'Villages',
+      labelKey: 'name',
+      valueKey: 'id',
+      isMulti: true,
+      isSelectAll: true,
+      isShowLabel: true,
+      required: true
+    });
+  });
+
+  it('does not render villages field when organizer role is not selected', () => {
+    renderWithForm({}, baseStore, {
+      users: [{ role: [{ name: divisionalManagerRole }] }]
+    });
+    const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
+    expect(villagesCalls.length).toBe(0);
   });
 });

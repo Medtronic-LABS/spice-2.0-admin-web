@@ -75,6 +75,9 @@ const DistrictChiefdomVillageFields = ({
   const {
     input: { value: selectedChiefdoms }
   } = useField(`${name}.chiefdoms`, { subscription: { value: true } });
+  const {
+    input: { value: selectedVillages }
+  } = useField(`${name}.villages`, { subscription: { value: true } });
   const roleFlags = getRoleFlags(spiceRole);
 
   const {
@@ -83,7 +86,7 @@ const DistrictChiefdomVillageFields = ({
     isAreaManagerSelected,
     isDivisionalManagerSelected
   } = roleFlags;
-  const isPoOrFoSelected = isPoSelected || isFoSelected;
+  const isOrganizerSelected = isPoSelected || isFoSelected;
   const isManagerSelected = isAreaManagerSelected || isDivisionalManagerSelected;
 
   const selectedDistrictIds = useMemo(
@@ -93,6 +96,10 @@ const DistrictChiefdomVillageFields = ({
   const selectedChiefdomIds = useMemo(
     () => extractIds(selectedChiefdoms),
     [selectedChiefdoms]
+  );
+  const selectedVillageIds = useMemo(
+    () => extractIds(selectedVillages),
+    [selectedVillages]
   );
 
   // District fetch
@@ -111,7 +118,7 @@ const DistrictChiefdomVillageFields = ({
 
   // Villages fetch
   useEffect(() => {
-    if (selectedChiefdomIds.length && countryId && isPoOrFoSelected) {
+    if (selectedChiefdomIds.length && countryId && isOrganizerSelected) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
@@ -130,27 +137,34 @@ const DistrictChiefdomVillageFields = ({
   }, [
     countryId,
     dispatch,
-    isPoOrFoSelected,
+    isOrganizerSelected,
     selectedChiefdomIds
   ]);
 
   // Branches fetch by region filters
   useEffect(() => {
-    if (!isManagerSelected || selectedDistrictIds.length === 0) {
+    const noRoleSelected = !isManagerSelected && !isOrganizerSelected;
+    const managerInvalid = isManagerSelected && selectedDistrictIds.length === 0;
+    const poFoInvalid = isOrganizerSelected && selectedVillageIds.length === 0;
+
+    if (noRoleSelected || managerInvalid || poFoInvalid) {
       return;
     }
-
     const requestPayload: {
       districtIds?: number[];
       chiefdomIds?: number[];
-    } = {
-      districtIds: selectedDistrictIds
-    };
+      unionIds?: number[];
+    } = {};
 
+    if (isManagerSelected && selectedDistrictIds.length) {
+      requestPayload.districtIds = selectedDistrictIds;
+    }
     if (isAreaManagerSelected && selectedChiefdomIds.length) {
       requestPayload.chiefdomIds = selectedChiefdomIds;
     }
-
+    if (isOrganizerSelected && selectedVillageIds.length) {
+      requestPayload.unionIds = selectedVillageIds;
+    }
     dispatch(
       fetchBranchesByUnionRequest({
         payload: requestPayload,
@@ -159,7 +173,15 @@ const DistrictChiefdomVillageFields = ({
         }
       })
     );
-  }, [dispatch, isAreaManagerSelected, isManagerSelected, selectedChiefdomIds, selectedDistrictIds]);
+  }, [
+    dispatch,
+    isOrganizerSelected,
+    isAreaManagerSelected,
+    isManagerSelected,
+    selectedChiefdomIds,
+    selectedDistrictIds,
+    selectedVillageIds
+  ]);
 
   const {
     district: { s: districtSName },
@@ -168,7 +190,7 @@ const DistrictChiefdomVillageFields = ({
   } = useAppTypeConfigs();
   const colClass = `${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `;
 
-  if (!isPoOrFoSelected && !isManagerSelected) {
+  if (!isOrganizerSelected && !isManagerSelected) {
     return null;
   }
 
@@ -229,7 +251,7 @@ const DistrictChiefdomVillageFields = ({
           }
         />
       </div>
-      {(isPoOrFoSelected || isAreaManagerSelected) && (
+      {(isOrganizerSelected || isAreaManagerSelected) && (
         <div className={colClass}>
           <Field
             name={`${name}.chiefdoms`}
@@ -284,7 +306,7 @@ const DistrictChiefdomVillageFields = ({
           />
         </div>
       )}
-      {isPoOrFoSelected && (
+      {isOrganizerSelected && (
         <div className={colClass}>
           <Field
             name={`${name}.villages`}
@@ -309,6 +331,10 @@ const DistrictChiefdomVillageFields = ({
                 options={villages || []}
                 loadingOptions={villagesLoading}
                 error={isError(meta)}
+                onChange={(value: any) => {
+                  form.change(`${name}.branches`, undefined);
+                  input.onChange(value);
+                }}
               />
             )}
           />
