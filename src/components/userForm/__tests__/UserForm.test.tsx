@@ -7,7 +7,7 @@ import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
 import UserForm from '../UserForm';
 import { clearBranchesByUnion } from '../../../store/branch/actions';
-import { chcpRole } from '../../../constants/roleConstants';
+import { chcpRole, heRole } from '../../../constants/roleConstants';
 
 const mockStore = configureStore([]);
 
@@ -178,15 +178,26 @@ jest.mock('../../multiSelect/MultiSelect', () => ({
     <div data-testid='multi-select'>
       <label>{props.label}</label>
       {props.label === 'SPICE Role' && typeof props.onChange === 'function' && (
-        <button
-          type='button'
-          data-testid='spice-role-change-trigger'
-          onClick={() =>
-            props.onChange([{ id: 2, name: 'CHCP', displayName: 'CHCP', groupName: 'SPICE' }], 0)
-          }
-        >
-          trigger-spice-role-change
-        </button>
+        <>
+          <button
+            type='button'
+            data-testid='spice-role-change-trigger-chcp'
+            onClick={() =>
+              props.onChange([{ id: 2, name: 'CHCP', displayName: 'CHCP', groupName: 'SPICE' }], 0)
+            }
+          >
+            trigger-chcp
+          </button>
+          <button
+            type='button'
+            data-testid='spice-role-change-trigger-he'
+            onClick={() =>
+              props.onChange([{ id: 3, name: 'HE', displayName: 'HE', groupName: 'SPICE' }], 0)
+            }
+          >
+            trigger-he
+          </button>
+        </>
       )}
     </div>
   )
@@ -469,6 +480,38 @@ describe('UserForm', () => {
       }
     );
 
+    it('renders DistrictChiefdomVillageFields with expected props when HE is default-selected (isAdminForm)',
+      async () => {
+      const storeWithHe = {
+        ...defaultStoreState,
+        user: {
+          ...defaultStoreState.user,
+          userRoles: {
+            SPICE: [
+              { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+              { id: 2, name: heRole, groupName: 'SPICE', displayName: 'HE', appTypes: ['web'] }
+            ]
+          }
+        }
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },
+          defaultSelectedRole: heRole
+        },
+        storeWithHe
+      );
+      await waitFor(() => {
+        expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
+      });
+      const lastCall = mockDistrictChiefdomVillageFieldsCalls[mockDistrictChiefdomVillageFieldsCalls.length - 1];
+      expect(lastCall).toHaveProperty('name');
+      expect(lastCall).toHaveProperty('isError');
+      expect(lastCall).toHaveProperty('isHFCreate');
+      expect(lastCall).toHaveProperty('index');
+      expect(lastCall).toHaveProperty('form');
+    });
+
     it('passes DistrictChiefdomVillageFields base props when FO is default-selected', async () => {
       const storeWithFo = {
         ...defaultStoreState,
@@ -743,10 +786,10 @@ describe('UserForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('spice-role-change-trigger')).toBeInTheDocument();
+        expect(screen.getByTestId('spice-role-change-trigger-chcp')).toBeInTheDocument();
       });
 
-      fireEvent.click(screen.getByTestId('spice-role-change-trigger'));
+      fireEvent.click(screen.getByTestId('spice-role-change-trigger-chcp'));
 
       await waitFor(() => {
         expect(mockRoleChange).toHaveBeenCalledWith(
@@ -783,6 +826,85 @@ describe('UserForm', () => {
       const lastCall = mockDistrictChiefdomVillageFieldsCalls[mockDistrictChiefdomVillageFieldsCalls.length - 1];
       expect(lastCall).toHaveProperty('index');
       expect(lastCall).toHaveProperty('form');
+    });
+  });
+
+  describe('HE role behavior', () => {
+    const storeWithHeRole = {
+      ...defaultStoreState,
+      user: {
+        ...defaultStoreState.user,
+        userRoles: {
+          SPICE: [
+            { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+            { id: 2, name: heRole, groupName: 'SPICE', displayName: 'HE', appTypes: ['web'] }
+          ]
+        }
+      }
+    };
+
+    it('passes spiceRoleList with HE to DynamicCHForm when HE is default-selected', async () => {
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },
+          defaultSelectedRole: heRole
+        },
+        storeWithHeRole
+      );
+      await waitFor(() => {
+        const lastCall = mockDynamicCHFormCalls[mockDynamicCHFormCalls.length - 1];
+        expect(lastCall.spiceRoleList).toEqual(
+          expect.arrayContaining([expect.objectContaining({ name: heRole })])
+        );
+      });
+    });
+
+    it('passes DistrictChiefdomVillageFields when HE role is in form values', () => {
+      const initialValues = {
+        users: [
+          {
+            role: [{ id: 2, name: heRole }],
+            suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }]
+          }
+        ]
+      };
+      renderUserForm({}, defaultStoreState, initialValues);
+      expect(screen.getByTestId('district-chiefdom-village-fields')).toBeInTheDocument();
+      expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('calls roleChange when SPICE role is updated to HE for site user', async () => {
+      mockRoleChange.mockClear();
+      renderUserForm(
+        {
+          isSiteUser: true,
+          data: [
+            {
+              suiteAccess: [{ groupName: 'SPICE', label: 'SPICE', id: 'SPICE' }],
+              role: [],
+              roles: [],
+              reportRoles: [],
+              insightRoles: []
+            }
+          ]
+        },
+        storeWithHeRole
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('spice-role-change-trigger-he')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('spice-role-change-trigger-he'));
+
+      await waitFor(() => {
+        expect(mockRoleChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            index: 0,
+            allRoles: expect.arrayContaining([expect.objectContaining({ name: heRole })])
+          })
+        );
+      });
     });
   });
 

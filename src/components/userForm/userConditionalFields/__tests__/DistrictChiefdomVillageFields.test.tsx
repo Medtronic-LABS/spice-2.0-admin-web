@@ -5,7 +5,13 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import DistrictChiefdomVillageFields from '../DistrictChiefdomVillageFields';
 import * as HF_ACTION_TYPES from '../../../../store/healthFacility/actionTypes';
-import { foRole, poRole, areaManagerRole, divisionalManagerRole } from '../../../../constants/roleConstants';
+import {
+  foRole,
+  poRole,
+  areaManagerRole,
+  divisionalManagerRole,
+  heRole
+} from '../../../../constants/roleConstants';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -613,6 +619,29 @@ describe('DistrictChiefdomVillageFields', () => {
     renderWithForm({}, baseStore, {
       users: [{ role: [{ name: divisionalManagerRole }] }]
     });
+    const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
+    expect(villagesCalls.length).toBe(0);
+  });
+
+  it('returns null when HE and other location roles are not selected', () => {
+    const { container } = renderWithForm({}, baseStore, {
+      users: [{ role: [{ name: 'NURSE' }] }]
+    });
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders district and chiefdom as multiselect when HE is selected', () => {
+    renderWithForm({}, baseStore, { users: [{ role: [{ name: heRole }] }] });
+    expect(screen.queryByTestId('trigger-select-County')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('trigger-select-Chiefdom')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('multi-select').length).toBe(2);
+    const labels = mockMultiSelect.mock.calls.map((call) => call[0].label);
+    expect(labels).toEqual(expect.arrayContaining(['County', 'Chiefdom']));
+  });
+
+  it('does not render villages field when HE is selected', () => {
+    mockMultiSelect.mockClear();
+    renderWithForm({}, baseStore, { users: [{ role: [{ name: heRole }] }] });
     const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
     expect(villagesCalls.length).toBe(0);
   });

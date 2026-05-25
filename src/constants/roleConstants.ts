@@ -19,6 +19,7 @@ export const foRole = 'FO';
 export const areaManagerRole = 'AREA_MANAGER';
 export const divisionalManagerRole = 'DIVISIONAL_MANAGER';
 export const chcpRole = 'CHCP';
+export const heRole = 'HE';
 // export const PHUIncharge = 'PHU_INCHARGE';
 
 // COMMUNITY
@@ -28,6 +29,7 @@ export const chwPeerRoles = ['CHW', peerSupervisor];
 export const mobCommunityRoles = ['PROVIDER', 'MID_WIFE', 'LAB_ASSISTANT', 'SRN', 'SECHN', 'CHA', 'MCHA'];
 export const adminRoles = ['HEALTH_FACILITY_ADMIN', ...mobCommunityRoles];
 export const superAdminRoles = ['SUPER_ADMIN', 'SUPER_USER'];
+export const allSingleRoles = ['HE', 'CHCP'];
 // REPORTS
 export const allReportRoles = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN', hf4ReportUser];
 export const reportAndFacilityAdmin = ['REPORT_ADMIN', 'FACILITY_REPORT_ADMIN'];

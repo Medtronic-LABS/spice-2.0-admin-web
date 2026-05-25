@@ -84,7 +84,8 @@ const DistrictChiefdomVillageFields = ({
     isPoSelected,
     isFoSelected,
     isAreaManagerSelected,
-    isDivisionalManagerSelected
+    isDivisionalManagerSelected,
+    isHESelected
   } = roleFlags;
   const isOrganizerSelected = isPoSelected || isFoSelected;
   const isManagerSelected = isAreaManagerSelected || isDivisionalManagerSelected;
@@ -190,7 +191,7 @@ const DistrictChiefdomVillageFields = ({
   } = useAppTypeConfigs();
   const colClass = `${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `;
 
-  if (!isOrganizerSelected && !isManagerSelected) {
+  if (!isOrganizerSelected && !isManagerSelected && !isHESelected) {
     return null;
   }
 
@@ -202,7 +203,7 @@ const DistrictChiefdomVillageFields = ({
           type='text'
           validate={required}
           render={({ input, meta }) =>
-            isFoSelected || isAreaManagerSelected || isDivisionalManagerSelected ? (
+            isFoSelected || isAreaManagerSelected || isDivisionalManagerSelected || isHESelected ? (
               <MultiSelect
                 {...(input as any)}
                 label={districtSName}
@@ -251,14 +252,14 @@ const DistrictChiefdomVillageFields = ({
           }
         />
       </div>
-      {(isOrganizerSelected || isAreaManagerSelected) && (
+      {(isOrganizerSelected || isAreaManagerSelected || isHESelected) && (
         <div className={colClass}>
           <Field
             name={`${name}.chiefdoms`}
             type='text'
             validate={required}
             render={({ input, meta }) =>
-              isFoSelected || isAreaManagerSelected ? (
+              isFoSelected || isAreaManagerSelected || isHESelected ? (
                 <MultiSelect
                   {...(input as any)}
                   label={chiefdomSName}

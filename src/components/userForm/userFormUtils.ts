@@ -1,6 +1,15 @@
 import { useCallback } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
-import { areaManagerRole, divisionalManagerRole, foRole, poRole, shastiyaKormiRole, SPICE, villageBasedRoles } from '../../constants/roleConstants';
+import {
+  areaManagerRole,
+  divisionalManagerRole,
+  foRole,
+  heRole,
+  poRole,
+  shastiyaKormiRole,
+  SPICE,
+  villageBasedRoles
+} from '../../constants/roleConstants';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 import { removeRedRiskFromRoleArray } from '../../utils/commonUtils';
@@ -39,7 +48,8 @@ export const getRoleFlags = (roles?: IRole | IRole[]) => {
     isFoSelected: roleNames.has(foRole),
     isAreaManagerSelected: roleNames.has(areaManagerRole),
     isDivisionalManagerSelected: roleNames.has(divisionalManagerRole),
-    isShastiyaKormiSelected: roleNames.has(shastiyaKormiRole)
+    isShastiyaKormiSelected: roleNames.has(shastiyaKormiRole),
+    isHESelected: roleNames.has(heRole)
   };
 };
 

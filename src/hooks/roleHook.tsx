@@ -36,8 +36,8 @@ import {
   villageBasedRoles,
   // PHUInchargeRole,
   PHUInchargePlusFacilityReportAdmin,
-  chcpRole,
-  shastiyaKormiRole
+  shastiyaKormiRole,
+  allSingleRoles
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
@@ -431,7 +431,7 @@ export const useRoleMeta = ({
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },
         {
-          selectedRoles: [chcpRole],
+          selectedRoles: allSingleRoles,
           selectedSuite: SPICE,
           disabledSPICERoles: {
             suite: SPICE,

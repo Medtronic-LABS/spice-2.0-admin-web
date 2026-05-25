@@ -5,6 +5,7 @@ import {
   areaManagerRole,
   divisionalManagerRole,
   foRole,
+  heRole,
   poRole,
   shastiyaKormiRole
 } from '../../../constants/roleConstants';
@@ -122,7 +123,8 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: false,
-      isShastiyaKormiSelected: false
+      isShastiyaKormiSelected: false,
+      isHESelected: false
     });
   });
 
@@ -132,7 +134,8 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: false,
-      isShastiyaKormiSelected: false
+      isShastiyaKormiSelected: false,
+      isHESelected: false
     });
   });
 
@@ -148,7 +151,8 @@ describe('getRoleFlags', () => {
       isFoSelected: true,
       isAreaManagerSelected: true,
       isDivisionalManagerSelected: false,
-      isShastiyaKormiSelected: true
+      isShastiyaKormiSelected: true,
+      isHESelected: false
     });
   });
 
@@ -158,7 +162,19 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: true,
-      isShastiyaKormiSelected: false
+      isShastiyaKormiSelected: false,
+      isHESelected: false
+    });
+  });
+
+  test('should detect HE role in an array', () => {
+    expect(getRoleFlags([{ name: heRole }])).toEqual({
+      isPoSelected: false,
+      isFoSelected: false,
+      isAreaManagerSelected: false,
+      isDivisionalManagerSelected: false,
+      isShastiyaKormiSelected: false,
+      isHESelected: true
     });
   });
 });
