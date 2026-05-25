@@ -7,6 +7,7 @@ import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
 import UserForm from '../UserForm';
 import { clearBranchesByUnion } from '../../../store/branch/actions';
+import { chcpRole } from '../../../constants/roleConstants';
 
 const mockStore = configureStore([]);
 
@@ -64,7 +65,8 @@ jest.mock('../userFormUtils', () => ({
     formUserData: mockFormUserData,
     roleBasedAppTypes: mockRoleBasedAppTypes
   }),
-  filterRolesByAppTypeFn: (roles: any) => roles || {}
+  filterRolesByAppTypeFn: (roles: any) => roles || {},
+  isVillageBasedRoleSelection: jest.fn(() => false)
 }));
 
 jest.mock('../../../hooks/roleHook', () => ({
@@ -175,6 +177,17 @@ jest.mock('../../multiSelect/MultiSelect', () => ({
   default: (props: any) => (
     <div data-testid='multi-select'>
       <label>{props.label}</label>
+      {props.label === 'SPICE Role' && typeof props.onChange === 'function' && (
+        <button
+          type='button'
+          data-testid='spice-role-change-trigger'
+          onClick={() =>
+            props.onChange([{ id: 2, name: 'CHCP', displayName: 'CHCP', groupName: 'SPICE' }], 0)
+          }
+        >
+          trigger-spice-role-change
+        </button>
+      )}
     </div>
   )
 }));
@@ -336,6 +349,34 @@ describe('UserForm', () => {
       renderUserForm();
       expect(mockDynamicCHFormCalls.length).toBeGreaterThanOrEqual(1);
       expect(mockDynamicCHFormCalls[mockDynamicCHFormCalls.length - 1]).toHaveProperty('spiceRoleList');
+    });
+
+    it('passes spiceRoleList with CHCP to DynamicCHForm when CHCP is default-selected', async () => {
+      const storeWithChcpRole = {
+        ...defaultStoreState,
+        user: {
+          ...defaultStoreState.user,
+          userRoles: {
+            SPICE: [
+              { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+              { id: 2, name: chcpRole, groupName: 'SPICE', displayName: 'CHCP', appTypes: ['web'] }
+            ]
+          }
+        }
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true },
+          defaultSelectedRole: chcpRole
+        },
+        storeWithChcpRole
+      );
+      await waitFor(() => {
+        const lastCall = mockDynamicCHFormCalls[mockDynamicCHFormCalls.length - 1];
+        expect(lastCall.spiceRoleList).toEqual(
+          expect.arrayContaining([expect.objectContaining({ name: chcpRole })])
+        );
+      });
     });
 
     it('passes BranchTaggingFields props even when Shastiya Kormi role is not selected', () => {
@@ -554,7 +595,8 @@ describe('UserForm', () => {
 
     it.each([
       { roleName: 'PO' },
-      { roleName: 'FO' }
+      { roleName: 'FO' },
+      { roleName: chcpRole }
     ])(
       'renders assigned health facility selector and dispatches clearBranchesByUnion when %s user changes it',
       async ({ roleName }) => {
@@ -623,6 +665,124 @@ describe('UserForm', () => {
       renderUserForm();
       const phoneNumberWithRequired = mockPhoneNumberCalls.find((c: any) => c.required === true);
       expect(phoneNumberWithRequired).toBeDefined();
+    });
+  });
+
+  describe('CHCP role behavior', () => {
+    const storeWithChcpRole = {
+      ...defaultStoreState,
+      user: {
+        ...defaultStoreState.user,
+        userRoles: {
+          SPICE: [
+            { id: 1, name: 'Admin', groupName: 'SPICE', displayName: 'Admin', appTypes: ['web'] },
+            { id: 2, name: chcpRole, groupName: 'SPICE', displayName: 'CHCP', appTypes: ['web'] }
+          ]
+        }
+      }
+    };
+
+    it('does not render Assigned Health Facility when isHF is true and CHCP is selected', () => {
+      const initialValues = {
+        users: [
+          {
+            role: [{ id: 2, name: chcpRole }],
+            suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }]
+          }
+        ]
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isHF: true, isAdminForm: true },
+          defaultSelectedRole: chcpRole
+        },
+        storeWithChcpRole,
+        initialValues
+      );
+      expect(screen.queryByText('Assigned Health Facility')).not.toBeInTheDocument();
+    });
+
+    it('renders Assigned Health Facility when CHCP is selected on admin form and isHF is false', async () => {
+      const initialValues = {
+        users: [
+          {
+            role: [{ id: 2, name: chcpRole }],
+            suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }]
+          }
+        ]
+      };
+      renderUserForm(
+        {
+          userFormParams: { ...defaultProps.userFormParams, isAdminForm: true, isHF: false },
+          defaultSelectedRole: chcpRole
+        },
+        storeWithChcpRole,
+        initialValues
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Assigned Health Facility')).toBeInTheDocument();
+      });
+    });
+
+    it('calls roleChange when SPICE role is updated for site user', async () => {
+      mockRoleChange.mockClear();
+      renderUserForm(
+        {
+          isSiteUser: true,
+          data: [
+            {
+              suiteAccess: [{ groupName: 'SPICE', label: 'SPICE', id: 'SPICE' }],
+              role: [],
+              roles: [],
+              reportRoles: [],
+              insightRoles: []
+            }
+          ]
+        },
+        storeWithChcpRole
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('spice-role-change-trigger')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('spice-role-change-trigger'));
+
+      await waitFor(() => {
+        expect(mockRoleChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            index: 0,
+            allRoles: expect.arrayContaining([expect.objectContaining({ name: chcpRole })])
+          })
+        );
+      });
+    });
+
+    it('calls roleChange on mount when isHFCreate is true', async () => {
+      mockRoleChange.mockClear();
+      renderUserForm({
+        userFormParams: { ...defaultProps.userFormParams, isHFCreate: true, isHF: true }
+      });
+      await waitFor(() => {
+        expect(mockRoleChange).toHaveBeenCalled();
+      });
+    });
+
+    it('passes DistrictChiefdomVillageFields base props when CHCP is selected (not PO-specific flow)', () => {
+      const initialValues = {
+        users: [
+          {
+            role: [{ id: 2, name: chcpRole }],
+            suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }]
+          }
+        ]
+      };
+      renderUserForm({}, defaultStoreState, initialValues);
+      expect(screen.getByTestId('district-chiefdom-village-fields')).toBeInTheDocument();
+      expect(mockDistrictChiefdomVillageFieldsCalls.length).toBeGreaterThanOrEqual(1);
+      const lastCall = mockDistrictChiefdomVillageFieldsCalls[mockDistrictChiefdomVillageFieldsCalls.length - 1];
+      expect(lastCall).toHaveProperty('index');
+      expect(lastCall).toHaveProperty('form');
     });
   });
 

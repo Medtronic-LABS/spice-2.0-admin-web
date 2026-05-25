@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { foRole, hf4ReportUser, INSIGHTS, peerSupervisor, poRole, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
+import { chcpRole, foRole, hf4ReportUser, INSIGHTS, peerSupervisor, poRole, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
@@ -1094,6 +1094,11 @@ const UserForm = ({
           const isShastiyaKormiSelected = roleNames.has(shastiyaKormiRole);
           const isPoSelected = roleNames.has(poRole);
           const isFoSelected = roleNames.has(foRole);
+          const isCHCPSelected = roleNames.has(chcpRole);
+
+          const hasSelectedSpiceRoles = isShastiyaKormiSelected || isPoSelected || isFoSelected || isCHCPSelected;
+          const hasSpiceHFSelection = showSpiceHFRef.current[index] || hasSelectedSpiceRoles;
+
           return (
             <span key={`form_${idRefs.current[index]}`}>
               <div className='row gx-1dot25'>
@@ -1678,17 +1683,14 @@ const UserForm = ({
                     (isEdit
                       ? ((mandatoryRoles || []).length
                           ? !isCHPCHWSelected(mandatoryRoles) &&
-                            (showSpiceHFRef.current[index] || isShastiyaKormiSelected || isPoSelected || isFoSelected)
-                          : (showSpiceHFRef.current[index] ||
-                              isShastiyaKormiSelected ||
-                              isPoSelected ||
-                              isFoSelected) &&
+                            hasSpiceHFSelection
+                          : hasSpiceHFSelection &&
                             (spiceRole || []).length) ||
                         (!isCommunity && isSiteUser && !isHF)
-                      : (showSpiceHFRef.current[index] || isShastiyaKormiSelected || isPoSelected || isFoSelected) &&
+                      : hasSpiceHFSelection &&
                         (!isEdit || isReportOrInsightUser)))) &&
                   !isHFCreate &&
-                  !(isHF && (isShastiyaKormiSelected || isPoSelected || isFoSelected)) && (
+                  !(isHF && hasSelectedSpiceRoles) && (
                     <div className={`${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `}>
                       <Field
                         name={`${name}.${NAMING_VARIABLES.healthFacility}`}

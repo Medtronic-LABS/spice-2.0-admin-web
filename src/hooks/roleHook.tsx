@@ -36,6 +36,7 @@ import {
   villageBasedRoles,
   // PHUInchargeRole,
   PHUInchargePlusFacilityReportAdmin,
+  chcpRole,
   shastiyaKormiRole
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
@@ -426,6 +427,16 @@ export const useRoleMeta = ({
           selectedRoles: CHPARoles,
           selectedSuite: SPICE,
           disabledSPICERoles: { suite: SPICE, validSpiceRoles: CHPARoles },
+          disabledREPORTSRoles: { suite: REPORTS, validReportRoles: allReportRoles },
+          disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
+        },
+        {
+          selectedRoles: [chcpRole],
+          selectedSuite: SPICE,
+          disabledSPICERoles: {
+            suite: SPICE,
+            validSpiceRoles: getValidSpiceRoleForAllAFRoles()
+          },
           disabledREPORTSRoles: { suite: REPORTS, validReportRoles: allReportRoles },
           disabledINSIGHTSRoles: { suite: INSIGHTS, validInsightRoles: allInsightRoles }
         },

@@ -18,6 +18,7 @@ export const poRole = 'PO';
 export const foRole = 'FO';
 export const areaManagerRole = 'AREA_MANAGER';
 export const divisionalManagerRole = 'DIVISIONAL_MANAGER';
+export const chcpRole = 'CHCP';
 // export const PHUIncharge = 'PHU_INCHARGE';
 
 // COMMUNITY
