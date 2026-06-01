@@ -5,14 +5,15 @@ import { NAMING_VARIABLES } from '../../../constants/appConstants';
 import Checkbox from '../../formFields/Checkbox';
 import useFieldVisibility from '../../../hooks/useFieldVisibility';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { loadingSelector, timezoneListSelector } from '../../../store/user/selectors';
 import { useEffect } from 'react';
 import { fetchCultureListRequest, fetchTimezoneListRequest } from '../../../store/user/actions';
 import { filterByAppTypes } from '../../../utils/commonUtils';
+import { useAppDispatch } from '../../../store/hooks';
 
 export const SiteUserForm = (props: any) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const timezoneList = useSelector(timezoneListSelector);
   const isTimezoneListLoading = useSelector(loadingSelector);

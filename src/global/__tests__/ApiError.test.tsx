@@ -1,5 +1,3 @@
-import React from 'react';
-import { shallow } from 'enzyme';
 import ApiError from '../ApiError';
 
 describe('ApiError', () => {
@@ -38,8 +36,9 @@ describe('ApiError', () => {
 
     const apiError = new ApiError(error, statusCode);
 
-    const wrapper = shallow(<div>{apiError.message}</div>);
+    const renderedError = document.createElement('div');
+    renderedError.textContent = apiError.message;
 
-    expect(wrapper.text()).toBe(apiError.message);
+    expect(renderedError).toHaveTextContent(apiError.message);
   });
 });

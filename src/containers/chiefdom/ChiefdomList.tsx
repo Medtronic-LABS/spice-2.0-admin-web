@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router';
+import { useAppDispatch } from '../../store/hooks';
 
 import APPCONSTANTS from '../../constants/appConstants';
 import {
@@ -27,6 +28,7 @@ import ModalForm from '../../components/modal/ModalForm';
 import { IDistrictOption } from '../../store/district/types';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import { countryIdSelector } from '../../store/user/selectors';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -46,7 +48,7 @@ interface IChiefdomFormValue {
  */
 const ChiefdomList = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const countryId = useSelector(countryIdSelector);
   const chiefdomsList = useSelector(chiefdomListSelector);

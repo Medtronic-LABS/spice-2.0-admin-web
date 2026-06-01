@@ -1,6 +1,7 @@
 import { Field } from 'react-final-form';
 import { useMemo, useCallback, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../../store/hooks';
+
 import { useParams } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
@@ -54,7 +55,7 @@ export const DynamicCHForm = ({
   isHFCreate,
   showVillages
 }: any) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isCHPCHWSelected } = useUserFormUtils();
   const { healthFacilityId } = useParams<IMatchParams>();
   const { village: { p: villagePName } } = useAppTypeConfigs();
@@ -89,18 +90,23 @@ export const DynamicCHForm = ({
 
   // Memoize form values to prevent unnecessary re-renders
   const formValues = useMemo(() => form.getState().values.users[index], [form, index]);
+  const healthFacilityLinkedVillages = form.getState().values?.healthFacility?.linkedVillages;
   const mandatoryVillages = useMemo(() => formValues?.existingVillages || [], [formValues?.existingVillages]);
 
   // When creating user from HF create flow, use linked villages from the health facility form.
-  // When editing (!isHFCreate), use stable EMPTY_VILLAGES so dependency doesn't change every render
-  // (avoids infinite loop).
-  const linkedVillagesFromHF = isHFCreate
-    ? (form.getState().values?.healthFacility?.linkedVillages ?? [])
-    : EMPTY_VILLAGES;
+  // When editing (!isHFCreate), use stable EMPTY_VILLAGES so dependency doesn't change every render.
+  const linkedVillagesFromHF = useMemo(() => {
+    if (!isHFCreate) {
+      return EMPTY_VILLAGES;
+    }
+
+    return Array.isArray(healthFacilityLinkedVillages) ? healthFacilityLinkedVillages : EMPTY_VILLAGES;
+  }, [healthFacilityLinkedVillages, isHFCreate]);
+
   // Memoize the current HF villages calculation
   const currentHFVillages = useMemo(() => {
     if (isHFCreate) {
-      return Array.isArray(linkedVillagesFromHF) ? linkedVillagesFromHF : [];
+      return linkedVillagesFromHF;
     }
     const hfTenantId = isHF ? healthFacilityId : formValues?.healthfacility?.[0]?.formDataId;
     const allVillages = villages[index];
@@ -197,7 +203,7 @@ export const DynamicCHForm = ({
         loadingOptions={villagesLoading}
       />
     ),
-    [autoFetched, index, isActivating, isEdit, mandatoryVillages, villagesLoading]
+    [autoFetched, index, isActivating, isEdit, mandatoryVillages, villagePName, villagesLoading]
   );
 
   // Memoize the assigned villages field render function
@@ -233,7 +239,7 @@ export const DynamicCHForm = ({
         }}
       />
     ),
-    [currentHFVillages, debouncedFetchSubVillages, dispatch, isEditDisabled, isHF, isProfile, isError, villagesLoading]
+    [currentHFVillages, debouncedFetchSubVillages, dispatch, isEditDisabled, isHF, isProfile, isError, villagePName, villagesLoading]
   );
 
   // Memoize the community unit field render function

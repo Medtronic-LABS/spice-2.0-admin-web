@@ -7,7 +7,7 @@ import APPCONSTANTS, { APP_TYPE } from '../../../constants/appConstants';
 import { Provider } from 'react-redux';
 
 jest.mock('../../../assets/images/arrow-right-small.svg', () => ({
-  ReactComponent: 'ArrowRight'
+  ReactComponent: () => <svg data-testid='arrow-right' />
 }));
 
 const { SUITE_ACCESS } = APPCONSTANTS;
@@ -120,5 +120,32 @@ describe('SummaryCard component', () => {
     });
     const { container } = renderSummaryCard(props, localStore);
     expect(container).toBeInTheDocument();
+  });
+
+  it('should render chiefdom summary item as a link in community appType', () => {
+    const localStore = mockStore({
+      ...initialState,
+      user: {
+        ...initialState.user,
+        user: {
+          ...initialState.user.user,
+          appTypes: [APP_TYPE.COMMUNITY]
+        }
+      }
+    });
+    const communityProps = {
+      ...props,
+      data: [
+        {
+          label: 'Chiefdom',
+          value: '12',
+          type: 'number',
+          route: '/district/1/2/chiefdom'
+        }
+      ]
+    } as any;
+
+    renderSummaryCard(communityProps, localStore);
+    expect(screen.getByText('Chiefdom').closest('a')).toHaveAttribute('href', '/district/1/2/chiefdom');
   });
 });

@@ -13,9 +13,16 @@ jest.mock('react-router-dom', () => ({
     tenantId: '123',
     regionId: '456',
     form: 'test'
-  }),
-  useHistory: () => ({
-    push: jest.fn()
+  })
+}));
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'region-form-customization' },
+    push: jest.fn(),
+    replace: jest.fn(),
+    goBack: jest.fn()
   })
 }));
 

@@ -1,104 +1,20 @@
 import React from 'react';
+import { render, screen } from '@testing-library/react';
 import { Form } from 'react-final-form';
-import {
-  Config,
-  FieldConfig,
-  FieldState,
-  FieldSubscriber,
-  FieldSubscription,
-  FormApi,
-  FormState,
-  FormSubscriber,
-  FormSubscription,
-  Unsubscribe
-} from 'final-form';
-import ProgramForm from '../ProgramForm';
-import { IProgramFormValues } from '../../../store/program/types';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import { mount, ReactWrapper } from 'enzyme';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
+
+import ProgramForm from '../ProgramForm';
+import { IProgramFormValues } from '../../../store/program/types';
+import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 
 const mockStore = configureMockStore();
 
-const mockFormApi: FormApi<{ program: IProgramFormValues }, Partial<{ program: IProgramFormValues }>> = {
-  // tslint:disable-next-line:no-empty
-  batch: () => {},
-  // tslint:disable-next-line:no-empty
-  blur: () => {},
-  // tslint:disable-next-line:no-empty
-  change: () => {},
-  destroyOnUnregister: false,
-  focus: (name: 'program'): void => {
-    throw new Error('Function not implemented.');
-  },
-  initialize: (
-    data:
-      | Partial<{ program: IProgramFormValues }>
-      | ((values: { program: IProgramFormValues }) => Partial<{ program: IProgramFormValues }>)
-  ): void => {
-    throw new Error('Function not implemented.');
-  },
-  isValidationPaused: (): boolean => {
-    throw new Error('Function not implemented.');
-  },
-  getFieldState: <F extends 'program'>(field: F): FieldState<{ program: IProgramFormValues }[F]> | undefined => {
-    throw new Error('Function not implemented.');
-  },
-  getRegisteredFields: (): string[] => {
-    throw new Error('Function not implemented.');
-  },
-  getState: (): FormState<{ program: IProgramFormValues }, Partial<{ program: IProgramFormValues }>> => {
-    throw new Error('Function not implemented.');
-  },
-  pauseValidation: (): void => {
-    throw new Error('Function not implemented.');
-  },
-  registerField: <F extends 'program'>(
-    name: F,
-    subscriber: FieldSubscriber<{ program: IProgramFormValues }[F]>,
-    subscription: FieldSubscription,
-    config?: FieldConfig<{ program: IProgramFormValues }[F]> | undefined
-  ): Unsubscribe => {
-    throw new Error('Function not implemented.');
-  },
-  reset: (initialValues?: Partial<{ program: IProgramFormValues }> | undefined): void => {
-    throw new Error('Function not implemented.');
-  },
-  resetFieldState: (name: 'program'): void => {
-    throw new Error('Function not implemented.');
-  },
-  restart: (initialValues?: Partial<{ program: IProgramFormValues }> | undefined): void => {
-    throw new Error('Function not implemented.');
-  },
-  resumeValidation: (): void => {
-    throw new Error('Function not implemented.');
-  },
-  setConfig: <K extends keyof Config<object, object>>(
-    name: K,
-    value: Config<{ program: IProgramFormValues }, Partial<{ program: IProgramFormValues }>>[K]
-  ): void => {
-    throw new Error('Function not implemented.');
-  },
-  submit: (): Promise<{ program: IProgramFormValues } | undefined> | undefined => {
-    throw new Error('Function not implemented.');
-  },
-  subscribe: (
-    subscriber: FormSubscriber<{ program: IProgramFormValues }, Partial<{ program: IProgramFormValues }>>,
-    subscription: FormSubscription
-  ): Unsubscribe => {
-    throw new Error('Function not implemented.');
-  },
-  mutators: {}
-};
 describe('ProgramForm', () => {
   const mockTenantId = 'mockTenantId';
-  let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
-  it('should render the form with the program name and site select fields', async () => {
+  it('should render the form with the program name and site select fields', () => {
     const store = mockStore({
       site: {
         siteDropdownOptions: {
@@ -125,18 +41,19 @@ describe('ProgramForm', () => {
         labelName: null
       }
     });
-    wrapper = mount(
+
+    render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1/1/program/create']}>
           <Route path='/region/:regionId/:tenantId/program/create'>
-            <Form
+            <Form<{ program: IProgramFormValues }>
               onSubmit={() => {
                 //
               }}
             >
-              {({ handleSubmit }) => (
+              {({ handleSubmit, form }) => (
                 <form onSubmit={handleSubmit}>
-                  <ProgramForm form={mockFormApi} tenantId={mockTenantId} />
+                  <ProgramForm form={form} tenantId={mockTenantId} />
                 </form>
               )}
             </Form>
@@ -145,8 +62,7 @@ describe('ProgramForm', () => {
       </Provider>
     );
 
-    expect(wrapper.exists()).toBe(true);
-    expect(wrapper.find('input[name="program.name"]').exists()).toBe(true);
-    expect(wrapper.find('[type="text"]').exists()).toBe(true);
+    expect(screen.getByRole('textbox', { name: 'program.name' })).toBeInTheDocument();
+    expect(screen.getByText('Health Facility')).toBeInTheDocument();
   });
 });

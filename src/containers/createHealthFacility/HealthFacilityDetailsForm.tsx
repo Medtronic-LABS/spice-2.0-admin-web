@@ -1,7 +1,7 @@
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
@@ -56,6 +56,7 @@ import Workflows from '../healthFacility/Workflows';
 import './HealthFacilityDetails.scss';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { errorMsgs } from '../../constants/erroMsgs';
+import { useAppDispatch } from '../../store/hooks';
 
 interface IAddUserFormProps {
   formName: string;
@@ -89,7 +90,7 @@ const HealthFacilityDetailsForm = ({
   isActivating,
   isHFCreate
 }: IAddUserFormProps): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const hfTypesList = useSelector(hfTypesSelector);
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);

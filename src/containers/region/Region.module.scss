@@ -1,5 +1,4 @@
-@import '../../styles/variables';
-@import '../../styles/theme';
+@use '../../styles/variables' as *;
 
 .regionDetailIcons {
   background-color: $full-white !important;

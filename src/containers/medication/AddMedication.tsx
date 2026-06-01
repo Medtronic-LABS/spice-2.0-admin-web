@@ -2,7 +2,8 @@ import { Tools } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { useState } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
+
 import { RouteComponentProps } from 'react-router';
 import MedicationFormIcon from '../../assets/images/info-grey.svg';
 import FormContainer from '../../components/formContainer/FormContainer';
@@ -42,7 +43,7 @@ interface IMatchProps extends RouteComponentProps<IMatchParams> {}
 type Props = IStateProps & IDispatchProps & IRouteProps & IMatchProps;
 
 const AddMedication = (props: Props): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [previousFieldValue, setPreviousFieldValueState] = useState([] as IMedicationDataFormValues[]);
   const [internalFormState, setStateInternalFormState] = useState(

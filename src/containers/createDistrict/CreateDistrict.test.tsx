@@ -1,39 +1,42 @@
-import { mount } from 'enzyme';
-import CreateDistrict from './CreateDistrict';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import { BrowserRouter as Router } from 'react-router-dom';
 
-// Mock react-leaflet to avoid ES module issues
-jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
-  TileLayer: () => <div data-testid='tile-layer' />,
-  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
-  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
-  useMap: () => ({
-    setView: jest.fn(),
-    getCenter: () => ({ lat: 0, lng: 0 })
-  }),
-  useMapEvent: jest.fn(),
-  useMapEvents: jest.fn()
+import CreateDistrict from './CreateDistrict';
+
+jest.mock('./DistrictForm', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'district-form' }, 'District form')
 }));
 
-jest.mock('leaflet/dist/leaflet.css', () => ({}));
+jest.mock('../../components/userForm/UserForm', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'user-form' }, 'User form')
+}));
 
-// Mock react-router-dom hooks
 const mockPush = jest.fn();
 jest.mock('react-router-dom', () => {
   const actual = jest.requireActual('react-router-dom');
   return {
     ...actual,
-    useHistory: () => ({
-      push: mockPush
-    }),
     useParams: () => ({ tenantId: '3', regionId: '2' })
   };
 });
 
+jest.mock('../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'create-district' },
+    push: mockPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
+  })
+}));
+
 const mockStore = configureMockStore();
+
 describe('CreateDistrict', () => {
   const store = mockStore({
     district: {
@@ -80,20 +83,10 @@ describe('CreateDistrict', () => {
         country: { id: 1, appTypes: [] },
         appTypes: []
       },
-      timezoneList: [
-        {
-          id: 1
-        },
-        {
-          id: 2
-        }
-      ],
+      timezoneList: [{ id: 1 }, { id: 2 }],
       countryList: [
         { id: 1, countryCode: '91' },
-        {
-          id: 2,
-          countryCode: '232'
-        }
+        { id: 2, countryCode: '232' }
       ],
       cultureList: [],
       designationList: [],
@@ -141,61 +134,36 @@ describe('CreateDistrict', () => {
       labelName: null
     }
   });
-  let props: any;
-  let wrapper: any;
+
   beforeEach(() => {
     mockPush.mockClear();
-    props = {
-      loading: false,
-      countryId: '1',
-      createDistrictRequest: jest.fn(),
-      history: { push: jest.fn() },
-      match: { params: { regionId: '2', tenantId: '3' } }
-    };
-    wrapper = mount(
+  });
+
+  it('renders DistrictForm and UserForm inside FormContainer components', () => {
+    const { container } = render(
       <Provider store={store}>
-        <Router>
-          <CreateDistrict {...props} />
-        </Router>
+        <CreateDistrict />
       </Provider>
     );
+
+    expect(container.querySelector('form')).toBeInTheDocument();
+    expect(screen.getByTestId('district-form')).toBeInTheDocument();
+    expect(screen.getByTestId('user-form')).toBeInTheDocument();
+    expect(screen.getByText('District Details')).toBeInTheDocument();
+    expect(screen.getByText('District Admin')).toBeInTheDocument();
   });
 
-  it('renders FormContainer components', () => {
-    expect(wrapper.find('FormContainer').length);
-  });
+  it('calls handleNavigation function when cancel button is clicked', async () => {
+    const user = userEvent.setup();
 
-  it('renders UserForm component', () => {
-    expect(wrapper.find('UserForm')).toBeTruthy();
-    expect(wrapper.find('UserForm').length).toBe(1);
-  });
-
-  it('renders DistrictForm component', () => {
-    expect(wrapper.find('DistrictForm').length).toBe(1);
-  });
-
-  it('calls handleNavigation function when cancel button is clicked', () => {
-    const button = wrapper.find('button[type="button"]');
-    if (button.length > 0) {
-      button.simulate('click');
-      expect(mockPush).toHaveBeenCalled();
-    }
-  });
-
-  it('should render DistrictForm and UserForm inside FormContainer components', () => {
-    const componentWrapper = mount(
+    render(
       <Provider store={store}>
-        <Router>
-          <CreateDistrict {...props} />
-        </Router>
+        <CreateDistrict />
       </Provider>
     );
-    const districtFormContainer = componentWrapper.find('FormContainer[label="District Details"]');
 
-    const userFormContainer = componentWrapper.find('FormContainer[label="District Admin"]');
-    expect(districtFormContainer).toHaveLength(1);
-    expect(userFormContainer).toHaveLength(1);
-    expect(districtFormContainer.find('DistrictForm')).toHaveLength(1);
-    expect(userFormContainer.find('UserForm')).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(mockPush).toHaveBeenCalled();
   });
 });

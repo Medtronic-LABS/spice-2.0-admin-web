@@ -1,32 +1,21 @@
 import { goToUrl } from '../routeUtil';
 
 describe('goToUrl', () => {
-  const originalLocation = window.location;
+  const replaceSpy = jest.fn();
+  const locationRef = { replace: replaceSpy };
 
   beforeEach(() => {
-    // Mock the location object with only the replace function
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: {
-        ...window.location,
-        replace: jest.fn()
-      }
-    });
-  });
-
-  afterEach(() => {
-    // Restore the original location object after each test
-    window.location = originalLocation;
+    replaceSpy.mockClear();
   });
 
   it('should call window.location.replace with the provided URL', () => {
     const url = 'https://example.com';
-    goToUrl(url);
-    expect(window.location.replace).toHaveBeenCalledWith(url);
+    goToUrl(url, locationRef);
+    expect(replaceSpy).toHaveBeenCalledWith(url);
   });
 
   it('should default to "/" if no URL is provided', () => {
-    goToUrl();
-    expect(window.location.replace).toHaveBeenCalledWith('/');
+    goToUrl(undefined, locationRef);
+    expect(replaceSpy).toHaveBeenCalledWith('/');
   });
 });

@@ -13,9 +13,9 @@ import {
   districtLoadingSelector
 } from '../../../store/district/selectors';
 import { roleSelector } from '../../../store/user/selectors';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { Form } from 'react-final-form';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/chiefdomDataConstants';
 
 jest.mock('react-redux', () => ({
@@ -90,9 +90,10 @@ describe('ChiefdomForm', () => {
     });
   });
 
-  it('user event for input', () => {
+  it('user event for input', async () => {
+    const user = userEvent.setup();
     const input = screen.getByRole('textbox', { name: 'chiefdom.name' });
-    userEvent.type(input, 'Sample Text');
+    await user.type(input, 'Sample Text');
     expect(input).toHaveValue('Sample Text');
   });
 

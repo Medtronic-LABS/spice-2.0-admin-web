@@ -14,7 +14,7 @@ import {
 import toastCenter from '../../../utils/toastCenter';
 import { HF_SUMMARY } from '../../../tests/mockData/healthFacilityConstants';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/chiefdomDataConstants';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { getAdminPayload } from '../../../utils/formatObjectUtils';
 const { ROLES } = APPCONSTANTS;
 
@@ -25,7 +25,9 @@ jest.mock('../../../components/modal/ModalForm', () =>
     show ? (
       <div data-testid='modal-form'>
         <button onClick={handleCancel}>Cancel</button>
-        <button onClick={handleFormSubmit}>Submit</button>
+        <button onClick={() => handleFormSubmit({ users: [{ id: '123', firstName: 'John', lastName: 'Doe' }] })}>
+          Submit
+        </button>
         <MockUserForm />
       </div>
     ) : null
@@ -95,9 +97,11 @@ const initialState = {
   }
 };
 
-jest.mock('../../../components/button/IconButton.svg', () => ({
-  ReactComponent: 'IconButton'
-}));
+jest.mock('../../../components/button/IconButton', () => (props: any) => (
+  <button data-testid='detail-card-button' onClick={props.handleClick}>
+    {props.label}
+  </button>
+));
 
 jest.mock('../../../utils/formatObjectUtils', () => ({
   __esModule: true,

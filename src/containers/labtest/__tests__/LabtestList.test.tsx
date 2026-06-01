@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
 import { createMemoryHistory, History } from 'history';
 import configureStore from 'redux-mock-store';
 import LabTestList from '../LabtestList';
+import { HistoryRouter as Router } from '../../../tests/routerTestUtils';
 
 // Mock the toast center
 jest.mock('../../../utils/toastCenter', () => ({

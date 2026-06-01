@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
+import { useAppDispatch } from '../../store/hooks';
 
 import { getFormMetaSelector } from '../../store/workflow/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -19,6 +20,7 @@ import {
   labtestCustomization
 } from '../../store/labTest/actions';
 import { labTestJSONLoadingSelector } from '../../store/labTest/selectors';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 /**
  * Interface for route parameters
@@ -36,7 +38,7 @@ interface IMatchParams {
  * @returns {React.ReactElement} The rendered component
  */
 const LabTestCustomizationLayout = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const { tenantId, regionId, labTestName, identifier: uniqueName, testId: formId } = useParams<IMatchParams>();
   const testName = decodeURIComponent(labTestName);

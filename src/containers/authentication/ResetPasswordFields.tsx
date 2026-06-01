@@ -7,9 +7,12 @@ import ShowPasswordIcon from '../../assets/images/showPass.svg';
 import HidePasswordIcon from '../../assets/images/hidePass.svg';
 import TickIcon from '../../assets/images/tick.svg';
 import { useState } from 'react';
-import CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
 import commonPassword from '../../utils/Common_Passwords';
-import { sanitize } from 'dompurify';
+import DOMPurify from 'dompurify';
+import { appEnv } from '../../config/env';
+
+const cryptoJsLib = (CryptoJS as typeof CryptoJS & { default?: typeof CryptoJS }).default || CryptoJS;
 
 /**
  * Generates a hashed password
@@ -17,8 +20,8 @@ import { sanitize } from 'dompurify';
  * @returns {string} The hashed password
  */
 export const generatePassword = (password: string) => {
-  const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
-  return hmac.toString(CryptoJS.enc.Hex);
+  const hmac = cryptoJsLib.HmacSHA512(password, appEnv.passwordHashKey as string);
+  return hmac.toString(cryptoJsLib.enc.Hex);
 };
 
 /**
@@ -138,7 +141,7 @@ export const ResetPasswordFields = ({
             name='oldPassword'
             type={isShowOldPassword ? 'text' : 'password'}
             validate={composeValidators(validatePassword, validateOldPassword)}
-            parse={(value) => sanitize(value)}
+            parse={(value) => DOMPurify.sanitize(value)}
             render={({ input, meta }) => (
               <div>
                 <TextInput
@@ -167,7 +170,7 @@ export const ResetPasswordFields = ({
           name='newPassword'
           type={isShowPassword ? 'text' : 'password'}
           validate={composeValidators(validatePassword, checkUsername)}
-          parse={(value) => sanitize(value)}
+          parse={(value) => DOMPurify.sanitize(value)}
           render={({ input, meta }) => (
             <>
               <TextInput
@@ -196,7 +199,7 @@ export const ResetPasswordFields = ({
             name='confirmPassword'
             type={isShowConfirmPassword ? 'text' : 'password'}
             validate={composeValidators(validatePassword, validatePasswordMatch)}
-            parse={(value) => sanitize(value)}
+            parse={(value) => DOMPurify.sanitize(value)}
             render={({ input: newIn, meta }) => (
               <div>
                 <TextInput

@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
 import { createMemoryHistory, History } from 'history';
 import configureStore from 'redux-mock-store';
 import ProgramList from '../ProgramList';
+import { HistoryRouter as Router } from '../../../tests/routerTestUtils';
 
 // Mock the toast center and getErrorToastArgs
 jest.mock('../../../utils/toastCenter', () => ({

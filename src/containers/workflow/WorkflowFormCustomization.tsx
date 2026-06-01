@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { camelCase } from 'lodash';
+import { useAppDispatch } from '../../store/hooks';
 
 import { formJSONSelector, getFormMetaSelector, loadingSelector } from '../../store/workflow/selectors';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -13,6 +14,7 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ReorderView from '../../components/formBuilder/components/reorder/ReorderView';
 import { getConfigByViewType } from '../../components/formBuilder/utils/FieldUtils';
 import useFormCustomization from '../../components/formBuilder/hooks/useFormCustomization';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 interface IMatchParams {
   regionId: string;
@@ -26,7 +28,7 @@ interface IMatchParams {
  * Renders the workflow form customization component.
  */
 const WorkflowFormCustomization = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const { tenantId, regionId, form, clinicalWorkflowId, workflowId: wfId } = useParams<IMatchParams>();
   const formType = decodeURIComponent(form);

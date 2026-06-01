@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createMemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import MedicationList from '../MedicationList';
 import { APP_TYPE } from '../../../constants/appConstants';
+import { HistoryRouter as Router } from '../../../tests/routerTestUtils';
 
 // Mock toastCenter
 jest.mock('../../../utils/toastCenter', () => ({

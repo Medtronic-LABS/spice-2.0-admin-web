@@ -1,7 +1,7 @@
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RouteComponentProps, useParams } from 'react-router-dom';
 import IconLegal from '../../assets/images/icon-legal.svg';
 import CustomTable from '../../components/customTable/CustomTable';
 import Deactivation from '../../components/deactivate/Deactivation';
@@ -30,6 +30,8 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import DistrictForm from '../createDistrict/DistrictForm';
 import DistrictConsentForm from './DistrictConsentForm';
 import { getAdminPayload } from '../../utils/formatObjectUtils';
+import { useAppDispatch } from '../../store/hooks';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 interface IMatchParams {
   districtId: string;
@@ -47,7 +49,7 @@ interface IMatchParams {
  *
  */
 const DistrictSummary: React.FC<RouteComponentProps<IMatchParams>> = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const { districtId, tenantId } = useParams<IMatchParams>();
 

@@ -6,7 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { IDistrict, IDistrictAdmin, IAdminEditFormValues } from '../../../store/district/types';
 import { initialState } from '../../../store/district/reducer';
 import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { formatUserToastMsg } from '../../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
+import { useAppDispatch } from '../../store/hooks';
 
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
@@ -43,7 +44,7 @@ import styles from './Region.module.scss';
  * @returns {React.ReactElement}
  */
 const Region = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const regions = useSelector(getRegionsSelector);
   const regionsCount = useSelector(getRegionsCountSelector);
   const loading = useSelector(getLoadingSelector);

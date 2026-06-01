@@ -1,8 +1,7 @@
-@import '../../styles/variables';
-@import '../../styles/theme';
+@use '../../styles/variables' as *;
 
 .breadcrumb {
-  @extend .subtle-color;
+  color: var(--subtle-text-color);
   min-height: 2.25rem;
   .homeIcon {
     width: 1.5rem;
@@ -26,7 +25,7 @@
   .breadcrumbLink {
     transition: font-size 0.1s, color 0.1s;
     &:hover {
-      @extend .primary-title;
+      color: var(--primary-title-text-color);
     }
     &.active {
       color: var(--primary-title-text-color);

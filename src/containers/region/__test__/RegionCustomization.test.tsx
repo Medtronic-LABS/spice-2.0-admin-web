@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import RegionCustomization, { findCurrentFormType, FormTypes } from '../RegionCustomization';
 
-jest.mock('../../assets/images/edit.svg', () => ({
+jest.mock('../../../assets/images/edit.svg', () => ({
   ReactComponent: () => <svg data-testid='edit-icon' />
 }));
 

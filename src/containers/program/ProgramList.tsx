@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import ProgramForm from './ProgramForm';
 import CustomTable from '../../components/customTable/CustomTable';
@@ -21,6 +22,7 @@ import {
   updateProgram
 } from '../../store/program/actions';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 interface IModalState {
   data?: IProgramDetails;
@@ -66,7 +68,7 @@ const ProgramList = (): React.ReactElement => {
     isOpen: false
   });
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const programCount = useSelector(programListTotalSelector);
   const programs = useSelector(programListSelector);
   const loading = useSelector(programLoadingSelector);

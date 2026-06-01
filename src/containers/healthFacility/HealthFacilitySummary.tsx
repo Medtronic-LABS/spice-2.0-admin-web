@@ -1,7 +1,8 @@
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
 
 import { FormApi } from 'final-form';
 import CustomTable from '../../components/customTable/CustomTable';
@@ -75,7 +76,7 @@ interface IModalState {
 }
 
 const HealthFacilitySummary = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { healthFacilityId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
   const healthFacility = useSelector(healthFacilitySelector);
   const loading = useSelector(healthFacilityLoadingSelector);

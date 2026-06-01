@@ -78,7 +78,16 @@ const ModalForm = React.memo(
     const isFromCloseBtn = true;
 
     return ReactDOM.createPortal(
-      <div ref={ref} className={`${styles.modal} modal modal-show`} data-testid='modal-form'>
+      <div
+        ref={ref}
+        className={`${styles.modal} modal modal-show show`}
+        data-testid='modal-form'
+        style={{ display: 'block' }}
+        role='dialog'
+        aria-modal='true'
+        aria-hidden='false'
+        tabIndex={-1}
+      >
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
           <div className={`modal-content ${styles.modalContent}`}>
             {/* Modal header */}

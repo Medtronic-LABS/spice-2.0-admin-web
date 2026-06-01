@@ -19,6 +19,12 @@ describe('<ModalForm />', () => {
     expect(screen.getByText('Test Modal')).toBeInTheDocument();
   });
 
+  it('renders the bootstrap show class so the modal is visible', () => {
+    render(<ModalForm {...props} />);
+    expect(screen.getByTestId('modal-form')).toHaveClass('show');
+    expect(screen.getByTestId('modal-form')).toHaveStyle({ display: 'block' });
+  });
+
   it('should close modal when cancel button is clicked', () => {
     render(<ModalForm {...props} cancelText='Cancel' />);
     fireEvent.click(screen.getByText('Cancel'));

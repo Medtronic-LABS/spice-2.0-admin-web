@@ -1,88 +1,183 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import { MemoryRouter, Route } from 'react-router-dom';
+
 import DistrictSummary from '../DistrictSummary';
-import MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
+
+jest.mock('../../../components/detailCard/DetailCard', () => ({
+  __esModule: true,
+  default: ({ header, buttonLabel, customLabel, onButtonClick, onCustomClick, onSearch, children }: any) =>
+    require('react').createElement(
+      'div',
+      { 'data-testid': 'detail-card' },
+      require('react').createElement('div', null, header),
+      buttonLabel
+        ? require('react').createElement(
+            'button',
+            { type: 'button', onClick: () => onButtonClick?.({}) },
+            buttonLabel
+          )
+        : null,
+      customLabel
+        ? require('react').createElement(
+            'button',
+            { type: 'button', onClick: () => onCustomClick?.() },
+            customLabel
+          )
+        : null,
+      onSearch
+        ? require('react').createElement('input', {
+            'data-testid': `${header}-search`,
+            onChange: (event: any) => onSearch(event.target.value)
+          })
+        : null,
+      children
+    )
+}));
+
+jest.mock('../../../components/customTable/CustomTable', () => ({
+  __esModule: true,
+  default: ({ onRowEdit, onDeleteClick }: any) =>
+    require('react').createElement(
+      'div',
+      { 'data-testid': 'custom-table' },
+      require('react').createElement(
+        'button',
+        {
+          type: 'button',
+          onClick: () =>
+            onRowEdit?.({
+              roles: [],
+              countryCode: '',
+              phoneNumber: '',
+              firstName: 'Admin',
+              lastName: 'User'
+            })
+        },
+        'Edit row'
+      ),
+      require('react').createElement(
+        'button',
+        {
+          type: 'button',
+          onClick: () =>
+            onDeleteClick?.({
+              data: {
+                id: '1',
+                tenantId: '1'
+              },
+              index: 0
+            })
+        },
+        'Delete row'
+      )
+    )
+}));
+
+jest.mock('../../../components/modal/ModalForm', () => ({
+  __esModule: true,
+  default: ({ show, title, handleDeactivate, render }: any) => {
+    if (!show) {
+      return null;
+    }
+
+    return require('react').createElement(
+      'div',
+      { 'data-testid': 'modal' },
+      require('react').createElement('div', null, title),
+      render ? render({}) : null,
+      handleDeactivate
+        ? require('react').createElement(
+            'button',
+            { type: 'button', onClick: () => handleDeactivate() },
+            'Open deactivate'
+          )
+        : null
+    );
+  }
+}));
+
+jest.mock('../../../components/userForm/UserForm', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'user-form' }, 'User form')
+}));
+
+jest.mock('../../createDistrict/DistrictForm', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'district-form' }, 'District form')
+}));
+
+jest.mock('../../../components/deactivate/Deactivation', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'deactivation-form' }, 'Deactivate form')
+}));
+
+jest.mock('../DistrictConsentForm', () => ({
+  __esModule: true,
+  default: ({ isOpen }: any) =>
+    isOpen ? require('react').createElement('div', { 'data-testid': 'district-consent-form' }) : null
+}));
+
+jest.mock('../../../hooks/useCountryId', () => ({
+  __esModule: true,
+  default: () => 1
+}));
+
+const mockPush = jest.fn();
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
+  return {
+    ...actual,
+    useParams: () => ({
+      districtId: '1',
+      tenantId: '2'
+    })
+  };
+});
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'district-summary' },
+    push: mockPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
+  })
+}));
 
 const mockStore = configureMockStore();
 
-// Mock react-leaflet to avoid ESM issues in Jest
-jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }: any) => <div data-testid='map-container'>{children}</div>,
-  TileLayer: () => <div data-testid='tile-layer' />,
-  Marker: ({ children }: any) => <div data-testid='marker'>{children}</div>,
-  Popup: ({ children }: any) => <div data-testid='popup'>{children}</div>,
-  useMap: () => ({
-    setView: jest.fn(),
-    getCenter: () => ({ lat: 0, lng: 0 })
-  }),
-  useMapEvent: jest.fn(),
-  useMapEvents: jest.fn()
-}));
-
-jest.mock('leaflet/dist/leaflet.css', () => ({}));
-
-jest.mock('../../../assets/images/edit.svg', () => ({
-  ReactComponent: 'EditIcon'
-}));
-
-// Mock UserForm to avoid pulling in heavy formBuilder/labtest dependencies
-jest.mock('../../../components/userForm/UserForm', () => ({
-  __esModule: true,
-  default: () => <div>UserFormMock</div>
-}));
-
-jest.mock('../../../constants/appConstants', () => ({
-  ...jest.requireActual('../../../constants/appConstants'),
-  ROLES: {
-    SUPER_USER: 'SUPER_USER',
-    SUPER_ADMIN: 'SUPER_ADMIN',
-    REGION_ADMIN: 'REGION_ADMIN',
-    DISTRICT_ADMIN: 'DISTRICT_ADMIN',
-    CHIEFDOM_ADMIN: 'CHIEFDOM_ADMIN'
-  },
-  CHIEFDOM_DELETE_CONFIRMATION: undefined,
-  DELETE_CONSENT_TITLE: 'Delete confirmation',
-  DELETE_CONSENT_CONFIRMATION: 'Are you sure you want to delete the district consent form?'
-}));
-
-jest.mock('../../../hooks/tablePagination', () => ({
-  useTablePaginationHook: jest.fn(() => ({
-    listParams: {
-      page: 2,
-      rowsPerPage: 10
-    },
-    setListReqParams: jest.fn()
-  }))
-}));
-
 describe('District Summary', () => {
   let store: any;
-  let wrapper: any;
-  const props: any = {
-    match: {
-      params: {
-        districtId: '1',
-        tenantId: '2'
-      }
-    }
-  };
 
   beforeEach(() => {
+    mockPush.mockClear();
     store = mockStore({
       district: {
         district: {
           id: '1',
+          countryId: 1,
           clinicalWorkflow: [1],
-          users: MOCK_DATA_CONSTANTS.DISTRICT_DETAIL_RESPONSE_PAYLOAD.users,
+          users: [
+            {
+              id: '1',
+              firstName: 'John',
+              lastName: 'Doe',
+              username: 'john@example.com',
+              phoneNumber: '1234567890',
+              countryCode: '91',
+              roles: [],
+              tenantId: '1'
+            }
+          ],
           name: 'DistrictOne',
           maxNoOfUsers: '22',
           tenantId: '1'
         },
         loading: false,
-        clinicalWorkflows: MOCK_DATA_CONSTANTS.FETCH_CLINICAL_WORKFLOWS_RESPONSE_PAYLOAD
+        clinicalWorkflows: []
       },
       workflow: {
         loading: false
@@ -91,126 +186,107 @@ describe('District Summary', () => {
         user: {
           role: 'SUPER_ADMIN',
           countryId: '1',
-          country: { id: 1, appTypes: [] },
+          country: { id: 1, tenantId: 1, appTypes: [] },
           appTypes: []
-        },
-        timezoneList: [
-          {
-            id: 1
-          },
-          {
-            id: 2
-          }
-        ],
-        countryList: [
-          { id: 1, countryCode: '91' },
-          {
-            id: 2,
-            countryCode: '232'
-          }
-        ]
+        }
       },
       healthFacility: {
-        loading: false
+        loading: false,
+        workflowLoading: false
       },
       common: {
         labelName: null
       }
     });
+  });
 
-    wrapper = mount(
+  it('should render CustomTable and two DetailCard components', () => {
+    render(
       <Provider store={store}>
-        <MemoryRouter initialEntries={['/tenant/1']}>
-          <Route path='/tenant/:tenantId'>
-            <DistrictSummary {...props} />
-          </Route>
-        </MemoryRouter>
+        <DistrictSummary />
       </Provider>
     );
+
+    expect(screen.getByTestId('custom-table')).toBeInTheDocument();
+    expect(screen.getAllByTestId('detail-card')).toHaveLength(2);
   });
 
-  it('should render CustomTable component', () => {
-    expect(wrapper.find('CustomTable')).toHaveLength(1);
+  it('should open the consent form from the district summary card', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Provider store={store}>
+        <DistrictSummary />
+      </Provider>
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Consent form' }));
+
+    expect(screen.getByTestId('district-consent-form')).toBeInTheDocument();
   });
 
-  it('should render DetailCard component', () => {
-    expect(wrapper.find('DetailCard')).toHaveLength(2);
+  it('should open the add district admin modal from the admin card', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Provider store={store}>
+        <DistrictSummary />
+      </Provider>
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add District Admin' }));
+
+    expect(screen.getByTestId('modal')).toHaveTextContent('Add District Admin');
+    expect(screen.getByTestId('user-form')).toBeInTheDocument();
   });
 
-  it('should render ModalForm component', () => {
-    expect(wrapper.find('Memo()')).toHaveLength(3);
+  it('should open the edit district admin modal from the table', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Provider store={store}>
+        <DistrictSummary />
+      </Provider>
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Edit row' }));
+
+    expect(screen.getByText('Edit District Admin')).toBeInTheDocument();
+    expect(screen.getByTestId('user-form')).toBeInTheDocument();
   });
 
-  it('should handle render methods in Edit District Admin ModalForm', () => {
-    const ModalForm = wrapper.find('Memo()').at(1);
-    const handleAdminSubmit = ModalForm.prop('handleFormSubmit');
-    handleAdminSubmit({ users: [MOCK_DATA_CONSTANTS.DISTRICT_ADMIN] });
-    const handleCancelClick = ModalForm.prop('handleCancel');
-    handleCancelClick();
-    const editModalRender = ModalForm.prop('render');
-    editModalRender(jest.fn());
+  it('should dispatch delete admin request from the table', async () => {
+    const user = userEvent.setup();
 
-    expect(wrapper.find('Memo()')).toHaveLength(3);
+    render(
+      <Provider store={store}>
+        <DistrictSummary />
+      </Provider>
+    );
+
+    store.clearActions();
+    await user.click(screen.getByRole('button', { name: 'Delete row' }));
+
+    expect(store.getActions()).toContainEqual(expect.objectContaining({ type: 'DELETE_HEALTH_FACILITY_USER_REQUEST' }));
   });
 
-  it('should handle render methods in Deactivate District ModalForm', () => {
-    const ModalForm = wrapper.find('Memo()').at(2);
-    const handleAdminSubmit = ModalForm.prop('handleFormSubmit');
-    handleAdminSubmit({ district: MOCK_DATA_CONSTANTS.CREATE_DISTRICT_PAYLOAD });
-    const showDeactivateModal = ModalForm.prop('handleDeactivate');
-    showDeactivateModal();
-    const handleDeactivateSubmit = ModalForm.prop('handleFormSubmit');
-    handleDeactivateSubmit({ district: MOCK_DATA_CONSTANTS.CREATE_DISTRICT_PAYLOAD });
-    const editDeactivateModalRender = ModalForm.prop('render');
-    editDeactivateModalRender(jest.fn());
+  it('should open the district edit modal and switch to deactivate mode', async () => {
+    const user = userEvent.setup();
 
-    expect(wrapper.find('Memo()')).toHaveLength(3);
-  });
+    render(
+      <Provider store={store}>
+        <DistrictSummary />
+      </Provider>
+    );
 
-  it('should handle render methods in customTable', () => {
-    const CustomTable = wrapper.find('CustomTable');
-    const onDeleteClick = CustomTable.prop('onDeleteClick');
-    onDeleteClick({
-      data: {
-        id: '1',
-        name: 'District Test',
-        maxNoOfUsers: 100,
-        tenantId: '1'
-      },
-      index: 0
-    });
-    const openEditModal = CustomTable.prop('onRowEdit');
-    // Provide minimal admin data to avoid undefined errors inside openEditModal
-    openEditModal({
-      roles: [],
-      countryCode: '',
-      phoneNumber: '',
-      firstName: '',
-      lastName: ''
-    });
-    expect(wrapper.find('CustomTable')).toHaveLength(1);
-  });
+    await user.click(screen.getByRole('button', { name: 'Edit District' }));
 
-  it('should handle render methods in DistrictConsentForm', () => {
-    const DistrictConsentForm = wrapper.find('DistrictConsentForm');
-    const handleConsentFormClose = DistrictConsentForm.prop('handleConsentFormClose');
-    handleConsentFormClose();
-    expect(wrapper.find('CustomTable')).toHaveLength(1);
-  });
+    expect(screen.getByTestId('modal')).toHaveTextContent('Edit District');
+    expect(screen.getByTestId('district-form')).toBeInTheDocument();
 
-  it('should handle render methods in DetailCard', () => {
-    const DetailCard = wrapper.find('DetailCard').first();
-    const onButtonClick = DetailCard.prop('onButtonClick');
-    onButtonClick();
-    expect(wrapper.find('DetailCard')).toHaveLength(2);
-  });
+    await user.click(screen.getByRole('button', { name: 'Open deactivate' }));
 
-  it('should handle render methods in DetailCard', () => {
-    const DetailCard = wrapper.find('DetailCard').last();
-    const handleSearch = DetailCard.prop('onSearch');
-    handleSearch('Acc');
-    const openAddModal = DetailCard.prop('onButtonClick');
-    openAddModal({});
-    expect(wrapper.find('DetailCard')).toHaveLength(2);
+    expect(screen.getByText('Deactivate District')).toBeInTheDocument();
+    expect(screen.getByTestId('deactivation-form')).toBeInTheDocument();
   });
 });

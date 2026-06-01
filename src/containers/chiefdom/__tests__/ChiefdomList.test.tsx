@@ -2,12 +2,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import ChiefdomList from '../ChiefdomList';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
 import { IChiefdomDetail } from '../../../store/chiefdom/types';
 import '@testing-library/jest-dom';
+import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 
 const mockStore = configureMockStore();
 jest.mock('../../../assets/images/edit.svg', () => ({
@@ -132,6 +133,7 @@ describe('Chiefdom List', () => {
   });
 
   it('should redirect to create Chiefdom', async () => {
+    const user = userEvent.setup();
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/region/1']}>
@@ -143,7 +145,7 @@ describe('Chiefdom List', () => {
     );
 
     const button = screen.getByRole('button', { name: /Add (Chiefdom|Sub County)/i });
-    await userEvent.click(button);
+    await user.click(button);
 
     await waitFor(() => {
       expect(button).toBeInTheDocument();

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
 
 import AccordianView from '../../components/formBuilder/components/accordian/AccordianView';
 import {
@@ -26,6 +27,7 @@ import styles from '../../components/formBuilder/styles/FormBuilder.module.scss'
 import { Form } from 'react-final-form';
 import { filterByAppTypes } from '../../utils/commonUtils';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 /**
  * Interface for route parameters
@@ -41,7 +43,7 @@ interface IMatchParams {
  * @returns {React.ReactElement} The rendered component
  */
 const RegionFormCustomization = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const history = useHistory();
   const { tenantId, regionId, form } = useParams<IMatchParams>();

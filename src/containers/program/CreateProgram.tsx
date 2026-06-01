@@ -1,6 +1,6 @@
 import { Form, FormRenderProps } from 'react-final-form';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { RouteComponentProps } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import FormContainer from '../../components/formContainer/FormContainer';
 import Loader from '../../components/loader/Loader';
 import ProgramForm from './ProgramForm';
@@ -11,6 +11,8 @@ import { PROTECTED_ROUTES } from '../../constants/route';
 import APPCONSTANTS from '../../constants/appConstants';
 import { createProgram } from '../../store/program/actions';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { useAppDispatch } from '../../store/hooks';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 interface IMatchParams {
   regionId?: string;
@@ -27,7 +29,7 @@ interface IRouteProps extends RouteComponentProps<IMatchParams> {}
 const CreateProgram = (props: IRouteProps): React.ReactElement => {
   const { regionId, tenantId } = props.match.params;
   const history = useHistory();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const loading = useSelector(programLoadingSelector);
 
   /**

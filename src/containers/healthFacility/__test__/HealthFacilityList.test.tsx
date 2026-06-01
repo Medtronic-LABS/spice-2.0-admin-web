@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { BrowserRouter as Router, MemoryRouter, Route } from 'react-router-dom';
+import { BrowserRouter as Router, MemoryRouter } from 'react-router-dom';
 import HealthFacilityList from '../HealthFacilityList';
 import * as healthFacilityActions from '../../../store/healthFacility/actions';
 import { mockHealthFacilityList } from '../../../tests/mockData/healthFacilityConstants';
@@ -10,6 +10,7 @@ import { PROTECTED_ROUTES } from '../../../constants/route';
 import { FETCH_HEALTH_FACILITY_LIST_REQUEST } from '../../../store/healthFacility/actionTypes';
 import { FETCH_DISTRICT_LIST_REQUEST } from '../../../store/district/actionTypes';
 import * as districtActions from '../../../store/district/actions';
+import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 
 // Mock store setup
 const mockStore = configureStore([]);
@@ -32,13 +33,78 @@ jest.mock('leaflet/dist/leaflet.css', () => ({}));
 jest.mock('../../../assets/images/edit.svg', () => ({
   ReactComponent: () => <svg data-testid='edit-icon' />
 }));
+jest.mock('../../../components/tableFilter/Filter', () => () => <div data-testid="filter">filter</div>);
+jest.mock('../../../components/loader/Loader', () => () => <div data-testid="loader">Loading...</div>);
+jest.mock('../../../components/detailCard/DetailCard', () => ({ children, onButtonClick, onSearch, buttonLabel, header }: any) => (
+  <div data-testid="detail-card">
+    <h2>{header}</h2>
+    <button data-testid="detail-card-button" onClick={onButtonClick}>
+      {buttonLabel}
+    </button>
+    <input data-testid="detail-card-search" onChange={(e) => onSearch?.(e.target.value)} />
+    {children}
+  </div>
+));
+jest.mock('../../../components/customTable/CustomTable', () => (props: any) => {
+  const { columnsDef = [], rowData = [], handleRowClick, onRowEdit, showActiveToggle, onActivateClick } = props;
+
+  return (
+    <div data-testid="custom-table">
+      <div role="rowgroup">
+        {columnsDef.map((column: any) => (
+          <div key={column.id} role="columnheader">
+            {column.label}
+          </div>
+        ))}
+      </div>
+      {rowData.map((row: any, index: number) => (
+        <div key={row.id} data-testid={`row-${row.id}`} onClick={() => handleRowClick?.(row)}>
+          {showActiveToggle?.(row) ? (
+            <input
+              type="checkbox"
+              role="checkbox"
+              aria-label={`active-${row.id}`}
+              checked={Boolean(row.active)}
+              readOnly
+              onClick={(e) => {
+                e.stopPropagation();
+                onActivateClick?.({ ...row, index });
+              }}
+            />
+          ) : null}
+          <button
+            data-testid="edit-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRowEdit?.({ ...row, index });
+            }}
+          >
+            Edit
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+});
+jest.mock('../../../components/modal/ModalForm', () => ({ show, title }: any) =>
+  show ? <div data-testid="modal-form">{title}</div> : null
+);
+jest.mock('../../../components/customTable/ConfirmationModalPopup', () => ({ isOpen, popupTitle }: any) =>
+  isOpen ? <div data-testid="confirmation-modal">{popupTitle}</div> : null
+);
 jest.mock('../../../components/userForm/UserForm', () => () => {
   return <div data-testid='mock-userForm'>userForm</div>;
 });
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush
+  ...jest.requireActual('react-router-dom')
+}));
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'health-facility-list' },
+    push: mockHistoryPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
   })
 }));
 jest.mock('../../../hooks/useCountryId', () => () => 1);

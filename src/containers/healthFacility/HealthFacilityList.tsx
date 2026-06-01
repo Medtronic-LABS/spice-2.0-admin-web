@@ -1,6 +1,7 @@
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
 
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
@@ -9,7 +10,7 @@ import ModalForm from '../../components/modal/ModalForm';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import { useTablePaginationHook } from '../../hooks/tablePagination';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import APPCONSTANTS from '../../constants/appConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
@@ -42,6 +43,7 @@ import { chiefdomListSelector as getAllChiefdomsSelector } from '../../store/hea
 import { fetchChiefdomListRequest, clearChiefdomList } from '../../store/healthFacility/actions';
 import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 /**
  * Interface for modal state
@@ -68,7 +70,7 @@ interface IMatchParams {
  * @returns {React.ReactElement} The rendered component
  */
 const HealthFacilityList = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const healthFacilityList = useSelector(healthFacilityListSelector);
   const healthFacilityCount = useSelector(healthFacilityListTotalSelector);

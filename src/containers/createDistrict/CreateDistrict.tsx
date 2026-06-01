@@ -2,8 +2,9 @@ import { FormApi, Tools } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useRef } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
 
 import DistrictAdminFormIcon from '../../assets/images/avatar-o.svg';
 import DistrictFormIcon from '../../assets/images/info-grey.svg';
@@ -21,6 +22,7 @@ import { countryIdSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import { getAdminPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 import DistrictForm from './DistrictForm';
 
 interface IDistrictFormValues {
@@ -41,7 +43,7 @@ interface IDistrictFormValues {
 const CreateDistrict: React.FC = () => {
   const history = useHistory();
   const { regionId, tenantId } = useParams<{ regionId: string; tenantId: string }>();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const formInstance = useRef<FormApi<IDistrictFormValues> | undefined>(undefined);
 
   const loading = useSelector((state: AppState) => state.district.loading);

@@ -1,5 +1,7 @@
-import JoditEditor from 'jodit-react';
+import { lazy, Suspense } from 'react';
 import { TOOLBAR_BUTTONS } from './ToolBarButtons';
+
+const JoditEditor = lazy(() => import('jodit-react'));
 
 interface IExtraButton {
   name: string;
@@ -79,11 +81,13 @@ const TextEditor = ({
   }
   return (
     <div>
-      <JoditEditor
-        value={editorContent}
-        config={{ ...basicEditorConfig, ...initialEditorConfig }}
-        onBlur={(newContent) => setEditorContent(newContent)}
-      />
+      <Suspense fallback={null}>
+        <JoditEditor
+          value={editorContent}
+          config={{ ...basicEditorConfig, ...initialEditorConfig }}
+          onBlur={(newContent) => setEditorContent(newContent)}
+        />
+      </Suspense>
     </div>
   );
 };

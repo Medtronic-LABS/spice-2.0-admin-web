@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import ModalForm from '../../components/modal/ModalForm';
@@ -27,6 +27,8 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import Loader from '../../components/loader/Loader';
 import { IWorkflow } from '../../store/healthFacility/types';
 import { getAppTypeSelector } from '../../store/user/selectors';
+import { useAppDispatch } from '../../store/hooks';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 /**
  * Interface for route parameters
@@ -53,7 +55,7 @@ interface IModalState {
 const WorkflowCustomization = (): React.ReactElement => {
   const { WORKFLOW_MODULE } = APPCONSTANTS;
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const [workflowModal, setWorkflowModal] = useState<IModalState>({
     isOpen: false,

@@ -112,7 +112,7 @@ describe('useUserFormUtils', () => {
       siteRolesChange(mockInput, newValue, 0, true, [false, true]);
     });
 
-    expect(mockInput.onChange).toBeCalled();
+    expect(mockInput.onChange).toHaveBeenCalled();
   });
 });
 

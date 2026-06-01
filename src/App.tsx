@@ -11,16 +11,17 @@ import { useSelector } from 'react-redux';
 import { getIsLoggedInSelector } from './store/user/selectors';
 import TermsAndConditions from './containers/terms/TermsAndConditions';
 import useAppTypeConfigs from './hooks/appTypeBasedConfigs';
+import { appEnv } from './config/env';
 
 const App = () => {
   const loggedIn = useSelector(getIsLoggedInSelector);
   const { pathname } = useLocation();
-  const gaTrackId = process.env.REACT_APP_GA_TRACKING_ID;
+  const gaTrackId = appEnv.googleAnalyticsTrackingId;
   const { isCommunity } = useAppTypeConfigs();
 
   useEffect(() => {
     if (gaTrackId) {
-      ReactGa.initialize(process.env.REACT_APP_GA_TRACKING_ID as string);
+      ReactGa.initialize(gaTrackId);
 
       /**
        * to report the page view

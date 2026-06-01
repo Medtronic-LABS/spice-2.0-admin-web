@@ -1,7 +1,9 @@
+import { useAppDispatch } from '../../store/hooks';
+
 import arrayMutators from 'final-form-arrays';
 import ModalForm from '../../components/modal/ModalForm';
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   countryIdSelector,
   getUserSuiteAccessSelector,
@@ -29,7 +31,7 @@ import { chiefdomDropdownLoadingSelector } from '../../store/chiefdom/selectors'
 import { healthFacilityLoadingSelector } from '../../store/healthFacility/selectors';
 
 const TermsAndConditions = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const role = useSelector(roleSelector);
   const countryId = useSelector(countryIdSelector);
   const userId = useSelector(userIdSelector);

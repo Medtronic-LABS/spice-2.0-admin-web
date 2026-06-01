@@ -1,14 +1,15 @@
 // LandingPage.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Router, BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import LandingPage from '../LandingPage';
 import APPCONSTANTS, { APP_TYPE } from '../../../constants/appConstants';
 import { goToUrl } from '../../../utils/routeUtil';
 import { HOME_PAGE_BY_ROLE } from '../../../constants/route';
 import { createMemoryHistory } from 'history';
+import { HistoryRouter as Router } from '../../../tests/routerTestUtils';
 
 // Mock react-leaflet and leaflet CSS to avoid ESM issues pulled via routes
 jest.mock('react-leaflet', () => ({

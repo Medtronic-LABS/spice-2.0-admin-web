@@ -5,9 +5,11 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import DetailCard from '../DetailCard';
 
-jest.mock('../../button/IconButton.svg', () => ({
-  ReactComponent: 'IconButton'
-}));
+jest.mock('../../button/IconButton', () => (props: any) => (
+  <button data-testid='detail-card-button' onClick={props.handleClick}>
+    {props.label}
+  </button>
+));
 
 const mockStore = configureStore([]);
 const defaultStoreState = {
@@ -32,7 +34,8 @@ describe('DetailCard', () => {
     unmount();
   });
 
-  it('renders searchbar and button', () => {
+  it('renders searchbar and button', async () => {
+    const user = userEvent.setup();
     const headerText = 'Test Header';
     const buttonLabel = 'Test Button';
     const onButtonClick = jest.fn();
@@ -55,13 +58,14 @@ describe('DetailCard', () => {
     );
     const searchbar = getByPlaceholderText('Search Name');
     const button = getByText(buttonLabel);
-    userEvent.type(searchbar, 'Test');
-    userEvent.click(button);
+    await user.type(searchbar, 'Test');
+    await user.click(button);
     expect(onButtonClick).toHaveBeenCalled();
     unmount();
   });
 
-  it('renders custom icon and label', () => {
+  it('renders custom icon and label', async () => {
+    const user = userEvent.setup();
     const headerText = 'Test Header';
     const customLabel = 'Test Custom Label';
     const customIcon = 'test-icon.png';
@@ -72,23 +76,24 @@ describe('DetailCard', () => {
       </DetailCard>
     );
     const icon = getByAltText('custom-icon');
-    userEvent.click(icon);
+    await user.click(icon);
     expect(onCustomClick).toHaveBeenCalled();
     unmount();
   });
 
-  it('renders custom icon button with null handler', () => {
+  it('renders custom icon button with null handler', async () => {
+    const user = userEvent.setup();
     const headerText = 'Test Header';
     const customLabel = 'Test Custom Label';
     const onCustomClick = jest.fn();
-    const { unmount, getByText } = render(
+    const { unmount, getByTestId } = render(
       <DetailCard header={headerText} customLabel={customLabel} onCustomClick={onCustomClick}>
         <div>Test Child</div>
       </DetailCard>
     );
 
-    const customButton = getByText(customLabel);
-    userEvent.click(customButton);
+    const customButton = getByTestId('detail-card-button');
+    await user.click(customButton);
     expect(onCustomClick).toHaveBeenCalled();
     unmount();
   });

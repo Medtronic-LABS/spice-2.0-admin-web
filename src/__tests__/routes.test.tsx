@@ -27,15 +27,15 @@ jest.mock('react-leaflet', () => ({
   useMapEvents: jest.fn()
 }));
 
-jest.mock('../../../assets/images/admin.svg', () => ({
+jest.mock('../assets/images/admin.svg', () => ({
   ReactComponent: () => <div>AdminPortalLogo</div>
 }));
 
-jest.mock('../../../assets/images/reports.svg', () => ({
+jest.mock('../assets/images/reports.svg', () => ({
   ReactComponent: () => <div>ReportingPortalLogo</div>
 }));
 
-jest.mock('../../../assets/images/insights.svg', () => ({
+jest.mock('../assets/images/insights.svg', () => ({
   ReactComponent: () => <div>InsightsLogo</div>
 }));
 
@@ -62,7 +62,7 @@ describe('AppRoutes', () => {
     jest.clearAllMocks();
   });
 
-  it('should render public routes when not logged in', () => {
+  it('should render public routes when not logged in', async () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[PUBLIC_ROUTES.login]}>
@@ -71,7 +71,7 @@ describe('AppRoutes', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(await screen.findByText('Login')).toBeInTheDocument();
     expect(screen.queryByText('Admin')).not.toBeInTheDocument(); // Ensure protected routes are not rendered
   });
 
@@ -102,7 +102,7 @@ describe('AppRoutes', () => {
     });
   });
 
-  it('should redirect to the login page when not logged in and navigating to a protected route', () => {
+  it('should redirect to the login page when not logged in and navigating to a protected route', async () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[PROTECTED_ROUTES.landingPage]}>
@@ -111,7 +111,7 @@ describe('AppRoutes', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(await screen.findByText('Login')).toBeInTheDocument();
   });
 
   it('should render loader when initializing', () => {

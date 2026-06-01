@@ -11,8 +11,17 @@ import { PROTECTED_ROUTES } from '../../../constants/route';
 const mockHistoryPush = jest.fn();
 
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({ push: mockHistoryPush })
+  ...jest.requireActual('react-router-dom')
+}));
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'region-dashboard' },
+    push: mockHistoryPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
+  })
 }));
 
 jest.mock('../../../hooks/appTypeBasedConfigs', () => () => ({

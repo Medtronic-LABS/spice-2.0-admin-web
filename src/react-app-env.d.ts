@@ -1,6 +1,9 @@
 /// <reference types="node" />
 /// <reference types="react" />
 /// <reference types="react-dom" />
+/// <reference types="vite/client" />
+
+declare const __APP_ENV__: Record<string, string | undefined>;
 
 declare namespace NodeJS {
   interface ProcessEnv {

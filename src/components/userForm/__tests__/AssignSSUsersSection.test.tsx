@@ -4,8 +4,8 @@ import { Form, FormSpy } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import AssignSSUsersSection, { DEFAULT_SS_USER_ROW, getFilteredSubVillageOptionsForIndex } from '../AssignSSUsersSection';
 
-jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
-jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid='plus-icon' /> }));
+jest.mock('../../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
+jest.mock('../../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid='plus-icon' /> }));
 
 const defaultMockState = {
   region: {
@@ -22,8 +22,11 @@ const defaultMockState = {
   }
 };
 
+// Spread defaultMockState into a new outer object on every call so reselect's
+// weakMapMemoize doesn't return cached results when in-place mutations would
+// otherwise be invisible.
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn((selector: (state: any) => any) => selector(defaultMockState))
+  useSelector: jest.fn((selector: (state: any) => any) => selector({ ...defaultMockState }))
 }));
 
 jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
@@ -152,7 +155,7 @@ describe('AssignSSUsersSection', () => {
     jest.clearAllMocks();
     resetMockState();
     const { useSelector } = require('react-redux');
-    useSelector.mockImplementation((selector: (state: any) => any) => selector(defaultMockState));
+    useSelector.mockImplementation((selector: (state: any) => any) => selector({ ...defaultMockState }));
   });
 
   describe('DEFAULT_SS_USER_ROW', () => {

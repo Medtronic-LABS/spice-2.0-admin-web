@@ -1,4 +1,4 @@
-@import '../../styles/variables';
+@use '../../styles/variables' as *;
 
 $load-more-btn-height: 2.678rem;
 $no-data-message-background-color: $full-white;

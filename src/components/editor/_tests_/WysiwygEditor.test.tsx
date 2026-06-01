@@ -8,16 +8,20 @@ jest.mock('jodit-react', () => (props: any) => {
 });
 
 describe('TextEditor', () => {
-  it('Should render with test id', () => {
+  beforeEach(() => {
+    mockChildComponent.mockClear();
+  });
+
+  it('Should render with test id', async () => {
     const props = {
       editorContent: '',
       setEditorContent: jest.fn()
     };
     render(<TextEditor {...props} />);
-    expect(screen.getByTestId('jodit-editor')).toBeInTheDocument();
+    expect(await screen.findByTestId('jodit-editor')).toBeInTheDocument();
   });
 
-  it('calls setEditorContent when onBlur is triggered', () => {
+  it('calls setEditorContent when onBlur is triggered', async () => {
     const setEditorContentMock = jest.fn();
     const props = {
       editorContent: 'initial content',
@@ -25,6 +29,7 @@ describe('TextEditor', () => {
     };
 
     render(<TextEditor {...props} />);
+    await screen.findByTestId('jodit-editor');
 
     const lastCall = mockChildComponent.mock.calls[mockChildComponent.mock.calls.length - 1][0];
 
@@ -33,7 +38,7 @@ describe('TextEditor', () => {
     expect(setEditorContentMock).toHaveBeenCalledWith('new content');
   });
 
-  it('Should render with test id and editorConfig', () => {
+  it('Should render with test id and editorConfig', async () => {
     const props = {
       editorContent: '',
       setEditorContent: jest.fn(),
@@ -44,6 +49,6 @@ describe('TextEditor', () => {
       }
     };
     render(<TextEditor {...props} />);
-    expect(screen.getByTestId('jodit-editor')).toBeInTheDocument();
+    expect(await screen.findByTestId('jodit-editor')).toBeInTheDocument();
   });
 });

@@ -2,8 +2,9 @@ import { Fragment, useRef, useState } from 'react';
 import BinIcon from '../../../../assets/images/bin.svg';
 import PlusIcon from '../../../../assets/images/plus_blue.svg';
 import styles from '../../styles/TextInputArray.module.scss';
-import { matchPath, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
 import { PROTECTED_ROUTES } from '../../../../constants/route';
+import { matchPathCompat as matchPath } from '../../../../utils/routerCompat';
 
 interface ITextInputArray {
   onChange?: (value: string[]) => void;

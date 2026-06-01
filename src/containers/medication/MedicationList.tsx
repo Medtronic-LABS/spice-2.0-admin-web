@@ -1,7 +1,7 @@
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
@@ -26,6 +26,8 @@ import {
 } from '../../store/medication/selectors';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import MedicationForm, { IMedicationDataFormValues } from './MedicationForm';
+import { useAppDispatch } from '../../store/hooks';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 /**
  * MedicationList component
@@ -39,7 +41,7 @@ const MedicationList = (): React.ReactElement => {
   const [isOpenMedicationModal, setOpenMedicationModal] = useState(false);
   const [medicationInitialValues, setMedicationInitialValues] = useState({});
   const [filters, setFilters] = useState<any>({ classificationIds: [], brandIds: [], dosageFormIds: [] });
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const {
     medication: {
       categories: { available: isCategory },

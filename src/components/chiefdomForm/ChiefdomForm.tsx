@@ -1,8 +1,9 @@
 import { FormApi } from 'final-form';
 import React, { useEffect } from 'react';
 import { Field } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
+import { useAppDispatch } from '../../store/hooks';
 
 import APPCONSTANTS from '../../constants/appConstants';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
@@ -30,7 +31,7 @@ interface IChiefdomFormProps {
  * @returns {React.ReactElement}
  */
 const ChiefdomForm = ({ nestingKey, isEdit = false, form }: IChiefdomFormProps): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const districtOptions = useSelector(districtOptionsSelector);
   const districtOptionsLoading = useSelector(districtOptionsLoadingSelector);
   const { regionId, districtId, tenantId } = useParams<{ regionId?: string; districtId?: string; tenantId: string }>();

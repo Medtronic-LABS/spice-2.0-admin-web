@@ -1,10 +1,21 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import CustomTable from '../CustomTable';
 
 jest.mock('../../../assets/images/edit.svg', () => ({
-  ReactComponent: 'EditIcon'
+  ReactComponent: () => <svg data-testid='edit-icon-svg' />
+}));
+jest.mock('../../../assets/images/bin.svg', () => ({
+  ReactComponent: () => <svg data-testid='delete-icon-svg' />
+}));
+jest.mock('../../../assets/images/icon-activate.svg', () => ({
+  ReactComponent: () => <svg data-testid='activate-icon-svg' />
+}));
+
+jest.mock('../../tooltip', () => ({
+  __esModule: true,
+  default: ({ children }: any) => <>{children}</>
 }));
 
 jest.mock('../../../components/loader/Loader', () => () => <div data-testid='loading-component'>Loading</div>);

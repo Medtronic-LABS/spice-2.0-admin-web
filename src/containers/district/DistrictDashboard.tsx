@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
+import { useAppDispatch } from '../../store/hooks';
 
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
@@ -29,7 +30,7 @@ import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
  * District Dashboard component
  */
 const DistrictDashboard = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const regionId = useSelector(formDataIdSelector);
   const tenantId = useSelector(tenantIdSelector);
   const districtList = useSelector(districtDashboardListSelector);

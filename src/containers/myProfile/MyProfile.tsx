@@ -1,7 +1,8 @@
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import arrayMutators from 'final-form-arrays';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import UserForm from '../../components/userForm/UserForm';
@@ -28,7 +29,7 @@ import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
  * @return {React.ReactElement} The rendered MyProfile component
  */
 const MyProfile = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const userId = useSelector(userIdSelector);
   const [showEditModal, setShowEditModal] = useState(false);
   const [userDetails, setUserDetails] = useState<IEditUserDetail>();

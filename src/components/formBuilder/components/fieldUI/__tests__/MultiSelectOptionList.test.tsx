@@ -40,10 +40,11 @@ describe('MultiSelectOptionList', () => {
   });
 
   it('displays validation error when no option is selected', async () => {
+    const user = userEvent.setup();
     renderComponent();
 
     const select = screen.getByText('Select Fields to add to Collapsible');
-    await userEvent.click(select);
+    await user.click(select);
 
     fireEvent.blur(select);
 
@@ -62,11 +63,12 @@ describe('MultiSelectOptionList', () => {
   });
 
   it('calls form.mutators.setValue when an option is selected', async () => {
+    const user = userEvent.setup();
     renderComponent();
 
     const select = screen.getByText('Select Fields to add to Collapsible');
-    await userEvent.click(select);
-    await userEvent.click(screen.getByText('Option 1'));
+    await user.click(select);
+    await user.click(screen.getByText('Option 1'));
 
     expect(mockProps.form.mutators.setValue).toHaveBeenCalled();
   });

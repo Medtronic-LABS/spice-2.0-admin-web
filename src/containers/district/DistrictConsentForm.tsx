@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -28,7 +29,7 @@ interface IProps {
  * @returns {React.ReactElement}
  */
 const DistrictConsentForm = ({ isOpen, consentFormConfig, handleConsentFormClose }: IProps): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { id: formId } = useSelector(consentFormSelector) || {};
   const [editorContent, setEditorContent] = useState('');
   const [isDeactivatePopupOpen, setDeactivatePopupOpen] = useState(false);

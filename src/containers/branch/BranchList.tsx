@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
@@ -27,6 +28,7 @@ import useCountryId from '../../hooks/useCountryId';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import { clearChiefdomList, fetchChiefdomListRequest } from '../../store/healthFacility/actions';
 import { mapBranchToCreatePayload, mapBranchToUpdatePayload } from '../../utils/formatObjectUtils';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 import { PROTECTED_ROUTES } from '../../constants/route';
 
 interface IMatchParams {
@@ -51,7 +53,7 @@ interface IFetchDetailsParams {
  * @returns {React.ReactElement}
  */
 const BranchList = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const { regionId, tenantId } = useParams<IMatchParams>();
   const countryId = useCountryId({ regionId });
@@ -131,14 +133,14 @@ const BranchList = (): React.ReactElement => {
         })
       );
     }
-  }, [dispatch, districtList.length, countryId, tenantId]);
+  }, [dispatch, districtList.length, countryId, tenantId, districtSName]);
 
   /**
    * Invoke fetch on mount and when listParams (search/page) change
    */
   useEffect(() => {
-    fetchDetails({ ...filters });
-  }, [fetchDetails]);
+    fetchDetails(filters);
+  }, [fetchDetails, filters]);
 
   /**
    * Clear branch list on unmount

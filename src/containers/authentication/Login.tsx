@@ -14,7 +14,7 @@ import hidePass from '../../assets/images/hidePass.svg';
 import { PUBLIC_ROUTES } from '../../constants/route';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import { loginRequest } from '../../store/user/actions';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 interface ILoginForm {
   email: string;
@@ -27,7 +27,7 @@ interface ILoginForm {
  * @returns {React.ReactElement} The rendered Login component
  */
 const Login = (props: any): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const username = localStorageServices.getItem(APPCONSTANTS.USERNAME);
   const password = localStorageServices.getItem(APPCONSTANTS.PASSWORD);
   const rememberMe = localStorageServices.getItem(APPCONSTANTS.REMEMBER_ME);

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { FormApi } from 'final-form';
 import { Field } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import TextInput from '../../components/formFields/TextInput';
 import SelectInput from '../../components/formFields/SelectInput';
@@ -13,6 +13,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import { clearHFList, fetchHFListRequest } from '../../store/healthFacility/actions';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import useCountryId from '../../hooks/useCountryId';
+import { useAppDispatch } from '../../store/hooks';
 
 /**
  * Interface for ProgramForm props
@@ -33,7 +34,7 @@ const ProgramForm = (props: IProgramFormProps): React.ReactElement => {
   const { regionId } = useParams<{ regionId?: string }>();
   const countryIdValue = useCountryId({ regionId });
   const healthFacilityList = useSelector(healthFacilityListSelector);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const hfListLoading = useSelector(healthFacilityLoadingSelector);
   const {
     healthFacility: { s: healthFacilitySName }

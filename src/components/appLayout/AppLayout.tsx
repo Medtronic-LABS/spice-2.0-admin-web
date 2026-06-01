@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { matchPath, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { APP_TYPE_NAME } from '../../constants/appConstants';
 import { PROTECTED_ROUTES, routesWithSideMenu } from '../../constants/route';
 import localStorageService from '../../global/localStorageServices';
 import { getAppTypeSelector, initializingSelector, roleSelector } from '../../store/user/selectors';
 import { stopPropogation } from '../../utils/commonUtils';
+import { matchPathCompat as matchPath } from '../../utils/routerCompat';
 import Breadcrumb from '../breadcrumb/Breadcrumb';
 import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 import SideMenu from '../sideMenu/SideMenu';

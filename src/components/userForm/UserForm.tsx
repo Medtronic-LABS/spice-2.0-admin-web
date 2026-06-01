@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
@@ -77,6 +77,7 @@ import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import BranchTaggingFields from './userConditionalFields/BranchTaggingFields';
 import useUserFormUtils, { filterRolesByAppTypeFn, isVillageBasedRoleSelection } from './userFormUtils';
 import AssignSSUsersSection from './AssignSSUsersSection';
+import { useAppDispatch } from '../../store/hooks';
 import { clearBranchesByUnion } from '../../store/branch/actions';
 import DistrictChiefdomVillageFields from './userConditionalFields/DistrictChiefdomVillageFields';
 import { IDistrict } from '../../store/district/types';
@@ -147,7 +148,7 @@ const UserForm = ({
   const { pathname } = useLocation();
   const formName = 'users';
   const { tenantId, healthFacilityId } = useParams<IMatchParams>();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const rolesGrouped = useSelector(userRolesSelector);
   const role = useSelector(roleSelector);
   const currentModule: ModuleNames = pathname.split('/')[1];

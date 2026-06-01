@@ -1,8 +1,9 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
+import { useAppDispatch } from '../../store/hooks';
 
 import ChiefdomForm from '../../components/chiefdomForm/ChiefdomForm';
 import CustomTable from '../../components/customTable/CustomTable';
@@ -56,7 +57,7 @@ export interface IAdminEditFormValues {
 const ChiefdomSummary = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const ChiefdomDetail = useSelector(getChiefdomDetailSelector);
   const chiefdomAdmins = useSelector(getOuAdminsSelector);
   const loading = useSelector(chiefdomLoadingSelector);

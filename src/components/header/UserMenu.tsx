@@ -9,7 +9,7 @@ import IconLegal from '../../assets/images/icon-legal.svg';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import PasswordChangeIcon from '../../assets/images/reset-password.svg';
 import ResetPasswordFields, { generatePassword } from '../../containers/authentication/ResetPasswordFields';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { changeOwnPassword } from '../../store/user/actions';
 import {
   emailSelector,
@@ -23,6 +23,7 @@ import ModalForm from '../modal/ModalForm';
 import { useState } from 'react';
 import { CHIEFDOM_ADMIN, DISTRICT_ADMIN, REGION_ADMIN, SU_SA_RA, SU_SA_RA_DA, SU_SA_RA_DA_CDA_HFA } from '../../routes';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useAppDispatch } from '../../store/hooks';
 
 /**
  * Interface for user menu item
@@ -48,7 +49,7 @@ const { ROLES, SUITE_ACCESS } = APPCONSTANTS;
  * @returns {React.ReactElement} The rendered UserMenu component
  */
 const UserMenu = ({ role }: { role: string }): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const email = useSelector(emailSelector);
   const userId = useSelector(userIdSelector);
@@ -186,8 +187,8 @@ const UserMenu = ({ role }: { role: string }): React.ReactElement => {
         <NavLink
           to={route}
           key={`label_${key}`}
-          activeClassName={label === 'Change Password' ? '' : 'no-pointer-events'}
-          exact={true}
+          end={true}
+          className={({ isActive }) => (isActive && label !== 'Change Password' ? 'no-pointer-events' : undefined)}
           onClick={(event) => label === 'Change Password' && handleClick({ label, route }, event)}
         >
           <div

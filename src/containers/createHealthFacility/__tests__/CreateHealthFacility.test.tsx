@@ -2,19 +2,29 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import CreateHealthFacility, { filterAndExtractAppTypes } from '../CreateHealthFacility';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../../constants/route';
 import '@testing-library/jest-dom';
+import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 
 const mockStore = configureStore([]);
 const mockPush = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ regionId: '1', districtId: undefined, chiefdomId: undefined, tenantId: '1' }),
-  useHistory: () => ({ push: mockPush })
+  useParams: () => ({ regionId: '1', districtId: undefined, chiefdomId: undefined, tenantId: '1' })
+}));
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'create-health-facility' },
+    push: mockPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
+  })
 }));
 
 jest.mock('../../../hooks/appTypeBasedConfigs', () => ({

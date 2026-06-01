@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { matchPath, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { useAppDispatch } from '../../store/hooks';
 
 import { ReactComponent as HomeIcon } from '../../assets/images/home.svg';
 import { HOME_PAGE_BY_ROLE, PROTECTED_ROUTES } from '../../constants/route';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getRegionDetailsSelector } from '../../store/region/selectors';
 import { districtSelector } from '../../store/district/selectors';
 import { getChiefdomDetailSelector } from '../../store/chiefdom/selectors';
@@ -22,6 +23,7 @@ import { clearHFSummary, setHFSummary } from '../../store/healthFacility/actions
 import { setBranchSummary, clearBranchSummary } from '../../store/branch/actions';
 import { clearSideMenu } from '../../store/common/actions';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { matchPathCompat as matchPath } from '../../utils/routerCompat';
 
 interface ISection {
   route: string;
@@ -92,12 +94,13 @@ const dashboardRoutes = [
  */
 const Breadcrumb = (): React.ReactElement => {
   const { pathname } = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const region = useSelector(getRegionDetailsSelector);
   const district = useSelector(districtSelector);
   const chiefdom = useSelector(getChiefdomDetailSelector);
   const healthFacility = useSelector(healthFacilitySelector);
   const branch = useSelector(branchSummarySelector);
+  const branchTenantId = (branch as { tenantId?: string } | undefined)?.tenantId;
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
 
@@ -233,12 +236,12 @@ const Breadcrumb = (): React.ReactElement => {
         path: PROTECTED_ROUTES.branchSummary,
         exact: true
       })?.params as { tenantId?: string } | undefined;
-      const branchTenantId = (branch as { tenantId?: string })?.tenantId ?? branchParams?.tenantId;
+      const currentBranchTenantId = branchTenantId ?? branchParams?.tenantId;
       result.push({
         label: branch.name,
         route: PROTECTED_ROUTES.branchSummary
           .replace(':branchId', branch.id?.toString())
-          .replace(':tenantId', branchTenantId?.toString() ?? '')
+          .replace(':tenantId', currentBranchTenantId?.toString() ?? '')
       });
     }
     if (customBreadcrumb && customBreadcrumb.appendParent) {
@@ -273,6 +276,7 @@ const Breadcrumb = (): React.ReactElement => {
     showSite,
     branch?.name,
     branch?.id,
+    branchTenantId,
     showBranch,
     pathname
   ]);
@@ -447,9 +451,11 @@ const Breadcrumb = (): React.ReactElement => {
             {!!i && <span className='subtle-color mx-0dot25 align-baseline'>/</span>}
             <NavLink
               to={route}
-              activeClassName={`fs-1dot5 fw-bold no-pointer-events ${styles.active}`}
-              className={`align-baseline ${styles.breadcrumbLink}`}
-              isActive={() => i === sections.length - 1}
+              className={() =>
+                `align-baseline ${styles.breadcrumbLink} ${
+                  i === sections.length - 1 ? `fs-1dot5 fw-bold no-pointer-events ${styles.active}` : ''
+                }`
+              }
               data-testid={label}
             >
               {label}

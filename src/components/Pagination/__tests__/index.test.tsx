@@ -48,7 +48,7 @@ describe('Pagination component', () => {
     const { getByTestId, unmount } = render(<Pagination {...props} />);
     const prevPageLink = getByTestId('prevPage');
     prevPageLink.click();
-    expect(props.onChangePage).toBeCalledWith(props.currentPage - 1, 10);
+    expect(props.onChangePage).toHaveBeenCalledWith(props.currentPage - 1, 10);
     unmount();
   });
 
@@ -57,7 +57,7 @@ describe('Pagination component', () => {
     const { getByTestId, unmount } = render(<Pagination {...props} />);
     const lastPageLink = getByTestId('lastPage');
     lastPageLink.click();
-    expect(props.onChangePage).toBeCalledWith(10, 10);
+    expect(props.onChangePage).toHaveBeenCalledWith(10, 10);
     unmount();
   });
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { RouteComponentProps, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import {
@@ -39,6 +39,7 @@ import DistrictConsentForm from './DistrictConsentForm';
 import { loadingSelector } from '../../store/workflow/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useAppDispatch } from '../../store/hooks';
 
 interface IMatchParams {
   regionId: string;
@@ -57,7 +58,7 @@ interface IMatchProps extends RouteComponentProps<IMatchParams> {}
  */
 const DistrictList = (props: IMatchProps & IDispatchProps): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const loading = useSelector(districtLoadingSelector);
   const workflowLoading = useSelector(loadingSelector);
   const districtList = useSelector(getDistrictListSelector);

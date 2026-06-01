@@ -18,7 +18,7 @@ import { SET_HF_SUMMARY } from '../../../store/healthFacility/actionTypes';
 import { SET_BRANCH_SUMMARY } from '../../../store/branch/actionTypes';
 
 jest.mock('../../../assets/images/home.svg', () => ({
-  ReactComponent: 'HomeIcon'
+  ReactComponent: () => <svg data-testid='home-icon' aria-label='Home' />
 }));
 
 const mockStore = configureStore([]);

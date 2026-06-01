@@ -1,4 +1,3 @@
-import { mount } from 'enzyme';
 import EDIT_TEXT_CONFIG from '../EditText';
 
 describe('EditTextConfig', () => {
@@ -8,9 +7,9 @@ describe('EditTextConfig', () => {
     editTextFields = EDIT_TEXT_CONFIG.getEmptyData();
   });
 
-  it('should render without errors', () => {
-    const wrapper = mount(<div />);
-    expect(wrapper).toBeDefined();
+  it('should expose the expected config methods', () => {
+    expect(EDIT_TEXT_CONFIG.getEmptyData).toEqual(expect.any(Function));
+    expect(EDIT_TEXT_CONFIG.getJSON).toEqual(expect.any(Function));
   });
 
   it('should return correct default value', () => {

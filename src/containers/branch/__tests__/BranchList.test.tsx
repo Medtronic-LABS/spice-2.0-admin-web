@@ -2,18 +2,28 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import BranchList from '../BranchList';
 import APPCONSTANTS from '../../../constants/appConstants';
 import '@testing-library/jest-dom';
+import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 
 const mockStore = configureStore([]);
 
 const mockPush = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ regionId: '1', tenantId: '1' }),
-  useHistory: () => ({ push: mockPush })
+  useParams: () => ({ regionId: '1', tenantId: '1' })
+}));
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'branch-list' },
+    push: mockPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
+  })
 }));
 
 jest.mock('../../../hooks/useCountryId', () => ({

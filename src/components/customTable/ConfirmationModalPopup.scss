@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 // Variables
 $colors: (
   success: (
@@ -21,12 +23,12 @@ $colors: (
 
 // Mixins
 @mixin status-variant($color-map) {
-  background-color: map-get($color-map, light);
-  color: map-get($color-map, base);
+  background-color: map.get($color-map, light);
+  color: map.get($color-map, base);
 
   &::before {
-    background-color: map-get($color-map, base);
-    box-shadow: 0 0 0 4px map-get($color-map, shadow);
+    background-color: map.get($color-map, base);
+    box-shadow: 0 0 0 4px map.get($color-map, shadow);
   }
 }
 
@@ -79,15 +81,15 @@ $colors: (
   }
 
   &.sync-recent {
-    @include status-variant(map-get($colors, success));
+    @include status-variant(map.get($colors, success));
   }
 
   &.sync-warning {
-    @include status-variant(map-get($colors, warning));
+    @include status-variant(map.get($colors, warning));
   }
 
   &.sync-danger {
-    @include status-variant(map-get($colors, danger));
+    @include status-variant(map.get($colors, danger));
   }
 }
 

@@ -2,8 +2,8 @@ import { Tools } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import ChiefdomAdminFormIcon from '../../assets/images/avatar-o.svg';
 import ChiefdomFormIcon from '../../assets/images/info-grey.svg';
 import ChiefdomForm from '../../components/chiefdomForm/ChiefdomForm';
@@ -21,6 +21,8 @@ import { roleSelector } from '../../store/user/selectors';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import { getAdminPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
+import { useAppDispatch } from '../../store/hooks';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 export interface IChiefdomFormValues {
   chiefdom: {
@@ -43,7 +45,7 @@ export interface IParams {
  */
 
 const CreateChiefdom: React.FC = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const { regionId, tenantId, districtId } = useParams<IParams>();
 

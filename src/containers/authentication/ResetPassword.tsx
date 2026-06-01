@@ -7,10 +7,11 @@ import { PUBLIC_ROUTES } from '../../constants/route';
 import { useCallback, useEffect, useState } from 'react';
 import APPCONSTANTS from '../../constants/appConstants';
 import { info } from '../../utils/toastCenter';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getUserName, resetPassword } from '../../store/user/actions';
 import { resetPasswordLoadingSelector } from '../../store/user/selectors';
 import Loader from '../../components/loader/Loader';
+import { useAppDispatch } from '../../store/hooks';
 
 interface IRouteProps extends RouteComponentProps<{ token: string }> {}
 interface IResetPasswordState {
@@ -33,7 +34,7 @@ type Props = IRouteProps & IStateProps;
  * @returns {React.ReactElement} The rendered ResetPassword component
  */
 const ResetPassword = (props: Props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isResetPasswordLoading = useSelector(resetPasswordLoadingSelector);
 
   const [passwordState, setPasswordState] = useState<IResetPasswordState>({

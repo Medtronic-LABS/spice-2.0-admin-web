@@ -1,7 +1,7 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import CustomTable from '../../components/customTable/CustomTable';
@@ -37,6 +37,7 @@ import { getAdminPayload } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { columnDef } from './adminListMeta';
+import { useAppDispatch } from '../../store/hooks';
 
 interface IMatchParams {
   regionId?: string;
@@ -51,7 +52,7 @@ interface IMatchParams {
  * @returns {React.ReactElement}
  */
 const UserList = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { regionId, tenantId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
   const countryIdValue = useCountryId({ regionId });
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();

@@ -10,9 +10,10 @@ describe('Checkbox', () => {
   });
 
   it('should handle onClick event', async () => {
+    const user = userEvent.setup();
     const mockOnClick = jest.fn();
     render(<Checkbox label='Test Label' onClick={mockOnClick} />);
-    await userEvent.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('checkbox'));
     expect(mockOnClick).toHaveBeenCalled();
   });
 

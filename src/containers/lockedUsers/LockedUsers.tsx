@@ -5,7 +5,7 @@ import DetailCard from '../../components/detailCard/DetailCard';
 import { ReactComponent as UnlockUserIcon } from '../../assets/images/user-unlock.svg';
 import APPCONSTANTS from '../../constants/appConstants';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { fetchLockedUsersRequest, unlockUsersRequest } from '../../store/user/actions';
 import {
   isLockedUserLoading,
@@ -15,6 +15,7 @@ import {
   tenantIdSelector
 } from '../../store/user/selectors';
 import { ILockedUsers } from '../../store/user/types';
+import { useAppDispatch } from '../../store/hooks';
 
 /**
  * LockedUsers component for displaying and managing locked user accounts.
@@ -22,7 +23,7 @@ import { ILockedUsers } from '../../store/user/types';
  */
 const LockedUsers = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const tenantId = useSelector(tenantIdSelector);
   const lockedUsersList = useSelector(lockedUsers);
   const lockedUsersTotal = useSelector(lockedUsersCount);

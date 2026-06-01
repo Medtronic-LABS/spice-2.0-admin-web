@@ -81,9 +81,9 @@ jest.mock('../../../hooks/roleOptionsHook', () => ({
   })
 }));
 
-jest.mock('../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
-jest.mock('../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid='plus-icon' /> }));
-jest.mock('../../assets/images/reset.svg', () => ({ ReactComponent: () => <span data-testid='reset-icon' /> }));
+jest.mock('../../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
+jest.mock('../../../assets/images/plus_blue.svg', () => ({ ReactComponent: () => <span data-testid='plus-icon' /> }));
+jest.mock('../../../assets/images/reset.svg', () => ({ ReactComponent: () => <span data-testid='reset-icon' /> }));
 
 jest.mock('../../formFields/TextInput', () => {
   const ReactLib = require('react');

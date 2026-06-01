@@ -3,13 +3,11 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import Header from '../Header';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import APPCONSTANTS, { ROLE_LABELS } from '../../../constants/appConstants';
 import { LOGOUT_REQUEST } from '../../../store/user/actionTypes';
 
-jest.mock('../../../assets/images/nav-bar-logo.svg', () => ({
-  ReactComponent: 'NavBarLogo'
-}));
+jest.mock('../../../assets/images/app-logo-name.png', () => 'app-logo-name.png');
 
 const mockStore = configureStore();
 const { ROLES, SUITE_ACCESS } = APPCONSTANTS;

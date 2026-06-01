@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ModalViewer from '../ModalViewer';
 
 jest.mock('../../../assets/images/close.svg', () => ({
-  ReactComponent: 'closeIcon'
+  ReactComponent: () => <svg data-testid='close-icon' />
 }));
 
 describe('ModalViewer', () => {
@@ -38,6 +38,17 @@ describe('ModalViewer', () => {
     expect(screen.getByTestId('modal-viewer')).toBeInTheDocument();
     expect(screen.getByText('Test Modal')).toBeInTheDocument();
     expect(screen.getByText('Modal Content')).toBeInTheDocument();
+  });
+
+  it('should render the bootstrap show class so the modal is visible', () => {
+    render(
+      <ModalViewer {...defaultProps}>
+        <div>Modal Content</div>
+      </ModalViewer>
+    );
+
+    expect(screen.getByTestId('modal-viewer')).toHaveClass('show');
+    expect(screen.getByTestId('modal-viewer')).toHaveStyle({ display: 'block' });
   });
 
   it('should call handleCancel when close button is clicked', () => {

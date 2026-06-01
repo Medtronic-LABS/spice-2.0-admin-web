@@ -251,6 +251,7 @@ describe('TableFilter Component', () => {
   });
 
   it('displays no results message when search has no matches', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     render(
       <Provider store={store}>
         <TableFilter {...defaultProps} />
@@ -259,7 +260,10 @@ describe('TableFilter Component', () => {
     fireEvent.click(screen.getByText('Test Filter'));
 
     const searchInput = screen.getByPlaceholderText('Search Facility');
-    await userEvent.type(searchInput, 'No Match');
+    await user.type(searchInput, 'No Match');
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('No results found')).toBeInTheDocument();

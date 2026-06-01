@@ -1,15 +1,9 @@
-@import 'styles/variables';
-
-// Import Bootstrap and its default variables
-@import './styles/bootstrapOverrides';
-
-@import '~bootstrap/scss/bootstrap';
-@import 'styles/theme';
+@use './styles/bootstrapOverrides';
+@use 'styles/theme';
+@use 'styles/toastoverrides';
+@use 'styles/selectOverrides';
 
 @import 'react-toastify/dist/ReactToastify.css';
-@import 'styles/toastoverrides';
-
-@import 'styles/selectOverrides';
 
 @font-face {
   font-family: 'AppFont';

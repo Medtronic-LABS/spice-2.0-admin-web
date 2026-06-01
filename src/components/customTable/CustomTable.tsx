@@ -592,14 +592,14 @@ const CustomTable = (props: ICustomTableProps) => {
                 const isLastChild = (rowData.length || 0) === rowIndex + 1;
                 return (
                   <tr
-                    key={rowDataItem.id || rowIndex}
+                    key={`row-${rowDataItem.id ?? 'idx'}-${rowIndex}`}
                     onClick={() => navigateToDetail(rowDataItem)}
                     className={handleRowStyle(isLastChild, rowDataItem)}
                     data-testid={`row-${rowDataItem.id || rowIndex}`}
                   >
                     {columnsDef &&
                       columnsDef.map((column: IColumns, columnIndex: number) => (
-                        <td key={column.id || columnIndex}>
+                        <td key={`cell-${column.id ?? 'idx'}-${columnIndex}`}>
                           {column.cellFormatter ? column.cellFormatter(rowDataItem, column) : rowDataItem[column.name]}
                         </td>
                       ))}

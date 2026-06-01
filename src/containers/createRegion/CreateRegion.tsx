@@ -1,9 +1,11 @@
+import { useAppDispatch } from '../../store/hooks';
+
 import { Tools } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 import RegionAdminFormIcon from '../../assets/images/avatar-o.svg';
 import RegionFormIcon from '../../assets/images/info-grey.svg';
@@ -32,7 +34,7 @@ export interface IRegionFormValues {
 
 const CreateRegion: React.FC = () => {
   const history = useHistory();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const loading = useSelector((state: AppState) => state.region.loading);
 
   const {

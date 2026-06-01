@@ -21,7 +21,7 @@ jest.mock('../../../components/userForm/UserForm', () => () => {
   return <div data-testid='mock-userForm'>userForm</div>;
 });
 
-jest.mock('../../assets/images/edit.svg', () => ({
+jest.mock('../../../assets/images/edit.svg', () => ({
   ReactComponent: () => <svg data-testid='edit-icon' />
 }));
 

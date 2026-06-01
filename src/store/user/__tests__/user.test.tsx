@@ -130,6 +130,8 @@ describe('User Saga', () => {
           tenantId,
           suiteAccess,
           formDataId: organizations[0]?.formDataId,
+          appTypes,
+          country,
           countryId: undefined,
           organizations
         } as any)
@@ -180,6 +182,8 @@ describe('User Saga', () => {
           tenantId,
           suiteAccess,
           formDataId: organizations[0]?.formDataId,
+          appTypes,
+          country: { ...country, appTypes },
           countryId: undefined,
           organizations
         } as any)
@@ -228,6 +232,8 @@ describe('User Saga', () => {
           tenantId,
           suiteAccess,
           formDataId: organizations[0]?.formDataId,
+          appTypes: [],
+          country,
           countryId: undefined,
           organizations
         } as any)
@@ -284,6 +290,8 @@ describe('User Saga', () => {
           tenantId,
           suiteAccess,
           formDataId: organizations[0]?.formDataId,
+          appTypes: [],
+          country: { ...country, displayValues: null },
           countryId: undefined,
           organizations
         } as any)
@@ -348,6 +356,8 @@ describe('User Saga', () => {
           tenantId,
           suiteAccess,
           formDataId: organizations[0]?.formDataId,
+          appTypes: [],
+          country,
           countryId: undefined,
           organizations
         } as any)
@@ -530,6 +540,8 @@ describe('User Saga', () => {
           tenantId,
           formDataId: organizations[0]?.formDataId,
           suiteAccess,
+          appTypes,
+          country,
           countryId: undefined,
           organizations
         } as any)
@@ -576,6 +588,8 @@ describe('User Saga', () => {
         tenantId: '1',
         formDataId: organizations[0]?.formDataId,
         suiteAccess,
+        appTypes,
+        country: { ...country, appTypes },
         countryId: undefined,
         organizations
       };
@@ -622,6 +636,8 @@ describe('User Saga', () => {
         tenantId: undefined,
         formDataId: organizations[0]?.formDataId,
         suiteAccess,
+        appTypes,
+        country: { ...country, tenantId: undefined },
         countryId: undefined,
         organizations
       };
@@ -670,6 +686,13 @@ describe('User Saga', () => {
         tenantId: '1',
         formDataId: organizations[0]?.formDataId,
         suiteAccess,
+        appTypes: [],
+        country: {
+          ...country,
+          appTypes: null,
+          id: null,
+          displayValues: null
+        },
         countryId: undefined,
         organizations
       };
@@ -727,6 +750,13 @@ describe('User Saga', () => {
         tenantId: '1',
         formDataId: organizations[0]?.formDataId,
         suiteAccess,
+        appTypes: [],
+        country: {
+          ...country,
+          appTypes: null,
+          id: null,
+          displayValues: null
+        },
         countryId: undefined,
         organizations
       };
@@ -1640,6 +1670,7 @@ describe('User Saga', () => {
         return Promise.reject(new Error('Error'));
       });
 
+      const failureCB = jest.fn();
       const dispatched: any = [];
       await runSaga(
         {
@@ -1647,10 +1678,11 @@ describe('User Saga', () => {
           getState: () => mockState
         },
         fetchTermsConditionsSaga,
-        { countryId: 1, successCB: jest.fn(), type: ACTION_TYPES.FETCH_TERMS_CONDITIONS_REQUEST }
+        { countryId: 1, successCB: jest.fn(), failureCB, type: ACTION_TYPES.FETCH_TERMS_CONDITIONS_REQUEST }
       ).toPromise();
 
       expect(userService.fetchTermsConditionsAPI).toHaveBeenCalledWith(1);
+      expect(failureCB).toHaveBeenCalledWith(new Error('Error'));
       expect(dispatched).toEqual([userActions.fetchTermsAndConditionsFailure(new Error('Error'))]);
     });
   });

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useAppDispatch } from '../../store/hooks';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
-import { useHistory } from 'react-router';
 import { HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
 import { ReactComponent as ReportingPortalLogo } from '../../assets/images/reports.svg';
@@ -18,6 +18,8 @@ import { clearSideMenu } from '../../store/common/actions';
 import { clearAppType } from '../../store/user/actions';
 import { SUPER_ADMIN, SUPER_USER } from '../../routes';
 import { trackGoogleAnalyticsEvent } from '../../utils/analytics';
+import { appEnv } from '../../config/env';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
 
@@ -38,7 +40,7 @@ interface ISpiceSuite {
 
 const LandingPage = (): React.ReactElement => {
   const history = useHistory();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
@@ -63,7 +65,7 @@ const LandingPage = (): React.ReactElement => {
         icon: ReportingPortalLogo,
         hasDomain: true,
         suiteAccessName: CFR,
-        domainUrl: process.env.REACT_APP_CFR_WEB_URL,
+        domainUrl: appEnv.cfrWebUrl,
         disabled: false
       },
       {
@@ -72,7 +74,7 @@ const LandingPage = (): React.ReactElement => {
         icon: InsightsLogo,
         hasDomain: true,
         suiteAccessName: INSIGHTS,
-        domainUrl: process.env.REACT_APP_INSIGHT_WEB_URL
+        domainUrl: appEnv.insightWebUrl
       }
     ],
     [role]

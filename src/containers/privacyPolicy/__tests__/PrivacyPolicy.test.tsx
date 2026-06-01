@@ -1,45 +1,47 @@
-import { shallow } from 'enzyme';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import PrivacyPolicy from '../PrivacyPolicy';
 import styles from './PrivacyPolicy.module.scss';
 
 describe('PrivacyPolicy', () => {
-  let wrapper: any;
-
-  beforeEach(() => {
-    wrapper = shallow(<PrivacyPolicy />);
-  });
-
   it('should render a div with the correct class name', () => {
-    expect(wrapper.find('div').at(0).hasClass(styles.privacyContainer)).toBe(false);
+    const { container } = render(<PrivacyPolicy />);
+
+    expect(container.firstChild).toHaveClass(styles.privacyContainer);
   });
 
   it('should render a container div', () => {
-    expect(wrapper.find('div.container').length).toBe(1);
+    const { container } = render(<PrivacyPolicy />);
+
+    expect(container.querySelector('div.container')).toBeInTheDocument();
   });
 
   it('should render a logo image with the correct props', () => {
-    const logo = wrapper.find('img[alt="Medtronics"]');
-    expect(logo.length).toBe(1);
-    expect(logo.prop('alt')).toBe('Medtronics');
-    expect(logo.prop('className')).toBe(styles.logo);
+    render(<PrivacyPolicy />);
+
+    const logo = screen.getByAltText('Medtronics');
+
+    expect(logo.tagName).toBe('IMG');
+    expect(logo).toHaveClass(styles.logo);
   });
 
   it('should render an h1 element with the correct class name and text', () => {
-    const title = wrapper.find('h1');
-    expect(title.hasClass(styles.privacyTitle)).toBe(false);
-    expect(title.text()).toBe('Privacy Statement');
+    render(<PrivacyPolicy />);
+
+    const title = screen.getByRole('heading', { level: 1, name: 'Privacy Statement' });
+
+    expect(title).toHaveClass(styles.privacyTitle);
   });
 
   it('should render two h3 elements with the correct class name and text', () => {
-    const headers = wrapper.find('h3');
-    expect(headers.length).toBe(11);
+    render(<PrivacyPolicy />);
 
-    const firstHeader = headers.at(0);
-    expect(firstHeader.hasClass(styles.privacyHeader)).toBe(false);
-    expect(firstHeader.text()).toBe('Please read this privacy statement carefully.');
+    const headers = screen.getAllByRole('heading', { level: 3 });
 
-    const secondHeader = headers.at(1);
-    expect(secondHeader.hasClass(styles.privacyHeader)).toBe(false);
-    expect(secondHeader.text()).toBe('INTRODUCTION');
+    expect(headers).toHaveLength(11);
+    expect(headers[0]).toHaveClass(styles.privacyHeader);
+    expect(headers[0]).toHaveTextContent('Please read this privacy statement carefully.');
+    expect(headers[1]).toHaveClass(styles.privacyHeader);
+    expect(headers[1]).toHaveTextContent('INTRODUCTION');
   });
 });

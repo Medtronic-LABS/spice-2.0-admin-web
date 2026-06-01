@@ -19,7 +19,7 @@ import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import localStorageServices from '../../global/localStorageServices';
 import { encryptData } from '../../utils/commonUtils';
-import CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
 import * as userService from '../../services/userAPI';
 import * as userActions from './actions';
 import { IActionProps } from '../../typings/global';
@@ -28,21 +28,86 @@ import { AppState } from '../rootReducer';
 import { IUserRole } from '../healthFacility/types';
 import { setLabelName } from '../common/actions';
 import { activateUser, deactivateUser, assignPeerSupervisor, reasignCHW } from '../../services/userAPI';
+import { appEnv } from '../../config/env';
+
+const cryptoJsLib = (CryptoJS as typeof CryptoJS & { default?: typeof CryptoJS }).default || CryptoJS;
+
+const isValidStorageValue = (value: unknown): boolean => {
+  if (value === undefined || value === null) {
+    return false;
+  }
+  const normalized = String(value).trim().toLowerCase();
+  return Boolean(normalized) && !['undefined', 'null', 'nan'].includes(normalized);
+};
+
+const getHeaderValue = (headers: Record<string, unknown>, headerName: string): string | undefined => {
+  const key = Object.keys(headers || {}).find((header) => header.toLowerCase() === headerName.toLowerCase());
+  if (!key) {
+    return undefined;
+  }
+  const rawValue = headers[key];
+  const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+  return isValidStorageValue(value) ? String(value) : undefined;
+};
+
+const getCountryFallback = (organizations: any[] = []) => {
+  const countryOrg =
+    organizations.find((organization: any) => String(organization?.formName || '').toLowerCase() === 'country') ||
+    organizations[0];
+  return {
+    id: countryOrg?.formDataId,
+    tenantId: countryOrg?.id
+  };
+};
+
+const setCountryStorage = (country: any, fallback?: { id?: unknown; tenantId?: unknown }) => {
+  const resolvedCountryId = isValidStorageValue(country?.id) ? country.id : fallback?.id;
+  const resolvedCountryTenantId = isValidStorageValue(country?.tenantId) ? country.tenantId : fallback?.tenantId;
+
+  if (isValidStorageValue(resolvedCountryId)) {
+    sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_ID, resolvedCountryId);
+  } else {
+    sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_ID);
+  }
+
+  if (isValidStorageValue(resolvedCountryTenantId)) {
+    sessionStorageServices.setItem(APPCONSTANTS.COUNTRY_TENANT_ID, resolvedCountryTenantId);
+  } else {
+    sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
+  }
+};
+
+const resolveAppTypes = (country: any, profileAppTypes: unknown, preferredRole: any, allRoles: any[] = []) => {
+  if (Array.isArray(country?.appTypes) && country.appTypes.length) {
+    return country.appTypes;
+  }
+  if (Array.isArray(profileAppTypes) && profileAppTypes.length) {
+    return profileAppTypes;
+  }
+  if (Array.isArray(preferredRole?.appTypes) && preferredRole.appTypes.length) {
+    return preferredRole.appTypes;
+  }
+  const roleWithAppTypes = allRoles.find((role: any) => Array.isArray(role?.appTypes) && role.appTypes.length);
+  return Array.isArray(roleWithAppTypes?.appTypes) ? roleWithAppTypes.appTypes : [];
+};
 
 /*
   Worker Saga: Fired on LOGIN_REQUEST action
 */
 export function* login({ username, password, rememberMe, successCb, failureCb }: ILoginRequest): SagaIterator {
   try {
-    const hmac = CryptoJS.HmacSHA512(password, process.env.REACT_APP_PASSWORD_HASH_KEY as string);
-    const hashedPassword = hmac.toString(CryptoJS.enc.Hex);
+    const hmac = cryptoJsLib.HmacSHA512(password, appEnv.passwordHashKey as string);
+    const hashedPassword = hmac.toString(cryptoJsLib.enc.Hex);
     const {
       headers,
       data: { isTermsAndConditionsAccepted }
     } = yield call(userService.login, username, hashedPassword);
+    const headerTenantId = getHeaderValue(headers || {}, 'tenantid');
     sessionStorageServices.setItem('iLi', true);
-    sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headers?.Tenantid);
-    yield put(userActions.addUserTenantID(headers?.Tenantid));
+    if (headerTenantId) {
+      sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, headerTenantId);
+      yield put(userActions.addUserTenantID(headerTenantId));
+    }
     localStorageServices.setItem(APPCONSTANTS.TAC_STATUS, isTermsAndConditionsAccepted);
     localStorageServices.setItem(APPCONSTANTS.IS_TERMS_CONDITIONS_DISMISSED, false);
     const {
@@ -53,6 +118,7 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
           lastName,
           id: userId,
           roles: allRoles,
+          appTypes: profileAppTypes,
           tenantId,
           country,
           organizations,
@@ -60,7 +126,17 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
         }
       }
     } = yield call(userService.fetchLoggedInUser);
-    sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
+    if (isValidStorageValue(tenantId)) {
+      sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
+      if (!headerTenantId) {
+        yield put(userActions.addUserTenantID(String(tenantId)));
+      }
+    }
+    const countryFallback = getCountryFallback(organizations);
+    setCountryStorage(country, {
+      ...countryFallback,
+      tenantId: tenantId || countryFallback.tenantId
+    });
     if (country?.displayValues) {
       yield put(setLabelName(country.displayValues));
     }
@@ -68,6 +144,7 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
     const spiceAdminRole = allRoles?.find(
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
     );
+    const resolvedAppTypes = resolveAppTypes(country, profileAppTypes, spiceAdminRole, allRoles);
     updateRememberMe(username, password, rememberMe);
     const payload: IUser = {
       email,
@@ -76,9 +153,11 @@ export function* login({ username, password, rememberMe, successCb, failureCb }:
       userId,
       role: spiceAdminRole?.name || allRoles[0]?.name || '',
       roleDetail: spiceAdminRole || allRoles[0],
+      appTypes: resolvedAppTypes,
       tenantId,
       suiteAccess,
       formDataId: organizations[0]?.formDataId,
+      country,
       countryId: undefined,
       organizations
     };
@@ -142,19 +221,27 @@ export function* fetchLoggedInUser(): SagaIterator {
           lastName,
           id: userId,
           roles: allRoles,
+          appTypes: profileAppTypes,
           tenantId,
+          country,
           organizations,
           suiteAccess
         }
       }
     } = yield call(userService.fetchLoggedInUser);
-    if (tenantId) {
+    if (isValidStorageValue(tenantId)) {
       sessionStorageServices.setItem(APPCONSTANTS.USER_TENANTID, tenantId);
     }
+    const countryFallback = getCountryFallback(organizations);
+    setCountryStorage(country, {
+      ...countryFallback,
+      tenantId: tenantId || countryFallback.tenantId
+    });
     const { ADMIN } = APPCONSTANTS.SUITE_ACCESS;
     const spiceAdminRole = allRoles?.find(
       ({ suiteAccessName }: { suiteAccessName: string }) => suiteAccessName === ADMIN
     );
+    const resolvedAppTypes = resolveAppTypes(country, profileAppTypes, spiceAdminRole, allRoles);
     const payload: IUser = {
       email,
       firstName,
@@ -162,9 +249,11 @@ export function* fetchLoggedInUser(): SagaIterator {
       userId,
       role: spiceAdminRole?.name || allRoles[0]?.name || '',
       roleDetail: spiceAdminRole || allRoles[0],
+      appTypes: resolvedAppTypes,
       tenantId,
       formDataId: organizations[0]?.formDataId,
       suiteAccess,
+      country,
       countryId: undefined,
       organizations
     };
@@ -172,6 +261,8 @@ export function* fetchLoggedInUser(): SagaIterator {
   } catch (e: any) {
     sessionStorageServices.clearAllItem();
     sessionStorageServices.deleteItem(APPCONSTANTS.USER_TENANTID);
+    sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_ID);
+    sessionStorageServices.deleteItem(APPCONSTANTS.COUNTRY_TENANT_ID);
     yield put(userActions.resetStore());
     yield put(userActions.fetchLoggedInUserFail());
   }
@@ -419,13 +510,16 @@ export function* unlockUsers({ userId, successCb, failureCb }: IUnlockUsersReque
 /*
   Worker Saga: Fired on FETCH_TERMS_CONDITIONS_REQUEST action
 */
-export function* fetchTermsConditionsSaga({ countryId, successCB }: IFetchTermsConditionsRequest): SagaIterator {
+export function* fetchTermsConditionsSaga({ countryId, successCB, failureCB }: IFetchTermsConditionsRequest): SagaIterator {
   try {
     const { data } = yield call(userService.fetchTermsConditionsAPI, countryId);
     const { entity: termsConditions } = data;
     successCB?.(termsConditions);
     yield put(userActions.fetchTermsAndConditionsSuccess(termsConditions));
   } catch (e) {
+    if (e instanceof Error) {
+      failureCB?.(e);
+    }
     yield put(userActions.fetchTermsAndConditionsFailure(e));
   }
 }

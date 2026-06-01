@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
@@ -35,7 +36,7 @@ import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
  * Chiefdom Dashboard component
  */
 const ChiefdomDashboard = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const chiefdomDashboardList = useSelector(chiefdomDashboardListSelector);
   const chiefdomCount = useSelector(chiefdomCountSelector);
   const loading = useSelector(chiefdomLoadingSelector);

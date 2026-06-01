@@ -27,6 +27,7 @@ definitions:
         artifacts:
           - coverage/**
           - node_modules/**
+          - test-report.xml
 
     # Step 2: Sonar – uses sonar-scanner image and coverage artifact
     - step: &sonar
@@ -40,6 +41,7 @@ definitions:
             -Dsonar.tests=./src
             -Dsonar.test.inclusions=*.test.{ts,tsx}
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.testExecutionReportPaths=test-report.xml
             -Dsonar.qualitygate.wait=true
         # SONAR_HOST_URL, SONAR_TOKEN from Bitbucket vars; SONAR_PROJECT_KEY set per branch below
 

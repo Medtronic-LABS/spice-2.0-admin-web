@@ -1,6 +1,6 @@
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import DownloadIcon from '../../assets/images/download.svg';
 import UploadIcon from '../../assets/images/upload_blue.svg';
@@ -34,8 +34,10 @@ import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import styles from './Region.module.scss';
 import { clearChiefdomList } from '../../store/chiefdom/actions';
 import { clearDistrictList } from '../../store/district/actions';
+import { useAppDispatch } from '../../store/hooks';
+
 const Region = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
   const { regionId, tenantId } = useParams<IMatchParams>();
   const regionDetails = useSelector(getRegionDetailsSelector);

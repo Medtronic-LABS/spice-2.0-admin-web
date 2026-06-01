@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { RouteComponentProps, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import { PROTECTED_ROUTES } from '../../constants/route';
 import CustomTable from '../../components/customTable/CustomTable';
@@ -64,7 +65,7 @@ interface IMatchProps extends RouteComponentProps<IMatchParams> {}
  */
 const LabTestList = (props: IMatchProps): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const loading = useSelector(labtestLoadingSelector);
   const labTestList = useSelector(labtestsSelector);
   const labTestCount = useSelector(labtestCountSelector);

@@ -3,16 +3,24 @@ import { Form } from 'react-final-form';
 import ResetPasswordFields from '../ResetPasswordFields';
 import CryptoJS from 'crypto-js';
 
-jest.mock('crypto-js', () => ({
-  HmacSHA512: jest.fn().mockReturnValue({
-    toString: jest.fn().mockReturnValue('hashed-password')
-  }),
-  enc: {
-    Hex: {
-      stringify: jest.fn()
+jest.mock('crypto-js', () => {
+  const cryptoMock = {
+    HmacSHA512: jest.fn().mockReturnValue({
+      toString: jest.fn().mockReturnValue('hashed-password')
+    }),
+    enc: {
+      Hex: {
+        stringify: jest.fn()
+      }
     }
-  }
-}));
+  };
+
+  return {
+    __esModule: true,
+    ...cryptoMock,
+    default: cryptoMock
+  };
+});
 
 describe('ResetPasswordFields', () => {
   const mockSetSubmitEnabled = jest.fn();
@@ -39,6 +47,9 @@ describe('ResetPasswordFields', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.REACT_APP_PASSWORD_HASH_KEY = 'test-key';
+    (CryptoJS.HmacSHA512 as jest.Mock).mockReturnValue({
+      toString: jest.fn().mockReturnValue('hashed-password')
+    });
   });
 
   describe('Rendering', () => {

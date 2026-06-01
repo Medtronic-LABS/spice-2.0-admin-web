@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { appEnv } from '../config/env';
 
 /**
  * Custom hook for progressive incrementation of a timer value.
@@ -11,11 +12,12 @@ export const useProgressiveIncrementorHook = (props: { displayProgress: boolean;
   const tick = useRef<number>(0);
   let reqFrameIterator: number;
   const [timerVal, setTimerVal] = useState(0);
+  const orgSuccessDelayTime = appEnv.organizationSuccessDelayTime;
   const timerConfig = {
     // to increase 5% at regular frequency
-    frequency: (Number(process.env.REACT_APP_ORG_SUCCESS_DELAY_TIME) || 1000) / 20,
-    stopAt: Number(process.env.REACT_APP_ORG_SUCCESS_DELAY_TIME) || 1000, // milli Seconds
-    currentStop: Number(process.env.REACT_APP_ORG_SUCCESS_DELAY_TIME)
+    frequency: orgSuccessDelayTime / 20,
+    stopAt: orgSuccessDelayTime, // milli Seconds
+    currentStop: orgSuccessDelayTime
   };
 
   /**

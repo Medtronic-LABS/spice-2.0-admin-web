@@ -6,7 +6,8 @@ import TextInput from '../../components/formFields/TextInput';
 import { Link } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants/route';
 import { History } from 'history';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
+
 import { forgotPasswordRequest } from '../../store/user/actions';
 
 interface IRouteProps {
@@ -19,7 +20,7 @@ interface IRouteProps {
  * @returns {React.ReactElement} The rendered ForgotPassword component
  */
 const ForgotPassword = (props: IRouteProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   /**
    * Handles the click event to navigate back to the login page

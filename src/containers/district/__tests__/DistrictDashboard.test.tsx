@@ -1,33 +1,77 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import DistrictDashboard from '../DistrictDashboard';
 import { BrowserRouter as Router } from 'react-router-dom';
-import styles from './District.module.scss';
-import DISTRICT_MOCK_DATA_CONSTANTS from '../../../tests/mockData/districtDataConstants';
-import { act, waitFor } from '@testing-library/react';
+
+import DistrictDashboard from '../DistrictDashboard';
+
+jest.mock('../../../components/summaryCard/SummaryCard', () => ({
+  __esModule: true,
+  default: ({ title }: any) => require('react').createElement('div', { 'data-testid': 'summary-card' }, title)
+}));
+
+jest.mock('../../../components/searchbar/Searchbar', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('input', { 'data-testid': 'searchbar' })
+}));
+
+jest.mock('../../../components/loader/Loader', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'loader' }, 'Loading')
+}));
+
+jest.mock('../../../hooks/pagination', () => ({
+  useLoadMorePagination: () => ({
+    isLastPage: true,
+    loadMore: jest.fn(),
+    resetPage: jest.fn()
+  })
+}));
+
+const mockPush = jest.fn();
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
+  return {
+    ...actual
+  };
+});
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'district-dashboard' },
+    push: mockPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
+  })
+}));
 
 const mockStore = configureStore([]);
 
-jest.mock('../../../assets/images/arrow-right-small.svg', () => ({
-  ReactComponent: 'ArrowRight'
-}));
 describe('DistrictDashboard', () => {
-  let store;
-  let wrapper;
-
   beforeEach(() => {
-    store = mockStore({
+    mockPush.mockClear();
+  });
+
+  it('should render dashboard cards and controls', () => {
+    const store = mockStore({
       district: {
-        dashboardList: DISTRICT_MOCK_DATA_CONSTANTS.DASHBOARD_DISTRICT_RESPONSE_PAYLOAD,
+        dashboardList: [
+          { id: '1', tenantId: '1', name: 'District 1', chiefdomCount: 2, healthFacilityCount: 3 },
+          { id: '2', tenantId: '2', name: 'District 2', chiefdomCount: 1, healthFacilityCount: 4 }
+        ],
+        total: 2,
         loading: false,
         loadingMore: false
       },
       user: {
         user: {
           formDataId: '1',
-          tenantId: '1'
+          tenantId: '1',
+          country: { id: 1, tenantId: 1, appTypes: [] },
+          appTypes: []
         }
       },
       common: {
@@ -36,29 +80,33 @@ describe('DistrictDashboard', () => {
       }
     });
 
-    wrapper = mount(
+    render(
       <Provider store={store}>
         <Router>
           <DistrictDashboard />
         </Router>
       </Provider>
     );
-  });
-  it('should render without errors', () => {
-    expect(wrapper.length).toBe(1);
+
+    expect(screen.getAllByTestId('summary-card')).toHaveLength(2);
+    expect(screen.getByTestId('searchbar')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Create District/i })).toBeInTheDocument();
   });
 
   it('should display loader when loading is true', () => {
-    store = mockStore({
+    const store = mockStore({
       district: {
-        dashboardList: DISTRICT_MOCK_DATA_CONSTANTS.DASHBOARD_DISTRICT_RESPONSE_PAYLOAD,
+        dashboardList: [],
+        total: 0,
         loading: true,
         loadingMore: true
       },
       user: {
         user: {
           formDataId: '1',
-          tenantId: '1'
+          tenantId: '1',
+          country: { id: 1, tenantId: 1, appTypes: [] },
+          appTypes: []
         }
       },
       common: {
@@ -67,7 +115,7 @@ describe('DistrictDashboard', () => {
       }
     });
 
-    wrapper = mount(
+    render(
       <Provider store={store}>
         <Router>
           <DistrictDashboard />
@@ -75,14 +123,14 @@ describe('DistrictDashboard', () => {
       </Provider>
     );
 
-    const loader = wrapper.find(`.${styles.loaderWrapper}.d-flex.align-items-center.justify-content-center.mt-2dot5`);
-    expect(loader.length).toBe(1);
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
   });
 
-  it('should display no data message when siteDashboardList is empty', () => {
-    store = mockStore({
+  it('should display no data message when district list is empty', () => {
+    const store = mockStore({
       district: {
         dashboardList: [],
+        total: 0,
         loading: false,
         loadingMore: false,
         error: null
@@ -90,7 +138,9 @@ describe('DistrictDashboard', () => {
       user: {
         user: {
           formDataId: '1',
-          tenantId: '1'
+          tenantId: '1',
+          country: { id: 1, tenantId: 1, appTypes: [] },
+          appTypes: []
         }
       },
       common: {
@@ -99,29 +149,32 @@ describe('DistrictDashboard', () => {
       }
     });
 
-    wrapper = mount(
+    render(
       <Provider store={store}>
         <Router>
           <DistrictDashboard />
         </Router>
       </Provider>
     );
-    const noDataMessage = wrapper.find('.fw-bold.highlight-text');
 
-    expect(noDataMessage.text()).toBe('Let’s Get Started!');
+    expect(screen.getByText('Let’s Get Started!')).toBeInTheDocument();
   });
-  it('should display search data', () => {
-    store = mockStore({
+
+  it('should navigate when create district is clicked', async () => {
+    const user = userEvent.setup();
+    const store = mockStore({
       district: {
         dashboardList: [],
+        total: 0,
         loading: false,
-        loadingMore: false,
-        error: null
+        loadingMore: false
       },
       user: {
         user: {
           formDataId: '1',
-          tenantId: '1'
+          tenantId: '1',
+          country: { id: 1, tenantId: 1, appTypes: [] },
+          appTypes: []
         }
       },
       common: {
@@ -129,20 +182,17 @@ describe('DistrictDashboard', () => {
         labelName: null
       }
     });
-    const wrapperDistrict = mount(
+
+    render(
       <Provider store={store}>
         <Router>
           <DistrictDashboard />
         </Router>
       </Provider>
     );
-    act(() => {
-      const wrapperProps: any = wrapperDistrict.find('DistrictDashboard').find('button').props();
-      wrapperProps.onClick();
-      wrapperDistrict.update();
-      waitFor(() => {
-        expect(wrapperProps.onCLick).toBeCalled();
-      });
-    });
+
+    await user.click(screen.getByRole('button', { name: /Create District/i }));
+
+    expect(mockPush).toHaveBeenCalled();
   });
 });

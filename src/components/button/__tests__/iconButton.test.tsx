@@ -2,11 +2,11 @@ import { render, screen } from '@testing-library/react';
 import IconButton from '../IconButton';
 
 // Mock SVG imports
-jest.mock('../../assets/images/edit.svg', () => ({
+jest.mock('../../../assets/images/edit.svg', () => ({
   ReactComponent: () => <svg data-testid='edit-icon'>Edit Icon</svg>
 }));
 
-jest.mock('../../assets/images/plus.svg', () => ({
+jest.mock('../../../assets/images/plus.svg', () => ({
   ReactComponent: () => <svg data-testid='plus-icon'>Plus Icon</svg>
 }));
 

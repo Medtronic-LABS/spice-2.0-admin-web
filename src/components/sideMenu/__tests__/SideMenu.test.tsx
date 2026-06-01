@@ -1,10 +1,11 @@
 import { Provider } from 'react-redux';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import SideMenu from '../SideMenu';
 import configureMockStore from 'redux-mock-store';
 import { render, waitFor } from '@testing-library/react';
 import APPCONSTANTS from '../../../constants/appConstants';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/commonDataConstants';
+import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 import { createMemoryHistory } from 'history';
 import { FETCH_SIDEMENU_REQUEST } from '../../../store/common/actionTypes';
 import { PROTECTED_ROUTES } from '../../../constants/route';
@@ -254,6 +255,47 @@ describe('SideMenu', () => {
     const { unmount, getByTestId } = renderComponent(localStore, '/district/2/3', PROTECTED_ROUTES.districtSummary);
     expect(getByTestId('side-menu-component')).toBeInTheDocument();
     expect(sessionStorage.getItem(APPCONSTANTS.COUNTRY_ID)).toBe('1');
+    unmount();
+  });
+
+  it('should map region scoped users and health facility routes to district routes for region admin in district context', () => {
+    const localStore = mockStore({
+      ...initialState,
+      user: {
+        user: { role: ROLES.REGION_ADMIN, country: { id: 1 }, tenantId: '4' }
+      },
+      common: {
+        ...initialState.common,
+        sideMenu: {
+          list: {
+            BY_REGION: [
+              {
+                name: 'REGION',
+                order: 0,
+                route: PROTECTED_ROUTES.region,
+                displayName: 'Region'
+              },
+              {
+                name: 'HEALTH_FACILITY_BY_REGION',
+                order: 1,
+                route: PROTECTED_ROUTES.healthFacilityByRegion,
+                displayName: 'Health Facility'
+              },
+              {
+                name: 'USERS_BY_REGION',
+                order: 2,
+                route: PROTECTED_ROUTES.userByRegion,
+                displayName: 'Users'
+              }
+            ]
+          }
+        }
+      }
+    });
+    const { unmount, getByText } = renderComponent(localStore, '/district/1/4', PROTECTED_ROUTES.districtSummary);
+    expect(getByText('Region').closest('a')).toHaveAttribute('href', '/region/1/1');
+    expect(getByText('Health Facility').closest('a')).toHaveAttribute('href', '/district/1/4/health-facility');
+    expect(getByText('Users').closest('a')).toHaveAttribute('href', '/district/1/4/user');
     unmount();
   });
 });

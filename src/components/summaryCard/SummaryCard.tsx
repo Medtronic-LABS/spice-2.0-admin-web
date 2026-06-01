@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { ReactComponent as ArrowRight } from '../../assets/images/arrow-right-small.svg';
 import APPCONSTANTS, { APP_TYPE } from '../../constants/appConstants';
@@ -8,6 +8,7 @@ import { convertToCaptilize } from '../../utils/validation';
 
 import styles from './SummaryCard.module.scss';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 export type IAppType = keyof typeof APP_TYPE;
 export interface ISummaryInfo {
@@ -80,7 +81,8 @@ const SummaryCard = ({
 
   const {
     isCommunity,
-    healthFacility: { s: healthFacilitySName }
+    healthFacility: { s: healthFacilitySName },
+    chiefdom: { s: chiefdomSName }
   } = useAppTypeConfigs();
 
   return (
@@ -112,7 +114,10 @@ const SummaryCard = ({
         </div>
       )}
       {data.map(({ label, value, route, disableEllipsis, onClick, appType }, i) =>
-        appType?.includes(APP_TYPE.NON_COMMUNITY as IAppType) || label === healthFacilitySName || !isCommunity ? (
+        appType?.includes(APP_TYPE.NON_COMMUNITY as IAppType) ||
+        label === healthFacilitySName ||
+        label === chiefdomSName ||
+        !isCommunity ? (
           <Link
             className={`${styles.summaryElement} py-sm-1dot125 py-0dot5 px-sm-1 px-0dot5 d-flex flex-column mw-0`}
             style={linkStyle}

@@ -1,4 +1,4 @@
-@import '../../styles/variables';
+@use '../../styles/variables' as *;
 
 .selectContainer {
   width: 100px;
@@ -85,19 +85,19 @@
     display: none;
   }
   &:hover {
+    width: fit-content;
+    background-color: var(--danger-color);
+    transition: background-color 1s, width 2s, content 2s;
     .hoverX {
+      transition: content 2s;
+      display: block;
       &::before {
         content: 'X';
       }
-      transition: content 2s;
-      display: block;
     }
     .hoverValue {
       display: none;
     }
-    width: fit-content;
-    background-color: var(--danger-color);
-    transition: background-color 1s, width 2s, content 2s;
   }
 }
 

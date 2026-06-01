@@ -1,8 +1,9 @@
 import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
 
 import { ReactComponent as PasswordChangeIcon } from '../../assets/images/reset-password.svg';
 import CustomTable from '../../components/customTable/CustomTable';
@@ -106,7 +107,7 @@ interface ICHWListModal {
  * @returns {React.ReactElement}
  */
 const UserList = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { tenantId, regionId, healthFacilityId, districtId, chiefdomId } = useParams<IMatchParams>();
   const countryIdValue = useCountryId({ regionId });
   const healthFacilityUserListLoading = useSelector(healthFacilityUsersLoadingSelector);
@@ -406,6 +407,12 @@ const UserList = (): React.ReactElement => {
     fetchList(); // get list of HF for filter dropdown, while closing the modal
   };
 
+  const confirmationUserId = openConfirmationModal.userData.id;
+
+  const handlePeerSupervisorModalCancel = useCallback(() => {
+    setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
+  }, []);
+
   /**
    * Handler function for success callback for add user and edit user.
    * On create, response.entity contains the created user (including id).
@@ -416,7 +423,7 @@ const UserList = (): React.ReactElement => {
         ? APPCONSTANTS.USER_DETAILS_UPDATE_SUCCESS
         : APPCONSTANTS.USER_DETAILS_CREATE_SUCCESS;
 
-      if (!openConfirmationModal.userData.id) {
+      if (!confirmationUserId) {
         toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
       }
       refreshHFUserList();
@@ -425,9 +432,8 @@ const UserList = (): React.ReactElement => {
       setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
       setIsOpenCHWListModal({ isOpen: false });
       handlePeerSupervisorModalCancel();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [dispatch, isOpenUserModal.isEdit, refreshHFUserList, isOpenPeerSupervisorModal.isEdit]
+    [confirmationUserId, dispatch, handlePeerSupervisorModalCancel, isOpenUserModal.isEdit, refreshHFUserList]
   );
 
   /**
@@ -436,7 +442,7 @@ const UserList = (): React.ReactElement => {
   const siteActivateUserSuccess = useCallback(() => {
     const successMessage = 'User Reassigned Successfully';
 
-    if (!openConfirmationModal.userData.id) {
+    if (!confirmationUserId) {
       toastCenter.success(APPCONSTANTS.SUCCESS, successMessage);
     }
     refreshHFUserList();
@@ -445,8 +451,7 @@ const UserList = (): React.ReactElement => {
     setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
     setIsOpenCHWListModal({ isOpen: false });
     handlePeerSupervisorModalCancel();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpenUserModal.isEdit, refreshHFUserList, isOpenPeerSupervisorModal.isEdit]);
+  }, [confirmationUserId, handlePeerSupervisorModalCancel, isOpenUserModal.isEdit, refreshHFUserList]);
 
   /**
    * Common submit handler for user add and edit
@@ -988,11 +993,6 @@ const UserList = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, refreshHFUserList, getCHWList]
   );
-
-  // Add handler for peer supervisor modal cancel
-  const handlePeerSupervisorModalCancel = () => {
-    setIsOpenPeerSupervisorModal({ isOpen: false, isEdit: false });
-  };
 
   // Add peer supervisor form renderer
   const peerSupervisorFormRenderer = (form?: FormApi<any>) => {

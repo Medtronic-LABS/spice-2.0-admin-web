@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { RouteComponentProps } from 'react-router';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef, type ComponentType, type LazyExoticComponent } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants/route';
-import Login from './containers/authentication/Login';
 import { AppLayout } from './components/appLayout/AppLayout';
 
 import APPCONSTANTS from './constants/appConstants';
@@ -17,53 +15,67 @@ import {
   getIsLoggingOutSelector,
   loadingSelector
 } from './store/user/selectors';
-import Region from './containers/region/Region';
-import RegionDashboard from './containers/region/RegionDashboard';
-import CreateRegion from './containers/createRegion/CreateRegion';
-import ForgotPassword from './containers/authentication/ForgotPassword';
-import ResetPassword from './containers/authentication/ResetPassword';
-import HealthFacilityList from './containers/healthFacility/HealthFacilityList';
-import HealthFacilitySummary from './containers/healthFacility/HealthFacilitySummary';
-import CreateHealthFacility from './containers/createHealthFacility/CreateHealthFacility';
-import MedicationList from './containers/medication/MedicationList';
-import AddMedication from './containers/medication/AddMedication';
-import MyProfile from './containers/myProfile/MyProfile';
-import LabTestList from './containers/labtest/LabtestList';
-import LabTestCustomizationLayout from './containers/labtest/LabTestCustomizationLayout';
-import LandingPage from './containers/landingPage/LandingPage';
 import Loader from './components/loader/Loader';
 import { goToUrl } from './utils/routeUtil';
-import DeactivatedRecords from './containers/deactivatedRecords/DeactivatedRecords';
-import DistrictList from './containers/district/DistrictList';
-import CreateDistrict from './containers/createDistrict/CreateDistrict';
-import DistrictSummary from './containers/district/DistrictSummary';
-import DistrictDashboard from './containers/district/DistrictDashboard';
-import LockedUsers from './containers/lockedUsers/LockedUsers';
-import UserList from './containers/user/UserList';
-import Admins from './containers/admins/AdminList';
-import ChiefdomDashboard from './containers/chiefdom/ChiefdomDashboard';
-import CreateChiefdom from './containers/createChiefdom/CreateChiefdom';
-import ChiefdomList from './containers/chiefdom/ChiefdomList';
-import ChiefdomSummary from './containers/chiefdom/ChiefdomSummary';
-import RegionCustomization from './containers/region/RegionCustomization';
-import RegionFormCustomization from './containers/region/RegionFormCustomization';
-import ProgramList from './containers/program/ProgramList';
-import ProgramForm from './containers/program/CreateProgram';
-import WorkflowCustomization from './containers/workflow/WorkflowCustomization';
-import WorkflowFormCustomization from './containers/workflow/WorkflowFormCustomization';
-import HealthFacilityDashboard from './containers/healthFacility/HealthFacilityDashboard';
-import PrivacyPolicy from './containers/privacyPolicy/PrivacyPolicy';
-import BranchList from './containers/branch/BranchList';
-import BranchSummary from './containers/branch/BranchSummary';
+import { useRouteComponentProps } from './utils/routerCompat';
+
+type RouteComponent = ComponentType<any> | LazyExoticComponent<ComponentType<any>>;
+
+const lazyRoute = (loadComponent: () => Promise<{ default: ComponentType<any> }>): LazyExoticComponent<ComponentType<any>> =>
+  lazy(loadComponent);
+
+const Login = lazyRoute(() => import('./containers/authentication/Login'));
+const Region = lazyRoute(() => import('./containers/region/Region'));
+const RegionDashboard = lazyRoute(() => import('./containers/region/RegionDashboard'));
+const CreateRegion = lazyRoute(() => import('./containers/createRegion/CreateRegion'));
+const ForgotPassword = lazyRoute(() => import('./containers/authentication/ForgotPassword'));
+const ResetPassword = lazyRoute(() => import('./containers/authentication/ResetPassword'));
+const HealthFacilityList = lazyRoute(() => import('./containers/healthFacility/HealthFacilityList'));
+const HealthFacilitySummary = lazyRoute(() => import('./containers/healthFacility/HealthFacilitySummary'));
+const CreateHealthFacility = lazyRoute(() => import('./containers/createHealthFacility/CreateHealthFacility'));
+const MedicationList = lazyRoute(() => import('./containers/medication/MedicationList'));
+const AddMedication = lazyRoute(() => import('./containers/medication/AddMedication'));
+const MyProfile = lazyRoute(() => import('./containers/myProfile/MyProfile'));
+const LabTestList = lazyRoute(() => import('./containers/labtest/LabtestList'));
+const LabTestCustomizationLayout = lazyRoute(() => import('./containers/labtest/LabTestCustomizationLayout'));
+const LandingPage = lazyRoute(() => import('./containers/landingPage/LandingPage'));
+const DeactivatedRecords = lazyRoute(() => import('./containers/deactivatedRecords/DeactivatedRecords'));
+const DistrictList = lazyRoute(() => import('./containers/district/DistrictList'));
+const CreateDistrict = lazyRoute(() => import('./containers/createDistrict/CreateDistrict'));
+const DistrictSummary = lazyRoute(() => import('./containers/district/DistrictSummary'));
+const DistrictDashboard = lazyRoute(() => import('./containers/district/DistrictDashboard'));
+const LockedUsers = lazyRoute(() => import('./containers/lockedUsers/LockedUsers'));
+const UserList = lazyRoute(() => import('./containers/user/UserList'));
+const Admins = lazyRoute(() => import('./containers/admins/AdminList'));
+const ChiefdomDashboard = lazyRoute(() => import('./containers/chiefdom/ChiefdomDashboard'));
+const CreateChiefdom = lazyRoute(() => import('./containers/createChiefdom/CreateChiefdom'));
+const ChiefdomList = lazyRoute(() => import('./containers/chiefdom/ChiefdomList'));
+const ChiefdomSummary = lazyRoute(() => import('./containers/chiefdom/ChiefdomSummary'));
+const RegionCustomization = lazyRoute(() => import('./containers/region/RegionCustomization'));
+const RegionFormCustomization = lazyRoute(() => import('./containers/region/RegionFormCustomization'));
+const ProgramList = lazyRoute(() => import('./containers/program/ProgramList'));
+const ProgramForm = lazyRoute(() => import('./containers/program/CreateProgram'));
+const WorkflowCustomization = lazyRoute(() => import('./containers/workflow/WorkflowCustomization'));
+const WorkflowFormCustomization = lazyRoute(() => import('./containers/workflow/WorkflowFormCustomization'));
+const HealthFacilityDashboard = lazyRoute(() => import('./containers/healthFacility/HealthFacilityDashboard'));
+const PrivacyPolicy = lazyRoute(() => import('./containers/privacyPolicy/PrivacyPolicy'));
+const BranchList = lazyRoute(() => import('./containers/branch/BranchList'));
+const BranchSummary = lazyRoute(() => import('./containers/branch/BranchSummary'));
 interface IRoute {
   path: string;
   exact: boolean;
-  component: React.FunctionComponent<any> | React.ComponentClass<any>;
+  component: RouteComponent;
 }
 
 interface IProtectedRoute extends IRoute {
   authorisedRoles?: string[];
 }
+
+const RouteElement = ({ route }: { route: IRoute }) => {
+  const routeProps = useRouteComponentProps(route.path, route.exact);
+
+  return <route.component key={routeProps.location.key} {...routeProps} />;
+};
 
 export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } =
   APPCONSTANTS.ROLES;
@@ -378,13 +390,13 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.branchByRegion,
       exact: true,
       component: BranchList,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     },
     {
       path: PROTECTED_ROUTES.branchSummary,
       exact: true,
       component: BranchSummary,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_RA
     }
   ];
 })();
@@ -444,35 +456,25 @@ export const AppRoutes = () => {
 
   return isLoggedIn ? (
     <AppLayout>
-      <Switch>
-        {protectedRoutes.map((route: IProtectedRoute, index: number) =>
-          route.authorisedRoles?.includes(role) || route.path === PROTECTED_ROUTES.landingPage ? (
-            <Route
-              path={route.path}
-              exact={route.exact}
-              key={index}
-              render={(routeProps: RouteComponentProps<any>) => (
-                <route.component key={routeProps.location.key} {...routeProps} />
-              )}
-            />
-          ) : null
-        )}
-        <Redirect exact={true} to={PROTECTED_ROUTES.landingPage} />
-      </Switch>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          {protectedRoutes.map((route: IProtectedRoute, index: number) =>
+            route.authorisedRoles?.includes(role) || route.path === PROTECTED_ROUTES.landingPage ? (
+              <Route path={route.path} key={index} element={<RouteElement route={route} />} />
+            ) : null
+          )}
+          <Route path='*' element={<Navigate replace={true} to={PROTECTED_ROUTES.landingPage} />} />
+        </Routes>
+      </Suspense>
     </AppLayout>
   ) : (
-    <Switch>
-      {publicRoutes.map((route: any, index: number) => (
-        <Route
-          path={route.path}
-          exact={route.exact}
-          key={index}
-          render={(routeProps: RouteComponentProps<any>) => (
-            <route.component key={routeProps.location.key} {...routeProps} />
-          )}
-        />
-      ))}
-      <Redirect exact={true} to={PUBLIC_ROUTES.login} />
-    </Switch>
+    <Suspense fallback={<Loader />}>
+      <Routes>
+        {publicRoutes.map((route: any, index: number) => (
+          <Route path={route.path} key={index} element={<RouteElement route={route} />} />
+        ))}
+        <Route path='*' element={<Navigate replace={true} to={PUBLIC_ROUTES.login} />} />
+      </Routes>
+    </Suspense>
   );
 };

@@ -1,4 +1,4 @@
-@import '../../styles/variables';
+@use '../../styles/variables' as *;
 $disable-btn-clr: #777;
 $hover-background: var(--medium-blue-3);
 $border-btn: #ddd;

@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import UserMenu from '../UserMenu';
 import APPCONSTANTS, { APP_TYPE } from '../../../constants/appConstants';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { CHANGE_OWN_PASSWORD_REQUEST } from '../../../store/user/actionTypes';
 
 jest.mock('leaflet/dist/leaflet.css', () => ({}));

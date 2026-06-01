@@ -1,9 +1,10 @@
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import CustomTable from '../../components/customTable/CustomTable';
 import DetailCard from '../../components/detailCard/DetailCard';
 import APPCONSTANTS from '../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
 /**
  * Interface for route parameters

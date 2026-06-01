@@ -7,7 +7,7 @@ import {
   districtLoadingSelector,
   getDistrictListSelector
 } from '../../store/district/selectors';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   activateAccountReq,
   fetchDistrictListRequest,
@@ -21,6 +21,7 @@ import { useTablePaginationHook } from '../../hooks/tablePagination';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import useCountryId from '../../hooks/useCountryId';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import { useAppDispatch } from '../../store/hooks';
 
 /**
  * DeactivatedRecords component for displaying and managing deactivated district records.
@@ -28,7 +29,7 @@ import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
  */
 const DeactivatedRecords = (): React.ReactElement => {
   const { listParams, handleSearch, handlePage } = useTablePaginationHook();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const loading = useSelector(districtLoadingSelector);
   const deactivatedRecords = useSelector(getDistrictListSelector);
   const deactivatedRecordsCount = useSelector(districtCountSelector);

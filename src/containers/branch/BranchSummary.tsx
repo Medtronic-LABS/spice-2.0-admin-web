@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { FormApi } from 'final-form';
+import { useAppDispatch } from '../../store/hooks';
 
 import DetailCard from '../../components/detailCard/DetailCard';
 import Loader from '../../components/loader/Loader';
@@ -25,7 +26,7 @@ interface IBranchSummaryRouteParams {
 }
 
 const BranchSummary: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { branchId, tenantId } = useParams<IBranchSummaryRouteParams>();
   const countryId = useCountryId();
   const branchSummary = useSelector(branchSummarySelector);

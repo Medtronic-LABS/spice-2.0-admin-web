@@ -1,9 +1,12 @@
-import CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
 import { saveAs } from 'file-saver';
 import React from 'react';
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
 import { redRisk } from '../constants/roleConstants';
 import { IHealthFacility, IHFUserGet, IUserRole } from '../store/healthFacility/types';
+import { appEnv } from '../config/env';
+
+const cryptoJsLib = (CryptoJS as typeof CryptoJS & { default?: typeof CryptoJS }).default || CryptoJS;
 
 export const jsonParse = (value: any) => {
   if (value) {
@@ -22,7 +25,7 @@ export const jsonParse = (value: any) => {
  * @return {CryptoJS.lib.WordArray} The generated encryption key
  */
 const getEncryptionKey = () => {
-  return CryptoJS.PBKDF2(process.env.REACT_APP_CRYPTR_SECRET_KEY as string, APPCONSTANTS.ENCRYPTION.SALT, {
+  return cryptoJsLib.PBKDF2(appEnv.cryptrSecretKey as string, APPCONSTANTS.ENCRYPTION.SALT, {
     keySize: APPCONSTANTS.ENCRYPTION.KEYLEN / 32,
     iterations: APPCONSTANTS.ENCRYPTION.ITERATION
   });
@@ -35,8 +38,8 @@ const getEncryptionKey = () => {
  */
 export const decryptData = (password: string) => {
   const key = getEncryptionKey();
-  const iv = CryptoJS.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
-  return CryptoJS.AES.decrypt(password, CryptoJS.enc.Utf8.parse(key as any), { iv }).toString(CryptoJS.enc.Utf8);
+  const iv = cryptoJsLib.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
+  return cryptoJsLib.AES.decrypt(password, cryptoJsLib.enc.Utf8.parse(key as any), { iv }).toString(cryptoJsLib.enc.Utf8);
 };
 
 /**
@@ -46,8 +49,8 @@ export const decryptData = (password: string) => {
  */
 export const encryptData = (value: string) => {
   const key = getEncryptionKey();
-  const iv = CryptoJS.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
-  return CryptoJS.AES.encrypt(value, CryptoJS.enc.Utf8.parse(key as any), { iv }).toString();
+  const iv = cryptoJsLib.enc.Utf8.parse(APPCONSTANTS.ENCRYPTION.IV);
+  return cryptoJsLib.AES.encrypt(value, cryptoJsLib.enc.Utf8.parse(key as any), { iv }).toString();
 };
 
 /**

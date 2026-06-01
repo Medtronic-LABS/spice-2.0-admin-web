@@ -1,3 +1,5 @@
+import { useAppDispatch } from '../../store/hooks';
+
 import React, { useEffect } from 'react';
 import { Field, useForm } from 'react-final-form';
 
@@ -13,7 +15,7 @@ import {
 } from '../../utils/validation';
 import styles from '../workflow/WorkflowForm.module.scss';
 import Checkbox from '../../components/formFields/Checkbox';
-import { useDispatch } from 'react-redux';
+
 import { clearAppType, setAppType } from '../../store/user/actions';
 import localStorageServices from '../../global/localStorageServices';
 import { APP_TYPE_NAME } from '../../constants/appConstants';
@@ -30,7 +32,7 @@ const appTypes = [
  */
 const RegionForm = (): React.ReactElement => {
   const form = useForm();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const appTypesError = required(form?.getState()?.values.region?.appTypes);
   const appTypesTouched = form?.getState()?.touched?.['region.appTypes'];
 

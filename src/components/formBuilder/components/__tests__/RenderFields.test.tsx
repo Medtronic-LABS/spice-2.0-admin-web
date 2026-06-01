@@ -19,7 +19,7 @@ jest.mock('react-router-dom', () => ({
   })
 }));
 
-jest.mock('../../assets/images/calendar-icon.svg', () => ({
+jest.mock('../../../../assets/images/calendar-icon.svg', () => ({
   ReactComponent: () => <svg data-testid='calendar-icon' />
 }));
 

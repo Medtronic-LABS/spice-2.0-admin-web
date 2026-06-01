@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import NavBarLogo from '../../assets/images/app-logo-name.png';
 import LogoutIcon from '../../assets/images/power-switch.svg';
 import CaretDownIcon from '../../assets/images/caret-down-grey.svg';
@@ -8,6 +8,7 @@ import styles from './Header.module.scss';
 import { logoutRequest } from '../../store/user/actions';
 import { firstNameSelector, lastNameSelector, roleDetailSelector, roleSelector } from '../../store/user/selectors';
 import { ROLE_LABELS } from '../../constants/appConstants';
+import { useAppDispatch } from '../../store/hooks';
 
 /**
  * Header component
@@ -15,7 +16,7 @@ import { ROLE_LABELS } from '../../constants/appConstants';
  * @returns {React.ReactElement} The rendered Header component
  */
 export default function Header(): React.ReactElement {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   /**
    * User's first name

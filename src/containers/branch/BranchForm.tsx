@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Field } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 
 import TextInput from '../../components/formFields/TextInput';
 import SelectInput from '../../components/formFields/SelectInput';
@@ -33,7 +34,7 @@ interface IBranchFormProps {
  * Branch form component for add/edit
  */
 const BranchForm = ({ form, formName = 'branch', isEdit = false }: IBranchFormProps): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const districtOptions = useSelector(getDistrictListSelector);
   const districtOptionsLoading = useSelector(districtLoadingSelector);
   const chiefdomOptions = useSelector(chiefdomDropdownSelector);

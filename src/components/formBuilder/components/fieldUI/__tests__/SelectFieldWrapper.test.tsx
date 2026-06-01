@@ -98,6 +98,7 @@ describe('SelectFieldWrapper', () => {
   });
 
   it('handles multi-select mode', async () => {
+    const user = userEvent.setup();
     const onChange = jest.fn();
     renderComponent({
       isMulti: true,
@@ -105,9 +106,9 @@ describe('SelectFieldWrapper', () => {
     });
 
     const select = screen.getByRole('combobox');
-    await userEvent.click(select);
-    await userEvent.click(screen.getByText('Option 1'));
-    await userEvent.click(screen.getByText('Option 2'));
+    await user.click(select);
+    await user.click(screen.getByText('Option 1'));
+    await user.click(screen.getByText('Option 2'));
 
     expect(screen.getByTestId('select-input')).toBeInTheDocument();
   });
@@ -135,12 +136,13 @@ describe('SelectFieldWrapper', () => {
   });
 
   it('handles custom onChange handler', async () => {
+    const user = userEvent.setup();
     const onChange = jest.fn();
     renderComponent({ onChange });
 
     const select = screen.getByRole('combobox');
-    await userEvent.click(select);
-    await userEvent.click(screen.getByText('Option 1'));
+    await user.click(select);
+    await user.click(screen.getByText('Option 1'));
 
     expect(screen.getByTestId('select-input')).toBeInTheDocument();
   });

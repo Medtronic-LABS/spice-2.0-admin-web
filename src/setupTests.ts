@@ -3,10 +3,10 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import React from 'react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import 'jest-canvas-mock';
-import { configure } from 'enzyme';
-import Adapter from '@cfaester/enzyme-adapter-react-18';
+import { TextDecoder, TextEncoder } from 'util';
 
 global.React = React;
-configure({ adapter: new Adapter() });
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder as typeof global.TextDecoder;

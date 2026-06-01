@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 :root {
   --red: #e31b28;
   --red-5: #fef4f4;
@@ -89,8 +91,8 @@
   --checkbox-un-selected-circle-color: var(--white-100);
   --checkbox-switcher-selected: var(--medium-blue-20);
   --checkbox-switcher-selected: #d7d2fd;
-  --checkbox-switcher-selected-hover: #{darken(#d7d2fd, 10%)};
-  --checkbox-switcher-un-selected-hover: #{darken(#d6d6d4, 15%)};
+  --checkbox-switcher-selected-hover: #{color.adjust(#d7d2fd, $lightness: -10%)};
+  --checkbox-switcher-un-selected-hover: #{color.adjust(#d6d6d4, $lightness: -15%)};
 
   //error
   --primary-error-color: var(--red) !important;

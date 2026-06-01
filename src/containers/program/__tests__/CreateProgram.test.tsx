@@ -1,15 +1,23 @@
-import { mount } from 'enzyme';
 import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import CreateProgram from '../CreateProgram';
 import configureMockStore from 'redux-mock-store';
 
+import CreateProgram from '../CreateProgram';
+import { HistoryRouter as Router } from '../../../tests/routerTestUtils';
+
+jest.mock('../ProgramForm', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'program-form' }, 'Program form')
+}));
+
 const mockStore = configureMockStore();
+
 describe('CreateProgram', () => {
-  let store;
-  let wrapper: any;
+  let store: any;
+
   const props: any = {
     role: 'admin',
     countryId: '1',
@@ -24,6 +32,7 @@ describe('CreateProgram', () => {
       push: jest.fn()
     }
   };
+
   beforeEach(() => {
     store = mockStore({
       program: {
@@ -45,27 +54,38 @@ describe('CreateProgram', () => {
         labelName: null
       }
     });
+  });
+
+  it('should render the component without errors', () => {
     const history = createMemoryHistory({ initialEntries: ['/create-program'] });
-    wrapper = mount(
+
+    render(
       <Provider store={store}>
         <Router history={history}>
           <CreateProgram {...props} />
         </Router>
       </Provider>
     );
+
+    expect(screen.getByTestId('program-form')).toBeInTheDocument();
   });
 
-  it('should render the component without errors', () => {
-    expect(wrapper.exists()).toBe(true);
-  });
+  it('renders the program form and handles cancel navigation', async () => {
+    const user = userEvent.setup();
+    const history = createMemoryHistory({ initialEntries: ['/create-program'] });
 
-  it('renders the program form', async () => {
-    expect(wrapper.find('form')).toHaveLength(1);
-    const cancelButton = wrapper.find('[type="submit"]');
-    cancelButton.simulate('click');
-    expect(cancelButton).toHaveLength(1);
-    const submit = wrapper.find('[type="button"]');
-    cancelButton.simulate('click');
-    expect(submit).toHaveLength(1);
+    render(
+      <Provider store={store}>
+        <Router history={history}>
+          <CreateProgram {...props} />
+        </Router>
+      </Provider>
+    );
+
+    expect(screen.getByTestId('program-form')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(history.location.pathname).toBe('/region/1/1/program');
   });
 });

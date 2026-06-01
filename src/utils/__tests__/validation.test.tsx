@@ -530,7 +530,9 @@ describe('Validation', () => {
       });
 
       test('should format the date from numeric input', () => {
-        const value = 1679683200000;
+        // 2023-03-25T00:00:00Z — picks the same calendar date in UTC and any
+        // east-of-UTC zone so the assertion is stable across CI and dev.
+        const value = Date.UTC(2023, 2, 25);
         const options = { month: 'long', format: 'DD-MM-YYYY' };
         const result = formatDate(value, options);
         expect(result).toBe('25-March-2023');

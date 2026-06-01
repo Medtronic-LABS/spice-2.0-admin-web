@@ -1,4 +1,4 @@
-@import '../../styles/variables';
+@use '../../styles/variables' as *;
 
 $user-logo-background: var(--burnt-orange);
 $user-options-hover-background-color: var(--medium-blue-3);

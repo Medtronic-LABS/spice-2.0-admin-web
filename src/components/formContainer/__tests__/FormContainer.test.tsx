@@ -21,8 +21,8 @@ describe('FormContainer', () => {
   });
 
   it('renders an icon when provided', () => {
-    const img = screen.getByRole('img') as HTMLImageElement;
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    const img = screen.getByRole('presentation') as HTMLImageElement;
+    expect(screen.getByRole('presentation')).toBeInTheDocument();
     expect(img.src).toContain('test-icon.png');
   });
 

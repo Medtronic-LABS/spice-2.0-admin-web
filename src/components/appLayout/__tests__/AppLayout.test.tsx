@@ -9,7 +9,7 @@ import APPCONSTANTS, { APP_TYPE } from '../../../constants/appConstants';
 const mockStore = configureStore([]);
 
 jest.mock('../../../assets/images/home.svg', () => ({
-  ReactComponent: 'HomeIcon'
+  ReactComponent: () => <svg data-testid='home-icon' aria-label='Home' />
 }));
 
 jest.mock('../../sideMenu/SideMenu', () => () => <div data-testid='side-menu-component'>Side Menu</div>);

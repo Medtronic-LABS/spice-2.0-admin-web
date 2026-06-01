@@ -1,6 +1,8 @@
+import { useAppDispatch } from '../../store/hooks';
+
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import Loader from '../../components/loader/Loader';
 import Searchbar from '../../components/searchbar/Searchbar';
@@ -31,7 +33,7 @@ import { formatUserToastMsg } from '../../utils/commonUtils';
  * @returns {React.ReactElement} The rendered HealthFacilityDashboard component
  */
 const HealthFacilityDashboard = (): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const hfDashboardList = useSelector(hfDashboardListSelector);
   const hfCount = useSelector(healthFacilityListTotalSelector);
   const loading = useSelector(healthFacilityLoadingSelector);

@@ -1,10 +1,9 @@
-import { mount } from 'enzyme';
 import TEXT_LABEL_CONFIG from '../TextLabel';
 
 describe('TEXT_LABEL_CONFIG', () => {
-  it('should render without error', () => {
-    const wrapper = mount(<div />);
-    expect(wrapper.exists()).toBe(true);
+  it('should expose the expected config methods', () => {
+    expect(TEXT_LABEL_CONFIG.getEmptyData).toEqual(expect.any(Function));
+    expect(TEXT_LABEL_CONFIG.getJSON).toEqual(expect.any(Function));
   });
 
   it('should return empty data when calling getEmptyData()', () => {

@@ -6,6 +6,7 @@ import APPCONSTANTS from '../constants/appConstants';
 import sessionStorageServices from './sessionStorageServices';
 import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/actions';
 import { PUBLIC_ROUTES } from '../constants/route';
+import { appEnv } from '../config/env';
 
 /**
  * Handles the response status and throws appropriate errors.
@@ -67,7 +68,7 @@ const responseStatusReturn = (response: AxiosResponse, store: any) => {
  * @param {any} store - The Redux store
  */
 export const setupInterceptors = (store: any) => {
-  axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
+  axios.defaults.baseURL = appEnv.apiBaseUrl;
   axios.defaults.headers.post['Content-Type'] = 'application/json';
   axios.defaults.headers.client = APPCONSTANTS.APP_TYPE;
   axios.defaults.validateStatus = () => true;

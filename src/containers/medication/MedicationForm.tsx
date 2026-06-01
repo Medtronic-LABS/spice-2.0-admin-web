@@ -2,6 +2,7 @@ import { FormApi } from 'final-form';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
+import { useAppDispatch } from '../../store/hooks';
 
 import { IMedicationFormValues } from './AddMedication';
 import TextInput from '../../components/formFields/TextInput';
@@ -13,7 +14,7 @@ import TickIcon from '../../assets/images/tick.svg';
 import SelectInput from '../../components/formFields/SelectInput';
 
 import styles from './AddMedication.module.scss';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import CustomTooltip from '../../components/tooltip';
 import Loader from '../../components/loader/Loader';
@@ -99,7 +100,7 @@ const MedicationForm = ({
   const { regionId: countryId }: { regionId: string } = useParams();
   const [brandOptions, setBrandOptions] = useState([] as Array<Partial<IList[]>>);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const classificationOptions = useSelector(getMedicationClassificationsSelector);
   const dosageFormOptions = useSelector(getMedicationDosageFormsSelector);
   const categoryList = useSelector(getMedicationCategorySelector);

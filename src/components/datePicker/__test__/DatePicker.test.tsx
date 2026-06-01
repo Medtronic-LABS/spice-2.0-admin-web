@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DatePickerComponent from '../DatePicker';
 
-jest.mock('../../assets/images/calendar-icon.svg', () => ({
+jest.mock('../../../assets/images/calendar-icon.svg', () => ({
   ReactComponent: () => <svg data-testid='calendar-icon' />
 }));
 

@@ -1,42 +1,64 @@
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { useDispatch, useSelector } from 'react-redux';
 
 import DistrictConsentForm from '../DistrictConsentForm';
-import ConsentForm from '../../ConsentForm/ConsentForm';
-import ConfirmationModalPopup from '../../../components/customTable/ConfirmationModalPopup';
 
 jest.mock('react-redux', () => ({
   useDispatch: jest.fn(),
   useSelector: jest.fn()
 }));
 
+jest.mock('../../ConsentForm/ConsentForm', () => ({
+  __esModule: true,
+  default: ({ submitConsentForm }: any) =>
+    require('react').createElement(
+      'button',
+      {
+        type: 'button',
+        'data-testid': 'consent-form',
+        onClick: () => submitConsentForm('test content')
+      },
+      'Submit consent form'
+    )
+}));
+
+jest.mock('../../../components/customTable/ConfirmationModalPopup', () => ({
+  __esModule: true,
+  default: () => require('react').createElement('div', { 'data-testid': 'confirmation-modal' })
+}));
+
+jest.mock('../../../hooks/appTypeBasedConfigs', () => ({
+  __esModule: true,
+  default: () => ({
+    district: {
+      s: 'District'
+    }
+  })
+}));
+
 describe('DistrictConsentForm', () => {
-  let wrapper: any;
   const dispatch = jest.fn();
-  const mockSelector = jest.fn();
 
   beforeEach(() => {
-    (useDispatch as any).mockReturnValue(dispatch);
-    (useSelector as any).mockImplementation(mockSelector);
-    wrapper = shallow(<DistrictConsentForm isOpen={true} consentFormConfig={{}} handleConsentFormClose={jest.fn()} />);
-  });
-
-  afterEach(() => {
+    (useDispatch as jest.Mock).mockReturnValue(dispatch);
+    (useSelector as jest.Mock).mockReturnValue({ id: '1' });
     jest.clearAllMocks();
   });
 
   it('renders ConsentForm and ConfirmationModalPopup components', () => {
-    expect(wrapper.find(ConsentForm)).toHaveLength(1);
-    expect(wrapper.find(ConfirmationModalPopup)).toHaveLength(1);
+    render(<DistrictConsentForm isOpen={true} consentFormConfig={{}} handleConsentFormClose={jest.fn()} />);
+
+    expect(screen.getByTestId('consent-form')).toBeInTheDocument();
+    expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
   });
 
-  it('closes ConsentForm', () => {
-    wrapper.find(ConsentForm).props().submitConsentForm();
-  });
+  it('calls customizeFormRequest on submitConsentForm', async () => {
+    const user = userEvent.setup();
 
-  it('calls customizeFormRequest on submitConsentForm', () => {
-    const data = {};
-    wrapper.find(ConsentForm).props().submitConsentForm(data);
+    render(<DistrictConsentForm isOpen={true} consentFormConfig={{}} handleConsentFormClose={jest.fn()} />);
+
+    await user.click(screen.getByTestId('consent-form'));
 
     expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'CUSTOMIZE_FORM_REQUEST' }));
   });

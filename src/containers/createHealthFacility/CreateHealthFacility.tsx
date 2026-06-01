@@ -2,8 +2,8 @@ import { FormApi, Tools } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { RouteComponentProps, useHistory, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RouteComponentProps, useParams } from 'react-router-dom';
 import SiteAddUserIcon from '../../assets/images/avatar-o.svg';
 import SiteDetailsIcon from '../../assets/images/info-grey.svg';
 import RightArrowIcon from '../../assets/images/right-arrow.svg';
@@ -34,6 +34,8 @@ import Workflows from '../healthFacility/Workflows';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
 import { formatUserToastMsg } from '../../utils/commonUtils';
 import IconButton from '../../components/button/IconButton';
+import { useAppDispatch } from '../../store/hooks';
+import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 import { clearBranchesByUnion } from '../../store/branch/actions';
 
 interface IMatchParams {
@@ -59,7 +61,7 @@ export const filterAndExtractAppTypes = (allWorkflows: IWorkflow[], selectedIds:
  * Renders the form for create site
  */
 const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const formInstance = useRef({} as FormApi<any>);
   const history = useHistory();
   const workflows = useSelector(workflowListSelector);

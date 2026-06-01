@@ -308,7 +308,6 @@ const SSUserRow = ({
 const AssignSSUsersSection = ({ isEdit }: { isEdit?: boolean }): React.ReactElement => {
   const form = useForm();
   const ssUsersFormName = 'ssUsers';
-  const ssUsersInitialValue = useMemo(() => [{ ...DEFAULT_SS_USER_ROW }], []);
   const ssUsersInitializedForUserId = useRef<string | null>(null);
   const subVillagesList = useSelector(getSubVillagesSelector);
   const subVillagesLoading = useSelector(getSubVillagesLoadingSelector);
@@ -354,6 +353,17 @@ const AssignSSUsersSection = ({ isEdit }: { isEdit?: boolean }): React.ReactElem
     return clearInitializedUser;
   }, [userId, ssListForUser, form, ssPrefixList]);
 
+  // Seed a default row only when the form has no ssUsers value of its own.
+  // Done in an effect (rather than via FieldArray's `initialValue`) because in
+  // final-form 5+, FieldArray.initialValue overrides form-level initialValues
+  // for the same field at registration time.
+  useEffect(() => {
+    const currentSsUsers = form.getState().values?.ssUsers;
+    if (!Array.isArray(currentSsUsers) || currentSsUsers.length === 0) {
+      form.change(ssUsersFormName, [{ ...DEFAULT_SS_USER_ROW }]);
+    }
+  }, [form]);
+
   return (
   <FormSpy subscription={{ values: true }}>
     {(formSpyProps: { values?: IFormSpyValues }) => {
@@ -371,7 +381,7 @@ const AssignSSUsersSection = ({ isEdit }: { isEdit?: boolean }): React.ReactElem
       return (
         <div className='mb-2 mt-2'>
           <div className='fw-bold theme-text mb-1dot25'>Assign Shasthya Shebika Users</div>
-          <FieldArray name={ssUsersFormName} initialValue={ssUsersInitialValue}>
+          <FieldArray name={ssUsersFormName}>
             {({ fields }) => (
               <>
                 {fields.map((fieldName: string, rowIndex: number) => (

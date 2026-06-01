@@ -11,6 +11,8 @@ import {
 } from '../../../store/workflow/actionTypes';
 import toastCenter from '../../../utils/toastCenter';
 
+const mockHistoryPush = jest.fn();
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({
@@ -19,9 +21,16 @@ jest.mock('react-router-dom', () => ({
     form: 'custom',
     clinicalWorkflowId: '52',
     workflowId: 'workflowCustomize'
-  }),
-  useHistory: () => ({
-    push: jest.fn()
+  })
+}));
+
+jest.mock('../../../utils/routerCompat', () => ({
+  ...jest.requireActual('../../../utils/routerCompat'),
+  useHistoryCompat: () => ({
+    location: { pathname: '/', search: '', hash: '', state: null, key: 'workflow-form-customization' },
+    push: mockHistoryPush,
+    replace: jest.fn(),
+    goBack: jest.fn()
   })
 }));
 
@@ -157,6 +166,10 @@ const initialState = {
   }
 };
 describe('WorkflowFormCustomization', () => {
+  beforeEach(() => {
+    mockHistoryPush.mockClear();
+  });
+
   it('should render without errors', () => {
     const localStore = mockStore(initialState);
     const { getByTestId, unmount } = render(
@@ -225,10 +238,7 @@ describe('WorkflowFormCustomization', () => {
   });
 
   it('should handle cancellation', async () => {
-    const mockHistoryPush = jest.fn();
-    jest.spyOn(require('react-router-dom'), 'useHistory').mockImplementation(() => ({
-      push: mockHistoryPush
-    }));
+    const user = userEvent.setup();
 
     const store = mockStore(initialState);
 
@@ -241,9 +251,7 @@ describe('WorkflowFormCustomization', () => {
     );
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
-    await waitFor(async () => {
-      userEvent.click(cancelButton);
-    });
+    await user.click(cancelButton);
 
     expect(mockHistoryPush).toHaveBeenCalled();
     unmount();
@@ -326,16 +334,13 @@ describe('WorkflowFormCustomization', () => {
   });
 
   it('should handle successful form submission', async () => {
+    const user = userEvent.setup();
     const localStore = mockStore({
       ...initialState,
       labtest: {
         units: []
       }
     });
-    const mockHistoryPush = jest.fn();
-    jest.spyOn(require('react-router-dom'), 'useHistory').mockImplementation(() => ({
-      push: mockHistoryPush
-    }));
 
     const { unmount } = render(
       <Provider store={localStore}>
@@ -346,9 +351,7 @@ describe('WorkflowFormCustomization', () => {
     );
 
     const submitButton = screen.getByRole('button', { name: /submit/i });
-    await waitFor(async () => {
-      userEvent.click(submitButton);
-    });
+    await user.click(submitButton);
 
     const actions = localStore.getActions();
     const submitAction = actions.find((action) => action.type === CUSTOMIZE_FORM_REQUEST);
@@ -363,16 +366,13 @@ describe('WorkflowFormCustomization', () => {
   });
 
   it('should handle form submission failure', async () => {
+    const user = userEvent.setup();
     const localStore = mockStore({
       ...initialState,
       labtest: {
         units: []
       }
     });
-    const mockHistoryPush = jest.fn();
-    jest.spyOn(require('react-router-dom'), 'useHistory').mockImplementation(() => ({
-      push: mockHistoryPush
-    }));
     const mockError = new Error('Submission failed');
 
     const { unmount } = render(
@@ -384,9 +384,7 @@ describe('WorkflowFormCustomization', () => {
     );
 
     const submitButton = screen.getByRole('button', { name: /submit/i });
-    await waitFor(async () => {
-      userEvent.click(submitButton);
-    });
+    await user.click(submitButton);
 
     const actions = localStore.getActions();
     const submitAction = actions.find((action) => action.type === CUSTOMIZE_FORM_REQUEST);
