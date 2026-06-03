@@ -16,8 +16,7 @@ import {
   peerSupervisor,
   villageBasedRoles,
   shastiyaKormiRole,
-  chcpRole,
-  heRole
+  allSingleRoles
 } from '../../constants/roleConstants';
 
 jest.mock('../appTypeBasedConfigs', () => ({
@@ -478,7 +477,9 @@ describe('roleHook', () => {
       expect(callArg.showVillages).toEqual([true]);
     });
 
-    it('should disable all other SPICE roles when HE is selected', () => {
+    it.each(allSingleRoles)(
+      'should disable all other SPICE roles when %s is selected',
+      (singleRole) => {
       const onRoleChange = jest.fn();
       const propDisabledRoles = { current: [{}] };
       const { result } = renderHook(() =>
@@ -489,17 +490,17 @@ describe('roleHook', () => {
         })
       );
 
-      const he = createRole({ name: heRole, groupName: SPICE, id: 1 });
+      const selectedRole = createRole({ name: singleRole, groupName: SPICE, id: 1 });
       const nurse = createRole({ name: 'NURSE', groupName: SPICE, id: 2 });
       const chw = createRole({ name: 'CHW', groupName: SPICE, id: 3 });
       const appTypeBasedRoles: Record<string, IRoles[]> = {
-        SPICE: [he, nurse, chw],
+        SPICE: [selectedRole, nurse, chw],
         REPORTS: [],
         INSIGHTS: []
       };
 
       result.current.roleChange({
-        allRoles: [he],
+        allRoles: [selectedRole],
         index: 0,
         appTypeBasedRoles
       });
@@ -508,40 +509,8 @@ describe('roleHook', () => {
       const disabledSpiceNames = callArg.disabledRoles[0].SPICE.map((r: IRoles) => r.name);
       expect(disabledSpiceNames).toContain('NURSE');
       expect(disabledSpiceNames).toContain('CHW');
-      expect(disabledSpiceNames).not.toContain(heRole);
-    });
-
-    it('should disable all other SPICE roles when CHCP is selected', () => {
-      const onRoleChange = jest.fn();
-      const propDisabledRoles = { current: [{}] };
-      const { result } = renderHook(() =>
-        useRoleMeta({
-          ...defaultMetaProps,
-          disabledRoles: propDisabledRoles,
-          onRoleChange
-        })
-      );
-
-      const chcp = createRole({ name: chcpRole, groupName: SPICE, id: 1 });
-      const nurse = createRole({ name: 'NURSE', groupName: SPICE, id: 2 });
-      const chw = createRole({ name: 'CHW', groupName: SPICE, id: 3 });
-      const appTypeBasedRoles: Record<string, IRoles[]> = {
-        SPICE: [chcp, nurse, chw],
-        REPORTS: [],
-        INSIGHTS: []
-      };
-
-      result.current.roleChange({
-        allRoles: [chcp],
-        index: 0,
-        appTypeBasedRoles
-      });
-
-      const [callArg] = onRoleChange.mock.calls[0];
-      const disabledSpiceNames = callArg.disabledRoles[0].SPICE.map((r: IRoles) => r.name);
-      expect(disabledSpiceNames).toContain('NURSE');
-      expect(disabledSpiceNames).toContain('CHW');
-      expect(disabledSpiceNames).not.toContain(chcpRole);
-    });
+      expect(disabledSpiceNames).not.toContain(singleRole);
+      }
+    );
   });
 });
