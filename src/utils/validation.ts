@@ -255,12 +255,6 @@ export function validateMobile(mobileNo: string, isBd: boolean): string {
     if (!digitCheck.test(mobileNo)) {
       return errorMsgs.PH_NO_LENGTH_ERROR;
     }
-
-    // Optional: Check for 5 or more consecutive same digits
-    const repeatingDigitsCheck = /(\d)\1{4,}/;
-    if (repeatingDigitsCheck.test(mobileNo)) {
-      return errorMsgs.PH_NO_REPEATING_DIGITS;
-    }
   } else {
     // For non-BD: just check if number has 8-10 digits
     if (!/^\d{8,10}$/.test(mobileNo)) {
