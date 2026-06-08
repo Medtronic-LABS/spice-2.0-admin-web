@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
 import CreateHealthFacility, { filterAndExtractAppTypes } from '../CreateHealthFacility';
+import { shastiyaKormiRole } from '../../../constants/roleConstants';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../../constants/route';
 import '@testing-library/jest-dom';
@@ -51,11 +52,16 @@ jest.mock('../../../utils/commonUtils', () => ({
   formatUserToastMsg: jest.fn((msg: string) => msg)
 }));
 
-jest.mock('../../../utils/formatObjectUtils', () => ({
-  formatHealthFacility: jest.fn((data: any) => ({ ...data, clinicalWorkflowIds: [1], customizedWorkflowIds: [] })),
-  getUserPayload: jest.fn(() => []),
-  getSSUsersPayload: jest.fn((ssUsers: any[]) => ssUsers ?? [])
-}));
+jest.mock('../../../utils/formatObjectUtils', () => {
+  const actual = jest.requireActual('../../../utils/formatObjectUtils');
+  return {
+    ...actual,
+    formatHealthFacility: jest.fn((data: any) => ({ ...data, clinicalWorkflowIds: [1], customizedWorkflowIds: [] })),
+    getUserPayload: jest.fn(() => [{ firstName: 'Test', lastName: 'User' }])
+  };
+});
+
+const mockUserFormValues: { users?: any[]; ssUsers?: any[] } = {};
 
 jest.mock('../../../global/sessionStorageServices', () => ({
   getItem: jest.fn(() => '1')
@@ -80,9 +86,10 @@ jest.mock('../../../components/loader/Loader', () => ({
 
 jest.mock('../../../components/formContainer/FormContainer', () => ({
   __esModule: true,
-  default: ({ label, children }: any) => (
+  default: ({ label, children, headerRender }: any) => (
     <div data-testid='form-container'>
       <span>{label}</span>
+      {headerRender?.()}
       {children}
     </div>
   )
@@ -107,10 +114,23 @@ jest.mock('../../../containers/healthFacility/Workflows', () => ({
   default: () => <div data-testid='workflows'>Workflows</div>
 }));
 
-jest.mock('../../../components/userForm/UserForm', () => ({
-  __esModule: true,
-  default: () => <div data-testid='user-form'>UserForm</div>
-}));
+jest.mock('../../../components/userForm/UserForm', () => {
+  const mockReact = require('react');
+  return {
+    __esModule: true,
+    default: ({ form }: { form?: { change: (field: string, value: unknown) => void } }) => {
+      mockReact.useEffect(() => {
+        if (mockUserFormValues.users) {
+          form?.change('users', mockUserFormValues.users);
+        }
+        if (mockUserFormValues.ssUsers) {
+          form?.change('ssUsers', mockUserFormValues.ssUsers);
+        }
+      }, [form]);
+      return mockReact.createElement('div', { 'data-testid': 'user-form' }, 'UserForm');
+    }
+  };
+});
 
 jest.mock('../../../assets/images/info-grey.svg', () => ({ ReactComponent: () => null }));
 jest.mock('../../../assets/images/avatar-o.svg', () => ({ ReactComponent: () => null }));
@@ -168,6 +188,8 @@ describe('CreateHealthFacility', () => {
     store = mockStore(defaultStoreState);
     jest.clearAllMocks();
     mockPush.mockClear();
+    mockUserFormValues.users = undefined;
+    mockUserFormValues.ssUsers = undefined;
   });
 
   const createPath = PROTECTED_ROUTES.createHealthFacilityByRegion.replace(':regionId', '1').replace(':tenantId', '1');
@@ -285,6 +307,68 @@ describe('CreateHealthFacility', () => {
     );
     await waitFor(() => {
       expect(screen.getByTestId('loader')).toBeInTheDocument();
+    });
+  });
+
+  describe('shasthyaShebikas payload', () => {
+    const ssUsersFixture = [
+      {
+        ssId: { id: 1, name: 'SS01' },
+        name: 'SS User',
+        phoneNumber: '+1234567890',
+        subVillages: [{ id: 10 }]
+      }
+    ];
+
+    const submitCreateHealthFacility = async () => {
+      renderCreateHealthFacility();
+      await waitFor(() => {
+        expect(screen.getByTestId('create-site-form')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      await waitFor(() => {
+        expect(screen.getByTestId('workflows')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByTestId('icon-btn-Add-User'));
+      await waitFor(() => {
+        expect(screen.getByTestId('user-form')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await waitFor(() => {
+        const { createHFRequest } = require('../../../store/healthFacility/actions');
+        expect(createHFRequest).toHaveBeenCalled();
+      });
+      const { createHFRequest } = require('../../../store/healthFacility/actions');
+      return createHFRequest.mock.calls[createHFRequest.mock.calls.length - 1][0];
+    };
+
+    it('omits shasthyaShebikas for non-SK role', async () => {
+      mockUserFormValues.users = [{ role: { name: 'CHW' } }];
+      mockUserFormValues.ssUsers = ssUsersFixture;
+      const payload = await submitCreateHealthFacility();
+      expect(payload.data.users[0]).not.toHaveProperty('shasthyaShebikas');
+    });
+
+    it('includes shasthyaShebikas for SK role with SS data', async () => {
+      mockUserFormValues.users = [{ role: { name: shastiyaKormiRole } }];
+      mockUserFormValues.ssUsers = ssUsersFixture;
+      const payload = await submitCreateHealthFacility();
+      expect(payload.data.users[0].shasthyaShebikas).toEqual([
+        {
+          name: 'SS User',
+          phoneNumber: '+1234567890',
+          ssId: 'SS01',
+          subVillageIds: ['10'],
+          isActive: true
+        }
+      ]);
+    });
+
+    it('includes empty shasthyaShebikas for SK role when ssUsers is cleared', async () => {
+      mockUserFormValues.users = [{ role: { name: shastiyaKormiRole } }];
+      mockUserFormValues.ssUsers = [];
+      const payload = await submitCreateHealthFacility();
+      expect(payload.data.users[0].shasthyaShebikas).toEqual([]);
     });
   });
 });

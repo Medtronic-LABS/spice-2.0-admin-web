@@ -1,5 +1,6 @@
 import { IUserFormValues } from '../components/userForm/UserForm';
 import APPCONSTANTS, { NAMING_VARIABLES } from '../constants/appConstants';
+import { shastiyaKormiRole } from '../constants/roleConstants';
 import { IAdminEditFormValues } from '../containers/chiefdom/ChiefdomSummary';
 import { IBranch, ICreateBranchRequestPayload, IUpdateBranchRequestPayload } from '../store/branch/types';
 import { IHFUserGet, IHFUserPost } from '../store/healthFacility/types';
@@ -313,17 +314,30 @@ export interface ISSUserPayloadItem {
   isActive: boolean;
 }
 
+export const hasShastiyaKormiRole = (role: any): boolean => {
+  if (!role) {
+    return false;
+  }
+  if (Array.isArray(role)) {
+    return role.some((r: { name?: string }) => r?.name?.toUpperCase() === shastiyaKormiRole);
+  }
+  return role?.name?.toUpperCase() === shastiyaKormiRole;
+};
+
 /**
  * Transforms an array of SS users from API/form shape to the payload shape.
  * Maps ssId -> ssId.name and subVillage -> subVillage[].id as strings.
+ * Returns an empty array when the user does not have the SHASTIYA_KORMI role.
  *
  * @param ssUsers - Array of SS user objects with nested ssId and subVillage
+ * @param role - User form role field (users[0].role) to verify SHASTIYA_KORMI before building payload
  * @returns Array of payload objects with name, phoneNumber, ssId (string), subVillageIds (string[])
  */
 export const getSSUsersPayload = (
-  ssUsers: ISSUserInputItem[]
+  ssUsers: ISSUserInputItem[],
+  role?: any
 ): ISSUserPayloadItem[] => {
-  if (!Array.isArray(ssUsers)) {
+  if (!hasShastiyaKormiRole(role) || !Array.isArray(ssUsers)) {
     return [];
   }
 

@@ -28,7 +28,7 @@ import {
 } from '../../store/healthFacility/selectors';
 import { IClinicalWorkflows, IHFUserGet, IHealthFacility, IWorkflow } from '../../store/healthFacility/types';
 import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
-import { formatHealthFacility, getSSUsersPayload, getUserPayload } from '../../utils/formatObjectUtils';
+import { formatHealthFacility, getSSUsersPayload, getUserPayload, hasShastiyaKormiRole } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import Workflows from '../healthFacility/Workflows';
 import HealthFacilityDetailsForm from './HealthFacilityDetailsForm';
@@ -320,10 +320,10 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
               spiceRolesGroup: rolesGrouped?.SPICE
             })
           : undefined;
-      const shasthyaShebikas = getSSUsersPayload(ssUsers ?? []);
-      const mappedUserData = postUserData?.map(user => ({
+      const shasthyaShebikas = getSSUsersPayload(ssUsers ?? [], users?.[0]?.role);
+      const mappedUserData = postUserData?.map((user) => ({
         ...user,
-        shasthyaShebikas
+        ...(hasShastiyaKormiRole(users?.[0]?.role) ? { shasthyaShebikas } : {})
       })) ?? [];
       const postData = {
         ...formatHealthFacility({ ...{ ...healthFacility, clinicalWorkflows: clinicalWFs } }, countryId, appTypes),

@@ -29,6 +29,7 @@ import {
   FETCH_USER_ROLES_REQUEST
 } from '../../../store/user/actionTypes';
 import APPCONSTANTS from '../../../constants/appConstants';
+import { shastiyaKormiRole } from '../../../constants/roleConstants';
 
 // Mock react-leaflet to avoid ES module issues
 jest.mock('react-leaflet', () => ({
@@ -945,6 +946,110 @@ describe('UserList Component', () => {
         expect(failureCbSpy).toHaveBeenCalled();
         expect(successCbSpy).toHaveBeenCalled();
       }
+    });
+
+    describe('shasthyaShebikas payload', () => {
+      const ssUsersFixture = [
+        {
+          ssId: { id: 1, name: 'SS01' },
+          name: 'SS User',
+          phoneNumber: '+1234567890',
+          subVillages: [{ id: 10 }]
+        }
+      ];
+
+      const submitEditUser = async (formData: { users: any[]; ssUsers?: any[] }) => {
+        const localStore = mockStore({
+          user: {
+            user: { country: { id: 1, appTypes: [] }, email: 'test@gmail.com', role: 'SUPER_ADMIN', appTypes: [] },
+            countryList: [],
+            userRoles: mockIGroupRoles,
+            chwList: []
+          },
+          healthFacility: {
+            healthFacilityUserList: [mockIHFUserGet],
+            healthFacilityList: [],
+            hfTotal: 0,
+            peerSupervisorList: { list: [] },
+            hfUserDetailLoading: false,
+            hfUsersLoading: false,
+            loading: false,
+            peerSupervisorLoading: false
+          },
+          common: { labelName: null }
+        });
+
+        renderComponent(localStore);
+        const mockCustomTable: any = mockChildTableComponent.mock.calls[0][0];
+        mockCustomTable.onRowEdit({ id: 1, roles: [{ groupName: 'SPICE' }] });
+
+        await waitFor(() => {
+          expect(mockModalFormCalls[0]).toBeDefined();
+        });
+
+        mockModalFormCalls[0].handleFormSubmit(formData);
+        return localStore.getActions().find((action: any) => action.type === UPDATE_HEALTH_FACILITY_USER_REQUEST);
+      };
+
+      it('omits shasthyaShebikas for non-SK role', async () => {
+        const action = await submitEditUser({
+          users: [
+            {
+              id: 1,
+              firstName: 'John',
+              lastName: 'Doe',
+              username: 'johndoe',
+              role: { name: 'CHW' },
+              roles: [{ groupName: 'SPICE' }]
+            }
+          ],
+          ssUsers: ssUsersFixture
+        });
+        expect(action?.data).toBeDefined();
+        expect(action?.data).not.toHaveProperty('shasthyaShebikas');
+      });
+
+      it('includes shasthyaShebikas for SK role with SS data', async () => {
+        const action = await submitEditUser({
+          users: [
+            {
+              id: 1,
+              firstName: 'John',
+              lastName: 'Doe',
+              username: 'johndoe',
+              role: { name: shastiyaKormiRole },
+              roles: [{ groupName: 'SPICE' }]
+            }
+          ],
+          ssUsers: ssUsersFixture
+        });
+        expect(action?.data.shasthyaShebikas).toEqual([
+          {
+            name: 'SS User',
+            phoneNumber: '+1234567890',
+            ssId: 'SS01',
+            subVillageIds: ['10'],
+            isActive: true
+          }
+        ]);
+      });
+
+      it('includes empty shasthyaShebikas for SK role when ssUsers is cleared', async () => {
+        const action = await submitEditUser({
+          users: [
+            {
+              id: 1,
+              firstName: 'John',
+              lastName: 'Doe',
+              username: 'johndoe',
+              role: { name: shastiyaKormiRole },
+              roles: [{ groupName: 'SPICE' }]
+            }
+          ],
+          ssUsers: []
+        });
+        expect(action?.data.shasthyaShebikas).toEqual([]);
+      });
     });
   });
 

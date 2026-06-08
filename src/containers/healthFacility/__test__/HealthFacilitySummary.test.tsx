@@ -5,6 +5,7 @@ import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
 import HealthFacilitySummary from '../HealthFacilitySummary';
 import * as healthFacilityActions from '../../../store/healthFacility/actions';
+import { shastiyaKormiRole } from '../../../constants/roleConstants';
 
 const mockStore = configureStore([]);
 
@@ -465,6 +466,84 @@ describe('HealthFacilitySummary', () => {
       });
       const lastUserFormCall = mockUserFormCalls[mockUserFormCalls.length - 1];
       expect(lastUserFormCall.isEdit).toBe(true);
+    });
+  });
+
+  describe('shasthyaShebikas payload', () => {
+    const ssUsersFixture = [
+      {
+        ssId: { id: 1, name: 'SS01' },
+        name: 'SS User',
+        phoneNumber: '+1234567890',
+        subVillages: [{ id: 10 }]
+      }
+    ];
+
+    const submitAddUser = (formData: { users: any[]; ssUsers?: any[] }) => {
+      renderComponent();
+      const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');
+      fireEvent.click(addUserButton!);
+      const addUserModal = mockModalFormCalls.find((modal) => modal.title === 'Add User' && modal.show);
+      expect(addUserModal).toBeDefined();
+      addUserModal?.handleFormSubmit(formData);
+      return store.getActions().find((action: any) => action.type === 'CREATE_HEALTH_FACILITY_USER_REQUEST');
+    };
+
+    it('omits shasthyaShebikas for non-SK role', () => {
+      const action = submitAddUser({
+        users: [
+          {
+            firstName: 'John',
+            lastName: 'Doe',
+            username: 'johndoe',
+            role: { name: 'CHW' },
+            roles: [{ groupName: 'SPICE' }]
+          }
+        ],
+        ssUsers: ssUsersFixture
+      });
+      expect(action?.data).toBeDefined();
+      expect(action?.data).not.toHaveProperty('shasthyaShebikas');
+    });
+
+    it('includes shasthyaShebikas for SK role with SS data', () => {
+      const action = submitAddUser({
+        users: [
+          {
+            firstName: 'John',
+            lastName: 'Doe',
+            username: 'johndoe',
+            role: { name: shastiyaKormiRole },
+            roles: [{ groupName: 'SPICE' }]
+          }
+        ],
+        ssUsers: ssUsersFixture
+      });
+      expect(action?.data.shasthyaShebikas).toEqual([
+        {
+          name: 'SS User',
+          phoneNumber: '+1234567890',
+          ssId: 'SS01',
+          subVillageIds: ['10'],
+          isActive: true
+        }
+      ]);
+    });
+
+    it('includes empty shasthyaShebikas for SK role when ssUsers is cleared', () => {
+      const action = submitAddUser({
+        users: [
+          {
+            firstName: 'John',
+            lastName: 'Doe',
+            username: 'johndoe',
+            role: { name: shastiyaKormiRole },
+            roles: [{ groupName: 'SPICE' }]
+          }
+        ],
+        ssUsers: []
+      });
+      expect(action?.data.shasthyaShebikas).toEqual([]);
     });
   });
 });

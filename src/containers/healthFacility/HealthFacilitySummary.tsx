@@ -48,7 +48,13 @@ import {
 } from '../../store/healthFacility/types';
 import { countryIdSelector, roleSelector, userRolesSelector } from '../../store/user/selectors';
 import { formatRoles, formatUserToastMsg } from '../../utils/commonUtils';
-import { formatHealthFacility, getSSUsersPayload, getUserPayload, ISSUserInputItem } from '../../utils/formatObjectUtils';
+import {
+  formatHealthFacility,
+  getSSUsersPayload,
+  getUserPayload,
+  hasShastiyaKormiRole,
+  ISSUserInputItem
+} from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
 import { onlyCHWRoles, shastiyaKormiRole } from '../../constants/roleConstants';
@@ -463,7 +469,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
     users,
     ssUsers
   }: {
-    users: IHFUserPost[];
+    users: IHFUserGet[];
     ssUsers?: ISSUserInputItem[];
   }): void => {
     const userObj = getUserPayload({
@@ -473,8 +479,11 @@ const HealthFacilitySummary = (): React.ReactElement => {
       tenantId,
       spiceRolesGroup: rolesGrouped?.SPICE
     });
-    const ssUsersPayload = getSSUsersPayload(ssUsers ?? []);
-    const data: IHFUserPost = { ...userObj[0], shasthyaShebikas: ssUsersPayload };
+    const ssUsersPayload = getSSUsersPayload(ssUsers ?? [], users[0]?.role);
+    const data: IHFUserPost = {
+      ...userObj[0],
+      ...(hasShastiyaKormiRole(users[0]?.role) ? { shasthyaShebikas: ssUsersPayload } : {})
+    };
     const isUserEdit = isHFUserEdit || data.id;
     onSubmitHandler(
       data,

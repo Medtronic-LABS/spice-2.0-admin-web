@@ -1,4 +1,5 @@
 import APPCONSTANTS, { NAMING_VARIABLES } from '../../constants/appConstants';
+import { shastiyaKormiRole } from '../../constants/roleConstants';
 import {
   getUserPayload,
   getAdminPayload,
@@ -716,14 +717,25 @@ describe('formatObjectUtils', () => {
   });
 
   describe('getSSUsersPayload', () => {
+    const shastiyaKormiRoles = [{ name: shastiyaKormiRole }];
+
+    it('should return empty array when role is not SHASTIYA_KORMI', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { ssId: { name: 'SS01' }, name: 'User', phoneNumber: '+1', subVillages: [] }
+      ];
+      expect(getSSUsersPayload(ssUsers, [{ name: 'CHW' }])).toEqual([]);
+      expect(getSSUsersPayload(ssUsers)).toEqual([]);
+      expect(getSSUsersPayload(ssUsers, { name: 'CHW' })).toEqual([]);
+    });
+
     it('should return empty array when ssUsers is not an array', () => {
-      expect(getSSUsersPayload(null as any)).toEqual([]);
-      expect(getSSUsersPayload(undefined as any)).toEqual([]);
-      expect(getSSUsersPayload('invalid' as any)).toEqual([]);
+      expect(getSSUsersPayload(null as any, shastiyaKormiRoles)).toEqual([]);
+      expect(getSSUsersPayload(undefined as any, shastiyaKormiRoles)).toEqual([]);
+      expect(getSSUsersPayload('invalid' as any, shastiyaKormiRoles)).toEqual([]);
     });
 
     it('should return empty array when ssUsers is empty array', () => {
-      expect(getSSUsersPayload([])).toEqual([]);
+      expect(getSSUsersPayload([], shastiyaKormiRoles)).toEqual([]);
     });
 
     it('should map form/API shape to payload shape with ssId.name and subVillages[].id', () => {
@@ -735,7 +747,7 @@ describe('formatObjectUtils', () => {
           subVillages: [{ id: 10 }, { id: 20 }]
         }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result).toEqual([
         {
           name: 'SS User One',
@@ -757,7 +769,7 @@ describe('formatObjectUtils', () => {
           subVillages: [{ id: 5 }]
         }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result).toEqual([
         {
           id: 42,
@@ -779,7 +791,7 @@ describe('formatObjectUtils', () => {
           subVillages: []
         }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result[0]).not.toHaveProperty('id');
     });
 
@@ -788,9 +800,18 @@ describe('formatObjectUtils', () => {
         { id: 10, ssId: { id: 1, name: 'SS01' }, name: 'Existing', phoneNumber: '+1', subVillages: [] },
         { ssId: { id: 2, name: 'SS02' }, name: 'New', phoneNumber: '+2', subVillages: [] }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result[0].id).toBe(10);
       expect(result[1]).not.toHaveProperty('id');
+    });
+
+    it('should accept a single SHASTIYA_KORMI role object', () => {
+      const ssUsers: ISSUserInputItem[] = [
+        { ssId: { name: 'SS01' }, name: 'User', phoneNumber: '+1', subVillages: [{ id: 1 }] }
+      ];
+      const result = getSSUsersPayload(ssUsers, { name: shastiyaKormiRole });
+      expect(result).toHaveLength(1);
+      expect(result[0].ssId).toBe('SS01');
     });
 
     it('should handle multiple SS users', () => {
@@ -798,7 +819,7 @@ describe('formatObjectUtils', () => {
         { ssId: { id: 1, name: 'SS01' }, name: 'User 1', phoneNumber: '+1', subVillages: [{ id: 1 }] },
         { ssId: { id: 2, name: 'SS02' }, name: 'User 2', phoneNumber: '+2', subVillages: [{ id: 2 }, { id: 3 }] }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
         name: 'User 1',
@@ -818,7 +839,7 @@ describe('formatObjectUtils', () => {
 
     it('should default missing fields to empty string or empty array', () => {
       const ssUsers: ISSUserInputItem[] = [{}];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result).toEqual([
         {
           name: '',
@@ -834,7 +855,7 @@ describe('formatObjectUtils', () => {
       const ssUsers: ISSUserInputItem[] = [
         { name: 'Test', phoneNumber: '+1', subVillages: [] }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result[0].ssId).toBe('');
     });
 
@@ -842,7 +863,7 @@ describe('formatObjectUtils', () => {
       const ssUsers: ISSUserInputItem[] = [
         { ssId: { name: 'SS01' }, name: 'Test', phoneNumber: '', subVillages: [{ id: undefined }, {}] }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result[0].subVillageIds).toEqual(['', '']);
     });
 
@@ -850,7 +871,7 @@ describe('formatObjectUtils', () => {
       const ssUsers: ISSUserInputItem[] = [
         { ssId: { id: 1, name: 'SS01' }, name: 'A', phoneNumber: '1', subVillages: [{ id: 100 }] }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       const item: ISSUserPayloadItem = result[0];
       expect(typeof item.name).toBe('string');
       expect(typeof item.phoneNumber).toBe('string');
@@ -864,7 +885,7 @@ describe('formatObjectUtils', () => {
       const ssUsers: ISSUserInputItem[] = [
         { ssId: { id: 1, name: 'SS01' }, name: 'A', phoneNumber: '1', subVillages: [], isActive: false }
       ];
-      const result = getSSUsersPayload(ssUsers);
+      const result = getSSUsersPayload(ssUsers, shastiyaKormiRoles);
       expect(result[0].isActive).toBe(false);
     });
   });

@@ -66,7 +66,7 @@ import {
   chwListSelector
 } from '../../store/user/selectors';
 import { IRoles } from '../../store/user/types';
-import { getUserPayload, getSSUsersPayload } from '../../utils/formatObjectUtils';
+import { getUserPayload, getSSUsersPayload, hasShastiyaKormiRole } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import ResetPasswordFields, { generatePassword } from '../authentication/ResetPasswordFields';
 import { chwColumnDef, columnDef } from './userListMeta';
@@ -517,8 +517,11 @@ const UserList = (): React.ReactElement => {
         spiceRolesGroup: rolesGrouped?.SPICE,
         appTypes
       });
-      const ssUsersPayload = getSSUsersPayload(ssUsers ?? []);
-      const data: IHFUserPost = { ...userObj[0], shasthyaShebikas: ssUsersPayload };
+      const ssUsersPayload = getSSUsersPayload(ssUsers ?? [], users[0]?.role);
+      const data: IHFUserPost = {
+        ...userObj[0],
+        ...(hasShastiyaKormiRole(users[0]?.role) ? { shasthyaShebikas: ssUsersPayload } : {})
+      };
 
       // If we're assigning a peer supervisor
       if (openConfirmationModal.userData.id && openConfirmationModal.roleId) {

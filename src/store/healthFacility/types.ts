@@ -253,6 +253,7 @@ export interface IHFUserGet {
   email: string;
   countryCode: string;
   roles: IUserRole[];
+  role?: IUserRole | IUserRole[];
   tenantId: number;
   villages?: number[];
   existingVillages?: number[];

@@ -15,18 +15,11 @@ import Checkbox from '../formFields/Checkbox';
 import MultiSelect from '../multiSelect/MultiSelect';
 import { required } from '../../utils/validation';
 import { ISSPrefix } from '../../store/healthFacility/types';
-import { shastiyaKormiRole } from '../../constants/roleConstants';
 import { ISubVillage } from '../../store/region/types';
+import { hasShastiyaKormiRole } from '../../utils/formatObjectUtils';
 
 /** Default row shape for Assign SS Users (used when adding a new row) */
 export const DEFAULT_SS_USER_ROW = { ssId: null, name: '', phoneNumber: '', subVillages: null, isActive: true };
-
-/** SPICE role name that enables the Assign SS Users section */
-const hasShastiyaKormiRole = (role: any): boolean => {
-  if (!role) { return false; }
-  if (Array.isArray(role)) { return role.some((r: { name?: string }) => r?.name === shastiyaKormiRole); }
-  return role?.name === shastiyaKormiRole;
-};
 
 /** Map API SS user item to form row shape */
 const mapApiSSUserToFormRow = (
