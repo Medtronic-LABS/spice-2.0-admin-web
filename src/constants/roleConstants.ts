@@ -20,6 +20,7 @@ export const areaManagerRole = 'AREA_MANAGER';
 export const divisionalManagerRole = 'DIVISIONAL_MANAGER';
 export const chcpRole = 'CHCP';
 export const heRole = 'HE';
+export const nurseRole = 'NURSE';
 // export const PHUIncharge = 'PHU_INCHARGE';
 
 // COMMUNITY

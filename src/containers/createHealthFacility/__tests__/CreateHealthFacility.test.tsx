@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
-import CreateHealthFacility, { filterAndExtractAppTypes } from '../CreateHealthFacility';
+import CreateHealthFacility, { filterAndExtractAppTypes, resolveHealthFacilityType } from '../CreateHealthFacility';
 import { shastiyaKormiRole } from '../../../constants/roleConstants';
 import APPCONSTANTS from '../../../constants/appConstants';
 import { PROTECTED_ROUTES } from '../../../constants/route';
@@ -62,6 +62,8 @@ jest.mock('../../../utils/formatObjectUtils', () => {
 });
 
 const mockUserFormValues: { users?: any[]; ssUsers?: any[] } = {};
+const mockHealthFacilityFormValues: { type?: { name: string } } = {};
+const mockUserFormCalls: any[] = [];
 
 jest.mock('../../../global/sessionStorageServices', () => ({
   getItem: jest.fn(() => '1')
@@ -104,10 +106,32 @@ jest.mock('../../../components/button/IconButton', () => ({
   )
 }));
 
-jest.mock('../HealthFacilityDetailsForm', () => ({
-  __esModule: true,
-  default: () => <div data-testid='health-facility-details-form'>HealthFacilityDetailsForm</div>
-}));
+jest.mock('../HealthFacilityDetailsForm', () => {
+  const mockReact = require('react');
+  return {
+    __esModule: true,
+    default: ({ form }: { form?: { change: (field: string, value: unknown) => void; getState: () => any } }) => {
+      mockReact.useEffect(() => {
+        if (!mockHealthFacilityFormValues.type) {
+          return;
+        }
+        const current = form?.getState?.()?.values?.healthFacility ?? {};
+        if (current.type?.name === mockHealthFacilityFormValues.type.name) {
+          return;
+        }
+        form?.change('healthFacility', {
+          ...current,
+          type: mockHealthFacilityFormValues.type
+        });
+      }, [form]);
+      return mockReact.createElement(
+        'div',
+        { 'data-testid': 'health-facility-details-form' },
+        'HealthFacilityDetailsForm'
+      );
+    }
+  };
+});
 
 jest.mock('../../../containers/healthFacility/Workflows', () => ({
   __esModule: true,
@@ -118,15 +142,16 @@ jest.mock('../../../components/userForm/UserForm', () => {
   const mockReact = require('react');
   return {
     __esModule: true,
-    default: ({ form }: { form?: { change: (field: string, value: unknown) => void } }) => {
+    default: (props: { form?: { change: (field: string, value: unknown) => void } }) => {
+      mockUserFormCalls.push(props);
       mockReact.useEffect(() => {
         if (mockUserFormValues.users) {
-          form?.change('users', mockUserFormValues.users);
+          props.form?.change('users', mockUserFormValues.users);
         }
         if (mockUserFormValues.ssUsers) {
-          form?.change('ssUsers', mockUserFormValues.ssUsers);
+          props.form?.change('ssUsers', mockUserFormValues.ssUsers);
         }
-      }, [form]);
+      }, [props.form]);
       return mockReact.createElement('div', { 'data-testid': 'user-form' }, 'UserForm');
     }
   };
@@ -160,6 +185,20 @@ const defaultStoreState = {
   }
 };
 
+describe('resolveHealthFacilityType', () => {
+  it('returns the string when health facility type is already a string', () => {
+    expect(resolveHealthFacilityType('Upazila Health Complex')).toBe('Upazila Health Complex');
+  });
+
+  it('returns the name property when health facility type is an object', () => {
+    expect(resolveHealthFacilityType({ id: 1, name: 'Community Health Centre' })).toBe('Community Health Centre');
+  });
+
+  it('returns undefined when health facility type is undefined', () => {
+    expect(resolveHealthFacilityType(undefined)).toBeUndefined();
+  });
+});
+
 describe('filterAndExtractAppTypes', () => {
   it('returns unique app types from workflows matching selected ids', () => {
     const workflows = [
@@ -190,6 +229,8 @@ describe('CreateHealthFacility', () => {
     mockPush.mockClear();
     mockUserFormValues.users = undefined;
     mockUserFormValues.ssUsers = undefined;
+    mockHealthFacilityFormValues.type = undefined;
+    mockUserFormCalls.length = 0;
   });
 
   const createPath = PROTECTED_ROUTES.createHealthFacilityByRegion.replace(':regionId', '1').replace(':tenantId', '1');
@@ -307,6 +348,37 @@ describe('CreateHealthFacility', () => {
     );
     await waitFor(() => {
       expect(screen.getByTestId('loader')).toBeInTheDocument();
+    });
+  });
+
+  describe('UserForm healthFacilityType', () => {
+    const navigateToUserStep = async () => {
+      renderCreateHealthFacility();
+      await waitFor(() => {
+        expect(screen.getByTestId('create-site-form')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      await waitFor(() => {
+        expect(screen.getByTestId('workflows')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByTestId('icon-btn-Add-User'));
+      await waitFor(() => {
+        expect(screen.getByTestId('user-form')).toBeInTheDocument();
+      });
+    };
+
+    it('passes healthFacilityType to UserForm on USER step when health facility type is set', async () => {
+      mockHealthFacilityFormValues.type = { name: 'Upazila Health Complex' };
+      await navigateToUserStep();
+
+      const lastUserFormCall = mockUserFormCalls[mockUserFormCalls.length - 1];
+      expect(lastUserFormCall.userFormParams).toEqual(
+        expect.objectContaining({
+          isHF: true,
+          isHFCreate: true,
+          healthFacilityType: 'Upazila Health Complex'
+        })
+      );
     });
   });
 

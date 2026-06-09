@@ -44,6 +44,7 @@ export interface IUserFormProps {
   userFormParams?: {
     isRegionCreate?: boolean;
     isHF?: boolean;
+    healthFacilityType?: string;
     isHFCreate?: boolean;
     isProfile?: boolean;
     isFromAdminList?: boolean;

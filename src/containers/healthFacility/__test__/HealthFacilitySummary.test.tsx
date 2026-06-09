@@ -437,6 +437,47 @@ describe('HealthFacilitySummary', () => {
     });
   });
 
+  describe('UserForm healthFacilityType', () => {
+    it('passes healthFacilityType from health facility summary to UserForm when Add User modal is open', () => {
+      renderComponent({
+        ...defaultStoreState,
+        healthFacility: {
+          ...defaultStoreState.healthFacility,
+          healthFacility: {
+            ...defaultStoreState.healthFacility.healthFacility,
+            type: 'Community Health Centre'
+          }
+        }
+      });
+      const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');
+      fireEvent.click(addUserButton!);
+      const lastUserFormCall = mockUserFormCalls[mockUserFormCalls.length - 1];
+      expect(lastUserFormCall.userFormParams).toEqual(
+        expect.objectContaining({
+          isHF: true,
+          healthFacilityType: 'Community Health Centre'
+        })
+      );
+    });
+
+    it('passes Upazila Health Complex as healthFacilityType when facility type matches', () => {
+      renderComponent({
+        ...defaultStoreState,
+        healthFacility: {
+          ...defaultStoreState.healthFacility,
+          healthFacility: {
+            ...defaultStoreState.healthFacility.healthFacility,
+            type: 'Upazila Health Complex'
+          }
+        }
+      });
+      const addUserButton = screen.getAllByTestId('detail-card-button').find((btn) => btn.textContent === 'Add User');
+      fireEvent.click(addUserButton!);
+      const lastUserFormCall = mockUserFormCalls[mockUserFormCalls.length - 1];
+      expect(lastUserFormCall.userFormParams.healthFacilityType).toBe('Upazila Health Complex');
+    });
+  });
+
   describe('UserForm isEdit', () => {
     it('passes isEdit false when Add User modal is open', () => {
       renderComponent();

@@ -7,7 +7,7 @@ import { ReactComponent as BinIcon } from '../../assets/images/bin.svg';
 import { ReactComponent as PlusIcon } from '../../assets/images/plus_blue.svg';
 import { ReactComponent as ResetIcon } from '../../assets/images/reset.svg';
 import APPCONSTANTS, { ADMIN_BASED_ON_URL, NAMING_VARIABLES } from '../../constants/appConstants';
-import { chcpRole, foRole, hf4ReportUser, INSIGHTS, peerSupervisor, poRole, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
+import { chcpRole, foRole, hf4ReportUser, INSIGHTS, nurseRole, peerSupervisor, poRole, REPORTS, shastiyaKormiRole, SPICE } from '../../constants/roleConstants';
 import { IMatchParams } from '../../containers/user/UserList';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import { useRoleMeta } from '../../hooks/roleHook';
@@ -75,7 +75,12 @@ import MultiSelect from '../multiSelect/MultiSelect';
 import { SiteUserForm } from './userConditionalFields/AdminFields';
 import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import BranchTaggingFields from './userConditionalFields/BranchTaggingFields';
-import useUserFormUtils, { filterRolesByAppTypeFn, isVillageBasedRoleSelection } from './userFormUtils';
+import useUserFormUtils, {
+  filterRolesByAppTypeFn,
+  getHfFilteredForNurse,
+  getSpiceRoleOptionsForHF,
+  isVillageBasedRoleSelection
+} from './userFormUtils';
 import AssignSSUsersSection from './AssignSSUsersSection';
 import { useAppDispatch } from '../../store/hooks';
 import { clearBranchesByUnion } from '../../store/branch/actions';
@@ -134,6 +139,7 @@ const UserForm = ({
   const {
     isRegionCreate = false,
     isHF = false,
+    healthFacilityType,
     isHFCreate = false,
     isProfile = false,
     isFromAdminList = false,
@@ -215,7 +221,7 @@ const UserForm = ({
     isCommunity
   } = useAppTypeConfigs();
 
-  const [newHFList, setNewHFList] = useState(healthFacilityList);
+  const [newHFList, setNewHFList] = useState<IHealthFacility[]>(healthFacilityList);
   const [appTypeBasedRoles, setAppTypeRoles] = useState(rolesGrouped);
   const initialValue = useMemo<Array<Partial<any>>>(
     // memoizing the initial value to prevent infinite render cycles
@@ -1058,6 +1064,12 @@ const UserForm = ({
     }
   }, [autoFetchData, getRoleOptions, initialEditData, isEdit]);
 
+  const getHfFiltered = (isNurseSelected: boolean, hfList: IHealthFacility[]) =>
+    getHfFilteredForNurse(isNurseSelected, hfList);
+
+  const getSpiceRoleOptions = (roles: IRoles[]) =>
+    getSpiceRoleOptionsForHF(roles, { isHF, healthFacilityType });
+
   return (
     <>
       <FieldArray name={formName} initialValue={autoFetchData}>
@@ -1096,7 +1108,7 @@ const UserForm = ({
           const isPoSelected = roleNames.has(poRole);
           const isFoSelected = roleNames.has(foRole);
           const isCHCPSelected = roleNames.has(chcpRole);
-
+          const isNurseSelected = roleNames.has(nurseRole);
           const hasSelectedSpiceRoles = isShastiyaKormiSelected || isPoSelected || isFoSelected || isCHCPSelected;
           const hasSpiceHFSelection = showSpiceHFRef.current[index] || hasSelectedSpiceRoles;
 
@@ -1223,7 +1235,7 @@ const UserForm = ({
                             isModel={true}
                             isMulti={true}
                             required={true}
-                            options={spiceRoles.current}
+                            options={getSpiceRoleOptions(spiceRoles.current)}
                             isOptionDisabled={(option: any) => {
                               const optionsToBeDisabled = [
                                 ...(autoFetched[index] || mandatoryRoles ? mandatoryRoles : []),
@@ -1301,6 +1313,8 @@ const UserForm = ({
                               }
                               // clear designation whenever role gets update
                               form.change(`${formName}[${index}].designation`, null);
+                              // clear selected health facility when role gets updated
+                              form.change(`${formName}[${index}].healthfacility`, null);
                               input.onChange(values);
                             }}
                           />
@@ -1312,7 +1326,7 @@ const UserForm = ({
                             errorLabel='Please select role.'
                             labelKey='displayName'
                             valueKey='id'
-                            options={!isProfile ? spiceRoles.current : []}
+                            options={!isProfile ? getSpiceRoleOptions(spiceRoles.current) : []}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             isModel={true}
@@ -1706,7 +1720,7 @@ const UserForm = ({
                               errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
                               labelKey='name'
                               valueKey='id'
-                              options={newHFList}
+                              options={getHfFiltered(isNurseSelected, newHFList)}
                               loadingOptions={hfLoading}
                               error={isError(meta)}
                               isModel={true}

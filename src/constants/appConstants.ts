@@ -367,6 +367,7 @@ const APPCONSTANTS = {
   RESET: 'Reset',
   YES: 'Yes',
   NO: 'No',
+  UPAZILA_HEALTH_COMPLEX: 'Upazila Health Complex',
 
   // LAB TEST
   LABTEST_CREATION_SUCCESS: 'Lab test created successfully.',

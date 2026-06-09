@@ -642,7 +642,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         parentOrgId={healthFacility?.chiefdom?.tenantId}
         ignoreTenantId={tenantId}
         appTypes={appTypes}
-        userFormParams={{ isHF: true }}
+        userFormParams={{ isHF: true, healthFacilityType: healthFacility?.type }}
         isActivating={isOpenCHWUserModal.isActivating}
       />
     );

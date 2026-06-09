@@ -7,7 +7,8 @@ import configureStore from 'redux-mock-store';
 import { MemoryRouter } from 'react-router-dom';
 import UserForm from '../UserForm';
 import { clearBranchesByUnion } from '../../../store/branch/actions';
-import { chcpRole, heRole } from '../../../constants/roleConstants';
+import APPCONSTANTS from '../../../constants/appConstants';
+import { chcpRole, heRole, nurseRole } from '../../../constants/roleConstants';
 
 const mockStore = configureStore([]);
 
@@ -52,22 +53,28 @@ const mockIsRoleExists = jest.fn(() => false);
 const mockRoleBasedAppTypes = jest.fn(() => []);
 const mockRoleChange = jest.fn();
 const mockGetRoleOptions = jest.fn();
+let mockRoleOptionsFn: ((args: any) => void) | undefined;
 
-jest.mock('../userFormUtils', () => ({
-  __esModule: true,
-  default: () => ({
-    isCHPCHWSelected: mockIsCHPCHWSelected,
-    isRoleExists: mockIsRoleExists,
-    siteRolesChange: jest.fn(),
-    getSuiteAccessList: mockGetSuiteAccessList,
-    isHFAdminSelected: false,
-    getSpiceGroupName: mockGetSpiceGroupName,
-    formUserData: mockFormUserData,
-    roleBasedAppTypes: mockRoleBasedAppTypes
-  }),
-  filterRolesByAppTypeFn: (roles: any) => roles || {},
-  isVillageBasedRoleSelection: jest.fn(() => false)
-}));
+jest.mock('../userFormUtils', () => {
+  const actual = jest.requireActual('../userFormUtils');
+  return {
+    __esModule: true,
+    default: () => ({
+      isCHPCHWSelected: mockIsCHPCHWSelected,
+      isRoleExists: mockIsRoleExists,
+      siteRolesChange: jest.fn(),
+      getSuiteAccessList: mockGetSuiteAccessList,
+      isHFAdminSelected: false,
+      getSpiceGroupName: mockGetSpiceGroupName,
+      formUserData: mockFormUserData,
+      roleBasedAppTypes: mockRoleBasedAppTypes
+    }),
+    filterRolesByAppTypeFn: (roles: any) => roles || {},
+    isVillageBasedRoleSelection: jest.fn(() => false),
+    getHfFilteredForNurse: actual.getHfFilteredForNurse,
+    getSpiceRoleOptionsForHF: actual.getSpiceRoleOptionsForHF
+  };
+});
 
 jest.mock('../../../hooks/roleHook', () => ({
   useRoleMeta: () => ({
@@ -76,9 +83,12 @@ jest.mock('../../../hooks/roleHook', () => ({
 }));
 
 jest.mock('../../../hooks/roleOptionsHook', () => ({
-  useRoleOptions: () => ({
-    getRoleOptions: mockGetRoleOptions
-  })
+  useRoleOptions: ({ roleOptionsFn }: any) => {
+    mockRoleOptionsFn = roleOptionsFn;
+    return {
+      getRoleOptions: mockGetRoleOptions
+    };
+  }
 }));
 
 jest.mock('../../../assets/images/bin.svg', () => ({ ReactComponent: () => <span data-testid='bin-icon' /> }));
@@ -154,9 +164,12 @@ jest.mock('../../formFields/Radio', () => ({
   )
 }));
 
+const mockSelectInputCalls: any[] = [];
 jest.mock('../../formFields/SelectInput', () => ({
   __esModule: true,
-  default: (props: any) => (
+  default: (props: any) => {
+    mockSelectInputCalls.push(props);
+    return (
     <div data-testid='select-input'>
       <label>{props.label}</label>
       {typeof props.onChange === 'function' && (
@@ -169,12 +182,16 @@ jest.mock('../../formFields/SelectInput', () => ({
         </button>
       )}
     </div>
-  )
+    );
+  }
 }));
 
+const mockMultiSelectCalls: any[] = [];
 jest.mock('../../multiSelect/MultiSelect', () => ({
   __esModule: true,
-  default: (props: any) => (
+  default: (props: any) => {
+    mockMultiSelectCalls.push(props);
+    return (
     <div data-testid='multi-select'>
       <label>{props.label}</label>
       {props.label === 'SPICE Role' && typeof props.onChange === 'function' && (
@@ -197,10 +214,20 @@ jest.mock('../../multiSelect/MultiSelect', () => ({
           >
             trigger-he
           </button>
+          <button
+            type='button'
+            data-testid='spice-role-change-trigger-nurse'
+            onClick={() =>
+              props.onChange([{ id: 2, name: 'NURSE', displayName: 'Nurse', groupName: 'SPICE' }], 0)
+            }
+          >
+            trigger-nurse
+          </button>
         </>
       )}
     </div>
-  )
+    );
+  }
 }));
 
 jest.mock('../userConditionalFields/AdminFields', () => ({
@@ -307,9 +334,21 @@ describe('UserForm', () => {
     mockDynamicCHFormCalls.length = 0;
     mockBranchTaggingFieldsCalls.length = 0;
     mockDistrictChiefdomVillageFieldsCalls.length = 0;
+    mockMultiSelectCalls.length = 0;
+    mockSelectInputCalls.length = 0;
     mockGetSuiteAccessList.mockReturnValue([{ groupName: 'SPICE', label: 'SPICE' }]);
     mockGetSpiceGroupName.mockImplementation((suiteAccess: any[]) => suiteAccess?.[0] || { groupName: 'SPICE' });
     mockFormUserData.mockImplementation((data: any) => data || {});
+    mockGetRoleOptions.mockImplementation(() => {
+      mockRoleOptionsFn?.({
+        spiceRoleOptions: [
+          { id: 1, name: 'CHCP', displayName: 'CHCP', groupName: 'SPICE', appTypes: ['web'] },
+          { id: 2, name: nurseRole, displayName: 'Nurse', groupName: 'SPICE', appTypes: ['web'] }
+        ],
+        reportRoleOptions: [],
+        insightRoleOptions: []
+      });
+    });
   });
 
   describe('Component rendering', () => {
@@ -904,6 +943,127 @@ describe('UserForm', () => {
             allRoles: expect.arrayContaining([expect.objectContaining({ name: heRole })])
           })
         );
+      });
+    });
+  });
+
+  describe('Nurse role and health facility type behavior', () => {
+    const getSpiceRoleOptions = () =>
+      mockMultiSelectCalls.filter((call) => call.label === 'SPICE Role').at(-1)?.options || [];
+
+    const siteUserFormData = [
+      {
+        suiteAccess: [{ groupName: 'SPICE', label: 'SPICE', id: 'SPICE' }],
+        role: [],
+        roles: [],
+        reportRoles: [],
+        insightRoles: []
+      }
+    ];
+
+    const storeWithNurseRole = {
+      ...defaultStoreState,
+      user: {
+        ...defaultStoreState.user,
+        userRoles: {
+          SPICE: [
+            { id: 1, name: 'CHCP', groupName: 'SPICE', displayName: 'CHCP', appTypes: ['web'] },
+            { id: 2, name: nurseRole, groupName: 'SPICE', displayName: 'Nurse', appTypes: ['web'] }
+          ]
+        }
+      },
+      healthFacility: {
+        ...defaultStoreState.healthFacility,
+        healthFacilityList: [
+          { id: 1, name: 'Upazila HF', type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX, tenantId: 1 },
+          { id: 2, name: 'Community HF', type: 'Community Health Centre', tenantId: 2 }
+        ]
+      }
+    };
+
+    it('excludes Nurse from SPICE role options when isHF and health facility type is not Upazila Health Complex', async () => {
+      renderUserForm(
+        {
+          isSiteUser: true,
+          data: siteUserFormData,
+          userFormParams: {
+            ...defaultProps.userFormParams,
+            isHF: true,
+            healthFacilityType: 'Community Health Centre'
+          }
+        },
+        storeWithNurseRole
+      );
+
+      await waitFor(() => {
+        const options = getSpiceRoleOptions();
+        expect(options.map((role: any) => role.name)).toEqual(['CHCP']);
+      });
+    });
+
+    it('includes Nurse in SPICE role options when isHF and health facility type is Upazila Health Complex', async () => {
+      renderUserForm(
+        {
+          isSiteUser: true,
+          data: siteUserFormData,
+          userFormParams: {
+            ...defaultProps.userFormParams,
+            isHF: true,
+            healthFacilityType: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+          }
+        },
+        storeWithNurseRole
+      );
+
+      await waitFor(() => {
+        const options = getSpiceRoleOptions();
+        expect(options.map((role: any) => role.name)).toEqual(['CHCP', nurseRole]);
+      });
+    });
+
+    const getAssignedHfOptions = () =>
+      mockSelectInputCalls.filter((call) => call.label === 'Assigned Health Facility').at(-1)?.options || [];
+
+    it('filters assigned health facility options to Upazila Health Complex when Nurse is selected', async () => {
+      renderUserForm(
+        {
+          isSiteUser: true,
+          isEdit: true,
+          initialEditValue: {
+            suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }],
+            role: [],
+            roles: [],
+            reportRoles: [],
+            insightRoles: [],
+            organizations: [],
+            villages: []
+          },
+          userFormParams: { ...defaultProps.userFormParams, isHF: false }
+        },
+        storeWithNurseRole
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Assigned Health Facility')).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        const options = getAssignedHfOptions();
+        expect(options).toHaveLength(2);
+        expect(options.map((hf: { type: string }) => hf.type)).toEqual(
+          expect.arrayContaining([APPCONSTANTS.UPAZILA_HEALTH_COMPLEX, 'Community Health Centre'])
+        );
+      });
+
+      fireEvent.click(screen.getByTestId('spice-role-change-trigger-nurse'));
+
+      await waitFor(() => {
+        const options = getAssignedHfOptions();
+        expect(options).toHaveLength(1);
+        expect(options[0]).toMatchObject({
+          name: 'Upazila HF',
+          type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+        });
       });
     });
   });

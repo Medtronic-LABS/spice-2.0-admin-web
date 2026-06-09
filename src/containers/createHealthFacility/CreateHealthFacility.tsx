@@ -47,6 +47,10 @@ interface IMatchParams {
 
 interface IRouteProps extends RouteComponentProps<IMatchParams> {}
 
+export const resolveHealthFacilityType = (
+  hfType: string | { name?: string } | undefined
+): string | undefined => (typeof hfType === 'string' ? hfType : hfType?.name);
+
 export const filterAndExtractAppTypes = (allWorkflows: IWorkflow[], selectedIds: number[]): string[] => {
   // Filter workflows by selected IDs
   const filteredWorkflows = allWorkflows.filter((workflow) => selectedIds.includes(Number(workflow.id)));
@@ -429,7 +433,9 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
 
         case PAGENUMBER.SUBMIT:
         case PAGENUMBER.USER:
-        default:
+        default: {
+          const healthFacilityType = resolveHealthFacilityType(form.getState().values?.healthFacility?.type);
+
           return (
             (submittedData.addUserClicked || !userOptional) && (
               <div className='col-12'>
@@ -447,12 +453,13 @@ const CreateHealthFacility = (props: IRouteProps): React.ReactElement => {
                     disabledRolesState={{ disabledRoles: disabledRoleState, setDisabledRoles }}
                     appTypes={submittedData.data?.appTypes ?? []}
                     fetchHFListForReports={false}
-                    userFormParams={{ isHF: true, isHFCreate: true }}
+                    userFormParams={{ isHF: true, isHFCreate: true, healthFacilityType }}
                   />
                 </FormContainer>
               </div>
             )
           );
+        }
       }
     },
     [

@@ -1,14 +1,17 @@
 import { renderHook, act } from '@testing-library/react';
-import useUserFormUtils, { getRoleFlags } from '../userFormUtils';
+import useUserFormUtils, { getHfFilteredForNurse, getRoleFlags, getSpiceRoleOptionsForHF } from '../userFormUtils';
 import { IRoles } from '../../../store/user/types';
+import APPCONSTANTS from '../../../constants/appConstants';
 import {
   areaManagerRole,
   divisionalManagerRole,
   foRole,
   heRole,
+  nurseRole,
   poRole,
   shastiyaKormiRole
 } from '../../../constants/roleConstants';
+import { IHealthFacility } from '../../../store/healthFacility/types';
 
 jest.mock('../userFormMeta', () => ({
   __esModule: true,
@@ -113,6 +116,59 @@ describe('useUserFormUtils', () => {
     });
 
     expect(mockInput.onChange).toHaveBeenCalled();
+  });
+});
+
+describe('getHfFilteredForNurse', () => {
+  const hfList = [
+    { id: 1, name: 'Upazila HF', type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX },
+    { id: 2, name: 'Community HF', type: 'Community Health Centre' }
+  ] as IHealthFacility[];
+
+  it('returns only Upazila Health Complex facilities when Nurse is selected', () => {
+    expect(getHfFilteredForNurse(true, hfList)).toEqual([hfList[0]]);
+  });
+
+  it('returns all facilities when Nurse is not selected', () => {
+    expect(getHfFilteredForNurse(false, hfList)).toEqual(hfList);
+  });
+});
+
+describe('getSpiceRoleOptionsForHF', () => {
+  const roles = [
+    { id: 1, name: 'CHCP', displayName: 'CHCP', groupName: 'SPICE', appTypes: [] },
+    { id: 2, name: nurseRole, displayName: 'Nurse', groupName: 'SPICE', appTypes: [] }
+  ] as IRoles[];
+
+  it('excludes Nurse when isHF is true and health facility type is not Upazila Health Complex', () => {
+    expect(
+      getSpiceRoleOptionsForHF(roles, {
+        isHF: true,
+        healthFacilityType: 'Community Health Centre'
+      })
+    ).toEqual([roles[0]]);
+  });
+
+  it('includes Nurse when isHF is true and health facility type is Upazila Health Complex', () => {
+    expect(
+      getSpiceRoleOptionsForHF(roles, {
+        isHF: true,
+        healthFacilityType: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+      })
+    ).toEqual(roles);
+  });
+
+  it('includes Nurse when isHF is false regardless of health facility type', () => {
+    expect(
+      getSpiceRoleOptionsForHF(roles, {
+        isHF: false,
+        healthFacilityType: 'Community Health Centre'
+      })
+    ).toEqual(roles);
+  });
+
+  it('excludes Nurse when isHF is true and health facility type is undefined', () => {
+    expect(getSpiceRoleOptionsForHF(roles, { isHF: true })).toEqual([roles[0]]);
   });
 });
 

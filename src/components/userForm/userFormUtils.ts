@@ -5,11 +5,13 @@ import {
   divisionalManagerRole,
   foRole,
   heRole,
+  nurseRole,
   poRole,
   shastiyaKormiRole,
   SPICE,
   villageBasedRoles
 } from '../../constants/roleConstants';
+import { IHealthFacility } from '../../store/healthFacility/types';
 import { IGroupRoles, IRoles } from '../../store/user/types';
 import UserFormMeta from './userFormMeta';
 import { removeRedRiskFromRoleArray } from '../../utils/commonUtils';
@@ -35,6 +37,33 @@ export const isVillageBasedRoleSelection = (roles: IRoles[] | undefined): boolea
   (roles || []).some(
     (r) => villageBasedRoles.includes(r?.name) || r?.name === shastiyaKormiRole
   );
+
+export const getHfFilteredForNurse = (
+  isNurseSelected: boolean,
+  hfList: IHealthFacility[],
+  upazilaHealthComplexType: string = APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+) => {
+  if (isNurseSelected) {
+    return hfList.filter((hf) => hf.type === upazilaHealthComplexType);
+  }
+  return hfList;
+};
+
+export const getSpiceRoleOptionsForHF = (
+  roles: IRoles[],
+  {
+    isHF = false,
+    healthFacilityType
+  }: {
+    isHF?: boolean;
+    healthFacilityType?: string;
+  } = {}
+) => {
+  if (isHF && healthFacilityType !== APPCONSTANTS.UPAZILA_HEALTH_COMPLEX) {
+    return roles.filter((role) => role.name !== nurseRole);
+  }
+  return roles;
+};
 
 interface IRole { name?: string; }
 
