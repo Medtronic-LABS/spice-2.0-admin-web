@@ -78,6 +78,55 @@ describe('districtReducer', () => {
     });
   });
 
+  it('should handle FETCH_TAGGED_DISTRICTS_REQUEST', () => {
+    const initialState: any = { loadingTaggedDistricts: false };
+    const action: any = { type: types.FETCH_TAGGED_DISTRICTS_REQUEST };
+    expect(districtReducer(initialState, action)).toEqual({ loadingTaggedDistricts: true });
+  });
+
+  it('should handle FETCH_TAGGED_DISTRICTS_SUCCESS', () => {
+    const initialState: any = {
+      loadingTaggedDistricts: true,
+      taggedDistrictList: [],
+      taggedDistrictTotal: 0,
+      error: null
+    };
+    const action: any = {
+      type: types.FETCH_TAGGED_DISTRICTS_SUCCESS,
+      payload: {
+        districtList: [{ id: '1', name: 'Tagged District' }],
+        total: 1
+      }
+    };
+    expect(districtReducer(initialState, action)).toEqual({
+      loadingTaggedDistricts: false,
+      taggedDistrictList: [{ id: '1', name: 'Tagged District' }],
+      taggedDistrictTotal: 1,
+      error: null
+    });
+  });
+
+  it('should handle FETCH_TAGGED_DISTRICTS_FAILURE', () => {
+    const initialState: any = { loadingTaggedDistricts: true, error: null };
+    const error: any = 'Error fetching tagged districts';
+    const action: any = { type: types.FETCH_TAGGED_DISTRICTS_FAILURE, error };
+    expect(districtReducer(initialState, action)).toEqual({ loadingTaggedDistricts: false, error });
+  });
+
+  it('should handle CLEAR_TAGGED_DISTRICT_LIST', () => {
+    const initialState: any = {
+      taggedDistrictList: [{ id: '1', name: 'Tagged District' }],
+      taggedDistrictTotal: 1,
+      loadingTaggedDistricts: true
+    };
+    const action: any = { type: types.CLEAR_TAGGED_DISTRICT_LIST };
+    expect(districtReducer(initialState, action)).toEqual({
+      taggedDistrictList: [],
+      taggedDistrictTotal: 0,
+      loadingTaggedDistricts: false
+    });
+  });
+
   it('should handle FETCH_DISTRICT_SUCCESS', () => {
     const initialState: any = {
       loading: false,

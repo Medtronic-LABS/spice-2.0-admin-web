@@ -46,8 +46,11 @@ export interface IFetchDistrictList {
 export interface IDistrictState {
   district: IDistrict;
   loading: boolean;
+  loadingTaggedDistricts: boolean;
   loadingOptions: boolean;
   districtList: IDistrict[];
+  taggedDistrictList: IDistrict[];
+  taggedDistrictTotal: number;
   allDistricts: IDistrict[];
   districtOptions: IDistrictOption[];
   admins: IAdminEditFormValues[];
@@ -427,6 +430,26 @@ export interface IFetchDistrictsByCountryIdFailure {
   error: Error;
 }
 
+export interface IFetchTaggedDistrictsRequest {
+  type: typeof ACTION_TYPES.FETCH_TAGGED_DISTRICTS_REQUEST;
+  successCb?: (payload: IFetchDistrictListSuccessPayload) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchTaggedDistrictsSuccess {
+  type: typeof ACTION_TYPES.FETCH_TAGGED_DISTRICTS_SUCCESS;
+  payload: IFetchDistrictListSuccessPayload;
+}
+
+export interface IFetchTaggedDistrictsFailure {
+  type: typeof ACTION_TYPES.FETCH_TAGGED_DISTRICTS_FAILURE;
+  error: Error;
+}
+
+export interface IClearTaggedDistrictList {
+  type: typeof ACTION_TYPES.CLEAR_TAGGED_DISTRICT_LIST;
+}
+
 export type DistrictActions =
   | IFetchDistrictListRequest
   | IFetchDistrictListSuccess
@@ -469,4 +492,8 @@ export type DistrictActions =
   | IClearDistrictAdmin
   | IFetchDistrictsByCountryIdRequest
   | IFetchDistrictsByCountryIdSuccess
-  | IFetchDistrictsByCountryIdFailure;
+  | IFetchDistrictsByCountryIdFailure
+  | IFetchTaggedDistrictsRequest
+  | IFetchTaggedDistrictsSuccess
+  | IFetchTaggedDistrictsFailure
+  | IClearTaggedDistrictList;

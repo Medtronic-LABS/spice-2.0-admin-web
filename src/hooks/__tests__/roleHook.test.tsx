@@ -16,7 +16,9 @@ import {
   peerSupervisor,
   villageBasedRoles,
   shastiyaKormiRole,
-  allSingleRoles
+  allSingleRoles,
+  areaManagerRole,
+  divisionalManagerRole
 } from '../../constants/roleConstants';
 
 jest.mock('../appTypeBasedConfigs', () => ({
@@ -228,6 +230,22 @@ describe('roleHook', () => {
       );
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe(superAdminRole);
+    });
+
+    it('should include AREA_MANAGER and DIVISIONAL_MANAGER for site users with admin suiteAccessName', () => {
+      const roles = [
+        createRole({ name: areaManagerRole, groupName: SPICE, suiteAccessName: 'admin' }),
+        createRole({ name: divisionalManagerRole, groupName: SPICE, suiteAccessName: 'admin' })
+      ];
+      const result = filterSPICERoles(
+        roles,
+        { ...baseOptions, isSiteUser: true, isCommunity: true },
+        []
+      );
+      expect(result).toHaveLength(2);
+      expect(result.map((r) => r.name)).toEqual(
+        expect.arrayContaining([areaManagerRole, divisionalManagerRole])
+      );
     });
   });
 

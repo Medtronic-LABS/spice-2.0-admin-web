@@ -7,6 +7,7 @@ import {
   fetchDistrictDetail,
   fetchDistrictOptions,
   fetchDistrictList,
+  fetchTaggedDistricts,
   getDashboardDistrict,
   removeDistrictAdmin,
   updateDistrictAdminInfo,
@@ -94,6 +95,68 @@ describe('District sagas', () => {
         fetchActiveDistrictRequestMockData.search
       );
       expect(dispatched).toEqual([districtActions.fetchDistrictListFailure(error)]);
+    });
+  });
+
+  describe('Fetches Tagged Districts: FETCH_TAGGED_DISTRICTS_REQUEST', () => {
+    it('Fetches tagged districts and dispatches success when response uses entityList', async () => {
+      const fetchTaggedDistrictsSpy = jest
+        .spyOn(districtService, 'fetchTaggedDistricts')
+        .mockImplementation(() =>
+          Promise.resolve({ data: { entityList: fetchDistrictResponseMockData, totalCount: 2 } } as AxiosResponse)
+        );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchTaggedDistricts,
+        { type: ACTION_TYPES.FETCH_TAGGED_DISTRICTS_REQUEST }
+      ).toPromise();
+      expect(fetchTaggedDistrictsSpy).toHaveBeenCalled();
+      expect(dispatched).toEqual([
+        districtActions.fetchTaggedDistrictsSuccess({
+          districtList: fetchDistrictResponseMockData as any,
+          total: 2
+        })
+      ]);
+    });
+
+    it('Fetches tagged districts and dispatches success when response uses entity', async () => {
+      jest.spyOn(districtService, 'fetchTaggedDistricts').mockImplementation(() =>
+        Promise.resolve({ data: { entity: fetchDistrictResponseMockData, totalCount: 2 } } as AxiosResponse)
+      );
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchTaggedDistricts,
+        { type: ACTION_TYPES.FETCH_TAGGED_DISTRICTS_REQUEST }
+      ).toPromise();
+      expect(dispatched).toEqual([
+        districtActions.fetchTaggedDistrictsSuccess({
+          districtList: fetchDistrictResponseMockData as any,
+          total: 2
+        })
+      ]);
+    });
+
+    it('Fails to fetch tagged districts and dispatches failure', async () => {
+      const error = new Error('Failed to fetch tagged districts');
+      jest.spyOn(districtService, 'fetchTaggedDistricts').mockImplementation(() => Promise.reject(error));
+      const dispatched: any = [];
+      await runSaga(
+        {
+          dispatch: (action) => dispatched.push(action),
+          getState: () => mockState
+        },
+        fetchTaggedDistricts,
+        { type: ACTION_TYPES.FETCH_TAGGED_DISTRICTS_REQUEST }
+      ).toPromise();
+      expect(dispatched).toEqual([districtActions.fetchTaggedDistrictsFailure(error)]);
     });
   });
 

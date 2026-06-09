@@ -28,6 +28,9 @@ export interface IChiefdomList {
 export interface IChiefdomState {
   chiefdom?: IChiefdom;
   chiefdomList: IChiefdomList[];
+  taggedChiefdomList: IChiefdomList[];
+  taggedChiefdomTotal: number;
+  loadingTaggedChiefdoms: boolean;
   allChiefdoms: IChiefdomList[];
   listTotal: number;
   chiefdomDetail: IChiefdomDetail;
@@ -351,6 +354,27 @@ export interface IFetchChiefDomsByCountryIdFailure {
   error: Error;
 }
 
+export interface IFetchTaggedChiefdomsRequest {
+  type: typeof ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST;
+  districtIds: (string | number)[];
+  successCb?: (payload: IFetchChiefdomListSuccessPayload) => void;
+  failureCb?: (error: Error) => void;
+}
+
+export interface IFetchTaggedChiefdomsSuccess {
+  type: typeof ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_SUCCESS;
+  payload: IFetchChiefdomListSuccessPayload;
+}
+
+export interface IFetchTaggedChiefdomsFailure {
+  type: typeof ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_FAILURE;
+  error: Error;
+}
+
+export interface IClearTaggedChiefdomList {
+  type: typeof ACTION_TYPES.CLEAR_TAGGED_CHIEFDOM_LIST;
+}
+
 export type ChiefdomActions =
   | IFetchChiefdomDashboardListRequest
   | IFetchChiefdomDashboardListSuccess
@@ -390,4 +414,8 @@ export type ChiefdomActions =
   | IClearOUDropdown
   | IFetchChiefDomsByCountryIdRequest
   | IFetchChiefDomsByCountryIdSuccess
-  | IFetchChiefDomsByCountryIdFailure;
+  | IFetchChiefDomsByCountryIdFailure
+  | IFetchTaggedChiefdomsRequest
+  | IFetchTaggedChiefdomsSuccess
+  | IFetchTaggedChiefdomsFailure
+  | IClearTaggedChiefdomList;

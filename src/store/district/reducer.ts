@@ -17,6 +17,9 @@ export const initialState: IDistrictState = {
     }
   },
   districtList: [],
+  taggedDistrictList: [],
+  taggedDistrictTotal: 0,
+  loadingTaggedDistricts: false,
   allDistricts: [],
   districtOptions: [],
   admins: [],
@@ -54,6 +57,19 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
         total: action.payload.total,
         error: null
       };
+    case DISTRICT_TYPES.FETCH_TAGGED_DISTRICTS_REQUEST:
+      return {
+        ...state,
+        loadingTaggedDistricts: true
+      };
+    case DISTRICT_TYPES.FETCH_TAGGED_DISTRICTS_SUCCESS:
+      return {
+        ...state,
+        loadingTaggedDistricts: false,
+        taggedDistrictList: action.payload.districtList,
+        taggedDistrictTotal: action.payload.total,
+        error: null
+      };
     case DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_SUCCESS:
       return {
         ...state,
@@ -66,6 +82,19 @@ const districtReducer = (state = initialState, action = {} as DistrictActions): 
         ...state,
         districtList: [],
         total: 0
+      };
+    case DISTRICT_TYPES.CLEAR_TAGGED_DISTRICT_LIST:
+      return {
+        ...state,
+        taggedDistrictList: [],
+        taggedDistrictTotal: 0,
+        loadingTaggedDistricts: false
+      };
+    case DISTRICT_TYPES.FETCH_TAGGED_DISTRICTS_FAILURE:
+      return {
+        ...state,
+        loadingTaggedDistricts: false,
+        error: action.error
       };
     case DISTRICT_TYPES.FETCH_DISTRICT_LIST_FAILURE:
     case DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_FAILURE:

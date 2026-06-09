@@ -6,6 +6,9 @@ import configureStore from 'redux-mock-store';
 import RegionDashboard from '../RegionDashboard';
 import * as regionActions from '../../../store/region/actions';
 import MOCK_DATA_CONSTANTS from '../../../tests/mockData/commonDataConstants';
+import { areaManagerRole, divisionalManagerRole } from '../../../constants/roleConstants';
+import APPCONSTANTS from '../../../constants/appConstants';
+import sessionStorageServices from '../../../global/sessionStorageServices';
 import { PROTECTED_ROUTES } from '../../../constants/route';
 
 const mockHistoryPush = jest.fn();
@@ -243,5 +246,97 @@ describe('Region Dashboard', () => {
   it('does not render Loader when loading and loadingMore are false', () => {
     renderComponent();
     expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+  });
+
+  it('auto-navigates to matching region for area manager role by country name', async () => {
+    renderComponent({
+      user: {
+        timezoneList: [],
+        user: {
+          role: areaManagerRole,
+          country: { name: 'Region A' }
+        }
+      }
+    });
+
+    await waitFor(() => {
+      expect(sessionStorageServices.setItem).toHaveBeenCalledWith(APPCONSTANTS.ID, '101');
+      expect(sessionStorageServices.setItem).toHaveBeenCalledWith(APPCONSTANTS.FORM_ID, '1');
+      expect(mockHistoryPush).toHaveBeenCalledWith({
+        pathname: PROTECTED_ROUTES.regionSummary.replace(':regionId', '1').replace(':tenantId', '101')
+      });
+    });
+  });
+
+  it('auto-navigates when country id, tenantId, and name all match', async () => {
+    renderComponent({
+      user: {
+        timezoneList: [],
+        user: {
+          role: areaManagerRole,
+          country: { id: '1', tenantId: '101', name: 'Region A' }
+        }
+      }
+    });
+
+    await waitFor(() => {
+      expect(mockHistoryPush).toHaveBeenCalledWith({
+        pathname: PROTECTED_ROUTES.regionSummary.replace(':regionId', '1').replace(':tenantId', '101')
+      });
+    });
+  });
+
+  it('does not auto-navigate when id matches but name does not', async () => {
+    renderComponent({
+      user: {
+        timezoneList: [],
+        user: {
+          role: areaManagerRole,
+          country: { id: '1', name: 'Different Label' }
+        }
+      }
+    });
+
+    await waitFor(() => {
+      expect(mockHistoryPush).not.toHaveBeenCalled();
+    });
+  });
+
+  it('auto-navigates when country name matches case-insensitively', async () => {
+    renderComponent({
+      user: {
+        timezoneList: [],
+        user: {
+          role: areaManagerRole,
+          country: { name: '  region a  ' }
+        }
+      }
+    });
+
+    await waitFor(() => {
+      expect(mockHistoryPush).toHaveBeenCalledWith({
+        pathname: PROTECTED_ROUTES.regionSummary.replace(':regionId', '1').replace(':tenantId', '101')
+      });
+    });
+  });
+
+  it('auto-navigates to matching region for divisional manager role by country name', async () => {
+    renderComponent({
+      user: {
+        timezoneList: [],
+        user: {
+          role: divisionalManagerRole,
+          country: { name: 'Region A' }
+        }
+      }
+    });
+
+    await waitFor(() => {
+      expect(sessionStorageServices.setItem).toHaveBeenCalledWith(APPCONSTANTS.ID, '101');
+      expect(sessionStorageServices.setItem).toHaveBeenCalledWith(APPCONSTANTS.FORM_ID, '1');
+      expect(mockHistoryPush).toHaveBeenCalledWith({
+        pathname: PROTECTED_ROUTES.regionSummary.replace(':regionId', '1').replace(':tenantId', '101')
+      });
+    });
   });
 });

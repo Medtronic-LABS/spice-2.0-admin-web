@@ -77,7 +77,7 @@ const RouteElement = ({ route }: { route: IRoute }) => {
   return <route.component key={routeProps.location.key} {...routeProps} />;
 };
 
-export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN } =
+export const { SUPER_USER, SUPER_ADMIN, HEALTH_FACILITY_ADMIN, REGION_ADMIN, DISTRICT_ADMIN, CHIEFDOM_ADMIN, AREA_MANAGER, DIVISIONAL_MANAGER } =
   APPCONSTANTS.ROLES;
 export const { REPORT_ADMIN, SPICE_INSIGHTS_DEVELOPER, SPICE_INSIGHTS_USER, FACILITY_REPORT_ADMIN } =
   APPCONSTANTS.COMMUNITY_ROLES;
@@ -89,6 +89,10 @@ export const SU_SA_RA_DA_CDA = [...SU_SA_RA_DA, CHIEFDOM_ADMIN];
 export const CDA_HFA = [CHIEFDOM_ADMIN, HEALTH_FACILITY_ADMIN];
 export const SU_SA_RA_DA_CDA_HFA = [...SU_SA_RA_DA_CDA, HEALTH_FACILITY_ADMIN];
 export const A = [HEALTH_FACILITY_ADMIN];
+export const AM_DM = [AREA_MANAGER, DIVISIONAL_MANAGER];
+export const SU_SA_AM_DM = [...SU_SA, ...AM_DM];
+export const SU_SA_RA_AM_DM = [...SU_SA_RA, ...AM_DM];
+export const SU_SA_RA_DA_CDA_HFA_AM_DM = [...SU_SA_RA_DA_CDA_HFA, ...AM_DM];
 
 const communityRoutes = [
   {
@@ -144,13 +148,13 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.regionDashboard,
       exact: true,
       component: RegionDashboard,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_AM_DM
     },
     {
       path: PROTECTED_ROUTES.region,
       exact: true,
       component: Region,
-      authorisedRoles: SU_SA_RA
+      authorisedRoles: SU_SA_RA_AM_DM
     },
     {
       path: PROTECTED_ROUTES.createRegion,
@@ -240,13 +244,13 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.healthFacilitySummary,
       exact: true,
       component: HealthFacilitySummary,
-      authorisedRoles: SU_SA_RA_DA_CDA_HFA
+      authorisedRoles: SU_SA_RA_DA_CDA_HFA_AM_DM
     },
     {
       path: PROTECTED_ROUTES.healthFacilityByRegion,
       exact: true,
       component: HealthFacilityList,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_AM_DM
     },
     {
       path: PROTECTED_ROUTES.healthFacilityByDistrict,
@@ -264,7 +268,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.createHealthFacilityByRegion,
       exact: true,
       component: CreateHealthFacility,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_AM_DM
     },
     {
       path: PROTECTED_ROUTES.createHealthFacilityByDistrict,
@@ -294,7 +298,7 @@ const protectedRoutes: IProtectedRoute[] = (() => {
       path: PROTECTED_ROUTES.userByRegion,
       exact: true,
       component: UserList,
-      authorisedRoles: SU_SA
+      authorisedRoles: SU_SA_AM_DM
     },
     {
       path: PROTECTED_ROUTES.userByDistrict,

@@ -17,7 +17,8 @@ import {
   IActivateAccountReq,
   IDistrict,
   IFetchDistrictOptionsPayload,
-  IFetchDistrictsByCountryIdRequest
+  IFetchDistrictsByCountryIdRequest,
+  IFetchTaggedDistrictsRequest
 } from './types';
 import * as districtActions from './actions';
 import * as hfActions from '../healthFacility/actions';
@@ -33,7 +34,8 @@ import {
   DEACTIVATE_DISTRICT_REQUEST,
   FETCH_DISTRICT_OPTIONS_REQUEST,
   ACTIVATE_ACCOUNT_REQUEST,
-  FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST
+  FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST,
+  FETCH_TAGGED_DISTRICTS_REQUEST
 } from './actionTypes';
 import { AppState } from '../rootReducer';
 import APPCONSTANTS from '../../constants/appConstants';
@@ -84,6 +86,21 @@ export function* fetchDistrictList({
     if (e instanceof Error) {
       failureCb?.(e);
       yield put(districtActions.fetchDistrictListFailure(e));
+    }
+  }
+}
+
+export function* fetchTaggedDistricts({ successCb, failureCb }: IFetchTaggedDistrictsRequest): SagaIterator {
+  try {
+    const { data } = yield call(districtService.fetchTaggedDistricts);
+    const districtList = data?.entityList || data?.entity || [];
+    const payload = { districtList, total: data?.totalCount ?? districtList.length };
+    successCb?.(payload);
+    yield put(districtActions.fetchTaggedDistrictsSuccess(payload));
+  } catch (e) {
+    if (e instanceof Error) {
+      failureCb?.(e);
+      yield put(districtActions.fetchTaggedDistrictsFailure(e));
     }
   }
 }
@@ -301,6 +318,7 @@ export function* fetchDistrictOptions(action: IFetchDistrictOptionsRequest): Sag
 function* districtSaga() {
   yield all([takeLatest(FETCH_DISTRICT_LIST_REQUEST, fetchDistrictList)]);
   yield all([takeLatest(FETCH_DISTRICTS_BY_COUNTRY_ID_REQUEST, fetchDistrictsByCountryList)]);
+  yield all([takeLatest(FETCH_TAGGED_DISTRICTS_REQUEST, fetchTaggedDistricts)]);
   yield all([takeLatest(CREATE_DISTRICT_REQUEST, createDistrict)]);
   yield all([takeLatest(FETCH_DISTRICT_DETAIL_REQUEST, fetchDistrictDetail)]);
   yield all([takeLatest(FETCH_DISTRICT_DASHBOARD_LIST_REQUEST, getDashboardDistrict)]);

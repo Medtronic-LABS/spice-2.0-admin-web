@@ -13,7 +13,8 @@ import {
   deleteDistrictAdmin,
   deactivateDistrict,
   fetchDistrictOptions,
-  fetchDistrictAdmins
+  fetchDistrictAdmins,
+  fetchTaggedDistricts
 } from '../districtAPI';
 
 describe('District APIs', () => {
@@ -260,6 +261,15 @@ describe('District APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/district/district-list');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(requestData);
+  });
+
+  it('fetchTaggedDistricts sends a GET request to /user-service/user/tagged-districts', async () => {
+    mockAxios.onGet('/user-service/user/tagged-districts').reply(200, {});
+
+    await fetchTaggedDistricts();
+
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe('/user-service/user/tagged-districts');
   });
 
   it('fetchDistrictAdmins sends a POST request to /user-service/user/admin-users with correct data', async () => {

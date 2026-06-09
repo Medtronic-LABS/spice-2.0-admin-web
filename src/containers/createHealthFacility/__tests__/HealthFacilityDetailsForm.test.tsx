@@ -135,11 +135,17 @@ const defaultStoreState = {
   },
   chiefdom: {
     chiefdomList: [],
+    taggedChiefdomList: [],
+    taggedChiefdomTotal: 0,
+    loadingTaggedChiefdoms: false,
     loading: false,
     chiefdomDetail: null
   },
   district: {
     districtList: [],
+    taggedDistrictList: [],
+    taggedDistrictTotal: 0,
+    loadingTaggedDistricts: false,
     loading: false,
     district: {}
   },
@@ -183,10 +189,11 @@ describe('HealthFacilityDetailsForm', () => {
       isHFCreate: boolean;
       data: Record<string, unknown>;
     }> = {},
-    initialValues: Record<string, unknown> = defaultInitialValues
+    initialValues: Record<string, unknown> = defaultInitialValues,
+    localStore: ReturnType<typeof mockStore> = store
   ) => {
     return render(
-      <Provider store={store}>
+      <Provider store={localStore}>
         <Form onSubmit={jest.fn()} initialValues={initialValues}>
           {({ form }) => (
             <HealthFacilityDetailsForm
@@ -250,6 +257,48 @@ describe('HealthFacilityDetailsForm', () => {
     unmount();
     const actions = store.getActions();
     expect(actions.some((a: { type: string }) => a.type === 'CLEAR_HF_FORM_DATA')).toBe(true);
+  });
+
+  it('dispatches fetchTaggedDistrictsRequest on mount when not in edit mode', () => {
+    const localStore = mockStore(defaultStoreState);
+    renderWithForm({ isEdit: false }, defaultInitialValues, localStore);
+    const actions = localStore.getActions();
+    expect(actions.some((a: { type: string }) => a.type === 'FETCH_TAGGED_DISTRICTS_REQUEST')).toBe(true);
+    expect(actions.some((a: { type: string }) => a.type === 'FETCH_DISTRICT_LIST_REQUEST')).toBe(false);
+  });
+
+  it('does not dispatch fetchTaggedDistrictsRequest on mount in edit mode', () => {
+    const localStore = mockStore(defaultStoreState);
+    renderWithForm({ isEdit: true }, defaultInitialValues, localStore);
+    const actions = localStore.getActions();
+    expect(actions.some((a: { type: string }) => a.type === 'FETCH_TAGGED_DISTRICTS_REQUEST')).toBe(false);
+  });
+
+  it('dispatches fetchTaggedChiefdomsRequest when a district is selected', () => {
+    const localStore = mockStore(defaultStoreState);
+    renderWithForm(
+      { isEdit: false },
+      {
+        healthFacility: {
+          ...defaultInitialValues.healthFacility,
+          district: { id: 10, name: 'District 10', tenantId: '100' }
+        }
+      },
+      localStore
+    );
+    const actions = localStore.getActions();
+    expect(actions.some((a: any) => a.type === 'CLEAR_TAGGED_CHIEFDOM_LIST')).toBe(true);
+    const fetchTaggedChiefdomsAction = actions.find((a: any) => a.type === 'FETCH_TAGGED_CHIEFDOMS_REQUEST');
+    expect(fetchTaggedChiefdomsAction).toBeDefined();
+    expect(fetchTaggedChiefdomsAction.districtIds).toEqual([10]);
+    expect(actions.some((a: { type: string }) => a.type === 'FETCH_CHIEFDOM_LIST_REQUEST')).toBe(false);
+  });
+
+  it('does not fetch tagged chiefdoms when no district is selected', () => {
+    const localStore = mockStore(defaultStoreState);
+    renderWithForm({ isEdit: false }, defaultInitialValues, localStore);
+    const actions = localStore.getActions();
+    expect(actions.some((a: { type: string }) => a.type === 'FETCH_TAGGED_CHIEFDOMS_REQUEST')).toBe(false);
   });
 
   it('does not render map container when latitude and longitude are empty', () => {

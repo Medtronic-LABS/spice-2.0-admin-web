@@ -41,7 +41,11 @@ import {
   IFetchChiefDomsByCountryIdRequest,
   IFetchChiefDomsByCountryIdSuccess,
   IFetchChiefDomsByCountryIdSuccessPayload,
-  IFetchChiefDomsByCountryIdFailure
+  IFetchChiefDomsByCountryIdFailure,
+  IFetchTaggedChiefdomsRequest,
+  IFetchTaggedChiefdomsSuccess,
+  IFetchTaggedChiefdomsFailure,
+  IClearTaggedChiefdomList
 } from './types';
 import * as ACTION_TYPES from './actionTypes';
 
@@ -305,4 +309,31 @@ export const fetchChiefDomsByCountryIdSuccess = (
 export const fetchChiefDomsByCountryIdFailure = (error: Error): IFetchChiefDomsByCountryIdFailure => ({
   type: ACTION_TYPES.FETCH_CHIEFDOMS_BY_COUNTRY_ID_LIST_FAILURE,
   error
+});
+
+export const fetchTaggedChiefdomsRequest = ({
+  districtIds,
+  successCb,
+  failureCb
+}: Omit<IFetchTaggedChiefdomsRequest, 'type'>): IFetchTaggedChiefdomsRequest => ({
+  type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST,
+  districtIds,
+  successCb,
+  failureCb
+});
+
+export const fetchTaggedChiefdomsSuccess = (
+  payload: IFetchChiefdomListSuccessPayload
+): IFetchTaggedChiefdomsSuccess => ({
+  type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_SUCCESS,
+  payload
+});
+
+export const fetchTaggedChiefdomsFailure = (error: Error): IFetchTaggedChiefdomsFailure => ({
+  type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_FAILURE,
+  error
+});
+
+export const clearTaggedChiefdomList = (): IClearTaggedChiefdomList => ({
+  type: ACTION_TYPES.CLEAR_TAGGED_CHIEFDOM_LIST
 });

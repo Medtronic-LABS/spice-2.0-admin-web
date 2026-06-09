@@ -9,6 +9,7 @@ import {
   fetchChiefdomDashboardList,
   fetchChiefdomDetail,
   fetchChiefdomList,
+  fetchTaggedChiefdoms,
   getChiefdomListForDropdown,
   updateChiefdom,
   updateChiefdomAdmin
@@ -236,6 +237,67 @@ describe('Fetch Chiefdom List', () => {
     ).toPromise();
     expect(fetchChiefdomListSpy).toHaveBeenCalledWith('1', null, 0, 'Sample');
     expect(dispatched).toEqual([chiefdomActions.fetchChiefdomListFailure(error)]);
+  });
+});
+
+describe('Fetches Tagged Chiefdoms: FETCH_TAGGED_CHIEFDOMS_REQUEST', () => {
+  it('Fetches tagged chiefdoms and dispatches success when response uses entityList', async () => {
+    const fetchTaggedChiefdomsSpy = jest.spyOn(chiefdomService, 'fetchTaggedChiefdoms').mockImplementation(() =>
+      Promise.resolve({
+        data: { entityList: fetchChiefdomsResponseMockData, totalCount: 2 }
+      } as AxiosResponse)
+    );
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchTaggedChiefdoms,
+      { districtIds: [1, 2], type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST }
+    ).toPromise();
+    expect(fetchTaggedChiefdomsSpy).toHaveBeenCalledWith([1, 2]);
+    expect(dispatched).toEqual([
+      chiefdomActions.fetchTaggedChiefdomsSuccess({
+        chiefdomList: fetchChiefdomsResponseMockData,
+        total: 2
+      })
+    ]);
+  });
+
+  it('Fetches tagged chiefdoms and dispatches success when response uses entity', async () => {
+    jest.spyOn(chiefdomService, 'fetchTaggedChiefdoms').mockImplementation(() =>
+      Promise.resolve({
+        data: { entity: fetchChiefdomsResponseMockData, totalCount: 2 }
+      } as AxiosResponse)
+    );
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchTaggedChiefdoms,
+      { districtIds: [1, 2], type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST }
+    ).toPromise();
+    expect(dispatched).toEqual([
+      chiefdomActions.fetchTaggedChiefdomsSuccess({
+        chiefdomList: fetchChiefdomsResponseMockData,
+        total: 2
+      })
+    ]);
+  });
+
+  it('Fails to fetch tagged chiefdoms and dispatches failure', async () => {
+    const error = new Error('Failed to fetch tagged chiefdoms');
+    jest.spyOn(chiefdomService, 'fetchTaggedChiefdoms').mockImplementation(() => Promise.reject(error));
+    const dispatched: any = [];
+    await runSaga(
+      {
+        dispatch: (action) => dispatched.push(action)
+      },
+      fetchTaggedChiefdoms,
+      { districtIds: [1], type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST }
+    ).toPromise();
+    expect(dispatched).toEqual([chiefdomActions.fetchTaggedChiefdomsFailure(error)]);
   });
 });
 

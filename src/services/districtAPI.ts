@@ -133,3 +133,9 @@ export const fetchDistrictsByCountryId = (countryId: string) =>
     url: `/admin-service/data/districts/${countryId}`,
     data: {}
   });
+
+export const fetchTaggedDistricts = () =>
+  axios({
+    method: 'GET',
+    url: '/user-service/user/tagged-districts'
+  });

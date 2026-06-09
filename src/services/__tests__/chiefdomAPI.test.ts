@@ -9,6 +9,7 @@ import {
   fetchChiefdomDashboardList,
   fetchChiefdomForDropdown,
   fetchChiefdomList,
+  fetchTaggedChiefdoms,
   getChiefdomDetails,
   updateChiefdom,
   updateChiefdomAdmin
@@ -260,6 +261,16 @@ describe('Chiefdom APIs', () => {
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/user-service/user/admin-users');
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(data);
+  });
+
+  it('fetchTaggedChiefdoms sends a GET request with comma-separated districtId param', async () => {
+    mockAxios.onGet('/user-service/user/tagged-chiefdoms').reply(200, {});
+
+    await fetchTaggedChiefdoms([1, 2, 3]);
+
+    expect(mockAxios.history.get.length).toBe(1);
+    expect(mockAxios.history.get[0].url).toBe('/user-service/user/tagged-chiefdoms');
+    expect(mockAxios.history.get[0].params).toEqual({ districtId: '1,2,3' });
   });
 
   const testLabel7 = 'fetchChiefdomForDropdown sends a POST request to /admin-service/chiefdom/all with correct data';

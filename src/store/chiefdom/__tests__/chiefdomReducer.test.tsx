@@ -261,6 +261,44 @@ describe('chiefdomReducer', () => {
     expect(newState).toEqual(mainExpectedState);
   });
 
+  it('should handle FETCH_TAGGED_CHIEFDOMS_REQUEST', () => {
+    const action: any = { type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST };
+    expect(chiefdomReducer(mainInitialState, action)).toEqual({
+      ...mainInitialState,
+      loadingTaggedChiefdoms: true
+    });
+  });
+
+  it('should handle FETCH_TAGGED_CHIEFDOMS_SUCCESS', () => {
+    const action: any = {
+      type: ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_SUCCESS,
+      payload: { chiefdomList: [{ id: '1', name: 'Tagged Chiefdom' }], total: 1 }
+    };
+    expect(chiefdomReducer(mainInitialState, action)).toEqual({
+      ...mainInitialState,
+      loadingTaggedChiefdoms: false,
+      taggedChiefdomList: [{ id: '1', name: 'Tagged Chiefdom' }],
+      taggedChiefdomTotal: 1,
+      error: null
+    });
+  });
+
+  it('should handle CLEAR_TAGGED_CHIEFDOM_LIST', () => {
+    const state = {
+      ...mainInitialState,
+      taggedChiefdomList: [{ id: '1', name: 'Tagged Chiefdom' }],
+      taggedChiefdomTotal: 1,
+      loadingTaggedChiefdoms: true
+    };
+    const action: any = { type: ACTION_TYPES.CLEAR_TAGGED_CHIEFDOM_LIST };
+    expect(chiefdomReducer(state, action)).toEqual({
+      ...mainInitialState,
+      taggedChiefdomList: [],
+      taggedChiefdomTotal: 0,
+      loadingTaggedChiefdoms: false
+    });
+  });
+
   it('should update chiefdom detail', () => {
     const payload = {
       id: '123',

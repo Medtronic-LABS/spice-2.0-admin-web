@@ -2,7 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
-import { AppRoutes } from '../routes';
+import {
+  AM_DM,
+  AppRoutes,
+  AREA_MANAGER,
+  DIVISIONAL_MANAGER,
+  SU_SA_RA_DA_CDA_HFA_AM_DM
+} from '../routes';
 import APPCONSTANTS from '../constants/appConstants';
 import { PROTECTED_ROUTES, PUBLIC_ROUTES } from '../constants/route';
 import { goToUrl } from '../utils/routeUtil';
@@ -47,6 +53,9 @@ const initialState = {
   user: {
     isLoggedIn: false,
     loggingIn: false,
+    loggingOut: false,
+    loading: false,
+    initializing: false,
     role: APPCONSTANTS.ROLES.SUPER_ADMIN,
     user: {
       firstName: 'Super',
@@ -56,6 +65,52 @@ const initialState = {
     }
   }
 };
+
+jest.mock('../containers/authentication/Login', () => ({
+  __esModule: true,
+  default: () => <div>Login</div>
+}));
+
+jest.mock('../containers/landingPage/LandingPage', () => ({
+  __esModule: true,
+  default: () => <div>Admin</div>
+}));
+
+jest.mock('../components/appLayout/AppLayout', () => ({
+  AppLayout: ({ children }: { children: React.ReactNode }) => <div data-testid='app-layout'>{children}</div>
+}));
+
+jest.mock('../containers/healthFacility/HealthFacilitySummary', () => ({
+  __esModule: true,
+  default: () => <div>HealthFacilitySummary</div>
+}));
+
+const healthFacilitySummaryPath = PROTECTED_ROUTES.healthFacilitySummary
+  .replace(':healthFacilityId', '1')
+  .replace(':tenantId', '101');
+
+const renderLoggedInRoute = (role: string, path: string) => {
+  const localStore = mockStore({
+    user: {
+      ...initialState.user,
+      isLoggedIn: true,
+      user: {
+        ...initialState.user.user,
+        role,
+        suiteAccess: [APPCONSTANTS.SUITE_ACCESS.ADMIN]
+      }
+    }
+  });
+
+  return render(
+    <Provider store={localStore}>
+      <MemoryRouter initialEntries={[path]}>
+        <AppRoutes />
+      </MemoryRouter>
+    </Provider>
+  );
+};
+
 describe('AppRoutes', () => {
   const store = mockStore(initialState);
   beforeEach(() => {
@@ -175,5 +230,23 @@ describe('AppRoutes', () => {
 
     // Restore original URLSearchParams
     global.URLSearchParams = originalURLSearchParams;
+  });
+
+  it.each([
+    ['area manager', AREA_MANAGER],
+    ['divisional manager', DIVISIONAL_MANAGER]
+  ])('renders health facility summary for %s role', async (_label, role) => {
+    renderLoggedInRoute(role, healthFacilitySummaryPath);
+
+    expect(await screen.findByText('HealthFacilitySummary')).toBeInTheDocument();
+    expect(screen.queryByText('Admin')).not.toBeInTheDocument();
+  });
+});
+
+describe('health facility summary route authorisation', () => {
+  it('includes area and divisional managers in authorised roles', () => {
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM).toEqual(expect.arrayContaining(AM_DM));
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM).toContain(AREA_MANAGER);
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM).toContain(DIVISIONAL_MANAGER);
   });
 });

@@ -1,6 +1,9 @@
 import {
   districtLoadingSelector,
   getDistrictListSelector,
+  getTaggedDistrictListSelector,
+  taggedDistrictCountSelector,
+  taggedDistrictLoadingSelector,
   districtCountSelector,
   districtSelector,
   districtDashboardListSelector,
@@ -25,6 +28,18 @@ test('districtLoadingSelector should return loading from state', () => {
 // Test getDistrictListSelector
 test('getDistrictListSelector should return loading from state', () => {
   return expect(getDistrictListSelector(initialState)).toEqual(initialState.district.districtList);
+});
+
+test('getTaggedDistrictListSelector should return taggedDistrictList from state', () => {
+  return expect(getTaggedDistrictListSelector(initialState)).toEqual(initialState.district.taggedDistrictList);
+});
+
+test('taggedDistrictCountSelector should return taggedDistrictTotal from state', () => {
+  return expect(taggedDistrictCountSelector(initialState)).toEqual(initialState.district.taggedDistrictTotal);
+});
+
+test('taggedDistrictLoadingSelector should return loadingTaggedDistricts from state', () => {
+  return expect(taggedDistrictLoadingSelector(initialState)).toEqual(initialState.district.loadingTaggedDistricts);
 });
 
 // Test districtCountSelector

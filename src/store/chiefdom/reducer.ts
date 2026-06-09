@@ -3,6 +3,9 @@ import * as ACTION_TYPES from './actionTypes';
 
 export const initialState: IChiefdomState = {
   chiefdomList: [],
+  taggedChiefdomList: [],
+  taggedChiefdomTotal: 0,
+  loadingTaggedChiefdoms: false,
   allChiefdoms: [],
   listTotal: 0,
   chiefdomDetail: {
@@ -102,6 +105,32 @@ const chiefdomReducer = (state: IChiefdomState = initialState, action = {} as Ch
         ...state,
         chiefdomList: [],
         listTotal: 0
+      };
+    case ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_REQUEST:
+      return {
+        ...state,
+        loadingTaggedChiefdoms: true
+      };
+    case ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_SUCCESS:
+      return {
+        ...state,
+        loadingTaggedChiefdoms: false,
+        taggedChiefdomList: action.payload.chiefdomList,
+        taggedChiefdomTotal: action.payload.total,
+        error: null
+      };
+    case ACTION_TYPES.FETCH_TAGGED_CHIEFDOMS_FAILURE:
+      return {
+        ...state,
+        loadingTaggedChiefdoms: false,
+        error: action.error
+      };
+    case ACTION_TYPES.CLEAR_TAGGED_CHIEFDOM_LIST:
+      return {
+        ...state,
+        taggedChiefdomList: [],
+        taggedChiefdomTotal: 0,
+        loadingTaggedChiefdoms: false
       };
     case ACTION_TYPES.UPDATE_CHIEFDOM_SUCCESS:
       return {

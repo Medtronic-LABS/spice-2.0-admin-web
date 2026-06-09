@@ -1,6 +1,9 @@
 import {
   chiefdomDashboardListSelector,
   chiefdomListSelector,
+  getTaggedChiefdomListSelector,
+  taggedChiefdomCountSelector,
+  taggedChiefdomLoadingSelector,
   chiefdomCountSelector,
   chiefdomListCountSelector,
   chiefdomLoadingSelector,
@@ -23,6 +26,18 @@ test('chiefdomDashboardListSelector should return chiefdom dashboard list from s
 
 test('chiefdomListSelector should return chiefdom from state', () => {
   return expect(chiefdomListSelector(initialState)).toEqual(initialState.chiefdom.chiefdomList);
+});
+
+test('getTaggedChiefdomListSelector should return taggedChiefdomList from state', () => {
+  return expect(getTaggedChiefdomListSelector(initialState)).toEqual(initialState.chiefdom.taggedChiefdomList);
+});
+
+test('taggedChiefdomCountSelector should return taggedChiefdomTotal from state', () => {
+  return expect(taggedChiefdomCountSelector(initialState)).toEqual(initialState.chiefdom.taggedChiefdomTotal);
+});
+
+test('taggedChiefdomLoadingSelector should return loadingTaggedChiefdoms from state', () => {
+  return expect(taggedChiefdomLoadingSelector(initialState)).toEqual(initialState.chiefdom.loadingTaggedChiefdoms);
 });
 
 test('chiefdomCountSelector should return chiefdom count from state', () => {

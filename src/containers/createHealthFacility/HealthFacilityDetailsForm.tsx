@@ -13,14 +13,22 @@ import MultiSelect from '../../components/multiSelect/MultiSelect';
 import APPCONSTANTS from '../../constants/appConstants';
 import sessionStorageServices from '../../global/sessionStorageServices';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
-import { fetchChiefdomDetail, fetchChiefdomListRequest } from '../../store/chiefdom/actions';
 import {
-  chiefdomListSelector,
-  chiefdomLoadingSelector,
-  getChiefdomDetailSelector
+  clearTaggedChiefdomList,
+  fetchChiefdomDetail,
+  fetchTaggedChiefdomsRequest
+} from '../../store/chiefdom/actions';
+import {
+  getChiefdomDetailSelector,
+  getTaggedChiefdomListSelector,
+  taggedChiefdomLoadingSelector
 } from '../../store/chiefdom/selectors';
-import { fetchDistrictDetailReq, fetchDistrictListRequest } from '../../store/district/actions';
-import { districtLoadingSelector, districtSelector, getDistrictListSelector } from '../../store/district/selectors';
+import { fetchDistrictDetailReq, fetchTaggedDistrictsRequest } from '../../store/district/actions';
+import {
+  districtSelector,
+  getTaggedDistrictListSelector,
+  taggedDistrictLoadingSelector
+} from '../../store/district/selectors';
 import {
   clearHFFormData,
   clearVillageList,
@@ -41,7 +49,7 @@ import { ICity, IObjectData, IVillages } from '../../store/healthFacility/types'
 import { countryIdSelector } from '../../store/user/selectors';
 import { useUniqueFieldValidation } from '../../hooks/useUniqueFieldValidation';
 import { checkFacilityNameUnique, checkPostalCodeUnique } from '../../services/healthFacilityAPI';
-import { filterByAppTypes } from '../../utils/commonUtils';
+import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import {
   composeValidators,
@@ -94,10 +102,10 @@ const HealthFacilityDetailsForm = ({
   const { regionId, districtId, chiefdomId, tenantId } = useParams<IMatchParams>();
   const hfTypesList = useSelector(hfTypesSelector);
   const hfTypesLoading = useSelector(hfTypesLoadingSelector);
-  const districtList = useSelector(getDistrictListSelector);
-  const chiefdomList = useSelector(chiefdomListSelector);
-  const districtLoading = useSelector(districtLoadingSelector);
-  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const taggedDistrictList = useSelector(getTaggedDistrictListSelector);
+  const taggedChiefdomList = useSelector(getTaggedChiefdomListSelector);
+  const taggedDistrictLoading = useSelector(taggedDistrictLoadingSelector);
+  const taggedChiefdomLoading = useSelector(taggedChiefdomLoadingSelector);
   const villagesList = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
   const languages = useSelector(cultureListSelector);
@@ -282,21 +290,47 @@ const HealthFacilityDetailsForm = ({
     }
   }, [dispatch, hfTypesList.length, countryId]);
 
-  // District fetch
+  // Tagged district fetch
   useEffect(() => {
-    if (!isEdit) {
-      dispatch(fetchDistrictListRequest({ countryId, tenantId, isActive: true }));
+    if (!isEdit && !taggedDistrictList.length) {
+      dispatch(
+        fetchTaggedDistrictsRequest({
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+              )
+            )
+        })
+      );
     }
-  }, [countryId, dispatch, isEdit, tenantId]);
+  }, [countryId, dispatch, districtSName, isEdit, taggedDistrictList.length]);
 
-  // Chiefdom fetch
+  // Tagged chiefdom fetch
   useEffect(() => {
-    const selectedDistrictId = form.getState().values?.healthFacility?.district?.tenantId;
-    if (selectedDistrictId && !isEdit) {
-      dispatch(fetchChiefdomListRequest({ tenantId: selectedDistrictId }));
+    const selectedDistrictId = form.getState().values?.healthFacility?.district?.id;
+    if (!isEdit) {
+      dispatch(clearTaggedChiefdomList());
+      if (selectedDistrictId) {
+        dispatch(
+          fetchTaggedChiefdomsRequest({
+            districtIds: [selectedDistrictId],
+            failureCb: (e) =>
+              toastCenter.error(
+                ...getErrorToastArgs(
+                  e,
+                  APPCONSTANTS.OOPS,
+                  formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
+                )
+              )
+          })
+        );
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, countryId, form.getState().values?.healthFacility?.district?.id]);
+  }, [dispatch, chiefdomSName, isEdit, form.getState().values?.healthFacility?.district?.id]);
 
   // Villages fetch
   useEffect(() => {
@@ -548,8 +582,8 @@ const HealthFacilityDetailsForm = ({
                     errorLabel={districtSName.toLowerCase()}
                     labelKey='name'
                     valueKey='id'
-                    options={districtList || []}
-                    loadingOptions={districtLoading}
+                    options={taggedDistrictList || []}
+                    loadingOptions={taggedDistrictLoading}
                     error={(meta.touched && meta.error) || undefined}
                     onChange={(value: any) => {
                       form.change(`${formName}.chiefdom`, undefined);
@@ -577,8 +611,8 @@ const HealthFacilityDetailsForm = ({
                   errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
-                  options={chiefdomList}
-                  loadingOptions={chiefdomLoading}
+                  options={taggedChiefdomList}
+                  loadingOptions={taggedChiefdomLoading}
                   error={(meta.touched && meta.error) || undefined}
                   onChange={(value: any) => {
                     form.change(`${formName}.city`, undefined);

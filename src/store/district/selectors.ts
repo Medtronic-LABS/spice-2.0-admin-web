@@ -3,6 +3,9 @@ import { AppState } from '../rootReducer';
 
 const getLoading = (state: AppState) => state.district.loading;
 const getDistrictList = (state: AppState) => state.district.districtList;
+const getTaggedDistrictList = (state: AppState) => state.district?.taggedDistrictList ?? [];
+const getTaggedDistrictTotal = (state: AppState) => state.district?.taggedDistrictTotal ?? 0;
+const getLoadingTaggedDistricts = (state: AppState) => state.district?.loadingTaggedDistricts ?? false;
 const getAllDistrictList = (state: AppState) => state.district.allDistricts;
 const getDistrict = (state: AppState) => state.district.district;
 const getDistrictOptions = (state: AppState) => state.district.districtOptions;
@@ -18,6 +21,21 @@ const getClinicalWorkflowsCount = (state: AppState) => state.district.clinicalWo
 export const districtLoadingSelector = createSelector(getLoading, (loading) => loading);
 
 export const getDistrictListSelector = createSelector(getDistrictList, (districtList) => districtList);
+
+export const getTaggedDistrictListSelector = createSelector(
+  getTaggedDistrictList,
+  (taggedDistrictList) => taggedDistrictList
+);
+
+export const taggedDistrictCountSelector = createSelector(
+  getTaggedDistrictTotal,
+  (taggedDistrictTotal) => taggedDistrictTotal
+);
+
+export const taggedDistrictLoadingSelector = createSelector(
+  getLoadingTaggedDistricts,
+  (loadingTaggedDistricts) => loadingTaggedDistricts
+);
 
 export const getAllDistrictListSelector = createSelector(getAllDistrictList, (districtList) => districtList);
 

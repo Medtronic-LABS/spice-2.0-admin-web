@@ -26,21 +26,21 @@ import {
   updateHFStatusRequest,
   validateLinkedRestrictionsRequest
 } from '../../store/healthFacility/actions';
-import { clearDistrictList, fetchDistrictListRequest } from '../../store/district/actions';
+import { clearTaggedDistrictList, fetchTaggedDistrictsRequest } from '../../store/district/actions';
+import { clearTaggedChiefdomList, fetchTaggedChiefdomsRequest } from '../../store/chiefdom/actions';
 import {
   healthFacilityListSelector,
   healthFacilityListTotalSelector,
   healthFacilityLoadingSelector,
   hfTypesSelector
 } from '../../store/healthFacility/selectors';
-import { getDistrictListSelector } from '../../store/district/selectors';
+import { getTaggedDistrictListSelector } from '../../store/district/selectors';
+import { getTaggedChiefdomListSelector } from '../../store/chiefdom/selectors';
 import { IHealthFacility, IHealthFacilityForm } from '../../store/healthFacility/types';
 import { roleSelector } from '../../store/user/selectors';
 import { formatHealthFacility } from '../../utils/formatObjectUtils';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 import HealthFacilityDetailsForm from '../createHealthFacility/HealthFacilityDetailsForm';
-import { chiefdomListSelector as getAllChiefdomsSelector } from '../../store/healthFacility/selectors';
-import { fetchChiefdomListRequest, clearChiefdomList } from '../../store/healthFacility/actions';
 import { filterByAppTypes, formatUserToastMsg } from '../../utils/commonUtils';
 import ConfirmationModalPopup from '../../components/customTable/ConfirmationModalPopup';
 import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
@@ -77,8 +77,8 @@ const HealthFacilityList = (): React.ReactElement => {
   const loading = useSelector(healthFacilityLoadingSelector);
   const role = useSelector(roleSelector);
   const hfTypesList = useSelector(hfTypesSelector);
-  const districtList = useSelector(getDistrictListSelector);
-  const chiefdomList = useSelector(getAllChiefdomsSelector);
+  const taggedDistrictList = useSelector(getTaggedDistrictListSelector);
+  const taggedChiefdomList = useSelector(getTaggedChiefdomListSelector);
   const { regionId, tenantId, districtId, chiefdomId } = useParams<IMatchParams>();
   const countryId = useCountryId({ regionId });
   const isSuperUser = [APPCONSTANTS.ROLES.SUPER_ADMIN, APPCONSTANTS.ROLES.SUPER_USER].includes(role);
@@ -142,12 +142,9 @@ const HealthFacilityList = (): React.ReactElement => {
       dispatch(fetchHFTypesRequest({ countryId }));
     }
     setFilters({ ...filters, chiefdomIds: [] });
-    if (!districtList.length) {
+    if (!taggedDistrictList.length) {
       dispatch(
-        fetchDistrictListRequest({
-          countryId,
-          tenantId,
-          isActive: true,
+        fetchTaggedDistrictsRequest({
           failureCb: (e) =>
             toastCenter.error(
               ...getErrorToastArgs(
@@ -160,16 +157,23 @@ const HealthFacilityList = (): React.ReactElement => {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, hfTypesList.length, districtList.length, chiefdomList.length, countryId]);
+  }, [dispatch, hfTypesList.length, taggedDistrictList.length, countryId]);
 
   useEffect(() => {
-    dispatch(clearChiefdomList());
+    dispatch(clearTaggedChiefdomList());
     setFilters({ ...filters, chiefdomIds: [] });
     if (filters.districtIds.length) {
       dispatch(
-        fetchChiefdomListRequest({
-          countryId: Number(countryId),
-          districtIds: filters.districtIds
+        fetchTaggedChiefdomsRequest({
+          districtIds: filters.districtIds,
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
+              )
+            )
         })
       );
     }
@@ -184,7 +188,8 @@ const HealthFacilityList = (): React.ReactElement => {
   useEffect(() => {
     return () => {
       dispatch(clearHFList());
-      dispatch(clearDistrictList());
+      dispatch(clearTaggedDistrictList());
+      dispatch(clearTaggedChiefdomList());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -507,7 +512,7 @@ const HealthFacilityList = (): React.ReactElement => {
               isGeneric: true,
               isSearchable: true,
               placeholder: `Search ${districtSName}`,
-              data: districtList,
+              data: taggedDistrictList,
               isShow: true
             },
             {
@@ -518,7 +523,7 @@ const HealthFacilityList = (): React.ReactElement => {
               isGeneric: true,
               isSearchable: true,
               placeholder: `Search ${chiefdomSName}`,
-              data: chiefdomList,
+              data: taggedChiefdomList,
               isShow: true
             }
           ]}

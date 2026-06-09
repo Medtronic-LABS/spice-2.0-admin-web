@@ -51,7 +51,11 @@ import {
   IFetchDistrictsByCountryIdRequest,
   IFetchDistrictsByCountryIdSuccess,
   IFetchDistrictsByCountryIdSuccessPayload,
-  IFetchDistrictsByCountryIdFailure
+  IFetchDistrictsByCountryIdFailure,
+  IFetchTaggedDistrictsRequest,
+  IFetchTaggedDistrictsSuccess,
+  IFetchTaggedDistrictsFailure,
+  IClearTaggedDistrictList
 } from './types';
 
 export const fetchDistrictListRequest = ({
@@ -346,4 +350,29 @@ export const fetchDistrictsByCountryIdSuccess = (
 export const fetchDistrictsByCountryIdFailure = (error: Error): IFetchDistrictsByCountryIdFailure => ({
   type: DISTRICT_TYPES.FETCH_DISTRICTS_BY_COUNTRY_ID_FAILURE,
   error
+});
+
+export const fetchTaggedDistrictsRequest = ({
+  successCb,
+  failureCb
+}: Omit<IFetchTaggedDistrictsRequest, 'type'>): IFetchTaggedDistrictsRequest => ({
+  type: DISTRICT_TYPES.FETCH_TAGGED_DISTRICTS_REQUEST,
+  successCb,
+  failureCb
+});
+
+export const fetchTaggedDistrictsSuccess = (
+  payload: IFetchDistrictListSuccessPayload
+): IFetchTaggedDistrictsSuccess => ({
+  type: DISTRICT_TYPES.FETCH_TAGGED_DISTRICTS_SUCCESS,
+  payload
+});
+
+export const fetchTaggedDistrictsFailure = (error: Error): IFetchTaggedDistrictsFailure => ({
+  type: DISTRICT_TYPES.FETCH_TAGGED_DISTRICTS_FAILURE,
+  error
+});
+
+export const clearTaggedDistrictList = (): IClearTaggedDistrictList => ({
+  type: DISTRICT_TYPES.CLEAR_TAGGED_DISTRICT_LIST
 });

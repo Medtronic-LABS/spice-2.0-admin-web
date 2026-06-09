@@ -8,8 +8,10 @@ import * as healthFacilityActions from '../../../store/healthFacility/actions';
 import { mockHealthFacilityList } from '../../../tests/mockData/healthFacilityConstants';
 import { PROTECTED_ROUTES } from '../../../constants/route';
 import { FETCH_HEALTH_FACILITY_LIST_REQUEST } from '../../../store/healthFacility/actionTypes';
-import { FETCH_DISTRICT_LIST_REQUEST } from '../../../store/district/actionTypes';
+import { FETCH_TAGGED_DISTRICTS_REQUEST } from '../../../store/district/actionTypes';
+import { FETCH_TAGGED_CHIEFDOMS_REQUEST } from '../../../store/chiefdom/actionTypes';
 import * as districtActions from '../../../store/district/actions';
+import * as chiefdomActions from '../../../store/chiefdom/actions';
 import { LegacyRoute as Route } from '../../../tests/routerTestUtils';
 
 // Mock store setup
@@ -144,7 +146,14 @@ describe('HealthFacilityList Component', () => {
         }
       },
       district: {
-        districtList: []
+        taggedDistrictList: [],
+        taggedDistrictTotal: 0,
+        loadingTaggedDistricts: false
+      },
+      chiefdom: {
+        taggedChiefdomList: [],
+        taggedChiefdomTotal: 0,
+        loadingTaggedChiefdoms: false
       },
       common: {
         labelName: null
@@ -181,7 +190,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: {
         labelName: null
       }
@@ -223,7 +233,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: { labelName: null }
     });
     const firstRow = listWithActiveRow[0];
@@ -277,7 +288,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: {
         labelName: null
       }
@@ -309,7 +321,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: {
         labelName: null
       }
@@ -340,7 +353,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: {
         labelName: null
       }
@@ -371,7 +385,7 @@ describe('HealthFacilityList Component', () => {
     expect(fetchHFTypesRequestSpy).toHaveBeenCalledWith({ countryId: 1 });
   });
 
-  it('dispatches fetchDistrictListRequest when districtList is empty on mount', () => {
+  it('dispatches fetchTaggedDistrictsRequest when taggedDistrictList is empty on mount', () => {
     render(
       <Provider store={store}>
         <Router>
@@ -381,12 +395,13 @@ describe('HealthFacilityList Component', () => {
     );
 
     const actions = store.getActions();
-    expect(actions.some((a: { type: string }) => a.type === FETCH_DISTRICT_LIST_REQUEST)).toBe(true);
+    expect(actions.some((a: { type: string }) => a.type === FETCH_TAGGED_DISTRICTS_REQUEST)).toBe(true);
   });
 
-  it('dispatches clearHFList and clearDistrictList on unmount', () => {
+  it('dispatches clearHFList and clearTaggedDistrictList on unmount', () => {
     const clearHFListSpy = jest.spyOn(healthFacilityActions, 'clearHFList');
-    const clearDistrictListSpy = jest.spyOn(districtActions, 'clearDistrictList');
+    const clearTaggedDistrictListSpy = jest.spyOn(districtActions, 'clearTaggedDistrictList');
+    const clearTaggedChiefdomListSpy = jest.spyOn(chiefdomActions, 'clearTaggedChiefdomList');
 
     const { unmount } = render(
       <Provider store={store}>
@@ -399,7 +414,8 @@ describe('HealthFacilityList Component', () => {
     unmount();
 
     expect(clearHFListSpy).toHaveBeenCalled();
-    expect(clearDistrictListSpy).toHaveBeenCalled();
+    expect(clearTaggedDistrictListSpy).toHaveBeenCalled();
+    expect(clearTaggedChiefdomListSpy).toHaveBeenCalled();
   });
 
   it('navigates to create health facility route when Add is clicked with region params', () => {
@@ -441,7 +457,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: { labelName: null }
     });
 
@@ -481,7 +498,8 @@ describe('HealthFacilityList Component', () => {
           appTypes: []
         }
       },
-      district: { districtList: [] },
+      district: { taggedDistrictList: [], taggedDistrictTotal: 0, loadingTaggedDistricts: false },
+      chiefdom: { taggedChiefdomList: [], taggedChiefdomTotal: 0, loadingTaggedChiefdoms: false },
       common: { labelName: null }
     });
 

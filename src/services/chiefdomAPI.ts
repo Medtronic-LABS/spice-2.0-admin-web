@@ -119,3 +119,12 @@ export const fetchChiefdomsByCountryId = (countryId: string) =>
     url: `/admin-service/data/chiefdoms/${countryId}`,
     data: {}
   });
+
+export const fetchTaggedChiefdoms = (districtIds: (string | number)[]) =>
+  axios({
+    method: 'GET',
+    url: '/user-service/user/tagged-chiefdoms',
+    params: {
+      districtId: districtIds.join(',')
+    }
+  });

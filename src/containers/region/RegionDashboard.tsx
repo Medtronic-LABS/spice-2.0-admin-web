@@ -21,8 +21,10 @@ import {
   getRegionsSelector
 } from '../../store/region/selectors';
 import { appendZeroBefore, formatUserToastMsg } from '../../utils/commonUtils';
+import { findMatchingRegionCard } from '../../utils/routeUtil';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
+import { areaManagerRole, divisionalManagerRole } from '../../constants/roleConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import localStorageServices from '../../global/localStorageServices';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -34,7 +36,7 @@ import { getClinicalWorkflowSelector } from '../../store/district/selectors';
 import { clearHFSummary } from '../../store/healthFacility/actions';
 import { IRegionDetail } from '../../store/region/types';
 import { clearAppType, fetchTimezoneListRequest, setAppType } from '../../store/user/actions';
-import { timezoneListSelector } from '../../store/user/selectors';
+import { countryIdSelector, roleSelector, timezoneListSelector } from '../../store/user/selectors';
 import styles from './Region.module.scss';
 
 /**
@@ -51,7 +53,10 @@ const Region = (): React.ReactElement => {
   const loadingMore = useSelector(getRegionsLoadingMoreSelector);
   const timezoneList = useSelector(timezoneListSelector);
   const clinicalWorkflows = useSelector(getClinicalWorkflowSelector);
+  const userRoles = useSelector(roleSelector);
+  const userCountry = useSelector(countryIdSelector);
   const { push } = useHistory();
+  const hasAutoNavigated = useRef(false);
 
   const {
     region: { s: regionSName, p: regionPName }
@@ -238,6 +243,33 @@ const Region = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [regions, onDashboardExit]
   );
+
+  const isManagerRole = userRoles === areaManagerRole || userRoles === divisionalManagerRole;
+
+  useEffect(() => {
+    const hasCountryMatchKey = userCountry?.id || userCountry?.tenantId || userCountry?.name;
+    if (
+      !isManagerRole ||
+      loading ||
+      searchText.current ||
+      !hasCountryMatchKey ||
+      !parsedData.length ||
+      hasAutoNavigated.current
+    ) {
+      return;
+    }
+
+    const matchingRegion = findMatchingRegionCard(parsedData, userCountry);
+    if (!matchingRegion?.detailRoute) {
+      return;
+    }
+
+    hasAutoNavigated.current = true;
+    sessionStorageServices.setItem(APPCONSTANTS.ID, matchingRegion.tenantId);
+    sessionStorageServices.setItem(APPCONSTANTS.FORM_ID, matchingRegion.formId);
+    matchingRegion.setBreadcrumbDetails?.();
+    push({ pathname: matchingRegion.detailRoute });
+  }, [isManagerRole, loading, parsedData, userCountry, push]);
 
   const noRegionsAvailable = !(searchText.current || parsedData.length);
   const noSearchResultAvailable = Boolean(searchText.current && !parsedData.length);

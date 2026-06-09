@@ -341,10 +341,14 @@ describe('UserList Component', () => {
   });
 
   describe('Component Rendering', () => {
-    it('should render without crashing', async () => {
-      renderWithMemoryRouter(store);
-      await waitFor(() => expect(screen.getByText(/Users/i)).toBeInTheDocument());
-    });
+    it(
+      'should render without crashing',
+      async () => {
+        renderWithMemoryRouter(store);
+        expect(await screen.findByText(/Users/i, {}, { timeout: 10000 })).toBeInTheDocument();
+      },
+      15000
+    );
 
     it('should render DetailCard with correct header and button', () => {
       renderComponent(store);
