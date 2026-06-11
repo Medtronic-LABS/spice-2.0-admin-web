@@ -64,9 +64,18 @@ jest.mock('../../../multiSelect/MultiSelect', () => ({
   default: (props: any) => {
     mockMultiSelect(props);
     return (
-      <div data-testid='multi-select'>
-        <span>{props.label}</span>
-      </div>
+    <div data-testid='multi-select'>
+      <span>{props.label}</span>
+      {props.label === 'Villages' && (
+        <button
+          type='button'
+          data-testid='trigger-multi-Villages'
+          onClick={() => props.onChange?.([{ id: 100, name: 'V1' }, { id: 200, name: 'V2' }])}
+        >
+          trigger
+        </button>
+      )}
+    </div>
     );
   }
 }));
@@ -80,16 +89,23 @@ const baseStore = {
     isRolesLoading: false
   },
   district: {
-    districtList: [{ id: 1, name: 'D1' }],
-    loading: false
+    taggedDistrictList: [{ id: 1, name: 'D1' }],
+    loadingTaggedDistricts: false
+  },
+  chiefdom: {
+    taggedChiefdomList: [{ id: 2, name: 'C1' }],
+    loadingTaggedChiefdoms: false
   },
   healthFacility: {
-    chiefdomList: [{ id: 2, name: 'C1' }],
-    chiefdomLoading: false,
     villagesList: [{ id: 3, name: 'V1' }],
     villagesLoading: false
   }
 };
+
+const DEBOUNCE_MS = 500;
+
+const getActionsByType = (store: ReturnType<typeof mockStore>, type: string) =>
+  store.getActions().filter((action: { type: string }) => action.type === type);
 
 describe('DistrictChiefdomVillageFields', () => {
   const defaultProps = {
@@ -101,7 +117,8 @@ describe('DistrictChiefdomVillageFields', () => {
   const renderWithForm = (
     props: Partial<React.ComponentProps<typeof DistrictChiefdomVillageFields>> = {},
     storeState = baseStore,
-    initialValues: Record<string, unknown> = { users: [{ role: [{ name: poRole }] }] }
+    initialValues: Record<string, unknown> = { users: [{ role: [{ name: poRole }] }] },
+    { flushDebounce = true }: { flushDebounce?: boolean } = {}
   ) => {
     const store = mockStore(storeState);
     const view = render(
@@ -113,13 +130,23 @@ describe('DistrictChiefdomVillageFields', () => {
         </Form>
       </Provider>
     );
+    if (flushDebounce) {
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+    }
     return { ...view, store };
   };
 
   beforeEach(() => {
+    jest.useFakeTimers();
     jest.clearAllMocks();
     mockSelectInput.mockClear();
     mockMultiSelect.mockClear();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('renders district, chiefdom, and village fields with configured labels', () => {
@@ -131,21 +158,22 @@ describe('DistrictChiefdomVillageFields', () => {
     expect(screen.getByText('Villages')).toBeInTheDocument();
   });
 
-  it('dispatches fetch district list when countryId is available from route', () => {
-    const { store } = renderWithForm();
+  it('dispatches fetch tagged districts when tagged district list is empty', () => {
+    const storeState = {
+      ...baseStore,
+      district: { taggedDistrictList: [], loadingTaggedDistricts: false }
+    };
+    const { store } = renderWithForm({}, storeState);
     expect(store.getActions()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'FETCH_DISTRICT_LIST_REQUEST',
-          countryId: 99,
-          tenantId: '10',
-          isActive: true
+          type: 'FETCH_TAGGED_DISTRICTS_REQUEST'
         })
       ])
     );
   });
 
-  it('dispatches fetch chiefdom list when selected district is present', () => {
+  it('dispatches fetch tagged chiefdoms when selected district is present', () => {
     const { store } = renderWithForm(
       {},
       baseStore,
@@ -156,8 +184,10 @@ describe('DistrictChiefdomVillageFields', () => {
     expect(store.getActions()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: HF_ACTION_TYPES.FETCH_CHIEFDOM_LIST_REQUEST_FOR_HF,
-          countryId: 99,
+          type: 'CLEAR_TAGGED_CHIEFDOM_LIST'
+        }),
+        expect.objectContaining({
+          type: 'FETCH_TAGGED_CHIEFDOMS_REQUEST',
           districtIds: [1]
         })
       ])
@@ -193,9 +223,9 @@ describe('DistrictChiefdomVillageFields', () => {
     renderWithForm();
     const districtCall = mockSelectInput.mock.calls.find((c) => c[0].label === 'County');
     const chiefdomCall = mockSelectInput.mock.calls.find((c) => c[0].label === 'Chiefdom');
-    expect(districtCall?.[0].options).toEqual(baseStore.district.districtList);
+    expect(districtCall?.[0].options).toEqual(baseStore.district.taggedDistrictList);
     expect(districtCall?.[0].loadingOptions).toBe(false);
-    expect(chiefdomCall?.[0].options).toEqual(baseStore.healthFacility.chiefdomList);
+    expect(chiefdomCall?.[0].options).toEqual(baseStore.chiefdom.taggedChiefdomList);
     expect(mockMultiSelect.mock.calls[0][0].options).toEqual(baseStore.healthFacility.villagesList);
     expect(mockMultiSelect.mock.calls[0][0].loadingOptions).toBe(false);
   });
@@ -644,5 +674,136 @@ describe('DistrictChiefdomVillageFields', () => {
     renderWithForm({}, baseStore, { users: [{ role: [{ name: heRole }] }] });
     const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
     expect(villagesCalls.length).toBe(0);
+  });
+
+  describe('debounced fetches', () => {
+    it('debounces fetchTaggedChiefdomsRequest until district selection settles', () => {
+      const { store } = renderWithForm({}, baseStore, { users: [{ role: [{ name: poRole }] }] }, { flushDebounce: false });
+
+      act(() => {
+        screen.getByTestId('trigger-select-County').click();
+      });
+
+      expect(getActionsByType(store, 'FETCH_TAGGED_CHIEFDOMS_REQUEST')).toHaveLength(0);
+
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+
+      expect(getActionsByType(store, 'FETCH_TAGGED_CHIEFDOMS_REQUEST')).toEqual([
+        expect.objectContaining({ districtIds: [10] })
+      ]);
+    });
+
+    it('debounces fetchVillagesListRequest until chiefdom selection settles', () => {
+      const { store } = renderWithForm(
+        {},
+        baseStore,
+        {
+          users: [
+            {
+              role: [{ name: poRole }],
+              districts: { id: 5, name: 'D' }
+            }
+          ]
+        },
+        { flushDebounce: false }
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+      store.clearActions();
+
+      act(() => {
+        screen.getByTestId('trigger-select-Chiefdom').click();
+      });
+
+      expect(getActionsByType(store, 'FETCH_VILLAGES_LIST_REQUEST_FOR_HF')).toHaveLength(0);
+
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+
+      expect(getActionsByType(store, 'FETCH_VILLAGES_LIST_REQUEST_FOR_HF')).toEqual([
+        expect.objectContaining({
+          countryId: 99,
+          chiefdomIds: [20]
+        })
+      ]);
+    });
+
+    it('debounces fetchBranchesByUnionRequest until village selection settles', () => {
+      const { store } = renderWithForm(
+        {},
+        baseStore,
+        {
+          users: [
+            {
+              role: [{ name: poRole }],
+              districts: { id: 5, name: 'D' },
+              chiefdoms: { id: 7, name: 'C' }
+            }
+          ]
+        },
+        { flushDebounce: false }
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+      store.clearActions();
+
+      act(() => {
+        screen.getByTestId('trigger-multi-Villages').click();
+      });
+
+      expect(getActionsByType(store, 'FETCH_BRANCHES_BY_UNION_REQUEST')).toHaveLength(0);
+
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+
+      expect(getActionsByType(store, 'FETCH_BRANCHES_BY_UNION_REQUEST')).toEqual([
+        expect.objectContaining({
+          payload: {
+            unionIds: [100, 200]
+          }
+        })
+      ]);
+    });
+
+    it('dispatches only the latest chiefdom fetch after rapid district changes', () => {
+      const store = mockStore(baseStore);
+      let formApi: any;
+
+      render(
+        <Provider store={store}>
+          <Form onSubmit={jest.fn()} initialValues={{ users: [{ role: [{ name: poRole }] }] }}>
+            {({ form }) => {
+              formApi = form;
+              return <DistrictChiefdomVillageFields form={form} {...defaultProps} />;
+            }}
+          </Form>
+        </Provider>
+      );
+
+      act(() => {
+        formApi.change('users.0.districts', { id: 10, name: 'D1' });
+      });
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+      act(() => {
+        formApi.change('users.0.districts', { id: 20, name: 'D2' });
+      });
+      act(() => {
+        jest.advanceTimersByTime(DEBOUNCE_MS);
+      });
+
+      const chiefdomRequests = getActionsByType(store, 'FETCH_TAGGED_CHIEFDOMS_REQUEST');
+      expect(chiefdomRequests).toHaveLength(1);
+      expect(chiefdomRequests[0]).toEqual(expect.objectContaining({ districtIds: [20] }));
+    });
   });
 });

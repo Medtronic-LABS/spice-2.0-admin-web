@@ -1,28 +1,37 @@
 import { FormApi } from 'final-form';
 import { useEffect, useMemo } from 'react';
 import { Field, useField } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import SelectInput from '../../formFields/SelectInput';
 import MultiSelect from '../../multiSelect/MultiSelect';
 import APPCONSTANTS from '../../../constants/appConstants';
 import useAppTypeConfigs from '../../../hooks/appTypeBasedConfigs';
+import useDebouncedValue from '../../../hooks/useDebouncedValue';
 import { fetchBranchesByUnionRequest } from '../../../store/branch/actions';
-import { districtLoadingSelector, getDistrictListSelector } from '../../../store/district/selectors';
-import { fetchDistrictListRequest } from '../../../store/district/actions';
-import { fetchChiefdomListRequest, fetchVillagesListRequest } from '../../../store/healthFacility/actions';
+import { clearTaggedChiefdomList, fetchTaggedChiefdomsRequest } from '../../../store/chiefdom/actions';
 import {
-  chiefdomListSelector,
-  chiefdomLoadingSelector,
+  getTaggedChiefdomListSelector,
+  taggedChiefdomLoadingSelector
+} from '../../../store/chiefdom/selectors';
+import { fetchTaggedDistrictsRequest } from '../../../store/district/actions';
+import {
+  getTaggedDistrictListSelector,
+  taggedDistrictLoadingSelector
+} from '../../../store/district/selectors';
+import { fetchVillagesListRequest } from '../../../store/healthFacility/actions';
+import {
   villagesListSelector,
   villagesLoadingSelector
 } from '../../../store/healthFacility/selectors';
 import { IVillages } from '../../../store/healthFacility/types';
 import { countryIdSelector } from '../../../store/user/selectors';
+import { formatUserToastMsg } from '../../../utils/commonUtils';
 import toastCenter, { getErrorToastArgs } from '../../../utils/toastCenter';
 import sessionStorageServices from '../../../global/sessionStorageServices';
 import { getRoleFlags } from '../userFormUtils';
 import { required } from '../../../utils/validation';
+import { useAppDispatch } from '../../../store/hooks';
 
 interface IDistrictChiefdomVillageFieldsProps {
   form: FormApi<any>;
@@ -54,14 +63,14 @@ const DistrictChiefdomVillageFields = ({
   isHFCreate,
   index
 }: IDistrictChiefdomVillageFieldsProps) => {
-  const dispatch = useDispatch();
-  const { tenantId, regionId } = useParams<{ tenantId: string, regionId: string }>();
+  const dispatch = useAppDispatch();
+  const { regionId } = useParams<{ tenantId: string; regionId: string }>();
   const country = useSelector(countryIdSelector);
   const countryId = Number(regionId || country?.id || sessionStorageServices.getItem(APPCONSTANTS.COUNTRY_ID));
-  const districtList = useSelector(getDistrictListSelector);
-  const districtLoading = useSelector(districtLoadingSelector);
-  const chiefdomList = useSelector(chiefdomListSelector);
-  const chiefdomLoading = useSelector(chiefdomLoadingSelector);
+  const taggedDistrictList = useSelector(getTaggedDistrictListSelector);
+  const taggedDistrictLoading = useSelector(taggedDistrictLoadingSelector);
+  const taggedChiefdomList = useSelector(getTaggedChiefdomListSelector);
+  const taggedChiefdomLoading = useSelector(taggedChiefdomLoadingSelector);
   const villages = useSelector(villagesListSelector);
   const villagesLoading = useSelector(villagesLoadingSelector);
 
@@ -103,27 +112,61 @@ const DistrictChiefdomVillageFields = ({
     [selectedVillages]
   );
 
-  // District fetch
-  useEffect(() => {
-    if (countryId) {
-      dispatch(fetchDistrictListRequest({ countryId, tenantId, isActive: true }));
-    }
-  }, [countryId, dispatch, tenantId]);
+  const debouncedDistrictIds = useDebouncedValue(selectedDistrictIds, 500);
+  const debouncedChiefdomIds = useDebouncedValue(selectedChiefdomIds, 500);
+  const debouncedVillageIds = useDebouncedValue(selectedVillageIds, 500);
 
-  // Chiefdom fetch
+  const {
+    district: { s: districtSName },
+    chiefdom: { s: chiefdomSName },
+    village: { p: villagePName }
+  } = useAppTypeConfigs();
+
+  // Tagged district fetch
   useEffect(() => {
-    if (selectedDistrictIds.length && countryId) {
-      dispatch(fetchChiefdomListRequest({ countryId, districtIds: selectedDistrictIds }));
+    if (!taggedDistrictList.length) {
+      dispatch(
+        fetchTaggedDistrictsRequest({
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
+              )
+            )
+        })
+      );
     }
-  }, [countryId, dispatch, selectedDistrictIds]);
+  }, [dispatch, districtSName, taggedDistrictList.length]);
+
+  // Tagged chiefdom fetch
+  useEffect(() => {
+    dispatch(clearTaggedChiefdomList());
+    if (debouncedDistrictIds.length) {
+      dispatch(
+        fetchTaggedChiefdomsRequest({
+          districtIds: debouncedDistrictIds,
+          failureCb: (e) =>
+            toastCenter.error(
+              ...getErrorToastArgs(
+                e,
+                APPCONSTANTS.OOPS,
+                formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
+              )
+            )
+        })
+      );
+    }
+  }, [dispatch, chiefdomSName, debouncedDistrictIds]);
 
   // Villages fetch
   useEffect(() => {
-    if (selectedChiefdomIds.length && countryId && isOrganizerSelected) {
+    if (debouncedChiefdomIds.length && countryId && isOrganizerSelected) {
       dispatch(
         fetchVillagesListRequest({
           countryId,
-          chiefdomIds: selectedChiefdomIds,
+          chiefdomIds: debouncedChiefdomIds,
           successCb: (list: IVillages[]) => {
             if (!list.length) {
               toastCenter.error(APPCONSTANTS.OOPS, APPCONSTANTS.NO_VILLAGE_PRESENT);
@@ -139,14 +182,14 @@ const DistrictChiefdomVillageFields = ({
     countryId,
     dispatch,
     isOrganizerSelected,
-    selectedChiefdomIds
+    debouncedChiefdomIds
   ]);
 
   // Branches fetch by region filters
   useEffect(() => {
     const noRoleSelected = !isManagerSelected && !isOrganizerSelected;
-    const managerInvalid = isManagerSelected && selectedDistrictIds.length === 0;
-    const poFoInvalid = isOrganizerSelected && selectedVillageIds.length === 0;
+    const managerInvalid = isManagerSelected && debouncedDistrictIds.length === 0;
+    const poFoInvalid = isOrganizerSelected && debouncedVillageIds.length === 0;
 
     if (noRoleSelected || managerInvalid || poFoInvalid) {
       return;
@@ -157,14 +200,14 @@ const DistrictChiefdomVillageFields = ({
       unionIds?: number[];
     } = {};
 
-    if (isManagerSelected && selectedDistrictIds.length) {
-      requestPayload.districtIds = selectedDistrictIds;
+    if (isManagerSelected && debouncedDistrictIds.length) {
+      requestPayload.districtIds = debouncedDistrictIds;
     }
-    if (isAreaManagerSelected && selectedChiefdomIds.length) {
-      requestPayload.chiefdomIds = selectedChiefdomIds;
+    if (isAreaManagerSelected && debouncedChiefdomIds.length) {
+      requestPayload.chiefdomIds = debouncedChiefdomIds;
     }
-    if (isOrganizerSelected && selectedVillageIds.length) {
-      requestPayload.unionIds = selectedVillageIds;
+    if (isOrganizerSelected && debouncedVillageIds.length) {
+      requestPayload.unionIds = debouncedVillageIds;
     }
     dispatch(
       fetchBranchesByUnionRequest({
@@ -179,16 +222,11 @@ const DistrictChiefdomVillageFields = ({
     isOrganizerSelected,
     isAreaManagerSelected,
     isManagerSelected,
-    selectedChiefdomIds,
-    selectedDistrictIds,
-    selectedVillageIds
+    debouncedChiefdomIds,
+    debouncedDistrictIds,
+    debouncedVillageIds
   ]);
 
-  const {
-    district: { s: districtSName },
-    chiefdom: { s: chiefdomSName },
-    village: { p: villagePName }
-  } = useAppTypeConfigs();
   const colClass = `${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `;
 
   if (!isOrganizerSelected && !isManagerSelected && !isHESelected) {
@@ -219,8 +257,8 @@ const DistrictChiefdomVillageFields = ({
                 isDisabled={false}
                 isModel={true}
                 isMulti={true}
-                options={districtList || []}
-                loadingOptions={districtLoading}
+                options={taggedDistrictList || []}
+                loadingOptions={taggedDistrictLoading}
                 error={isError(meta)}
                 onChange={(value: any) => {
                   form.change(`${name}.chiefdoms`, undefined);
@@ -236,8 +274,8 @@ const DistrictChiefdomVillageFields = ({
                 errorLabel={districtSName.toLowerCase()}
                 labelKey='name'
                 valueKey='id'
-                options={districtList || []}
-                loadingOptions={districtLoading}
+                options={taggedDistrictList || []}
+                loadingOptions={taggedDistrictLoading}
                 error={isError(meta)}
                 isModel={true}
                 required={true}
@@ -275,8 +313,8 @@ const DistrictChiefdomVillageFields = ({
                   isDisabled={false}
                   isModel={true}
                   isMulti={true}
-                  options={chiefdomList || []}
-                  loadingOptions={chiefdomLoading}
+                  options={taggedChiefdomList || []}
+                  loadingOptions={taggedChiefdomLoading}
                   error={isError(meta)}
                   onChange={(value: any) => {
                     form.change(`${name}.villages`, undefined);
@@ -291,8 +329,8 @@ const DistrictChiefdomVillageFields = ({
                   errorLabel={chiefdomSName.toLowerCase()}
                   labelKey='name'
                   valueKey='id'
-                  options={chiefdomList || []}
-                  loadingOptions={chiefdomLoading}
+                  options={taggedChiefdomList || []}
+                  loadingOptions={taggedChiefdomLoading}
                   error={isError(meta)}
                   isModel={true}
                   required={true}
