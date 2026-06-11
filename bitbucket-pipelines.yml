@@ -194,3 +194,16 @@ pipelines:
             - step:
                 <<: *deploy-s3-cf
                 runs-on: *runner-uhis-dev
+
+    deploy-uhis-training:
+      - stage:
+          name: Build & Deploy to UHIS-TRAINING
+          deployment: uhis-training
+          steps:
+            - step:
+                <<: *build
+                runs-on: *runner-uhis-dev
+            - step:
+                <<: *deploy-s3-cf-training
+                runs-on: *runner-uhis-dev
+
