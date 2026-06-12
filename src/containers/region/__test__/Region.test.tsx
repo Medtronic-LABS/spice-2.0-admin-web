@@ -174,13 +174,39 @@ describe('Region Component', () => {
     expect(getByTestId('drag-drop-files')).toBeInTheDocument();
   });
 
-  it('hides Download and Upload when user role is REGION_ADMIN (read-only)', () => {
-    store = getMockStore({
-      user: { user: { role: APPCONSTANTS.ROLES.REGION_ADMIN, appTypes: [] } }
-    });
-    renderWithProviders(<Region />, { store });
-    expect(screen.queryByText('Download')).not.toBeInTheDocument();
-    expect(screen.queryByText('Upload')).not.toBeInTheDocument();
+  describe('read-only access for region admin and manager roles', () => {
+    const readOnlyRoles = [
+      ['REGION_ADMIN', APPCONSTANTS.ROLES.REGION_ADMIN],
+      ['AREA_MANAGER', APPCONSTANTS.ROLES.AREA_MANAGER],
+      ['DIVISIONAL_MANAGER', APPCONSTANTS.ROLES.DIVISIONAL_MANAGER]
+    ] as const;
+
+    it.each(readOnlyRoles)(
+      'hides Download and Upload when user role is %s',
+      (_label, role) => {
+        store = getMockStore({
+          user: { user: { role, appTypes: [] } }
+        });
+        renderWithProviders(<Region />, { store });
+        expect(screen.queryByText('Download')).not.toBeInTheDocument();
+        expect(screen.queryByText('Upload')).not.toBeInTheDocument();
+      }
+    );
+
+    it.each(readOnlyRoles)(
+      'hides Download Template when region list is empty and user role is %s',
+      (_label, role) => {
+        store = getMockStore({
+          user: { user: { role, appTypes: [] } },
+          region: {
+            ...initialState.region,
+            detail: { ...initialState.region.detail, list: [], total: 0 }
+          }
+        });
+        renderWithProviders(<Region />, { store });
+        expect(screen.queryByText('Download Template')).not.toBeInTheDocument();
+      }
+    );
   });
 
   it('dispatches downloadFileRequest when Download button is clicked', () => {
@@ -262,18 +288,6 @@ describe('Region Component', () => {
         failureCb: expect.any(Function)
       })
     );
-  });
-
-  it('hides Download Template button when region list is empty and user role is REGION_ADMIN', () => {
-    store = getMockStore({
-      user: { user: { role: APPCONSTANTS.ROLES.REGION_ADMIN, appTypes: [] } },
-      region: {
-        ...initialState.region,
-        detail: { ...initialState.region.detail, list: [], total: 0 }
-      }
-    });
-    renderWithProviders(<Region />, { store });
-    expect(screen.queryByText('Download Template')).not.toBeInTheDocument();
   });
 
   it('disables Download Template button when downloading is true', () => {

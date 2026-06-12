@@ -48,6 +48,7 @@ const Region = (): React.ReactElement => {
   const regionDetailsId = useSelector(getRegionIdSelector);
   const [uploadClicked, setUploadClicked] = useState(false);
   const appTypes = useSelector(getAppTypeSelector);
+  const { REGION_ADMIN, AREA_MANAGER, DIVISIONAL_MANAGER } = APPCONSTANTS.ROLES;
 
   const {
     isCommunity,
@@ -60,7 +61,7 @@ const Region = (): React.ReactElement => {
   } = useAppTypeConfigs();
 
   // Check if the current user role is Region Admin to set read-only access
-  const isReadOnly = role === APPCONSTANTS.ROLES.REGION_ADMIN;
+  const isReadOnly = new Set([REGION_ADMIN, AREA_MANAGER, DIVISIONAL_MANAGER]).has(role);
 
   /**
    * Handles the file download process when the download button is clicked.

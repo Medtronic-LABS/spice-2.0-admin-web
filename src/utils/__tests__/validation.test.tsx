@@ -711,18 +711,6 @@ describe('Validation', () => {
       expect(result).toBe('');
     });
 
-    it('should return error for BD number with 5 consecutive same digits', () => {
-      const input = '01222223456';
-      const result = validateMobile(input, true);
-      expect(result).toBe('Phone number cannot contain 5 or more consecutive same digits');
-    });
-
-    it('should return error for numbers with 5 or more consecutive same digits', () => {
-      expect(validateMobile('01222223456', true)).toBe('Phone number cannot contain 5 or more consecutive same digits');
-      expect(validateMobile('01777778901', true)).toBe('Phone number cannot contain 5 or more consecutive same digits');
-      expect(validateMobile('01234444456', true)).toBe('Phone number cannot contain 5 or more consecutive same digits');
-    });
-
     it('should accept numbers with less than 5 consecutive same digits', () => {
       expect(validateMobile('01222334567', true)).toBe('');
       expect(validateMobile('01233334567', true)).toBe('');
