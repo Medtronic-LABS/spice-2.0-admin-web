@@ -152,7 +152,7 @@ export const ReorderModel = ({
                   }}
                 </FieldArray>
               </div>
-              <div className='modal-footer py-0dot75 px-1dot25'>
+              <div className='modal-footer py-0dot75 px-1dot25 gap-0dot75'>
                 <button type='button' className='btn secondary-btn me-0dot625 px-1dot125 ms-auto' onClick={onCancel}>
                   Cancel
                 </button>

@@ -131,7 +131,7 @@ const ModalForm = React.memo(
                     </div>
                     {/* Modal footer */}
                     {!hideFooterButton && (
-                      <div className={`modal-footer py-0dot75 px-1dot25`}>
+                      <div className={`modal-footer py-0dot75 px-1dot25 gap-0dot75`}>
                         {deactivateLabel && (
                           <button
                             type='button'
