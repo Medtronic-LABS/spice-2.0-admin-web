@@ -71,7 +71,7 @@ jest.mock('../userFormUtils', () => {
     }),
     filterRolesByAppTypeFn: (roles: any) => roles || {},
     isVillageBasedRoleSelection: jest.fn(() => false),
-    getHfFilteredForNurse: actual.getHfFilteredForNurse,
+    getHfFilteredByRole: actual.getHfFilteredByRole,
     getSpiceRoleOptionsForHF: actual.getSpiceRoleOptionsForHF
   };
 });
@@ -947,7 +947,7 @@ describe('UserForm', () => {
     });
   });
 
-  describe('Nurse role and health facility type behavior', () => {
+  describe('Nurse and CHCP role health facility type behavior', () => {
     const getSpiceRoleOptions = () =>
       mockMultiSelectCalls.filter((call) => call.label === 'SPICE Role').at(-1)?.options || [];
 
@@ -976,12 +976,13 @@ describe('UserForm', () => {
         ...defaultStoreState.healthFacility,
         healthFacilityList: [
           { id: 1, name: 'Upazila HF', type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX, tenantId: 1 },
-          { id: 2, name: 'Community HF', type: 'Community Health Centre', tenantId: 2 }
+          { id: 2, name: 'Community Clinic HF', type: APPCONSTANTS.COMMUNITY_CLINIC, tenantId: 2 },
+          { id: 3, name: 'Community HF', type: 'Community Health Centre', tenantId: 3 }
         ]
       }
     };
 
-    it('excludes Nurse from SPICE role options when isHF and health facility type is not Upazila Health Complex', async () => {
+    it('excludes Nurse and CHCP from SPICE role options when isHF and health facility type matches neither', async () => {
       renderUserForm(
         {
           isSiteUser: true,
@@ -997,11 +998,11 @@ describe('UserForm', () => {
 
       await waitFor(() => {
         const options = getSpiceRoleOptions();
-        expect(options.map((role: any) => role.name)).toEqual(['CHCP']);
+        expect(options.map((role: any) => role.name)).toEqual([]);
       });
     });
 
-    it('includes Nurse in SPICE role options when isHF and health facility type is Upazila Health Complex', async () => {
+    it('includes only Nurse in SPICE role options when isHF and health facility type is Upazila Health Complex', async () => {
       renderUserForm(
         {
           isSiteUser: true,
@@ -1017,7 +1018,27 @@ describe('UserForm', () => {
 
       await waitFor(() => {
         const options = getSpiceRoleOptions();
-        expect(options.map((role: any) => role.name)).toEqual(['CHCP', nurseRole]);
+        expect(options.map((role: any) => role.name)).toEqual([nurseRole]);
+      });
+    });
+
+    it('includes only CHCP in SPICE role options when isHF and health facility type is Community Clinic', async () => {
+      renderUserForm(
+        {
+          isSiteUser: true,
+          data: siteUserFormData,
+          userFormParams: {
+            ...defaultProps.userFormParams,
+            isHF: true,
+            healthFacilityType: APPCONSTANTS.COMMUNITY_CLINIC
+          }
+        },
+        storeWithNurseRole
+      );
+
+      await waitFor(() => {
+        const options = getSpiceRoleOptions();
+        expect(options.map((role: any) => role.name)).toEqual([chcpRole]);
       });
     });
 
@@ -1049,9 +1070,13 @@ describe('UserForm', () => {
 
       await waitFor(() => {
         const options = getAssignedHfOptions();
-        expect(options).toHaveLength(2);
+        expect(options).toHaveLength(3);
         expect(options.map((hf: { type: string }) => hf.type)).toEqual(
-          expect.arrayContaining([APPCONSTANTS.UPAZILA_HEALTH_COMPLEX, 'Community Health Centre'])
+          expect.arrayContaining([
+            APPCONSTANTS.UPAZILA_HEALTH_COMPLEX,
+            APPCONSTANTS.COMMUNITY_CLINIC,
+            'Community Health Centre'
+          ])
         );
       });
 
@@ -1063,6 +1088,41 @@ describe('UserForm', () => {
         expect(options[0]).toMatchObject({
           name: 'Upazila HF',
           type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+        });
+      });
+    });
+
+    it('filters assigned health facility options to Community Clinic when CHCP is selected', async () => {
+      renderUserForm(
+        {
+          isSiteUser: true,
+          isEdit: true,
+          initialEditValue: {
+            suiteAccess: [{ groupName: 'SPICE', label: 'SPICE' }],
+            role: [],
+            roles: [],
+            reportRoles: [],
+            insightRoles: [],
+            organizations: [],
+            villages: []
+          },
+          userFormParams: { ...defaultProps.userFormParams, isHF: false }
+        },
+        storeWithNurseRole
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('Assigned Health Facility')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('spice-role-change-trigger-chcp'));
+
+      await waitFor(() => {
+        const options = getAssignedHfOptions();
+        expect(options).toHaveLength(1);
+        expect(options[0]).toMatchObject({
+          name: 'Community Clinic HF',
+          type: APPCONSTANTS.COMMUNITY_CLINIC
         });
       });
     });

@@ -5,6 +5,7 @@ import {
   divisionalManagerRole,
   foRole,
   heRole,
+  chcpRole,
   nurseRole,
   poRole,
   shastiyaKormiRole,
@@ -38,15 +39,20 @@ export const isVillageBasedRoleSelection = (roles: IRoles[] | undefined): boolea
     (r) => villageBasedRoles.includes(r?.name) || r?.name === shastiyaKormiRole
   );
 
-export const getHfFilteredForNurse = (
-  isNurseSelected: boolean,
-  hfList: IHealthFacility[],
-  upazilaHealthComplexType: string = APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+const ROLE_HEALTH_FACILITY_TYPE_MAP: Record<string, string> = {
+  [nurseRole]: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX,
+  [chcpRole]: APPCONSTANTS.COMMUNITY_CLINIC
+};
+
+export const getHfFilteredByRole = (
+  role: string | undefined,
+  hfList: IHealthFacility[]
 ) => {
-  if (isNurseSelected) {
-    return hfList.filter((hf) => hf.type === upazilaHealthComplexType);
+  const requiredHfType = role ? ROLE_HEALTH_FACILITY_TYPE_MAP[role] : undefined;
+  if (!requiredHfType) {
+    return hfList;
   }
-  return hfList;
+  return hfList.filter((hf) => hf.type === requiredHfType);
 };
 
 export const getSpiceRoleOptionsForHF = (
@@ -59,10 +65,13 @@ export const getSpiceRoleOptionsForHF = (
     healthFacilityType?: string;
   } = {}
 ) => {
-  if (isHF && healthFacilityType !== APPCONSTANTS.UPAZILA_HEALTH_COMPLEX) {
-    return roles.filter((role) => role.name !== nurseRole);
+  if (!isHF) {
+    return roles;
   }
-  return roles;
+  return roles.filter((role) => {
+    const requiredHfType = ROLE_HEALTH_FACILITY_TYPE_MAP[role.name];
+    return !requiredHfType || healthFacilityType === requiredHfType;
+  });
 };
 
 interface IRole { name?: string; }

@@ -1,9 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
-import useUserFormUtils, { getHfFilteredForNurse, getRoleFlags, getSpiceRoleOptionsForHF } from '../userFormUtils';
+import useUserFormUtils, { getHfFilteredByRole, getRoleFlags, getSpiceRoleOptionsForHF } from '../userFormUtils';
 import { IRoles } from '../../../store/user/types';
 import APPCONSTANTS from '../../../constants/appConstants';
 import {
   areaManagerRole,
+  chcpRole,
   divisionalManagerRole,
   foRole,
   heRole,
@@ -119,24 +120,33 @@ describe('useUserFormUtils', () => {
   });
 });
 
-describe('getHfFilteredForNurse', () => {
+describe('getHfFilteredByRole', () => {
   const hfList = [
     { id: 1, name: 'Upazila HF', type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX },
-    { id: 2, name: 'Community HF', type: 'Community Health Centre' }
+    { id: 2, name: 'Community Clinic HF', type: APPCONSTANTS.COMMUNITY_CLINIC },
+    { id: 3, name: 'Other HF', type: 'Community Health Centre' }
   ] as IHealthFacility[];
 
-  it('returns only Upazila Health Complex facilities when Nurse is selected', () => {
-    expect(getHfFilteredForNurse(true, hfList)).toEqual([hfList[0]]);
+  it('returns only Upazila Health Complex facilities when role is Nurse', () => {
+    expect(getHfFilteredByRole(nurseRole, hfList)).toEqual([hfList[0]]);
   });
 
-  it('returns all facilities when Nurse is not selected', () => {
-    expect(getHfFilteredForNurse(false, hfList)).toEqual(hfList);
+  it('returns only Community Clinic facilities when role is CHCP', () => {
+    expect(getHfFilteredByRole(chcpRole, hfList)).toEqual([hfList[1]]);
+  });
+
+  it('returns all facilities when role is not Nurse or CHCP', () => {
+    expect(getHfFilteredByRole('HE', hfList)).toEqual(hfList);
+  });
+
+  it('returns all facilities when role is undefined', () => {
+    expect(getHfFilteredByRole(undefined, hfList)).toEqual(hfList);
   });
 });
 
 describe('getSpiceRoleOptionsForHF', () => {
   const roles = [
-    { id: 1, name: 'CHCP', displayName: 'CHCP', groupName: 'SPICE', appTypes: [] },
+    { id: 1, name: chcpRole, displayName: 'CHCP', groupName: 'SPICE', appTypes: [] },
     { id: 2, name: nurseRole, displayName: 'Nurse', groupName: 'SPICE', appTypes: [] }
   ] as IRoles[];
 
@@ -144,9 +154,18 @@ describe('getSpiceRoleOptionsForHF', () => {
     expect(
       getSpiceRoleOptionsForHF(roles, {
         isHF: true,
-        healthFacilityType: 'Community Health Centre'
+        healthFacilityType: APPCONSTANTS.COMMUNITY_CLINIC
       })
     ).toEqual([roles[0]]);
+  });
+
+  it('excludes CHCP when isHF is true and health facility type is not Community Clinic', () => {
+    expect(
+      getSpiceRoleOptionsForHF(roles, {
+        isHF: true,
+        healthFacilityType: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+      })
+    ).toEqual([roles[1]]);
   });
 
   it('includes Nurse when isHF is true and health facility type is Upazila Health Complex', () => {
@@ -155,10 +174,19 @@ describe('getSpiceRoleOptionsForHF', () => {
         isHF: true,
         healthFacilityType: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
       })
-    ).toEqual(roles);
+    ).toEqual([roles[1]]);
   });
 
-  it('includes Nurse when isHF is false regardless of health facility type', () => {
+  it('includes CHCP when isHF is true and health facility type is Community Clinic', () => {
+    expect(
+      getSpiceRoleOptionsForHF(roles, {
+        isHF: true,
+        healthFacilityType: APPCONSTANTS.COMMUNITY_CLINIC
+      })
+    ).toEqual([roles[0]]);
+  });
+
+  it('includes Nurse and CHCP when isHF is false regardless of health facility type', () => {
     expect(
       getSpiceRoleOptionsForHF(roles, {
         isHF: false,
@@ -167,8 +195,8 @@ describe('getSpiceRoleOptionsForHF', () => {
     ).toEqual(roles);
   });
 
-  it('excludes Nurse when isHF is true and health facility type is undefined', () => {
-    expect(getSpiceRoleOptionsForHF(roles, { isHF: true })).toEqual([roles[0]]);
+  it('excludes Nurse and CHCP when isHF is true and health facility type is undefined', () => {
+    expect(getSpiceRoleOptionsForHF(roles, { isHF: true })).toEqual([]);
   });
 });
 

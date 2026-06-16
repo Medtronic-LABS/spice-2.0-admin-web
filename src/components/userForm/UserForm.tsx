@@ -77,7 +77,7 @@ import { DynamicCHForm } from './userConditionalFields/DynamicCHForm';
 import BranchTaggingFields from './userConditionalFields/BranchTaggingFields';
 import useUserFormUtils, {
   filterRolesByAppTypeFn,
-  getHfFilteredForNurse,
+  getHfFilteredByRole,
   getSpiceRoleOptionsForHF,
   isVillageBasedRoleSelection
 } from './userFormUtils';
@@ -1064,8 +1064,8 @@ const UserForm = ({
     }
   }, [autoFetchData, getRoleOptions, initialEditData, isEdit]);
 
-  const getHfFiltered = (isNurseSelected: boolean, hfList: IHealthFacility[]) =>
-    getHfFilteredForNurse(isNurseSelected, hfList);
+  const getHfFiltered = (role: string | undefined, hfList: IHealthFacility[]) =>
+    getHfFilteredByRole(role, hfList);
 
   const getSpiceRoleOptions = (roles: IRoles[]) =>
     getSpiceRoleOptionsForHF(roles, { isHF, healthFacilityType });
@@ -1109,6 +1109,7 @@ const UserForm = ({
           const isFoSelected = roleNames.has(foRole);
           const isCHCPSelected = roleNames.has(chcpRole);
           const isNurseSelected = roleNames.has(nurseRole);
+          const hfFilterRole = isNurseSelected ? nurseRole : isCHCPSelected ? chcpRole : undefined;
           const hasSelectedSpiceRoles = isShastiyaKormiSelected || isPoSelected || isFoSelected || isCHCPSelected;
           const hasSpiceHFSelection = showSpiceHFRef.current[index] || hasSelectedSpiceRoles;
 
@@ -1720,7 +1721,7 @@ const UserForm = ({
                               errorLabel={`assigned ${healthfacilitySName.toLowerCase()}`}
                               labelKey='name'
                               valueKey='id'
-                              options={getHfFiltered(isNurseSelected, newHFList)}
+                              options={getHfFiltered(hfFilterRole, newHFList)}
                               loadingOptions={hfLoading}
                               error={isError(meta)}
                               isModel={true}

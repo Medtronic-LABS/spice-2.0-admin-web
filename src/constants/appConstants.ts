@@ -370,6 +370,7 @@ const APPCONSTANTS = {
   YES: 'Yes',
   NO: 'No',
   UPAZILA_HEALTH_COMPLEX: 'Upazila Health Complex',
+  COMMUNITY_CLINIC: 'Community Clinic',
 
   // LAB TEST
   LABTEST_CREATION_SUCCESS: 'Lab test created successfully.',
