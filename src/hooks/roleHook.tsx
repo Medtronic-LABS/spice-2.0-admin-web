@@ -39,7 +39,8 @@ import {
   shastiyaKormiRole,
   allSingleRoles,
   areaManagerRole,
-  divisionalManagerRole
+  divisionalManagerRole,
+  hoRole
 } from '../constants/roleConstants';
 import { IRoles } from '../store/user/types';
 import useAppTypeConfigs from './appTypeBasedConfigs';
@@ -126,8 +127,8 @@ export const filterSPICERoles = (
       return false;
     }
     const adminFormRoles = suiteNameLower === spiceRole.spice;
-    const isAreaOrDivisionalManager = [areaManagerRole, divisionalManagerRole].includes(name);
-    const siteUserCondition = !adminFormRoles || isAreaOrDivisionalManager;
+    const isManagerRole = [areaManagerRole, divisionalManagerRole, hoRole].includes(name);
+    const siteUserCondition = !adminFormRoles || isManagerRole;
     const isHFCondition = siteUserCondition || name === hfAdminRole;
     const isCommunityCondition = isHFCondition || name === superAdminRole;
     const isHFCreateCondition = isHFCondition && !villageBasedRoles.includes(name);

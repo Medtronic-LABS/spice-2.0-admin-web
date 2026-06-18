@@ -24,7 +24,7 @@ import { appendZeroBefore, formatUserToastMsg } from '../../utils/commonUtils';
 import { findMatchingRegionCard } from '../../utils/routeUtil';
 import toastCenter, { getErrorToastArgs } from '../../utils/toastCenter';
 
-import { areaManagerRole, divisionalManagerRole } from '../../constants/roleConstants';
+import { areaManagerRole, divisionalManagerRole, hoRole } from '../../constants/roleConstants';
 import { PROTECTED_ROUTES } from '../../constants/route';
 import localStorageServices from '../../global/localStorageServices';
 import sessionStorageServices from '../../global/sessionStorageServices';
@@ -244,7 +244,7 @@ const Region = (): React.ReactElement => {
     [regions, onDashboardExit]
   );
 
-  const isManagerRole = userRoles === areaManagerRole || userRoles === divisionalManagerRole;
+  const isManagerRole = [areaManagerRole, divisionalManagerRole, hoRole].includes(userRoles);
 
   useEffect(() => {
     const hasCountryMatchKey = userCountry?.id || userCountry?.tenantId || userCountry?.name;

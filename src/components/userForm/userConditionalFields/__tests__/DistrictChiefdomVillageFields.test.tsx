@@ -10,7 +10,8 @@ import {
   poRole,
   areaManagerRole,
   divisionalManagerRole,
-  heRole
+  heRole,
+  hoRole
 } from '../../../../constants/roleConstants';
 
 jest.mock('react-router-dom', () => ({
@@ -650,6 +651,26 @@ describe('DistrictChiefdomVillageFields', () => {
       users: [{ role: [{ name: divisionalManagerRole }] }]
     });
     const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
+    expect(villagesCalls.length).toBe(0);
+  });
+
+  it('renders district multiselect when HO is selected', () => {
+    renderWithForm({}, baseStore, { users: [{ role: [{ name: hoRole }] }] });
+    expect(screen.getAllByTestId('multi-select').length).toBe(1);
+    const districtCall = mockMultiSelect.mock.calls.find((call) => call[0].label === 'County');
+    expect(districtCall?.[0]).toMatchObject({
+      label: 'County',
+      isMulti: true,
+      required: true
+    });
+  });
+
+  it('does not render chiefdom or villages fields when HO is selected', () => {
+    mockMultiSelect.mockClear();
+    renderWithForm({}, baseStore, { users: [{ role: [{ name: hoRole }] }] });
+    const chiefdomCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Chiefdom');
+    const villagesCalls = mockMultiSelect.mock.calls.filter((call) => call[0].label === 'Villages');
+    expect(chiefdomCalls.length).toBe(0);
     expect(villagesCalls.length).toBe(0);
   });
 

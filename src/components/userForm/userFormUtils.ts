@@ -3,6 +3,7 @@ import APPCONSTANTS from '../../constants/appConstants';
 import {
   areaManagerRole,
   divisionalManagerRole,
+  hoRole,
   foRole,
   heRole,
   chcpRole,
@@ -86,6 +87,7 @@ export const getRoleFlags = (roles?: IRole | IRole[]) => {
     isFoSelected: roleNames.has(foRole),
     isAreaManagerSelected: roleNames.has(areaManagerRole),
     isDivisionalManagerSelected: roleNames.has(divisionalManagerRole),
+    isHoSelected: roleNames.has(hoRole),
     isShastiyaKormiSelected: roleNames.has(shastiyaKormiRole),
     isHESelected: roleNames.has(heRole)
   };

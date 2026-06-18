@@ -8,6 +8,7 @@ import {
   divisionalManagerRole,
   foRole,
   heRole,
+  hoRole,
   nurseRole,
   poRole,
   shastiyaKormiRole
@@ -207,6 +208,7 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: false,
+      isHoSelected: false,
       isShastiyaKormiSelected: false,
       isHESelected: false
     });
@@ -218,6 +220,7 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: false,
+      isHoSelected: false,
       isShastiyaKormiSelected: false,
       isHESelected: false
     });
@@ -235,6 +238,7 @@ describe('getRoleFlags', () => {
       isFoSelected: true,
       isAreaManagerSelected: true,
       isDivisionalManagerSelected: false,
+      isHoSelected: false,
       isShastiyaKormiSelected: true,
       isHESelected: false
     });
@@ -246,6 +250,7 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: true,
+      isHoSelected: false,
       isShastiyaKormiSelected: false,
       isHESelected: false
     });
@@ -257,8 +262,21 @@ describe('getRoleFlags', () => {
       isFoSelected: false,
       isAreaManagerSelected: false,
       isDivisionalManagerSelected: false,
+      isHoSelected: false,
       isShastiyaKormiSelected: false,
       isHESelected: true
+    });
+  });
+
+  test('should detect HO role in an array', () => {
+    expect(getRoleFlags([{ name: hoRole }])).toEqual({
+      isPoSelected: false,
+      isFoSelected: false,
+      isAreaManagerSelected: false,
+      isDivisionalManagerSelected: false,
+      isHoSelected: true,
+      isShastiyaKormiSelected: false,
+      isHESelected: false
     });
   });
 });

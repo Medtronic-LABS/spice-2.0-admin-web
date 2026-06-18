@@ -277,7 +277,7 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
       data: { entity: userRoles }
     } = yield call(userService.fetchUserRoles, countryId);
     const role = yield select((state: AppState) => state.user.user.role);
-    const { SUPER_ADMIN, SUPER_USER } = APPCONSTANTS.ROLES;
+    const { SUPER_ADMIN, SUPER_USER, DIVISIONAL_MANAGER, HO } = APPCONSTANTS.ROLES;
     const { REPORT_ADMIN, SPICE_INSIGHTS_DEVELOPER } = APPCONSTANTS.COMMUNITY_ROLES;
     const updatedUserRoles = {
       ...userRoles,
@@ -286,7 +286,7 @@ export function* fetchUserRoles({ countryId, successCb, failureCb }: IFetchUserR
         : userRoles?.SPICE?.filter((r: IUserRole) => r.name !== SUPER_ADMIN)
     };
     if ((updatedUserRoles.REPORTS || []).length) {
-      updatedUserRoles.REPORTS = [SUPER_ADMIN, SUPER_USER].includes(role)
+      updatedUserRoles.REPORTS = [SUPER_ADMIN, SUPER_USER, DIVISIONAL_MANAGER, HO].includes(role)
         ? userRoles.REPORTS
         : userRoles.REPORTS.filter((r: IUserRole) => r.name !== REPORT_ADMIN);
     }

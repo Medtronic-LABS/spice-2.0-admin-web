@@ -94,10 +94,12 @@ const DistrictChiefdomVillageFields = ({
     isFoSelected,
     isAreaManagerSelected,
     isDivisionalManagerSelected,
+    isHoSelected,
     isHESelected
   } = roleFlags;
   const isOrganizerSelected = isPoSelected || isFoSelected;
   const isManagerSelected = isAreaManagerSelected || isDivisionalManagerSelected;
+  const isDistrictScopedRole = isDivisionalManagerSelected || isHoSelected;
 
   const selectedDistrictIds = useMemo(
     () => extractIds(selectedDistricts),
@@ -229,7 +231,7 @@ const DistrictChiefdomVillageFields = ({
 
   const colClass = `${isHFCreate ? 'col-12 col-sm-6 col-lg-4' : 'col-sm-6 col-12'} `;
 
-  if (!isOrganizerSelected && !isManagerSelected && !isHESelected) {
+  if (!isOrganizerSelected && !isManagerSelected && !isHoSelected && !isHESelected) {
     return null;
   }
 
@@ -241,7 +243,7 @@ const DistrictChiefdomVillageFields = ({
           type='text'
           validate={required}
           render={({ input, meta }) =>
-            isFoSelected || isAreaManagerSelected || isDivisionalManagerSelected || isHESelected ? (
+            isFoSelected || isAreaManagerSelected || isDistrictScopedRole || isHESelected ? (
               <MultiSelect
                 {...(input as any)}
                 label={districtSName}

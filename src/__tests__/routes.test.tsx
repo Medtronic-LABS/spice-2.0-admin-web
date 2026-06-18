@@ -3,11 +3,12 @@ import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import {
-  AM_DM,
+  AM_DM_HO,
   AppRoutes,
   AREA_MANAGER,
   DIVISIONAL_MANAGER,
-  SU_SA_RA_DA_CDA_HFA_AM_DM
+  HO,
+  SU_SA_RA_DA_CDA_HFA_AM_DM_HO
 } from '../routes';
 import APPCONSTANTS from '../constants/appConstants';
 import { PROTECTED_ROUTES, PUBLIC_ROUTES } from '../constants/route';
@@ -234,7 +235,8 @@ describe('AppRoutes', () => {
 
   it.each([
     ['area manager', AREA_MANAGER],
-    ['divisional manager', DIVISIONAL_MANAGER]
+    ['divisional manager', DIVISIONAL_MANAGER],
+    ['head office', HO]
   ])('renders health facility summary for %s role', async (_label, role) => {
     renderLoggedInRoute(role, healthFacilitySummaryPath);
 
@@ -244,9 +246,10 @@ describe('AppRoutes', () => {
 });
 
 describe('health facility summary route authorisation', () => {
-  it('includes area and divisional managers in authorised roles', () => {
-    expect(SU_SA_RA_DA_CDA_HFA_AM_DM).toEqual(expect.arrayContaining(AM_DM));
-    expect(SU_SA_RA_DA_CDA_HFA_AM_DM).toContain(AREA_MANAGER);
-    expect(SU_SA_RA_DA_CDA_HFA_AM_DM).toContain(DIVISIONAL_MANAGER);
+  it('includes area, divisional, and head office managers in authorised roles', () => {
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM_HO).toEqual(expect.arrayContaining(AM_DM_HO));
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM_HO).toContain(AREA_MANAGER);
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM_HO).toContain(DIVISIONAL_MANAGER);
+    expect(SU_SA_RA_DA_CDA_HFA_AM_DM_HO).toContain(HO);
   });
 });
