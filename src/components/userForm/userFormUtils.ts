@@ -40,20 +40,27 @@ export const isVillageBasedRoleSelection = (roles: IRoles[] | undefined): boolea
     (r) => villageBasedRoles.includes(r?.name) || r?.name === shastiyaKormiRole
   );
 
-const ROLE_HEALTH_FACILITY_TYPE_MAP: Record<string, string> = {
-  [nurseRole]: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX,
-  [chcpRole]: APPCONSTANTS.COMMUNITY_CLINIC
+const ROLE_HEALTH_FACILITY_TYPE_MAP: Record<string, string[]> = {
+  [nurseRole]: [
+    APPCONSTANTS.UPAZILA_HEALTH_COMPLEX,
+    APPCONSTANTS.GENERAL_HOSPITAL
+  ],
+  [chcpRole]: [APPCONSTANTS.COMMUNITY_CLINIC]
 };
 
 export const getHfFilteredByRole = (
   role: string | undefined,
   hfList: IHealthFacility[]
 ) => {
-  const requiredHfType = role ? ROLE_HEALTH_FACILITY_TYPE_MAP[role] : undefined;
-  if (!requiredHfType) {
+  const allowedHfTypes = role
+    ? ROLE_HEALTH_FACILITY_TYPE_MAP[role]
+    : undefined;
+
+  if (!allowedHfTypes?.length) {
     return hfList;
   }
-  return hfList.filter((hf) => hf.type === requiredHfType);
+
+  return hfList.filter((hf) => allowedHfTypes.includes(hf.type));
 };
 
 export const getSpiceRoleOptionsForHF = (
@@ -69,9 +76,14 @@ export const getSpiceRoleOptionsForHF = (
   if (!isHF) {
     return roles;
   }
+
   return roles.filter((role) => {
-    const requiredHfType = ROLE_HEALTH_FACILITY_TYPE_MAP[role.name];
-    return !requiredHfType || healthFacilityType === requiredHfType;
+    const allowedHfTypes = ROLE_HEALTH_FACILITY_TYPE_MAP[role.name];
+
+    return (
+      !allowedHfTypes ||
+      allowedHfTypes.includes(healthFacilityType ?? '')
+    );
   });
 };
 

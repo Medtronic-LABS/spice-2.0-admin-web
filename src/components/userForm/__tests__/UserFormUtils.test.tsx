@@ -125,11 +125,15 @@ describe('getHfFilteredByRole', () => {
   const hfList = [
     { id: 1, name: 'Upazila HF', type: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX },
     { id: 2, name: 'Community Clinic HF', type: APPCONSTANTS.COMMUNITY_CLINIC },
-    { id: 3, name: 'Other HF', type: 'Community Health Centre' }
+    { id: 3, name: 'General Hospital HF', type: APPCONSTANTS.GENERAL_HOSPITAL },
+    { id: 4, name: 'Other HF', type: 'Community Health Centre' }
   ] as IHealthFacility[];
 
-  it('returns only Upazila Health Complex facilities when role is Nurse', () => {
-    expect(getHfFilteredByRole(nurseRole, hfList)).toEqual([hfList[0]]);
+  it('returns Upazila Health Complex and General Hospital facilities when role is Nurse', () => {
+    expect(getHfFilteredByRole(nurseRole, hfList)).toEqual([
+      hfList[0],
+      hfList[2]
+    ]);
   });
 
   it('returns only Community Clinic facilities when role is CHCP', () => {
@@ -151,7 +155,7 @@ describe('getSpiceRoleOptionsForHF', () => {
     { id: 2, name: nurseRole, displayName: 'Nurse', groupName: 'SPICE', appTypes: [] }
   ] as IRoles[];
 
-  it('excludes Nurse when isHF is true and health facility type is not Upazila Health Complex', () => {
+  it('excludes Nurse when isHF is true and health facility type is not supported by Nurse', () => {
     expect(
       getSpiceRoleOptionsForHF(roles, {
         isHF: true,
@@ -160,7 +164,7 @@ describe('getSpiceRoleOptionsForHF', () => {
     ).toEqual([roles[0]]);
   });
 
-  it('excludes CHCP when isHF is true and health facility type is not Community Clinic', () => {
+  it('excludes CHCP when isHF is true and health facility type is Upazila Health Complex', () => {
     expect(
       getSpiceRoleOptionsForHF(roles, {
         isHF: true,
@@ -174,6 +178,15 @@ describe('getSpiceRoleOptionsForHF', () => {
       getSpiceRoleOptionsForHF(roles, {
         isHF: true,
         healthFacilityType: APPCONSTANTS.UPAZILA_HEALTH_COMPLEX
+      })
+    ).toEqual([roles[1]]);
+  });
+
+  it('includes Nurse when isHF is true and health facility type is General Hospital', () => {
+    expect(
+      getSpiceRoleOptionsForHF(roles, {
+        isHF: true,
+        healthFacilityType: APPCONSTANTS.GENERAL_HOSPITAL
       })
     ).toEqual([roles[1]]);
   });
