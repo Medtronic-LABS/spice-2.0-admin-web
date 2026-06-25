@@ -83,6 +83,7 @@
     "autoprefixer": "10.4.5"
   },
   "scripts": {
+    "prebuild": "node scripts/generate-build-info.js",
     "dev": "vite",
     "start": "vite",
     "build": "vite build",

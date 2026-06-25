@@ -61,6 +61,7 @@ const HealthFacilityDashboard = lazyRoute(() => import('./containers/healthFacil
 const PrivacyPolicy = lazyRoute(() => import('./containers/privacyPolicy/PrivacyPolicy'));
 const BranchList = lazyRoute(() => import('./containers/branch/BranchList'));
 const BranchSummary = lazyRoute(() => import('./containers/branch/BranchSummary'));
+const Info = lazyRoute(() => import('./containers/info/Info'));
 interface IRoute {
   path: string;
   exact: boolean;
@@ -428,6 +429,11 @@ const publicRoutes = [
     path: PUBLIC_ROUTES.privacyPolicy,
     exact: true,
     component: PrivacyPolicy
+  },
+  {
+    path: PUBLIC_ROUTES.info,
+    exact: true,
+    component: Info
   }
 ];
 /**

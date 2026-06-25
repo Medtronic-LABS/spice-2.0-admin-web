@@ -4,7 +4,8 @@ export const PUBLIC_ROUTES = {
   login: '/',
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
-  privacyPolicy: '/privacy-policy'
+  privacyPolicy: '/privacy-policy',
+  info: '/info'
 };
 
 export const PROTECTED_ROUTES = {

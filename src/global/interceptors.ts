@@ -8,6 +8,11 @@ import { fetchLoggedInUser, resetStore, sessionTimedout } from '../store/user/ac
 import { PUBLIC_ROUTES } from '../constants/route';
 import { appEnv } from '../config/env';
 
+const publicRoutes = [
+  PUBLIC_ROUTES.privacyPolicy,
+  PUBLIC_ROUTES.info,
+];
+
 /**
  * Handles the response status and throws appropriate errors.
  * @param {AxiosResponse} response - The axios response object
@@ -94,8 +99,8 @@ export const setupInterceptors = (store: any) => {
     }
   );
 
-  // get logged in user while refresh expect privacy policy page
-  if (document.location.pathname !== PUBLIC_ROUTES.privacyPolicy) {
+  // get logged in user while refresh except privacy policy and info page
+  if (!publicRoutes.includes(document.location.pathname)) {
     store.dispatch(fetchLoggedInUser());
   }
 };

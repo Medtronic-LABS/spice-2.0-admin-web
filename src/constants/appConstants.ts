@@ -1,5 +1,6 @@
 const APPCONSTANTS = {
   APP_TYPE: 'web',
+  APP_NAME: 'spice-web',
   HASH_ALGORITM: 'sha512',
   USER_TENANTID: 'uti',
   APP_VERSION: 'av',
@@ -476,7 +477,8 @@ const APPCONSTANTS = {
   BRANCH_CREATE_SUCCESS: 'Branch created successfully.',
   BRANCH_CREATE_FAIL: 'Failed to create the branch. Please try again.',
   BRANCH_UPDATE_SUCCESS: 'Branch updated successfully.',
-  BRANCH_UPDATE_FAIL: 'Failed to update the branch. Please try again.'
+  BRANCH_UPDATE_FAIL: 'Failed to update the branch. Please try again.',
+  NOT_AVAILABLE: 'N/A'
 };
 
 export const ROLE_LABELS = {
@@ -536,5 +538,15 @@ export const BD_PHONE_NUMBER_LENGTH = 11;
 export const CFR_SUITEACCSESS_NAME = { user: 'cfr_user', admin: 'cfr_admin', quickSight: 'cfr_quicksight_admin' };
 export const COMMON_INSIGHTS_ADMINROLE = ['CFR_QUICKSIGHT_SPICE_ADMIN', 'CFR_QUICKSIGHT_TC_ADMIN'];
 export const COMMON_INSIGHTS_USERROLE = ['CFR_HEALTH_FACILITY_USER'];
-
+export const BACKEND_SERVICES = [
+  'admin-service',
+  'auth-service',
+  'cql-service',
+  'fhir-mapper',
+  'fhir-server',
+  'notification-service',
+  'offline-service',
+  'spice-service',
+  'user-service'
+];
 export default APPCONSTANTS;
