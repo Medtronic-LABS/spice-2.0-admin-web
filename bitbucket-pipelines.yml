@@ -2,15 +2,12 @@ options:
   max-time: 60
 
 definitions:
+  oidc: &bitbucket-oidc
+    audiences:
+      - ari:cloud:bitbucket::workspace/25d4da96-4791-4b12-9b73-a2308af9ff35
+
   caches:
     npm: ~/.npm
-
-  # Runner for UHIS environment
-  runner-uhis-dev: &runner-uhis-dev
-    - self.hosted
-    - linux
-    - spice.uhis
-    - ec2.runner
 
   steps:
     # Step 1: Install & Test – produces coverage and node_modules for Sonar and Build
@@ -64,38 +61,83 @@ definitions:
         artifacts:
           - build/**
 
-    # Step 4: Upload to S3 & Invalidate CloudFront
-    - step: &deploy-s3-cf
-        name: Upload to S3 & Invalidate CloudFront
+    # Step 4a: Dev/QA deploy — shared AWS account (uhis-dev + uhis-qa)
+    # Set AWS_OIDC_ROLE on deployment: uhis-dev, uhis-qa
+    - step: &deploy-s3-cf-dev-qa
+        name: Upload to S3 & Invalidate CloudFront (Dev/QA)
         image: amazon/aws-cli:2.15.0
+        oidc: *bitbucket-oidc
         script:
           - set -e
-          # AWS_S3_BUCKET, CF_DIST_ID from deployment vars
-          - aws s3 sync build/ s3://${AWS_S3_BUCKET}/ --delete --exact-timestamps --exclude "index.html" --cache-control "max-age=31536000,public"
-          - aws s3 cp build/index.html s3://${AWS_S3_BUCKET}/index.html --metadata-directive REPLACE --cache-control "no-cache, no-store, must-revalidate"
-          - aws --no-cli-pager cloudfront create-invalidation --distribution-id ${CF_DIST_ID} --paths "/*" --output text --query "Invalidation.Id"
-
-    # step 5: Deploy to UHIS-TRAINING
-    # OIDC deploy: use same audience in AWS IdP and in the IAM role trust policy.
-    - step: &deploy-s3-cf-training
-        name: Upload to S3 & Invalidate CloudFront
-        image: amazon/aws-cli:2.15.0
-        oidc:
-          audiences:
-            - ari:cloud:bitbucket::workspace/25d4da96-4791-4b12-9b73-a2308af9ff35
-        script:
-          - set -e
-
-          # Configure AWS OIDC authentication
-          - export AWS_ROLE_ARN=$AWS_OIDC_ROLE
+          - |
+            if [ -z "${AWS_OIDC_ROLE:-}" ]; then
+              echo "ERROR AWS_OIDC_ROLE is required for dev/qa deploy"
+              exit 1
+            fi
+          - export AWS_ROLE_ARN="${AWS_OIDC_ROLE}"
           - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
-          - echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
+          - echo "${BITBUCKET_STEP_OIDC_TOKEN}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"
+          - echo "Using dev/qa OIDC role ${AWS_ROLE_ARN}"
           - aws sts get-caller-identity
-          # AWS_S3_BUCKET, CF_DIST_ID from deployment vars
           - aws s3 sync build/ s3://${AWS_S3_BUCKET}/ --delete --exact-timestamps --exclude "index.html" --cache-control "max-age=31536000,public"
           - aws s3 cp build/index.html s3://${AWS_S3_BUCKET}/index.html --metadata-directive REPLACE --cache-control "no-cache, no-store, must-revalidate"
           - aws --no-cli-pager cloudfront create-invalidation --distribution-id ${CF_DIST_ID} --paths "/*" --output text --query "Invalidation.Id"
-          - rm -f $(pwd)/web-identity-token
+          - rm -f "${AWS_WEB_IDENTITY_TOKEN_FILE}"
+
+    # Step 4b: Training deploy — separate AWS account
+    # Set AWS_OIDC_ROLE_TRAINING (or AWS_OIDC_ROLE) on deployment: uhis-training
+    - step: &deploy-s3-cf-training
+        name: Upload to S3 & Invalidate CloudFront (Training)
+        image: amazon/aws-cli:2.15.0
+        oidc: *bitbucket-oidc
+        script:
+          - set -e
+          - |
+            if [ -z "${AWS_OIDC_ROLE_TRAINING:-}" ] && [ -z "${AWS_OIDC_ROLE:-}" ]; then
+              echo "ERROR AWS_OIDC_ROLE_TRAINING (or AWS_OIDC_ROLE) is required for training deploy"
+              exit 1
+            fi
+          - export AWS_ROLE_ARN="${AWS_OIDC_ROLE_TRAINING:-${AWS_OIDC_ROLE}}"
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
+          - echo "${BITBUCKET_STEP_OIDC_TOKEN}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"
+          - echo "Using training OIDC role ${AWS_ROLE_ARN}"
+          - aws sts get-caller-identity
+          - aws s3 sync build/ s3://${AWS_S3_BUCKET}/ --delete --exact-timestamps --exclude "index.html" --cache-control "max-age=31536000,public"
+          - aws s3 cp build/index.html s3://${AWS_S3_BUCKET}/index.html --metadata-directive REPLACE --cache-control "no-cache, no-store, must-revalidate"
+          - aws --no-cli-pager cloudfront create-invalidation --distribution-id ${CF_DIST_ID} --paths "/*" --output text --query "Invalidation.Id"
+          - rm -f "${AWS_WEB_IDENTITY_TOKEN_FILE}"
+
+    # Step 4c: Deploy to GCP Training via Workload Identity Federation
+    # Required deployment variables on uhis-gcp-training:
+    #   GCP_PROJECT_ID, GCP_PROJECT_NUMBER, WIF_POOL_ID, WIF_PROVIDER_ID
+    #   GCP_SERVICE_ACCOUNT, GCS_BUCKET, URL_MAP_NAME
+    - step: &deploy-gcp-training
+        name: Upload to GCS & Invalidate CDN
+        image: google/cloud-sdk:slim
+        oidc: true
+        script:
+          - set -e
+          - echo "$BITBUCKET_STEP_OIDC_TOKEN" > oidc-token
+          - |
+            gcloud iam workload-identity-pools create-cred-config \
+              projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WIF_POOL_ID}/providers/${WIF_PROVIDER_ID} \
+              --service-account=${GCP_SERVICE_ACCOUNT} \
+              --credential-source-file=oidc-token \
+              --output-file=gcp-creds.json
+          - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/gcp-creds.json
+          - gcloud auth login --cred-file=gcp-creds.json
+          - gcloud config set project ${GCP_PROJECT_ID}
+          - gsutil -m rsync -r -d build gs://${GCS_BUCKET}
+          - |
+            gsutil setmeta \
+              -h "Cache-Control:no-cache,no-store,must-revalidate" \
+              gs://${GCS_BUCKET}/index.html
+          - |
+            gcloud compute url-maps invalidate-cdn-cache \
+              ${URL_MAP_NAME} \
+              --path="/*" \
+              --quiet
+          - rm -f oidc-token gcp-creds.json
 
 pipelines:
   pull-requests:
@@ -105,17 +147,14 @@ pipelines:
           steps:
             - step:
                 <<: *install-test
-                runs-on: *runner-uhis-dev
             - step:
                 <<: *sonar
-                runs-on: *runner-uhis-dev
       - stage:
           name: Build
           deployment: uhis-dev
           steps:
             - step:
                 <<: *build
-                runs-on: *runner-uhis-dev
 
     "feature/uhis-*":
       - stage:
@@ -123,17 +162,14 @@ pipelines:
           steps:
             - step:
                 <<: *install-test
-                runs-on: *runner-uhis-dev
             - step:
                 <<: *sonar
-                runs-on: *runner-uhis-dev
       - stage:
           name: Build
           deployment: uhis-dev
           steps:
             - step:
                 <<: *build
-                runs-on: *runner-uhis-dev
 
   branches:
     "uhis-dev":
@@ -142,46 +178,38 @@ pipelines:
           steps:
             - step:
                 <<: *install-test
-                runs-on: *runner-uhis-dev
             - step:
                 <<: *sonar
-                runs-on: *runner-uhis-dev
       - stage:
           name: Build & Deploy to UHIS-DEV
           deployment: uhis-dev
           steps:
             - step:
                 <<: *build
-                runs-on: *runner-uhis-dev
             - step:
-                <<: *deploy-s3-cf
-                runs-on: *runner-uhis-dev
-    
+                <<: *deploy-s3-cf-dev-qa
+
     "uhis-training":
       - stage:
           name: Install, Test & Sonar
           steps:
             - step:
                 <<: *install-test
-                runs-on: *runner-uhis-dev
             - step:
                 <<: *sonar
-                runs-on: *runner-uhis-dev
       - stage:
           name: Build & Deploy to UHIS-TRAINING
           deployment: uhis-training
           steps:
             - step:
                 <<: *build
-                runs-on: *runner-uhis-dev
             - step:
                 <<: *deploy-s3-cf-training
-                runs-on: *runner-uhis-dev
 
-  # Manual pipeline: Build & Deploy to UHIS-QA
-  # Required deployment variables for 'uhis-qa':
-  #   - AWS_S3_BUCKET: S3 bucket for QA environment (e.g., spice-web-uhis-qa)
-  #   - CF_DIST_ID: CloudFront distribution ID for QA environment
+  # Manual pipelines
+  # Dev/QA (shared AWS account): AWS_OIDC_ROLE, AWS_S3_BUCKET, CF_DIST_ID
+  # Training AWS (uhis-training): AWS_OIDC_ROLE_TRAINING or AWS_OIDC_ROLE, AWS_S3_BUCKET, CF_DIST_ID
+  # Training GCP (uhis-gcp-training): GCP_PROJECT_ID, GCP_PROJECT_NUMBER, WIF_POOL_ID, WIF_PROVIDER_ID, GCP_SERVICE_ACCOUNT, GCS_BUCKET, URL_MAP_NAME
   custom:
     deploy-uhis-qa:
       - stage:
@@ -190,10 +218,8 @@ pipelines:
           steps:
             - step:
                 <<: *build
-                runs-on: *runner-uhis-dev
             - step:
-                <<: *deploy-s3-cf
-                runs-on: *runner-uhis-dev
+                <<: *deploy-s3-cf-dev-qa
 
     deploy-uhis-training:
       - stage:
@@ -202,8 +228,15 @@ pipelines:
           steps:
             - step:
                 <<: *build
-                runs-on: *runner-uhis-dev
             - step:
                 <<: *deploy-s3-cf-training
-                runs-on: *runner-uhis-dev
 
+    deploy-uhis-training-gcp:
+      - stage:
+          name: Build & Deploy to GCP Training
+          deployment: uhis-gcp-training
+          steps:
+            - step:
+                <<: *build
+            - step:
+                <<: *deploy-gcp-training
