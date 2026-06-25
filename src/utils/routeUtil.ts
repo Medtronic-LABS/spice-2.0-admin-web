@@ -6,7 +6,7 @@ import { ISummaryCardProps } from '../components/summaryCard/SummaryCard';
  *
  * @param {string} url The URL used for go to specific website.
  */
-export const goToUrl = (url: string = '/', locationRef: Pick<Location, 'replace'> = window.location) => {
+export const goToUrl = (url: string = '/', locationRef: Pick<Location, 'replace'> = globalThis.location) => {
   locationRef.replace(url);
 };
 

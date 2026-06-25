@@ -129,7 +129,7 @@ const HealthFacilityDetailsForm = ({
     isCommunity
   } = useAppTypeConfigs();
   const [cityList, setCityList] = useState<ICity[]>([]);
-  const timerId: React.MutableRefObject<number | undefined> = useRef<number>();
+  const timerId = useRef<number>();
   const [cityLoading, setCityLoading] = useState(false);
   const [initialPostalCode] = useState<string>(data?.postalCode || '');
   const chiefdom = useSelector(getChiefdomDetailSelector);
@@ -295,14 +295,15 @@ const HealthFacilityDetailsForm = ({
     if (!isEdit && !taggedDistrictList.length) {
       dispatch(
         fetchTaggedDistrictsRequest({
-          failureCb: (e) =>
-            toastCenter.error(
+          failureCb: (e) => {
+            void toastCenter.error(
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
                 formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
               )
-            )
+            );
+          }
         })
       );
     }
@@ -317,14 +318,15 @@ const HealthFacilityDetailsForm = ({
         dispatch(
           fetchTaggedChiefdomsRequest({
             districtIds: [selectedDistrictId],
-            failureCb: (e) =>
-              toastCenter.error(
+            failureCb: (e) => {
+              void toastCenter.error(
                 ...getErrorToastArgs(
                   e,
                   APPCONSTANTS.OOPS,
                   formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
                 )
-              )
+              );
+            }
           })
         );
       }

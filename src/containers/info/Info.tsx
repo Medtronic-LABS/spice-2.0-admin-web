@@ -35,7 +35,7 @@ const GITLAB_HOSTS = new Set(['uhis-staging.brac.net', 'uhis.brac.net']);
 export const getCommitUrl = (
   serviceName: string,
   commitId: string,
-  host: string = window.location.host
+  host: string = globalThis.location.host
 ): string | null => {
   if (commitId === APPCONSTANTS.NOT_AVAILABLE) {
     return null;

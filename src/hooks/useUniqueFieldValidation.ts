@@ -1,7 +1,7 @@
 import { FormApi } from 'final-form';
 import { FieldMetaState } from 'react-final-form';
 import { useCallback, useRef, useState } from 'react';
-import type { MutableRefObject } from 'react';
+import type { RefObject } from 'react';
 import toastCenter, { getErrorToastArgs } from '../utils/toastCenter';
 import APPCONSTANTS from '../constants/appConstants';
 
@@ -26,8 +26,8 @@ export interface IUseUniqueFieldValidationReturn {
   loading: boolean;
   networkError: boolean;
   setNetworkError: (value: boolean) => void;
-  submitEnabledStatusRef: MutableRefObject<boolean>;
-  lastCheckedRef: MutableRefObject<string>;
+  submitEnabledStatusRef: RefObject<boolean>;
+  lastCheckedRef: RefObject<string>;
 }
 
 /**

@@ -166,14 +166,15 @@ const HealthFacilityList = (): React.ReactElement => {
       dispatch(
         fetchTaggedChiefdomsRequest({
           districtIds: filters.districtIds,
-          failureCb: (e) =>
-            toastCenter.error(
+          failureCb: (e) => {
+            void toastCenter.error(
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
                 formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
               )
-            )
+            );
+          }
         })
       );
     }

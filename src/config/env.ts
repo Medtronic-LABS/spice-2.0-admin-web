@@ -20,19 +20,15 @@ const readNumericEnv = (key: string, fallback: number): number => {
 const isLocalHostname = (hostname?: string): boolean => hostname === 'localhost' || hostname === '127.0.0.1';
 
 const parseUrl = (value?: string): URL | undefined => {
-  if (!value) {
+  if (!value || !URL.canParse(value)) {
     return undefined;
   }
 
-  try {
-    return new URL(value);
-  } catch (_error) {
-    return undefined;
-  }
+  return new URL(value);
 };
 
 const shouldUseProxyBaseUrl = (baseUrl?: string): boolean => {
-  if (typeof window === 'undefined' || !isLocalHostname(window.location.hostname)) {
+  if (globalThis.window === undefined || !isLocalHostname(globalThis.window.location.hostname)) {
     return false;
   }
 

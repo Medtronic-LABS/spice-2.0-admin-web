@@ -34,7 +34,7 @@ export interface IUserFormProps {
     setMandatoryRoles: React.Dispatch<React.SetStateAction<IRoles[][]>>;
   };
 
-  roleOptionsState?: React.MutableRefObject<IRoles[][]>;
+  roleOptionsState?: React.RefObject<IRoles[][] | null>;
   isSiteUser?: boolean;
   isAdminForm?: boolean;
   defaultSelectedRole?: string;

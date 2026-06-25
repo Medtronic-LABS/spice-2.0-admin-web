@@ -100,8 +100,8 @@ interface IComponentProps {
   hashFieldIdsWithFieldName?: any;
   addNewFieldDisabled?: boolean;
   isFieldNameChangable?: boolean;
-  codeRef?: React.MutableRefObject<string>;
-  urlRef?: React.MutableRefObject<string>;
+  codeRef?: React.RefObject<string | null>;
+  urlRef?: React.RefObject<string | null>;
   input?: any;
   isCustomizationForm?: boolean;
   isCommunity?: boolean;

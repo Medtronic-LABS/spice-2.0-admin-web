@@ -129,14 +129,15 @@ const DistrictChiefdomVillageFields = ({
     if (!taggedDistrictList.length) {
       dispatch(
         fetchTaggedDistrictsRequest({
-          failureCb: (e) =>
-            toastCenter.error(
+          failureCb: (e) => {
+            void toastCenter.error(
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
                 formatUserToastMsg(APPCONSTANTS.DISTRICT_FETCH_ERROR, districtSName)
               )
-            )
+            );
+          }
         })
       );
     }
@@ -149,14 +150,15 @@ const DistrictChiefdomVillageFields = ({
       dispatch(
         fetchTaggedChiefdomsRequest({
           districtIds: debouncedDistrictIds,
-          failureCb: (e) =>
-            toastCenter.error(
+          failureCb: (e) => {
+            void toastCenter.error(
               ...getErrorToastArgs(
                 e,
                 APPCONSTANTS.OOPS,
                 formatUserToastMsg(APPCONSTANTS.CHIEFDOM_FETCH_ERROR, chiefdomSName)
               )
-            )
+            );
+          }
         })
       );
     }

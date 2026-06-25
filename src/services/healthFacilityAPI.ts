@@ -177,8 +177,8 @@ export const fetchVillagesList = (
   countryId: number,
   districtId: number | undefined,
   chiefdomId: number | undefined,
-  chiefdomIds: number[] = [],
-  appTypes: string[]
+  appTypes: string[],
+  chiefdomIds: number[] = []
 ) =>
   axios({
     url: '/admin-service/villages-list',

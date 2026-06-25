@@ -63,7 +63,7 @@ const ReorderItem = ({ itemId, initOrder, children, removeBorderClass, isRemoveI
    */
   const onDrag = (e: React.DragEvent<HTMLDivElement>) => {
     const { pageY: nxtPageY } = e;
-    const dragOffset = nxtPageY - (dragCheckPoint.current as number);
+    const dragOffset = nxtPageY - (dragCheckPoint.current ?? 0);
     if (!nxtPageY) {
       return;
     }
@@ -89,7 +89,7 @@ const ReorderItem = ({ itemId, initOrder, children, removeBorderClass, isRemoveI
     top: dragging
       ? `${Math.min(
           (itemRef.current?.parentElement?.offsetHeight || 0) - height[itemId],
-          Math.max(0, (topWhenDragStart.current as number) + (pageY - (dragStartPageY.current as number)))
+          Math.max(0, (topWhenDragStart.current ?? 0) + (pageY - (dragStartPageY.current ?? 0)))
         )}px`
       : `${top}px`
   };

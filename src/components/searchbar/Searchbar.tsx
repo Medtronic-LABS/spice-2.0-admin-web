@@ -16,7 +16,7 @@ interface ISearchbarProps {
  */
 const Searchbar = ({ placeholder, onSearch, isOutlined = true }: ISearchbarProps): React.ReactElement => {
   const [searchText, setSearchText] = useState('');
-  const timerId: React.MutableRefObject<number | undefined> = useRef<number>();
+  const timerId = useRef<number>();
   const onChange = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       clearTimeout(timerId.current);

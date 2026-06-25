@@ -190,14 +190,6 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
   const formatMenuItems = useCallback(
     (rawMenu: ISideMenu[]) => {
       let choosenRoutes: ISideMenu[] = [...rawMenu];
-      const routeVariableValues = {
-        ':regionId': regionId || countryIdValue, // for community and non-community
-        ':districtId': districtId,
-        ':chiefdomId': chiefdomId,
-        ':healthFacilityId': healthFacilityId,
-        ':branchId': branchId,
-        ':tenantId': getTenentId()
-      };
       choosenRoutes = choosenRoutes.map((menu: ISideMenu) => {
         menu = { ...menu };
         const contextAwareRoute = getContextAwareRoute(menu?.route);
@@ -239,7 +231,7 @@ const SideMenu = memo(({ className }: ISideMenuProps) => {
         menuBy,
         SIDE_MENU_FETCHING_HIERARCHY.region,
         APPCONSTANTS.BY_REGION_DETAILS
-      ].filter(Boolean) as string[];
+      ].filter((key): key is string => Boolean(key));
       const menuKey =
         fallbackMenuKeys.find(
           (key) => Array.isArray(list?.[key]) && list[key].some((menuItem: ISideMenu) => Boolean(menuItem?.route))

@@ -2,9 +2,10 @@ import React, { type ComponentType, type ReactNode } from 'react';
 import {
   Route as ReactRouterRoute,
   Routes,
-  unstable_HistoryRouter as HistoryRouter,
   useLocation,
 } from 'react-router-dom';
+
+export { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
 
 import { matchPathCompat, useHistoryCompat } from '../utils/routerCompat';
 
@@ -66,13 +67,15 @@ const LegacyRouteElement = ({ path = '*', exact = false, component: Component, r
   return <>{children}</>;
 };
 
-export { HistoryRouter };
-
 export const LegacyRoute = ({ path = '*', exact = false, component, render, children }: LegacyRouteProps) => (
   <Routes>
     <ReactRouterRoute
       path={getRoutePath(path, exact)}
-      element={<LegacyRouteElement path={path} exact={exact} component={component} render={render} children={children} />}
+      element={
+        <LegacyRouteElement path={path} exact={exact} component={component} render={render}>
+          {children}
+        </LegacyRouteElement>
+      }
     />
   </Routes>
 );

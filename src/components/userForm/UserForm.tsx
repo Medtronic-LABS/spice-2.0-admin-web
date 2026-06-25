@@ -1109,7 +1109,11 @@ const UserForm = ({
           const isFoSelected = roleNames.has(foRole);
           const isCHCPSelected = roleNames.has(chcpRole);
           const isNurseSelected = roleNames.has(nurseRole);
-          const hfFilterRole = isNurseSelected ? nurseRole : isCHCPSelected ? chcpRole : undefined;
+          const hfFilterRole = (() => {
+            if (isNurseSelected) return nurseRole;
+            if (isCHCPSelected) return chcpRole;
+            return undefined;
+          })();
           const hasSelectedSpiceRoles = isShastiyaKormiSelected || isPoSelected || isFoSelected || isCHCPSelected;
           const hasSpiceHFSelection = showSpiceHFRef.current[index] || hasSelectedSpiceRoles;
 
@@ -1327,7 +1331,7 @@ const UserForm = ({
                             errorLabel='Please select role.'
                             labelKey='displayName'
                             valueKey='id'
-                            options={!isProfile ? getSpiceRoleOptions(spiceRoles.current) : []}
+                            options={isProfile ? [] : getSpiceRoleOptions(spiceRoles.current)}
                             loading={isRolesLoading}
                             error={isError(meta) && !spiceRole?.length}
                             isModel={true}

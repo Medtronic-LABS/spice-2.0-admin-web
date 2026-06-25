@@ -32,12 +32,24 @@ import { appEnv } from '../../config/env';
 
 const cryptoJsLib = (CryptoJS as typeof CryptoJS & { default?: typeof CryptoJS }).default || CryptoJS;
 
+const getStorageStringValue = (value: unknown): string | undefined => {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed || undefined;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return `${value}`;
+  }
+  return undefined;
+};
+
 const isValidStorageValue = (value: unknown): boolean => {
-  if (value === undefined || value === null) {
+  const stringValue = getStorageStringValue(value);
+  if (!stringValue) {
     return false;
   }
-  const normalized = String(value).trim().toLowerCase();
-  return Boolean(normalized) && !['undefined', 'null', 'nan'].includes(normalized);
+  const normalized = stringValue.toLowerCase();
+  return !['undefined', 'null', 'nan'].includes(normalized);
 };
 
 const getHeaderValue = (headers: Record<string, unknown>, headerName: string): string | undefined => {
@@ -47,7 +59,7 @@ const getHeaderValue = (headers: Record<string, unknown>, headerName: string): s
   }
   const rawValue = headers[key];
   const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
-  return isValidStorageValue(value) ? String(value) : undefined;
+  return isValidStorageValue(value) ? getStorageStringValue(value) : undefined;
 };
 
 const getCountryFallback = (organizations: any[] = []) => {

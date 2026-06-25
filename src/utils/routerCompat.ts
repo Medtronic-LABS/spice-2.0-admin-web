@@ -63,14 +63,14 @@ export const useHistoryCompat = (): HistoryLike => {
   const location = useLocation();
   const historyRef = useRef<HistoryLike | null>(null);
 
-  if (!historyRef.current) {
-    historyRef.current = {
-      location,
-      push: (to: NavigationTarget) => navigateTo(navigate, to),
-      replace: (to: NavigationTarget) => navigateTo(navigate, to, true),
-      goBack: () => navigate(-1),
-    };
-  }
+  historyRef.current ??= {
+    location,
+    push: (to: NavigationTarget) => navigateTo(navigate, to),
+    replace: (to: NavigationTarget) => navigateTo(navigate, to, true),
+    goBack: () => {
+      navigate(-1);
+    },
+  };
 
   historyRef.current.location = location;
 

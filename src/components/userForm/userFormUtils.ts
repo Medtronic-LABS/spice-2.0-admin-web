@@ -90,7 +90,14 @@ export const getSpiceRoleOptionsForHF = (
 interface IRole { name?: string; }
 
 export const getRoleFlags = (roles?: IRole | IRole[]) => {
-  const roleList = Array.isArray(roles) ? roles : roles ? [roles] : [];
+  let roleList: IRole[];
+  if (Array.isArray(roles)) {
+    roleList = roles;
+  } else if (roles) {
+    roleList = [roles];
+  } else {
+    roleList = [];
+  }
 
   const roleNames = new Set(roleList.map((r) => r?.name));
 

@@ -72,7 +72,7 @@ export const addNewFieldFn = ({
   isFieldNameChangable: boolean;
   hashFieldIdsWithTitle: any;
   hashFieldIdsWithFieldName: any;
-  accordianRef: React.MutableRefObject<any>;
+  accordianRef: React.RefObject<any>;
   setFormMeta: any;
   isDeletable?: boolean;
   isWorkFlowCustomization?: boolean;

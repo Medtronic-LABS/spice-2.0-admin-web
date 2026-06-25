@@ -28,13 +28,12 @@ const ModalViewer = React.memo(
       return null;
     }
     return ReactDOM.createPortal(
-      <div
+      <dialog
+        open
         className={`${styles.modal} modal modal-show show`}
         data-testid='modal-viewer'
         style={{ display: 'block' }}
-        role='dialog'
         aria-modal='true'
-        aria-hidden='false'
         tabIndex={-1}
       >
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
@@ -53,7 +52,7 @@ const ModalViewer = React.memo(
             {renderInsideForm ? <Form onSubmit={() => {}} render={() => children} /> : children}
           </div>
         </div>
-      </div>,
+      </dialog>,
       document.body
     );
   }

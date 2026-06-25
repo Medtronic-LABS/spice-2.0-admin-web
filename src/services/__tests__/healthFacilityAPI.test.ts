@@ -329,7 +329,7 @@ describe('Health Facility APIs', () => {
 
     mockAxios.onPost('/admin-service/villages-list').reply(200, {});
 
-    await fetchVillagesList(countryId, districtId, chiefdomId, chiefdomIds, appTypes);
+    await fetchVillagesList(countryId, districtId, chiefdomId, appTypes, chiefdomIds);
 
     expect(mockAxios.history.post.length).toBe(1);
     expect(mockAxios.history.post[0].url).toBe('/admin-service/villages-list');

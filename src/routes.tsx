@@ -468,9 +468,9 @@ export const AppRoutes = () => {
     <AppLayout>
       <Suspense fallback={<Loader />}>
         <Routes>
-          {protectedRoutes.map((route: IProtectedRoute, index: number) =>
+          {protectedRoutes.map((route: IProtectedRoute) =>
             route.authorisedRoles?.includes(role) || route.path === PROTECTED_ROUTES.landingPage ? (
-              <Route path={route.path} key={index} element={<RouteElement route={route} />} />
+              <Route path={route.path} key={route.path} element={<RouteElement route={route} />} />
             ) : null
           )}
           <Route path='*' element={<Navigate replace={true} to={PROTECTED_ROUTES.landingPage} />} />
@@ -480,8 +480,8 @@ export const AppRoutes = () => {
   ) : (
     <Suspense fallback={<Loader />}>
       <Routes>
-        {publicRoutes.map((route: any, index: number) => (
-          <Route path={route.path} key={index} element={<RouteElement route={route} />} />
+        {publicRoutes.map((route: any) => (
+          <Route path={route.path} key={route.path} element={<RouteElement route={route} />} />
         ))}
         <Route path='*' element={<Navigate replace={true} to={PUBLIC_ROUTES.login} />} />
       </Routes>

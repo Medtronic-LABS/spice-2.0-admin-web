@@ -27,7 +27,7 @@ export interface IModalProps {
   hideFooterButton?: boolean;
   handleFormSubmit: (values?: any) => void;
   handleDeactivate?: () => void;
-  render?: (form?: FormApi<any>, ref?: HTMLDivElement | null) => React.ReactElement;
+  render?: (form?: FormApi<any>, ref?: HTMLDialogElement | null) => React.ReactElement;
   mutators?: object;
   initialValues?: object;
   size?: IModalSize;
@@ -69,7 +69,7 @@ const ModalForm = React.memo(
     showCloseBtn = true
   }: IModalProps): React.ReactElement | null => {
     /** Reference to the modal div */
-    const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDialogElement>(null);
 
     if (!show) {
       return null;
@@ -78,14 +78,13 @@ const ModalForm = React.memo(
     const isFromCloseBtn = true;
 
     return ReactDOM.createPortal(
-      <div
+      <dialog
         ref={ref}
+        open
         className={`${styles.modal} modal modal-show show`}
         data-testid='modal-form'
         style={{ display: 'block' }}
-        role='dialog'
         aria-modal='true'
-        aria-hidden='false'
         tabIndex={-1}
       >
         <div className={`modal-dialog modal-dialog-centered ${size ? size : styles.modalWidth}`}>
@@ -182,7 +181,7 @@ const ModalForm = React.memo(
             />
           </div>
         </div>
-      </div>,
+      </dialog>,
       document.body
     );
   }
