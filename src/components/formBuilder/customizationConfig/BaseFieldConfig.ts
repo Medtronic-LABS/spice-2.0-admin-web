@@ -86,6 +86,7 @@ export const baseFieldMeta: IBaseFieldMeta = {
   optionsList: {
     order: 5.1,
     label: 'Options',
+    error: 'Please add an option and press enter to add',
     component: 'OPTION_LIST'
   },
   targetViews: {

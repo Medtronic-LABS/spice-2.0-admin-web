@@ -73,6 +73,13 @@ const BooleanOptionsRender = ({ name, obj, field }: any) => {
  * Renders the string options component based on the provided configuration.
  * @param {any} props - The props for the StringOptionsRender component
  */
+const getEmptyOptionsError = (field: string, inputProps: { label?: string; error?: string }) => {
+  if (field === 'optionsList' && inputProps?.error) {
+    return inputProps.error;
+  }
+  return `Please add the ${inputProps?.label?.toLowerCase()}`;
+};
+
 const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
   return (
     <Field
@@ -119,7 +126,7 @@ const StringOptionsRender = ({ name, obj, field, inputProps }: any) => {
             }
             label={inputProps?.label}
             disabled={!!inputProps.disabled}
-            error={!(obj[field] || []).length ? 'Please add the ' + inputProps?.label.toLowerCase() : ''}
+            error={!(obj[field] || []).length ? getEmptyOptionsError(field, inputProps) : ''}
             classChange={'optionsList'}
             allowOnlyNumbers={field === 'startsWith'}
           />

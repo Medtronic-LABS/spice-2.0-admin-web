@@ -165,6 +165,44 @@ describe('OptionList Component', () => {
     expect(tagInput).toBeInTheDocument();
   });
 
+  it('uses optionsList error from inputProps when options are empty', () => {
+    const props = {
+      ...stringProps,
+      inputProps: {
+        label: 'Options',
+        error: 'Please add an option and press enter to add',
+        disabled: false
+      }
+    };
+
+    renderWithForm(props, stringStore);
+
+    expect(mockChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: 'Please add an option and press enter to add'
+      })
+    );
+  });
+
+  it('uses generic error for non-optionsList fields', () => {
+    const startsWithProps = {
+      ...stringProps,
+      field: 'startsWith',
+      inputProps: {
+        label: 'Starts With',
+        disabled: false
+      }
+    };
+
+    renderWithForm(startsWithProps, stringStore);
+
+    expect(mockChildComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: 'Please add the starts with'
+      })
+    );
+  });
+
   it('handles startsWith field type correctly', () => {
     const startsWithProps = {
       ...stringProps,
