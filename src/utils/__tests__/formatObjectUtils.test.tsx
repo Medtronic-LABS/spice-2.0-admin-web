@@ -384,8 +384,7 @@ describe('formatObjectUtils', () => {
       const user = {
         ...mockUser,
         roles: [{ id: 1 }, { id: 2 }],
-        villages: [{ id: 1 }],
-        existingVillages: [{ id: 2 }]
+        villages: [{ id: 1 }, { id: 2 }]
       };
 
       const result = getUserPayload({
@@ -402,6 +401,27 @@ describe('formatObjectUtils', () => {
           supervisorId: 123
         })
       );
+    });
+
+    it('should derive villageIds from the consolidated villages field only', () => {
+      const user = {
+        ...mockUser,
+        roles: [{ id: 1, groupName: APPCONSTANTS.spiceRoleGrouped.spice }],
+        villages: [
+          { id: 10, name: 'Current HF Village' },
+          { id: 20, name: 'Other HF Village' },
+          { id: 30, name: 'Legacy Assigned Village' }
+        ]
+      };
+
+      const result = getUserPayload({
+        userFormData: [user],
+        countryId: 1,
+        isHFCreate: false,
+        appTypes: [APPCONSTANTS.appTypes.community]
+      });
+
+      expect(result[0].villageIds).toEqual([10, 20, 30]);
     });
 
     it('should handle redRisk role assignment', () => {

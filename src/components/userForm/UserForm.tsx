@@ -356,15 +356,6 @@ const UserForm = ({
    */
   const initialEditData = useMemo<Array<Partial<any>>>(
     () => {
-      const currentVillages: IVillages[] = [];
-      const existingVillages: IVillages[] = [];
-      (initialEditValue?.villages || []).forEach((village: IVillages) => {
-        if (Number(village?.healthFacilityId) === Number(healthFacilityId)) {
-          currentVillages.push(village);
-        } else {
-          existingVillages.push(village);
-        }
-      });
       let selectedDistricts: IDistrict[] = [];
       if (Array.isArray(initialEditValue?.districts)) {
         selectedDistricts = initialEditValue.districts;
@@ -383,8 +374,7 @@ const UserForm = ({
           ...initialEditValue,
           ...formUserData(initialEditValue),
           selectedVillages: initialEditValue?.villages,
-          existingVillages: isEdit && !isHF ? [] : existingVillages,
-          villages: isEdit && !isHF ? initialEditValue?.villages : currentVillages,
+          villages: initialEditValue?.villages,
           hfTenantIds: isEdit
             ? (initialEditValue?.organizations || [])
               .filter((hfDetail: any) => hfDetail.formName === 'healthfacility')
@@ -561,7 +551,6 @@ const UserForm = ({
         form.change(`${formName}[${index}].reportUserOrganization`, userData.reportUserOrganization || null);
         form.change(`${formName}[${index}].insightUserOrganization`, userData.insightUserOrganization || null);
         form.change(`${formName}[${index}].supervisor`, userData.supervisor || '');
-        form.change(`${formName}[${index}].existingVillages`, userData.villages || []);
         form.change(`${formName}[${index}].selectedVillages`, userData.selectedVillages || []);
         form.change(`${formName}[${index}].timezone`, userData.timezone || []);
         form.change(`${formName}[${index}].culture`, userData.culture || null);
@@ -1841,7 +1830,6 @@ const UserForm = ({
                   isHF={isHF}
                   isEdit={isEdit}
                   isProfile={isProfile}
-                  isActivating={isActivating}
                   peerSupervisors={peerSupervisors}
                   peerSupervisorLoading={peerSupervisorLoading}
                   autoFetched={autoFetched}

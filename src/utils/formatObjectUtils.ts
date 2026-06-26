@@ -131,10 +131,7 @@ export const getUserPayload = ({
       branches: branches
         .filter((b: IBranch) => b && typeof b.id === 'number')
         .map((b: IBranch) => b.id),
-      villageIds: [
-        ...(Array.isArray(user?.villages) ? user.villages : []),
-        ...(Array.isArray(user?.existingVillages) ? user.existingVillages : [])
-      ]
+      villageIds: [...(Array.isArray(user?.villages) ? user.villages : [])]
         .filter((v): v is { id: number } => v && typeof v.id === 'number')
         .map(v => v.id),
       village: user?.village,

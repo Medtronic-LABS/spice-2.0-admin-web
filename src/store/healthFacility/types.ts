@@ -256,7 +256,6 @@ export interface IHFUserGet {
   role?: IUserRole | IUserRole[];
   tenantId: number;
   villages?: number[];
-  existingVillages?: number[];
   supervisor: string | null;
   district?: { tenantId: string | number };
   county?: { tenantId: string | number };

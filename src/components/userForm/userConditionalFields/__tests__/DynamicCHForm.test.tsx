@@ -41,10 +41,21 @@ jest.mock('../../../formFields/SelectInput', () => ({
   default: ({ label }: any) => <div data-testid='select-input'>{label}</div>
 }));
 
+const mockMultiSelect = jest.fn();
+jest.mock('../../../multiSelect/MultiSelect', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    mockMultiSelect(props);
+    return <div data-testid='multi-select'>{props.label}</div>;
+  }
+}));
+
+const getAssignedVillagesProps = () =>
+  mockMultiSelect.mock.calls.find((call) => call[0].label === 'Assigned Villages')?.[0];
+
 const defaultInitialValues = {
   users: [
     {
-      existingVillages: [],
       selectedVillages: [],
       healthfacility: {},
       selectedRoles: []
@@ -66,7 +77,6 @@ const defaultProps = {
   isError: () => '',
   isChaUser: false,
   isChpUser: false,
-  isActivating: false,
   communityList: [],
   isHFCreate: false,
   showVillages: true
@@ -86,6 +96,7 @@ const renderWithForm = (
 describe('DynamicCHForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockMultiSelect.mockClear();
     mockIsCHPCHWSelected.mockReturnValue(false);
     mockDispatch.mockImplementation((action: any) => action);
   });
@@ -98,46 +109,6 @@ describe('DynamicCHForm', () => {
   it('renders Assigned Villages field when showVillages is true', () => {
     renderWithForm();
     expect(screen.getByText('Assigned Villages')).toBeInTheDocument();
-  });
-
-  it('does not render Existing Villages when mandatoryVillages is empty', () => {
-    renderWithForm();
-    expect(screen.queryByText('Existing Villages')).not.toBeInTheDocument();
-  });
-
-  it('renders Existing Villages when autoFetched[index] is true and mandatoryVillages has items', () => {
-    const initialValues = {
-      users: [
-        {
-          existingVillages: [{ id: 1, name: 'Village A' }],
-          selectedVillages: [],
-          healthfacility: {},
-          selectedRoles: []
-        }
-      ]
-    };
-    renderWithForm({ autoFetched: [true] }, initialValues);
-    expect(screen.getByText('Existing Villages')).toBeInTheDocument();
-  });
-
-  it('renders Existing Villages when isEdit and isHF are true and mandatoryVillages has items', () => {
-    const initialValues = {
-      users: [
-        {
-          existingVillages: [{ id: 1, name: 'Village A' }],
-          selectedVillages: [],
-          healthfacility: {},
-          selectedRoles: []
-        }
-      ]
-    };
-    renderWithForm({ isEdit: true, isHF: true }, initialValues);
-    expect(screen.getByText('Existing Villages')).toBeInTheDocument();
-  });
-
-  it('does not render Community Unit when isChaUser is false', () => {
-    renderWithForm();
-    expect(screen.queryByText('Community Unit')).not.toBeInTheDocument();
   });
 
   it('renders Community Unit when isChaUser is true', () => {
@@ -163,26 +134,9 @@ describe('DynamicCHForm', () => {
     expect(screen.getByText('Community Unit')).toBeInTheDocument();
   });
 
-  it('does not render Existing Villages when only isEdit is true but isHF is false and no mandatory villages', () => {
-    renderWithForm({ isEdit: true, isHF: false });
-    expect(screen.queryByText('Existing Villages')).not.toBeInTheDocument();
-  });
-
-  it('renders with correct index for form values', () => {
-    const initialValues = {
-      users: [
-        { existingVillages: [], selectedVillages: [], healthfacility: {}, selectedRoles: [] },
-        {
-          existingVillages: [{ id: 2, name: 'Village B' }],
-          selectedVillages: [],
-          healthfacility: {},
-          selectedRoles: []
-        }
-      ]
-    };
-    renderWithForm({ index: 1, name: 'users[1]', autoFetched: [false, true] }, initialValues);
-    expect(screen.getByText('Assigned Villages')).toBeInTheDocument();
-    expect(screen.getByText('Existing Villages')).toBeInTheDocument();
+  it('does not render Community Unit when isChaUser is false', () => {
+    renderWithForm();
+    expect(screen.queryByText('Community Unit')).not.toBeInTheDocument();
   });
 
   it('dispatches fetchSubVillagesRequest and fetchBranchesByUnionRequest when there is exactly one village option and Shastiya Kormi role is selected', () => {
@@ -210,7 +164,6 @@ describe('DynamicCHForm', () => {
     const initialValues = {
       users: [
         {
-          existingVillages: [],
           selectedVillages: [{ id: 10, name: 'Village A' }, { id: 20, name: 'Village B' }],
           healthfacility: {},
           selectedRoles: []
@@ -258,7 +211,6 @@ describe('DynamicCHForm', () => {
     const initialValues = {
       users: [
         {
-          existingVillages: [],
           selectedVillages: [],
           healthfacility: {},
           selectedRoles: []
@@ -277,7 +229,6 @@ describe('DynamicCHForm', () => {
     const initialValues = {
       users: [
         {
-          existingVillages: [],
           selectedVillages: [],
           healthfacility: {},
           selectedRoles: []
@@ -290,5 +241,144 @@ describe('DynamicCHForm', () => {
     );
     expect(screen.getByText('Assigned Villages')).toBeInTheDocument();
     unmount();
+  });
+
+  describe('assigned village options in edit and auto-fetch mode', () => {
+    const fetchedVillages = [
+      { id: 1, name: 'Village A', healthFacilityId: 10 },
+      { id: 2, name: 'Village B', healthFacilityId: 20 },
+      { id: 3, name: 'Village C', healthFacilityId: 10 }
+    ];
+
+    it('in edit mode passes the full fetched village list without HF filtering', () => {
+      renderWithForm(
+        {
+          isEdit: true,
+          isHF: true,
+          villages: [fetchedVillages] as any,
+          autoFetched: [false]
+        },
+        {
+          users: [
+            {
+              selectedVillages: fetchedVillages,
+              healthfacility: [{ formDataId: 10 }],
+              selectedRoles: []
+            }
+          ]
+        }
+      );
+
+      expect(getAssignedVillagesProps()?.options).toEqual(fetchedVillages);
+    });
+
+    it('in auto-fetch mode passes the full fetched village list without HF filtering', () => {
+      renderWithForm(
+        {
+          isEdit: false,
+          isHF: false,
+          villages: [fetchedVillages] as any,
+          autoFetched: [true]
+        },
+        {
+          users: [
+            {
+              selectedVillages: fetchedVillages,
+              healthfacility: [{ formDataId: 10 }],
+              selectedRoles: []
+            }
+          ]
+        }
+      );
+
+      expect(getAssignedVillagesProps()?.options).toEqual(fetchedVillages);
+    });
+
+    it('in edit mode merges assigned villages missing from the fetched list into options', () => {
+      const assignedVillages = [
+        { id: 1, name: 'Village A', healthFacilityId: 10 },
+        { id: 99, name: 'Legacy Village', healthFacilityId: 20 }
+      ];
+      const partialFetchedList = [{ id: 1, name: 'Village A', healthFacilityId: 10 }];
+
+      renderWithForm(
+        {
+          isEdit: true,
+          villages: [partialFetchedList] as any,
+          autoFetched: [false]
+        },
+        {
+          users: [
+            {
+              selectedVillages: assignedVillages,
+              healthfacility: {},
+              selectedRoles: []
+            }
+          ]
+        }
+      );
+
+      expect(getAssignedVillagesProps()?.options).toEqual([
+        { id: 1, name: 'Village A', healthFacilityId: 10 },
+        { id: 99, name: 'Legacy Village', healthFacilityId: 20 }
+      ]);
+    });
+
+    it('in auto-fetch mode merges assigned villages missing from the fetched list into options', () => {
+      const assignedVillages = [
+        { id: 5, name: 'Assigned Village', healthFacilityId: 30 },
+        { id: 6, name: 'Another Assigned Village', healthFacilityId: 40 }
+      ];
+      const partialFetchedList = [{ id: 5, name: 'Assigned Village', healthFacilityId: 30 }];
+
+      renderWithForm(
+        {
+          isEdit: false,
+          villages: [partialFetchedList] as any,
+          autoFetched: [true]
+        },
+        {
+          users: [
+            {
+              selectedVillages: assignedVillages,
+              healthfacility: {},
+              selectedRoles: []
+            }
+          ]
+        }
+      );
+
+      expect(getAssignedVillagesProps()?.options).toEqual([
+        { id: 5, name: 'Assigned Village', healthFacilityId: 30 },
+        { id: 6, name: 'Another Assigned Village', healthFacilityId: 40 }
+      ]);
+    });
+
+    it('in create mode uses the fetched village list as-is without merging selectedVillages', () => {
+      const fetchedList = [{ id: 1, name: 'Village A', healthFacilityId: 10 }];
+      const selectedVillages = [
+        { id: 1, name: 'Village A', healthFacilityId: 10 },
+        { id: 99, name: 'Legacy Village', healthFacilityId: 20 }
+      ];
+
+      renderWithForm(
+        {
+          isEdit: false,
+          villages: [fetchedList] as any,
+          autoFetched: [false]
+        },
+        {
+          users: [
+            {
+              selectedVillages,
+              healthfacility: {},
+              selectedRoles: []
+            }
+          ]
+        }
+      );
+
+      expect(getAssignedVillagesProps()?.options).toEqual(fetchedList);
+    });
   });
 });

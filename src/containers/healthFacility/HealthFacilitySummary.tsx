@@ -700,9 +700,7 @@ const HealthFacilitySummary = (): React.ReactElement => {
         isActive: !newData.active,
         countryId: countryIdValue,
         healthFacilityId,
-        villageIds: [...(newData?.villages || []), ...(newData?.existingVillages || [])]?.map(
-          (village: any) => village.id
-        ),
+        villageIds: (newData?.villages || [])?.map((village: any) => village.id),
         peerSupervisorId: newData?.supervisor?.id,
         appTypes,
         successCb: () => {
