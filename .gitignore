@@ -41,6 +41,7 @@ Thumbs.db
 
 # production
 /build
+public/build-info.json
 
 # Applications
 *.app

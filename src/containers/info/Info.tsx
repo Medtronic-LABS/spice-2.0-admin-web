@@ -30,7 +30,33 @@ const SERVICE_REPO_MAP: Record<string, string> = {
   'user-service': 'user-service'
 };
 
-const GITLAB_HOSTS = new Set(['uhis-staging.brac.net', 'uhis.brac.net']);
+const BRAC_DEPLOYMENT_HOSTS = ['uhis-staging.brac.net', 'uhis.brac.net'] as const;
+const TRAINING_DEPLOYMENT_HOST = 'spice-training.uhis.labsplatform.com';
+
+const GITLAB_HOSTS = new Set<string>(BRAC_DEPLOYMENT_HOSTS);
+const FHIR_SERVICE_ACTUATOR_HOSTS = new Set<string>([...BRAC_DEPLOYMENT_HOSTS, TRAINING_DEPLOYMENT_HOST]);
+
+const FHIR_SERVICE_ACTUATOR_NAME_MAP: Record<string, string> = {
+  'fhir-mapper': 'fhirmapper-service',
+  'fhir-server': 'fhirserver-service'
+};
+
+const normalizeHost = (hostOrUrl: string): string =>
+  hostOrUrl.replace(/^https?:\/\//, '').replace(/\/$/, '').split('/')[0];
+
+const isFhirServiceActuatorHost = (host: string = globalThis.location.host): boolean =>
+  FHIR_SERVICE_ACTUATOR_HOSTS.has(normalizeHost(host));
+
+export const resolveActuatorServiceName = (
+  serviceName: string,
+  host: string = globalThis.location.host
+): string => {
+  if (!isFhirServiceActuatorHost(host)) {
+    return serviceName;
+  }
+
+  return FHIR_SERVICE_ACTUATOR_NAME_MAP[serviceName] ?? serviceName;
+};
 
 export const getCommitUrl = (
   serviceName: string,
@@ -47,7 +73,7 @@ export const getCommitUrl = (
     return null;
   }
 
-  if (GITLAB_HOSTS.has(host)) {
+  if (GITLAB_HOSTS.has(normalizeHost(host))) {
     return `https://gitlab.brac.net/non-erp/${repoName}/-/commit/${commitId}`;
   }
 
@@ -71,7 +97,8 @@ const toServiceRow = (serviceName: string, info?: IActuatorInfoResponse | null):
 
 const fetchServiceInfo = async (serviceName: string): Promise<IServiceBuildRow> => {
   try {
-    const response = await fetch(getServiceInfoUrl(serviceName));
+    const actuatorServiceName = resolveActuatorServiceName(serviceName);
+    const response = await fetch(getServiceInfoUrl(actuatorServiceName));
 
     const info = response.ok ? ((await response.json()) as IActuatorInfoResponse) : undefined;
 

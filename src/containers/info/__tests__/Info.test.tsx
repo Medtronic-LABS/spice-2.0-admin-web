@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import APPCONSTANTS, { BACKEND_SERVICES } from '../../../constants/appConstants';
-import Info, { getCommitUrl } from '../Info';
+import Info, { getCommitUrl, resolveActuatorServiceName } from '../Info';
 
 jest.mock('../../../assets/images/app-logo-name.png', () => 'logo.png');
 
@@ -179,6 +179,32 @@ describe('Info', () => {
 
   it('returns null when commit is unavailable', () => {
     expect(getCommitUrl('spice-web', APPCONSTANTS.NOT_AVAILABLE, 'localhost')).toBeNull();
+  });
+
+  describe('resolveActuatorServiceName', () => {
+    it('maps fhir services on staging, production, and training hosts', () => {
+      const hosts = ['uhis.brac.net', 'uhis-staging.brac.net', 'spice-training.uhis.labsplatform.com'];
+
+      hosts.forEach((host) => {
+        expect(resolveActuatorServiceName('fhir-mapper', host)).toBe('fhirmapper-service');
+        expect(resolveActuatorServiceName('fhir-server', host)).toBe('fhirserver-service');
+      });
+    });
+
+    it('accepts training host with protocol prefix', () => {
+      expect(resolveActuatorServiceName('fhir-mapper', 'https://spice-training.uhis.labsplatform.com')).toBe(
+        'fhirmapper-service'
+      );
+      expect(resolveActuatorServiceName('fhir-server', 'https://spice-training.uhis.labsplatform.com')).toBe(
+        'fhirserver-service'
+      );
+    });
+
+    it('keeps original service names on other hosts', () => {
+      expect(resolveActuatorServiceName('fhir-mapper', 'localhost')).toBe('fhir-mapper');
+      expect(resolveActuatorServiceName('fhir-server', 'localhost')).toBe('fhir-server');
+      expect(resolveActuatorServiceName('user-service', 'uhis.brac.net')).toBe('user-service');
+    });
   });
 
   it('renders one row for spice-web and each backend service', async () => {
