@@ -3,8 +3,16 @@ const fs = require('fs');
 const path = require('path');
 
 const getGitCommit = () => {
+  if (process.env.CI_COMMIT_SHA) {
+    return process.env.CI_COMMIT_SHA;
+  }
+
+  if (process.env.BITBUCKET_COMMIT) {
+    return process.env.BITBUCKET_COMMIT;
+  }
+
   try {
-    return execSync('git rev-parse HEAD').toString().trim();
+    return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
   } catch {
     return 'unknown';
   }
