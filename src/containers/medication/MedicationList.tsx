@@ -143,7 +143,8 @@ const MedicationList = (): React.ReactElement => {
       classification: value.classificationId
         ? { id: value.classificationId, name: value.classificationName }
         : undefined,
-      dosage_form: value.dosageFormId ? { id: value.dosageFormId, name: value.dosageFormName } : undefined
+      dosage_form: value.dosageFormId ? { id: value.dosageFormId, name: value.dosageFormName } : undefined,
+      recommended: value.recommended
     };
     setMedicationInitialValues(editValue);
   };
@@ -203,7 +204,8 @@ const MedicationList = (): React.ReactElement => {
       groups: isGroup && data?.groups.length ? data.groups : undefined,
       name: data?.name,
       id: data?.id,
-      codeDetails
+      codeDetails,
+      recommended: data?.recommended
     };
     dispatch(
       updateMedication({

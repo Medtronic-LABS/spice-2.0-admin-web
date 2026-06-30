@@ -132,6 +132,7 @@ const LabTestCustomizationLayout = () => {
       displayOrder: 1,
       countryId: Number(regionId),
       tenantId: null,
+      recommended: false,
       ...state
     };
     dispatch(

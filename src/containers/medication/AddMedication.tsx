@@ -280,7 +280,8 @@ const AddMedication = (props: Props): React.ReactElement => {
               name: medicationData.category.name
             }
           : undefined,
-      groups: isGroup && medicationData?.groups?.length ? medicationData.groups : undefined
+      groups: isGroup && medicationData?.groups?.length ? medicationData.groups : undefined,
+      recommended: medicationData.recommended
     }));
 
     dispatch(

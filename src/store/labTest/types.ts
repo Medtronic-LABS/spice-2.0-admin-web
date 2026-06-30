@@ -13,6 +13,7 @@ export interface ILabTest {
   formInput: string | any;
   updatedAt?: string;
   displayOrder?: number;
+  recommended: boolean;
 }
 
 export interface ILabTestCustomizationRequest {

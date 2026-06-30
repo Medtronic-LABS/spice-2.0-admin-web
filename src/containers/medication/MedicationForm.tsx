@@ -38,6 +38,7 @@ import {
 import { IList } from '../../store/medication/types';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
 import MultiSelect from '../../components/multiSelect/MultiSelect';
+import Checkbox from '../../components/formFields/Checkbox';
 
 export interface IMedicationDataFormValues {
   id?: number;
@@ -49,6 +50,7 @@ export interface IMedicationDataFormValues {
   category: IList;
   groups?: IList[];
   country: string | IList;
+  recommended?: boolean;
 }
 
 export interface ICodeDetails {
@@ -609,6 +611,18 @@ const MedicationForm = ({
     );
   };
 
+  const renderRecommended = (name: any, index: number) => {
+    return (
+      <div className={`${disableOptions ? 'col-6' : 'col-6 col-lg-3'}`}>
+        <Field
+          name={`${name}.recommended`}
+          type='checkbox'
+          render={({ input }) => <Checkbox label='Recommended' {...input} />}
+        />
+      </div>
+    );
+  };
+
   /**
    * Effect hook to set brand options when classification options or initial edit data change
    */
@@ -654,6 +668,7 @@ const MedicationForm = ({
                     {renderDosageForm(name, index)}
                     {isCategories && renderCategoryForm(name, index)}
                     {isGroupList && renderGroupForm(name, index)}
+                    {renderRecommended(name, index)}
                   </div>
                   {renderActionIcons(fields, index, isFirstChild, isLastChild)}
                 </div>

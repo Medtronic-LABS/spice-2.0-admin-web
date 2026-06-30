@@ -40,6 +40,7 @@ export interface IMedicationList {
     name: string;
   };
   groups: IList[];
+  recommended?: boolean;
 }
 
 export interface IMedicationState {
@@ -178,6 +179,7 @@ export interface IMedicationPayload {
   category?: IList;
   groups?: IList[];
   id?: string;
+  recommended?: boolean;
 }
 
 export interface ICodeDetailsPayload {

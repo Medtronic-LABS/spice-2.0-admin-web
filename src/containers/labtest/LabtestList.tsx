@@ -55,6 +55,7 @@ export interface IRouteDataForCustomizLabTest {
   countryId: number;
   tenantId: string;
   codeDetails: ICodeDetails;
+  recommended: boolean;
 }
 
 interface IMatchProps extends RouteComponentProps<IMatchParams> {}

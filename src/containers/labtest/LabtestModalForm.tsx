@@ -4,6 +4,7 @@ import TextInput from '../../components/formFields/TextInput';
 import { composeValidators, containsOnlyLettersAndNumbers, minLength, required } from '../../utils/validation';
 import { FormApi } from 'final-form';
 import useAppTypeConfigs from '../../hooks/appTypeBasedConfigs';
+import Checkbox from '../../components/formFields/Checkbox';
 
 /**
  * Interface for LabtestModalForm props
@@ -72,6 +73,13 @@ const LabtestModalForm = ({ isEdit = false, form }: ILabtestModalFormProps): Rea
                 error={(meta.touched && meta.error) || undefined}
               />
             )}
+          />
+        </div>
+        <div className='col-12 col-lg-6 d-flex'>
+          <Field
+            name='recommended'
+            type='checkbox'
+            render={({ input }) => <Checkbox label='Recommended' {...input} />}
           />
         </div>
       </div>
