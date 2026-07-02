@@ -25,7 +25,10 @@
 build-staging:
   <<: *build_template
   variables:
-    NODE_ENV: "staging"
+    # Do NOT set NODE_ENV=production here. `vite build` already bakes production
+    # mode into the bundle (so apiBaseUrl uses REACT_APP_BASE_URL). With
+    # NODE_ENV=production, the `npx update-browserslist-db` step's `npm uninstall`
+    # prunes devDependencies (vite) -> "vite: not found" at build time.
     CI: "false"
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'

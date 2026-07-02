@@ -5,4 +5,3 @@ stages:
 include:
   - '/.gitlab/build.yml'
   - '/.gitlab/deploy.yml'
-  
