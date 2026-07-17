@@ -36,6 +36,10 @@ jest.mock('../../../assets/images/insights.svg', () => ({
   ReactComponent: () => <div>InsightsLogo</div>
 }));
 
+jest.mock('../../../assets/images/coaching.svg', () => ({
+  ReactComponent: () => <div>CoachingLogo</div>
+}));
+
 // Mock route util
 jest.mock('../../../utils/routeUtil', () => ({
   goToUrl: jest.fn()
@@ -66,6 +70,7 @@ describe('LandingPage', () => {
 
   beforeAll(() => {
     process.env.REACT_APP_CFR_WEB_URL = 'http://localhost:8000';
+    process.env.REACT_APP_MICRO_COACHING_DASHBOARD_URL = 'http://localhost:5173/medtronics-ui';
   });
 
   beforeEach(() => {
@@ -125,6 +130,36 @@ describe('LandingPage', () => {
       </Provider>
     );
     expect(goToUrl).toHaveBeenCalledWith(process.env.REACT_APP_CFR_WEB_URL);
+  });
+
+  it('should render the LandingPage component correctly with Micro Coaching Dashboard suite access only', async () => {
+    const localStore = mockStore({
+      user: {
+        user: {
+          ...initialState.user.user,
+          tenantId: '10',
+          userId: '42',
+          email: 'coach@example.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          role: APPCONSTANTS.ROLES.SUPER_ADMIN,
+          suiteAccess: [APPCONSTANTS.SUITE_ACCESS.MICRO_COACHING_DASHBOARD]
+        }
+      },
+      regionCom: {
+        ...initialState.regionCom
+      }
+    });
+    render(
+      <Provider store={localStore}>
+        <MemoryRouter>
+          <LandingPage />
+        </MemoryRouter>
+      </Provider>
+    );
+    expect(goToUrl).toHaveBeenCalledWith(
+      'http://localhost:5173/medtronics-ui?tenantId=10&userId=42&email=coach%40example.com&firstName=John&lastName=Doe&role=SUPER_ADMIN'
+    );
   });
 
   it('should render the LandingPage component correctly with Admin suite access', async () => {

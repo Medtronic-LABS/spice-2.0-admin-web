@@ -46,6 +46,10 @@ jest.mock('../assets/images/insights.svg', () => ({
   ReactComponent: () => <div>InsightsLogo</div>
 }));
 
+jest.mock('../assets/images/coaching.svg', () => ({
+  ReactComponent: () => <div>CoachingLogo</div>
+}));
+
 jest.mock('../components/loader/Loader', () => () => <div data-testid='loader'>Loader</div>);
 
 const mockStore = configureStore();

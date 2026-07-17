@@ -27,7 +27,8 @@ const APPCONSTANTS = {
   SUITE_ACCESS: {
     ADMIN: 'admin',
     CFR: 'cfr',
-    INSIGHTS: 'insights'
+    INSIGHTS: 'insights',
+    MICRO_COACHING_DASHBOARD: 'micro-coaching-dashboard'
   },
   SPICE_ROLE_SUITE_ACCESS: {
     mob: 'mob',

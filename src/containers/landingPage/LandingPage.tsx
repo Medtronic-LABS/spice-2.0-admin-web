@@ -2,11 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 
 import { useSelector } from 'react-redux';
-import { roleSelector, getUserSuiteAccessSelector } from '../../store/user/selectors';
+import { roleSelector, getUserSuiteAccessSelector, userDataSelector } from '../../store/user/selectors';
 import { HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
 import { ReactComponent as ReportingPortalLogo } from '../../assets/images/reports.svg';
 import { ReactComponent as InsightsLogo } from '../../assets/images/insights.svg';
+import { ReactComponent as CoachingLogo } from '../../assets/images/coaching.svg';
 
 import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
@@ -21,7 +22,7 @@ import { trackGoogleAnalyticsEvent } from '../../utils/analytics';
 import { appEnv } from '../../config/env';
 import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
-const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
+const { ADMIN, CFR, INSIGHTS, MICRO_COACHING_DASHBOARD } = APPCONSTANTS.SUITE_ACCESS;
 
 interface ISpiceSuite {
   id: number;
@@ -43,41 +44,67 @@ const LandingPage = (): React.ReactElement => {
   const dispatch = useAppDispatch();
   const role = useSelector(roleSelector);
   const userSuiteAccess = useSelector(getUserSuiteAccessSelector);
+  const user = useSelector(userDataSelector);
   const [suites, setSuites] = useState<ISpiceSuite[]>([]);
 
   /**
    * Memoized value to spiceSuites with dependency on role
    */
   const spiceSuites: ISpiceSuite[] = useMemo(
-    () => [
-      {
-        id: 1,
-        name: 'Admin',
-        icon: AdminPortalLogo,
-        hasDomain: false,
-        suiteAccessName: ADMIN,
-        domainUrl: HOME_PAGE_BY_ROLE[role],
-        disabled: false
-      },
-      {
-        id: 2,
-        name: 'Reports',
-        icon: ReportingPortalLogo,
-        hasDomain: true,
-        suiteAccessName: CFR,
-        domainUrl: appEnv.cfrWebUrl,
-        disabled: false
-      },
-      {
-        id: 3,
-        name: 'Insights',
-        icon: InsightsLogo,
-        hasDomain: true,
-        suiteAccessName: INSIGHTS,
-        domainUrl: appEnv.insightWebUrl
+    () => {
+      let coachingUrl = appEnv.microCoachingDashboardUrl || '';
+      if (coachingUrl && user) {
+        try {
+          const url = new URL(coachingUrl, window.location.origin);
+          url.searchParams.append('tenantId', String(user.tenantId || ''));
+          url.searchParams.append('userId', String(user.userId || ''));
+          url.searchParams.append('email', user.email || '');
+          url.searchParams.append('firstName', user.firstName || '');
+          url.searchParams.append('lastName', user.lastName || '');
+          url.searchParams.append('role', role || '');
+          coachingUrl = url.toString();
+        } catch (e) {
+          console.error(e);
+        }
       }
-    ],
-    [role]
+      return [
+        {
+          id: 1,
+          name: 'Admin',
+          icon: AdminPortalLogo,
+          hasDomain: false,
+          suiteAccessName: ADMIN,
+          domainUrl: HOME_PAGE_BY_ROLE[role],
+          disabled: false
+        },
+        {
+          id: 2,
+          name: 'Reports',
+          icon: ReportingPortalLogo,
+          hasDomain: true,
+          suiteAccessName: CFR,
+          domainUrl: appEnv.cfrWebUrl,
+          disabled: false
+        },
+        {
+          id: 3,
+          name: 'Insights',
+          icon: InsightsLogo,
+          hasDomain: true,
+          suiteAccessName: INSIGHTS,
+          domainUrl: appEnv.insightWebUrl
+        },
+        {
+          id: 4,
+          name: 'Micro Coaching Dashboard',
+          icon: CoachingLogo,
+          hasDomain: true,
+          suiteAccessName: MICRO_COACHING_DASHBOARD,
+          domainUrl: coachingUrl
+        }
+      ];
+    },
+    [role, user]
   );
 
   /**

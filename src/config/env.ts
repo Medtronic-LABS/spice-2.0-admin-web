@@ -55,6 +55,9 @@ export const appEnv = {
   get insightWebUrl(): string | undefined {
     return readEnv('REACT_APP_INSIGHT_WEB_URL');
   },
+  get microCoachingDashboardUrl(): string | undefined {
+    return readEnv('REACT_APP_MICRO_COACHING_DASHBOARD_URL');
+  },
   get passwordHashKey(): string | undefined {
     return readEnv('REACT_APP_PASSWORD_HASH_KEY');
   },
