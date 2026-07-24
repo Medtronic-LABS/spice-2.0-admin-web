@@ -55,6 +55,9 @@ export const appEnv = {
   get insightWebUrl(): string | undefined {
     return readEnv('REACT_APP_INSIGHT_WEB_URL');
   },
+  get coachingWebUrl(): string | undefined {
+    return readEnv('REACT_APP_COACHING_WEB_URL');
+  },
   get passwordHashKey(): string | undefined {
     return readEnv('REACT_APP_PASSWORD_HASH_KEY');
   },

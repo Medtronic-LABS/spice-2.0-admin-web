@@ -7,6 +7,7 @@ import { HOME_PAGE_BY_ROLE } from '../../constants/route';
 import { ReactComponent as AdminPortalLogo } from '../../assets/images/admin.svg';
 import { ReactComponent as ReportingPortalLogo } from '../../assets/images/reports.svg';
 import { ReactComponent as InsightsLogo } from '../../assets/images/insights.svg';
+import { ReactComponent as CoachingLogo } from '../../assets/images/coaching.svg';
 
 import APPCONSTANTS, { APP_TYPE_NAME } from '../../constants/appConstants';
 import styles from './LandingPage.module.scss';
@@ -21,7 +22,7 @@ import { trackGoogleAnalyticsEvent } from '../../utils/analytics';
 import { appEnv } from '../../config/env';
 import { useHistoryCompat as useHistory } from '../../utils/routerCompat';
 
-const { ADMIN, CFR, INSIGHTS } = APPCONSTANTS.SUITE_ACCESS;
+const { ADMIN, CFR, INSIGHTS, COACHING } = APPCONSTANTS.SUITE_ACCESS;
 
 interface ISpiceSuite {
   id: number;
@@ -75,6 +76,14 @@ const LandingPage = (): React.ReactElement => {
         hasDomain: true,
         suiteAccessName: INSIGHTS,
         domainUrl: appEnv.insightWebUrl
+      },
+      {
+        id: 4,
+        name: 'Micro Coaching',
+        icon: CoachingLogo,
+        hasDomain: true,
+        suiteAccessName: COACHING,
+        domainUrl: appEnv.coachingWebUrl
       }
     ],
     [role]
