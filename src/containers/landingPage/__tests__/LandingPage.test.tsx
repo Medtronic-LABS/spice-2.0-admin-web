@@ -36,6 +36,10 @@ jest.mock('../../../assets/images/insights.svg', () => ({
   ReactComponent: () => <div>InsightsLogo</div>
 }));
 
+jest.mock('../../../assets/images/coaching.svg', () => ({
+  ReactComponent: () => <div>CoachingLogo</div>
+}));
+
 // Mock route util
 jest.mock('../../../utils/routeUtil', () => ({
   goToUrl: jest.fn()
